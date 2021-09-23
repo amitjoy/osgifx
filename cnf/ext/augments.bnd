@@ -1,0 +1,5 @@
+-augment.1 = \
+	org.eclipse.equinox.preferences; \
+		capability:='osgi.service; \
+			osgi.extender=osgi.service; \
+			objectClass=org.eclipse.core.runtime.preferences.IPreferencesService'
