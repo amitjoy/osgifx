@@ -1,0 +1,26 @@
+# Bnd
+
+biz.aQute:biz.aQute.osgi.conditionaltarget:1.7.0
+
+# Apache
+
+org.apache.commons:commons-lang3:3.12.0
+org.apache.commons:org.apache.commons.collections:3.2.0.v2013030210310
+org.apache.sling:org.apache.sling.commons.johnzon:1.2.6
+
+# OSGi
+
+org.apache.felix:org.apache.felix.cm.json:1.0.6
+org.apache.felix:org.apache.felix.configadmin:1.9.22
+org.apache.felix:org.apache.felix.configurator:1.0.14
+org.apache.felix:org.apache.felix.converter:1.0.18
+org.apache.felix:org.apache.felix.coordinator:1.0.2
+org.apache.felix:org.apache.felix.eventadmin:1.6.2
+org.apache.felix:org.apache.felix.gogo.command:1.1.2
+org.apache.felix:org.apache.felix.gogo.runtime:1.1.4
+org.apache.felix:org.apache.felix.gogo.shell:1.1.4
+org.apache.felix:org.apache.felix.rootcause:0.2.0
+org.apache.felix:org.apache.felix.scr:2.1.30
+org.osgi:org.osgi.util.function:1.1.0
+org.osgi:org.osgi.util.promise:1.1.1
+org.osgi:org.osgi.util.pushstream:1.0.1

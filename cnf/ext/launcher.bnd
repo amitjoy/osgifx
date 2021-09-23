@@ -1,0 +1,72 @@
+-runrepos                       =         Workspace, Runtime, e(fx)clipse
+-runfw                          =         org.eclipse.osgi
+-runkeep                        =         false
+-runtrace                       =         true 
+-runee                          =         JavaSE-1.8
+-runstartlevel                  =         begin = 0, step = -1, order = sortbynameversion
+-runvm                          =         -ea
+-runsystemcapabilities          =         ${native_capability}
+-runpath.efx                    =         org.eclipse.fx.osgi
+-runproperties.scr              =         ds.log.enabled=false
+-runproperties.workspace        =         osgi.instance.area.default=${target-dir} 
+
+-runproperties.efx              =         osgi.framework.extensions=org.eclipse.fx.osgi,\
+                                          eclipse.application.launchDefault=true,\
+                                          osgi.compatibility.eagerStart.LazyActivation=true,\
+                                          osgi.compatibility.errorOnFailedStart=false
+
+-runsystempackages              =         javax.annotation, \
+                                          javax.crypto,\
+                                          javax.crypto.interfaces,\
+                                          javax.crypto.spec,\
+                                          javax.imageio,\
+                                          javax.imageio.stream,\
+                                          javax.imageio.event,\
+                                          javax.imageio.metadata,\
+                                          javax.imageio.plugins,\
+                                          javax.imageio.plugins.bmp,\
+                                          javax.imageio.plugins.jpeg,\
+                                          javax.imageio.spi,\
+                                          javax.security,\
+                                          javax.security.auth,\
+                                          javax.security.auth.callback,\
+                                          javax.security.auth.kerberos,\
+                                          javax.security.auth.login,\
+                                          javax.security.auth.spi,\
+                                          javax.security.auth.x500,\
+                                          javax.security.cert,\
+                                          javax.security.sasl,\
+                                          javafx.animation,\
+                                          javafx.application,\
+                                          javafx.beans,\
+                                          javafx.beans.binding,\
+                                          javafx.beans.property,\
+                                          javafx.beans.property.adapter,\
+                                          javafx.beans.value,\
+                                          javafx.collections,\
+                                          javafx.collections.transformation,\
+                                          javafx.concurrent,\
+                                          javafx.css,\
+                                          javafx.embed.swing,\
+                                          javafx.event,\
+                                          javafx.fxml,\
+                                          javafx.geometry,\
+                                          javafx.print,\
+                                          javafx.scene,\
+                                          javafx.scene.canvas,\
+                                          javafx.scene.chart,\
+                                          javafx.scene.control,\
+                                          javafx.scene.control.cell,\
+                                          javafx.scene.effect,\
+                                          javafx.scene.image,\
+                                          javafx.scene.input,\
+                                          javafx.scene.layout,\
+                                          javafx.scene.media,\
+                                          javafx.scene.paint,\
+                                          javafx.scene.shape,\
+                                          javafx.scene.text,\
+                                          javafx.scene.transform,\
+                                          javafx.scene.web,\
+                                          javafx.stage,\
+                                          javafx.util,\
+                                          javafx.util.converter

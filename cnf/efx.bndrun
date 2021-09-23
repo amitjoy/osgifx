@@ -1,0 +1,10 @@
+efx: \
+	${bundles.deps},\
+	${bundles.e4.efxclipse},\
+	${bundles.equinox},\
+	${bundles.eclipse.emf},\
+	${bundles.eclipse.core},\
+	${bundles.e4.core}
+
+requirement.efx: ${replacelist;${efx};.+;bnd.identity\\;id='$0'}
+requirement.gogo: ${replacelist;${bundles.console};.+;bnd.identity\\;id='$0'}
