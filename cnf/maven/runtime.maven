@@ -1,3 +1,7 @@
+# UI
+
+org.controlsfx:controlsfx:8.40.18
+
 # Bnd
 
 biz.aQute:biz.aQute.osgi.conditionaltarget:1.7.0
