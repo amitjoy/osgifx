@@ -1,0 +1,16 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+-privatepackage     : \
+                      styles,\
+                      in.bytehue.osgifx.console.application.*
+-includeresource    : \
+                      plugin.xml = _plugin.xml,\
+					  Application.e4xmi = Application.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic
+-buildpath          : \
+                      ${bundles.e4.core},\
+                      ${bundles.e4.efxclipse},\
+                      controlsfx,\
+                      de.jensd:fontawesomefx;packages=*,\
+                      javax.inject
