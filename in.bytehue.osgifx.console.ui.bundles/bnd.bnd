@@ -6,4 +6,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : ${bundles.ui}
--privatepackage     : in.bytehue.osgifx.console.ui.bundles
+-privatepackage     : in.bytehue.osgifx.console.ui.*

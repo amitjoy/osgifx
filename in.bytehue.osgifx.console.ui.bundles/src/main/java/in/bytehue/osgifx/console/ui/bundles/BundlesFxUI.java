@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.fx.core.URLUtils;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.log.Logger;
+import org.osgi.framework.BundleContext;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,9 +18,13 @@ import javafx.scene.layout.VBox;
 
 public class BundlesFxUI {
 
-    @Inject
     @Log
+    @Inject
     private Logger logger;
+
+    @Inject
+    @Named("in.bytehue.osgifx.console.ui.bundles")
+    private BundleContext context;
 
     @PostConstruct
     public void postConstruct(final VBox parent, @LocalInstance final FXMLLoader loader) {
