@@ -9,8 +9,5 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : \
-                      ${bundles.e4.core},\
-                      ${bundles.e4.efxclipse},\
-                      controlsfx,\
-                      de.jensd:fontawesomefx;packages=*,\
-                      javax.inject
+                      ${bundles.ui},\
+                      de.jensd:fontawesomefx;packages=*
