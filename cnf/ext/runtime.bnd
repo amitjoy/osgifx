@@ -72,3 +72,9 @@ bundles.e4.efxclipse: \
 				 org.eclipse.fx.ui.workbench.renderers.base,\
 				 org.eclipse.fx.ui.workbench.renderers.fx,\
 				 org.eclipse.fx.ui.workbench.services
+
+bundles.ui: \
+				${bundles.e4.core},\
+                ${bundles.e4.efxclipse},\
+                controlsfx,\
+                javax.inject

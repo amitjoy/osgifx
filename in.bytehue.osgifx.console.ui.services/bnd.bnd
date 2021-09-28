@@ -1,0 +1,10 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+-includeresource    : \
+                      plugin.xml = _plugin.xml,\
+					  fragment.e4xmi = fragment.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic
+-buildpath          : ${bundles.ui}
+
+Private-Package: in.bytehue.osgifx.console.ui.services

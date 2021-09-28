@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="ASCII"?>
-<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_c376wBuoEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.application.application">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGiFX Console" width="1400" height="800">
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmi:id="_c376wBuoEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.application.application">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGi.fx Console" width="1400" height="800">
     <tags>efx-center-on-screen</tags>
     <tags>shellMaximized</tags>
-    <children xsi:type="basic:PartStack" xmi:id="_dLYzgBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.ui.extensions.partstack" selectedElement="_8QhvwB9BEeydu5PZ2N9S0A">
-      <children xsi:type="basic:Part" xmi:id="_IcUzsB9BEeydu5PZ2N9S0A" elementId="in.bytehue.osgifx.console.application.part.bundle" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.parts.Sample1" label="Bundles" closeable="true">
-        <tags>showTopTrimArea</tags>
-        <tags>Part-ToolBarMenu-Floating</tags>
-        <trimBars xmi:id="_8wAAYB9JEeydu5PZ2N9S0A" elementId="in.bytehue.osgifx.console.application.trimbar.0">
-          <children xsi:type="menu:ToolBar" xmi:id="_9j0qAB9JEeydu5PZ2N9S0A" elementId="in.bytehue.osgifx.console.application.toolbar.0">
-            <children xsi:type="menu:HandledToolItem" xmi:id="_-ebREB9JEeydu5PZ2N9S0A" elementId="in.bytehue.osgifx.console.application.handledtoolitem.a" label="A"/>
-            <children xsi:type="menu:HandledToolItem" xmi:id="__15aUB9JEeydu5PZ2N9S0A" elementId="in.bytehue.osgifx.console.application.handledtoolitem.b" label="B"/>
-          </children>
-        </trimBars>
-      </children>
-      <children xsi:type="basic:Part" xmi:id="_8QhvwB9BEeydu5PZ2N9S0A" elementId="in.bytehue.osgifx.console.application.part.config" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.parts.Sample2" label="Configurations" closeable="true"/>
-    </children>
-    <mainMenu xmi:id="_MzvKoBvlEeyN6bJvNlYYNw" elementId="in.bytehue.osgifx.console.application.menu"/>
+    <children xsi:type="basic:PartStack" xmi:id="_dLYzgBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.ui.extensions.partstack"/>
   </children>
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" visible="false" label="OSGiFX Console Connection Settings" width="600" height="400">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" visible="false" label="Choose Connections" width="600" height="400">
     <tags>efx-center-on-screen</tags>
   </children>
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="OSGiFX Console Add Connection Settings">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="Add Connections">
     <tags>efx-center-on-screen</tags>
   </children>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
