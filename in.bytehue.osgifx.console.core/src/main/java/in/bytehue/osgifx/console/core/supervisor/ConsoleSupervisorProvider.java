@@ -14,7 +14,7 @@ public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor,
 
     @Override
     public void event(final Event e) throws Exception {
-        super.connect(ConsoleAgent.class, this, "192.168.2.136", 1450, 5000);
+        // TODO Auto-generated method stub
     }
 
     @Override
@@ -29,8 +29,9 @@ public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor,
         return false;
     }
 
-    void active() {
-        System.out.println(getAgent());
+    @Override
+    public void connect(final String host, final int port, final int timeout) throws Exception {
+        super.connect(ConsoleAgent.class, this, host, 1450, 5000);
     }
 
 }
