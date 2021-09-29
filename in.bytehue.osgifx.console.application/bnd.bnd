@@ -9,5 +9,5 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : \
-                      ${bundles.ui},\
+                      ${bundles.required},\
                       de.jensd:fontawesomefx;packages=*
