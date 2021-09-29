@@ -9,7 +9,7 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.components',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.configurations',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.dashboard',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.dashboard',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
                      bnd.identity;id='in.bytehue.osgifx.console.util',\
                      \
@@ -26,6 +26,7 @@
 	in.bytehue.osgifx.console.ui.components;version=snapshot;startlevel=5,\
 	in.bytehue.osgifx.console.ui.configurations;version=snapshot;startlevel=5,\
 	in.bytehue.osgifx.console.ui.dashboard;version=snapshot;startlevel=5,\
+	in.bytehue.osgifx.console.ui.events;version=snapshot;startlevel=5,\
 	in.bytehue.osgifx.console.ui.services;version=snapshot;startlevel=5,\
 	in.bytehue.osgifx.console.util;version=snapshot;startlevel=5,\
 	javax.annotation;version='[1.2.0,1.2.1)';startlevel=5,\
