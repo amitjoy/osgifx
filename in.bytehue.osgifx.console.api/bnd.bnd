@@ -1,2 +1,2 @@
--buildpath.base.api: 
--buildpath: biz.aQute.remote.agent;packages=*
+-buildpath.base.api : 
+-buildpath          : biz.aQute.remote.agent;packages=*
