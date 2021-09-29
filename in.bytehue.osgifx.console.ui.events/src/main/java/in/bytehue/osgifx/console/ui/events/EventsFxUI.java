@@ -23,7 +23,7 @@ public class EventsFxUI {
     private Logger logger;
 
     @Inject
-    @Named("in.bytehue.osgifx.console.ui.dashboard")
+    @Named("in.bytehue.osgifx.console.ui.events")
     private BundleContext context;
 
     @PostConstruct
