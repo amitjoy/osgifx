@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.application.fxml;
+package in.bytehue.osgifx.console.application.window;
 
 import java.net.URL;
 import java.util.ResourceBundle;

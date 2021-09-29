@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="ASCII"?>
-<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_c376wBuoEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.application.application">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGi.fx Console" width="1400" height="800">
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_c376wBuoEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.application">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGi.fx Console" width="1200" height="700">
     <tags>efx-center-on-screen</tags>
-    <tags>shellMaximized</tags>
     <children xsi:type="basic:PartStack" xmi:id="_dLYzgBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.ui.extensions.partstack"/>
     <mainMenu xmi:id="_IB5tkCBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.menu.extensions" mnemonics="">
-      <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.menu.extensions.list" label="Extensions"/>
+      <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.menu.extensions.list" label="View"/>
+      <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.actions" label="Actions">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_plyscCCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handledmenuitem.installupdate" label="Install/Update Bundle"/>
+      </children>
+      <children xsi:type="menu:Menu" xmi:id="_zHSQ0CCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.help" label="Help">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_1i8a8CCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handledmenuitem.about" label="About OSGi.fx Console"/>
+      </children>
     </mainMenu>
   </children>
   <children xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" visible="false" label="Choose Connections" width="600" height="400">
@@ -21,4 +26,5 @@
   <addons xmi:id="_c376xRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
   <addons xmi:id="_c376xhuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
   <addons xmi:id="_c376xxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
+  <addons xmi:id="_Xj5j8CD7EeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.addon.bundlecontext" contributionURI="bundleclass://in.bytehue.osgifx.console.core/in.bytehue.osgifx.console.core.addon.BundleContextAddon"/>
 </application:Application>
