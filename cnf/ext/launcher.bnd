@@ -3,7 +3,7 @@
 -runkeep                        =         false
 -runtrace                       =         true 
 -runee                          =         JavaSE-1.8
--runstartlevel                  =         begin = 5, step = -1, order = sortbynameversion
+-runstartlevel                  =         begin = 1, step = -1, order = sortbynameversion
 -runvm                          =         -ea
 -runsystemcapabilities          =         ${native_capability}
 -runpath.efx                    =         org.eclipse.fx.osgi
