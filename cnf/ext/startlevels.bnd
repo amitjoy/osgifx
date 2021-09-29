@@ -1,0 +1,4 @@
+default.startlevel : 50
+startlevels        : \
+	in.bytehue.osgifx.console.application;                        startlevel=5,\
+	in.bytehue.osgifx.console.core;                               startlevel=10
