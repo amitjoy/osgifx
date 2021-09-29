@@ -3,7 +3,7 @@
 <plugin>
 	<extension id="product" point="org.eclipse.core.runtime.products">
 		<product name="OSGiFX Console" application="org.eclipse.fx.ui.workbench.fx.application">
-			<property name="appName" value="OSGiFX Console" />
+			<property name="appName" value="OSGi.fx Console" />
 			<property name="applicationXMI" value="in.bytehue.osgifx.console.application/Application.e4xmi" />
 			<property name="cssTheme" value="theme.default" />
 			<property name="clearPersistedState" value="true" />
