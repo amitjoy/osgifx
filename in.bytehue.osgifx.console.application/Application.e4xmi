@@ -8,10 +8,10 @@
         <children xsi:type="menu:DynamicMenuContribution" xmi:id="__cOGkCEsEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.extensions.list" label="" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.MenuContributionHandler"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.actions" label="Actions">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_plyscCCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handledmenuitem.installupdate" label="Install/Update Bundle"/>
+        <children xsi:type="menu:DirectMenuItem" xmi:id="_bo4bsCFQEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.directmenuitem.install" label="Install/Update Bundle" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.InstallBundleHandler"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_zHSQ0CCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.help" label="Help">
-        <children xsi:type="menu:HandledMenuItem" xmi:id="_1i8a8CCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handledmenuitem.about" label="About OSGi.fx Console"/>
+        <children xsi:type="menu:DirectMenuItem" xmi:id="_vzJVkCFQEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.directmenuitem.about" label="About OSGi.fx Console" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.AboutConsoleHandler"/>
       </children>
     </mainMenu>
   </children>
