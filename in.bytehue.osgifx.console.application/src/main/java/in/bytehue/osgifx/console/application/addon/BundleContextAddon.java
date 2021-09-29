@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.core.addon;
+package in.bytehue.osgifx.console.application.addon;
 
 import static org.osgi.framework.Bundle.ACTIVE;
 
