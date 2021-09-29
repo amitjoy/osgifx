@@ -4,7 +4,9 @@
     <tags>efx-center-on-screen</tags>
     <children xsi:type="basic:PartStack" xmi:id="_dLYzgBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.ui.extensions.partstack"/>
     <mainMenu xmi:id="_IB5tkCBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.menu.extensions" mnemonics="">
-      <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.menu.extensions.list" label="View"/>
+      <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.menu.extensions.list" label="View">
+        <children xsi:type="menu:DynamicMenuContribution" xmi:id="__cOGkCEsEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.extensions.list" label="" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.MenuContributionHandler"/>
+      </children>
       <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.menu.actions" label="Actions">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_plyscCCVEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handledmenuitem.installupdate" label="Install/Update Bundle"/>
       </children>
@@ -19,10 +21,6 @@
   <children xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="Add Connections">
     <tags>efx-center-on-screen</tags>
   </children>
-  <handlers xmi:id="_kfEX4CEREeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handler.show.tab" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ShowTabHandler" command="_CWTsYCEdEeyZSsScTJ7-zg"/>
-  <commands xmi:id="_CWTsYCEdEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.command.show.tab" commandName="Show Tab">
-    <parameters xmi:id="_yWeucCEjEeyZSsScTJ7-zg" elementId="part.id" name="part.id" optional="false"/>
-  </commands>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
@@ -30,5 +28,5 @@
   <addons xmi:id="_c376xRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
   <addons xmi:id="_c376xhuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
   <addons xmi:id="_c376xxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
-  <addons xmi:id="_Xj5j8CD7EeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.addon.bundlecontext" contributionURI="bundleclass://in.bytehue.osgifx.console.core/in.bytehue.osgifx.console.core.addon.BundleContextAddon"/>
+  <addons xmi:id="_Xj5j8CD7EeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.addon.bundlecontext" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.addon.BundleContextAddon"/>
 </application:Application>
