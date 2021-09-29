@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="ASCII"?>
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="in.bytehue.osgifx.console.ui.extensions.partstack">
     <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.tab.bundles" contributionURI="bundleclass://in.bytehue.osgifx.console.ui.bundles/in.bytehue.osgifx.console.ui.bundles.BundlesFxUI" label="Bundles" closeable="true">
       <tags>Container:VBox</tags>
     </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_JvHA0CBrEey33dbookdebQ" featurename="children" parentElementId="in.bytehue.osgifx.console.application.menu.extensions.list">
-    <elements xsi:type="menu:HandledMenuItem" xmi:id="_so-YIiBqEey33dbookdebQ" elementId="in.bytehue.osgifx.console.application.handledmenuitem.bundles" label="Bundles"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_Ij8scSDzEeyZSsScTJ7-zg" featurename="commands" parentElementId="in.bytehue.osgifx.console.application">
-    <elements xsi:type="commands:Command" xmi:id="_Ij8sciDzEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.command.show.bundles" commandName="Show Bundles Tab"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_D-EGciDzEeyZSsScTJ7-zg" featurename="handlers" parentElementId="in.bytehue.osgifx.console.application">
-    <elements xsi:type="commands:Handler" xmi:id="_D-EGcyDzEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handler.show.bundles" contributionURI="bundleclass://in.bytehue.osgifx.console.ui.bundles/in.bytehue.osgifx.console.ui.bundles.handler.ShowBundlesHandler" command="_Ij8sciDzEeyZSsScTJ7-zg"/>
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_h3J5ciEcEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.directmenuitem.show.bundles" label="Bundles" contributionURI="bundleclass://in.bytehue.osgifx.console.ui.bundles/in.bytehue.osgifx.console.ui.bundles.handler.ShowBundlesHandler"/>
   </fragments>
 </fragment:ModelFragments>

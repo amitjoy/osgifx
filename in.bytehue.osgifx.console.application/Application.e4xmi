@@ -19,6 +19,10 @@
   <children xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="Add Connections">
     <tags>efx-center-on-screen</tags>
   </children>
+  <handlers xmi:id="_kfEX4CEREeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.handler.show.tab" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ShowTabHandler" command="_CWTsYCEdEeyZSsScTJ7-zg"/>
+  <commands xmi:id="_CWTsYCEdEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.command.show.tab" commandName="Show Tab">
+    <parameters xmi:id="_yWeucCEjEeyZSsScTJ7-zg" elementId="part.id" name="part.id" optional="false"/>
+  </commands>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
