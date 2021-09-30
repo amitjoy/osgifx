@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.agent.provider;
 
-import static aQute.remote.api.Agent.AGENT_SERVER_PORT_KEY;
 import static aQute.remote.api.Agent.PORT_P;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
@@ -26,14 +25,16 @@ import aQute.remote.util.Link;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private File          cache;
-    private ServerSocket  server;
-    private BundleContext context;
+    private File              cache;
+    private ServerSocket      server;
+    private BundleContext     context;
+    private List<AgentServer> agents;
 
-    private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
+    private static final String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
 
     @Override
     public void start(final BundleContext context) throws Exception {
+        agents       = new CopyOnWriteArrayList<>();
         this.context = context;
 
         // Get the specified port in the framework properties
@@ -46,8 +47,7 @@ public final class Activator extends Thread implements BundleActivator {
         final Matcher m = PORT_P.matcher(port);
         if (!m.matches()) {
             throw new IllegalArgumentException(
-                    "Invalid port specification in property aQute.agent.server.port, expects [<host>:]<port> : "
-                            + port);
+                    "Invalid port specification in property osgi.fx.agent.port, expects [<host>:]<port> : " + port);
         }
 
         // See if the host was set, otherwise use localhost for security reasons
