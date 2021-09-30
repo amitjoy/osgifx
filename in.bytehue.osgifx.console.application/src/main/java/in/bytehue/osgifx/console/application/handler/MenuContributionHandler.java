@@ -45,6 +45,7 @@ public final class MenuContributionHandler {
         final MDirectMenuItem dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
 
         dynamicItem.setLabel(part.getLabel());
+        dynamicItem.setIconURI(part.getIconURI());
         dynamicItem.setAccessibilityPhrase(part.getElementId());
         dynamicItem.setContributorURI("platform:/plugin/in.bytehue.osgifx.console.application");
         dynamicItem.setContributionURI(
