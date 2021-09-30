@@ -8,9 +8,9 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.bundles',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.components',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.configurations',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.dashboard',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
                      bnd.identity;id='in.bytehue.osgifx.console.util',\
                      \
@@ -18,7 +18,7 @@
                      ${requirement.gogo}
 
 install.order    :   \
-                     in.bytehue.osgifx.console.ui.dashboard,\
+                     in.bytehue.osgifx.console.ui.overview,\
                      in.bytehue.osgifx.console.ui.bundles,\
                      in.bytehue.osgifx.console.ui.services,\
                      in.bytehue.osgifx.console.ui.components,\

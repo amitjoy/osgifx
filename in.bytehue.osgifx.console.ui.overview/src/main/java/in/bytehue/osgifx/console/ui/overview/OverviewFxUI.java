@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.ui.dashboard;
+package in.bytehue.osgifx.console.ui.overview;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,7 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
-public class DashboardFxUI {
+public class OverviewFxUI {
 
     @Log
     @Inject
