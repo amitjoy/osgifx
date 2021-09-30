@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ToolBar xmlns:fx="http://javafx.com/fxml" fx:id="decorationArea" fx:controller="in.bytehue.osgifx.console.application.decoration.DecorationController" prefHeight="20" minHeight="20" maxHeight="20">
+	<items>
+		<Region> 
+			<HBox.hgrow>ALWAYS</HBox.hgrow>
+		</Region>
+		<VBox spacing="1">
+			<children>
+				<Button fx:id="window_close" onAction="#handleClose"/>
+			</children>
+		</VBox>
+	</items>
+</ToolBar>
