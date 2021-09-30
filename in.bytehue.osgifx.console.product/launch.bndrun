@@ -27,9 +27,10 @@ install.order    :   \
                      in.bytehue.osgifx.console.ui.gogo
 
 -runbundles.X    :   ${install.order} 
--runbundles      :   \
+-runbundles: \
 	com.google.guava;version='[27.1.0,27.1.1)';startlevel=1,\
 	com.ibm.icu.base;version='[58.2.0,58.2.1)';startlevel=1,\
+	controlsfx;version='[8.40.18,8.40.19)';startlevel=1,\
 	in.bytehue.osgifx.console.application;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.core;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.launcher;version=snapshot;startlevel=1,\

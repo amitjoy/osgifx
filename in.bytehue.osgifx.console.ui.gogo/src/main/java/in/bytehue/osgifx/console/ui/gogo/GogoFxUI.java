@@ -28,7 +28,7 @@ public class GogoFxUI {
 
     @PostConstruct
     public void postConstruct(final VBox parent, @LocalInstance final FXMLLoader loader) {
-        final URL fxml = context.getBundle().getResource("/fxml/sample.fxml");
+        final URL fxml = context.getBundle().getResource("/fxml/tab-content.fxml");
         loader.setLocation(fxml);
         try {
             final Node n = loader.load();
