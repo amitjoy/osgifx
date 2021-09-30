@@ -9,7 +9,4 @@
 			<property name="clearPersistedState" value="true" />
 		</product>
 	</extension>
-	<extension point="org.eclipse.fx.ui.theme">
-		<theme id="theme.default" basestylesheet="css/default.css" />
-	</extension>
 </plugin>
