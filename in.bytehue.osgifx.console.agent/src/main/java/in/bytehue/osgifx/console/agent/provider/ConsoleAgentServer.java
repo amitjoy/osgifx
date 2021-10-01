@@ -168,6 +168,31 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         configAdminTracker.close();
     }
 
+    @Override
+    public long maxMemory() {
+        return Runtime.getRuntime().maxMemory();
+    }
+
+    @Override
+    public long availableMemory() {
+        return Runtime.getRuntime().freeMemory();
+    }
+
+    @Override
+    public String osName() {
+        return System.getProperty("os.name");
+    }
+
+    @Override
+    public String osVersion() {
+        return System.getProperty("os.version");
+    }
+
+    @Override
+    public String osArch() {
+        return System.getProperty("os.arch");
+    }
+
     private ConfigurationDTO toDTO(final Configuration configuration) {
         final ConfigurationDTO dto = new ConfigurationDTO();
 
