@@ -4,6 +4,6 @@ Bundle-SymbolicName : ${p}; singleton:=true
 	in.bytehue.osgifx.console.agent.*,\
 	in.bytehue.osgifx.console.supervisor,\
 	in.bytehue.osgifx.console.core.*,\
-	in.bytehue.osgifx.console.ui.dto
+	in.bytehue.osgifx.console.ui.*
 -conditionalpackage : aQute.*
 -fixupmessages      : 'private reference' 
