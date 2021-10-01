@@ -1,6 +1,9 @@
 # UI
 
+eu.hansolo:Medusa:8.3
+eu.hansolo:tilesfx:1.6.8
 org.controlsfx:controlsfx:8.40.18
+com.googlecode.json-simple:json-simple:1.1.1
 
 # Bnd
 

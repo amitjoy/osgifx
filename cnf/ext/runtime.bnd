@@ -78,4 +78,6 @@ bundles.required: \
                 ${bundles.e4.efxclipse},\
 				${bundles.eclipse.core},\
                 controlsfx,\
+                eu.hansolo.medusa,\
+                eu.hansolo.tilesfx,\
                 javax.inject
