@@ -169,4 +169,43 @@ public interface ConsoleAgent extends Agent {
      * @throws IllegalStateException If this configuration has been deleted.
      */
     void updateConfiguration(String pid, Map<String, Object> newProperties) throws IOException;
+
+    /**
+     * Returns the maximum amount of memory that the Java virtual machine will
+     * attempt to use. If there is no inherent limit then the value {@link
+     * java.lang.Long#MAX_VALUE} will be returned.
+     *
+     * @return the maximum amount of memory that the remote machine will
+     *         attempt to use, measured in bytes
+     */
+    long maxMemory();
+
+    /**
+     * Returns the amount of available memory in the remove machine.
+     *
+     * @return an approximation to the total amount of memory currently
+     *         available for future allocated objects, measured in bytes.
+     */
+    long availableMemory();
+
+    /**
+     * Returns the operating system name
+     *
+     * @return the operating system name
+     */
+    String osName();
+
+    /**
+     * Returns the operating system version
+     *
+     * @return the operating system version
+     */
+    String osVersion();
+
+    /**
+     * Returns the operating system architecture
+     *
+     * @return the operating system architecture
+     */
+    String osArch();
 }
