@@ -15,10 +15,6 @@ public class DecorationController implements Initializable {
     @FXML
     private ToolBar decorationArea;
 
-    public DecorationController() {
-        System.err.println("Creating controller ....");
-    }
-
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
     }
