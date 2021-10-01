@@ -11,6 +11,7 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.properties',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
                      bnd.identity;id='in.bytehue.osgifx.console.util',\
                      \
@@ -24,13 +25,17 @@ install.order    :   \
                      in.bytehue.osgifx.console.ui.components,\
                      in.bytehue.osgifx.console.ui.configurations,\
                      in.bytehue.osgifx.console.ui.events,\
+                     in.bytehue.osgifx.console.ui.properties,\
                      in.bytehue.osgifx.console.ui.gogo
 
 -runbundles.X    :   ${install.order} 
 -runbundles: \
 	com.google.guava;version='[27.1.0,27.1.1)';startlevel=1,\
+	com.googlecode.json-simple;version='[1.1.1,1.1.2)';startlevel=1,\
 	com.ibm.icu.base;version='[58.2.0,58.2.1)';startlevel=1,\
 	controlsfx;version='[8.40.18,8.40.19)';startlevel=1,\
+	eu.hansolo.medusa;version='[8.3.0,8.3.1)';startlevel=1,\
+	eu.hansolo.tilesfx;version='[1.6.8,1.6.9)';startlevel=1,\
 	in.bytehue.osgifx.console.application;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.core;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.launcher;version=snapshot;startlevel=1,\
