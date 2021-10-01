@@ -16,7 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
-public class GogoFxUI {
+public final class GogoFxUI {
 
     @Log
     @Inject
