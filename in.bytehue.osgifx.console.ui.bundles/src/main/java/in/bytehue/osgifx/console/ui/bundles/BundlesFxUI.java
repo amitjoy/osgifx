@@ -34,7 +34,7 @@ public final class BundlesFxUI {
             final Node n = loader.load();
             parent.getChildren().add(n);
         } catch (final IOException e) {
-            logger.error("Failed to load 'PersonForm.fxml'", e);
+            logger.error("Failed to load fxml", e);
         }
     }
 
