@@ -22,17 +22,6 @@ public final class RuntimeDataProvider implements DataProvider {
     private final ObservableList<EventFxDTO>         events         = FXCollections.observableArrayList();
     private final ObservableList<PropertyFxDTO>      properties     = FXCollections.observableArrayList();
 
-    public RuntimeDataProvider() {
-        for (int i = 1; i < 101; i++) {
-            final BundleFxDTO dto1 = new BundleFxDTO();
-            dto1.setStatus("ACTIVE");
-            dto1.setSymbolicName("com.amitinside.1");
-            dto1.setVersion("1.2.3");
-
-            bundles.add(dto1);
-        }
-    }
-
     @Override
     public ObservableList<BundleFxDTO> bundles() {
         return bundles;
