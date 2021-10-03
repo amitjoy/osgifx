@@ -1,76 +1,64 @@
 package in.bytehue.osgifx.console.ui.dto;
 
+import javafx.beans.property.MapProperty;
+import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableMap;
 
-/**
- * Data Transfer Object of a Configuration
- */
 public final class ConfigurationFxDTO {
 
-    /** The name of the configuration */
-    private SimpleStringProperty name;
+    private final StringProperty              pid          = new SimpleStringProperty(this, "pid");
+    private final StringProperty              factoryPid   = new SimpleStringProperty(this, "factoryPid");
+    private final MapProperty<String, String> properties   = new SimpleMapProperty<>(this, "properties");
+    private final MapProperty<Long, String>   usingBundles = new SimpleMapProperty<>(this, "usingBundles");
 
-    /** The bundle to which the configuration is bound */
-    private SimpleStringProperty bundle;
-
-    /**
-     * Returns the name of the configuration
-     *
-     * @return the name of the configuration
-     */
-    public String getName() {
-        return nameProperty().get();
+    public StringProperty pidProperty() {
+        return pid;
     }
 
-    /**
-     * Returns the name of the configuration as JavaFX bean
-     *
-     * @return the name of the configuration as JavaFX bean
-     */
-    public SimpleStringProperty nameProperty() {
-        if (name == null) {
-            name = new SimpleStringProperty(this, "name");
-        }
-        return name;
+    public String getPid() {
+        return pidProperty().get();
     }
 
-    /**
-     * Sets the name of the configuration
-     *
-     * @param name the name of the configuration
-     */
-    public void setName(final String name) {
-        nameProperty().set(name);
+    public void setPid(final String pid) {
+        pidProperty().set(pid);
     }
 
-    /**
-     * Returns the bound bundle
-     *
-     * @return the name of the configuration
-     */
-    public String getBundle() {
-        return bundleProperty().get();
+    public StringProperty factoryPidProperty() {
+        return factoryPid;
     }
 
-    /**
-     * Returns the bound bundle as JavaFX bean
-     *
-     * @return the name of the configuration as JavaFX bean
-     */
-    public SimpleStringProperty bundleProperty() {
-        if (bundle == null) {
-            bundle = new SimpleStringProperty(this, "bundle");
-        }
-        return bundle;
+    public String getFactoryPid() {
+        return factoryPidProperty().get();
     }
 
-    /**
-     * Sets the bound bundle
-     *
-     * @param bundle the bound bundle
-     */
-    public void setBundleProperty(final String bundle) {
-        bundleProperty().set(bundle);
+    public void setFactoryPid(final String factoryPid) {
+        factoryPidProperty().set(factoryPid);
+    }
+
+    public MapProperty<String, String> propertiesProperty() {
+        return properties;
+    }
+
+    public ObservableMap<String, String> getProperties() {
+        return propertiesProperty().get();
+    }
+
+    public void setProperties(final ObservableMap<String, String> properties) {
+        propertiesProperty().set(properties);
+    }
+
+    public MapProperty<Long, String> usingBundlesProperty() {
+        return usingBundles;
+    }
+
+    public ObservableMap<Long, String> getUsingBundles() {
+        return usingBundlesProperty().get();
+    }
+
+    public void setUsingBundles(final ObservableMap<Long, String> usingBundles) {
+        usingBundlesProperty().set(usingBundles);
     }
 
 }
