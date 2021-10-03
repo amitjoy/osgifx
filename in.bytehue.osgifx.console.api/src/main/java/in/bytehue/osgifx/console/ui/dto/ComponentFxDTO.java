@@ -1,7 +1,5 @@
 package in.bytehue.osgifx.console.ui.dto;
 
-import org.osgi.service.component.runtime.dto.ReferenceDTO;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.MapProperty;
@@ -28,7 +26,7 @@ public final class ComponentFxDTO {
     private final MapProperty<Long, String>          services            = new SimpleMapProperty<>(this, "services");
     private final ListProperty<String>               pid                 = new SimpleListProperty<>(this, "pid");
     private final MapProperty<String, String>        properties          = new SimpleMapProperty<>(this, "properties");
-    private final ListProperty<ReferenceDTO>         references          = new SimpleListProperty<>(this, "references");
+    private final MapProperty<String, String>        references          = new SimpleMapProperty<>(this, "references");
     private final StringProperty                     activate            = new SimpleStringProperty(this, "activate");
     private final StringProperty                     deactivate          = new SimpleStringProperty(this, "deactivate");
     private final StringProperty                     modified            = new SimpleStringProperty(this, "modified");
@@ -153,15 +151,15 @@ public final class ComponentFxDTO {
         propertiesProperty().set(properties);
     }
 
-    public ListProperty<ReferenceDTO> referencesProperty() {
+    public MapProperty<String, String> referencesProperty() {
         return references;
     }
 
-    public ObservableList<ReferenceDTO> getReferences() {
+    public ObservableMap<String, String> getReferences() {
         return referencesProperty().get();
     }
 
-    public void setReferences(final ObservableList<ReferenceDTO> references) {
+    public void setReferences(final ObservableMap<String, String> references) {
         referencesProperty().set(references);
     }
 

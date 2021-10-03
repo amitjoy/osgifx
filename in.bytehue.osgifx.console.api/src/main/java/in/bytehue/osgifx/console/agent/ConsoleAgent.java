@@ -20,7 +20,7 @@ import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 import aQute.remote.api.Agent;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
-import in.bytehue.osgifx.console.agent.dto.XConfigDTO;
+import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
@@ -50,7 +50,7 @@ public interface ConsoleAgent extends Agent {
      *
      * @return the detailed information of all the configurations
      */
-    List<XConfigDTO> getAllConfigurations();
+    List<XConfigurationDTO> getAllConfigurations();
 
     /**
      * Get the detailed information of all events
@@ -186,7 +186,7 @@ public interface ConsoleAgent extends Agent {
      * @throws IOException if access to persistent storage fails
      * @throws InvalidSyntaxException if the filter string is invalid
      */
-    Collection<XConfigDTO> listConfigurations(String filter) throws IOException, InvalidSyntaxException;
+    Collection<XConfigurationDTO> listConfigurations(String filter) throws IOException, InvalidSyntaxException;
 
     /**
      * Delete the associated {@code Configuration} object.
