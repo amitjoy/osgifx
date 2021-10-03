@@ -33,7 +33,12 @@ import org.slf4j.LoggerFactory;
 import aQute.lib.startlevel.StartLevelRuntimeHandler;
 import aQute.remote.agent.AgentServer;
 import in.bytehue.osgifx.console.agent.ConsoleAgent;
-import in.bytehue.osgifx.console.agent.dto.ConfigurationDTO;
+import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
+import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
+import in.bytehue.osgifx.console.agent.dto.XConfigDTO;
+import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
+import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
 @Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.agent.ConsoleAgent")
 public final class ConsoleAgentServer extends AgentServer implements ConsoleAgent {
@@ -59,6 +64,42 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
+    public List<XBundleDTO> getAllBundles() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<XComponentDTO> getAllComponents() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<XConfigDTO> getAllConfigurations() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<XPropertyDTO> getAllProperties() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<XEventDTO> getAllEvents() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<XServiceDTO> getAllServices() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public Collection<ComponentDescriptionDTO> getComponentDescriptionDTOs() {
         // @formatter:off
         return Optional.ofNullable(scrTracker.getService())
@@ -68,8 +109,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public Collection<ComponentConfigurationDTO> getComponentConfigurationDTOs(
-            final ComponentDescriptionDTO description) {
+    public Collection<ComponentConfigurationDTO> getComponentConfigurationDTOs(final ComponentDescriptionDTO description) {
         // @formatter:off
         return Optional.ofNullable(scrTracker.getService())
                        .map(scr -> scr.getComponentConfigurationDTOs(description))
@@ -113,15 +153,14 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public Collection<ConfigurationDTO> listConfigurations(final String filter)
-            throws IOException, InvalidSyntaxException {
+    public Collection<XConfigDTO> listConfigurations(final String filter) throws IOException, InvalidSyntaxException {
         final ConfigurationAdmin configAdmin = configAdminTracker.getService();
         if (configAdmin == null) {
             return Collections.emptyList();
         }
-        final List<ConfigurationDTO> configurations = new ArrayList<>();
+        final List<XConfigDTO> configurations = new ArrayList<>();
         for (final Configuration configuration : configAdmin.listConfigurations(filter)) {
-            final ConfigurationDTO dto = toDTO(configuration);
+            final XConfigDTO dto = toDTO(configuration);
             configurations.add(dto);
         }
         return configurations;
@@ -193,8 +232,8 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         return System.getProperty("os.arch");
     }
 
-    private ConfigurationDTO toDTO(final Configuration configuration) {
-        final ConfigurationDTO dto = new ConfigurationDTO();
+    private XConfigDTO toDTO(final Configuration configuration) {
+        final XConfigDTO dto = new XConfigDTO();
 
         dto.pid        = configuration.getPid();
         dto.factoryPid = configuration.getFactoryPid();
@@ -203,9 +242,9 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         return dto;
     }
 
-    private Map<String, Object> toMap(final Dictionary<String, Object> dictionary) {
+    public static Map<String, String> toMap(final Dictionary<String, Object> dictionary) {
         final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream().collect(Collectors.toMap(identity(), dictionary::get));
+        return keys.stream().collect(Collectors.toMap(identity(), v -> dictionary.get(v).toString()));
     }
 
 }
