@@ -2,6 +2,7 @@ package in.bytehue.osgifx.console.agent;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -17,13 +18,60 @@ import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
 import aQute.remote.api.Agent;
-import in.bytehue.osgifx.console.agent.dto.ConfigurationDTO;
+import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
+import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
+import in.bytehue.osgifx.console.agent.dto.XConfigDTO;
+import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
+import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
 /**
  * OSGi.fx console agent running on remote OSGi framework
  */
 @ProviderType
 public interface ConsoleAgent extends Agent {
+
+    /**
+     * Get the detailed information of all the installed bundles
+     *
+     * @return the detailed information of all the installed bundles
+     */
+    List<XBundleDTO> getAllBundles();
+
+    /**
+     * Get the detailed information of all the registered DS service components
+     *
+     * @return the detailed information of all the registered DS service components
+     */
+    List<XComponentDTO> getAllComponents();
+
+    /**
+     * Get the detailed information of all the configurations
+     *
+     * @return the detailed information of all the configurations
+     */
+    List<XConfigDTO> getAllConfigurations();
+
+    /**
+     * Get the detailed information of all events
+     *
+     * @return the detailed information of all events
+     */
+    List<XEventDTO> getAllEvents();
+
+    /**
+     * Get the detailed information of all the properties
+     *
+     * @return the detailed information of all the properties
+     */
+    List<XPropertyDTO> getAllProperties();
+
+    /**
+     * Get the detailed information of all services
+     *
+     * @return the detailed information of all services
+     */
+    List<XServiceDTO> getAllServices();
 
     /**
      * Returns all the component descriptions.
@@ -138,7 +186,7 @@ public interface ConsoleAgent extends Agent {
      * @throws IOException if access to persistent storage fails
      * @throws InvalidSyntaxException if the filter string is invalid
      */
-    Collection<ConfigurationDTO> listConfigurations(String filter) throws IOException, InvalidSyntaxException;
+    Collection<XConfigDTO> listConfigurations(String filter) throws IOException, InvalidSyntaxException;
 
     /**
      * Delete the associated {@code Configuration} object.
