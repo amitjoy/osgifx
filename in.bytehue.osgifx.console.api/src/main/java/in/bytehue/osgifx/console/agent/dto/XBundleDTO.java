@@ -11,6 +11,7 @@ public class XBundleDTO extends DTO {
     public String              symbolicName;
     public String              version;
     public String              location;
+    public String              category;
     public boolean             isFragment;
     public long                lastModified;
     public String              documentation;

@@ -35,7 +35,7 @@ import aQute.remote.agent.AgentServer;
 import in.bytehue.osgifx.console.agent.ConsoleAgent;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
-import in.bytehue.osgifx.console.agent.dto.XConfigDTO;
+import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
@@ -76,7 +76,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public List<XConfigDTO> getAllConfigurations() {
+    public List<XConfigurationDTO> getAllConfigurations() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -153,14 +153,14 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public Collection<XConfigDTO> listConfigurations(final String filter) throws IOException, InvalidSyntaxException {
+    public Collection<XConfigurationDTO> listConfigurations(final String filter) throws IOException, InvalidSyntaxException {
         final ConfigurationAdmin configAdmin = configAdminTracker.getService();
         if (configAdmin == null) {
             return Collections.emptyList();
         }
-        final List<XConfigDTO> configurations = new ArrayList<>();
+        final List<XConfigurationDTO> configurations = new ArrayList<>();
         for (final Configuration configuration : configAdmin.listConfigurations(filter)) {
-            final XConfigDTO dto = toDTO(configuration);
+            final XConfigurationDTO dto = toDTO(configuration);
             configurations.add(dto);
         }
         return configurations;
@@ -232,8 +232,8 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         return System.getProperty("os.arch");
     }
 
-    private XConfigDTO toDTO(final Configuration configuration) {
-        final XConfigDTO dto = new XConfigDTO();
+    private XConfigurationDTO toDTO(final Configuration configuration) {
+        final XConfigurationDTO dto = new XConfigurationDTO();
 
         dto.pid        = configuration.getPid();
         dto.factoryPid = configuration.getFactoryPid();

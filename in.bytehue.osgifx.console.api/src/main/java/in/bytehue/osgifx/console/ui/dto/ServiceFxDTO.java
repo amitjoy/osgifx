@@ -12,7 +12,7 @@ import javafx.util.Pair;
 public final class ServiceFxDTO {
 
     private final LongProperty                       id           = new SimpleLongProperty(this, "id");
-    private final ObjectProperty<Pair<Long, String>> bundle       = new SimpleObjectProperty<>(this, "bundle");
+    private final ObjectProperty<Pair<String, Long>> bundle       = new SimpleObjectProperty<>(this, "bundle");
     private final MapProperty<String, String>        properties   = new SimpleMapProperty<>(this, "properties");
     private final MapProperty<Long, String>          usingBundles = new SimpleMapProperty<>(this, "usingBundles");
 
@@ -28,15 +28,15 @@ public final class ServiceFxDTO {
         idProperty().set(id);
     }
 
-    public ObjectProperty<Pair<Long, String>> bundleProperty() {
+    public ObjectProperty<Pair<String, Long>> bundleProperty() {
         return bundle;
     }
 
-    public Pair<Long, String> getBundle() {
+    public Pair<String, Long> getBundle() {
         return bundleProperty().get();
     }
 
-    public void setBundle(final Pair<Long, String> bundle) {
+    public void setBundle(final Pair<String, Long> bundle) {
         bundleProperty().set(bundle);
     }
 

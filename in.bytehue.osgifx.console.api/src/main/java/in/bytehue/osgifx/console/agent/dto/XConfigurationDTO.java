@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.osgi.dto.DTO;
 
-public class XConfigDTO extends DTO {
+public class XConfigurationDTO extends DTO {
 
     public String              pid;
     public String              factoryPid;

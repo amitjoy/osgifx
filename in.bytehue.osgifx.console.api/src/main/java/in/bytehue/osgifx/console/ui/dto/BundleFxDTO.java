@@ -19,6 +19,7 @@ public final class BundleFxDTO {
     private final StringProperty              symbolicName       = new SimpleStringProperty(this, "symbolicName");
     private final StringProperty              version            = new SimpleStringProperty(this, "version");
     private final StringProperty              location           = new SimpleStringProperty(this, "location");
+    private final StringProperty              category           = new SimpleStringProperty(this, "category");
     private final BooleanProperty             isFragment         = new SimpleBooleanProperty(this, "isFragment");
     private final LongProperty                lastModified       = new SimpleLongProperty(this, "lastModified");
     private final StringProperty              documentation      = new SimpleStringProperty(this, "documentation");
@@ -92,6 +93,18 @@ public final class BundleFxDTO {
 
     public void setLocation(final String location) {
         locationProperty().set(location);
+    }
+
+    public StringProperty categoryProperty() {
+        return category;
+    }
+
+    public String getCategory() {
+        return categoryProperty().get();
+    }
+
+    public void setCategory(final String category) {
+        categoryProperty().set(category);
     }
 
     public BooleanProperty isFragmentProperty() {
