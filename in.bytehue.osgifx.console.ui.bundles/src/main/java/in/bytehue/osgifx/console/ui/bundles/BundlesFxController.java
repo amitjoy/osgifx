@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.ui.bundles;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -17,6 +16,7 @@ import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.ui.dto.BundleFxDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -48,11 +48,9 @@ public final class BundlesFxController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        final URL fxml = context.getBundle().getResource("/fxml/expander-column-content.fxml");
-        loader.setLocation(fxml);
-        final Node n = loadFxml();
+        final Node expandedNode = Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
 
-        final TableRowExpanderColumn<BundleFxDTO> expanderColumn     = new TableRowExpanderColumn<>(param -> n);
+        final TableRowExpanderColumn<BundleFxDTO> expanderColumn     = new TableRowExpanderColumn<>(param -> expandedNode);
         final TableColumn<BundleFxDTO, String>    symbolicNameColumn = new TableColumn<>("Symbolic Name");
         symbolicNameColumn.setPrefWidth(450);
         symbolicNameColumn.setCellValueFactory(new PropertyValueFactory<>("symbolicName"));
@@ -73,15 +71,6 @@ public final class BundlesFxController implements Initializable {
         table.setItems(dataProvider.bundles());
 
         TableFilter.forTableView(table).apply();
-    }
-
-    private Node loadFxml() {
-        try {
-            return loader.load();
-        } catch (final IOException e) {
-            logger.error("Failed to load fxml", e);
-        }
-        return null;
     }
 
 }
