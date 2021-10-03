@@ -65,38 +65,32 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
 
     @Override
     public List<XBundleDTO> getAllBundles() {
-        // TODO Auto-generated method stub
-        return null;
+        return XBundleInfoProvider.get(getContext());
     }
 
     @Override
     public List<XComponentDTO> getAllComponents() {
-        // TODO Auto-generated method stub
-        return null;
+        return XComponentInfoProvider.get(getContext(), scrTracker.getService());
     }
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        // TODO Auto-generated method stub
-        return null;
+        return XConfigurationtInfoProvider.get(getContext(), configAdminTracker.getService());
     }
 
     @Override
     public List<XPropertyDTO> getAllProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return XPropertytInfoProvider.get(getContext());
     }
 
     @Override
     public List<XEventDTO> getAllEvents() {
-        // TODO Auto-generated method stub
-        return null;
+        return XEventInfoProvider.get(getContext());
     }
 
     @Override
     public List<XServiceDTO> getAllServices() {
-        // TODO Auto-generated method stub
-        return null;
+        return XServiceInfoProvider.get(getContext());
     }
 
     @Override
