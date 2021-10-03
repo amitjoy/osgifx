@@ -80,4 +80,5 @@ bundles.required: \
                 controlsfx,\
                 eu.hansolo.medusa,\
                 eu.hansolo.tilesfx,\
-                javax.inject
+                javax.inject,\
+                in.bytehue.osgifx.console.util
