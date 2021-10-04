@@ -2,12 +2,12 @@ package in.bytehue.osgifx.console.ui.service;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-import in.bytehue.osgifx.console.ui.dto.BundleFxDTO;
-import in.bytehue.osgifx.console.ui.dto.ComponentFxDTO;
-import in.bytehue.osgifx.console.ui.dto.ConfigurationFxDTO;
-import in.bytehue.osgifx.console.ui.dto.EventFxDTO;
-import in.bytehue.osgifx.console.ui.dto.PropertyFxDTO;
-import in.bytehue.osgifx.console.ui.dto.ServiceFxDTO;
+import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
+import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
+import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
+import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
+import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import javafx.collections.ObservableList;
 
 /**
@@ -22,41 +22,41 @@ public interface DataProvider {
      *
      * @return the observable list of bundles
      */
-    ObservableList<BundleFxDTO> bundles();
+    ObservableList<XBundleDTO> bundles();
 
     /**
      * Returns the observable list of services
      *
      * @return the observable list of services
      */
-    ObservableList<ServiceFxDTO> services();
+    ObservableList<XServiceDTO> services();
 
     /**
      * Returns the observable list of components
      *
      * @return the observable list of components
      */
-    ObservableList<ComponentFxDTO> components();
+    ObservableList<XComponentDTO> components();
 
     /**
      * Returns the observable list of configurations
      *
      * @return the observable list of configurations
      */
-    ObservableList<ConfigurationFxDTO> configurations();
+    ObservableList<XConfigurationDTO> configurations();
 
     /**
      * Returns the observable list of events
      *
      * @return the observable list of events
      */
-    ObservableList<EventFxDTO> events();
+    ObservableList<XEventDTO> events();
 
     /**
      * Returns the observable list of properties
      *
      * @return the observable list of properties
      */
-    ObservableList<PropertyFxDTO> properties();
+    ObservableList<XPropertyDTO> properties();
 
 }

@@ -14,7 +14,7 @@ import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 
-import in.bytehue.osgifx.console.ui.dto.BundleFxDTO;
+import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXML;
@@ -28,7 +28,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public final class BundlesFxController implements Initializable {
 
     @FXML
-    private TableView<BundleFxDTO> table;
+    private TableView<XBundleDTO> table;
 
     @Log
     @Inject
@@ -50,18 +50,18 @@ public final class BundlesFxController implements Initializable {
     public void initialize(final URL location, final ResourceBundle resources) {
         final Node expandedNode = Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
 
-        final TableRowExpanderColumn<BundleFxDTO> expanderColumn     = new TableRowExpanderColumn<>(param -> expandedNode);
-        final TableColumn<BundleFxDTO, String>    symbolicNameColumn = new TableColumn<>("Symbolic Name");
+        final TableRowExpanderColumn<XBundleDTO> expanderColumn     = new TableRowExpanderColumn<>(param -> expandedNode);
+        final TableColumn<XBundleDTO, String>    symbolicNameColumn = new TableColumn<>("Symbolic Name");
         symbolicNameColumn.setPrefWidth(450);
         symbolicNameColumn.setCellValueFactory(new PropertyValueFactory<>("symbolicName"));
 
-        final TableColumn<BundleFxDTO, String> versionColumn = new TableColumn<>("Version");
+        final TableColumn<XBundleDTO, String> versionColumn = new TableColumn<>("Version");
         versionColumn.setPrefWidth(450);
         versionColumn.setCellValueFactory(new PropertyValueFactory<>("version"));
 
-        final TableColumn<BundleFxDTO, String> statusColumn = new TableColumn<>("Status");
+        final TableColumn<XBundleDTO, String> statusColumn = new TableColumn<>("State");
         statusColumn.setPrefWidth(200);
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("state"));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(symbolicNameColumn);

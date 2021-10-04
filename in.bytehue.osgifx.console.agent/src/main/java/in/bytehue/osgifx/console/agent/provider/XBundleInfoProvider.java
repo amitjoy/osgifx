@@ -7,11 +7,14 @@ import static org.osgi.framework.Constants.SERVICE_ID;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +28,10 @@ import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
+import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
+import in.bytehue.osgifx.console.agent.dto.XPackageDTO;
+import in.bytehue.osgifx.console.agent.dto.XPackageDTO.XpackageType;
+import in.bytehue.osgifx.console.agent.dto.XServiceInfoDTO;
 
 public final class XBundleInfoProvider {
 
@@ -46,7 +53,7 @@ public final class XBundleInfoProvider {
         dto.location           = bundle.getLocation();
         dto.category           = getHeader(bundle, Constants.BUNDLE_CATEGORY);
         dto.isFragment         = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
-        dto.lastModified       = bundle.getLastModified();
+        dto.lastModified       = LocalDateTime.ofInstant(Instant.ofEpochMilli(bundle.getLastModified()), TimeZone.getDefault().toZoneId());
         dto.documentation      = getHeader(bundle, Constants.BUNDLE_DOCURL);
         dto.vendor             = getHeader(bundle, Constants.BUNDLE_VENDOR);
         dto.description        = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
@@ -63,97 +70,139 @@ public final class XBundleInfoProvider {
         return dto;
     }
 
-    private static Map<Long, String> getHostBundles(final Bundle bundle) {
-        final Map<Long, String> attachedHosts = new HashMap<>();
-        final BundleWiring      wiring        = bundle.adapt(BundleWiring.class);
+    private static List<XBundleInfoDTO> getHostBundles(final Bundle bundle) {
+        final List<XBundleInfoDTO> attachedHosts = new ArrayList<>();
+        final BundleWiring         wiring        = bundle.adapt(BundleWiring.class);
 
         for (final BundleWire wire : wiring.getRequiredWires(HOST_NAMESPACE)) {
-            final Bundle b = wire.getProviderWiring().getBundle();
-            attachedHosts.put(b.getBundleId(), b.getSymbolicName());
+            final Bundle         b   = wire.getProviderWiring().getBundle();
+            final XBundleInfoDTO dto = new XBundleInfoDTO();
+
+            dto.id  = b.getBundleId();
+            dto.symbolicName = b.getSymbolicName();
+            attachedHosts.add(dto);
         }
         return attachedHosts;
     }
 
-    private static Map<Long, String> getAttachedFragements(final Bundle bundle) {
-        final Map<Long, String> attachedFragments = new HashMap<>();
-        final BundleWiring      wiring            = bundle.adapt(BundleWiring.class);
+    private static List<XBundleInfoDTO> getAttachedFragements(final Bundle bundle) {
+        final List<XBundleInfoDTO> attachedFragments = new ArrayList<>();
+        final BundleWiring         wiring            = bundle.adapt(BundleWiring.class);
 
         for (final BundleWire wire : wiring.getProvidedWires(HOST_NAMESPACE)) {
-            final Bundle b = wire.getRequirerWiring().getBundle();
-            attachedFragments.put(b.getBundleId(), b.getSymbolicName());
+            final Bundle         b   = wire.getRequirerWiring().getBundle();
+            final XBundleInfoDTO dto = new XBundleInfoDTO();
+
+            dto.id  = b.getBundleId();
+            dto.symbolicName = b.getSymbolicName();
+
+            attachedFragments.add(dto);
         }
         return attachedFragments;
     }
 
-    private static Map<Long, String> getUsedServices(final Bundle bundle) {
-        final Map<Long, String>     services     = new HashMap<>();
+    private static List<XServiceInfoDTO> getUsedServices(final Bundle bundle) {
+        final List<XServiceInfoDTO> services     = new ArrayList<>();
         final ServiceReference<?>[] usedServices = bundle.getServicesInUse();
 
         for (final ServiceReference<?> service : usedServices) {
-            services.put(Long.parseLong(service.getProperty(SERVICE_ID).toString()), service.getProperty(OBJECTCLASS).toString());
+            final XServiceInfoDTO dto = new XServiceInfoDTO();
+
+            dto.id          = Long.parseLong(service.getProperty(SERVICE_ID).toString());
+            dto.objectClass = service.getProperty(OBJECTCLASS).toString();
+
+            services.add(dto);
         }
         return services;
     }
 
-    private static Map<Long, String> getRegisteredServices(final Bundle bundle) {
-        final Map<Long, String>     services           = new HashMap<>();
+    private static List<XServiceInfoDTO> getRegisteredServices(final Bundle bundle) {
+        final List<XServiceInfoDTO> services           = new ArrayList<>();
         final ServiceReference<?>[] registeredServices = bundle.getRegisteredServices();
 
         for (final ServiceReference<?> service : registeredServices) {
-            services.put(Long.parseLong(service.getProperty(SERVICE_ID).toString()), service.getProperty(OBJECTCLASS).toString());
+            final XServiceInfoDTO dto = new XServiceInfoDTO();
+
+            dto.id          = Long.parseLong(service.getProperty(SERVICE_ID).toString());
+            dto.objectClass = service.getProperty(OBJECTCLASS).toString();
+
+            services.add(dto);
         }
         return services;
     }
 
-    private static Map<Long, String> getWiredBundles(final Bundle bundle) {
+    private static List<XBundleInfoDTO> getWiredBundles(final Bundle bundle) {
         final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
         if (bundleWiring == null) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
-        final Map<Long, String> bundles       = new HashMap<>();
-        final List<BundleWire>  providedWires = bundleWiring.getProvidedWires(null);
-        final List<BundleWire>  requierdWires = bundleWiring.getRequiredWires(null);
+        final List<XBundleInfoDTO> bundles       = new ArrayList<>();
+        final List<BundleWire>     providedWires = bundleWiring.getProvidedWires(null);
+        final List<BundleWire>     requierdWires = bundleWiring.getRequiredWires(null);
 
         for (final BundleWire wire : providedWires) {
             final BundleRevision requirer = wire.getRequirer();
-            bundles.put(requirer.getBundle().getBundleId(), requirer.getSymbolicName());
+            final XBundleInfoDTO dto      = new XBundleInfoDTO();
+
+            dto.id  = requirer.getBundle().getBundleId();
+            dto.symbolicName = requirer.getSymbolicName();
+
+            bundles.add(dto);
         }
         for (final BundleWire wire : requierdWires) {
             final BundleRevision provider = wire.getProvider();
-            bundles.put(provider.getBundle().getBundleId(), provider.getSymbolicName());
-        }
+            final XBundleInfoDTO dto      = new XBundleInfoDTO();
 
+            dto.id  = provider.getBundle().getBundleId();
+            dto.symbolicName = provider.getSymbolicName();
+
+            bundles.add(dto);
+        }
         return bundles;
     }
 
-    private static Map<String, String> getImportedPackages(final Bundle bundle) {
+    private static List<XPackageDTO> getImportedPackages(final Bundle bundle) {
         final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
         if (bundleWiring == null) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
-        final List<BundleWire>    bundleWires      = bundleWiring.getRequiredWires(PACKAGE_NAMESPACE);
-        final Map<String, String> importedPackages = new HashMap<>();
+        final List<BundleWire>  bundleWires      = bundleWiring.getRequiredWires(PACKAGE_NAMESPACE);
+        final List<XPackageDTO> importedPackages = new ArrayList<>();
 
         for (final BundleWire bundleWire : bundleWires) {
             final String pkg     = (String) bundleWire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
             final String version = bundleWire.getCapability().getRevision().getVersion().toString();
-            importedPackages.put(pkg, version);
+
+            final XPackageDTO dto = new XPackageDTO();
+
+            dto.name    = pkg;
+            dto.version = version;
+            dto.type    = XpackageType.IMPORT;
+
+            importedPackages.add(dto);
         }
         return importedPackages;
     }
 
-    private static Map<String, String> getExportedPackages(final Bundle bundle) {
+    private static List<XPackageDTO> getExportedPackages(final Bundle bundle) {
         final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
         if (bundleWiring == null) {
-            return Collections.emptyMap();
+            return Collections.emptyList();
         }
-        final List<BundleWire>    bundleWires      = bundleWiring.getProvidedWires(PACKAGE_NAMESPACE);
-        final Map<String, String> exportedPackages = new HashMap<>();
+        final List<BundleWire>  bundleWires      = bundleWiring.getProvidedWires(PACKAGE_NAMESPACE);
+        final List<XPackageDTO> exportedPackages = new ArrayList<>();
 
         for (final BundleWire bundleWire : bundleWires) {
             final String pkg     = (String) bundleWire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
             final String version = bundleWire.getCapability().getRevision().getVersion().toString();
-            exportedPackages.put(pkg, version);
+
+            final XPackageDTO dto = new XPackageDTO();
+
+            dto.name    = pkg;
+            dto.version = version;
+            dto.type    = XpackageType.EXPORT;
+
+            exportedPackages.add(dto);
         }
         return exportedPackages;
     }
@@ -185,7 +234,7 @@ public final class XBundleInfoProvider {
 
     private static Map<String, String> toMap(final Dictionary<String, String> dictionary) {
         final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream().collect(Collectors.toMap(identity(), v -> dictionary.get(v)));
+        return keys.stream().collect(Collectors.toMap(identity(), dictionary::get));
     }
 
 }

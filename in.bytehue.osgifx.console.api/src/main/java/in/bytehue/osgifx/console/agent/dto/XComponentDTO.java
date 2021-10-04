@@ -4,28 +4,29 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.dto.DTO;
-
-import aQute.libg.tuple.Pair;
+import org.osgi.service.component.runtime.dto.ReferenceDTO;
+import org.osgi.service.component.runtime.dto.SatisfiedReferenceDTO;
+import org.osgi.service.component.runtime.dto.UnsatisfiedReferenceDTO;
 
 public class XComponentDTO extends DTO {
 
-    public long                      id;
-    public String                    name;
-    public String                    state;
-    public Pair<String, Long>        bundle;
-    public String                    factory;
-    public String                    scope;
-    public String                    implementationClass;
-    public String                    configurationPolicy;
-    public List<String>              serviceInterfaces;
-    public List<String>              configurationPid;
-    public Map<String, String>       properties;
-    public List<Map<String, String>> references;
-    public String                    failure;
-    public String                    activate;
-    public String                    deactivate;
-    public String                    modified;
-    public Map<String, String>       satisfiedReferences;
-    public Map<String, String>       unsatisfiedReferences;
+    public long                          id;
+    public String                        name;
+    public String                        state;
+    public XBundleInfoDTO                bundle;
+    public String                        factory;
+    public String                        scope;
+    public String                        implementationClass;
+    public String                        configurationPolicy;
+    public List<String>                  serviceInterfaces;
+    public List<String>                  configurationPid;
+    public Map<String, String>           properties;
+    public List<ReferenceDTO>            references;
+    public String                        failure;
+    public String                        activate;
+    public String                        deactivate;
+    public String                        modified;
+    public List<SatisfiedReferenceDTO>   satisfiedReferences;
+    public List<UnsatisfiedReferenceDTO> unsatisfiedReferences;
 
 }
