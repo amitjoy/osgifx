@@ -19,7 +19,7 @@ import in.bytehue.osgifx.console.agent.ConsoleAgent;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 
 @Component
-public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor, ConsoleAgent> implements ConsoleSupervisor {
+public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor, ConsoleAgent> implements ConsoleSupervisor, Supervisor {
 
     @Reference
     private EventAdmin eventAdmin;

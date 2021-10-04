@@ -2,7 +2,6 @@ package in.bytehue.osgifx.console.supervisor;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-import aQute.remote.api.Supervisor;
 import in.bytehue.osgifx.console.agent.ConsoleAgent;
 
 /**
@@ -12,7 +11,7 @@ import in.bytehue.osgifx.console.agent.ConsoleAgent;
  * use to control the session.
  */
 @ProviderType
-public interface ConsoleSupervisor extends Supervisor {
+public interface ConsoleSupervisor {
 
     /** event topic for consumers to listen for disconnection */
     String DISCONNECTION_TOPIC = "osgi/fx/console/disconnected";
