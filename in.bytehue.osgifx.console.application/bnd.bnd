@@ -11,3 +11,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
 -buildpath          : \
                       ${bundles.required},\
                       de.jensd:fontawesomefx;packages=*
+Import-Package      : org.controlsfx.glyphfont, * 

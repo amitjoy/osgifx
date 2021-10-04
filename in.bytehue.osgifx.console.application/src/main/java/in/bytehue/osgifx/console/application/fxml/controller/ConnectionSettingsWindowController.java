@@ -90,6 +90,13 @@ public final class ConnectionSettingsWindowController implements Initializable {
     }
 
     @FXML
+    public void removeConnection(final ActionEvent event) {
+        final MWindow addConnectionWindow = (MWindow) model.find(ADD_CONNECTION_WINDOW_ID, application);
+        addConnectionWindow.setVisible(true);
+        addConnectionWindow.setOnTop(true);
+    }
+
+    @FXML
     public void connectAgent(final ActionEvent event) {
         try {
             final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
