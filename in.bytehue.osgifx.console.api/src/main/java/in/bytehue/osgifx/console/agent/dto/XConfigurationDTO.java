@@ -8,7 +8,7 @@ public class XConfigurationDTO extends DTO {
 
     public String              pid;
     public String              factoryPid;
+    public String              location;
     public Map<String, String> properties;
-    public Map<Long, String>   usingBundles;
 
 }

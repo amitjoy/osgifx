@@ -20,7 +20,7 @@ public class XBundleDTO extends DTO {
     public int                 startLevel;
     public Map<String, String> exportedPackages;
     public Map<String, String> importedPackages;
-    public Map<Long, String>   importingBundles;
+    public Map<Long, String>   wiredBundles;
     public Map<Long, String>   registeredServices;
     public Map<String, String> manifestHeaders;
     public Map<Long, String>   usedServices;

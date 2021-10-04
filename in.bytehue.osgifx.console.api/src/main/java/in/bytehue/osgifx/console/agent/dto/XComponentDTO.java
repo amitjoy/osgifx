@@ -4,25 +4,28 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.dto.DTO;
-import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
-import javafx.util.Pair;
+import aQute.libg.tuple.Pair;
 
 public class XComponentDTO extends DTO {
 
+    public long                      id;
+    public String                    name;
+    public String                    state;
     public Pair<String, Long>        bundle;
+    public String                    factory;
+    public String                    scope;
     public String                    implementationClass;
-    public String                    defaultState;
-    public String                    activation;
     public String                    configurationPolicy;
-    public long                      serviceId;
-    public String                    serviceType;
-    public Map<Long, String>         services;
-    public List<String>              pid;
+    public List<String>              serviceInterfaces;
+    public List<String>              configurationPid;
     public Map<String, String>       properties;
-    public Map<String, ReferenceDTO> references;
+    public List<Map<String, String>> references;
+    public String                    failure;
     public String                    activate;
     public String                    deactivate;
     public String                    modified;
+    public Map<String, String>       satisfiedReferences;
+    public Map<String, String>       unsatisfiedReferences;
 
 }
