@@ -13,7 +13,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableMap;
 
 public final class BundleFxDTO {
-
     private final LongProperty                id                 = new SimpleLongProperty(this, "id");
     private final StringProperty              state              = new SimpleStringProperty(this, "state");
     private final StringProperty              symbolicName       = new SimpleStringProperty(this, "symbolicName");
@@ -28,7 +27,7 @@ public final class BundleFxDTO {
     private final IntegerProperty             startLevel         = new SimpleIntegerProperty(this, "startLevel");
     private final MapProperty<String, String> exportedPackages   = new SimpleMapProperty<>(this, "exportedPackages");
     private final MapProperty<String, String> importedPackages   = new SimpleMapProperty<>(this, "importedPackages");
-    private final MapProperty<Long, String>   importingBundles   = new SimpleMapProperty<>(this, "importingBundles");
+    private final MapProperty<Long, String>   wiredBundles       = new SimpleMapProperty<>(this, "wiredBundles");
     private final MapProperty<Long, String>   registeredServices = new SimpleMapProperty<>(this, "registeredServices");
     private final MapProperty<String, String> manifestHeaders    = new SimpleMapProperty<>(this, "manifestHeaders");
     private final MapProperty<Long, String>   usedServices       = new SimpleMapProperty<>(this, "usedServices");
@@ -203,16 +202,16 @@ public final class BundleFxDTO {
         importedPackagesProperty().set(importedPackages);
     }
 
-    public MapProperty<Long, String> importingBundlesProperty() {
-        return importingBundles;
+    public MapProperty<Long, String> wiredBundlesProperty() {
+        return wiredBundles;
     }
 
-    public ObservableMap<Long, String> getImportingBundles() {
-        return importingBundlesProperty().get();
+    public ObservableMap<Long, String> getWiredBundles() {
+        return wiredBundlesProperty().get();
     }
 
-    public void setImportingBundles(final ObservableMap<Long, String> importingBundles) {
-        importingBundlesProperty().set(importingBundles);
+    public void setWiredBundles(final ObservableMap<Long, String> wiredBundles) {
+        wiredBundlesProperty().set(wiredBundles);
     }
 
     public MapProperty<Long, String> registeredServicesProperty() {

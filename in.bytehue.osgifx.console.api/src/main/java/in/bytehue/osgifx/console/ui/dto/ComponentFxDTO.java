@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.ui.dto;
 
+import java.util.Map;
+
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.MapProperty;
@@ -16,20 +18,60 @@ import javafx.util.Pair;
 
 public final class ComponentFxDTO {
 
-    private final ObjectProperty<Pair<String, Long>> bundle              = new SimpleObjectProperty<>(this, "bundle");
-    private final StringProperty                     implementationClass = new SimpleStringProperty(this, "implementationClass");
-    private final StringProperty                     defaultState        = new SimpleStringProperty(this, "defaultState");
-    private final StringProperty                     activation          = new SimpleStringProperty(this, "activation");
-    private final StringProperty                     configurationPolicy = new SimpleStringProperty(this, "configurationPolicy");
-    private final LongProperty                       serviceId           = new SimpleLongProperty(this, "serviceId");
-    private final StringProperty                     serviceType         = new SimpleStringProperty(this, "serviceType");
-    private final MapProperty<Long, String>          services            = new SimpleMapProperty<>(this, "services");
-    private final ListProperty<String>               pid                 = new SimpleListProperty<>(this, "pid");
-    private final MapProperty<String, String>        properties          = new SimpleMapProperty<>(this, "properties");
-    private final MapProperty<String, String>        references          = new SimpleMapProperty<>(this, "references");
-    private final StringProperty                     activate            = new SimpleStringProperty(this, "activate");
-    private final StringProperty                     deactivate          = new SimpleStringProperty(this, "deactivate");
-    private final StringProperty                     modified            = new SimpleStringProperty(this, "modified");
+    private final LongProperty                       id                    = new SimpleLongProperty(this, "id");
+    private final StringProperty                     name                  = new SimpleStringProperty(this, "name");
+    private final StringProperty                     state                 = new SimpleStringProperty(this, "state");
+    private final ObjectProperty<Pair<String, Long>> bundle                = new SimpleObjectProperty<>(this, "bundle");
+    private final StringProperty                     factory               = new SimpleStringProperty(this, "factory");
+    private final StringProperty                     scope                 = new SimpleStringProperty(this, "scope");
+    private final StringProperty                     implementationClass   = new SimpleStringProperty(this, "implementationClass");
+    private final StringProperty                     configurationPolicy   = new SimpleStringProperty(this, "configurationPolicy");
+    private final ListProperty<String>               serviceInterfaces     = new SimpleListProperty<>(this, "serviceInterfaces");
+    private final ListProperty<String>               configurationPid      = new SimpleListProperty<>(this, "configurationPid");
+    private final MapProperty<String, String>        properties            = new SimpleMapProperty<>(this, "properties");
+    private final ListProperty<Map<String, String>>  references            = new SimpleListProperty<>(this, "references");
+    private final StringProperty                     failure               = new SimpleStringProperty(this, "failure");
+    private final StringProperty                     activate              = new SimpleStringProperty(this, "activate");
+    private final StringProperty                     deactivate            = new SimpleStringProperty(this, "deactivate");
+    private final StringProperty                     modified              = new SimpleStringProperty(this, "modified");
+    private final MapProperty<String, String>        satisfiedReferences   = new SimpleMapProperty<>(this, "satisfiedReferences");
+    private final MapProperty<String, String>        unsatisfiedReferences = new SimpleMapProperty<>(this, "unsatisfiedReferences");
+
+    public LongProperty idProperty() {
+        return id;
+    }
+
+    public long getId() {
+        return idProperty().get();
+    }
+
+    public void setId(final long id) {
+        idProperty().set(id);
+    }
+
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    public String getName() {
+        return nameProperty().get();
+    }
+
+    public void setName(final String name) {
+        nameProperty().set(name);
+    }
+
+    public StringProperty stateProperty() {
+        return state;
+    }
+
+    public String getState() {
+        return stateProperty().get();
+    }
+
+    public void setState(final String state) {
+        stateProperty().set(state);
+    }
 
     public ObjectProperty<Pair<String, Long>> bundleProperty() {
         return bundle;
@@ -41,6 +83,30 @@ public final class ComponentFxDTO {
 
     public void setBundle(final Pair<String, Long> bundle) {
         bundleProperty().set(bundle);
+    }
+
+    public StringProperty factoryProperty() {
+        return factory;
+    }
+
+    public String getFactory() {
+        return factoryProperty().get();
+    }
+
+    public void setFactory(final String factory) {
+        factoryProperty().set(factory);
+    }
+
+    public StringProperty scopeProperty() {
+        return scope;
+    }
+
+    public String getScope() {
+        return scopeProperty().get();
+    }
+
+    public void setScope(final String scope) {
+        scopeProperty().set(scope);
     }
 
     public StringProperty implementationClassProperty() {
@@ -55,30 +121,6 @@ public final class ComponentFxDTO {
         implementationClassProperty().set(implementationClass);
     }
 
-    public StringProperty defaultStateProperty() {
-        return defaultState;
-    }
-
-    public String getDefaultState() {
-        return defaultStateProperty().get();
-    }
-
-    public void setDefaultState(final String defaultState) {
-        defaultStateProperty().set(defaultState);
-    }
-
-    public StringProperty activationProperty() {
-        return activation;
-    }
-
-    public String getActivation() {
-        return activationProperty().get();
-    }
-
-    public void setActivation(final String activation) {
-        activationProperty().set(activation);
-    }
-
     public StringProperty configurationPolicyProperty() {
         return configurationPolicy;
     }
@@ -91,52 +133,28 @@ public final class ComponentFxDTO {
         configurationPolicyProperty().set(configurationPolicy);
     }
 
-    public LongProperty serviceIdProperty() {
-        return serviceId;
+    public ListProperty<String> serviceInterfacesProperty() {
+        return serviceInterfaces;
     }
 
-    public long getServiceId() {
-        return serviceIdProperty().get();
+    public ObservableList<String> getServiceInterfaces() {
+        return serviceInterfacesProperty().get();
     }
 
-    public void setServiceId(final long serviceId) {
-        serviceIdProperty().set(serviceId);
+    public void setServiceInterfaces(final ObservableList<String> serviceInterfaces) {
+        serviceInterfacesProperty().set(serviceInterfaces);
     }
 
-    public StringProperty serviceTypeProperty() {
-        return serviceType;
+    public ListProperty<String> configurationPidProperty() {
+        return configurationPid;
     }
 
-    public String getServiceType() {
-        return serviceTypeProperty().get();
+    public ObservableList<String> getConfigurationPid() {
+        return configurationPidProperty().get();
     }
 
-    public void setServiceType(final String serviceType) {
-        serviceTypeProperty().set(serviceType);
-    }
-
-    public MapProperty<Long, String> servicesProperty() {
-        return services;
-    }
-
-    public ObservableMap<Long, String> getServices() {
-        return servicesProperty().get();
-    }
-
-    public void setServices(final ObservableMap<Long, String> services) {
-        servicesProperty().set(services);
-    }
-
-    public ListProperty<String> pidProperty() {
-        return pid;
-    }
-
-    public ObservableList<String> getPid() {
-        return pidProperty().get();
-    }
-
-    public void setPid(final ObservableList<String> pid) {
-        pidProperty().set(pid);
+    public void setConfigurationPid(final ObservableList<String> configurationPid) {
+        configurationPidProperty().set(configurationPid);
     }
 
     public MapProperty<String, String> propertiesProperty() {
@@ -151,16 +169,28 @@ public final class ComponentFxDTO {
         propertiesProperty().set(properties);
     }
 
-    public MapProperty<String, String> referencesProperty() {
+    public ListProperty<Map<String, String>> referencesProperty() {
         return references;
     }
 
-    public ObservableMap<String, String> getReferences() {
+    public ObservableList<Map<String, String>> getReferences() {
         return referencesProperty().get();
     }
 
-    public void setReferences(final ObservableMap<String, String> references) {
+    public void setReferences(final ObservableList<Map<String, String>> references) {
         referencesProperty().set(references);
+    }
+
+    public StringProperty failureProperty() {
+        return failure;
+    }
+
+    public String getFailure() {
+        return failureProperty().get();
+    }
+
+    public void setFailure(final String failure) {
+        failureProperty().set(failure);
     }
 
     public StringProperty activateProperty() {
@@ -197,6 +227,30 @@ public final class ComponentFxDTO {
 
     public void setModified(final String modified) {
         modifiedProperty().set(modified);
+    }
+
+    public MapProperty<String, String> satisfiedReferencesProperty() {
+        return satisfiedReferences;
+    }
+
+    public ObservableMap<String, String> getSatisfiedReferences() {
+        return satisfiedReferencesProperty().get();
+    }
+
+    public void setSatisfiedReferences(final ObservableMap<String, String> satisfiedReferences) {
+        satisfiedReferencesProperty().set(satisfiedReferences);
+    }
+
+    public MapProperty<String, String> unsatisfiedReferencesProperty() {
+        return unsatisfiedReferences;
+    }
+
+    public ObservableMap<String, String> getUnsatisfiedReferences() {
+        return unsatisfiedReferencesProperty().get();
+    }
+
+    public void setUnsatisfiedReferences(final ObservableMap<String, String> unsatisfiedReferences) {
+        unsatisfiedReferencesProperty().set(unsatisfiedReferences);
     }
 
 }

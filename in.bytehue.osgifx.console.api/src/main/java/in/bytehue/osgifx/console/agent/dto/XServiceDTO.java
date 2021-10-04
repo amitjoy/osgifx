@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.osgi.dto.DTO;
 
-import javafx.util.Pair;
+import aQute.libg.tuple.Pair;
 
 public class XServiceDTO extends DTO {
 

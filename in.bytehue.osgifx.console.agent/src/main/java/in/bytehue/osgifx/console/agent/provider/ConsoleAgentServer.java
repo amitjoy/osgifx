@@ -1,21 +1,17 @@
 package in.bytehue.osgifx.console.agent.provider;
 
 import static java.util.Collections.emptyList;
-import static java.util.function.Function.identity;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.osgi.annotation.bundle.Capability;
 import org.osgi.framework.BundleContext;
@@ -75,7 +71,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        return XConfigurationtInfoProvider.get(getContext(), configAdminTracker.getService());
+        return XConfigurationtInfoProvider.get(configAdminTracker.getService());
     }
 
     @Override
@@ -119,7 +115,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
                 .ifPresent(p -> {
                     try {
                         p.getValue();
-                    } catch (InvocationTargetException | InterruptedException e) {
+                    } catch (final Exception e) {
                         logger.error("Cannot enable component '{}'", description);
                     }
                 });
@@ -134,7 +130,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
                 .ifPresent(p -> {
                     try {
                         p.getValue();
-                    } catch (InvocationTargetException | InterruptedException e) {
+                    } catch (final Exception e) {
                         logger.error("Cannot disable component '{}'", description);
                     }
                 });
@@ -172,7 +168,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
                     configuration.delete();
                 }
             }
-        } catch (IOException | InvalidSyntaxException e) {
+        } catch (final Exception e) {
             logger.error("Cannot delete configuration '{}'", pid);
         }
     }
@@ -189,7 +185,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
                     configuration.update(new Hashtable<>(newProperties));
                 }
             }
-        } catch (IOException | InvalidSyntaxException e) {
+        } catch (final Exception e) {
             logger.error("Cannot update configuration '{}'", pid);
         }
     }
@@ -231,14 +227,9 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
 
         dto.pid        = configuration.getPid();
         dto.factoryPid = configuration.getFactoryPid();
-        dto.properties = toMap(configuration.getProperties());
+        dto.properties = ConsoleAgentHelper.toMap(configuration.getProperties());
 
         return dto;
-    }
-
-    public static Map<String, String> toMap(final Dictionary<String, Object> dictionary) {
-        final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream().collect(Collectors.toMap(identity(), v -> dictionary.get(v).toString()));
     }
 
 }
