@@ -28,7 +28,8 @@ import javafx.stage.StageStyle;
 
 public final class ConnectionSettingsWindowController implements Initializable {
 
-    private static final String CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.connection";
+    private static final String CONNECTION_WINDOW_ID     = "in.bytehue.osgifx.console.window.connection";
+    private static final String ADD_CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.addconnections";
 
     @Inject
     private EModelService model;
@@ -41,6 +42,9 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @FXML
     private Button connectButton;
+
+    @FXML
+    private Button addConnectionButton;
 
     @FXML
     private Button removeConnectionButton;
@@ -79,6 +83,13 @@ public final class ConnectionSettingsWindowController implements Initializable {
     }
 
     @FXML
+    public void addConnection(final ActionEvent event) {
+        final MWindow addConnectionWindow = (MWindow) model.find(ADD_CONNECTION_WINDOW_ID, application);
+        addConnectionWindow.setVisible(true);
+        addConnectionWindow.setOnTop(true);
+    }
+
+    @FXML
     public void connectAgent(final ActionEvent event) {
         try {
             final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
@@ -99,4 +110,5 @@ public final class ConnectionSettingsWindowController implements Initializable {
         final ConnectionSettingDTO dto = new ConnectionSettingDTO("localhost", 2000, 400);
         return FXCollections.observableArrayList(dto);
     }
+
 }
