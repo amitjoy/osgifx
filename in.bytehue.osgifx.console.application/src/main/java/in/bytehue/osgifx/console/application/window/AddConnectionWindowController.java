@@ -9,7 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 
-public class AddConnectionWindowController implements Initializable {
+public final class AddConnectionWindowController implements Initializable {
 
     @FXML
     private AnchorPane anchorPanel;

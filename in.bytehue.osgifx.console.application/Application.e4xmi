@@ -16,12 +16,15 @@
         <children xsi:type="menu:DirectMenuItem" xmi:id="_vzJVkCFQEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.directmenuitem.about" label="About OSGi.fx Console" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/about.png" tooltip="Shows information about the OSGi.fx Console" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.AboutConsoleHandler"/>
       </children>
     </mainMenu>
-  </children>
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" visible="false" label="Choose Connections" width="600" height="400">
-    <tags>efx-center-on-screen</tags>
-  </children>
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="Add Connections">
-    <tags>efx-center-on-screen</tags>
+    <windows xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" label="Choose Connections" width="550" height="300">
+      <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
+      <persistedState key="efx.window.stagemodality" value="APPLICATION_MODAL"/>
+      <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/in.bytehue.osgifx.console.application/fxml/connection-chooser-window.fxml"/>
+      <tags>efx-center-on-screen</tags>
+      <windows xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="Add Connections">
+        <tags>efx-center-on-screen</tags>
+      </windows>
+    </windows>
   </children>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
