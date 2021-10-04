@@ -11,7 +11,6 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
-import in.bytehue.osgifx.console.agent.ConsoleAgent;
 import in.bytehue.osgifx.console.application.dto.ConnectionSettingDTO;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
@@ -28,8 +27,7 @@ import javafx.stage.StageStyle;
 
 public final class ConnectionSettingsWindowController implements Initializable {
 
-    private static final String CONNECTION_WINDOW_ID     = "in.bytehue.osgifx.console.window.connection";
-    private static final String ADD_CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.addconnections";
+    private static final String CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.connection";
 
     @Inject
     private EModelService model;
@@ -84,16 +82,10 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @FXML
     public void addConnection(final ActionEvent event) {
-        final MWindow addConnectionWindow = (MWindow) model.find(ADD_CONNECTION_WINDOW_ID, application);
-        addConnectionWindow.setVisible(true);
-        addConnectionWindow.setOnTop(true);
     }
 
     @FXML
     public void removeConnection(final ActionEvent event) {
-        final MWindow addConnectionWindow = (MWindow) model.find(ADD_CONNECTION_WINDOW_ID, application);
-        addConnectionWindow.setVisible(true);
-        addConnectionWindow.setOnTop(true);
     }
 
     @FXML
@@ -102,8 +94,6 @@ public final class ConnectionSettingsWindowController implements Initializable {
             final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
             supervisor.connect(selectedConnection.host, selectedConnection.port, selectedConnection.timeout);
 
-            final ConsoleAgent agent = supervisor.getAgent();
-            System.out.println(agent.getAllBundles());
             final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
             connectionChooserWindow.setVisible(false);
         } catch (final Exception e) {

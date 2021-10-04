@@ -21,11 +21,6 @@
       <persistedState key="efx.window.stagemodality" value="APPLICATION_MODAL"/>
       <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/in.bytehue.osgifx.console.application/fxml/connection-chooser-window.fxml"/>
       <tags>efx-center-on-screen</tags>
-      <windows xsi:type="basic:TrimmedWindow" xmi:id="_9QMugB1IEeyQ9K7YOHt1sg" elementId="in.bytehue.osgifx.console.window.addconnections" visible="false" label="Add Connections" width="300" height="300">
-        <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
-        <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/in.bytehue.osgifx.console.application/fxml/add-connection-window.fxml"/>
-        <tags>efx-center-on-screen</tags>
-      </windows>
     </windows>
   </children>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
