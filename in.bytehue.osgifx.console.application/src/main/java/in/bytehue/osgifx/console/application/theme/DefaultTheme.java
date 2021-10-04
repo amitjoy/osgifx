@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.application.themes;
+package in.bytehue.osgifx.console.application.theme;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;

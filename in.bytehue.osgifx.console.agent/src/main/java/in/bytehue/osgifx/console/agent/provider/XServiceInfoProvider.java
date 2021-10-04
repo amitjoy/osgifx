@@ -3,7 +3,7 @@ package in.bytehue.osgifx.console.agent.provider;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 
-import aQute.libg.tuple.Pair;
+import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
 public final class XServiceInfoProvider {
@@ -29,7 +29,11 @@ public final class XServiceInfoProvider {
     private static XServiceDTO toDTO(final ServiceReferenceDTO refDTO, final BundleContext context) {
         final XServiceDTO dto = new XServiceDTO();
 
-        dto.bundle       = Pair.newInstance(ConsoleAgentHelper.bsn(refDTO.bundle, context), refDTO.bundle);
+        final XBundleInfoDTO bundleInfo = new XBundleInfoDTO();
+        bundleInfo.id           = refDTO.bundle;
+        bundleInfo.symbolicName = ConsoleAgentHelper.bsn(refDTO.bundle, context);
+
+        dto.bundle       = bundleInfo;
         dto.id           = refDTO.id;
         dto.properties   = refDTO.properties.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> (String) e.getValue()));
         dto.usingBundles = getUsingBundles(refDTO.usingBundles, context);
@@ -37,11 +41,16 @@ public final class XServiceInfoProvider {
         return dto;
     }
 
-    private static Map<Long, String> getUsingBundles(final long[] usingBundles, final BundleContext context) {
-        final Map<Long, String> bundles = new HashMap<>();
+    private static List<XBundleInfoDTO> getUsingBundles(final long[] usingBundles, final BundleContext context) {
+        final List<XBundleInfoDTO> bundles = new ArrayList<>();
         for (final long id : usingBundles) {
             final String bsn = ConsoleAgentHelper.bsn(id, context);
-            bundles.put(id, bsn);
+
+            final XBundleInfoDTO dto = new XBundleInfoDTO();
+            dto.id           = id;
+            dto.symbolicName = bsn;
+
+            bundles.add(dto);
         }
         return bundles;
     }

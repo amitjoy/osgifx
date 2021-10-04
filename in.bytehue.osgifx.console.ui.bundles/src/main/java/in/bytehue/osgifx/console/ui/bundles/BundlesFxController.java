@@ -14,8 +14,11 @@ import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 
+import com.sun.org.apache.xpath.internal.operations.String;
+
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
+import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,12 +26,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 
 public final class BundlesFxController implements Initializable {
-
-    @FXML
-    private TableView<XBundleDTO> table;
 
     @Log
     @Inject
@@ -37,6 +36,9 @@ public final class BundlesFxController implements Initializable {
     @Inject
     @LocalInstance
     private FXMLLoader loader;
+
+    @FXML
+    private TableView<XBundleDTO> table;
 
     @Inject
     @Service
@@ -53,15 +55,15 @@ public final class BundlesFxController implements Initializable {
         final TableRowExpanderColumn<XBundleDTO> expanderColumn     = new TableRowExpanderColumn<>(param -> expandedNode);
         final TableColumn<XBundleDTO, String>    symbolicNameColumn = new TableColumn<>("Symbolic Name");
         symbolicNameColumn.setPrefWidth(450);
-        symbolicNameColumn.setCellValueFactory(new PropertyValueFactory<>("symbolicName"));
+        symbolicNameColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
 
         final TableColumn<XBundleDTO, String> versionColumn = new TableColumn<>("Version");
         versionColumn.setPrefWidth(450);
-        versionColumn.setCellValueFactory(new PropertyValueFactory<>("version"));
+        versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
         final TableColumn<XBundleDTO, String> statusColumn = new TableColumn<>("State");
         statusColumn.setPrefWidth(200);
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("state"));
+        statusColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(symbolicNameColumn);

@@ -7,14 +7,11 @@ import static org.osgi.framework.Constants.SERVICE_ID;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,7 +50,7 @@ public final class XBundleInfoProvider {
         dto.location           = bundle.getLocation();
         dto.category           = getHeader(bundle, Constants.BUNDLE_CATEGORY);
         dto.isFragment         = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
-        dto.lastModified       = LocalDateTime.ofInstant(Instant.ofEpochMilli(bundle.getLastModified()), TimeZone.getDefault().toZoneId());
+        dto.lastModified       = bundle.getLastModified();
         dto.documentation      = getHeader(bundle, Constants.BUNDLE_DOCURL);
         dto.vendor             = getHeader(bundle, Constants.BUNDLE_VENDOR);
         dto.description        = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
@@ -78,7 +75,7 @@ public final class XBundleInfoProvider {
             final Bundle         b   = wire.getProviderWiring().getBundle();
             final XBundleInfoDTO dto = new XBundleInfoDTO();
 
-            dto.id  = b.getBundleId();
+            dto.id           = b.getBundleId();
             dto.symbolicName = b.getSymbolicName();
             attachedHosts.add(dto);
         }
@@ -93,7 +90,7 @@ public final class XBundleInfoProvider {
             final Bundle         b   = wire.getRequirerWiring().getBundle();
             final XBundleInfoDTO dto = new XBundleInfoDTO();
 
-            dto.id  = b.getBundleId();
+            dto.id           = b.getBundleId();
             dto.symbolicName = b.getSymbolicName();
 
             attachedFragments.add(dto);
@@ -105,6 +102,9 @@ public final class XBundleInfoProvider {
         final List<XServiceInfoDTO> services     = new ArrayList<>();
         final ServiceReference<?>[] usedServices = bundle.getServicesInUse();
 
+        if (usedServices == null) {
+            return Collections.emptyList();
+        }
         for (final ServiceReference<?> service : usedServices) {
             final XServiceInfoDTO dto = new XServiceInfoDTO();
 
@@ -120,6 +120,9 @@ public final class XBundleInfoProvider {
         final List<XServiceInfoDTO> services           = new ArrayList<>();
         final ServiceReference<?>[] registeredServices = bundle.getRegisteredServices();
 
+        if (registeredServices == null) {
+            return Collections.emptyList();
+        }
         for (final ServiceReference<?> service : registeredServices) {
             final XServiceInfoDTO dto = new XServiceInfoDTO();
 
@@ -144,7 +147,7 @@ public final class XBundleInfoProvider {
             final BundleRevision requirer = wire.getRequirer();
             final XBundleInfoDTO dto      = new XBundleInfoDTO();
 
-            dto.id  = requirer.getBundle().getBundleId();
+            dto.id           = requirer.getBundle().getBundleId();
             dto.symbolicName = requirer.getSymbolicName();
 
             bundles.add(dto);
@@ -153,7 +156,7 @@ public final class XBundleInfoProvider {
             final BundleRevision provider = wire.getProvider();
             final XBundleInfoDTO dto      = new XBundleInfoDTO();
 
-            dto.id  = provider.getBundle().getBundleId();
+            dto.id           = provider.getBundle().getBundleId();
             dto.symbolicName = provider.getSymbolicName();
 
             bundles.add(dto);

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<ToolBar xmlns:fx="http://javafx.com/fxml" fx:id="decorationArea" fx:controller="in.bytehue.osgifx.console.application.decoration.DecorationController" prefHeight="26" minHeight="26" maxHeight="26">
+<ToolBar xmlns:fx="http://javafx.com/fxml" fx:id="decorationArea" fx:controller="in.bytehue.osgifx.console.application.fxml.controller.TopAreaDecorationController" prefHeight="26" minHeight="26" maxHeight="26">
 	<items>
 		<Region> 
 			<HBox.hgrow>ALWAYS</HBox.hgrow>

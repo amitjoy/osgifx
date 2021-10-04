@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.agent.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public class XBundleDTO extends DTO {
     public String                location;
     public String                category;
     public boolean               isFragment;
-    public LocalDateTime         lastModified;
+    public long                  lastModified;
     public String                documentation;
     public String                vendor;
     public String                description;
