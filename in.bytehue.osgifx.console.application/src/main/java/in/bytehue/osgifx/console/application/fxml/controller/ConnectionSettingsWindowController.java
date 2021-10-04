@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.application.window;
+package in.bytehue.osgifx.console.application.fxml.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -11,8 +11,10 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
+import in.bytehue.osgifx.console.agent.ConsoleAgent;
 import in.bytehue.osgifx.console.application.dto.ConnectionSettingDTO;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
+import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +24,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.StageStyle;
 
 public final class ConnectionSettingsWindowController implements Initializable {
@@ -58,9 +59,9 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        hostColumn.setCellValueFactory(new PropertyValueFactory<>("host"));
-        portColumn.setCellValueFactory(new PropertyValueFactory<>("port"));
-        timeoutColumn.setCellValueFactory(new PropertyValueFactory<>("timeout"));
+        hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
+        portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
+        timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
 
         connectionTable.setItems(getStoredConnections());
         connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -81,7 +82,10 @@ public final class ConnectionSettingsWindowController implements Initializable {
     public void connectAgent(final ActionEvent event) {
         try {
             final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
-            supervisor.connect(selectedConnection.getHost(), selectedConnection.getPort(), selectedConnection.getTimeout());
+            supervisor.connect(selectedConnection.host, selectedConnection.port, selectedConnection.timeout);
+
+            final ConsoleAgent agent = supervisor.getAgent();
+            System.out.println(agent.getAllBundles());
             final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
             connectionChooserWindow.setVisible(false);
         } catch (final Exception e) {

@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.application.decoration;
+package in.bytehue.osgifx.console.application.fxml.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -10,7 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ToolBar;
 import javafx.stage.Stage;
 
-public class DecorationController implements Initializable {
+public final class TopAreaDecorationController implements Initializable {
 
     @FXML
     private ToolBar decorationArea;

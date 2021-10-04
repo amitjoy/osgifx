@@ -34,5 +34,4 @@
   <addons xmi:id="_c376xhuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
   <addons xmi:id="_c376xxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
   <addons xmi:id="_Xj5j8CD7EeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.addon.bundlecontext" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.addon.BundleContextAddon"/>
-  <addons xmi:id="_0xpOACTAEeyGaYLC8KcXJA" elementId="in.bytehue.osgifx.console.application.addon.agentdisconnection" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.addon.AgentDisconnectAddon"/>
 </application:Application>

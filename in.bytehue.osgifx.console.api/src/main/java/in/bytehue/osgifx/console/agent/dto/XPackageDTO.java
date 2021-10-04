@@ -1,6 +1,8 @@
 package in.bytehue.osgifx.console.agent.dto;
 
-public class XPackageDTO {
+import org.osgi.dto.DTO;
+
+public class XPackageDTO extends DTO {
 
     public String       name;
     public String       version;

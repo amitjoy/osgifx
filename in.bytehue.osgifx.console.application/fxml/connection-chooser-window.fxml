@@ -6,14 +6,14 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="550.0" style="-fx-font-size: 9pt;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.application.window.ConnectionSettingsWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="550.0" style="-fx-font-size: 9pt;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.application.fxml.controller.ConnectionSettingsWindowController">
    <children>
       <ImageView fitHeight="67.0" fitWidth="550.0" pickOnBounds="true" preserveRatio="true" smooth="false" />
       <TableView fx:id="connectionTable" layoutY="69.0" prefHeight="181.0" prefWidth="500.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="69.0">
         <columns>
-          <TableColumn fx:id="hostColumn" prefWidth="236.0" text="Host" />
-          <TableColumn fx:id="portColumn" prefWidth="168.0" text="Port" />
-            <TableColumn fx:id="timeoutColumn" minWidth="0.0" prefWidth="142.0" text="Timeout" />
+          <TableColumn fx:id="hostColumn" editable="false" prefWidth="236.0" text="Host" />
+          <TableColumn fx:id="portColumn" editable="false" prefWidth="168.0" text="Port" />
+            <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="142.0" text="Timeout" />
         </columns>
       </TableView>
       <Button fx:id="connectButton" disable="true" layoutX="356.0" layoutY="263.0" mnemonicParsing="false" onAction="#connectAgent" prefWidth="80.0" style="-fx-background-color: #5cb85c;" text="Connect" />
