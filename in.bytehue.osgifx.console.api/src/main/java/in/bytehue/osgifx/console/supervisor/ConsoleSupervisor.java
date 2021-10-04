@@ -14,6 +14,9 @@ import in.bytehue.osgifx.console.agent.ConsoleAgent;
 @ProviderType
 public interface ConsoleSupervisor extends Supervisor {
 
+    /** event topic for consumers to listen for disconnection */
+    String DISCONNECTION_TOPIC = "osgi/fx/console/disconnected";
+
     /**
      * Returns the associated agent instance to control the remote OSGi framework
      *
