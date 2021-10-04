@@ -18,7 +18,7 @@
       </TableView>
       <Button fx:id="connectButton" disable="true" layoutX="356.0" layoutY="263.0" mnemonicParsing="false" onAction="#connectAgent" prefWidth="80.0" style="-fx-background-color: #5cb85c;" text="Connect" />
       <Button layoutX="456.0" layoutY="263.0" mnemonicParsing="false" onAction="#handleClose" prefWidth="80.0" style="-fx-background-color: #d9534f;" text="Cancel" />
-      <Button layoutX="17.0" layoutY="263.0" mnemonicParsing="false" prefWidth="80.0" style="-fx-background-color: #5bc0de;" text="Add" />
+      <Button fx:id="addConnectionButton" layoutX="17.0" layoutY="263.0" mnemonicParsing="false" onAction="#addConnection" prefWidth="80.0" style="-fx-background-color: #5bc0de;" text="Add" />
       <Button fx:id="removeConnectionButton" disable="true" layoutX="115.0" layoutY="263.0" mnemonicParsing="false" prefWidth="80.0" style="-fx-background-color: #5bc0de;" text="Remove" />
    </children>
 </AnchorPane>

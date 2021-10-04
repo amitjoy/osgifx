@@ -3,26 +3,39 @@ package in.bytehue.osgifx.console.application.fxml.controller;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 
 public final class AddConnectionWindowController implements Initializable {
 
-    @FXML
-    private AnchorPane anchorPanel;
+    private static final String ADD_CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.addconnections";
+
+    @Inject
+    private EModelService model;
+
+    @Inject
+    private MApplication application;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        final Scene stage = anchorPanel.getScene();
-        anchorPanel.setAccessibleHelp("Hellp, I am help");
-        System.out.println("====> 1 ====> " + stage);
     }
 
-    public void doThis(final ActionEvent e) {
-        final Scene stage = anchorPanel.getScene();
-        System.out.println("====> 2 ====> " + stage);
+    @FXML
+    public void handleClose(final ActionEvent event) {
+        final MWindow addConnectionWindow = (MWindow) model.find(ADD_CONNECTION_WINDOW_ID, application);
+        addConnectionWindow.setVisible(false);
+        addConnectionWindow.setOnTop(false);
     }
+
+    @FXML
+    public void addConnection(final ActionEvent event) {
+    }
+
 }
