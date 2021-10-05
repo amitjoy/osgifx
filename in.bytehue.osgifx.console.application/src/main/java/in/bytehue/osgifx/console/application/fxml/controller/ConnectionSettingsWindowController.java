@@ -17,6 +17,7 @@ import org.eclipse.fx.core.command.CommandService;
 
 import in.bytehue.osgifx.console.application.dialog.ConnectionDialog;
 import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
+import in.bytehue.osgifx.console.application.preference.ConnectionsProvider;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import javafx.application.Platform;
@@ -43,6 +44,9 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @Inject
     private CommandService commandService;
+
+    @Inject
+    private ConnectionsProvider connectionsProvider;
 
     @FXML
     private Button connectButton;
@@ -71,7 +75,7 @@ public final class ConnectionSettingsWindowController implements Initializable {
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
 
-        // connectionTable.setItems(getStoredConnections());
+        connectionTable.setItems(connectionsProvider.getConnections());
         connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 connectButton.setDisable(false);
