@@ -1,14 +1,18 @@
 package in.bytehue.osgifx.console.ui.overview;
 
+import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.AGENT_CONNECTED_EVENT_TOPIC;
+
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.e4.ui.di.UIEventTopic;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
@@ -17,7 +21,7 @@ import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.skins.LeaderBoardItem;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
-import javafx.fxml.FXMLLoader;
+import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Background;
@@ -32,13 +36,12 @@ public final class OverviewFxUI {
     private static final double TILE_WIDTH  = 400;
     private static final double TILE_HEIGHT = 200;
 
-    @PostConstruct
-    public void postConstruct(final VBox parent, @LocalInstance final FXMLLoader loader) {
-        createControls(parent);
-    }
+    @Inject
+    private ConsoleSupervisor supervisor;
 
-    private List<LeaderBoardItem> getRuntimeInfo() {
-        return Collections.emptyList();
+    @PostConstruct
+    public void postConstruct(final VBox parent) {
+        createControls(parent);
     }
 
     private List<LeaderBoardItem> getAgentInfo() {
@@ -71,7 +74,7 @@ public final class OverviewFxUI {
         clockTile.setRoundedCorners(false);
 
         final Tile agentInfoTile = TileBuilder.create()
-                                                .skinType(SkinType.LEADER_BOARD)
+                                                .skinType(SkinType.TEXT)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                 .title("Agent")
                                                 .text("Console agent information")
@@ -84,42 +87,56 @@ public final class OverviewFxUI {
                                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                   .title("Runtime")
                                                   .text("Runtime OSGi framework information")
-                                                  .leaderBoardItems(getRuntimeInfo())
                                                   .build();
         runtimeInfoTile.setRoundedCorners(false);
 
+        final double noOfInstalledBundles = java.util.Optional.ofNullable(supervisor.getAgent())
+                                                              .map(agent -> agent.getAllBundles().size())
+                                                              .map(Double::valueOf)
+                                                              .orElse(0.0d);
         final Tile noOfBundlesTile = TileBuilder.create()
                                                 .skinType(SkinType.NUMBER)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                 .title("Bundles")
                                                 .text("Number of installed bundles")
-                                                .value(13)
-                                                .unit("mb")
-                                                .description("Test")
+                                                .value(noOfInstalledBundles)
+                                                .valueVisible(noOfInstalledBundles != 0.0d)
+                                                .unit("")
+                                                .description("Bundles and fragments")
                                                 .textVisible(true)
                                                 .build();
         noOfBundlesTile.setRoundedCorners(false);
 
+        final double noOfServices = java.util.Optional.ofNullable(supervisor.getAgent())
+                                                      .map(agent -> agent.getAllServices().size())
+                                                      .map(Double::valueOf)
+                                                      .orElse(0.0d);
         final Tile noOfServicesTile = TileBuilder.create()
                                                  .skinType(SkinType.NUMBER)
                                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                  .title("Services")
                                                  .text("Number of registered services")
-                                                 .value(13)
-                                                 .unit("mb")
-                                                 .description("Test")
+                                                 .value(noOfServices)
+                                                 .valueVisible(noOfServices != 0.0d)
+                                                 .unit("")
+                                                 .description("Plain OSGi services and components")
                                                  .textVisible(true)
                                                  .build();
         noOfServicesTile.setRoundedCorners(false);
 
+        final double noOfComponents = java.util.Optional.ofNullable(supervisor.getAgent())
+                                                        .map(agent -> agent.getAllComponents().size())
+                                                        .map(Double::valueOf)
+                                                        .orElse(0.0d);
         final Tile noOfComponentsTile = TileBuilder.create()
                                                    .skinType(SkinType.NUMBER)
                                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                    .title("Components")
                                                    .text("Number of registered components")
-                                                   .value(13)
-                                                   .unit("mb")
-                                                   .description("Test")
+                                                   .value(noOfComponents)
+                                                   .valueVisible(noOfComponents != 0.0d)
+                                                   .unit("")
+                                                   .description("SCR components")
                                                    .textVisible(true)
                                                    .build();
         noOfComponentsTile.setRoundedCorners(false);
@@ -193,6 +210,12 @@ public final class OverviewFxUI {
 
         parent.getChildren().add(pane);
         // @formatter:on
+    }
+
+    @Inject
+    @Optional
+    public void updateView(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final VBox parent) {
+        createControls(parent);
     }
 
 }
