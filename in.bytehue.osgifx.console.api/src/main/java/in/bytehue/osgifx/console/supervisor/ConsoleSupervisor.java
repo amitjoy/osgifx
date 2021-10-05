@@ -13,6 +13,9 @@ import in.bytehue.osgifx.console.agent.ConsoleAgent;
 @ProviderType
 public interface ConsoleSupervisor {
 
+    /** The topic where an event will be sent after the agent gets connected */
+    String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
+
     /**
      * Returns the associated agent instance to control the remote OSGi framework
      *
