@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.application.fxml.controller;
 
+import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.AGENT_CONNECTED_EVENT_TOPIC;
+
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,7 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -39,6 +42,9 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @Inject
     private MApplication application;
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private ConsoleSupervisor supervisor;
@@ -115,6 +121,8 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
             final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
             connectionChooserWindow.setVisible(false);
+
+            eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, "");
         } catch (final Exception e) {
             final ExceptionDialog dialog = new ExceptionDialog(e);
             dialog.initStyle(StageStyle.UNDECORATED);
