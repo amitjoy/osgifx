@@ -122,7 +122,7 @@ public final class ConnectionSettingsWindowController implements Initializable {
             final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
             connectionChooserWindow.setVisible(false);
 
-            eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, "");
+            eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, selectedConnection.host + ":" + selectedConnection.port);
         } catch (final Exception e) {
             final ExceptionDialog dialog = new ExceptionDialog(e);
             dialog.initStyle(StageStyle.UNDECORATED);

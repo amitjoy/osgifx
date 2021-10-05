@@ -1,19 +1,24 @@
 package in.bytehue.osgifx.console.agent.provider;
 
 import static java.util.Collections.emptyList;
+import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.osgi.annotation.bundle.Capability;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.dto.ServiceReferenceDTO;
@@ -198,28 +203,25 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public long maxMemory() {
-        return Runtime.getRuntime().maxMemory();
+    public Map<String, String> runtimeInfo() {
+        final Map<String, String> runtime      = new HashMap<>();
+        final Bundle              systemBundle = getContext().getBundle(SYSTEM_BUNDLE_ID);
+
+        runtime.put("Framework", systemBundle.getSymbolicName());
+        runtime.put("Framework Version", systemBundle.getVersion().toString());
+        runtime.put("Memory Total", String.valueOf(Runtime.getRuntime().totalMemory()));
+        runtime.put("Memory Free", String.valueOf(Runtime.getRuntime().freeMemory()));
+        runtime.put("OS Name", System.getProperty("os.name"));
+        runtime.put("OS Version", System.getProperty("os.version"));
+        runtime.put("OS Architechture", System.getProperty("os.arch"));
+        runtime.put("Uptime", String.valueOf(getSystemUptime()));
+
+        return runtime;
     }
 
-    @Override
-    public long availableMemory() {
-        return Runtime.getRuntime().freeMemory();
-    }
-
-    @Override
-    public String osName() {
-        return System.getProperty("os.name");
-    }
-
-    @Override
-    public String osVersion() {
-        return System.getProperty("os.version");
-    }
-
-    @Override
-    public String osArch() {
-        return System.getProperty("os.arch");
+    private static long getSystemUptime() {
+        final RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
+        return rb.getUptime();
     }
 
     private XConfigurationDTO toDTO(final Configuration configuration) {
