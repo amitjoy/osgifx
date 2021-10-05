@@ -77,6 +77,7 @@ bundles.required: \
 				${bundles.e4.core},\
                 ${bundles.e4.efxclipse},\
 				${bundles.eclipse.core},\
+				org.eclipse.equinox.preferences,\
                 controlsfx,\
                 eu.hansolo.medusa,\
                 eu.hansolo.tilesfx,\

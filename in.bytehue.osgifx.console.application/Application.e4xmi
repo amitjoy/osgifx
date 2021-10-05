@@ -23,6 +23,12 @@
       <tags>efx-center-on-screen</tags>
     </windows>
   </children>
+  <handlers xmi:id="_fnE3ACVrEeyVo_nfbAX0Bg" elementId="in.bytehue.osgifx.console.application.handler.preference" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
+  <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="in.bytehue.osgifx.console.application.command.preference" commandName="Connection Preference Command">
+    <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
+    <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
+    <parameters xmi:id="_ciGqICVrEeyVo_nfbAX0Bg" elementId="timeout" name="Timeout" optional="false"/>
+  </commands>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
