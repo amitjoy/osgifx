@@ -3,6 +3,7 @@ package in.bytehue.osgifx.console.agent.provider;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public final class XComponentInfoProvider {
         dto.serviceInterfaces     = Stream.of(compDescDTO.serviceInterfaces).collect(Collectors.toList());
         dto.configurationPid      = Stream.of(compDescDTO.configurationPid).collect(Collectors.toList());
         dto.properties            = compConfDTO.properties.entrySet().stream()
-                .collect(toMap(Map.Entry::getKey, e -> (String) e.getValue()));
+                .collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
         dto.references            = Stream.of(compDescDTO.references).collect(Collectors.toList());
         dto.failure               = compConfDTO.failure;
         dto.activate              = compDescDTO.activate;
@@ -59,7 +60,13 @@ public final class XComponentInfoProvider {
         dto.unsatisfiedReferences = Stream.of(compConfDTO.unsatisfiedReferences).collect(Collectors.toList());
 
         return dto;
+    }
 
+    private static String arrayToString(final Object value) {
+        if (value instanceof String[]) {
+            return Arrays.asList((String[]) value).toString();
+        }
+        return value.toString();
     }
 
 }

@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +36,17 @@ public final class XServiceInfoProvider {
 
         dto.bundle       = bundleInfo;
         dto.id           = refDTO.id;
-        dto.properties   = refDTO.properties.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> (String) e.getValue()));
+        dto.properties   = refDTO.properties.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
         dto.usingBundles = getUsingBundles(refDTO.usingBundles, context);
 
         return dto;
+    }
+
+    private static String arrayToString(final Object value) {
+        if (value instanceof String[]) {
+            return Arrays.asList((String[]) value).toString();
+        }
+        return value.toString();
     }
 
     private static List<XBundleInfoDTO> getUsingBundles(final long[] usingBundles, final BundleContext context) {
