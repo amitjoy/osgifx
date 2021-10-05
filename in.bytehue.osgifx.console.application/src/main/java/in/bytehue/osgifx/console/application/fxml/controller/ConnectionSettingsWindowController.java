@@ -1,6 +1,9 @@
 package in.bytehue.osgifx.console.application.fxml.controller;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.inject.Inject;
@@ -10,13 +13,13 @@ import org.controlsfx.dialog.ExceptionDialog;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.command.CommandService;
 
-import in.bytehue.osgifx.console.application.dto.ConnectionSettingDTO;
+import in.bytehue.osgifx.console.application.dialog.ConnectionDialog;
+import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -37,6 +40,9 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @Inject
     private ConsoleSupervisor supervisor;
+
+    @Inject
+    private CommandService commandService;
 
     @FXML
     private Button connectButton;
@@ -65,7 +71,7 @@ public final class ConnectionSettingsWindowController implements Initializable {
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
 
-        connectionTable.setItems(getStoredConnections());
+        // connectionTable.setItems(getStoredConnections());
         connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 connectButton.setDisable(false);
@@ -82,6 +88,18 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @FXML
     public void addConnection(final ActionEvent event) {
+        final ConnectionDialog               connectionDialog = new ConnectionDialog();
+        final Optional<ConnectionSettingDTO> value            = connectionDialog.showAndWait();
+        if (value.isPresent()) {
+            final ConnectionSettingDTO dto        = value.get();
+            final Map<String, Object>  properties = new HashMap<>();
+
+            properties.put("host", dto.host);
+            properties.put("port", dto.port);
+            properties.put("timeout", dto.timeout);
+
+            commandService.execute("in.bytehue.osgifx.console.application.command.preference", properties);
+        }
     }
 
     @FXML
@@ -101,11 +119,6 @@ public final class ConnectionSettingsWindowController implements Initializable {
             dialog.initStyle(StageStyle.UNDECORATED);
             dialog.show();
         }
-    }
-
-    private ObservableList<ConnectionSettingDTO> getStoredConnections() {
-        final ConnectionSettingDTO dto = new ConnectionSettingDTO("localhost", 2000, 400);
-        return FXCollections.observableArrayList(dto);
     }
 
 }
