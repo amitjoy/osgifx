@@ -17,6 +17,10 @@ public final class ConnectionsProvider {
         connections.add(connection);
     }
 
+    public void removeConnection(final ConnectionSettingDTO connection) {
+        connections.remove(connection);
+    }
+
     public void addConnections(final List<ConnectionSettingDTO> connections) {
         this.connections.addAll(connections);
     }

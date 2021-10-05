@@ -9,7 +9,10 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.google.gson.Gson;
@@ -19,6 +22,11 @@ import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
 import in.bytehue.osgifx.console.application.preference.ConnectionsProvider;
 
 public final class ConnectionPreferenceHandler {
+
+    @Log
+    @Inject
+    @Optional
+    private Logger logger;
 
     @Inject
     @Preference(nodePath = "osgi.fx.connections")
@@ -33,17 +41,27 @@ public final class ConnectionPreferenceHandler {
     }
 
     @Execute
-    public void execute(@Named("host") final String host, @Named("port") final String port, @Named("timeout") final String timeout)
-            throws BackingStoreException {
+    public void execute( //
+            @Named("host") final String host, //
+            @Named("port") final String port, //
+            @Named("timeout") final String timeout, //
+            @Named("type") final String type) throws BackingStoreException {
+
         final Gson                       gson        = new Gson();
         final List<ConnectionSettingDTO> connections = getStoredValues();
         final ConnectionSettingDTO       dto         = new ConnectionSettingDTO(host, Integer.parseInt(port), Integer.parseInt(timeout));
 
-        connections.add(dto);
+        if ("ADD".equals(type)) {
+            connections.add(dto);
+            connectionsProvider.addConnection(dto);
+        } else if ("REMOVE".equals(type)) {
+            connections.remove(dto);
+            connectionsProvider.removeConnection(dto);
+        } else {
+            logger.warning(String.format("Cannot execute command %s}' with type '%s'", getClass().getSimpleName(), type));
+        }
         preferences.put("settings", gson.toJson(connections));
         preferences.flush();
-
-        connectionsProvider.addConnection(dto);
     }
 
     private List<ConnectionSettingDTO> getStoredValues() {
