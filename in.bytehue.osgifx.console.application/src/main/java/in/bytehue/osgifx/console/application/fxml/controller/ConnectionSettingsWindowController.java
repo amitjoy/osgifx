@@ -31,7 +31,8 @@ import javafx.stage.StageStyle;
 
 public final class ConnectionSettingsWindowController implements Initializable {
 
-    private static final String CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.connection";
+    private static final String CONNECTION_WINDOW_ID         = "in.bytehue.osgifx.console.window.connection";
+    private static final String COMMAND_ID_MANAGE_CONNECTION = "in.bytehue.osgifx.console.application.command.preference";
 
     @Inject
     private EModelService model;
@@ -95,19 +96,15 @@ public final class ConnectionSettingsWindowController implements Initializable {
         final ConnectionDialog               connectionDialog = new ConnectionDialog();
         final Optional<ConnectionSettingDTO> value            = connectionDialog.showAndWait();
         if (value.isPresent()) {
-            final ConnectionSettingDTO dto        = value.get();
-            final Map<String, Object>  properties = new HashMap<>();
-
-            properties.put("host", dto.host);
-            properties.put("port", dto.port);
-            properties.put("timeout", dto.timeout);
-
-            commandService.execute("in.bytehue.osgifx.console.application.command.preference", properties);
+            final ConnectionSettingDTO dto = value.get();
+            triggerCommand(dto, "ADD");
         }
     }
 
     @FXML
     public void removeConnection(final ActionEvent event) {
+        final ConnectionSettingDTO dto = connectionTable.getSelectionModel().getSelectedItem();
+        triggerCommand(dto, "REMOVE");
     }
 
     @FXML
@@ -123,6 +120,17 @@ public final class ConnectionSettingsWindowController implements Initializable {
             dialog.initStyle(StageStyle.UNDECORATED);
             dialog.show();
         }
+    }
+
+    private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
+        final Map<String, Object> properties = new HashMap<>();
+
+        properties.put("host", dto.host);
+        properties.put("port", dto.port);
+        properties.put("timeout", dto.timeout);
+        properties.put("type", type);
+
+        commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }
 
 }
