@@ -11,6 +11,10 @@ import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 @Component
 public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor, ConsoleAgent> implements ConsoleSupervisor, Supervisor {
 
+    private String host;
+    private int    port;
+    private int    timeout;
+
     @Override
     public void event(final Event e) throws Exception {
         // TODO Auto-generated method stub
@@ -30,7 +34,29 @@ public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor,
     @Override
     public void connect(final String host, final int port, final int timeout) throws Exception {
         // in the connection dialog, we have to show progress dialog while connecting to the runtime
-        super.connect(ConsoleAgent.class, this, host, port, timeout);
+        try {
+            super.connect(ConsoleAgent.class, this, host, port, timeout);
+            this.host    = host;
+            this.port    = port;
+            this.timeout = timeout;
+        } catch (final Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public String getHost() {
+        return host;
+    }
+
+    @Override
+    public int getPort() {
+        return port;
+    }
+
+    @Override
+    public int getTimeout() {
+        return timeout;
     }
 
 }

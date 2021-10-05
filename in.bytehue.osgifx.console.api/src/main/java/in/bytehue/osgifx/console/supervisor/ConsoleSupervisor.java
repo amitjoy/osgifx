@@ -34,4 +34,25 @@ public interface ConsoleSupervisor {
      */
     void connect(String host, int port, int timeout) throws Exception;
 
+    /**
+     * Returns the currently connected hostname
+     *
+     * @return the currently connected hostname
+     */
+    String getHost();
+
+    /**
+     * Returns the currently connected port
+     *
+     * @return the currently connected port
+     */
+    int getPort();
+
+    /**
+     * Returns the currently connected timeout
+     *
+     * @return the currently connected timeout
+     */
+    int getTimeout();
+
 }
