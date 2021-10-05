@@ -76,7 +76,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             }
         });
         final String hostnameCaption = "Hostname";
-        final String portCaption     = "Port";
+        final String portCaption     = "Port (between 1 to 65536)";
         final String timeoutCaption  = "Timeout in millis";
 
         txtHostname.setPromptText(hostnameCaption);
@@ -108,9 +108,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                     return false;
                 }
             }, String.format(requiredNumberFormat, portCaption)));
-            txtHostname.requestFocus();
         });
-
         setResultConverter(
                 dialogButton -> dialogButton == saveButtonType
                         ? new ConnectionSettingDTO(txtHostname.getText(), Integer.parseInt(txtPort.getText()),
