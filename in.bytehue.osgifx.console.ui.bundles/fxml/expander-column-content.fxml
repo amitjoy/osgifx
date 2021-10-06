@@ -9,8 +9,9 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.controlsfx.control.ToggleSwitch?>
+<?import org.controlsfx.glyphfont.Glyph?>
 
-<GridPane fx:controller="in.bytehue.osgifx.console.ui.bundles.BundleDetailsFxController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2300.0" prefWidth="900.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2300.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.bundles.BundleDetailsFxController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.0" minWidth="10.0" prefWidth="235.0" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="589.0" minWidth="10.0" prefWidth="565.0" />
@@ -31,9 +32,9 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="300.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="0.0" prefHeight="171.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
@@ -50,20 +51,29 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button mnemonicParsing="false" text="Start">
+      <Button mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="50.0" />
          </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="PLAY" />
+    	</graphic>
       </Button>
-      <Button mnemonicParsing="false" text="Stop">
+      <Button mnemonicParsing="false">
          <GridPane.margin>
-            <Insets left="120.0" />
+            <Insets left="90.0" />
          </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="STOP" />
+    	</graphic>
       </Button>
-      <Button mnemonicParsing="false" text="Uninstall">
+      <Button mnemonicParsing="false">
          <GridPane.margin>
-            <Insets left="190.0" />
+            <Insets left="130.0" />
          </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="TRASH" />
+    	</graphic>
       </Button>
       <Label text="ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
          <GridPane.margin>
@@ -195,7 +205,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <ToggleSwitch fx:id="fragmentLabel" GridPane.columnIndex="1" GridPane.rowIndex="8" disable="true" />
+      <ToggleSwitch fx:id="fragmentLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
       <Label fx:id="lasModifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9">
          <GridPane.margin>
             <Insets left="20.0" />
