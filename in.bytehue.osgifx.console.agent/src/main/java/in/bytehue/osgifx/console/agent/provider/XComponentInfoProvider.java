@@ -14,9 +14,13 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
+import org.osgi.service.component.runtime.dto.SatisfiedReferenceDTO;
+import org.osgi.service.component.runtime.dto.UnsatisfiedReferenceDTO;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
+import in.bytehue.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
+import in.bytehue.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 
 public final class XComponentInfoProvider {
 
@@ -42,6 +46,7 @@ public final class XComponentInfoProvider {
 
         dto.id                    = compConfDTO.id;
         dto.name                  = compDescDTO.name;
+        dto.state                 = mapToState(compConfDTO.state);
         dto.registeringBundle     = bInfoDTO.symbolicName;
         dto.registeringBundleId   = bInfoDTO.id;
         dto.factory               = compDescDTO.factory;
@@ -57,10 +62,49 @@ public final class XComponentInfoProvider {
         dto.activate              = compDescDTO.activate;
         dto.deactivate            = compDescDTO.deactivate;
         dto.modified              = compDescDTO.modified;
-        dto.satisfiedReferences   = Stream.of(compConfDTO.satisfiedReferences).collect(Collectors.toList());
-        dto.unsatisfiedReferences = Stream.of(compConfDTO.unsatisfiedReferences).collect(Collectors.toList());
+        dto.satisfiedReferences   = Stream.of(compConfDTO.satisfiedReferences).map(XComponentInfoProvider::toXS)
+                .collect(Collectors.toList());
+        dto.unsatisfiedReferences = Stream.of(compConfDTO.unsatisfiedReferences).map(XComponentInfoProvider::toXUS)
+                .collect(Collectors.toList());
 
         return dto;
+    }
+
+    private static String mapToState(final int state) {
+        switch (state) {
+            case ComponentConfigurationDTO.ACTIVE:
+                return "ACTIVE";
+            case ComponentConfigurationDTO.SATISFIED:
+                return "SATISFIED";
+            case ComponentConfigurationDTO.UNSATISFIED_REFERENCE:
+                return "UNSATISFIED_REFERENCE";
+            case ComponentConfigurationDTO.UNSATISFIED_CONFIGURATION:
+                return "UNSATISFIED_CONFIGURATION";
+            case ComponentConfigurationDTO.FAILED_ACTIVATION:
+                return "FAILED_ACTIVATION";
+            default:
+                return "<NO-MATCH>";
+        }
+    }
+
+    private static XSatisfiedReferenceDTO toXS(final SatisfiedReferenceDTO dto) {
+        final XSatisfiedReferenceDTO xsr = new XSatisfiedReferenceDTO();
+
+        xsr.name        = dto.name;
+        xsr.target      = dto.target;
+        xsr.objectClass = "";        // TODO
+
+        return xsr;
+    }
+
+    private static XUnsatisfiedReferenceDTO toXUS(final UnsatisfiedReferenceDTO dto) {
+        final XUnsatisfiedReferenceDTO uxsr = new XUnsatisfiedReferenceDTO();
+
+        uxsr.name        = dto.name;
+        uxsr.target      = dto.target;
+        uxsr.objectClass = "";        // TODO
+
+        return uxsr;
     }
 
     private static String arrayToString(final Object value) {
