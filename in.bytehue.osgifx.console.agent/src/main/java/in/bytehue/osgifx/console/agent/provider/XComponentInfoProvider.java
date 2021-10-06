@@ -5,12 +5,16 @@ import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
@@ -92,7 +96,7 @@ public final class XComponentInfoProvider {
 
         xsr.name        = dto.name;
         xsr.target      = dto.target;
-        xsr.objectClass = "";        // TODO
+        xsr.objectClass = prepareObjectClass(dto.boundServices);
 
         return xsr;
     }
@@ -102,9 +106,21 @@ public final class XComponentInfoProvider {
 
         uxsr.name        = dto.name;
         uxsr.target      = dto.target;
-        uxsr.objectClass = "";        // TODO
+        uxsr.objectClass = prepareObjectClass(dto.targetServices);
 
         return uxsr;
+    }
+
+    private static String prepareObjectClass(final ServiceReferenceDTO[] services) {
+        if (services == null) {
+            return "";
+        }
+        final Set<String> finalList = new HashSet<>();
+        for (final ServiceReferenceDTO dto : services) {
+            final String[] objectClass = (String[]) dto.properties.get(Constants.OBJECTCLASS);
+            finalList.addAll(Arrays.asList(objectClass));
+        }
+        return String.join(", ", finalList);
     }
 
     private static String arrayToString(final Object value) {
