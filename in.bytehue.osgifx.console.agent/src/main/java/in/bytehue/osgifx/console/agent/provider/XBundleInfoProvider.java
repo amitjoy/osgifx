@@ -8,6 +8,7 @@ import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
@@ -106,12 +107,10 @@ public final class XBundleInfoProvider {
             return Collections.emptyList();
         }
         for (final ServiceReference<?> service : usedServices) {
-            final XServiceInfoDTO dto = new XServiceInfoDTO();
+            final String[]     objectClass = (String[]) service.getProperty(OBJECTCLASS);
+            final List<String> objectClazz = Arrays.asList(objectClass);
 
-            dto.id          = Long.parseLong(service.getProperty(SERVICE_ID).toString());
-            dto.objectClass = service.getProperty(OBJECTCLASS).toString();
-
-            services.add(dto);
+            services.addAll(prepareServiceInfo(service, objectClazz));
         }
         return services;
     }
@@ -124,14 +123,25 @@ public final class XBundleInfoProvider {
             return Collections.emptyList();
         }
         for (final ServiceReference<?> service : registeredServices) {
+            final String[]     objectClasses = (String[]) service.getProperty(OBJECTCLASS);
+            final List<String> objectClazz   = Arrays.asList(objectClasses);
+
+            services.addAll(prepareServiceInfo(service, objectClazz));
+        }
+        return services;
+    }
+
+    private static List<XServiceInfoDTO> prepareServiceInfo(final ServiceReference<?> service, final List<String> objectClazz) {
+        final List<XServiceInfoDTO> serviceInfos = new ArrayList<>();
+        for (final String clz : objectClazz) {
             final XServiceInfoDTO dto = new XServiceInfoDTO();
 
             dto.id          = Long.parseLong(service.getProperty(SERVICE_ID).toString());
-            dto.objectClass = service.getProperty(OBJECTCLASS).toString();
+            dto.objectClass = clz;
 
-            services.add(dto);
+            serviceInfos.add(dto);
         }
-        return services;
+        return serviceInfos;
     }
 
     private static List<XBundleInfoDTO> getWiredBundles(final Bundle bundle) {
@@ -176,13 +186,15 @@ public final class XBundleInfoProvider {
             final String pkg     = (String) bundleWire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
             final String version = bundleWire.getCapability().getRevision().getVersion().toString();
 
-            final XPackageDTO dto = new XPackageDTO();
+            if (!hasPackage(importedPackages, pkg, version)) {
+                final XPackageDTO dto = new XPackageDTO();
 
-            dto.name    = pkg;
-            dto.version = version;
-            dto.type    = XpackageType.IMPORT;
+                dto.name    = pkg;
+                dto.version = version;
+                dto.type    = XpackageType.IMPORT;
 
-            importedPackages.add(dto);
+                importedPackages.add(dto);
+            }
         }
         return importedPackages;
     }
@@ -199,15 +211,21 @@ public final class XBundleInfoProvider {
             final String pkg     = (String) bundleWire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
             final String version = bundleWire.getCapability().getRevision().getVersion().toString();
 
-            final XPackageDTO dto = new XPackageDTO();
+            if (!hasPackage(exportedPackages, pkg, version)) {
+                final XPackageDTO dto = new XPackageDTO();
 
-            dto.name    = pkg;
-            dto.version = version;
-            dto.type    = XpackageType.EXPORT;
+                dto.name    = pkg;
+                dto.version = version;
+                dto.type    = XpackageType.EXPORT;
 
-            exportedPackages.add(dto);
+                exportedPackages.add(dto);
+            }
         }
         return exportedPackages;
+    }
+
+    private static boolean hasPackage(final List<XPackageDTO> packages, final String name, final String version) {
+        return packages.stream().anyMatch(o -> o.name.equals(name) && o.version.equals(version));
     }
 
     private static String findState(final int state) {
