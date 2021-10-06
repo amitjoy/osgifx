@@ -34,12 +34,19 @@ public final class XServiceInfoProvider {
         bundleInfo.id           = refDTO.bundle;
         bundleInfo.symbolicName = ConsoleAgentHelper.bsn(refDTO.bundle, context);
 
-        dto.bundle       = bundleInfo;
-        dto.id           = refDTO.id;
-        dto.properties   = refDTO.properties.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
-        dto.usingBundles = getUsingBundles(refDTO.usingBundles, context);
+        dto.id                = refDTO.id;
+        dto.bundleId          = bundleInfo.id;
+        dto.registeringBundle = bundleInfo.symbolicName;
+        dto.properties        = refDTO.properties.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
+        dto.usingBundles      = getUsingBundles(refDTO.usingBundles, context);
+        dto.types             = getObjectClass(refDTO.properties);
 
         return dto;
+    }
+
+    private static List<String> getObjectClass(final Map<String, Object> properties) {
+        final Object objectClass = properties.get(Constants.OBJECTCLASS);
+        return Arrays.asList((String[]) objectClass);
     }
 
     private static String arrayToString(final Object value) {
