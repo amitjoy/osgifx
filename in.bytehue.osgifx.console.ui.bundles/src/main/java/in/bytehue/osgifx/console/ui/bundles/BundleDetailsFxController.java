@@ -4,8 +4,13 @@ import java.net.URL;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.command.CommandService;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
@@ -16,11 +21,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 public final class BundleDetailsFxController implements Initializable {
+
+    @Log
+    @Inject
+    private Logger logger;
+
+    @Inject
+    private CommandService commandService;
 
     @FXML
     private Label idLabel;
@@ -57,6 +70,15 @@ public final class BundleDetailsFxController implements Initializable {
 
     @FXML
     private Label startLevelLabel;
+
+    @FXML
+    private Button startBundleButton;
+
+    @FXML
+    private Button stopBundleButton;
+
+    @FXML
+    private Button uninstallBundleButton;
 
     @FXML
     private TableView<XPackageDTO> exportedPackagesNameTable;
@@ -134,18 +156,23 @@ public final class BundleDetailsFxController implements Initializable {
     public void initialize(final URL location, final ResourceBundle resources) {
     }
 
-    void setValue(final XBundleDTO bundle) {
+    void initControls(final XBundleDTO bundle) {
         idLabel.setText(String.valueOf(bundle.id));
         stateLabel.setText(bundle.state);
         bsnLabel.setText(bundle.symbolicName);
         versionLabel.setText(bundle.version);
         locationLabel.setText(bundle.location);
         categoryLabel.setText(bundle.category);
-        // reset before
-        fragmentLabel.setSelected(false);
         if (bundle.isFragment) {
+            startBundleButton.setDisable(true);
+            stopBundleButton.setDisable(true);
             fragmentLabel.setSelected(true);
+        } else {
+            startBundleButton.setDisable(false);
+            stopBundleButton.setDisable(false);
+            fragmentLabel.setSelected(false);
         }
+        registerButtonHandlers(bundle);
         lasModifiedLabel.setText(String.valueOf(bundle.lastModified));
         docLabel.setText(bundle.documentation);
         vendorLabel.setText(bundle.vendor);
@@ -185,6 +212,18 @@ public final class BundleDetailsFxController implements Initializable {
         manifestHeadersTable.setItems(FXCollections.observableArrayList(bundle.manifestHeaders.entrySet()));
 
         applyTableFilters();
+    }
+
+    private void registerButtonHandlers(final XBundleDTO bundle) {
+        startBundleButton.setOnAction(a -> {
+            // execute command handler
+        });
+        stopBundleButton.setOnAction(a -> {
+            // execute command handler
+        });
+        uninstallBundleButton.setOnAction(a -> {
+            // execute command handler
+        });
     }
 
     private void applyTableFilters() {

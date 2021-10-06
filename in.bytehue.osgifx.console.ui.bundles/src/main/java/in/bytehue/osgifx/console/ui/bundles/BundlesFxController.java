@@ -49,7 +49,7 @@ public final class BundlesFxController implements Initializable {
                 "/fxml/expander-column-content.fxml");
         final BundleDetailsFxController          controller     = loader.getController();
         final TableRowExpanderColumn<XBundleDTO> expanderColumn = new TableRowExpanderColumn<>(param -> {
-                                                                    controller.setValue(param.getValue());
+                                                                    controller.initControls(param.getValue());
                                                                     return expandedNode;
                                                                 });
 
