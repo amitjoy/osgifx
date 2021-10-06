@@ -4,14 +4,14 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.properties.PropertiesFxController">
    <children>
-      <TableView layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TableView fx:id="propertyTable" layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columns>
-          <TableColumn prefWidth="570.0" text="Name" />
-          <TableColumn prefWidth="400.0" text="Value" />
-          <TableColumn prefWidth="200.0" text="Type" />
+          <TableColumn prefWidth="30.0" text="" />
+          <TableColumn fx:id="propertyName" prefWidth="515.0" text="Name" />
+          <TableColumn fx:id="propertyValue" prefWidth="400.0" text="Value" />
+          <TableColumn fx:id="propertyType" prefWidth="200.0" text="Type" />
         </columns>
       </TableView>
    </children>
