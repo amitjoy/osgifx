@@ -23,3 +23,6 @@ net.bytebuddy:byte-buddy:1.8.12
 net.bytebuddy:byte-buddy-agent:1.8.12
 org.assertj:assertj-core:3.19.0
 org.awaitility:awaitility:3.1.6
+
+# TilesFx
+eu.hansolo:tilesfx:1.6.8
