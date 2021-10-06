@@ -137,10 +137,12 @@ public final class BundleDetailsFxController implements Initializable {
     void setValue(final XBundleDTO bundle) {
         idLabel.setText(String.valueOf(bundle.id));
         stateLabel.setText(bundle.state);
-        bsnLabel.setText(bundle.state);
+        bsnLabel.setText(bundle.symbolicName);
         versionLabel.setText(bundle.version);
         locationLabel.setText(bundle.location);
         categoryLabel.setText(bundle.category);
+        // reset before
+        fragmentLabel.setSelected(false);
         if (bundle.isFragment) {
             fragmentLabel.setSelected(true);
         }
