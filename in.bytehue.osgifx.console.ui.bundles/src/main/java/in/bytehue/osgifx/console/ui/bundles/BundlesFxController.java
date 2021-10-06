@@ -9,8 +9,6 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.eclipse.fx.core.di.LocalInstance;
-import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
@@ -26,10 +24,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 
 public final class BundlesFxController implements Initializable {
-
-    @Log
-    @Inject
-    private Logger logger;
 
     @Inject
     @LocalInstance
