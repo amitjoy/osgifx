@@ -233,8 +233,8 @@
       </Label>
       <TableView fx:id="exportedPackagesNameTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="15" GridPane.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="exportedPackagesNameTableColumn" prefWidth="291.0" text="Name" />
-          <TableColumn fx:id="exportedPackagesVersionTableColumn" minWidth="0.0" prefWidth="263.0" text="Version" />
+          <TableColumn fx:id="exportedPackagesNameTableColumn" prefWidth="350.0" text="Name" />
+          <TableColumn fx:id="exportedPackagesVersionTableColumn" minWidth="0.0" prefWidth="218.0" text="Version" />
         </columns>
          <opaqueInsets>
             <Insets />
@@ -246,7 +246,7 @@
       <TableView fx:id="registeredServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="21" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="registeredServicesIdTableColumn" prefWidth="124.0" text="ID" />
-          <TableColumn fx:id="registeredServicesClassTableColumn" prefWidth="427.0" text="Object Class" />
+          <TableColumn fx:id="registeredServicesClassTableColumn" prefWidth="437.0" text="Object Class" />
         </columns>
          <GridPane.margin>
             <Insets left="20.0" />
@@ -255,7 +255,7 @@
       <TableView fx:id="manifestHeadersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="23" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="manifestHeadersTableColumn1" prefWidth="259.0" />
-          <TableColumn fx:id="manifestHeadersTableColumn2" minWidth="0.0" prefWidth="290.0" />
+          <TableColumn fx:id="manifestHeadersTableColumn2" minWidth="0.0" prefWidth="299.0" />
         </columns>
          <GridPane.margin>
             <Insets left="20.0" />
@@ -263,8 +263,8 @@
       </TableView>
       <TableView fx:id="importedPackagesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="17" GridPane.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="importedPackagesNameTableColumn" prefWidth="292.0" text="Name" />
-          <TableColumn fx:id="importedPackagesVersionTableColumn" prefWidth="246.0" text="Version" />
+          <TableColumn fx:id="importedPackagesNameTableColumn" prefWidth="353.0" text="Name" />
+          <TableColumn fx:id="importedPackagesVersionTableColumn" prefWidth="209.0" text="Version" />
         </columns>
          <GridPane.margin>
             <Insets left="20.0" />
@@ -273,7 +273,7 @@
       <TableView fx:id="wiredBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="19" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="wiredBundlesIdTableColumn" prefWidth="118.0" text="ID" />
-          <TableColumn fx:id="wiredBundlesBsnTableColumn" prefWidth="420.0" text="Symbolic Name" />
+          <TableColumn fx:id="wiredBundlesBsnTableColumn" prefWidth="444.0" text="Symbolic Name" />
         </columns>
          <GridPane.margin>
             <Insets left="20.0" />
