@@ -21,6 +21,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
+import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
@@ -144,18 +145,29 @@ public final class OverviewFxUI {
                                                    .build();
         noOfComponentsTile.setRoundedCorners(false);
 
+        final Indicator leftGraphics = new Indicator(Tile.RED);
+        leftGraphics.setOn(true);
+
+        final Indicator middleGraphics = new Indicator(Tile.YELLOW);
+        middleGraphics.setOn(true);
+
+        final Indicator rightGraphics = new Indicator(Tile.GREEN);
+        rightGraphics.setOn(true);
+
         final Tile noOfErrorFrameworkEventsTile = TileBuilder.create()
-                                                             .skinType(SkinType.NUMBER)
-                                                             .numberFormat(new DecimalFormat("#"))
+                                                             .skinType(SkinType.STATUS)
                                                              .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                             .title("Error Framework Events")
-                                                             .text("Number of published error framework events")
-                                                             .value(13)
-                                                             .unit("mb")
-                                                             .description("Test")
-                                                             .textVisible(true)
+                                                             .title("Framework Events")
+                                                             .leftText("ERROR")
+                                                             .middleText("WARNING")
+                                                             .rightText("INFORMATION")
+                                                             .leftGraphics(leftGraphics)
+                                                             .middleGraphics(middleGraphics)
+                                                             .rightGraphics(rightGraphics)
+                                                             .text("Overview of framework events in the runtime")
                                                              .build();
         noOfErrorFrameworkEventsTile.setRoundedCorners(false);
+        updateFrameworkEventsCount(noOfErrorFrameworkEventsTile);
 
         final int freeMemory = getMemory("Memory Free");
         final int totalMemory = getMemory("Memory Total");
@@ -354,6 +366,18 @@ public final class OverviewFxUI {
                                  .map(Long::valueOf)
                                  .map(this::toMB)
                                  .orElse(0);
+        // @formatter:on
+    }
+
+    private void updateFrameworkEventsCount(final Tile tile) {
+        // @formatter:off
+        java.util.Optional.ofNullable(supervisor.getAgent())
+                          .map(x -> x.getFrameworkEventsOverview()) 
+                          .ifPresent(dto -> {
+                                 tile.setLeftValue(dto.error);
+                                 tile.setMiddleValue(dto.warning);
+                                 tile.setRightValue(dto.info);
+                          });
         // @formatter:on
     }
 

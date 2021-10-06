@@ -8,6 +8,7 @@ import java.util.Map;
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.Configuration.ConfigurationAttribute;
 import org.osgi.service.cm.ConfigurationEvent;
@@ -22,6 +23,7 @@ import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
@@ -224,4 +226,53 @@ public interface ConsoleAgent extends Agent {
      * @return the runtime information
      */
     Map<String, String> runtimeInfo();
+    
+    /**
+     * Start a number of bundles
+     *
+     * @param id the bundle ids
+     * @return any errors that occurred
+     */
+    String start(long... id) throws Exception;
+
+    /**
+     * Stop a number of bundles
+     *
+     * @param id the bundle ids
+     * @return any errors that occurred
+     */
+    String stop(long... id) throws Exception;
+
+    /**
+     * Uninstall a number of bundles
+     *
+     * @param id the bundle ids
+     * @return any errors that occurred
+     */
+    String uninstall(long... id) throws Exception;
+
+    /**
+     * Install or update a bundle from the specified byte array instance.
+     * <p>
+     * This method does check if there is any existing bundle with the specified
+     * {@code location} identifier. If found, the existing bundle gets updated
+     * with the specified byte array instance. Otherwise, a new bundle gets
+     * installed with the specified byte array instance.
+     *
+     * @param location The bundle location (can be {@code null})
+     * @param data The byte array instance from which this bundle will be read
+     *            (cannot be {@code null})
+     * @return A Bundle DTO (cannot be {@code null})
+     * @throws Exception if the bundle cannot be installed or updated
+     */
+    @Override
+    BundleDTO installWithData(String location, byte[] data) throws Exception;
+
+    /**
+     * Returns the overview of the framework events
+     *
+     * @return the overview of the framework events
+     */
+    XFrameworkEventsDTO getFrameworkEventsOverview();
+
 }
