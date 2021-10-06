@@ -230,7 +230,7 @@
          <columns>
             <TableColumn fx:id="boundServicesNameColumn" prefWidth="200.0" text="Name" />
             <TableColumn fx:id="boundServicesTargetColumn" prefWidth="101.0" text="Target" />
-            <TableColumn fx:id="boundServicesClassColumn" prefWidth="323.0" text="Object Class" />
+            <TableColumn fx:id="boundServicesClassColumn" prefWidth="623.0" text="Object Class" />
          </columns>
       </TableView>
       <TableView fx:id="unboundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="27" GridPane.vgrow="ALWAYS">
@@ -240,7 +240,7 @@
          <columns>
             <TableColumn fx:id="unboundServicesNameColumn" prefWidth="200.0" text="Name" />
             <TableColumn fx:id="unboundServicesTargetColumn" prefWidth="101.0" text="Target" />
-            <TableColumn fx:id="unboundServicesClassColumn" prefWidth="320.0" text="Object Class" />
+            <TableColumn fx:id="unboundServicesClassColumn" prefWidth="623.0" text="Object Class" />
          </columns>
       </TableView>
       <Label fx:id="scopeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8">
