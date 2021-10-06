@@ -322,10 +322,10 @@ public final class OverviewFxUI {
     }
 
     private UptimeDTO toUptimeEntry(final long uptime) {
-        final int days    = (int) TimeUnit.SECONDS.toDays(uptime);
-        final int hours   = (int) TimeUnit.SECONDS.toHours(uptime) - days * 24;
-        final int minutes = (int) (TimeUnit.SECONDS.toMinutes(uptime) - TimeUnit.SECONDS.toHours(uptime) * 60);
-        final int seconds = (int) (TimeUnit.SECONDS.toSeconds(uptime) - TimeUnit.SECONDS.toMinutes(uptime) * 60);
+        final int days    = (int) TimeUnit.MILLISECONDS.toDays(uptime);
+        final int hours   = (int) TimeUnit.MILLISECONDS.toHours(uptime) - days * 24;
+        final int minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(uptime) - TimeUnit.MILLISECONDS.toHours(uptime) * 60);
+        final int seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(uptime) - TimeUnit.MILLISECONDS.toMinutes(uptime) * 60);
 
         return new UptimeDTO(days, hours, minutes, seconds);
     }

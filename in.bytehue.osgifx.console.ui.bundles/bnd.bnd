@@ -7,3 +7,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  graphic = graphic
 -buildpath          : ${bundles.required}
 -privatepackage     : in.bytehue.osgifx.console.ui.bundles.*
+Import-Package      : org.controlsfx.control, * 
