@@ -51,7 +51,7 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button mnemonicParsing="false">
+      <Button fx:id="startBundleButton" mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="50.0" />
          </GridPane.margin>
@@ -59,15 +59,15 @@
         	<Glyph fontFamily="FontAwesome" icon="PLAY" />
     	</graphic>
       </Button>
-      <Button mnemonicParsing="false">
+      <Button fx:id="stopBundleButton" mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="90.0" />
          </GridPane.margin>
          <graphic>
-        	<Glyph fontFamily="FontAwesome" icon="STOP" />
+        	<Glyph fontFamily="FontAwesome" icon="STOP"/>
     	</graphic>
       </Button>
-      <Button mnemonicParsing="false">
+      <Button fx:id="uninstallBundleButton" mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="130.0" />
          </GridPane.margin>
