@@ -9,7 +9,6 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.log.Logger;
@@ -25,7 +24,6 @@ public final class ConnectionPreferenceHandler {
 
     @Log
     @Inject
-    @Optional
     private Logger logger;
 
     @Inject
