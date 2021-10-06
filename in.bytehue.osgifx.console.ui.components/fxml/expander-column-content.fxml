@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import org.controlsfx.glyphfont.Glyph?>
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2000.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.components.ComponentDetailsFxController">
   <columnConstraints>
@@ -47,15 +48,21 @@
       <RowConstraints maxHeight="486.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button mnemonicParsing="false" text="Start">
+      <Button mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="50.0" />
          </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="PLAY" />
+    	</graphic>
       </Button>
-      <Button mnemonicParsing="false" text="Stop">
+      <Button mnemonicParsing="false">
          <GridPane.margin>
-            <Insets left="120.0" />
+            <Insets left="90.0" />
          </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="STOP" />
+    	</graphic>
       </Button>
       <Label text="ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
          <GridPane.margin>
