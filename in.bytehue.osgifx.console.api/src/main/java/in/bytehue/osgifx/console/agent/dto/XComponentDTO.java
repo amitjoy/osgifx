@@ -13,7 +13,8 @@ public class XComponentDTO extends DTO {
     public long                          id;
     public String                        name;
     public String                        state;
-    public XBundleInfoDTO                bundle;
+    public String                        registeringBundle;
+    public long                          registeringBundleId;
     public String                        factory;
     public String                        scope;
     public String                        implementationClass;
