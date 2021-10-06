@@ -16,10 +16,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.osgi.annotation.bundle.Capability;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.Configuration;
@@ -38,6 +40,7 @@ import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
@@ -48,6 +51,10 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
 
     private final ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
     private final ServiceTracker<ConfigurationAdmin, ConfigurationAdmin>           configAdminTracker;
+
+    private final AtomicInteger infoFrameworkEvents    = new AtomicInteger();
+    private final AtomicInteger warningFrameworkEvents = new AtomicInteger();
+    private final AtomicInteger errorFrameworkEvents   = new AtomicInteger();
 
     public ConsoleAgentServer(final String name, final BundleContext context, final File cache) {
         this(name, context, cache, StartLevelRuntimeHandler.absent());
@@ -213,10 +220,28 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         runtime.put("Memory Free", String.valueOf(Runtime.getRuntime().freeMemory()));
         runtime.put("OS Name", System.getProperty("os.name"));
         runtime.put("OS Version", System.getProperty("os.version"));
-        runtime.put("OS Architechture", System.getProperty("os.arch"));
+        runtime.put("OS Architecture", System.getProperty("os.arch"));
         runtime.put("Uptime", String.valueOf(getSystemUptime()));
 
         return runtime;
+    }
+
+    @Override
+    public void frameworkEvent(final FrameworkEvent event) {
+        super.frameworkEvent(event);
+        switch (event.getType()) {
+            case FrameworkEvent.INFO:
+                infoFrameworkEvents.incrementAndGet();
+                break;
+            case FrameworkEvent.WARNING:
+                warningFrameworkEvents.incrementAndGet();
+                break;
+            case FrameworkEvent.ERROR:
+                errorFrameworkEvents.incrementAndGet();
+                break;
+            default:
+                break;
+        }
     }
 
     private static long getSystemUptime() {
@@ -230,6 +255,17 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         dto.pid        = configuration.getPid();
         dto.factoryPid = configuration.getFactoryPid();
         dto.properties = ConsoleAgentHelper.toMap(configuration.getProperties());
+
+        return dto;
+    }
+
+    @Override
+    public XFrameworkEventsDTO getFrameworkEventsOverview() {
+        final XFrameworkEventsDTO dto = new XFrameworkEventsDTO();
+
+        dto.info    = infoFrameworkEvents.get();
+        dto.warning = warningFrameworkEvents.get();
+        dto.error   = errorFrameworkEvents.get();
 
         return dto;
     }
