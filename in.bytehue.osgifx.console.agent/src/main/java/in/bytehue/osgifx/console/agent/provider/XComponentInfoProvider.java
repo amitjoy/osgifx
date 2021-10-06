@@ -42,7 +42,8 @@ public final class XComponentInfoProvider {
 
         dto.id                    = compConfDTO.id;
         dto.name                  = compDescDTO.name;
-        dto.bundle                = bInfoDTO;
+        dto.registeringBundle     = bInfoDTO.symbolicName;
+        dto.registeringBundleId   = bInfoDTO.id;
         dto.factory               = compDescDTO.factory;
         dto.scope                 = compDescDTO.scope;
         dto.implementationClass   = compDescDTO.implementationClass;
