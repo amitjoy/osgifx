@@ -160,7 +160,9 @@ public final class XBundleInfoProvider {
             dto.id           = requirer.getBundle().getBundleId();
             dto.symbolicName = requirer.getSymbolicName();
 
-            bundles.add(dto);
+            if (!containsWire(bundles, dto.symbolicName, dto.id)) {
+                bundles.add(dto);
+            }
         }
         for (final BundleWire wire : requierdWires) {
             final BundleRevision provider = wire.getProvider();
@@ -169,9 +171,15 @@ public final class XBundleInfoProvider {
             dto.id           = provider.getBundle().getBundleId();
             dto.symbolicName = provider.getSymbolicName();
 
-            bundles.add(dto);
+            if (!containsWire(bundles, dto.symbolicName, dto.id)) {
+                bundles.add(dto);
+            }
         }
         return bundles;
+    }
+
+    private static boolean containsWire(final List<XBundleInfoDTO> bundles, final String bsn, final long id) {
+        return bundles.stream().anyMatch(b -> b.symbolicName.equals(bsn) && b.id == id);
     }
 
     private static List<XPackageDTO> getImportedPackages(final Bundle bundle) {
