@@ -3,6 +3,7 @@ package in.bytehue.osgifx.console.ui.components;
 import java.net.URL;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -120,6 +121,8 @@ public final class ComponentDetailsFxController implements Initializable {
     @Named("in.bytehue.osgifx.console.ui.components")
     private BundleContext context;
 
+    private final AtomicBoolean areReferenceTableNodesLoader = new AtomicBoolean();
+
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
     }
@@ -138,7 +141,11 @@ public final class ComponentDetailsFxController implements Initializable {
         activateLabel.setText(component.activate);
         deactivateLabel.setText(component.deactivate);
         modifiedLabel.setText(component.modified);
+
+        pidsList.getItems().clear();
         pidsList.getItems().addAll(component.configurationPid);
+
+        interfacesList.getItems().clear();
         interfacesList.getItems().addAll(component.serviceInterfaces);
 
         propertiesTableColumn1.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
@@ -180,13 +187,16 @@ public final class ComponentDetailsFxController implements Initializable {
         interfaceColumn.setPrefWidth(550);
         interfaceColumn.setCellValueFactory(new DTOCellValueFactory<>("interfaceName", String.class));
 
-        referencesTable.getColumns().add(expanderColumn);
-        referencesTable.getColumns().add(nameColumn);
-        referencesTable.getColumns().add(interfaceColumn);
+        if (!areReferenceTableNodesLoader.get()) {
+            referencesTable.getColumns().add(expanderColumn);
+            referencesTable.getColumns().add(nameColumn);
+            referencesTable.getColumns().add(interfaceColumn);
+        }
 
         referencesTable.setItems(FXCollections.observableArrayList(component.references));
 
         TableFilter.forTableView(referencesTable).apply();
+        areReferenceTableNodesLoader.set(true);
     }
 
     private void applyTableFilters() {

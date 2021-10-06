@@ -52,6 +52,7 @@ public final class ServiceDetailsFxController implements Initializable {
         propertiesTableColumn2.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
         propertiesTable.setItems(FXCollections.observableArrayList(service.properties.entrySet()));
 
+        objectClassesList.getItems().clear();
         objectClassesList.getItems().addAll(service.types);
 
         applyTableFilter();
