@@ -1,0 +1,2 @@
+-sub       : *.bnd
+-buildpath : eu.hansolo.tilesfx

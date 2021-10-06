@@ -79,7 +79,6 @@ bundles.required: \
 				${bundles.eclipse.core},\
 				org.eclipse.equinox.preferences,\
                 controlsfx,\
-                eu.hansolo.medusa,\
-                eu.hansolo.tilesfx,\
                 javax.inject,\
-                in.bytehue.osgifx.console.util
+                in.bytehue.osgifx.console.util,\
+                in.bytehue.osgifx.console.wrapper.tilesfx
