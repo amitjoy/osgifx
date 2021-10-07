@@ -112,11 +112,9 @@ public interface ConsoleAgent extends Agent {
      * activating or deactivating a component configuration, must occur
      * asynchronously to this method call.
      *
-     * @param description The component description to enable. Must not be
-     *            {@code null}.
-     * @see #isComponentEnabled(ComponentDescriptionDTO)
+     * @param id The id of component description to enable.
      */
-    void enableComponent(ComponentDescriptionDTO description);
+    void enableComponent(long id);
 
     /**
      * Disables the specified component description.
@@ -129,11 +127,9 @@ public interface ConsoleAgent extends Agent {
      * activating or deactivating a component configuration, must occur
      * asynchronously to this method call.
      *
-     * @param description The component description to disable. Must not be
-     *            {@code null}.
-     * @see #isComponentEnabled(ComponentDescriptionDTO)
+     * @param id The id of component description to enable.
      */
-    void disableComponent(ComponentDescriptionDTO description);
+    void disableComponent(long id);
 
     /**
      *
@@ -226,13 +222,14 @@ public interface ConsoleAgent extends Agent {
      * @return the runtime information
      */
     Map<String, String> runtimeInfo();
-    
+
     /**
      * Start a number of bundles
      *
      * @param id the bundle ids
      * @return any errors that occurred
      */
+    @Override
     String start(long... id) throws Exception;
 
     /**
@@ -241,6 +238,7 @@ public interface ConsoleAgent extends Agent {
      * @param id the bundle ids
      * @return any errors that occurred
      */
+    @Override
     String stop(long... id) throws Exception;
 
     /**
@@ -249,6 +247,7 @@ public interface ConsoleAgent extends Agent {
      * @param id the bundle ids
      * @return any errors that occurred
      */
+    @Override
     String uninstall(long... id) throws Exception;
 
     /**
