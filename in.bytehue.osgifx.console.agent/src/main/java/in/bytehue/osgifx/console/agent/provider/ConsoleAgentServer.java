@@ -120,33 +120,39 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public void enableComponent(final ComponentDescriptionDTO description) {
-        // @formatter:off
-        Optional.ofNullable(scrTracker.getService())
-                .map(scr -> scr.enableComponent(description))
-                .ifPresent(p -> {
-                    try {
-                        p.getValue();
-                    } catch (final Exception e) {
-                        logger.error("Cannot enable component '{}'", description);
-                    }
-                });
-        // @formatter:on
+    public void enableComponent(final long id) {
+        final ServiceComponentRuntime service = scrTracker.getService();
+        if (service == null) {
+            return;
+        }
+        final Collection<ComponentDescriptionDTO> descriptionDTOs = service.getComponentDescriptionDTOs();
+        for (final ComponentDescriptionDTO dto : descriptionDTOs) {
+            final Collection<ComponentConfigurationDTO> configurationDTOs = service.getComponentConfigurationDTOs(dto);
+            for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
+                if (configDTO.id == id) {
+                    service.enableComponent(dto);
+                    return;
+                }
+            }
+        }
     }
 
     @Override
-    public void disableComponent(final ComponentDescriptionDTO description) {
-        // @formatter:off
-        Optional.ofNullable(scrTracker.getService())
-                .map(scr -> scr.disableComponent(description))
-                .ifPresent(p -> {
-                    try {
-                        p.getValue();
-                    } catch (final Exception e) {
-                        logger.error("Cannot disable component '{}'", description);
-                    }
-                });
-        // @formatter:on
+    public void disableComponent(final long id) {
+        final ServiceComponentRuntime service = scrTracker.getService();
+        if (service == null) {
+            return;
+        }
+        final Collection<ComponentDescriptionDTO> descriptionDTOs = service.getComponentDescriptionDTOs();
+        for (final ComponentDescriptionDTO dto : descriptionDTOs) {
+            final Collection<ComponentConfigurationDTO> configurationDTOs = service.getComponentConfigurationDTOs(dto);
+            for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
+                if (configDTO.id == id) {
+                    service.disableComponent(dto);
+                    return;
+                }
+            }
+        }
     }
 
     @Override
