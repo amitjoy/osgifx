@@ -43,7 +43,7 @@ public final class ServiceDetailsFxController implements Initializable {
     public void initialize(final URL location, final ResourceBundle resources) {
     }
 
-    void setValue(final XServiceDTO service) {
+    void initControls(final XServiceDTO service) {
         idLabel.setText(String.valueOf(service.id));
         bundleBsnLabel.setText(service.registeringBundle);
         bundleIdLabel.setText(String.valueOf(service.bundleId));

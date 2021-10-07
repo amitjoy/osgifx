@@ -39,6 +39,8 @@ public final class ComponentsFxController implements Initializable {
     @Named("in.bytehue.osgifx.console.ui.components")
     private BundleContext context;
 
+    private TableRowExpanderColumn.TableRowDataFeatures<XComponentDTO> selectedComponent;
+
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         createControls();
@@ -48,8 +50,12 @@ public final class ComponentsFxController implements Initializable {
         final GridPane                              expandedNode   = (GridPane) Fx.loadFXML(loader, context,
                 "/fxml/expander-column-content.fxml");
         final ComponentDetailsFxController          controller     = loader.getController();
-        final TableRowExpanderColumn<XComponentDTO> expanderColumn = new TableRowExpanderColumn<>(param -> {
-                                                                       controller.setValue(param.getValue());
+        final TableRowExpanderColumn<XComponentDTO> expanderColumn = new TableRowExpanderColumn<>(expandedComponent -> {
+                                                                       controller.initControls(expandedComponent.getValue());
+                                                                       if (selectedComponent != null) {
+                                                                           selectedComponent.toggleExpanded();
+                                                                       }
+                                                                       selectedComponent = expandedComponent;
                                                                        return expandedNode;
                                                                    });
 
