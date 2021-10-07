@@ -39,6 +39,8 @@ public final class ServicesFxController implements Initializable {
     @Named("in.bytehue.osgifx.console.ui.services")
     private BundleContext context;
 
+    private TableRowExpanderColumn.TableRowDataFeatures<XServiceDTO> selectedService;
+
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         createControls();
@@ -48,8 +50,12 @@ public final class ServicesFxController implements Initializable {
         final GridPane                            expandedNode   = (GridPane) Fx.loadFXML(loader, context,
                 "/fxml/expander-column-content.fxml");
         final ServiceDetailsFxController          controller     = loader.getController();
-        final TableRowExpanderColumn<XServiceDTO> expanderColumn = new TableRowExpanderColumn<>(param -> {
-                                                                     controller.setValue(param.getValue());
+        final TableRowExpanderColumn<XServiceDTO> expanderColumn = new TableRowExpanderColumn<>(expandedService -> {
+                                                                     controller.initControls(expandedService.getValue());
+                                                                     if (selectedService != null) {
+                                                                         selectedService.toggleExpanded();
+                                                                     }
+                                                                     selectedService = expandedService;
                                                                      return expandedNode;
                                                                  });
 

@@ -137,13 +137,14 @@ public final class ComponentDetailsFxController implements Initializable {
     @Named("in.bytehue.osgifx.console.ui.components")
     private BundleContext context;
 
-    private final AtomicBoolean areReferenceTableNodesLoader = new AtomicBoolean();
+    private final AtomicBoolean                                       areReferenceTableNodesLoader = new AtomicBoolean();
+    private TableRowExpanderColumn.TableRowDataFeatures<ReferenceDTO> selectedReference;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
     }
 
-    void setValue(final XComponentDTO component) {
+    void initControls(final XComponentDTO component) {
         registerButtonHandlers(component);
         idLabel.setText(String.valueOf(component.id));
         componentNameLabel.setText(component.name);
@@ -202,8 +203,12 @@ public final class ComponentDetailsFxController implements Initializable {
         final GridPane                             expandedNode   = (GridPane) Fx.loadFXML(loader, context,
                 "/fxml/sub-expander-column-content.fxml");
         final ReferenceDetailsFxController         controller     = loader.getController();
-        final TableRowExpanderColumn<ReferenceDTO> expanderColumn = new TableRowExpanderColumn<>(param -> {
-                                                                      controller.setValue(param.getValue());
+        final TableRowExpanderColumn<ReferenceDTO> expanderColumn = new TableRowExpanderColumn<>(expandedReference -> {
+                                                                      controller.initControls(expandedReference.getValue());
+                                                                      if (selectedReference != null) {
+                                                                          selectedReference.toggleExpanded();
+                                                                      }
+                                                                      selectedReference = expandedReference;
                                                                       return expandedNode;
                                                                   });
 

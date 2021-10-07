@@ -39,6 +39,8 @@ public final class BundlesFxController implements Initializable {
     @Named("in.bytehue.osgifx.console.ui.bundles")
     private BundleContext context;
 
+    private TableRowExpanderColumn.TableRowDataFeatures<XBundleDTO> selectedBundle;
+
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         createControls();
@@ -48,8 +50,12 @@ public final class BundlesFxController implements Initializable {
         final GridPane                           expandedNode   = (GridPane) Fx.loadFXML(loader, context,
                 "/fxml/expander-column-content.fxml");
         final BundleDetailsFxController          controller     = loader.getController();
-        final TableRowExpanderColumn<XBundleDTO> expanderColumn = new TableRowExpanderColumn<>(param -> {
-                                                                    controller.initControls(param.getValue());
+        final TableRowExpanderColumn<XBundleDTO> expanderColumn = new TableRowExpanderColumn<>(expandedBundle -> {
+                                                                    controller.initControls(expandedBundle.getValue());
+                                                                    if (selectedBundle != null) {
+                                                                        selectedBundle.toggleExpanded();
+                                                                    }
+                                                                    selectedBundle = expandedBundle;
                                                                     return expandedNode;
                                                                 });
 

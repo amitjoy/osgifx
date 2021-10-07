@@ -57,7 +57,7 @@ public final class ReferenceDetailsFxController implements Initializable {
     public void initialize(final URL location, final ResourceBundle resources) {
     }
 
-    void setValue(final ReferenceDTO reference) {
+    void initControls(final ReferenceDTO reference) {
         nameLabel.setText(reference.name);
         interfaceLabel.setText(reference.interfaceName);
         cardinalityLabel.setText(reference.cardinality);
