@@ -10,6 +10,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  graphic = graphic
 -buildpath          : \
                       ${bundles.required},\
+                      biz.aQute.remote.agent,\
                       de.jensd:fontawesomefx;packages=*,\
                       com.google.gson
 Import-Package      : org.controlsfx.glyphfont, * 

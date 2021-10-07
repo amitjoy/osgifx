@@ -1,6 +1,8 @@
 package in.bytehue.osgifx.console.ui.bundles;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
@@ -27,6 +29,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 public final class BundleDetailsFxController implements Initializable {
+
+    private static final String BUNDLE_START_COMMAND_ID     = "in.bytehue.osgifx.console.application.command.bundle.start";
+    private static final String BUNDLE_STOP_COMMAND_ID      = "in.bytehue.osgifx.console.application.command.bundle.stop";
+    private static final String BUNDLE_UNINSTALL_COMMAND_ID = "in.bytehue.osgifx.console.application.command.bundle.uninstall";
 
     @Log
     @Inject
@@ -216,13 +222,13 @@ public final class BundleDetailsFxController implements Initializable {
 
     private void registerButtonHandlers(final XBundleDTO bundle) {
         startBundleButton.setOnAction(a -> {
-            // execute command handler
+            commandService.execute(BUNDLE_START_COMMAND_ID, createCommandMap(bundle.id));
         });
         stopBundleButton.setOnAction(a -> {
-            // execute command handler
+            commandService.execute(BUNDLE_STOP_COMMAND_ID, createCommandMap(bundle.id));
         });
         uninstallBundleButton.setOnAction(a -> {
-            // execute command handler
+            commandService.execute(BUNDLE_UNINSTALL_COMMAND_ID, createCommandMap(bundle.id));
         });
     }
 
@@ -235,6 +241,12 @@ public final class BundleDetailsFxController implements Initializable {
         TableFilter.forTableView(usedServicesTable).apply();
         TableFilter.forTableView(hostBundlesTable).apply();
         TableFilter.forTableView(attachedFragmentsTable).apply();
+    }
+
+    private Map<String, Object> createCommandMap(final long value) {
+        final Map<String, Object> properties = new HashMap<>();
+        properties.put("id", value);
+        return properties;
     }
 
 }

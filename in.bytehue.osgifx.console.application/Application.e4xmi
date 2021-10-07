@@ -24,11 +24,23 @@
     </windows>
   </children>
   <handlers xmi:id="_Y0EEwCWwEeyVo_nfbAX0Bg" elementId="in.bytehue.osgifx.console.application.handler.preference" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
+  <handlers xmi:id="_hvxvgCdFEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.handler.bundle.start" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.BundleStartHandler" command="_vvdL4CdEEeyh4bauXjycpA"/>
+  <handlers xmi:id="_arN1sCdHEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.handler.bundle.stop" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.BundleStopHandler" command="_MfEK8CdFEeyh4bauXjycpA"/>
+  <handlers xmi:id="_5g4iUCdHEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.handler.bundle.uninstall" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.BundleUninstallHandler" command="_UtYQMCdFEeyh4bauXjycpA"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="in.bytehue.osgifx.console.application.command.preference" commandName="Connection Preference Command">
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
     <parameters xmi:id="_ciGqICVrEeyVo_nfbAX0Bg" elementId="timeout" name="Timeout" optional="false"/>
     <parameters xmi:id="_bwGcQCWpEeyVo_nfbAX0Bg" elementId="type" name="Type" optional="false"/>
+  </commands>
+  <commands xmi:id="_vvdL4CdEEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.command.bundle.start" commandName="Bundle Start Command" description="Starts the specified bundle having the specified ID" category="_zP_6cCdEEeyh4bauXjycpA">
+    <parameters xmi:id="_IG20kCdFEeyh4bauXjycpA" elementId="id" name="ID" optional="false"/>
+  </commands>
+  <commands xmi:id="_MfEK8CdFEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.command.bundle.stop" commandName="Bundle Stop Command" description="Stops the specified bundle having the specified ID" category="_zP_6cCdEEeyh4bauXjycpA">
+    <parameters xmi:id="_S6ogMCdFEeyh4bauXjycpA" elementId="id" name="ID" optional="false"/>
+  </commands>
+  <commands xmi:id="_UtYQMCdFEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.command.bundle.uninstall" commandName="Bundle Uninstall Command" description="Uninstalls the specified bundle having the specified ID" category="_zP_6cCdEEeyh4bauXjycpA">
+    <parameters xmi:id="_ZUeXICdFEeyh4bauXjycpA" elementId="id" name="ID" optional="false"/>
   </commands>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
@@ -38,4 +50,6 @@
   <addons xmi:id="_c376xhuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
   <addons xmi:id="_c376xxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
   <addons xmi:id="_Xj5j8CD7EeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.addon.bundlecontext" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.addon.BundleContextAddon"/>
+  <categories xmi:id="_zP_6cCdEEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.category.bundle" name="Bundle Action" description="This category is used to group all commands relating to bundle state changes"/>
+  <categories xmi:id="_btigQCdFEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.category.scr" name="SCR Action" description="This category is used to group all commands relating to scr state changes"/>
 </application:Application>
