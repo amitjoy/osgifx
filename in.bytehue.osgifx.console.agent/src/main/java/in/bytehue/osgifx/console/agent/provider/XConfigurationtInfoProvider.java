@@ -31,7 +31,7 @@ public final class XConfigurationtInfoProvider {
 
         dto.pid        = configuration.getPid();
         dto.factoryPid = configuration.getFactoryPid();
-        dto.properties = ConsoleAgentHelper.toMap(configuration.getProperties());
+        dto.properties = ConsoleAgentHelper.valueOf(configuration.getProperties());
         dto.location   = configuration.getBundleLocation();
 
         return dto;
