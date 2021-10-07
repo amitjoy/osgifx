@@ -169,15 +169,7 @@ public final class BundleDetailsFxController implements Initializable {
         versionLabel.setText(bundle.version);
         locationLabel.setText(bundle.location);
         categoryLabel.setText(bundle.category);
-        if (bundle.isFragment) {
-            startBundleButton.setDisable(true);
-            stopBundleButton.setDisable(true);
-            fragmentLabel.setSelected(true);
-        } else {
-            startBundleButton.setDisable(false);
-            stopBundleButton.setDisable(false);
-            fragmentLabel.setSelected(false);
-        }
+        initConditionalControls(bundle);
         registerButtonHandlers(bundle);
         lasModifiedLabel.setText(String.valueOf(bundle.lastModified));
         docLabel.setText(bundle.documentation);
@@ -218,6 +210,34 @@ public final class BundleDetailsFxController implements Initializable {
         manifestHeadersTable.setItems(FXCollections.observableArrayList(bundle.manifestHeaders.entrySet()));
 
         applyTableFilters();
+    }
+
+    private void initConditionalControls(final XBundleDTO bundle) {
+        if (bundle.isFragment) {
+            initControlsForFragements();
+        } else {
+            initControlsForBundles(bundle);
+        }
+    }
+
+    private void initControlsForBundles(final XBundleDTO bundle) {
+        if ("ACTIVE".equals(bundle.state)) {
+            startBundleButton.setDisable(true);
+        } else {
+            startBundleButton.setDisable(false);
+        }
+        if ("RESOLVED".equals(bundle.state)) {
+            stopBundleButton.setDisable(true);
+        } else {
+            stopBundleButton.setDisable(false);
+        }
+        fragmentLabel.setSelected(false);
+    }
+
+    private void initControlsForFragements() {
+        startBundleButton.setDisable(true);
+        stopBundleButton.setDisable(true);
+        fragmentLabel.setSelected(true);
     }
 
     private void registerButtonHandlers(final XBundleDTO bundle) {
