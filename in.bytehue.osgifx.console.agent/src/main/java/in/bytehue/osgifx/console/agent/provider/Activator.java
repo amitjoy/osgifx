@@ -1,7 +1,9 @@
 package in.bytehue.osgifx.console.agent.provider;
 
 import static aQute.remote.api.Agent.PORT_P;
+import static in.bytehue.osgifx.console.agent.ConsoleAgent.AGENT_SERVER_PORT_KEY;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +14,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 
+import org.osgi.annotation.bundle.Capability;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.annotations.RequireConfigurationAdmin;
+import org.osgi.service.component.annotations.RequireServiceComponentRuntime;
+import org.osgi.service.event.annotations.RequireEventAdmin;
+import org.osgi.service.metatype.annotations.RequireMetaTypeImplementation;
 
 import aQute.lib.io.IO;
 import aQute.remote.agent.AgentServer;
@@ -22,15 +29,18 @@ import aQute.remote.api.Agent;
 import aQute.remote.api.Supervisor;
 import aQute.remote.util.Link;
 
+@RequireEventAdmin
+@RequireConfigurationAdmin
+@RequireMetaTypeImplementation
+@RequireServiceComponentRuntime
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
+@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.agent.ConsoleAgent")
 public final class Activator extends Thread implements BundleActivator {
 
     private File              cache;
     private ServerSocket      server;
     private BundleContext     context;
     private List<AgentServer> agents;
-
-    private static final String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
 
     @Override
     public void start(final BundleContext context) throws Exception {

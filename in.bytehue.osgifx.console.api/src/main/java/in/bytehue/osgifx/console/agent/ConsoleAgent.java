@@ -33,6 +33,9 @@ import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 @ProviderType
 public interface ConsoleAgent extends Agent {
 
+    /** The system property to set the port for communication */
+    String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
+
     /**
      * Get the detailed information of all the installed bundles
      *
