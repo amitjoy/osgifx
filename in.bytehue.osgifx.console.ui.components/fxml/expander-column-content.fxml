@@ -48,7 +48,7 @@
       <RowConstraints maxHeight="486.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button mnemonicParsing="false">
+      <Button fx:id="enableComponentButton" mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="50.0" />
          </GridPane.margin>
@@ -56,7 +56,7 @@
         	<Glyph fontFamily="FontAwesome" icon="PLAY" />
     	</graphic>
       </Button>
-      <Button mnemonicParsing="false">
+      <Button fx:id="disableComponentButton" mnemonicParsing="false">
          <GridPane.margin>
             <Insets left="90.0" />
          </GridPane.margin>

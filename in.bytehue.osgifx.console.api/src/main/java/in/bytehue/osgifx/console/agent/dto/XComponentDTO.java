@@ -8,7 +8,7 @@ import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
 public class XComponentDTO extends DTO {
 
-    public long                           id;
+    public String                         id;
     public String                         name;
     public String                         state;
     public String                         registeringBundle;

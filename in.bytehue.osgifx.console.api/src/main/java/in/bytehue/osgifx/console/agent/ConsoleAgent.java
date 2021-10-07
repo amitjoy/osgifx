@@ -112,9 +112,10 @@ public interface ConsoleAgent extends Agent {
      * activating or deactivating a component configuration, must occur
      * asynchronously to this method call.
      *
-     * @param id The id of component description to enable.
+     * @param name The name of the component description to enable.
+     * @return the error response as string
      */
-    void enableComponent(long id);
+    String enableComponent(String name);
 
     /**
      * Disables the specified component description.
@@ -128,8 +129,9 @@ public interface ConsoleAgent extends Agent {
      * asynchronously to this method call.
      *
      * @param id The id of component description to enable.
+     * @return the error response as string
      */
-    void disableComponent(long id);
+    String disableComponent(long id);
 
     /**
      *

@@ -11,8 +11,6 @@ import javax.inject.Inject;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.command.CommandService;
-import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
@@ -33,10 +31,6 @@ public final class BundleDetailsFxController implements Initializable {
     private static final String BUNDLE_START_COMMAND_ID     = "in.bytehue.osgifx.console.application.command.bundle.start";
     private static final String BUNDLE_STOP_COMMAND_ID      = "in.bytehue.osgifx.console.application.command.bundle.stop";
     private static final String BUNDLE_UNINSTALL_COMMAND_ID = "in.bytehue.osgifx.console.application.command.bundle.uninstall";
-
-    @Log
-    @Inject
-    private Logger logger;
 
     @Inject
     private CommandService commandService;

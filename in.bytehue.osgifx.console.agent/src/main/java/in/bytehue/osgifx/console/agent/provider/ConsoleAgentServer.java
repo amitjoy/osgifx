@@ -1,5 +1,6 @@
 package in.bytehue.osgifx.console.agent.provider;
 
+import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyList;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,7 +80,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
 
     @Override
     public List<XComponentDTO> getAllComponents() {
-        return XComponentInfoProvider.get(getContext(), scrTracker.getService());
+        return XComponentInfoProvider.get(scrTracker.getService());
     }
 
     @Override
@@ -120,39 +122,52 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public void enableComponent(final long id) {
+    public String enableComponent(final String name) {
         final ServiceComponentRuntime service = scrTracker.getService();
         if (service == null) {
-            return;
+            return "Service Component Runtime service is unavailable";
         }
+        final StringBuilder                       builder         = new StringBuilder();
         final Collection<ComponentDescriptionDTO> descriptionDTOs = service.getComponentDescriptionDTOs();
+
         for (final ComponentDescriptionDTO dto : descriptionDTOs) {
-            final Collection<ComponentConfigurationDTO> configurationDTOs = service.getComponentConfigurationDTOs(dto);
-            for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
-                if (configDTO.id == id) {
-                    service.enableComponent(dto);
-                    return;
+            if (dto.name.equals(name)) {
+                try {
+                    service.enableComponent(dto).onFailure(e -> builder.append(e.getMessage()).append(lineSeparator())).getValue();
+                } catch (InvocationTargetException | InterruptedException e) {
+                    builder.append(e.getMessage()).append(lineSeparator());
                 }
+                final String response = builder.toString();
+                return response.isEmpty() ? null : response;
             }
         }
+        return null;
     }
 
     @Override
-    public void disableComponent(final long id) {
+    public String disableComponent(final long id) {
         final ServiceComponentRuntime service = scrTracker.getService();
         if (service == null) {
-            return;
+            return "Service Component Runtime service is unavailable";
         }
+        final StringBuilder                       builder         = new StringBuilder();
         final Collection<ComponentDescriptionDTO> descriptionDTOs = service.getComponentDescriptionDTOs();
+
         for (final ComponentDescriptionDTO dto : descriptionDTOs) {
             final Collection<ComponentConfigurationDTO> configurationDTOs = service.getComponentConfigurationDTOs(dto);
             for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
                 if (configDTO.id == id) {
-                    service.disableComponent(dto);
-                    return;
+                    try {
+                        service.disableComponent(dto).onFailure(e -> builder.append(e.getMessage()).append(lineSeparator())).getValue();
+                    } catch (InvocationTargetException | InterruptedException e) {
+                        builder.append(e.getMessage()).append(lineSeparator());
+                    }
+                    final String response = builder.toString();
+                    return response.isEmpty() ? null : response;
                 }
             }
         }
+        return null;
     }
 
     @Override
