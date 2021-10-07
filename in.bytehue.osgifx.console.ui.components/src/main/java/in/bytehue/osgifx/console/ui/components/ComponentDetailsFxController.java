@@ -1,6 +1,8 @@
 package in.bytehue.osgifx.console.ui.components;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -10,6 +12,7 @@ import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.runtime.dto.ReferenceDTO;
@@ -24,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -31,6 +35,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 
 public final class ComponentDetailsFxController implements Initializable {
+
+    private static final String COMPONENT_ENABLE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.component.enable";
+    private static final String COMPONENT_DISABLE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.component.disable";
+
+    @Inject
+    private CommandService commandService;
 
     @FXML
     private Label idLabel;
@@ -70,6 +80,12 @@ public final class ComponentDetailsFxController implements Initializable {
 
     @FXML
     private Label modifiedLabel;
+
+    @FXML
+    private Button enableComponentButton;
+
+    @FXML
+    private Button disableComponentButton;
 
     @FXML
     private ListView<String> pidsList;
@@ -128,6 +144,7 @@ public final class ComponentDetailsFxController implements Initializable {
     }
 
     void setValue(final XComponentDTO component) {
+        registerButtonHandlers(component);
         idLabel.setText(String.valueOf(component.id));
         componentNameLabel.setText(component.name);
         stateLabel.setText(component.state);
@@ -141,6 +158,8 @@ public final class ComponentDetailsFxController implements Initializable {
         activateLabel.setText(component.activate);
         deactivateLabel.setText(component.deactivate);
         modifiedLabel.setText(component.modified);
+
+        initConditionalComponents(component);
 
         pidsList.getItems().clear();
         pidsList.getItems().addAll(component.configurationPid);
@@ -166,6 +185,17 @@ public final class ComponentDetailsFxController implements Initializable {
 
         createReferenceExpandedTable(component);
         applyTableFilters();
+    }
+
+    private void initConditionalComponents(final XComponentDTO component) {
+        final String state = component.state;
+        if ("DISABLED".equals(state)) {
+            enableComponentButton.setDisable(false);
+            disableComponentButton.setDisable(true);
+        } else {
+            enableComponentButton.setDisable(true);
+            disableComponentButton.setDisable(false);
+        }
     }
 
     private void createReferenceExpandedTable(final XComponentDTO component) {
@@ -195,11 +225,29 @@ public final class ComponentDetailsFxController implements Initializable {
 
         referencesTable.setItems(FXCollections.observableArrayList(component.references));
 
-        TableFilter.forTableView(referencesTable).apply();
         areReferenceTableNodesLoader.set(true);
     }
 
+    private void registerButtonHandlers(final XComponentDTO component) {
+        enableComponentButton.setOnAction(a -> {
+            // to enable a component, we need the name primarily as the there is no associated component ID
+            commandService.execute(COMPONENT_ENABLE_COMMAND_ID, createCommandMap(component.name, null));
+        });
+        disableComponentButton.setOnAction(a -> {
+            // to disable a component, we need the id primarily as the there is already an associated component ID
+            commandService.execute(COMPONENT_DISABLE_COMMAND_ID, createCommandMap(null, component.id));
+        });
+    }
+
+    private Map<String, Object> createCommandMap(final String name, final String id) {
+        final Map<String, Object> properties = new HashMap<>();
+        properties.computeIfAbsent("name", key -> name);
+        properties.computeIfAbsent("id", key -> id);
+        return properties;
+    }
+
     private void applyTableFilters() {
+        TableFilter.forTableView(referencesTable).apply();
         TableFilter.forTableView(propertiesTable).apply();
         TableFilter.forTableView(referencesTable).apply();
         TableFilter.forTableView(boundServicesTable).apply();
