@@ -53,7 +53,7 @@ public final class ServicesFxController implements Initializable {
         final ServiceDetailsFxController          controller     = loader.getController();
         final TableRowExpanderColumn<XServiceDTO> expanderColumn = new TableRowExpanderColumn<>(expandedService -> {
                                                                      controller.initControls(expandedService.getValue());
-                                                                     if (selectedService != null) {
+                                                                     if (selectedService != null && selectedService.isExpanded()) {
                                                                          selectedService.toggleExpanded();
                                                                      }
                                                                      selectedService = expandedService;

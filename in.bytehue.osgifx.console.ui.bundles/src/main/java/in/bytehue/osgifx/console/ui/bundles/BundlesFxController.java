@@ -53,7 +53,7 @@ public final class BundlesFxController implements Initializable {
         final BundleDetailsFxController          controller     = loader.getController();
         final TableRowExpanderColumn<XBundleDTO> expanderColumn = new TableRowExpanderColumn<>(expandedBundle -> {
                                                                     controller.initControls(expandedBundle.getValue());
-                                                                    if (selectedBundle != null) {
+                                                                    if (selectedBundle != null && selectedBundle.isExpanded()) {
                                                                         selectedBundle.toggleExpanded();
                                                                     }
                                                                     selectedBundle = expandedBundle;
