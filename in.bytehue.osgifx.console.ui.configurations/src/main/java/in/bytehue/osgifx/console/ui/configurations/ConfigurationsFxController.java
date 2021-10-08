@@ -54,7 +54,8 @@ public final class ConfigurationsFxController implements Initializable {
         final ConfigurationEditorFxController           controller     = loader.getController();
         final TableRowExpanderColumn<XConfigurationDTO> expanderColumn = new TableRowExpanderColumn<>(expandedConfig -> {
                                                                            controller.initControls(expandedConfig.getValue());
-                                                                           if (selectedConfiguration != null) {
+                                                                           if (selectedConfiguration != null
+                                                                                   && selectedConfiguration.isExpanded()) {
                                                                                selectedConfiguration.toggleExpanded();
                                                                            }
                                                                            selectedConfiguration = expandedConfig;

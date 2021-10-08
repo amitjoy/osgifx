@@ -53,7 +53,7 @@ public final class ComponentsFxController implements Initializable {
         final ComponentDetailsFxController          controller     = loader.getController();
         final TableRowExpanderColumn<XComponentDTO> expanderColumn = new TableRowExpanderColumn<>(expandedComponent -> {
                                                                        controller.initControls(expandedComponent.getValue());
-                                                                       if (selectedComponent != null) {
+                                                                       if (selectedComponent != null && selectedComponent.isExpanded()) {
                                                                            selectedComponent.toggleExpanded();
                                                                        }
                                                                        selectedComponent = expandedComponent;
