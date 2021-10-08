@@ -1,6 +1,7 @@
 package in.bytehue.osgifx.console.ui.configurations;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javax.inject.Inject;
@@ -61,17 +62,22 @@ public final class ConfigurationsFxController implements Initializable {
                                                                        });
 
         final TableColumn<XConfigurationDTO, String> pidColumn = new TableColumn<>("PID");
+        pidColumn.setPrefWidth(550);
+        pidColumn.setCellValueFactory(
+                new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
 
-        pidColumn.setPrefWidth(650);
-        pidColumn.setCellValueFactory(new DTOCellValueFactory<>("pid", String.class));
+        final TableColumn<XConfigurationDTO, String> nameColumn = new TableColumn<>("name");
+        nameColumn.setPrefWidth(400);
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class,
+                s -> Optional.ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
 
         final TableColumn<XConfigurationDTO, String> locationColumn = new TableColumn<>("Location");
-
-        locationColumn.setPrefWidth(200);
-        locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class));
+        locationColumn.setPrefWidth(150);
+        locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No PID associated"));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(pidColumn);
+        table.getColumns().add(nameColumn);
         table.getColumns().add(locationColumn);
 
         final ObservableList<XConfigurationDTO> configurations = dataProvider.configurations();
