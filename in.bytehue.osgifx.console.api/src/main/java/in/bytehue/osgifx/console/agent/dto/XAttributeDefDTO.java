@@ -10,7 +10,7 @@ public class XAttributeDefDTO extends DTO {
     public String       name;
     public String       description;
     public int          cardinality;
-    public Class<?>     type;
+    public String       type;
     public List<String> optionValues;
 
 }

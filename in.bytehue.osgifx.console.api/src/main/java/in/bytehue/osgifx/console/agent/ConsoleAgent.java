@@ -168,30 +168,6 @@ public interface ConsoleAgent extends Agent {
     Collection<ServiceReferenceDTO> getServiceReferences(String filter) throws Exception;
 
     /**
-     * List the current {@code ConfigurationDTO} objects which match the filter.
-     *
-     * <p>
-     * The syntax of the filter string is as defined in the {@link Filter}
-     * class. The filter can test any configuration properties including the
-     * following:
-     * <ul>
-     * <li>{@code service.pid} - the persistent identity</li>
-     * <li>{@code service.factoryPid} - the factory PID, if applicable</li>
-     * <li>{@code service.bundleLocation} - the bundle location</li>
-     * </ul>
-     * The filter can also be {@code null}, meaning that all
-     * {@code ConfigurationDTO} objects should be returned.
-     *
-     * @param filter A filter string, or {@code null} to retrieve all
-     *            {@code ConfigurationDTO} objects.
-     * @return All matching {@code ConfigurationDTO} objects, or {@code empty}
-     *         collection
-     * @throws IOException if access to persistent storage fails
-     * @throws InvalidSyntaxException if the filter string is invalid
-     */
-    Collection<XConfigurationDTO> listConfigurations(String filter) throws IOException, InvalidSyntaxException;
-
-    /**
      * Delete the associated {@code Configuration} object.
      * <p>
      * Removes this configuration object from the persistent store. Notify
