@@ -63,6 +63,12 @@ public final class RuntimeDataProvider implements DataProvider {
 
     @Override
     public ObservableList<XConfigurationDTO> configurations() {
+        final ConsoleAgent agent = supervisor.getAgent();
+        if (agent == null) {
+            return FXCollections.emptyObservableList();
+        }
+        configurations.clear();
+        configurations.addAll(agent.getAllConfigurations());
         return configurations;
     }
 

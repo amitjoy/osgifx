@@ -1,44 +1,32 @@
 package in.bytehue.osgifx.console.agent.provider;
 
-import static in.bytehue.osgifx.console.agent.provider.ConsoleAgentHelper.valueOf;
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
-import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
-import org.osgi.service.metatype.AttributeDefinition;
-import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
-import org.osgi.service.metatype.ObjectClassDefinition;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +34,11 @@ import org.slf4j.LoggerFactory;
 import aQute.lib.startlevel.StartLevelRuntimeHandler;
 import aQute.remote.agent.AgentServer;
 import in.bytehue.osgifx.console.agent.ConsoleAgent;
-import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
-import in.bytehue.osgifx.console.agent.dto.XObjectClassDefDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
@@ -81,6 +67,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         configAdminTracker = new ServiceTracker<>(context, ConfigurationAdmin.class, null);
 
         scrTracker.open();
+        metatypeTracker.open();
         configAdminTracker.open();
     }
 
@@ -96,7 +83,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        return XConfigurationtInfoProvider.get(configAdminTracker.getService());
+        return XConfigurationtInfoProvider.get(getContext(), configAdminTracker.getService(), metatypeTracker.getService());
     }
 
     @Override
@@ -187,164 +174,6 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     }
 
     @Override
-    public Collection<XConfigurationDTO> listConfigurations(final String filter) throws IOException, InvalidSyntaxException {
-        final List<XConfigurationDTO> configsWithoutMetatype = findConfigsWithoutMetatype();
-        final List<XConfigurationDTO> configsWithMetatype    = findConfigsWithMetatype();
-        final List<XConfigurationDTO> metatypeWithoutConfigs = findMetatypeWithoutConfigs();
-
-        // @formatter:off
-        return Stream.of(configsWithoutMetatype, configsWithMetatype, metatypeWithoutConfigs)
-                     .flatMap(Collection::stream)
-                     .collect(Collectors.toList());
-        // @formatter:on
-    }
-
-    private List<XConfigurationDTO> findConfigsWithoutMetatype() throws IOException, InvalidSyntaxException {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return Collections.emptyList();
-        }
-        final List<XConfigurationDTO> dtos = new ArrayList<>();
-        for (final Configuration config : configAdmin.listConfigurations(null)) {
-            final boolean hasMetatype = hasMetatype(config);
-            if (!hasMetatype) {
-                dtos.add(toConfigDTO(config, null));
-            }
-        }
-        return dtos;
-    }
-
-    private List<XConfigurationDTO> findConfigsWithMetatype() throws IOException, InvalidSyntaxException {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return Collections.emptyList();
-        }
-        final List<XConfigurationDTO> dtos = new ArrayList<>();
-        for (final Configuration config : configAdmin.listConfigurations(null)) {
-            final boolean hasMetatype = hasMetatype(config);
-            if (hasMetatype) {
-                dtos.add(toConfigDTO(config, toOCD(config)));
-            }
-        }
-        return dtos;
-    }
-
-    private List<XConfigurationDTO> findMetatypeWithoutConfigs() throws IOException, InvalidSyntaxException {
-        final MetaTypeService metatype = metatypeTracker.getService();
-        if (metatype == null) {
-            return null;
-        }
-        final List<XConfigurationDTO> dtos = new ArrayList<>();
-        for (final Bundle bundle : getContext().getBundles()) {
-            final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
-            for (final String pid : metatypeInfo.getPids()) {
-                final boolean hasAssociatedConfiguration = checkConfigurationExistence(pid);
-                if (!hasAssociatedConfiguration) {
-                    final XObjectClassDefDTO ocd = toOcdDTO(pid, metatypeInfo);
-                    dtos.add(toConfigDTO(null, ocd));
-                }
-            }
-        }
-        return dtos;
-    }
-
-    private boolean checkConfigurationExistence(final String pid) throws IOException, InvalidSyntaxException {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return false;
-        }
-        return configAdmin.listConfigurations("(service.pid=pid)") != null;
-    }
-
-    private XConfigurationDTO toConfigDTO(final Configuration configuration, final XObjectClassDefDTO ocd) {
-        final XConfigurationDTO dto = new XConfigurationDTO();
-
-        dto.pid        = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
-        dto.factoryPid = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties = Optional.ofNullable(configuration).map(c -> valueOf(configuration.getProperties())).orElse(null);
-        dto.location   = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
-        dto.ocd        = ocd;
-
-        return dto;
-    }
-
-    private XObjectClassDefDTO toOCD(final Configuration config) {
-        final MetaTypeService metatype = metatypeTracker.getService();
-        if (metatype == null) {
-            return null;
-        }
-        for (final Bundle bundle : getContext().getBundles()) {
-            final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
-            for (final String pid : metatypeInfo.getPids()) {
-                if (pid.equals(config.getPid())) {
-                    return toOcdDTO(pid, metatypeInfo);
-                }
-            }
-        }
-        return null;
-    }
-
-    private XObjectClassDefDTO toOcdDTO(final String pid, final MetaTypeInformation metatypeInfo) {
-        final ObjectClassDefinition ocd = metatypeInfo.getObjectClassDefinition(pid, null);
-        final XObjectClassDefDTO    dto = new XObjectClassDefDTO();
-
-        dto.id            = ocd.getID();
-        dto.name          = ocd.getName();
-        dto.description   = ocd.getDescription();
-        dto.attributeDefs = Stream.of(ocd.getAttributeDefinitions(ALL)).map(this::toAdDTO).collect(toList());
-
-        return null;
-    }
-
-    private XAttributeDefDTO toAdDTO(final AttributeDefinition ad) {
-        final XAttributeDefDTO dto = new XAttributeDefDTO();
-
-        dto.id           = ad.getID();
-        dto.name         = ad.getName();
-        dto.cardinality  = ad.getCardinality();
-        dto.description  = ad.getDescription();
-        dto.type         = toMetatypeClazz(ad.getType());
-        dto.optionValues = Arrays.asList(ad.getOptionLabels());
-
-        return dto;
-    }
-
-    private Class<?> toMetatypeClazz(final int type) {
-        switch (type) {
-            case AttributeDefinition.INTEGER:
-                return Integer.class;
-            case AttributeDefinition.FLOAT:
-            case AttributeDefinition.DOUBLE:
-                return Double.class;
-            case AttributeDefinition.BOOLEAN:
-                return Boolean.class;
-            case AttributeDefinition.LONG:
-                return Long.class;
-            case AttributeDefinition.PASSWORD:
-            case AttributeDefinition.STRING:
-                return String.class;
-            default: // TODO other types
-                return String.class;
-        }
-    }
-
-    private boolean hasMetatype(final Configuration config) {
-        final MetaTypeService metatype = metatypeTracker.getService();
-        if (metatype == null) {
-            return false;
-        }
-        for (final Bundle bundle : getContext().getBundles()) {
-            final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
-            for (final String pid : metatypeInfo.getPids()) {
-                if (pid.equals(config.getPid())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
     public void deleteConfiguration(final String pid) throws IOException {
         final ConfigurationAdmin configAdmin = configAdminTracker.getService();
         if (configAdmin == null) {
@@ -382,6 +211,7 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
     public void close() throws IOException {
         super.close();
         scrTracker.close();
+        metatypeTracker.close();
         configAdminTracker.close();
     }
 
