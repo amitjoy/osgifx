@@ -132,10 +132,11 @@ public final class XConfigurationtInfoProvider {
         final ObjectClassDefinition ocd = metatypeInfo.getObjectClassDefinition(pid, null);
         final XObjectClassDefDTO    dto = new XObjectClassDefDTO();
 
-        dto.id            = ocd.getID();
-        dto.name          = ocd.getName();
-        dto.description   = ocd.getDescription();
-        dto.attributeDefs = Stream.of(ocd.getAttributeDefinitions(ALL)).map(XConfigurationtInfoProvider::toAdDTO).collect(toList());
+        dto.id                 = ocd.getID();
+        dto.name               = ocd.getName();
+        dto.description        = ocd.getDescription();
+        dto.descriptorLocation = metatypeInfo.getBundle().getSymbolicName();
+        dto.attributeDefs      = Stream.of(ocd.getAttributeDefinitions(ALL)).map(XConfigurationtInfoProvider::toAdDTO).collect(toList());
 
         return dto;
     }
@@ -143,12 +144,13 @@ public final class XConfigurationtInfoProvider {
     private static XAttributeDefDTO toAdDTO(final AttributeDefinition ad) {
         final XAttributeDefDTO dto = new XAttributeDefDTO();
 
-        dto.id           = ad.getID();
-        dto.name         = ad.getName();
-        dto.cardinality  = ad.getCardinality();
-        dto.description  = ad.getDescription();
-        dto.type         = ad.getType();
-        dto.optionValues = Optional.ofNullable(ad.getOptionLabels()).map(Arrays::asList).orElse(null);
+        dto.id            = ad.getID();
+        dto.name          = ad.getName();
+        dto.cardinality   = ad.getCardinality();
+        dto.description   = ad.getDescription();
+        dto.type          = ad.getType();
+        dto.optionValues  = Optional.ofNullable(ad.getOptionLabels()).map(Arrays::asList).orElse(null);
+        dto.defaultValue = Optional.ofNullable(ad.getDefaultValue()).map(Arrays::asList).orElse(null);
 
         return dto;
     }
