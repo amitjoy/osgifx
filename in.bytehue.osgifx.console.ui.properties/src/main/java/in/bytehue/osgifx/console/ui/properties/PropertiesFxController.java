@@ -35,6 +35,8 @@ public final class PropertiesFxController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
+        propertyTable.setSelectionModel(null);
+
         propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
         propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
         propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));

@@ -43,6 +43,7 @@ public final class ComponentsFxController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
+        table.setSelectionModel(null);
         createControls();
     }
 
