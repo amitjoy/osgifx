@@ -22,7 +22,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 
 public final class ConfigurationsFxController implements Initializable {
 
@@ -49,7 +49,7 @@ public final class ConfigurationsFxController implements Initializable {
     }
 
     private void createControls() {
-        final GridPane                                  expandedNode   = (GridPane) Fx.loadFXML(loader, context,
+        final BorderPane                                expandedNode   = (BorderPane) Fx.loadFXML(loader, context,
                 "/fxml/expander-column-content.fxml");
         final ConfigurationEditorFxController           controller     = loader.getController();
         final TableRowExpanderColumn<XConfigurationDTO> expanderColumn = new TableRowExpanderColumn<>(expandedConfig -> {
@@ -66,7 +66,7 @@ public final class ConfigurationsFxController implements Initializable {
         pidColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
 
-        final TableColumn<XConfigurationDTO, String> nameColumn = new TableColumn<>("name");
+        final TableColumn<XConfigurationDTO, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setPrefWidth(400);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class,
                 s -> Optional.ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));

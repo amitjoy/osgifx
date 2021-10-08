@@ -25,4 +25,9 @@ org.assertj:assertj-core:3.19.0
 org.awaitility:awaitility:3.1.6
 
 # TilesFx
+
 eu.hansolo:tilesfx:1.6.8
+
+# FormsFx
+
+com.dlsc.formsfx:formsfx-core:8.4.0

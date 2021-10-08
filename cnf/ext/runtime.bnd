@@ -82,4 +82,5 @@ bundles.required: \
                 controlsfx,\
                 javax.inject,\
                 in.bytehue.osgifx.console.util,\
-                in.bytehue.osgifx.console.wrapper.tilesfx
+                in.bytehue.osgifx.console.wrapper.tilesfx,\
+                in.bytehue.osgifx.console.wrapper.formsfx
