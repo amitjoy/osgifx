@@ -147,29 +147,10 @@ public final class XConfigurationtInfoProvider {
         dto.name         = ad.getName();
         dto.cardinality  = ad.getCardinality();
         dto.description  = ad.getDescription();
-        dto.type         = toMetatypeClazz(ad.getType());
+        dto.type         = ad.getType();
         dto.optionValues = Optional.ofNullable(ad.getOptionLabels()).map(Arrays::asList).orElse(null);
 
         return dto;
-    }
-
-    private static String toMetatypeClazz(final int type) {
-        switch (type) {
-            case AttributeDefinition.INTEGER:
-                return Integer.class.getName();
-            case AttributeDefinition.FLOAT:
-            case AttributeDefinition.DOUBLE:
-                return Double.class.getName();
-            case AttributeDefinition.BOOLEAN:
-                return Boolean.class.getName();
-            case AttributeDefinition.LONG:
-                return Long.class.getName();
-            case AttributeDefinition.PASSWORD:
-            case AttributeDefinition.STRING:
-                return String.class.getName();
-            default: // TODO other types
-                return String.class.getName();
-        }
     }
 
     private static boolean hasMetatype(final Configuration config) {
