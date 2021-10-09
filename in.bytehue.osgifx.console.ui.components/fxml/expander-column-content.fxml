@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -55,6 +56,7 @@
          <graphic>
         	<Glyph fontFamily="FontAwesome" icon="PLAY" />
     	</graphic>
+    	<tooltip><Tooltip text="Enable Component" /></tooltip>
       </Button>
       <Button fx:id="disableComponentButton" mnemonicParsing="false">
          <GridPane.margin>
@@ -63,6 +65,7 @@
          <graphic>
         	<Glyph fontFamily="FontAwesome" icon="STOP" />
     	</graphic>
+    	<tooltip><Tooltip text="Disable Component" /></tooltip>
       </Button>
       <Label text="ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
          <GridPane.margin>
