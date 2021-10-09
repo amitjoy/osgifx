@@ -24,6 +24,7 @@ import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -32,11 +33,14 @@ public final class ConfigurationEditorFxController implements Initializable {
     @FXML
     private BorderPane rootPanel;
 
-    // @FXML
-    // private Button saveConfigButton;
-    //
-    // @FXML
-    // private Button deleteConfigButton;
+    @FXML
+    private Button cancelButton;
+
+    @FXML
+    private Button saveConfigButton;
+
+    @FXML
+    private Button deleteConfigButton;
 
     private FormRenderer form;
 
