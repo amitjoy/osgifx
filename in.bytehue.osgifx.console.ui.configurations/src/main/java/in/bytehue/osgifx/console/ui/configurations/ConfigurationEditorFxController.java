@@ -136,7 +136,7 @@ public final class ConfigurationEditorFxController implements Initializable {
 
     private Field<?> toFxField(final XAttributeDefDTO ad, final XConfigurationDTO config) {
         Field<?> field = fromAdTypeToFieldType(ad, getValue(config, ad.id), null).editable(true);
-        if (ad.cardinality == 1) { // TODO other cardinalities
+        if (ad.cardinality >= 1) {
             field = field.required(true).required(ad.id + " cannot be empty");
         }
         return field;
@@ -180,7 +180,7 @@ public final class ConfigurationEditorFxController implements Initializable {
                 field = Field.ofStringType(currentValue.toString()).validate(StringLengthValidator.exactly(1, id + "must be of length 1"));
                 break;
             case AttributeDefinition.STRING:
-            default: // TODO other types and cardinalities
+            default:
                 field = Field.ofStringType(currentValue.toString());
                 break;
         }
