@@ -15,6 +15,7 @@ import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.Fx;
+import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +44,7 @@ public final class ServicesFxController implements Initializable {
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
-        table.setSelectionModel(null);
+        table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         createControls();
     }
 
