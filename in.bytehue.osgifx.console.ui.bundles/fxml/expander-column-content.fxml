@@ -5,11 +5,13 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.controlsfx.control.ToggleSwitch?>
 <?import org.controlsfx.glyphfont.Glyph?>
+<?import javafx.scene.control.Tooltip?>
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2300.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.bundles.BundleDetailsFxController">
   <columnConstraints>
@@ -58,6 +60,7 @@
          <graphic>
         	<Glyph fontFamily="FontAwesome" icon="PLAY" />
     	</graphic>
+    	<tooltip><Tooltip text="Start Bundle" /></tooltip>
       </Button>
       <Button fx:id="stopBundleButton" mnemonicParsing="false">
          <GridPane.margin>
@@ -66,6 +69,7 @@
          <graphic>
         	<Glyph fontFamily="FontAwesome" icon="STOP"/>
     	</graphic>
+    	<tooltip><Tooltip text="Stop Bundle" /></tooltip>
       </Button>
       <Button fx:id="uninstallBundleButton" mnemonicParsing="false">
          <GridPane.margin>
@@ -74,6 +78,7 @@
          <graphic>
         	<Glyph fontFamily="FontAwesome" icon="TRASH" />
     	</graphic>
+    	<tooltip><Tooltip text="Uninstall Bundle" /></tooltip>
       </Button>
       <Label text="ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
          <GridPane.margin>
