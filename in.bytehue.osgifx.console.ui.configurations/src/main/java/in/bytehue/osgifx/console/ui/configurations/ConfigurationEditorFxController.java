@@ -84,7 +84,7 @@ public final class ConfigurationEditorFxController implements Initializable {
             String                   pid = config.pid;
             final XObjectClassDefDTO ocd = config.ocd;
             if (pid == null && ocd != null) {
-                pid = ocd.id;
+                pid = ocd.pid;
             }
             final String properties = convertFieldValuesToGson();
             commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(pid, properties));
@@ -249,7 +249,7 @@ public final class ConfigurationEditorFxController implements Initializable {
             if (field instanceof DataField) {
                 @SuppressWarnings("rawtypes")
                 final DataField df = (DataField) field;
-                if (df.isEditable()) {
+                if (!df.isEditable()) {
                     continue;
                 }
                 properties.put(field.getLabel(), df.getValue());
