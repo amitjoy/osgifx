@@ -29,6 +29,8 @@
   <handlers xmi:id="_5g4iUCdHEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.handler.bundle.uninstall" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.BundleUninstallHandler" command="_UtYQMCdFEeyh4bauXjycpA"/>
   <handlers xmi:id="_TFE30CdUEeyVbcMzeDU8dA" elementId="in.bytehue.osgifx.console.application.handler.component.enable" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ComponentEnableHandler" command="_C8x-kCdUEeyVbcMzeDU8dA"/>
   <handlers xmi:id="_UoijwCdWEeyVbcMzeDU8dA" elementId="in.bytehue.osgifx.console.application.handler.component.disable" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ComponentDisableHandler" command="_KvgUACdUEeyVbcMzeDU8dA"/>
+  <handlers xmi:id="_Ak1EMCnPEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.handler.configuration.delete" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ConfigurationDeleteHandler" command="_0-prQCnOEeyGMrCbruHUaw"/>
+  <handlers xmi:id="_QlbkkCnQEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.handler.configuration.update" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ConfigurationUpdateHandler" command="_sXl5YCnPEeyGMrCbruHUaw"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="in.bytehue.osgifx.console.application.command.preference" commandName="Connection Preference Command">
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
@@ -50,6 +52,13 @@
   <commands xmi:id="_KvgUACdUEeyVbcMzeDU8dA" elementId="in.bytehue.osgifx.console.application.command.component.disable" commandName="Component Disable Command" description="Disables the component with the specified ID" category="_btigQCdFEeyh4bauXjycpA">
     <parameters xmi:id="_Qfn4gCdUEeyVbcMzeDU8dA" elementId="id" name="ID" optional="false"/>
   </commands>
+  <commands xmi:id="_0-prQCnOEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.command.configuration.delete" commandName="Configuration Delete Command" description="Deletes the configuration with the specified PID" category="_sT3FYCnOEeyGMrCbruHUaw">
+    <parameters xmi:id="_8HG7sCnOEeyGMrCbruHUaw" elementId="pid" name="PID" optional="false"/>
+  </commands>
+  <commands xmi:id="_sXl5YCnPEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.command.configuration.update" commandName="Configuration Update Command" description="Updates the configuration of the specified PID" category="_sT3FYCnOEeyGMrCbruHUaw">
+    <parameters xmi:id="_4vx-ECnPEeyGMrCbruHUaw" elementId="pid" name="PID" optional="false"/>
+    <parameters xmi:id="_NF14QCnQEeyGMrCbruHUaw" elementId="properties" name="Properties" optional="false"/>
+  </commands>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
@@ -60,4 +69,5 @@
   <addons xmi:id="_Xj5j8CD7EeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.addon.bundlecontext" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.addon.BundleContextAddon"/>
   <categories xmi:id="_zP_6cCdEEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.category.bundle" name="Bundle Action" description="This category is used to group all commands relating to bundle state changes"/>
   <categories xmi:id="_btigQCdFEeyh4bauXjycpA" elementId="in.bytehue.osgifx.console.application.category.component" name="Component Action" description="This category is used to group all commands relating to component state changes"/>
+  <categories xmi:id="_sT3FYCnOEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.category.configuration" name="Configuration Action" description="This category is used to group all commands relating to configuration changes (ConfigurationAdmin)"/>
 </application:Application>
