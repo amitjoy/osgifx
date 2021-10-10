@@ -68,7 +68,10 @@ public final class BundlesFxUI {
         };
         parent.getChildren().clear();
         parent.setCenter(progressPane);
-        new Thread(task).start();
+
+        final Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
 }
