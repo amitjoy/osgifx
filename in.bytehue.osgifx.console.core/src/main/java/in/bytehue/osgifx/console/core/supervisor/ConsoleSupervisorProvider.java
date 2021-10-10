@@ -33,15 +33,11 @@ public final class ConsoleSupervisorProvider extends AgentSupervisor<Supervisor,
 
     @Override
     public void connect(final String host, final int port, final int timeout) throws Exception {
-        // in the connection dialog, we have to show progress dialog while connecting to the runtime
-        try {
-            super.connect(ConsoleAgent.class, this, host, port, timeout);
-            this.host    = host;
-            this.port    = port;
-            this.timeout = timeout;
-        } catch (final Exception e) {
-            throw e;
-        }
+        super.connect(ConsoleAgent.class, this, host, port, timeout);
+        this.host    = host;
+        this.port    = port;
+        this.timeout = timeout;
+        System.setProperty(CONNECTED_AGENT, host + ":" + port);
     }
 
     @Override

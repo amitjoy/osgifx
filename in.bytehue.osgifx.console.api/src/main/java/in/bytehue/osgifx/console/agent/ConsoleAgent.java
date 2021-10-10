@@ -18,7 +18,6 @@ import org.osgi.service.cm.ReadOnlyConfigurationException;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
-import aQute.remote.api.Agent;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
@@ -31,7 +30,7 @@ import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
  * OSGi.fx console agent running on remote OSGi framework
  */
 @ProviderType
-public interface ConsoleAgent extends Agent {
+public interface ConsoleAgent {
 
     /** The system property to set the port for communication */
     String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
@@ -210,7 +209,6 @@ public interface ConsoleAgent extends Agent {
      * @param id the bundle ids
      * @return any errors that occurred
      */
-    @Override
     String start(long... id) throws Exception;
 
     /**
@@ -219,7 +217,6 @@ public interface ConsoleAgent extends Agent {
      * @param id the bundle ids
      * @return any errors that occurred
      */
-    @Override
     String stop(long... id) throws Exception;
 
     /**
@@ -228,7 +225,6 @@ public interface ConsoleAgent extends Agent {
      * @param id the bundle ids
      * @return any errors that occurred
      */
-    @Override
     String uninstall(long... id) throws Exception;
 
     /**
@@ -245,7 +241,6 @@ public interface ConsoleAgent extends Agent {
      * @return A Bundle DTO (cannot be {@code null})
      * @throws Exception if the bundle cannot be installed or updated
      */
-    @Override
     BundleDTO installWithData(String location, byte[] data) throws Exception;
 
     /**
