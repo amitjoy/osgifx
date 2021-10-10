@@ -29,7 +29,7 @@ public final class RuntimeDataProvider implements DataProvider {
     private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
 
     @Override
-    public ObservableList<XBundleDTO> bundles() {
+    public synchronized ObservableList<XBundleDTO> bundles() {
         final ConsoleAgent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
@@ -40,7 +40,7 @@ public final class RuntimeDataProvider implements DataProvider {
     }
 
     @Override
-    public ObservableList<XServiceDTO> services() {
+    public synchronized ObservableList<XServiceDTO> services() {
         final ConsoleAgent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
@@ -51,7 +51,7 @@ public final class RuntimeDataProvider implements DataProvider {
     }
 
     @Override
-    public ObservableList<XComponentDTO> components() {
+    public synchronized ObservableList<XComponentDTO> components() {
         final ConsoleAgent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
@@ -62,7 +62,7 @@ public final class RuntimeDataProvider implements DataProvider {
     }
 
     @Override
-    public ObservableList<XConfigurationDTO> configurations() {
+    public synchronized ObservableList<XConfigurationDTO> configurations() {
         final ConsoleAgent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
@@ -73,12 +73,12 @@ public final class RuntimeDataProvider implements DataProvider {
     }
 
     @Override
-    public ObservableList<XEventDTO> events() {
+    public synchronized ObservableList<XEventDTO> events() {
         return events;
     }
 
     @Override
-    public ObservableList<XPropertyDTO> properties() {
+    public synchronized ObservableList<XPropertyDTO> properties() {
         final ConsoleAgent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
