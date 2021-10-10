@@ -40,7 +40,7 @@ public final class BundleStopHandler {
                 logger.error(error);
             }
         } catch (final Exception e) {
-            logger.error("Bundle " + id + "cannot be stopped");
+            logger.error("Bundle " + id + "cannot be stopped", e);
         }
     }
 

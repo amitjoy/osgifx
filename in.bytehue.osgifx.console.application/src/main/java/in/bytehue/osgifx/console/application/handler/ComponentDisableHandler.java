@@ -40,7 +40,7 @@ public final class ComponentDisableHandler {
                 logger.error(error);
             }
         } catch (final Exception e) {
-            logger.error("Service component with ID '" + id + "' cannot be disabled");
+            logger.error("Service component with ID '" + id + "' cannot be disabled", e);
         }
     }
 

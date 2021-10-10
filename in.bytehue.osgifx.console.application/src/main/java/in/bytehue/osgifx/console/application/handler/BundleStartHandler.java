@@ -40,7 +40,7 @@ public final class BundleStartHandler {
                 logger.error(error);
             }
         } catch (final Exception e) {
-            logger.error("Bundle " + id + "cannot be started");
+            logger.error("Bundle " + id + "cannot be started", e);
         }
     }
 

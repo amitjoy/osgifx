@@ -40,7 +40,7 @@ public final class ComponentEnableHandler {
                 logger.error(error);
             }
         } catch (final Exception e) {
-            logger.error("Service component '" + name + "' cannot be enabled");
+            logger.error("Service component '" + name + "' cannot be enabled", e);
         }
     }
 
