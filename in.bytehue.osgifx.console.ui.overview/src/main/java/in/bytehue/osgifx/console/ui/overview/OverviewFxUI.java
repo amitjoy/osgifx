@@ -25,6 +25,7 @@ import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
+import in.bytehue.osgifx.console.agent.ConsoleAgent;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -372,7 +373,7 @@ public final class OverviewFxUI {
     private void updateFrameworkEventsCount(final Tile tile) {
         // @formatter:off
         java.util.Optional.ofNullable(supervisor.getAgent())
-                          .map(x -> x.getFrameworkEventsOverview()) 
+                          .map(ConsoleAgent::getFrameworkEventsOverview)
                           .ifPresent(dto -> {
                                  tile.setLeftValue(dto.error);
                                  tile.setMiddleValue(dto.warning);
