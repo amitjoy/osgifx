@@ -189,14 +189,8 @@ public final class ComponentDetailsFxController implements Initializable {
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
-        final String state = component.state;
-        if ("DISABLED".equals(state)) {
-            enableComponentButton.setDisable(false);
-            disableComponentButton.setDisable(true);
-        } else {
-            enableComponentButton.setDisable(true);
-            disableComponentButton.setDisable(false);
-        }
+        enableComponentButton.setDisable(!"DISABLED".equals(component.state));
+        disableComponentButton.setDisable("DISABLED".equals(component.state));
     }
 
     private void createReferenceExpandedTable(final XComponentDTO component) {

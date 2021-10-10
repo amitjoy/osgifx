@@ -215,17 +215,9 @@ public final class BundleDetailsFxController implements Initializable {
     }
 
     private void initControlsForBundles(final XBundleDTO bundle) {
-        if ("ACTIVE".equals(bundle.state)) {
-            startBundleButton.setDisable(true);
-        } else {
-            startBundleButton.setDisable(false);
-        }
-        if ("RESOLVED".equals(bundle.state)) {
-            stopBundleButton.setDisable(true);
-        } else {
-            stopBundleButton.setDisable(false);
-        }
-        fragmentLabel.setSelected(false);
+        startBundleButton.setDisable("ACTIVE".equals(bundle.state));
+        stopBundleButton.setDisable("RESOLVED".equals(bundle.state));
+        fragmentLabel.setSelected(bundle.isFragment);
     }
 
     private void initControlsForFragements() {
