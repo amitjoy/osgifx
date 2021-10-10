@@ -49,6 +49,7 @@ public final class ConfigurationEditorFxController implements Initializable {
     }
 
     void initControls(final XConfigurationDTO config) {
+        initButtons(config);
         if (form != null) {
             rootPanel.getChildren().remove(form);
         }
@@ -207,6 +208,10 @@ public final class ConfigurationEditorFxController implements Initializable {
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
         return renderer;
+    }
+
+    private void initButtons(final XConfigurationDTO config) {
+        deleteConfigButton.setDisable(config.properties == null);
     }
 
     private Object getValue(final XConfigurationDTO config, final String id) {
