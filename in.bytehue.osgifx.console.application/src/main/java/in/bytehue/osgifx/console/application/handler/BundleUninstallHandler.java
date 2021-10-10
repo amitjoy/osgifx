@@ -40,7 +40,7 @@ public final class BundleUninstallHandler {
                 logger.error(error);
             }
         } catch (final Exception e) {
-            logger.error("Bundle " + id + "cannot be uninstalled");
+            logger.error("Bundle " + id + "cannot be uninstalled", e);
         }
     }
 
