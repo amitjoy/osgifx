@@ -197,11 +197,8 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
             return;
         }
         try {
-            for (final Configuration configuration : configAdmin.listConfigurations(null)) {
-                if (configuration.getPid().equals(pid)) {
-                    configuration.update(new Hashtable<>(newProperties));
-                }
-            }
+            final Configuration configuration = configAdmin.getConfiguration(pid, "?");
+            configuration.update(new Hashtable<>(newProperties));
         } catch (final Exception e) {
             logger.error("Cannot update configuration '{}'", pid);
         }
