@@ -12,7 +12,9 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
+import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -24,6 +26,7 @@ import in.bytehue.osgifx.console.application.preference.ConnectionsProvider;
 import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -76,6 +79,8 @@ public final class ConnectionSettingsWindowController implements Initializable {
     @FXML
     private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
 
+    ProgressDialog progressDialog;
+
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
         hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
@@ -115,19 +120,42 @@ public final class ConnectionSettingsWindowController implements Initializable {
 
     @FXML
     public void connectAgent(final ActionEvent event) {
-        try {
-            final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
-            supervisor.connect(selectedConnection.host, selectedConnection.port, selectedConnection.timeout);
+        final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
+        final Task<Void>           connectTask        = new Task<Void>() {
+                                                          @Override
+                                                          protected Void call() throws Exception {
+                                                              try {
+                                                                  supervisor.connect(selectedConnection.host, selectedConnection.port,
+                                                                          selectedConnection.timeout);
+                                                              } catch (final Exception e) {
+                                                                  Platform.runLater(() -> {
+                                                                                                                    progressDialog.close();
+                                                                                                                    final ExceptionDialog dialog = new ExceptionDialog(
+                                                                                                                            e);
+                                                                                                                    dialog.initStyle(
+                                                                                                                            StageStyle.UNDECORATED);
+                                                                                                                    dialog.show();
+                                                                                                                });
+                                                                  throw e;
+                                                              }
+                                                              return null;
+                                                          }
 
-            final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
-            connectionChooserWindow.setVisible(false);
+                                                          @Override
+                                                          protected void succeeded() {
+                                                              eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC,
+                                                                      selectedConnection.host + ":" + selectedConnection.port);
+                                                          }
+                                                      };
 
-            eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, selectedConnection.host + ":" + selectedConnection.port);
-        } catch (final Exception e) {
-            final ExceptionDialog dialog = new ExceptionDialog(e);
-            dialog.initStyle(StageStyle.UNDECORATED);
-            dialog.show();
-        }
+        final Thread th = new Thread(connectTask);
+        th.setDaemon(true);
+        th.start();
+
+        progressDialog = new ProgressDialog(connectTask);
+        progressDialog.setHeaderText("Connecting to " + selectedConnection.host + ":" + selectedConnection.port);
+        progressDialog.initStyle(StageStyle.UNDECORATED);
+        progressDialog.show();
     }
 
     private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
@@ -139,6 +167,14 @@ public final class ConnectionSettingsWindowController implements Initializable {
         properties.put("type", type);
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
+    }
+
+    @Inject
+    @org.eclipse.e4.core.di.annotations.Optional
+    private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
+        connectionChooserWindow.setVisible(false);
+        progressDialog.close();
     }
 
 }
