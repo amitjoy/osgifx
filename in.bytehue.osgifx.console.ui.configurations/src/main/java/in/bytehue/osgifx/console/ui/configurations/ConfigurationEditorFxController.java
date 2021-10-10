@@ -89,6 +89,7 @@ public final class ConfigurationEditorFxController implements Initializable {
             final String properties = convertFieldValuesToGson();
             commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(pid, properties));
         });
+        cancelButton.setOnAction(e -> form.reset());
     }
 
     private FormRenderer createForm(final XConfigurationDTO config) {
