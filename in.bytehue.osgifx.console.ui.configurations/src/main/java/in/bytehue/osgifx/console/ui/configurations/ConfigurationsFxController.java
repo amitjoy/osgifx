@@ -75,7 +75,7 @@ public final class ConfigurationsFxController implements Initializable {
 
         final TableColumn<XConfigurationDTO, String> locationColumn = new TableColumn<>("Location");
         locationColumn.setPrefWidth(150);
-        locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No PID associated"));
+        locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No bound location"));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(pidColumn);
