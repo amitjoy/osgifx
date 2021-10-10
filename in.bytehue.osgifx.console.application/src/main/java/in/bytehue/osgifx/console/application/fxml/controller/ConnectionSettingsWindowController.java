@@ -79,7 +79,7 @@ public final class ConnectionSettingsWindowController implements Initializable {
     @FXML
     private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
 
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
