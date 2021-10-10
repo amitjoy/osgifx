@@ -16,6 +16,9 @@ public interface ConsoleSupervisor {
     /** The topic where an event will be sent after the agent gets connected */
     String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
 
+    /** System property comprising the host and port of the connected agent */
+    String CONNECTED_AGENT = "osgi.fx.connected.agent";
+
     /**
      * Returns the associated agent instance to control the remote OSGi framework
      *

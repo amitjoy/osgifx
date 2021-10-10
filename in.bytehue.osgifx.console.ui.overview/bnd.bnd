@@ -5,5 +5,5 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  css = css,\
 					  fxml = fxml,\
 					  graphic = graphic
--buildpath          : ${bundles.required}, biz.aQute.remote.agent
+-buildpath          : ${bundles.required}
 -privatepackage     : in.bytehue.osgifx.console.ui.overview
