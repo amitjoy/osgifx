@@ -9,18 +9,24 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+
+import org.eclipse.fx.core.command.CommandService;
 import org.osgi.framework.Constants;
 import org.osgi.service.metatype.AttributeDefinition;
 
+import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 
 import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
+import in.bytehue.osgifx.console.agent.dto.XObjectClassDefDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -29,6 +35,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
 public final class ConfigurationEditorFxController implements Initializable {
+
+    private static final String CONFIG_DELETE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.delete";
+    private static final String CONFIG_UPDATE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.update";
+
+    @Inject
+    private CommandService commandService;
 
     @FXML
     private BorderPane rootPanel;
@@ -42,7 +54,8 @@ public final class ConfigurationEditorFxController implements Initializable {
     @FXML
     private Button deleteConfigButton;
 
-    private FormRenderer form;
+    private Form         form;
+    private FormRenderer formRenderer;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
@@ -50,11 +63,48 @@ public final class ConfigurationEditorFxController implements Initializable {
 
     void initControls(final XConfigurationDTO config) {
         initButtons(config);
-        if (form != null) {
-            rootPanel.getChildren().remove(form);
+        if (formRenderer != null) {
+            rootPanel.getChildren().remove(formRenderer);
         }
-        form = createForm(config);
-        rootPanel.setCenter(form);
+        formRenderer = createForm(config);
+        rootPanel.setCenter(formRenderer);
+    }
+
+    private void initButtons(final XConfigurationDTO config) {
+        deleteConfigButton.setDisable(config.properties == null);
+        deleteConfigButton.setOnAction(event -> {
+            String                   pid = config.pid;
+            final XObjectClassDefDTO ocd = config.ocd;
+            if (pid == null && ocd != null) {
+                pid = ocd.id;
+            }
+            commandService.execute(CONFIG_DELETE_COMMAND_ID, createCommandMap(pid, null));
+        });
+        saveConfigButton.setOnAction(event -> {
+            String                   pid = config.pid;
+            final XObjectClassDefDTO ocd = config.ocd;
+            if (pid == null && ocd != null) {
+                pid = ocd.id;
+            }
+            final String properties = convertFieldValuesToGson();
+            commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(pid, properties));
+        });
+    }
+
+    private FormRenderer createForm(final XConfigurationDTO config) {
+        // @formatter:off
+        form     = Form.of(Section.of(initGenericFields(config).toArray(new Field[0])).title("Generic Properties"),
+                           Section.of(initProperties(config).toArray(new Field[0])).title("Specific Properties"))
+                       .title("Configuration Properties");
+        // @formatter:on
+        final FormRenderer renderer = new FormRenderer(form);
+
+        GridPane.setColumnSpan(renderer, 2);
+        GridPane.setRowIndex(renderer, 3);
+        GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
+        GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
+
+        return renderer;
     }
 
     private List<Field<?>> initProperties(final XConfigurationDTO config) {
@@ -67,13 +117,23 @@ public final class ConfigurationEditorFxController implements Initializable {
     private List<Field<?>> initPropertiesFromConfiguration(final XConfigurationDTO config) {
         final List<Field<?>> fields = new ArrayList<>();
 
-        final Map<String, Object> filteredProperties = new HashMap<>(config.properties);
-        filteredProperties.remove(Constants.SERVICE_PID);
+        for (final Entry<String, Object> entry : config.properties.entrySet()) {
+            final String id    = entry.getKey();
+            final Object value = entry.getValue();
 
-        for (final Entry<String, Object> entry : filteredProperties.entrySet()) {
-            final String   id    = entry.getKey();
-            final Object   value = entry.getValue();
-            final Field<?> field = initFieldFromType(value, Clazz.valueOf(value.getClass()), id).label(id);
+            Field<?> field = initFieldFromType(value, Clazz.valueOf(value.getClass()), id).label(id);
+            if (Constants.SERVICE_PID.equals(field.getLabel())) {
+                field = field.editable(false);
+            }
+            fields.add(field);
+        }
+        return fields;
+    }
+
+    private List<Field<?>> initPropertiesFromOCD(final XConfigurationDTO config) {
+        final List<Field<?>> fields = new ArrayList<>();
+        for (final XAttributeDefDTO ad : config.ocd.attributeDefs) {
+            final Field<?> field = toFxField(ad, config);
             fields.add(field);
         }
         return fields;
@@ -111,15 +171,6 @@ public final class ConfigurationEditorFxController implements Initializable {
 
     }
 
-    private List<Field<?>> initPropertiesFromOCD(final XConfigurationDTO config) {
-        final List<Field<?>> fields = new ArrayList<>();
-        for (final XAttributeDefDTO ad : config.ocd.attributeDefs) {
-            final Field<?> field = toFxField(ad, config);
-            fields.add(field);
-        }
-        return fields;
-    }
-
     private List<Field<?>> initGenericFields(final XConfigurationDTO config) {
         final String pid        = Optional.ofNullable(config.pid).orElse("No PID associated");
         final String factoryPID = Optional.ofNullable(config.factoryPid).orElse("No Factory PID associated");
@@ -140,14 +191,14 @@ public final class ConfigurationEditorFxController implements Initializable {
     }
 
     private Field<?> toFxField(final XAttributeDefDTO ad, final XConfigurationDTO config) {
-        Field<?> field = fromAdTypeToFieldType(ad, getValue(config, ad.id), null).editable(true);
+        Field<?> field = fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(true);
         if (ad.cardinality >= 1) {
             field = field.required(true).required(ad.id + " cannot be empty");
         }
         return field;
     }
 
-    private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, Object currentValue, final Object defaultValue) {
+    private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, Object currentValue) {
         final int          type       = ad.type;
         final List<String> options    = ad.optionValues;
         final List<String> defaultVal = ad.defaultValue;
@@ -192,26 +243,26 @@ public final class ConfigurationEditorFxController implements Initializable {
         return field;
     }
 
-    private FormRenderer createForm(final XConfigurationDTO config) {
-        // @formatter:off
-        final Form         form     = Form.of(
-                                              Section.of(initGenericFields(config).toArray(new Field[0])).title("Generic Properties"),
-                                              Section.of(initProperties(config).toArray(new Field[0])).title("Specific Properties")
-                                              )
-                                          .title("Configuration Properties");
-        // @formatter:on
-        final FormRenderer renderer = new FormRenderer(form);
-
-        GridPane.setColumnSpan(renderer, 2);
-        GridPane.setRowIndex(renderer, 3);
-        GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
-        GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
-
-        return renderer;
+    private String convertFieldValuesToGson() {
+        final Map<String, Object> properties = new HashMap<>();
+        for (final Field<?> field : form.getFields()) {
+            if (field instanceof DataField) {
+                @SuppressWarnings("rawtypes")
+                final DataField df = (DataField) field;
+                if (df.isEditable()) {
+                    continue;
+                }
+                properties.put(field.getLabel(), df.getValue());
+            }
+        }
+        return new Gson().toJson(properties);
     }
 
-    private void initButtons(final XConfigurationDTO config) {
-        deleteConfigButton.setDisable(config.properties == null);
+    private Map<String, Object> createCommandMap(final String pid, final String properties) {
+        final Map<String, Object> props = new HashMap<>();
+        props.computeIfAbsent("pid", key -> pid);
+        props.computeIfAbsent("properties", key -> properties);
+        return props;
     }
 
     private Object getValue(final XConfigurationDTO config, final String id) {
