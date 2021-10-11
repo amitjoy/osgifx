@@ -29,8 +29,9 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableList<XServiceDTO>       services       = FXCollections.observableArrayList();
     private final ObservableList<XComponentDTO>     components     = FXCollections.observableArrayList();
     private final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
-    private final ObservableList<XEventDTO>         events         = FXCollections.observableArrayList();
     private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
+    private final ObservableList<XEventDTO>         events         = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
 
     @Activate
     void activate() {
@@ -92,7 +93,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     }
 
     @Override
-    public void accept(final XEventDTO event) {
+    public synchronized void accept(final XEventDTO event) {
         events.add(event);
     }
 
