@@ -12,4 +12,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       ${bundles.required},\
                       de.jensd:fontawesomefx;packages=*,\
                       com.google.gson
-Import-Package      : org.controlsfx.glyphfont, * 
+Import-Package      : org.controlsfx.glyphfont, org.controlsfx.control, * 
