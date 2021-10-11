@@ -1,1 +1,1 @@
--buildpath: org.apache.felix.converter
+-buildpath: org.apache.felix.converter, controlsfx

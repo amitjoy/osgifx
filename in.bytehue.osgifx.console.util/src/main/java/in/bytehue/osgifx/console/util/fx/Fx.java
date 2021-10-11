@@ -3,12 +3,17 @@ package in.bytehue.osgifx.console.util.fx;
 import java.io.IOException;
 import java.net.URL;
 
+import org.controlsfx.control.Notifications;
 import org.osgi.framework.BundleContext;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 public final class Fx {
 
@@ -47,6 +52,34 @@ public final class Fx {
             // set the new max-widht with some extra space
             column.setPrefWidth(max + 10.0d);
         });
+    }
+
+    public static void showSuccessNotification(final String title, final String text, final ClassLoader classloader) {
+        final Image success = new Image(classloader.getResource("/graphic/images/success.png").toExternalForm());
+        // @formatter:off
+        final Notifications notification = //
+                Notifications.create()
+                             .title(title)
+                             .graphic(new ImageView(success))
+                             .text(text)
+                             .hideAfter(Duration.seconds(7))
+                             .position(Pos.CENTER);
+        // @formatter:on
+        notification.show();
+    }
+
+    public static void showErrorNotification(final String title, final String text, final ClassLoader classloader) {
+        final Image success = new Image(classloader.getResource("/graphic/images/error.png").toExternalForm());
+        // @formatter:off
+        final Notifications notification = //
+                Notifications.create()
+                             .title(title)
+                             .graphic(new ImageView(success))
+                             .text(text)
+                             .hideAfter(Duration.seconds(7))
+                             .position(Pos.CENTER);
+        // @formatter:on
+        notification.show();
     }
 
 }
