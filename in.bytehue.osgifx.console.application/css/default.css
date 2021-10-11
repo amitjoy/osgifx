@@ -37,3 +37,7 @@
     -fx-font-size: 14;
     -fx-border-color: black;
 }
+
+.split-pane *.split-pane-divider {
+    -fx-padding: 0 1 0 1;
+}
