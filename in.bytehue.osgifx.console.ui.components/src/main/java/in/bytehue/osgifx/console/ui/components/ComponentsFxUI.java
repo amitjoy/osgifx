@@ -1,7 +1,7 @@
 package in.bytehue.osgifx.console.ui.components;
 
 import static in.bytehue.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
-import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.CONNECTED_AGENT;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

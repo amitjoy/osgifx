@@ -7,14 +7,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import in.bytehue.osgifx.console.agent.ConsoleAgent;
+import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
-import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
+import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,7 +23,7 @@ import javafx.collections.ObservableList;
 public final class RuntimeDataProvider implements DataProvider, Consumer<XEventDTO> {
 
     @Reference
-    private ConsoleSupervisor supervisor;
+    private Supervisor supervisor;
 
     private final ObservableList<XBundleDTO>        bundles        = FXCollections.observableArrayList();
     private final ObservableList<XServiceDTO>       services       = FXCollections.observableArrayList();
@@ -44,7 +44,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
 
     @Override
     public synchronized ObservableList<XBundleDTO> bundles() {
-        final ConsoleAgent agent = supervisor.getAgent();
+        final Agent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
         }
@@ -55,7 +55,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
 
     @Override
     public synchronized ObservableList<XServiceDTO> services() {
-        final ConsoleAgent agent = supervisor.getAgent();
+        final Agent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
         }
@@ -66,7 +66,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
 
     @Override
     public synchronized ObservableList<XComponentDTO> components() {
-        final ConsoleAgent agent = supervisor.getAgent();
+        final Agent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
         }
@@ -77,7 +77,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
 
     @Override
     public synchronized ObservableList<XConfigurationDTO> configurations() {
-        final ConsoleAgent agent = supervisor.getAgent();
+        final Agent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
         }
@@ -98,7 +98,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
 
     @Override
     public synchronized ObservableList<XPropertyDTO> properties() {
-        final ConsoleAgent agent = supervisor.getAgent();
+        final Agent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
         }

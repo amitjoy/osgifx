@@ -1,6 +1,6 @@
 package in.bytehue.osgifx.console.ui.overview;
 
-import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
@@ -25,8 +25,8 @@ import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
-import in.bytehue.osgifx.console.agent.ConsoleAgent;
-import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
+import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.supervisor.Supervisor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -47,7 +47,7 @@ public final class OverviewFxUI {
     private static final double TILE_HEIGHT = 200;
 
     @Inject
-    private ConsoleSupervisor supervisor;
+    private Supervisor supervisor;
 
     @PostConstruct
     public void postConstruct(final VBox parent) {
@@ -373,7 +373,7 @@ public final class OverviewFxUI {
     private void updateFrameworkEventsCount(final Tile tile) {
         // @formatter:off
         java.util.Optional.ofNullable(supervisor.getAgent())
-                          .map(ConsoleAgent::getFrameworkEventsOverview)
+                          .map(Agent::getFrameworkEventsOverview)
                           .ifPresent(dto -> {
                                  tile.setLeftValue(dto.error);
                                  tile.setMiddleValue(dto.warning);

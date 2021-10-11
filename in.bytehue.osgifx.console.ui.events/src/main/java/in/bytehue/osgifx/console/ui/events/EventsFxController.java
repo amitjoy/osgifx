@@ -1,6 +1,7 @@
 package in.bytehue.osgifx.console.ui.events;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.inject.Inject;
@@ -61,14 +62,14 @@ public final class EventsFxController implements Initializable {
                                                                    return expandedNode;
                                                                });
 
-        final TableColumn<XEventDTO, String> receivedAtColumn = new TableColumn<>("Received");
+        final TableColumn<XEventDTO, Date> receivedAtColumn = new TableColumn<>("Received");
 
-        receivedAtColumn.setPrefWidth(490);
-        receivedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("received", String.class));
+        receivedAtColumn.setPrefWidth(290);
+        receivedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("received", Date.class));
 
         final TableColumn<XEventDTO, String> topicColumn = new TableColumn<>("Topic");
 
-        topicColumn.setPrefWidth(700);
+        topicColumn.setPrefWidth(650);
         topicColumn.setCellValueFactory(new DTOCellValueFactory<>("topic", String.class));
 
         table.getColumns().add(expanderColumn);

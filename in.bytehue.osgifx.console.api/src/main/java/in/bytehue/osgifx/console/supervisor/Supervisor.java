@@ -2,9 +2,7 @@ package in.bytehue.osgifx.console.supervisor;
 
 import java.util.function.Consumer;
 
-import org.osgi.annotation.versioning.ProviderType;
-
-import in.bytehue.osgifx.console.agent.ConsoleAgent;
+import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 
 /**
@@ -13,8 +11,7 @@ import in.bytehue.osgifx.console.agent.dto.XEventDTO;
  * agent, not the initiator. I.e. this is not the interface the initiator will
  * use to control the session.
  */
-@ProviderType
-public interface ConsoleSupervisor {
+public interface Supervisor {
 
     /** The topic where an event will be sent after the agent gets connected */
     String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
@@ -23,11 +20,31 @@ public interface ConsoleSupervisor {
     String CONNECTED_AGENT = "osgi.fx.connected.agent";
 
     /**
-     * Returns the associated agent instance to control the remote OSGi framework
+     * Redirected standard output
      *
-     * @return the associated agent instance
+     * @param out the text that was redirected
+     * @return ignored (to make sync)
      */
-    ConsoleAgent getAgent();
+    boolean stdout(String out) throws Exception;
+
+    /**
+     * Redirected standard error.
+     *
+     * @param out the text that was redirected
+     * @return ignored (to make sync)
+     */
+    boolean stderr(String out) throws Exception;
+
+    /**
+     * Return the contents of the file that has the given SHA-1. The initiator
+     * of the connection should in general register the files it refers to in
+     * the communication to the agent. The agent then calls this method to
+     * retrieve the contents if it does not have it in its local cache.
+     *
+     * @param sha the SHA-1
+     * @return the contents of that file or null if no such file exists.
+     */
+    byte[] getFile(String sha) throws Exception;
 
     /**
      * Connects to the specific host and port using the provided timeout in connection
@@ -80,4 +97,10 @@ public interface ConsoleSupervisor {
      */
     void removeOSGiEventConsumer(Consumer<XEventDTO> eventConsumer);
 
+    /**
+     * Returns the associated agent
+     *
+     * @return the agent
+     */
+    Agent getAgent();
 }

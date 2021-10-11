@@ -1,7 +1,6 @@
 package in.bytehue.osgifx.console.agent.provider;
 
 import static aQute.remote.api.Agent.PORT_P;
-import static in.bytehue.osgifx.console.agent.ConsoleAgent.AGENT_SERVER_PORT_KEY;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
@@ -30,10 +29,9 @@ import org.osgi.service.event.annotations.RequireEventAdmin;
 import org.osgi.service.metatype.annotations.RequireMetaTypeImplementation;
 
 import aQute.lib.io.IO;
-import aQute.remote.agent.AgentServer;
-import aQute.remote.api.Agent;
-import aQute.remote.api.Supervisor;
 import aQute.remote.util.Link;
+import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 @RequireEventAdmin
 @RequireConfigurationAdmin
@@ -55,7 +53,7 @@ public final class Activator extends Thread implements BundleActivator {
         this.context = context;
 
         // Get the specified port in the framework properties
-        String port = context.getProperty(AGENT_SERVER_PORT_KEY);
+        String port = context.getProperty(Agent.AGENT_SERVER_PORT_KEY);
         if (port == null) {
             port = Agent.DEFAULT_PORT + "";
         }
@@ -98,7 +96,7 @@ public final class Activator extends Thread implements BundleActivator {
                     socket.setSoTimeout(1000);
 
                     // Create a new agent, and link it up.
-                    final ConsoleAgentServer sa = new ConsoleAgentServer("<>", context, cache);
+                    final AgentServer sa = new AgentServer("<>", context, cache);
 
                     if (agentSr != null) {
                         agentSr.unregister();

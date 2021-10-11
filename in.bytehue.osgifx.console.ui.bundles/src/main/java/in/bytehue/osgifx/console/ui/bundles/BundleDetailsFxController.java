@@ -1,6 +1,7 @@
 package in.bytehue.osgifx.console.ui.bundles;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,6 +12,8 @@ import javax.inject.Inject;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.command.CommandService;
+import org.osgi.util.converter.Converter;
+import org.osgi.util.converter.Converters;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
@@ -152,8 +155,11 @@ public final class BundleDetailsFxController implements Initializable {
     @FXML
     private TableColumn<XBundleInfoDTO, String> attachedFragmentsBsnTableColumn;
 
+    private Converter converter;
+
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
+        converter = Converters.standardConverter();
     }
 
     void initControls(final XBundleDTO bundle) {
@@ -165,7 +171,7 @@ public final class BundleDetailsFxController implements Initializable {
         categoryLabel.setText(bundle.category);
         initConditionalControls(bundle);
         registerButtonHandlers(bundle);
-        lasModifiedLabel.setText(String.valueOf(bundle.lastModified));
+        lasModifiedLabel.setText(formateLastModified(bundle.lastModified));
         docLabel.setText(bundle.documentation);
         vendorLabel.setText(bundle.vendor);
         descLabel.setText(bundle.description);
@@ -204,6 +210,13 @@ public final class BundleDetailsFxController implements Initializable {
         manifestHeadersTable.setItems(FXCollections.observableArrayList(bundle.manifestHeaders.entrySet()));
 
         applyTableFilters();
+    }
+
+    private String formateLastModified(final long lastModified) {
+        if (lastModified == 0) {
+            return "No last modification";
+        }
+        return converter.convert(lastModified).to(Date.class).toString();
     }
 
     private void initConditionalControls(final XBundleDTO bundle) {

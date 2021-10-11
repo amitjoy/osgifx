@@ -1,6 +1,9 @@
 -privatepackage       : in.bytehue.osgifx.console.agent.*, in.bytehue.osgifx.console.supervisor
 -conditionalpackage   : aQute.*
--buildpath            : biz.aQute.bndlib;packages=*, biz.aQute.remote.agent;packages=*, org.slf4j.api
+-buildpath            : \
+                        biz.aQute.bndlib;packages=*,\
+                        biz.aQute.remote.agent;packages=*,\
+                        org.slf4j.api
 -fixupmessages        : 'private reference'
 Import-Package        : \
 	org.osgi.framework;version='[1.5,2)',\
