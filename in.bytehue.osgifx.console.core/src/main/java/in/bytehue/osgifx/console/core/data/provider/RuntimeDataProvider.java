@@ -7,6 +7,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import com.google.common.collect.EvictingQueue;
+
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
@@ -16,6 +18,7 @@ import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
+import in.bytehue.osgifx.console.util.fx.ObservableQueue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -30,8 +33,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableList<XComponentDTO>     components     = FXCollections.observableArrayList();
     private final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
     private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
-    private final ObservableList<XEventDTO>         events         = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
 
     @Activate
     void activate() {
