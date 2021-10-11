@@ -10,8 +10,8 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.log.Logger;
 
-import in.bytehue.osgifx.console.agent.ConsoleAgent;
-import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
+import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 public final class ConfigurationDeleteHandler {
 
@@ -23,11 +23,11 @@ public final class ConfigurationDeleteHandler {
     private IEventBroker eventBroker;
 
     @Inject
-    private ConsoleSupervisor supervisor;
+    private Supervisor supervisor;
 
     @Execute
     public void execute(@Named("pid") final String pid) {
-        final ConsoleAgent agent = supervisor.getAgent();
+        final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
             logger.error("Remote agent cannot be connected");
             return;

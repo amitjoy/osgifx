@@ -1,6 +1,6 @@
 package in.bytehue.osgifx.console.ui.services;
 
-import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.CONNECTED_AGENT;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

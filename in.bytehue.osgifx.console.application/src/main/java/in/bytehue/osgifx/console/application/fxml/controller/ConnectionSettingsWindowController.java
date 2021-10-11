@@ -1,6 +1,6 @@
 package in.bytehue.osgifx.console.application.fxml.controller;
 
-import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import org.eclipse.fx.core.command.CommandService;
 import in.bytehue.osgifx.console.application.dialog.ConnectionDialog;
 import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
 import in.bytehue.osgifx.console.application.preference.ConnectionsProvider;
-import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
+import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -50,7 +50,7 @@ public final class ConnectionSettingsWindowController implements Initializable {
     private IEventBroker eventBroker;
 
     @Inject
-    private ConsoleSupervisor supervisor;
+    private Supervisor supervisor;
 
     @Inject
     private CommandService commandService;

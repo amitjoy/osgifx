@@ -1,7 +1,7 @@
 package in.bytehue.osgifx.console.ui.gogo;
 
 import static in.bytehue.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
-import static in.bytehue.osgifx.console.supervisor.ConsoleSupervisor.CONNECTED_AGENT;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
