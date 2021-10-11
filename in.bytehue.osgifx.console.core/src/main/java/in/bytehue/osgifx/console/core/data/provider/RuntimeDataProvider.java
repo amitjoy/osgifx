@@ -1,6 +1,10 @@
 package in.bytehue.osgifx.console.core.data.provider;
 
+import java.util.function.Consumer;
+
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import in.bytehue.osgifx.console.agent.ConsoleAgent;
@@ -16,7 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
-public final class RuntimeDataProvider implements DataProvider {
+public final class RuntimeDataProvider implements DataProvider, Consumer<XEventDTO> {
 
     @Reference
     private ConsoleSupervisor supervisor;
@@ -27,6 +31,16 @@ public final class RuntimeDataProvider implements DataProvider {
     private final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
     private final ObservableList<XEventDTO>         events         = FXCollections.observableArrayList();
     private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
+
+    @Activate
+    void activate() {
+        supervisor.addOSGiEventConsumer(this);
+    }
+
+    @Deactivate
+    void deactivate() {
+        supervisor.removeOSGiEventConsumer(this);
+    }
 
     @Override
     public synchronized ObservableList<XBundleDTO> bundles() {
@@ -75,6 +89,11 @@ public final class RuntimeDataProvider implements DataProvider {
     @Override
     public synchronized ObservableList<XEventDTO> events() {
         return events;
+    }
+
+    @Override
+    public void accept(final XEventDTO event) {
+        events.add(event);
     }
 
     @Override

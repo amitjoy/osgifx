@@ -1,4 +1,4 @@
--privatepackage       : in.bytehue.osgifx.console.agent.* 
+-privatepackage       : in.bytehue.osgifx.console.agent.*, in.bytehue.osgifx.console.supervisor
 -conditionalpackage   : aQute.*
 -buildpath            : biz.aQute.bndlib;packages=*, biz.aQute.remote.agent;packages=*, org.slf4j.api
 -fixupmessages        : 'private reference'
