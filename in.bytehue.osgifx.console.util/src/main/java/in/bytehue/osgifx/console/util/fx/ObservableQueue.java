@@ -6,7 +6,7 @@ import java.util.Queue;
 
 import javafx.collections.ObservableListBase;
 
-public class ObservableQueue<E> extends ObservableListBase<E> implements Queue<E> {
+public final class ObservableQueue<E> extends ObservableListBase<E> implements Queue<E> {
 
     private final Queue<E> queue;
 

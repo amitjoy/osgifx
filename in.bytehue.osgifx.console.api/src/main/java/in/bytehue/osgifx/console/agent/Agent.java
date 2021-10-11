@@ -24,7 +24,6 @@ import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
-import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
@@ -279,13 +278,6 @@ public interface Agent {
      * @return the detailed information of all the configurations
      */
     List<XConfigurationDTO> getAllConfigurations();
-
-    /**
-     * Get the detailed information of all events
-     *
-     * @return the detailed information of all events
-     */
-    List<XEventDTO> getAllEvents();
 
     /**
      * Get the detailed information of all the properties

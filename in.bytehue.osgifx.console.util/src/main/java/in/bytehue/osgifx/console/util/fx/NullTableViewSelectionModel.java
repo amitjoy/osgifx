@@ -7,7 +7,7 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 
 @SuppressWarnings("rawtypes")
-public class NullTableViewSelectionModel<S> extends TableView.TableViewSelectionModel<S> {
+public final class NullTableViewSelectionModel<S> extends TableView.TableViewSelectionModel<S> {
 
     public NullTableViewSelectionModel(final TableView<S> tableView) {
         super(tableView);
