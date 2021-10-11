@@ -45,6 +45,7 @@ public final class GogoFxController implements Initializable {
                 final String command = input.getText();
                 if ("clear".equals(command)) {
                     output.clear();
+                    input.clear();
                     return;
                 }
                 output.appendText("$ " + command + System.lineSeparator());
