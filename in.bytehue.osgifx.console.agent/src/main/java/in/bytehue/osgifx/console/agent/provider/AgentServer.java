@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -88,7 +89,7 @@ import in.bytehue.osgifx.console.supervisor.Supervisor;
  * Implementation of the Agent. This implementation implements the Agent
  * interfaces and communicates with a Supervisor interfaces.
  */
-public class AgentServer implements Agent, Closeable, EventHandler {
+public final class AgentServer implements Agent, Closeable, EventHandler {
     private static final Pattern       BSN_P    = Pattern.compile("\\s*([^;\\s]+).*");
     private static final AtomicInteger sequence = new AtomicInteger(1000);
 
@@ -867,11 +868,6 @@ public class AgentServer implements Agent, Closeable, EventHandler {
     }
 
     @Override
-    public List<XEventDTO> getAllEvents() {
-        return XEventInfoProvider.get(getContext());
-    }
-
-    @Override
     public List<XServiceDTO> getAllServices() {
         return XServiceInfoProvider.get(getContext());
     }
@@ -1028,7 +1024,11 @@ public class AgentServer implements Agent, Closeable, EventHandler {
         final Map<String, String> properties = new HashMap<>();
 
         for (final String propertyName : event.getPropertyNames()) {
-            properties.put(propertyName, event.getProperty(propertyName).toString());
+            Object propertyValue = event.getProperty(propertyName);
+            if (propertyValue instanceof String[]) {
+                propertyValue = Arrays.asList((String[]) propertyValue);
+            }
+            properties.put(propertyName, propertyValue.toString());
         }
         return properties;
     }
