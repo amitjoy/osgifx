@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ASCII"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_c376wBuoEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.application">
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGi.fx Console" width="1200" height="685">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="in.bytehue.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGi.fx Console" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/window.png" width="1200" height="685">
     <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
     <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/in.bytehue.osgifx.console.application/fxml/top-area.fxml"/>
     <tags>efx-center-on-screen</tags>
@@ -16,7 +16,7 @@
         <children xsi:type="menu:DirectMenuItem" xmi:id="_vzJVkCFQEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.directmenuitem.about" label="About OSGi.fx Console" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/about.png" tooltip="Shows information about the OSGi.fx Console" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.AboutConsoleHandler"/>
       </children>
     </mainMenu>
-    <windows xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" label="Choose Connections" width="550" height="300">
+    <windows xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" label="Choose Connections" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/window.png" width="550" height="300">
       <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
       <persistedState key="efx.window.stagemodality" value="APPLICATION_MODAL"/>
       <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/in.bytehue.osgifx.console.application/fxml/connection-chooser-window.fxml"/>

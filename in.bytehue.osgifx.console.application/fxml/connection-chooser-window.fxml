@@ -18,7 +18,7 @@
         <columns>
           <TableColumn fx:id="hostColumn" editable="false" prefWidth="236.0" text="Host" />
           <TableColumn fx:id="portColumn" editable="false" prefWidth="168.0" text="Port" />
-            <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="142.0" text="Timeout" />
+          <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="142.0" text="Timeout" />
         </columns>
       </TableView>
       <Button fx:id="connectButton" disable="true" layoutX="356.0" layoutY="263.0" mnemonicParsing="false" onAction="#connectAgent" prefWidth="80.0" style="-fx-background-color: #5cb85c;" text="Connect" />
