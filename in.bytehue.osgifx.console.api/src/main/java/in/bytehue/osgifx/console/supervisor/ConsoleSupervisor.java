@@ -1,8 +1,11 @@
 package in.bytehue.osgifx.console.supervisor;
 
+import java.util.function.Consumer;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 import in.bytehue.osgifx.console.agent.ConsoleAgent;
+import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 
 /**
  * A Supervisor handles the initiating side of a session with a remote agent.
@@ -57,5 +60,24 @@ public interface ConsoleSupervisor {
      * @return the currently connected timeout
      */
     int getTimeout();
+
+    /**
+     * Callback method for OSGi Events
+     */
+    void onOSGiEvent(XEventDTO event);
+
+    /**
+     * Registers the specified listener to listen to the OSGi events from the remote machine
+     *
+     * @param eventConsumer the event consume to register
+     */
+    void addOSGiEventConsumer(Consumer<XEventDTO> eventConsumer);
+
+    /**
+     * Deregisters previously registered listener
+     *
+     * @param eventConsumer the listener to deregister
+     */
+    void removeOSGiEventConsumer(Consumer<XEventDTO> eventConsumer);
 
 }

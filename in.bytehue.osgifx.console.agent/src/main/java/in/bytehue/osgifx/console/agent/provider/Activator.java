@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 
@@ -18,8 +21,11 @@ import org.osgi.annotation.bundle.Capability;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.annotations.RequireConfigurationAdmin;
 import org.osgi.service.component.annotations.RequireServiceComponentRuntime;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.annotations.RequireEventAdmin;
 import org.osgi.service.metatype.annotations.RequireMetaTypeImplementation;
 
@@ -37,10 +43,11 @@ import aQute.remote.util.Link;
 @Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.agent.ConsoleAgent")
 public final class Activator extends Thread implements BundleActivator {
 
-    private File              cache;
-    private ServerSocket      server;
-    private BundleContext     context;
-    private List<AgentServer> agents;
+    private File                              cache;
+    private ServerSocket                      server;
+    private BundleContext                     context;
+    private List<AgentServer>                 agents;
+    private ServiceRegistration<EventHandler> agentSr;
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -91,7 +98,17 @@ public final class Activator extends Thread implements BundleActivator {
                     socket.setSoTimeout(1000);
 
                     // Create a new agent, and link it up.
-                    final AgentServer sa = new ConsoleAgentServer("<>", context, cache);
+                    final ConsoleAgentServer sa = new ConsoleAgentServer("<>", context, cache);
+
+                    if (agentSr != null) {
+                        agentSr.unregister();
+                    }
+
+                    final Map<String, Object> properties = new HashMap<>();
+                    properties.put(EventConstants.EVENT_TOPIC, "*");
+
+                    agentSr = context.registerService(EventHandler.class, (EventHandler) sa, new Hashtable<>(properties));
+
                     agents.add(sa);
                     final Link<Agent, Supervisor> link = new Link<Agent, Supervisor>(Supervisor.class, sa, socket) {
                         @Override

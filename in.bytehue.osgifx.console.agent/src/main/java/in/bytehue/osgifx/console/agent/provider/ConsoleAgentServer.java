@@ -26,6 +26,8 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -41,8 +43,9 @@ import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
+import in.bytehue.osgifx.console.supervisor.ConsoleSupervisor;
 
-public final class ConsoleAgentServer extends AgentServer implements ConsoleAgent {
+public final class ConsoleAgentServer extends AgentServer implements ConsoleAgent, EventHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -261,6 +264,27 @@ public final class ConsoleAgentServer extends AgentServer implements ConsoleAgen
         dto.error   = errorFrameworkEvents.get();
 
         return dto;
+    }
+
+    @Override
+    public void handleEvent(final Event event) {
+        final XEventDTO dto = new XEventDTO();
+
+        dto.received   = System.currentTimeMillis();
+        dto.properties = initProperties(event);
+        dto.topic      = event.getTopic();
+
+        final ConsoleSupervisor supervisor = (ConsoleSupervisor) getSupervisor();
+        supervisor.onOSGiEvent(dto);
+    }
+
+    private Map<String, String> initProperties(final Event event) {
+        final Map<String, String> properties = new HashMap<>();
+
+        for (final String propertyName : event.getPropertyNames()) {
+            properties.put(propertyName, event.getProperty(propertyName).toString());
+        }
+        return properties;
     }
 
 }
