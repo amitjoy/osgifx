@@ -62,11 +62,11 @@ public final class ConfigurationEditorFxController implements Initializable {
     }
 
     void initControls(final XConfigurationDTO config) {
-        initButtons(config);
         if (formRenderer != null) {
             rootPanel.getChildren().remove(formRenderer);
         }
         formRenderer = createForm(config);
+        initButtons(config);
         rootPanel.setCenter(formRenderer);
     }
 
@@ -90,6 +90,7 @@ public final class ConfigurationEditorFxController implements Initializable {
             commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(pid, properties));
         });
         cancelButton.setOnAction(e -> form.reset());
+        saveConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
     }
 
     private FormRenderer createForm(final XConfigurationDTO config) {
