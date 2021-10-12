@@ -62,7 +62,7 @@ public final class EventsFxController implements Initializable {
                                                                    return expandedNode;
                                                                });
 
-        final TableColumn<XEventDTO, Date> receivedAtColumn = new TableColumn<>("Received");
+        final TableColumn<XEventDTO, Date> receivedAtColumn = new TableColumn<>("Received At");
 
         receivedAtColumn.setPrefWidth(290);
         receivedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("received", Date.class));
