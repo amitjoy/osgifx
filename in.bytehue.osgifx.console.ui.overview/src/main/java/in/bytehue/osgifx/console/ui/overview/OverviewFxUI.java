@@ -80,7 +80,6 @@ public final class OverviewFxUI {
                                           .skinType(SkinType.CLOCK)
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           .title("Today")
-                                          .text("Whatever text")
                                           .dateVisible(true)
                                           .locale(Locale.UK)
                                           .running(true)
