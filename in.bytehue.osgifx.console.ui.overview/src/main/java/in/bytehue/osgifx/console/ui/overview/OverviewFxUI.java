@@ -25,7 +25,6 @@ import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
-import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -155,33 +154,32 @@ public final class OverviewFxUI {
         final Indicator rightGraphics = new Indicator(Tile.GREEN);
         rightGraphics.setOn(true);
 
-        final Tile noOfErrorFrameworkEventsTile = TileBuilder.create()
-                                                             .skinType(SkinType.STATUS)
-                                                             .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                             .title("Framework Events")
-                                                             .leftText("ERROR")
-                                                             .middleText("WARNING")
-                                                             .rightText("INFORMATION")
-                                                             .leftGraphics(leftGraphics)
-                                                             .middleGraphics(middleGraphics)
-                                                             .rightGraphics(rightGraphics)
-                                                             .text("Overview of framework events in the runtime")
-                                                             .build();
-        noOfErrorFrameworkEventsTile.setRoundedCorners(false);
-        updateFrameworkEventsCount(noOfErrorFrameworkEventsTile);
+        final long freeMemoryInBytes = getMemory("Memory Free");
+        final long totalMemoryInBytes = getMemory("Memory Total");
 
-        final int freeMemory = getMemory("Memory Free");
-        final int totalMemory = getMemory("Memory Total");
+        final int freeMemoryInMB = toMB(freeMemoryInBytes);
+        final int totalMemoryInMB = toMB(totalMemoryInBytes);
+
+        final Tile memoryConsumptionTile = TileBuilder.create()
+                                                        .skinType(SkinType.PERCENTAGE)
+                                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                        .title("JVM Memory Consumption Percentage")
+                                                        .build();
+        memoryConsumptionTile.setRoundedCorners(false);
+        final double usedMemory = totalMemoryInBytes - freeMemoryInBytes;
+        final double memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
+        final double memoryConsumptionInfoInPercentage = memoryConsumptionInfo * 100;
+        memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
         final Tile availableMemoryTile = TileBuilder.create()
                                                     .skinType(SkinType.BAR_GAUGE)
                                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                     .minValue(0)
-                                                    .maxValue(totalMemory)
+                                                    .maxValue(totalMemoryInMB)
                                                     .startFromZero(true)
-                                                    .threshold(totalMemory * .8)
+                                                    .threshold(totalMemoryInMB * .8)
                                                     .thresholdVisible(true)
-                                                    .title("Allocated Memory")
+                                                    .title("JVM Allocated Memory")
                                                     .unit("MB")
                                                     .text("Allocated memory of the remote runtime")
                                                     .gradientStops(
@@ -199,7 +197,7 @@ public final class OverviewFxUI {
                                                     .animated(true)
                                                     .build();
         availableMemoryTile.setRoundedCorners(false);
-        availableMemoryTile.setValue(totalMemory - freeMemory);
+        availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
 
         final UptimeDTO uptime = java.util.Optional.ofNullable(supervisor.getAgent())
                                                    .map(agent -> new HashMap<>(agent.runtimeInfo()))
@@ -225,7 +223,7 @@ public final class OverviewFxUI {
                                                    noOfBundlesTile,
                                                    noOfServicesTile,
                                                    noOfComponentsTile,
-                                                   noOfErrorFrameworkEventsTile,
+                                                   memoryConsumptionTile,
                                                    availableMemoryTile,
                                                    uptimeTile);
         pane.setHgap(5);
@@ -358,27 +356,14 @@ public final class OverviewFxUI {
         }
     }
 
-    private int getMemory(final String key) {
+    private long getMemory(final String key) {
         // @formatter:off
         return java.util.Optional.ofNullable(supervisor.getAgent())
                                  .map(agent -> new HashMap<>(agent.runtimeInfo()))
                                  .filter(info -> !info.isEmpty())
                                  .map(info -> info.get(key))
                                  .map(Long::valueOf)
-                                 .map(this::toMB)
-                                 .orElse(0);
-        // @formatter:on
-    }
-
-    private void updateFrameworkEventsCount(final Tile tile) {
-        // @formatter:off
-        java.util.Optional.ofNullable(supervisor.getAgent())
-                          .map(Agent::getFrameworkEventsOverview)
-                          .ifPresent(dto -> {
-                                 tile.setLeftValue(dto.error);
-                                 tile.setMiddleValue(dto.warning);
-                                 tile.setRightValue(dto.info);
-                          });
+                                 .orElse(0L);
         // @formatter:on
     }
 
