@@ -27,7 +27,7 @@
 }
 
 .console .content {
-    -fx-background-color: black;
+    -fx-background-color: #2A2A2A;
     -fx-text-fill: white;
 }
 
