@@ -13,6 +13,7 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.properties',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.threads',\
                      bnd.identity;id='in.bytehue.osgifx.console.util',\
                      \
                      ${requirement.efx}, \
@@ -26,6 +27,7 @@ install.order    :   \
                      in.bytehue.osgifx.console.ui.configurations,\
                      in.bytehue.osgifx.console.ui.events,\
                      in.bytehue.osgifx.console.ui.properties,\
+                     in.bytehue.osgifx.console.ui.threads,\
                      in.bytehue.osgifx.console.ui.gogo
 
 -runbundles.X    :   ${install.order} 

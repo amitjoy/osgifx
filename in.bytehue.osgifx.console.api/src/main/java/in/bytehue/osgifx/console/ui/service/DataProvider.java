@@ -8,6 +8,7 @@ import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
+import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import javafx.collections.ObservableList;
 
 /**
@@ -58,5 +59,12 @@ public interface DataProvider {
      * @return the observable list of properties
      */
     ObservableList<XPropertyDTO> properties();
+
+    /**
+     * Returns the observable list of threads
+     *
+     * @return the observable list of threads
+     */
+    ObservableList<XThreadDTO> threads();
 
 }

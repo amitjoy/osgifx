@@ -27,6 +27,7 @@ import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
+import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 /**
@@ -294,6 +295,13 @@ public interface Agent {
     List<XServiceDTO> getAllServices();
 
     /**
+     * Get the detailed information of all the threads
+     *
+     * @return the detailed information of all the threads
+     */
+    List<XThreadDTO> getAllThreads();
+
+    /**
      * Returns all the component descriptions.
      *
      * <p>
@@ -425,4 +433,5 @@ public interface Agent {
      * @return the overview of the framework events
      */
     XFrameworkEventsDTO getFrameworkEventsOverview();
+
 }
