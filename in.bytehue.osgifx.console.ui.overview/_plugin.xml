@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
-	<extension point="org.eclipse.e4.workbench.model" id="in.bytehue.osgifx.console.ui.dashboard">
+	<extension point="org.eclipse.e4.workbench.model" id="in.bytehue.osgifx.console.ui.overview">
 		<fragment apply="always" uri="fragment.e4xmi">
 		</fragment>
 	</extension>
