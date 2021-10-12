@@ -86,14 +86,20 @@ public final class OverviewFxUI {
                                           .build();
         clockTile.setRoundedCorners(false);
 
-        final Tile agentInfoTile = TileBuilder.create()
-                                               .skinType(SkinType.CUSTOM)
-                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                               .title("Agent")
-                                               .text("Console agent information")
-                                               .graphic(createAgentTable(supervisor.getHost(), supervisor.getPort(), supervisor.getTimeout()))
-                                               .build();
-        agentInfoTile.setRoundedCorners(false);
+        final double noOfThreads = java.util.Optional.ofNullable(supervisor.getAgent())
+                                                     .map(agent -> agent.getAllThreads().size())
+                                                     .map(Double::valueOf)
+                                                     .orElse(0.0d);
+        final Tile noOfThreadsTile = TileBuilder.create()
+                                                 .skinType(SkinType.NUMBER)
+                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                 .title("Threads")
+                                                 .text("Number of threads")
+                                                 .value(noOfThreads)
+                                                 .valueVisible(noOfThreads != 0.0d)
+                                                 .textVisible(true)
+                                                 .build();
+        noOfThreadsTile.setRoundedCorners(false);
 
         final Map<String, String> runtimeInfo = java.util.Optional.ofNullable(supervisor.getAgent())
                                                                   .map(agent -> new HashMap<>(agent.runtimeInfo()))
@@ -228,7 +234,7 @@ public final class OverviewFxUI {
         final FlowGridPane pane = new FlowGridPane(3, 3,
                                                    clockTile,
                                                    runtimeInfoTile,
-                                                   agentInfoTile,
+                                                   noOfThreadsTile,
                                                    noOfBundlesTile,
                                                    noOfServicesTile,
                                                    noOfComponentsTile,
@@ -282,36 +288,6 @@ public final class OverviewFxUI {
             final HBox node = getTileTableInfo(key, value);
             dataTable.getChildren().add(node);
         }
-        return dataTable;
-    }
-
-    private Node createAgentTable(final String host, final int port, final int timeout) {
-        final Label name = new Label("");
-        name.setTextFill(Tile.FOREGROUND);
-        name.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(name, Priority.NEVER);
-
-        final Region spacer = new Region();
-        spacer.setPrefSize(5, 5);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        final Label views = new Label("");
-        views.setTextFill(Tile.FOREGROUND);
-        views.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setHgrow(views, Priority.NEVER);
-
-        final HBox header = new HBox(5, name, spacer, views);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setFillHeight(true);
-
-        final VBox dataTable = new VBox(0, header);
-        dataTable.setFillWidth(true);
-
-        final HBox hostNode    = getTileTableInfo("Host", host);
-        final HBox portNode    = getTileTableInfo("Port", String.valueOf(port));
-        final HBox timeoutNode = getTileTableInfo("Timeout", String.valueOf(timeout));
-
-        dataTable.getChildren().addAll(hostNode, portNode, timeoutNode);
         return dataTable;
     }
 
