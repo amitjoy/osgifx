@@ -1,6 +1,7 @@
 package in.bytehue.osgifx.console.ui.overview;
 
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
@@ -14,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.controlsfx.control.StatusBar;
+import org.controlsfx.glyphfont.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -27,11 +30,15 @@ import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -48,23 +55,26 @@ public final class OverviewFxUI {
     @Inject
     private Supervisor supervisor;
 
+    private final StatusBar statusBar = new StatusBar();
+
     @PostConstruct
-    public void postConstruct(final VBox parent) {
+    public void postConstruct(final BorderPane parent) {
         createControls(parent);
     }
 
     @Focus
-    void focus(final VBox parent) {
+    void focus(final BorderPane parent) {
         createControls(parent);
     }
 
-    private void createControls(final VBox parent) {
+    private void createControls(final BorderPane parent) {
         // this is required as the CSS styling of tilesfx were getting overridden after switching tabs
         parent.getChildren().clear();
+        initStatusBar(parent);
         createWidgets(parent);
     }
 
-    private void createWidgets(final VBox parent) {
+    private void createWidgets(final BorderPane parent) {
         // @formatter:off
         final Tile clockTile = TileBuilder.create()
                                           .skinType(SkinType.CLOCK)
@@ -233,13 +243,13 @@ public final class OverviewFxUI {
         pane.setPadding(new Insets(5));
         pane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        parent.getChildren().add(pane);
+        parent.setCenter(pane);
         // @formatter:on
     }
 
     @Inject
     @Optional
-    public void updateView(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final VBox parent) {
+    public void updateView(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
         createControls(parent);
     }
 
@@ -365,6 +375,23 @@ public final class OverviewFxUI {
                                  .map(Long::valueOf)
                                  .orElse(0L);
         // @formatter:on
+    }
+
+    private void initStatusBar(final BorderPane parent) {
+        final Button button = new Button("", new Glyph("FontAwesome", "DESKTOP"));
+        button.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(2), new Insets(4))));
+        statusBar.getLeftItems().clear();
+        statusBar.getLeftItems().add(button);
+        statusBar.getLeftItems().add(new Separator(Orientation.VERTICAL));
+        final String property = System.getProperty(CONNECTED_AGENT);
+        String       statusBarText;
+        if (property != null) {
+            statusBarText = "Connected to " + property;
+        } else {
+            statusBarText = "Disconnected";
+        }
+        statusBar.setText(statusBarText);
+        parent.setBottom(statusBar);
     }
 
 }
