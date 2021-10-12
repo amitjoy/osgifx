@@ -36,12 +36,12 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
 
     @Activate
-    void activate() {
+    synchronized void activate() {
         supervisor.addOSGiEventConsumer(this);
     }
 
     @Deactivate
-    void deactivate() {
+    synchronized void deactivate() {
         supervisor.removeOSGiEventConsumer(this);
     }
 
