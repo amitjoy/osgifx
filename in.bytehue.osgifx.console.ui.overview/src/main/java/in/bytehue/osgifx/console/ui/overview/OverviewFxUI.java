@@ -91,14 +91,14 @@ public final class OverviewFxUI {
                                                      .map(Double::valueOf)
                                                      .orElse(0.0d);
         final Tile noOfThreadsTile = TileBuilder.create()
-                                                 .skinType(SkinType.NUMBER)
-                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                 .title("Threads")
-                                                 .text("Number of threads")
-                                                 .value(noOfThreads)
-                                                 .valueVisible(noOfThreads != 0.0d)
-                                                 .textVisible(true)
-                                                 .build();
+                                                .skinType(SkinType.NUMBER)
+                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                .title("Threads")
+                                                .text("Number of threads")
+                                                .value(noOfThreads)
+                                                .valueVisible(noOfThreads != 0.0d)
+                                                .textVisible(true)
+                                                .build();
         noOfThreadsTile.setRoundedCorners(false);
 
         final Map<String, String> runtimeInfo = java.util.Optional.ofNullable(supervisor.getAgent())

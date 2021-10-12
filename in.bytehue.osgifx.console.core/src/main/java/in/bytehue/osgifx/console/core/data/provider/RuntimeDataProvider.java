@@ -14,6 +14,7 @@ import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
+import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import javafx.collections.FXCollections;
@@ -31,6 +32,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
     private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
     private final ObservableList<XEventDTO>         events         = FXCollections.observableArrayList();
+    private final ObservableList<XThreadDTO>        threads        = FXCollections.observableArrayList();
 
     @Activate
     synchronized void activate() {
@@ -105,6 +107,17 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
         properties.clear();
         properties.addAll(agent.getAllProperties());
         return properties;
+    }
+
+    @Override
+    public ObservableList<XThreadDTO> threads() {
+        final Agent agent = supervisor.getAgent();
+        if (agent == null) {
+            return FXCollections.emptyObservableList();
+        }
+        threads.clear();
+        threads.addAll(agent.getAllThreads());
+        return threads;
     }
 
 }

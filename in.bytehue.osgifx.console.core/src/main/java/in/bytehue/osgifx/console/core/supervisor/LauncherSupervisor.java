@@ -131,21 +131,6 @@ public class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> imple
     }
 
     @Override
-    public String getHost() {
-        return host;
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public int getTimeout() {
-        return timeout;
-    }
-
-    @Override
     public void onOSGiEvent(final XEventDTO event) {
         eventConsumers.forEach(consumer -> consumer.accept(event));
     }

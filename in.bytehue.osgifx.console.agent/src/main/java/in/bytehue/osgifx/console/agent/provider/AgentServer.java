@@ -83,6 +83,7 @@ import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
+import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 /**
@@ -870,6 +871,11 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
     @Override
     public List<XServiceDTO> getAllServices() {
         return XServiceInfoProvider.get(getContext());
+    }
+
+    @Override
+    public List<XThreadDTO> getAllThreads() {
+        return XThreadInfoProvider.get();
     }
 
     @Override
