@@ -228,8 +228,8 @@ public final class OverviewFxUI {
 
         final FlowGridPane pane = new FlowGridPane(3, 3,
                                                    clockTile,
-                                                   agentInfoTile,
                                                    runtimeInfoTile,
+                                                   agentInfoTile,
                                                    noOfBundlesTile,
                                                    noOfServicesTile,
                                                    noOfComponentsTile,
