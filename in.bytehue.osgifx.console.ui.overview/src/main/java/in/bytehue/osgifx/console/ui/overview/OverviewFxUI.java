@@ -59,6 +59,8 @@ public final class OverviewFxUI {
 
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
+        // hack to reset the css
+        parent.setOnMouseClicked(event -> createControls(parent));
         createControls(parent);
     }
 
