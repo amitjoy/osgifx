@@ -137,6 +137,9 @@ public class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> imple
 
     @Override
     public void addOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
+        if (eventConsumers.contains(eventConsumer)) {
+            return;
+        }
         eventConsumers.add(eventConsumer);
     }
 

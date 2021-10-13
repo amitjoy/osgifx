@@ -3,6 +3,7 @@ package in.bytehue.osgifx.console.application.handler;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -35,13 +36,24 @@ public final class EventReceiveMenuContributionHandler {
     @Preference(nodePath = "osgi.fx.event")
     private IEclipsePreferences preferences;
 
+    @PostConstruct
+    @SuppressWarnings("unchecked")
+    public void init() {
+        final boolean currentState = getCurrentState();
+        if (currentState) {
+            supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
+        } else {
+            supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
+        }
+    }
+
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
         prepareMenu(items, getCurrentState());
     }
 
-    @SuppressWarnings("unchecked")
     @Execute
+    @SuppressWarnings("unchecked")
     public void execute(final MDirectMenuItem menuItem) throws BackingStoreException {
         final boolean accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
         preferences.putBoolean("action", accessibilityPhrase);
@@ -57,7 +69,7 @@ public final class EventReceiveMenuContributionHandler {
     }
 
     private boolean getCurrentState() {
-        return preferences.getBoolean("action", true);
+        return preferences.getBoolean("action", false);
     }
 
     private void prepareMenu(final List<MMenuElement> items, final boolean value) {
