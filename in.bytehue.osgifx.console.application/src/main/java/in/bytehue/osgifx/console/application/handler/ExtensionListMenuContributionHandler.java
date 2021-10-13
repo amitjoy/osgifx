@@ -1,10 +1,13 @@
 package in.bytehue.osgifx.console.application.handler;
 
+import static org.eclipse.e4.ui.workbench.modeling.EPartService.PartState.ACTIVATE;
+
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -14,8 +17,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 
 public final class ExtensionListMenuContributionHandler {
+
+    @Inject
+    private EPartService partService;
 
     @Inject
     private EModelService modelService;
@@ -26,6 +33,11 @@ public final class ExtensionListMenuContributionHandler {
             final MDirectMenuItem tabMenu = createViewMenu(tab);
             items.add(tabMenu);
         }
+    }
+
+    @Execute
+    public void execute(final MDirectMenuItem menuItem) {
+        partService.showPart(menuItem.getAccessibilityPhrase(), ACTIVATE);
     }
 
     private List<MStackElement> getRegisteredTabs(final MWindow window) {
@@ -48,7 +60,7 @@ public final class ExtensionListMenuContributionHandler {
         dynamicItem.setAccessibilityPhrase(part.getElementId());
         dynamicItem.setContributorURI("platform:/plugin/in.bytehue.osgifx.console.application");
         dynamicItem.setContributionURI(
-                "bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ShowTabHandler");
+                "bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ExtensionListMenuContributionHandler");
 
         return dynamicItem;
     }
