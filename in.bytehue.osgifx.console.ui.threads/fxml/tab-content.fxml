@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.threads.ThreadsFxController">
    <children>
       <TableView style="-fx-table-cell-border-color: transparent;" fx:id="table" layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      	<columns>
+          <TableColumn prefWidth="30.0" text="" />
+          <TableColumn fx:id="nameColumn" prefWidth="500.0" text="Name" />
+          <TableColumn fx:id="idColumn" prefWidth="90.0" text="ID" />
+          <TableColumn fx:id="priorityColumn" prefWidth="90.0" text="Priority" />
+          <TableColumn fx:id="stateColumn" prefWidth="140.0" text="State" />
+          <TableColumn fx:id="isInterruptedColumn" prefWidth="140.0" text="Is Interrupted?" />
+          <TableColumn fx:id="isAliveColumn" prefWidth="90.0" text="Is Alive?" />
+          <TableColumn fx:id="isDaemonColumn" prefWidth="100.0" text="Is Daemon?" />
+        </columns>
       </TableView>
    </children>
 </AnchorPane>
