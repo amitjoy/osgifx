@@ -1,4 +1,3 @@
-
 package in.bytehue.osgifx.console.application.handler;
 
 import java.util.Collections;
@@ -16,7 +15,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
-public final class MenuContributionHandler {
+public final class ExtensionListMenuContributionHandler {
 
     @Inject
     private EModelService modelService;
