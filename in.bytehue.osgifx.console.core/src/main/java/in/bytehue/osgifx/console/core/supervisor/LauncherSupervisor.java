@@ -131,7 +131,7 @@ public class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> imple
     }
 
     @Override
-    public void onOSGiEvent(final XEventDTO event) {
+    public synchronized void onOSGiEvent(final XEventDTO event) {
         eventConsumers.forEach(consumer -> consumer.accept(event));
     }
 
