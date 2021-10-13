@@ -11,7 +11,6 @@ import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
@@ -42,7 +41,7 @@ public final class PropertiesFxController implements Initializable {
         propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
         propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
-        propertyTable.setItems(FXCollections.observableArrayList(dataProvider.properties()));
+        propertyTable.setItems(dataProvider.properties());
 
         TableFilter.forTableView(propertyTable).apply();
     }
