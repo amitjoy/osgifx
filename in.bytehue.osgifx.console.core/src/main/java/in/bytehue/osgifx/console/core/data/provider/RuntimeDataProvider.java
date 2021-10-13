@@ -2,9 +2,7 @@ package in.bytehue.osgifx.console.core.data.provider;
 
 import java.util.function.Consumer;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import com.google.common.collect.EvictingQueue;
@@ -36,16 +34,6 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
     private final ObservableList<XThreadDTO>        threads        = FXCollections.observableArrayList();
     private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
-
-    @Activate
-    synchronized void activate() {
-        supervisor.addOSGiEventConsumer(this);
-    }
-
-    @Deactivate
-    synchronized void deactivate() {
-        supervisor.removeOSGiEventConsumer(this);
-    }
 
     @Override
     public synchronized ObservableList<XBundleDTO> bundles() {
