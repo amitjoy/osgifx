@@ -18,6 +18,7 @@ public final class InstallBundleDialog extends Dialog<InstallBundleDTO> {
     public InstallBundleDialog(final FXMLLoader loader, final BundleContext context) {
         final DialogPane dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
+        dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
 
         dialogPane.setHeaderText("Remote Bundle Install");
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));

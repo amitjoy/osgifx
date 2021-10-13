@@ -134,6 +134,12 @@ public final class ConnectionSettingsWindowController implements Initializable {
                                                                                                                             e);
                                                                                                                     dialog.initStyle(
                                                                                                                             StageStyle.UNDECORATED);
+                                                                                                                    dialog.getDialogPane()
+                                                                                                                            .getStylesheets()
+                                                                                                                            .add(getClass()
+                                                                                                                                    .getResource(
+                                                                                                                                            "/css/default.css")
+                                                                                                                                    .toExternalForm());
                                                                                                                     dialog.show();
                                                                                                                 });
                                                                   throw e;
@@ -155,6 +161,7 @@ public final class ConnectionSettingsWindowController implements Initializable {
         progressDialog = new ProgressDialog(connectTask);
         progressDialog.setHeaderText("Connecting to " + selectedConnection.host + ":" + selectedConnection.port);
         progressDialog.initStyle(StageStyle.UNDECORATED);
+        progressDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
         progressDialog.show();
     }
 
