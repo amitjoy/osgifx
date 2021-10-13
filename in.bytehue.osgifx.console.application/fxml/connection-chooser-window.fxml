@@ -8,27 +8,27 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="550.0" style="-fx-font-size: 9pt;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.application.fxml.controller.ConnectionSettingsWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="400.0" style="-fx-font-size: 10pt;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.application.fxml.controller.ConnectionSettingsWindowController">
    <children>
-      <ImageView fitHeight="67.0" fitWidth="550.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+      <ImageView fitHeight="69.0" fitWidth="400.0" pickOnBounds="true" smooth="false">
          <image>
             <Image url="@../graphic/images/logo.png" />
          </image></ImageView>
       <TableView fx:id="connectionTable" layoutY="69.0" prefHeight="181.0" prefWidth="500.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="69.0">
         <columns>
-          <TableColumn fx:id="hostColumn" editable="false" prefWidth="236.0" text="Host" />
-          <TableColumn fx:id="portColumn" editable="false" prefWidth="168.0" text="Port" />
-          <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="142.0" text="Timeout" />
+          <TableColumn fx:id="hostColumn" editable="false" prefWidth="172.0" text="Host" />
+          <TableColumn fx:id="portColumn" editable="false" prefWidth="111.0" text="Port" />
+          <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="104.0" text="Timeout" />
         </columns>
       </TableView>
-      <Button fx:id="connectButton" disable="true" layoutX="356.0" layoutY="263.0" mnemonicParsing="false" onAction="#connectAgent" prefWidth="80.0" style="-fx-background-color: #5cb85c;" text="Connect" />
-      <Button layoutX="456.0" layoutY="263.0" mnemonicParsing="false" onAction="#handleClose" prefWidth="80.0" style="-fx-background-color: #d9534f;" text="Cancel" />
-      <Button fx:id="addConnectionButton" layoutX="15.0" layoutY="263.0" mnemonicParsing="false" onAction="#addConnection">
+      <Button fx:id="connectButton" disable="true" layoutX="221.0" layoutY="212.0" mnemonicParsing="false" onAction="#connectAgent" prefWidth="80.0" style="-fx-background-color: #5cb85c;" text="Connect" />
+      <Button layoutX="306.0" layoutY="212.0" mnemonicParsing="false" onAction="#handleClose" prefWidth="80.0" style="-fx-background-color: #d9534f;" text="Cancel" />
+      <Button fx:id="addConnectionButton" layoutX="15.0" layoutY="211.0" mnemonicParsing="false" onAction="#addConnection">
       	<graphic>
         	<Glyph fontFamily="FontAwesome" icon="PLUS" />
     	</graphic>
       </Button>
-      <Button fx:id="removeConnectionButton" disable="true" layoutX="50.0" layoutY="263.0" mnemonicParsing="false" onAction="#removeConnection">
+      <Button fx:id="removeConnectionButton" disable="true" layoutX="50.0" layoutY="212.0" mnemonicParsing="false" onAction="#removeConnection">
       	<graphic>
         	<Glyph fontFamily="FontAwesome" icon="MINUS" />
     	</graphic>

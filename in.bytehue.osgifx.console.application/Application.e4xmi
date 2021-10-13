@@ -19,7 +19,7 @@
         <children xsi:type="menu:DirectMenuItem" xmi:id="_vzJVkCFQEeyZSsScTJ7-zg" elementId="in.bytehue.osgifx.console.application.directmenuitem.about" label="About OSGi.fx Console" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/about.png" tooltip="Shows information about the OSGi.fx Console" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.AboutConsoleHandler"/>
       </children>
     </mainMenu>
-    <windows xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" label="Choose Connections" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/window.png" width="550" height="300">
+    <windows xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="in.bytehue.osgifx.console.window.connection" label="Choose Connections" iconURI="platform:/plugin/in.bytehue.osgifx.console.application/graphic/icons/window.png" width="400" height="250">
       <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
       <persistedState key="efx.window.stagemodality" value="APPLICATION_MODAL"/>
       <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/in.bytehue.osgifx.console.application/fxml/connection-chooser-window.fxml"/>
