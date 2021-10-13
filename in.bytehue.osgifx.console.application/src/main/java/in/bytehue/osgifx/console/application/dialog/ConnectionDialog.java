@@ -33,6 +33,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         dialogPane.setHeaderText("Add Connection Settings");
         dialogPane.getStyleClass().add("login-dialog");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         txtHostname = (CustomTextField) TextFields.createClearableTextField();
@@ -72,6 +73,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 lbMessage.setText(ex.getMessage());
                 final ExceptionDialog dialog = new ExceptionDialog(ex);
                 dialog.initStyle(StageStyle.UNDECORATED);
+                dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
                 dialog.show();
             }
         });

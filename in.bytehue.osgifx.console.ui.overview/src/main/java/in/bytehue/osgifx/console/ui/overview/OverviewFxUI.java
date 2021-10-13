@@ -85,6 +85,7 @@ public final class OverviewFxUI {
                                           .dateVisible(true)
                                           .locale(Locale.UK)
                                           .running(true)
+                                          .styleClass("overview")
                                           .build();
         clockTile.setRoundedCorners(false);
 
