@@ -101,7 +101,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     }
 
     @Override
-    public ObservableList<XThreadDTO> threads() {
+    public synchronized ObservableList<XThreadDTO> threads() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
             return FXCollections.emptyObservableList();
