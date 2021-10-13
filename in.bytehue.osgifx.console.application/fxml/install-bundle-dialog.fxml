@@ -11,15 +11,15 @@
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.application.fxml.controller.InstallBundleDialogController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="206.0" minWidth="10.0" prefWidth="181.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="125.0" minWidth="10.0" prefWidth="119.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="206.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="144.0" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Label text="Select a JAR file" GridPane.halignment="LEFT">
+      <Label text="Select a JAR" GridPane.halignment="LEFT">
          <GridPane.margin>
             <Insets left="78.0" right="20.0" />
          </GridPane.margin>
@@ -34,7 +34,7 @@
             <Insets left="-10.0" />
          </GridPane.margin>
       </ToggleSwitch>
-      <Button fx:id="fileChooser" mnemonicParsing="false" onAction="#chooseBundle" prefHeight="27.0" prefWidth="63.0" text="Choose" GridPane.columnIndex="1">
+      <Button fx:id="fileChooser" mnemonicParsing="false" onAction="#chooseBundle" prefHeight="28.0" prefWidth="78.0" text="Choose" GridPane.columnIndex="1">
          <GridPane.margin>
             <Insets left="10.0" right="50.0" />
          </GridPane.margin>
