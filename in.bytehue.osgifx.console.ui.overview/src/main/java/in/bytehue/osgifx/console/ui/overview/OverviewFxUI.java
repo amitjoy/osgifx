@@ -98,6 +98,7 @@ public final class OverviewFxUI {
                                                 .value(noOfThreads)
                                                 .valueVisible(noOfThreads != 0.0d)
                                                 .textVisible(true)
+                                                .decimals(0)
                                                 .build();
         noOfThreadsTile.setRoundedCorners(false);
 
@@ -125,6 +126,7 @@ public final class OverviewFxUI {
                                                 .value(noOfInstalledBundles)
                                                 .valueVisible(noOfInstalledBundles != 0.0d)
                                                 .textVisible(true)
+                                                .decimals(0)
                                                 .build();
         noOfBundlesTile.setRoundedCorners(false);
 
@@ -141,6 +143,7 @@ public final class OverviewFxUI {
                                                  .value(noOfServices)
                                                  .valueVisible(noOfServices != 0.0d)
                                                  .textVisible(true)
+                                                 .decimals(0)
                                                  .build();
         noOfServicesTile.setRoundedCorners(false);
 
@@ -157,6 +160,7 @@ public final class OverviewFxUI {
                                                    .value(noOfComponents)
                                                    .valueVisible(noOfComponents != 0.0d)
                                                    .textVisible(true)
+                                                   .decimals(0)
                                                    .build();
         noOfComponentsTile.setRoundedCorners(false);
 
@@ -284,7 +288,9 @@ public final class OverviewFxUI {
         for (final Entry<String, String> entry : sorted.entrySet()) {
             final String key   = entry.getKey();
             final String value = entry.getValue();
-
+            if ("Uptime".equals(key)) {
+                continue;
+            }
             final HBox node = getTileTableInfo(key, value);
             dataTable.getChildren().add(node);
         }
