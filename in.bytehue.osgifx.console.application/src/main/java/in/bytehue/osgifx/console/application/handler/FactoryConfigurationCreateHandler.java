@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
-public final class ConfigurationUpdateHandler {
+public final class FactoryConfigurationCreateHandler {
 
     @Log
     @Inject
@@ -31,7 +31,7 @@ public final class ConfigurationUpdateHandler {
     private Supervisor supervisor;
 
     @Execute
-    public void execute(@Named("pid") final String pid, @Named("properties") final String properties) {
+    public void execute(@Named("factoryPID") final String factoryPID, @Named("properties") final String properties) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
             logger.error("Remote agent cannot be connected");
@@ -40,10 +40,10 @@ public final class ConfigurationUpdateHandler {
         try {
             final Map<String, Object> props = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
             }.getType());
-            agent.updateConfiguration(pid, props);
-            eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+            agent.createFactoryConfiguration(factoryPID, props);
+            eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
         } catch (final Exception e) {
-            logger.error("Configuration with PID " + pid + "cannot be updated", e);
+            logger.error("Factory Configuration with Factory PID " + factoryPID + "cannot be created", e);
         }
     }
 

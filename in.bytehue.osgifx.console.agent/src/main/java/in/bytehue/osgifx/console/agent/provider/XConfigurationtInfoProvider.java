@@ -39,15 +39,17 @@ public final class XConfigurationtInfoProvider {
         List<XConfigurationDTO> configsWithoutMetatype = null;
         List<XConfigurationDTO> configsWithMetatype    = null;
         List<XConfigurationDTO> metatypeWithoutConfigs = null;
+        List<XConfigurationDTO> metatypeFactories      = null;
 
         try {
             configsWithoutMetatype = findConfigsWithoutMetatype(context, configAdmin, metatype);
             configsWithMetatype    = findConfigsWithMetatype(context, configAdmin, metatype);
             metatypeWithoutConfigs = findMetatypeWithoutConfigs(context, configAdmin, metatype);
+            metatypeFactories      = findMetatypeFactories(context, metatype);
         } catch (IOException | InvalidSyntaxException e) {
             return Collections.emptyList();
         }
-        return joinLists(configsWithoutMetatype, configsWithMetatype, metatypeWithoutConfigs);
+        return joinLists(configsWithoutMetatype, configsWithMetatype, metatypeWithoutConfigs, metatypeFactories);
     }
 
     private static List<XConfigurationDTO> findConfigsWithoutMetatype(final BundleContext context, final ConfigurationAdmin configAdmin,
@@ -85,9 +87,33 @@ public final class XConfigurationtInfoProvider {
             for (final String pid : metatypeInfo.getPids()) {
                 final boolean hasAssociatedConfiguration = checkConfigurationExistence(pid, configAdmin);
                 if (!hasAssociatedConfiguration) {
-                    final XObjectClassDefDTO ocd = toOcdDTO(pid, metatypeInfo);
+                    final XObjectClassDefDTO ocd = toOcdDTO(pid, metatypeInfo, ConfigurationType.SIMPLE);
                     dtos.add(toConfigDTO(null, ocd));
                 }
+            }
+            for (final String fpid : metatypeInfo.getFactoryPids()) {
+                final boolean hasAssociatedConfiguration = checkFactoryConfigurationExistence(fpid, configAdmin);
+                if (!hasAssociatedConfiguration) {
+                    final XObjectClassDefDTO ocd = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
+                    dtos.add(toConfigDTO(null, ocd));
+                }
+            }
+        }
+        return dtos;
+    }
+
+    private static List<XConfigurationDTO> findMetatypeFactories(final BundleContext context, final MetaTypeService metatype) {
+        final List<XConfigurationDTO> dtos = new ArrayList<>();
+        for (final Bundle bundle : context.getBundles()) {
+            final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
+            if (metatypeInfo == null) {
+                continue;
+            }
+            for (final String fpid : metatypeInfo.getFactoryPids()) {
+                final XObjectClassDefDTO ocd       = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
+                final XConfigurationDTO  configDTO = toConfigDTO(null, ocd);
+                configDTO.isFactory = true;
+                dtos.add(configDTO);
             }
         }
         return dtos;
@@ -96,6 +122,11 @@ public final class XConfigurationtInfoProvider {
     private static boolean checkConfigurationExistence(final String pid, final ConfigurationAdmin configAdmin)
             throws IOException, InvalidSyntaxException {
         return configAdmin.listConfigurations("(service.pid=" + pid + ")") != null;
+    }
+
+    private static boolean checkFactoryConfigurationExistence(final String factoryPid, final ConfigurationAdmin configAdmin)
+            throws IOException, InvalidSyntaxException {
+        return configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")") != null;
     }
 
     private static XConfigurationDTO toConfigDTO(final Configuration configuration, final XObjectClassDefDTO ocd) {
@@ -116,21 +147,30 @@ public final class XConfigurationtInfoProvider {
             if (metatypeInfo == null) {
                 continue;
             }
+            final String configPID        = config.getPid();
+            final String configFactoryPID = config.getFactoryPid();
+
             for (final String pid : metatypeInfo.getPids()) {
-                if (pid.equals(config.getPid())) {
-                    return toOcdDTO(pid, metatypeInfo);
+                if (pid.equals(configPID)) {
+                    return toOcdDTO(configPID, metatypeInfo, ConfigurationType.SIMPLE);
+                }
+            }
+            for (final String fPid : metatypeInfo.getFactoryPids()) {
+                if (fPid.equals(config.getFactoryPid())) {
+                    return toOcdDTO(configFactoryPID, metatypeInfo, ConfigurationType.FACTORY);
                 }
             }
         }
         return null;
     }
 
-    private static XObjectClassDefDTO toOcdDTO(final String pid, final MetaTypeInformation metatypeInfo) {
-        final ObjectClassDefinition ocd = metatypeInfo.getObjectClassDefinition(pid, null);
+    private static XObjectClassDefDTO toOcdDTO(final String ocdId, final MetaTypeInformation metatypeInfo, final ConfigurationType type) {
+        final ObjectClassDefinition ocd = metatypeInfo.getObjectClassDefinition(ocdId, null);
         final XObjectClassDefDTO    dto = new XObjectClassDefDTO();
 
-        dto.pid                = pid;
         dto.id                 = ocd.getID();
+        dto.pid                = type == ConfigurationType.SIMPLE ? ocdId : null;
+        dto.factoryPid         = type == ConfigurationType.FACTORY ? ocdId : null;
         dto.name               = ocd.getName();
         dto.description        = ocd.getDescription();
         dto.descriptorLocation = metatypeInfo.getBundle().getSymbolicName();
@@ -159,13 +199,16 @@ public final class XConfigurationtInfoProvider {
             if (metatypeInfo == null) {
                 continue;
             }
-            final String   pid          = config.getPid();
-            final String[] metatypePIDs = metatypeInfo.getPids();
-            final boolean  pidExists    = Arrays.asList(metatypePIDs).contains(pid);
-            if (!pidExists) {
-                continue;
+            final String   pid                 = config.getPid();
+            final String   factoryPID          = config.getFactoryPid();
+            final String[] metatypePIDs        = metatypeInfo.getPids();
+            final String[] metatypeFactoryPIDs = metatypeInfo.getFactoryPids();
+            final boolean  pidExists           = Arrays.asList(metatypePIDs).contains(pid);
+            final boolean  factoryPidExists    = Optional.ofNullable(factoryPID)
+                    .map(fPID -> Arrays.asList(metatypeFactoryPIDs).contains(factoryPID)).orElse(false);
+            if (pidExists || factoryPidExists) {
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -173,6 +216,11 @@ public final class XConfigurationtInfoProvider {
     @SafeVarargs
     private static <T> List<T> joinLists(final List<T>... lists) {
         return Stream.of(lists).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private enum ConfigurationType {
+        SIMPLE,
+        FACTORY
     }
 
 }

@@ -1,6 +1,6 @@
 package in.bytehue.osgifx.console.ui.configurations;
 
-import static in.bytehue.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURAION_ACTION_EVENT_TOPICS;
+import static in.bytehue.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.annotation.PostConstruct;
@@ -52,7 +52,7 @@ public final class ConfigurationsFxUI {
     @Inject
     @Optional
     private void updateControlsOnEvent( //
-            @UIEventTopic(CONFIGURAION_ACTION_EVENT_TOPICS) final String data, //
+            @UIEventTopic(CONFIGURATION_ACTION_EVENT_TOPICS) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);

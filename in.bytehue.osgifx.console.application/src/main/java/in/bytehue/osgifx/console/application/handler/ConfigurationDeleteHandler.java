@@ -1,6 +1,6 @@
 package in.bytehue.osgifx.console.application.handler;
 
-import static in.bytehue.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURAION_DELETED_EVENT_TOPIC;
+import static in.bytehue.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_DELETED_EVENT_TOPIC;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,7 +34,7 @@ public final class ConfigurationDeleteHandler {
         }
         try {
             agent.deleteConfiguration(pid);
-            eventBroker.send(CONFIGURAION_DELETED_EVENT_TOPIC, pid);
+            eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
         } catch (final Exception e) {
             logger.error("Configuration with PID " + pid + "cannot be deleted", e);
         }

@@ -412,13 +412,29 @@ public interface Agent {
 
     /**
      * Update the {@code Configuration} object associated with the specified
-     * {@code if} with the current properties.
+     * {@code pid} with the current properties.
+     *
+     * @param pid the Configuration PID to update
+     * @param newProperties the new properties to associate
      *
      * @throws IOException if update cannot access the properties in persistent
      *             storage
      * @throws IllegalStateException If this configuration has been deleted.
      */
     void updateConfiguration(String pid, Map<String, Object> newProperties) throws IOException;
+
+    /**
+     * Create the {@code Configuration} object associated with the specified
+     * {@code factoryPid} with the current properties.
+     *
+     * @param factoryPid the Configuration Factory PID
+     * @param newProperties the new properties to associate
+     *
+     * @throws IOException if update cannot access the properties in persistent
+     *             storage
+     * @throws IllegalStateException If this configuration has been deleted.
+     */
+    void createFactoryConfiguration(String factoryPid, Map<String, Object> newProperties) throws IOException;
 
     /**
      * Returns the runtime information of the remote system
