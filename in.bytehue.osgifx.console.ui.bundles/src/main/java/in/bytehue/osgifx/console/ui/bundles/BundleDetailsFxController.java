@@ -31,131 +31,92 @@ import javafx.scene.control.TableView;
 
 public final class BundleDetailsFxController implements Initializable {
 
+    private static final String AGENT_BUNDLE_BSN            = "in.bytehue.osgifx.console.agent";
     private static final String BUNDLE_START_COMMAND_ID     = "in.bytehue.osgifx.console.application.command.bundle.start";
     private static final String BUNDLE_STOP_COMMAND_ID      = "in.bytehue.osgifx.console.application.command.bundle.stop";
     private static final String BUNDLE_UNINSTALL_COMMAND_ID = "in.bytehue.osgifx.console.application.command.bundle.uninstall";
 
-    @Inject
-    private CommandService commandService;
-
     @FXML
-    private Label idLabel;
-
+    private Label                                      idLabel;
     @FXML
-    private Label bsnLabel;
-
+    private Label                                      bsnLabel;
     @FXML
-    private Label stateLabel;
-
+    private Label                                      stateLabel;
     @FXML
-    private Label versionLabel;
-
+    private Label                                      versionLabel;
     @FXML
-    private Label locationLabel;
-
+    private Label                                      locationLabel;
     @FXML
-    private Label categoryLabel;
-
+    private Label                                      categoryLabel;
     @FXML
-    private ToggleSwitch fragmentLabel;
-
+    private ToggleSwitch                               fragmentLabel;
     @FXML
-    private Label lasModifiedLabel;
-
+    private Label                                      lasModifiedLabel;
     @FXML
-    private Label docLabel;
-
+    private Label                                      docLabel;
     @FXML
-    private Label vendorLabel;
-
+    private Label                                      vendorLabel;
     @FXML
-    private Label descLabel;
-
+    private Label                                      descLabel;
     @FXML
-    private Label startLevelLabel;
-
+    private Label                                      startLevelLabel;
     @FXML
-    private Button startBundleButton;
-
+    private Button                                     startBundleButton;
     @FXML
-    private Button stopBundleButton;
-
+    private Button                                     stopBundleButton;
     @FXML
-    private Button uninstallBundleButton;
-
+    private Button                                     uninstallBundleButton;
     @FXML
-    private TableView<XPackageDTO> exportedPackagesNameTable;
-
+    private TableView<XPackageDTO>                     exportedPackagesNameTable;
     @FXML
-    private TableColumn<XPackageDTO, String> exportedPackagesNameTableColumn;
-
+    private TableColumn<XPackageDTO, String>           exportedPackagesNameTableColumn;
     @FXML
-    private TableColumn<XPackageDTO, String> exportedPackagesVersionTableColumn;
-
+    private TableColumn<XPackageDTO, String>           exportedPackagesVersionTableColumn;
     @FXML
-    private TableView<XServiceInfoDTO> registeredServicesTable;
-
+    private TableView<XServiceInfoDTO>                 registeredServicesTable;
     @FXML
-    private TableColumn<XServiceInfoDTO, String> registeredServicesIdTableColumn;
-
+    private TableColumn<XServiceInfoDTO, String>       registeredServicesIdTableColumn;
     @FXML
-    private TableColumn<XServiceInfoDTO, String> registeredServicesClassTableColumn;
-
+    private TableColumn<XServiceInfoDTO, String>       registeredServicesClassTableColumn;
     @FXML
-    private TableView<Entry<String, String>> manifestHeadersTable;
-
+    private TableView<Entry<String, String>>           manifestHeadersTable;
     @FXML
     private TableColumn<Entry<String, String>, String> manifestHeadersTableColumn1;
-
     @FXML
     private TableColumn<Entry<String, String>, String> manifestHeadersTableColumn2;
-
     @FXML
-    private TableView<XPackageDTO> importedPackagesTable;
-
+    private TableView<XPackageDTO>                     importedPackagesTable;
     @FXML
-    private TableColumn<XPackageDTO, String> importedPackagesNameTableColumn;
-
+    private TableColumn<XPackageDTO, String>           importedPackagesNameTableColumn;
     @FXML
-    private TableColumn<XPackageDTO, String> importedPackagesVersionTableColumn;
-
+    private TableColumn<XPackageDTO, String>           importedPackagesVersionTableColumn;
     @FXML
-    private TableView<XBundleInfoDTO> wiredBundlesTable;
-
+    private TableView<XBundleInfoDTO>                  wiredBundlesTable;
     @FXML
-    private TableColumn<XBundleInfoDTO, String> wiredBundlesIdTableColumn;
-
+    private TableColumn<XBundleInfoDTO, String>        wiredBundlesIdTableColumn;
     @FXML
-    private TableColumn<XBundleInfoDTO, String> wiredBundlesBsnTableColumn;
-
+    private TableColumn<XBundleInfoDTO, String>        wiredBundlesBsnTableColumn;
     @FXML
-    private TableView<XServiceInfoDTO> usedServicesTable;
-
+    private TableView<XServiceInfoDTO>                 usedServicesTable;
     @FXML
-    private TableColumn<XServiceInfoDTO, String> usedServicesIdTableColumn;
-
+    private TableColumn<XServiceInfoDTO, String>       usedServicesIdTableColumn;
     @FXML
-    private TableColumn<XServiceInfoDTO, String> usedServicesClassTableColumn;
-
+    private TableColumn<XServiceInfoDTO, String>       usedServicesClassTableColumn;
     @FXML
-    private TableView<XBundleInfoDTO> hostBundlesTable;
-
+    private TableView<XBundleInfoDTO>                  hostBundlesTable;
     @FXML
-    private TableColumn<XBundleInfoDTO, String> hostBundlesIdTableColumn;
-
+    private TableColumn<XBundleInfoDTO, String>        hostBundlesIdTableColumn;
     @FXML
-    private TableColumn<XBundleInfoDTO, String> hostBundlesBsnTableColumn;
-
+    private TableColumn<XBundleInfoDTO, String>        hostBundlesBsnTableColumn;
     @FXML
-    private TableView<XBundleInfoDTO> attachedFragmentsTable;
-
+    private TableView<XBundleInfoDTO>                  attachedFragmentsTable;
     @FXML
-    private TableColumn<XBundleInfoDTO, String> attachedFragmentsIdTableColumn;
-
+    private TableColumn<XBundleInfoDTO, String>        attachedFragmentsIdTableColumn;
     @FXML
-    private TableColumn<XBundleInfoDTO, String> attachedFragmentsBsnTableColumn;
-
-    private Converter converter;
+    private TableColumn<XBundleInfoDTO, String>        attachedFragmentsBsnTableColumn;
+    @Inject
+    private CommandService                             commandService;
+    private Converter                                  converter;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
@@ -220,23 +181,9 @@ public final class BundleDetailsFxController implements Initializable {
     }
 
     private void initConditionalControls(final XBundleDTO bundle) {
-        if (bundle.isFragment) {
-            initControlsForFragements();
-        } else {
-            initControlsForBundles(bundle);
-        }
-    }
-
-    private void initControlsForBundles(final XBundleDTO bundle) {
-        startBundleButton.setDisable("ACTIVE".equals(bundle.state));
-        stopBundleButton.setDisable("RESOLVED".equals(bundle.state));
+        startBundleButton.setDisable(bundle.isFragment || AGENT_BUNDLE_BSN.equals(bundle.symbolicName) || "ACTIVE".equals(bundle.state));
+        stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state));
         fragmentLabel.setSelected(bundle.isFragment);
-    }
-
-    private void initControlsForFragements() {
-        startBundleButton.setDisable(true);
-        stopBundleButton.setDisable(true);
-        fragmentLabel.setSelected(true);
     }
 
     private void registerButtonHandlers(final XBundleDTO bundle) {

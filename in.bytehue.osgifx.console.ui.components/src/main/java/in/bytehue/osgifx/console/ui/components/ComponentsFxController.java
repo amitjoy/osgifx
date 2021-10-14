@@ -28,18 +28,14 @@ public final class ComponentsFxController implements Initializable {
 
     @Inject
     @LocalInstance
-    private FXMLLoader loader;
-
+    private FXMLLoader                                                 loader;
     @FXML
-    private TableView<XComponentDTO> table;
-
+    private TableView<XComponentDTO>                                   table;
     @Inject
-    private DataProvider dataProvider;
-
+    private DataProvider                                               dataProvider;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.components")
-    private BundleContext context;
-
+    private BundleContext                                              context;
     private TableRowExpanderColumn.TableRowDataFeatures<XComponentDTO> selectedComponent;
 
     @Override

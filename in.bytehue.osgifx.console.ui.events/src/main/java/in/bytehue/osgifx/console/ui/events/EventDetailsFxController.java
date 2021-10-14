@@ -19,22 +19,17 @@ import javafx.scene.control.TableView;
 
 public final class EventDetailsFxController implements Initializable {
 
-    private Converter converter;
-
     @FXML
-    private Label receivedAtLabel;
-
+    private Label                                      receivedAtLabel;
     @FXML
-    private Label topicLabel;
-
+    private Label                                      topicLabel;
     @FXML
-    private TableView<Entry<String, String>> propertiesTable;
-
+    private TableView<Entry<String, String>>           propertiesTable;
     @FXML
     private TableColumn<Entry<String, String>, String> propertiesKeyTableColumn;
-
     @FXML
     private TableColumn<Entry<String, String>, String> propertiesValueTableColumn;
+    private Converter                                  converter;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

@@ -19,25 +19,19 @@ import javafx.scene.control.TableView;
 public final class ServiceDetailsFxController implements Initializable {
 
     @FXML
-    private Label idLabel;
-
+    private Label                                      idLabel;
     @FXML
-    private Label bundleBsnLabel;
-
+    private Label                                      bundleBsnLabel;
     @FXML
-    private Label bundleIdLabel;
-
+    private Label                                      bundleIdLabel;
     @FXML
-    private TableView<Entry<String, String>> propertiesTable;
-
+    private TableView<Entry<String, String>>           propertiesTable;
     @FXML
     private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
-
     @FXML
     private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
-
     @FXML
-    private ListView<String> objectClassesList;
+    private ListView<String>                           objectClassesList;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

@@ -18,19 +18,15 @@ import javafx.scene.input.KeyEvent;
 public final class GogoFxController implements Initializable {
 
     @FXML
-    private TextField input;
-
+    private TextField          input;
     @FXML
-    private TextArea output;
-
+    private TextArea           output;
     @Inject
-    private Supervisor supervisor;
-
+    private Supervisor         supervisor;
     @Inject
     private GogoConsoleHistory history;
-
-    private Agent agent;
-    private int   historyPointer;
+    private Agent              agent;
+    private int                historyPointer;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

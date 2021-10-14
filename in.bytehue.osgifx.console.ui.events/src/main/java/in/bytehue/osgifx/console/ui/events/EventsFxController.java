@@ -29,17 +29,14 @@ public final class EventsFxController implements Initializable {
 
     @Inject
     @LocalInstance
-    private FXMLLoader loader;
-
+    private FXMLLoader           loader;
     @FXML
     private TableView<XEventDTO> table;
-
     @Inject
-    private DataProvider dataProvider;
-
+    private DataProvider         dataProvider;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.events")
-    private BundleContext context;
+    private BundleContext        context;
 
     private TableRowExpanderColumn.TableRowDataFeatures<XEventDTO> selectedEvent;
 

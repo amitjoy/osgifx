@@ -31,8 +31,7 @@ public final class ServicesFxUI {
 
     @Inject
     @Named("in.bytehue.osgifx.console.ui.services")
-    private BundleContext context;
-
+    private BundleContext    context;
     private final StatusBar  statusBar    = new StatusBar();
     private final MaskerPane progressPane = new MaskerPane();
 
