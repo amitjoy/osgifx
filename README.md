@@ -73,7 +73,7 @@ Amit Kumar Mondal (admin@amitinside.com)
 
 ### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
 
-Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/master/CONTRIBUTING.md)
+Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/main/CONTRIBUTING.md)
 
 --------------------------------------------------------------------------------------------------------------
 
