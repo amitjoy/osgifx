@@ -5,13 +5,14 @@
 </p>
 
 -----------------------------------------------------------------------------------------------------------
-
-[![amitjoy - osgifx-console](https://img.shields.io/static/v1?label=amitjoy&message=osgi-fx&color=blue&logo=github)](https://github.com/amitjoy/osgifx-console)
-[![stars - osgifx-console](https://img.shields.io/github/stars/amitjoy/osgifx-console?style=social)](https://github.com/amitjoy/osgifx-console)
-[![forks - osgifx-console](https://img.shields.io/github/forks/amitjoy/osgi-messaging?style=social)](https://github.com/amitjoy/osgifx-console)
-[![License - Apache](https://img.shields.io/badge/License-Apache-blue)](#license)
-[![Build - Passing](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/amitjoy/osgifx-console/runs/1485969918)
-[![GitHub release](https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver)](https://github.com/amitjoy/osgifx-console/releases/)
+<p align="center">
+  <a href="https://github.com/amitjoy/osgifx-console"><img width="120" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=osgi-fx&color=blue&logo=github" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console"><img width="80" alt="logo" src="https://img.shields.io/github/stars/amitjoy/osgifx-console?style=social" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console"><img width="80" alt="logo" src="https://img.shields.io/github/forks/amitjoy/osgi-messaging?style=social" /></a>
+  <a href="#license"><img width="100" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console/runs/1485969918"><img width="90" alt="logo" src="https://img.shields.io/badge/Build-Passing-brightgreen" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="120" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
+  </p>
 
 ------------------------------------------------------------------------------------------------------------
 
