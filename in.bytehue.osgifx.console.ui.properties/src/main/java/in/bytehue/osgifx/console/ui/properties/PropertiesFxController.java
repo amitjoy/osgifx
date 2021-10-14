@@ -18,20 +18,16 @@ import javafx.scene.control.TableView;
 
 public final class PropertiesFxController implements Initializable {
 
-    @Inject
-    private DataProvider dataProvider;
-
     @FXML
-    private TableView<XPropertyDTO> propertyTable;
-
+    private TableView<XPropertyDTO>           propertyTable;
     @FXML
     private TableColumn<XPropertyDTO, String> propertyName;
-
     @FXML
     private TableColumn<XPropertyDTO, String> propertyValue;
-
     @FXML
     private TableColumn<XPropertyDTO, String> propertyType;
+    @Inject
+    private DataProvider                      dataProvider;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

@@ -39,104 +39,72 @@ public final class ComponentDetailsFxController implements Initializable {
     private static final String COMPONENT_ENABLE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.component.enable";
     private static final String COMPONENT_DISABLE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.component.disable";
 
-    @Inject
-    private CommandService commandService;
-
     @FXML
-    private Label idLabel;
-
+    private Label                                                     idLabel;
     @FXML
-    private Label componentNameLabel;
-
+    private Label                                                     componentNameLabel;
     @FXML
-    private Label stateLabel;
-
+    private Label                                                     stateLabel;
     @FXML
-    private Label bundleLabel;
-
+    private Label                                                     bundleLabel;
     @FXML
-    private Label bundleIdLabel;
-
+    private Label                                                     bundleIdLabel;
     @FXML
-    private Label factoryLabel;
-
+    private Label                                                     factoryLabel;
     @FXML
-    private Label scopeLabel;
-
+    private Label                                                     scopeLabel;
     @FXML
-    private Label classLabel;
-
+    private Label                                                     classLabel;
     @FXML
-    private Label policyLabel;
-
+    private Label                                                     policyLabel;
     @FXML
-    private Label failureLabel;
-
+    private Label                                                     failureLabel;
     @FXML
-    private Label activateLabel;
-
+    private Label                                                     activateLabel;
     @FXML
-    private Label deactivateLabel;
-
+    private Label                                                     deactivateLabel;
     @FXML
-    private Label modifiedLabel;
-
+    private Label                                                     modifiedLabel;
     @FXML
-    private Button enableComponentButton;
-
+    private Button                                                    enableComponentButton;
     @FXML
-    private Button disableComponentButton;
-
+    private Button                                                    disableComponentButton;
     @FXML
-    private ListView<String> pidsList;
-
+    private ListView<String>                                          pidsList;
     @FXML
-    private ListView<String> interfacesList;
-
+    private ListView<String>                                          interfacesList;
     @FXML
-    private TableView<Entry<String, String>> propertiesTable;
-
+    private TableView<Entry<String, String>>                          propertiesTable;
     @FXML
-    private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
-
+    private TableColumn<Entry<String, String>, String>                propertiesTableColumn1;
     @FXML
-    private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
-
+    private TableColumn<Entry<String, String>, String>                propertiesTableColumn2;
     @FXML
-    private TableView<ReferenceDTO> referencesTable;
-
+    private TableView<ReferenceDTO>                                   referencesTable;
     @FXML
-    private TableView<XSatisfiedReferenceDTO> boundServicesTable;
-
+    private TableView<XSatisfiedReferenceDTO>                         boundServicesTable;
     @FXML
-    private TableColumn<XSatisfiedReferenceDTO, String> boundServicesNameColumn;
-
+    private TableColumn<XSatisfiedReferenceDTO, String>               boundServicesNameColumn;
     @FXML
-    private TableColumn<XSatisfiedReferenceDTO, String> boundServicesTargetColumn;
-
+    private TableColumn<XSatisfiedReferenceDTO, String>               boundServicesTargetColumn;
     @FXML
-    private TableColumn<XSatisfiedReferenceDTO, String> boundServicesClassColumn;
-
+    private TableColumn<XSatisfiedReferenceDTO, String>               boundServicesClassColumn;
     @FXML
-    private TableView<XUnsatisfiedReferenceDTO> unboundServicesTable;
-
+    private TableView<XUnsatisfiedReferenceDTO>                       unboundServicesTable;
     @FXML
-    private TableColumn<XUnsatisfiedReferenceDTO, String> unboundServicesNameColumn;
-
+    private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesNameColumn;
     @FXML
-    private TableColumn<XUnsatisfiedReferenceDTO, String> unboundServicesTargetColumn;
-
+    private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesTargetColumn;
     @FXML
-    private TableColumn<XUnsatisfiedReferenceDTO, String> unboundServicesClassColumn;
-
+    private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesClassColumn;
     @Inject
     @LocalInstance
-    private FXMLLoader loader;
-
+    private FXMLLoader                                                loader;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.components")
-    private BundleContext context;
-
+    private BundleContext                                             context;
+    @Inject
+    private CommandService                                            commandService;
     private final AtomicBoolean                                       areReferenceTableNodesLoader = new AtomicBoolean();
     private TableRowExpanderColumn.TableRowDataFeatures<ReferenceDTO> selectedReference;
 

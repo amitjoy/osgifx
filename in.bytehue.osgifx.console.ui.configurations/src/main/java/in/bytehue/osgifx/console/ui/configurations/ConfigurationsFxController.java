@@ -29,18 +29,14 @@ public final class ConfigurationsFxController implements Initializable {
 
     @Inject
     @LocalInstance
-    private FXMLLoader loader;
-
+    private FXMLLoader                                                     loader;
     @Inject
-    private DataProvider dataProvider;
-
+    private DataProvider                                                   dataProvider;
     @FXML
-    private TableView<XConfigurationDTO> table;
-
+    private TableView<XConfigurationDTO>                                   table;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.configurations")
-    private BundleContext context;
-
+    private BundleContext                                                  context;
     private TableRowExpanderColumn.TableRowDataFeatures<XConfigurationDTO> selectedConfiguration;
 
     @Override

@@ -18,32 +18,24 @@ import javafx.scene.control.TableView;
 
 public final class ThreadsFxController implements Initializable {
 
-    @Inject
-    private DataProvider dataProvider;
-
     @FXML
-    private TableView<XThreadDTO> table;
-
+    private TableView<XThreadDTO>           table;
     @FXML
     private TableColumn<XThreadDTO, String> nameColumn;
-
     @FXML
     private TableColumn<XThreadDTO, String> idColumn;
-
     @FXML
     private TableColumn<XThreadDTO, String> priorityColumn;
-
     @FXML
     private TableColumn<XThreadDTO, String> stateColumn;
-
     @FXML
     private TableColumn<XThreadDTO, String> isInterruptedColumn;
-
     @FXML
     private TableColumn<XThreadDTO, String> isAliveColumn;
-
     @FXML
     private TableColumn<XThreadDTO, String> isDaemonColumn;
+    @Inject
+    private DataProvider                    dataProvider;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

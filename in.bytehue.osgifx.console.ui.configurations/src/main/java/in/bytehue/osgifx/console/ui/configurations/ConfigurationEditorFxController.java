@@ -44,24 +44,19 @@ public final class ConfigurationEditorFxController implements Initializable {
     private static final String CONFIG_FACTORY_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.factory";
 
     @FXML
-    private BorderPane rootPanel;
-
+    private BorderPane     rootPanel;
     @FXML
-    private Button cancelButton;
-
+    private Button         cancelButton;
     @FXML
-    private Button saveConfigButton;
-
+    private Button         saveConfigButton;
     @FXML
-    private Button deleteConfigButton;
-
+    private Button         deleteConfigButton;
     @Inject
     private CommandService commandService;
-
-    private Form         form;
-    private Converter    converter;
-    private FormRenderer formRenderer;
-    private List<String> uneditableProperties;
+    private Form           form;
+    private Converter      converter;
+    private FormRenderer   formRenderer;
+    private List<String>   uneditableProperties;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

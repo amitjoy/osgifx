@@ -13,43 +13,30 @@ public final class ReferenceDetailsFxController implements Initializable {
 
     @FXML
     private Label nameLabel;
-
     @FXML
     private Label interfaceLabel;
-
     @FXML
     private Label cardinalityLabel;
-
     @FXML
     private Label policyLabel;
-
     @FXML
     private Label policyOptionLabel;
-
     @FXML
     private Label targetLabel;
-
     @FXML
     private Label unbindLabel;
-
     @FXML
     private Label updatedLabel;
-
     @FXML
     private Label fieldLabel;
-
     @FXML
     private Label fieldOptionLabel;
-
     @FXML
     private Label scopeLabel;
-
     @FXML
     private Label bindLabel;
-
     @FXML
     private Label parameterLabel;
-
     @FXML
     private Label collectionTypeLabel;
 

@@ -28,17 +28,14 @@ public final class ServicesFxController implements Initializable {
 
     @Inject
     @LocalInstance
-    private FXMLLoader loader;
-
+    private FXMLLoader             loader;
     @Inject
-    private DataProvider dataProvider;
-
+    private DataProvider           dataProvider;
     @FXML
     private TableView<XServiceDTO> table;
-
     @Inject
     @Named("in.bytehue.osgifx.console.ui.services")
-    private BundleContext context;
+    private BundleContext          context;
 
     private TableRowExpanderColumn.TableRowDataFeatures<XServiceDTO> selectedService;
 

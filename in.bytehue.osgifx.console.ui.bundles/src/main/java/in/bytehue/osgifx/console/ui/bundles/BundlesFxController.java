@@ -28,18 +28,14 @@ public final class BundlesFxController implements Initializable {
 
     @Inject
     @LocalInstance
-    private FXMLLoader loader;
-
+    private FXMLLoader                                              loader;
     @FXML
-    private TableView<XBundleDTO> table;
-
+    private TableView<XBundleDTO>                                   table;
     @Inject
-    private DataProvider dataProvider;
-
+    private DataProvider                                            dataProvider;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.bundles")
-    private BundleContext context;
-
+    private BundleContext                                           context;
     private TableRowExpanderColumn.TableRowDataFeatures<XBundleDTO> selectedBundle;
 
     @Override

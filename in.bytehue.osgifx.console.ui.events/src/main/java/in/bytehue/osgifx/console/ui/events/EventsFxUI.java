@@ -34,8 +34,7 @@ public final class EventsFxUI {
 
     @Inject
     @Named("in.bytehue.osgifx.console.ui.events")
-    private BundleContext context;
-
+    private BundleContext    context;
     private final StatusBar  statusBar    = new StatusBar();
     private final MaskerPane progressPane = new MaskerPane();
 

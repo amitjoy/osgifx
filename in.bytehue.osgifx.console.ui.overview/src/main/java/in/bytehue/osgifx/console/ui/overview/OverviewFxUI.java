@@ -53,8 +53,7 @@ public final class OverviewFxUI {
     private static final double TILE_HEIGHT = 200;
 
     @Inject
-    private Supervisor supervisor;
-
+    private Supervisor      supervisor;
     private final StatusBar statusBar = new StatusBar();
 
     @PostConstruct
