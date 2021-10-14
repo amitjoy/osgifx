@@ -64,7 +64,7 @@ public final class ConfigurationsFxController implements Initializable {
                                                                        });
 
         final TableColumn<XConfigurationDTO, String> pidColumn = new TableColumn<>("PID");
-        pidColumn.setPrefWidth(550);
+        pidColumn.setPrefWidth(480);
         pidColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
 
@@ -77,10 +77,15 @@ public final class ConfigurationsFxController implements Initializable {
         locationColumn.setPrefWidth(150);
         locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No bound location"));
 
+        final TableColumn<XConfigurationDTO, String> isFactoryColumn = new TableColumn<>("Is Factory?");
+        isFactoryColumn.setPrefWidth(100);
+        isFactoryColumn.setCellValueFactory(new DTOCellValueFactory<>("isFactory", String.class));
+
         table.getColumns().add(expanderColumn);
         table.getColumns().add(pidColumn);
         table.getColumns().add(nameColumn);
         table.getColumns().add(locationColumn);
+        table.getColumns().add(isFactoryColumn);
 
         final ObservableList<XConfigurationDTO> configurations = dataProvider.configurations();
         table.setItems(configurations);

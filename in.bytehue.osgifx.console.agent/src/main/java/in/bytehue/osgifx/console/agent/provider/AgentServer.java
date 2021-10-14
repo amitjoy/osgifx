@@ -982,6 +982,20 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
     }
 
     @Override
+    public void createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) throws IOException {
+        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
+        if (configAdmin == null) {
+            return;
+        }
+        try {
+            final Configuration configuration = configAdmin.getFactoryConfiguration(factoryPid, "?");
+            configuration.update(new Hashtable<>(newProperties));
+        } catch (final Exception e) {
+            logger.error("Cannot update configuration '{}'", factoryPid);
+        }
+    }
+
+    @Override
     public Map<String, String> runtimeInfo() {
         final Map<String, String> runtime      = new HashMap<>();
         final Bundle              systemBundle = getContext().getBundle(SYSTEM_BUNDLE_ID);

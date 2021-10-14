@@ -34,6 +34,7 @@
   <handlers xmi:id="_UoijwCdWEeyVbcMzeDU8dA" elementId="in.bytehue.osgifx.console.application.handler.component.disable" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ComponentDisableHandler" command="_KvgUACdUEeyVbcMzeDU8dA"/>
   <handlers xmi:id="_Ak1EMCnPEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.handler.configuration.delete" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ConfigurationDeleteHandler" command="_0-prQCnOEeyGMrCbruHUaw"/>
   <handlers xmi:id="_QlbkkCnQEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.handler.configuration.update" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.ConfigurationUpdateHandler" command="_sXl5YCnPEeyGMrCbruHUaw"/>
+  <handlers xmi:id="_Ye9vkCzkEeyT06UdPG8mtw" elementId="in.bytehue.osgifx.console.application.handler.configuration.factory" contributionURI="bundleclass://in.bytehue.osgifx.console.application/in.bytehue.osgifx.console.application.handler.FactoryConfigurationCreateHandler" command="_I_6AkCzkEeyT06UdPG8mtw"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="in.bytehue.osgifx.console.application.command.preference" commandName="Connection Preference Command">
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
@@ -61,6 +62,10 @@
   <commands xmi:id="_sXl5YCnPEeyGMrCbruHUaw" elementId="in.bytehue.osgifx.console.application.command.configuration.update" commandName="Configuration Update Command" description="Updates the configuration of the specified PID" category="_sT3FYCnOEeyGMrCbruHUaw">
     <parameters xmi:id="_4vx-ECnPEeyGMrCbruHUaw" elementId="pid" name="PID" optional="false"/>
     <parameters xmi:id="_NF14QCnQEeyGMrCbruHUaw" elementId="properties" name="Properties" optional="false"/>
+  </commands>
+  <commands xmi:id="_I_6AkCzkEeyT06UdPG8mtw" elementId="in.bytehue.osgifx.console.application.command.configuration.factory" commandName="Factory Configuration Create Command" description="Cerates factory configuration of the specified Factory PID" category="_sT3FYCnOEeyGMrCbruHUaw">
+    <parameters xmi:id="_RwcCECzkEeyT06UdPG8mtw" elementId="factoryPID" name="Factory PID" optional="false"/>
+    <parameters xmi:id="_Upc2kCzkEeyT06UdPG8mtw" elementId="properties" name="Properties" optional="false"/>
   </commands>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>

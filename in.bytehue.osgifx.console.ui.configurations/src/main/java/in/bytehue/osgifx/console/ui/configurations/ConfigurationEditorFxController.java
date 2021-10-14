@@ -2,6 +2,7 @@ package in.bytehue.osgifx.console.ui.configurations;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +13,10 @@ import java.util.ResourceBundle;
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.command.CommandService;
-import org.osgi.framework.Constants;
 import org.osgi.service.metatype.AttributeDefinition;
+import org.osgi.util.converter.Converter;
+import org.osgi.util.converter.Converters;
+import org.osgi.util.converter.TypeReference;
 
 import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.Field;
@@ -36,11 +39,9 @@ import javafx.scene.layout.GridPane;
 
 public final class ConfigurationEditorFxController implements Initializable {
 
-    private static final String CONFIG_DELETE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.delete";
-    private static final String CONFIG_UPDATE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.update";
-
-    @Inject
-    private CommandService commandService;
+    private static final String CONFIG_DELETE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.configuration.delete";
+    private static final String CONFIG_UPDATE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.configuration.update";
+    private static final String CONFIG_FACTORY_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.factory";
 
     @FXML
     private BorderPane rootPanel;
@@ -54,11 +55,18 @@ public final class ConfigurationEditorFxController implements Initializable {
     @FXML
     private Button deleteConfigButton;
 
+    @Inject
+    private CommandService commandService;
+
     private Form         form;
+    private Converter    converter;
     private FormRenderer formRenderer;
+    private List<String> uneditableProperties;
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
+        uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
+        converter            = Converters.standardConverter();
     }
 
     void initControls(final XConfigurationDTO config) {
@@ -71,23 +79,25 @@ public final class ConfigurationEditorFxController implements Initializable {
     }
 
     private void initButtons(final XConfigurationDTO config) {
-        deleteConfigButton.setDisable(config.properties == null);
+        final String             pid        = config.pid;
+        final XObjectClassDefDTO ocd        = config.ocd;
+        final String             properties = convertFieldValuesToGson();
+
+        deleteConfigButton.setDisable(config.properties == null || config.isFactory || config.pid == null);
         deleteConfigButton.setOnAction(event -> {
-            String                   pid = config.pid;
-            final XObjectClassDefDTO ocd = config.ocd;
-            if (pid == null && ocd != null) {
-                pid = ocd.id;
-            }
-            commandService.execute(CONFIG_DELETE_COMMAND_ID, createCommandMap(pid, null));
+            commandService.execute(CONFIG_DELETE_COMMAND_ID, createCommandMap(pid, null, null));
         });
         saveConfigButton.setOnAction(event -> {
-            String                   pid = config.pid;
-            final XObjectClassDefDTO ocd = config.ocd;
+            String effectivePID = null;
             if (pid == null && ocd != null) {
-                pid = ocd.pid;
+                effectivePID = ocd.pid;
             }
-            final String properties = convertFieldValuesToGson();
-            commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(pid, properties));
+            if (config.isFactory) {
+                final String ocdFactoryPid = ocd.factoryPid;
+                commandService.execute(CONFIG_FACTORY_COMMAND_ID, createCommandMap(null, ocdFactoryPid, properties));
+                return;
+            }
+            commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(effectivePID, null, properties));
         });
         cancelButton.setOnAction(e -> form.reset());
         saveConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
@@ -123,9 +133,9 @@ public final class ConfigurationEditorFxController implements Initializable {
             final String id    = entry.getKey();
             final Object value = entry.getValue();
 
-            Field<?> field = initFieldFromType(value, Clazz.valueOf(value.getClass()), id).label(id);
-            if (Constants.SERVICE_PID.equals(field.getLabel())) {
-                field = field.editable(false);
+            final Field<?> field = initFieldFromType(value, Clazz.valueOf(value.getClass()), id, null).label(id);
+            if (uneditableProperties.contains(field.getLabel())) {
+                continue;
             }
             fields.add(field);
         }
@@ -193,53 +203,73 @@ public final class ConfigurationEditorFxController implements Initializable {
     }
 
     private Field<?> toFxField(final XAttributeDefDTO ad, final XConfigurationDTO config) {
-        Field<?> field = fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(true);
-        if (ad.cardinality >= 1) {
-            field = field.required(true).required(ad.id + " cannot be empty");
-        }
-        return field;
+        return fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(true);
     }
 
     private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, Object currentValue) {
         final int          type       = ad.type;
         final List<String> options    = ad.optionValues;
         final List<String> defaultVal = ad.defaultValue;
-        Field<?>           field      = null;
         final String       id         = ad.id;
-        if (options == null || options.isEmpty()) {
-            currentValue = currentValue != null ? currentValue : defaultVal.get(0);
-            field        = initFieldFromType(currentValue, type, id);
-        } else if (ad.cardinality == 1) {
-            field = Field.ofSingleSelectionType(options);
-        } else {
-            field = Field.ofMultiSelectionType(options);
-        }
-        return field.label(ad.id).labelDescription(ad.description);
+
+        currentValue = currentValue != null ? currentValue : defaultVal;
+        return initFieldFromType(currentValue, type, id, options).label(ad.id).labelDescription(ad.description);
     }
 
-    private Field<?> initFieldFromType(final Object currentValue, final int type, final String id) {
+    private Field<?> initFieldFromType(final Object currentValue, final int type, final String id, final List<String> options) {
         Field<?> field;
         switch (type) {
             case AttributeDefinition.LONG:
             case AttributeDefinition.INTEGER:
-                field = Field.ofIntegerType(Integer.parseInt(currentValue.toString()));
+                if (options != null && !options.isEmpty()) {
+                    final int selection = options.indexOf(currentValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
+                    }), selection);
+                    break;
+                }
+                field = Field.ofIntegerType(converter.convert(currentValue).to(int.class));
                 break;
             case AttributeDefinition.FLOAT:
             case AttributeDefinition.DOUBLE:
-                field = Field.ofDoubleType(Double.parseDouble(currentValue.toString()));
+                if (options != null && !options.isEmpty()) {
+                    final int selection = options.indexOf(currentValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
+                    }), selection);
+                    break;
+                }
+                field = Field.ofDoubleType(converter.convert(currentValue).to(double.class));
                 break;
             case AttributeDefinition.BOOLEAN:
-                field = Field.ofBooleanType(Boolean.parseBoolean(currentValue.toString()));
+                if (options != null && !options.isEmpty()) {
+                    final int selection = options.indexOf(currentValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
+                    }), selection);
+                    break;
+                }
+                field = Field.ofBooleanType(converter.convert(currentValue).to(boolean.class));
                 break;
             case AttributeDefinition.PASSWORD:
                 field = Field.ofPasswordType(currentValue.toString());
                 break;
             case AttributeDefinition.CHARACTER:
-                field = Field.ofStringType(currentValue.toString()).validate(StringLengthValidator.exactly(1, id + "must be of length 1"));
+                if (options != null && !options.isEmpty()) {
+                    final int selection = options.indexOf(currentValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    }), selection);
+                    break;
+                }
+                field = Field.ofStringType(converter.convert(currentValue).to(String.class))
+                        .validate(StringLengthValidator.exactly(1, id + "must be of length 1"));
                 break;
             case AttributeDefinition.STRING:
             default:
-                field = Field.ofStringType(currentValue.toString());
+                if (options != null && !options.isEmpty()) {
+                    final int selection = options.indexOf(currentValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    }), selection);
+                    break;
+                }
+                field = Field.ofStringType(converter.convert(currentValue).to(String.class));
                 break;
         }
         return field;
@@ -260,9 +290,10 @@ public final class ConfigurationEditorFxController implements Initializable {
         return new Gson().toJson(properties);
     }
 
-    private Map<String, Object> createCommandMap(final String pid, final String properties) {
+    private Map<String, Object> createCommandMap(final String pid, final String factoryPid, final String properties) {
         final Map<String, Object> props = new HashMap<>();
         props.computeIfAbsent("pid", key -> pid);
+        props.computeIfAbsent("factoryPID", key -> factoryPid);
         props.computeIfAbsent("properties", key -> properties);
         return props;
     }
