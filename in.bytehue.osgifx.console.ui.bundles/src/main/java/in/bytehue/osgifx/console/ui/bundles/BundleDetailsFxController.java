@@ -181,8 +181,9 @@ public final class BundleDetailsFxController implements Initializable {
     }
 
     private void initConditionalControls(final XBundleDTO bundle) {
-        startBundleButton.setDisable(bundle.isFragment || AGENT_BUNDLE_BSN.equals(bundle.symbolicName) || "ACTIVE".equals(bundle.state));
-        stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state));
+        startBundleButton.setDisable(bundle.isFragment || "ACTIVE".equals(bundle.state));
+        stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state) || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
+        uninstallBundleButton.setDisable(AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         fragmentLabel.setSelected(bundle.isFragment);
     }
 
