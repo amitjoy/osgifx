@@ -1,10 +1,8 @@
 package in.bytehue.osgifx.console.ui.components;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -26,7 +24,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -34,7 +31,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 
-public final class ComponentDetailsFxController implements Initializable {
+public final class ComponentDetailsFxController {
 
     private static final String COMPONENT_ENABLE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.component.enable";
     private static final String COMPONENT_DISABLE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.component.disable";
@@ -107,10 +104,6 @@ public final class ComponentDetailsFxController implements Initializable {
     private CommandService                                            commandService;
     private final AtomicBoolean                                       areReferenceTableNodesLoader = new AtomicBoolean();
     private TableRowExpanderColumn.TableRowDataFeatures<ReferenceDTO> selectedReference;
-
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
-    }
 
     void initControls(final XComponentDTO component) {
         registerButtonHandlers(component);

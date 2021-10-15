@@ -1,8 +1,5 @@
 package in.bytehue.osgifx.console.ui.services;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -19,12 +16,11 @@ import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 
-public final class ServicesFxController implements Initializable {
+public final class ServicesFxController {
 
     @Inject
     @LocalInstance
@@ -39,8 +35,8 @@ public final class ServicesFxController implements Initializable {
 
     private TableRowExpanderColumn.TableRowDataFeatures<XServiceDTO> selectedService;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         createControls();
     }

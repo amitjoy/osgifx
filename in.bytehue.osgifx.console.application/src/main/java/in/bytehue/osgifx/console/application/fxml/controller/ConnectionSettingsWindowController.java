@@ -2,11 +2,9 @@ package in.bytehue.osgifx.console.application.fxml.controller;
 
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
@@ -29,60 +27,46 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.StageStyle;
 
-public final class ConnectionSettingsWindowController implements Initializable {
+public final class ConnectionSettingsWindowController {
 
     private static final String CONNECTION_WINDOW_ID         = "in.bytehue.osgifx.console.window.connection";
     private static final String COMMAND_ID_MANAGE_CONNECTION = "in.bytehue.osgifx.console.application.command.preference";
 
-    @Inject
-    private EModelService model;
-
-    @Inject
-    private MApplication application;
-
-    @Inject
-    private IEventBroker eventBroker;
-
-    @Inject
-    private Supervisor supervisor;
-
-    @Inject
-    private CommandService commandService;
-
-    @Inject
-    private ConnectionsProvider connectionsProvider;
-
     @FXML
-    private Button connectButton;
-
+    private Button                                     connectButton;
     @FXML
-    private Button addConnectionButton;
-
+    private Button                                     addConnectionButton;
     @FXML
-    private Button removeConnectionButton;
-
+    private Button                                     removeConnectionButton;
     @FXML
-    private TableView<ConnectionSettingDTO> connectionTable;
-
+    private TableView<ConnectionSettingDTO>            connectionTable;
     @FXML
-    private TableColumn<ConnectionSettingDTO, String> hostColumn;
-
+    private TableColumn<ConnectionSettingDTO, String>  hostColumn;
     @FXML
     private TableColumn<ConnectionSettingDTO, Integer> portColumn;
-
     @FXML
     private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
+    @Inject
+    private EModelService                              model;
+    @Inject
+    private MApplication                               application;
+    @Inject
+    private IEventBroker                               eventBroker;
+    @Inject
+    private Supervisor                                 supervisor;
+    @Inject
+    private CommandService                             commandService;
+    @Inject
+    private ConnectionsProvider                        connectionsProvider;
+    private ProgressDialog                             progressDialog;
 
-    private ProgressDialog progressDialog;
-
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));

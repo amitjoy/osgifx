@@ -1,8 +1,5 @@
 package in.bytehue.osgifx.console.ui.gogo;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javax.inject.Inject;
 
 import com.google.common.base.Throwables;
@@ -10,12 +7,11 @@ import com.google.common.base.Throwables;
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
-public final class GogoFxController implements Initializable {
+public final class GogoFxController {
 
     @FXML
     private TextField          input;
@@ -28,8 +24,8 @@ public final class GogoFxController implements Initializable {
     private Agent              agent;
     private int                historyPointer;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         historyPointer = 0;
         agent          = supervisor.getAgent();
     }

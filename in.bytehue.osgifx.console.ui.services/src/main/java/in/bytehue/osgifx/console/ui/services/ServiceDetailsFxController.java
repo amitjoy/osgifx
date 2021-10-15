@@ -1,8 +1,6 @@
 package in.bytehue.osgifx.console.ui.services;
 
-import java.net.URL;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 
 import org.controlsfx.control.table.TableFilter;
 
@@ -10,13 +8,12 @@ import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public final class ServiceDetailsFxController implements Initializable {
+public final class ServiceDetailsFxController {
 
     @FXML
     private Label                                      idLabel;
@@ -32,10 +29,6 @@ public final class ServiceDetailsFxController implements Initializable {
     private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
     @FXML
     private ListView<String>                           objectClassesList;
-
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
-    }
 
     void initControls(final XServiceDTO service) {
         idLabel.setText(String.valueOf(service.id));
