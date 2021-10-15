@@ -109,6 +109,8 @@ public final class ConnectionSettingsWindowController {
                                                           @Override
                                                           protected Void call() throws Exception {
                                                               try {
+                                                                  updateMessage("Connecting to " + selectedConnection.host + ":"
+                                                                          + selectedConnection.port);
                                                                   supervisor.connect(selectedConnection.host, selectedConnection.port,
                                                                           selectedConnection.timeout);
                                                               } catch (final Exception e) {
@@ -143,7 +145,7 @@ public final class ConnectionSettingsWindowController {
         th.start();
 
         progressDialog = new ProgressDialog(connectTask);
-        progressDialog.setHeaderText("Connecting to " + selectedConnection.host + ":" + selectedConnection.port);
+        progressDialog.setHeaderText("Remote Connection");
         progressDialog.initStyle(StageStyle.UNDECORATED);
         progressDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
         progressDialog.show();
