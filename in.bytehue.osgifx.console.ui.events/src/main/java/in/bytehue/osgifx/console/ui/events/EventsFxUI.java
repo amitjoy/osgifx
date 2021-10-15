@@ -1,6 +1,8 @@
 package in.bytehue.osgifx.console.ui.events;
 
 import static in.bytehue.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.annotation.PostConstruct;
@@ -57,6 +59,24 @@ public final class EventsFxUI {
         createControls(parent, loader);
     }
 
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent( //
+            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent( //
+            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+    }
+
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
         final Task<?> task = new Task<Void>() {
 
@@ -93,7 +113,14 @@ public final class EventsFxUI {
         statusBar.getLeftItems().clear();
         statusBar.getLeftItems().add(button);
         statusBar.getLeftItems().add(new Separator(Orientation.VERTICAL));
-        statusBar.setText("Connected to " + System.getProperty(CONNECTED_AGENT));
+        final String property = System.getProperty(CONNECTED_AGENT);
+        final String statusBarText;
+        if (property != null) {
+            statusBarText = "Connected to " + property;
+        } else {
+            statusBarText = "Disconnected";
+        }
+        statusBar.setText(statusBarText);
         parent.setBottom(statusBar);
     }
 
