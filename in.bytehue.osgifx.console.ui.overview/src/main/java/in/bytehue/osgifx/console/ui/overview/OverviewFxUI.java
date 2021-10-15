@@ -1,6 +1,7 @@
 package in.bytehue.osgifx.console.ui.overview;
 
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import java.text.DecimalFormat;
@@ -20,6 +21,7 @@ import org.controlsfx.glyphfont.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.di.LocalInstance;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
@@ -29,6 +31,7 @@ import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -360,6 +363,24 @@ public final class OverviewFxUI {
         // @formatter:on
     }
 
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent( //
+            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        createWidgets(parent);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent( //
+            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        createWidgets(parent);
+    }
+
     private void initStatusBar(final BorderPane parent) {
         final Button button = new Button("", new Glyph("FontAwesome", "DESKTOP"));
         button.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(2), new Insets(4))));
@@ -367,7 +388,7 @@ public final class OverviewFxUI {
         statusBar.getLeftItems().add(button);
         statusBar.getLeftItems().add(new Separator(Orientation.VERTICAL));
         final String property = System.getProperty(CONNECTED_AGENT);
-        String       statusBarText;
+        final String statusBarText;
         if (property != null) {
             statusBarText = "Connected to " + property;
         } else {

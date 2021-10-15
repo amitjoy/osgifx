@@ -16,6 +16,9 @@ public interface Supervisor {
     /** The topic where an event will be sent after the agent gets connected */
     String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
 
+    /** The topic where an event will be sent after the agent gets disconnected */
+    String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
+
     /** System property comprising the host and port of the connected agent */
     String CONNECTED_AGENT = "osgi.fx.connected.agent";
 
