@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.ui.configurations;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
@@ -31,13 +29,12 @@ import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XObjectClassDefDTO;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
-public final class ConfigurationEditorFxController implements Initializable {
+public final class ConfigurationEditorFxController {
 
     private static final String CONFIG_DELETE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.configuration.delete";
     private static final String CONFIG_UPDATE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.configuration.update";
@@ -58,8 +55,8 @@ public final class ConfigurationEditorFxController implements Initializable {
     private FormRenderer   formRenderer;
     private List<String>   uneditableProperties;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
         converter            = Converters.standardConverter();
     }

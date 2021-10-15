@@ -1,11 +1,9 @@
 package in.bytehue.osgifx.console.ui.bundles;
 
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 
@@ -23,13 +21,12 @@ import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public final class BundleDetailsFxController implements Initializable {
+public final class BundleDetailsFxController {
 
     private static final String AGENT_BUNDLE_BSN            = "in.bytehue.osgifx.console.agent";
     private static final String BUNDLE_START_COMMAND_ID     = "in.bytehue.osgifx.console.application.command.bundle.start";
@@ -118,8 +115,8 @@ public final class BundleDetailsFxController implements Initializable {
     private CommandService                             commandService;
     private Converter                                  converter;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         converter = Converters.standardConverter();
     }
 

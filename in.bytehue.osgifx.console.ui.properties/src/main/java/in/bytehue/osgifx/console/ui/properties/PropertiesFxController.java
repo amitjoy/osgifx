@@ -1,8 +1,5 @@
 package in.bytehue.osgifx.console.ui.properties;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
@@ -12,11 +9,10 @@ import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public final class PropertiesFxController implements Initializable {
+public final class PropertiesFxController {
 
     @FXML
     private TableView<XPropertyDTO>           propertyTable;
@@ -29,8 +25,8 @@ public final class PropertiesFxController implements Initializable {
     @Inject
     private DataProvider                      dataProvider;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         propertyTable.setSelectionModel(new NullTableViewSelectionModel<>(propertyTable));
 
         propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));

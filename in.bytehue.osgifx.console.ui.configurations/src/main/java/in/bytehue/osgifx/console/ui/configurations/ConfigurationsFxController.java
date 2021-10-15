@@ -1,8 +1,6 @@
 package in.bytehue.osgifx.console.ui.configurations;
 
-import java.net.URL;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,12 +18,11 @@ import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
-public final class ConfigurationsFxController implements Initializable {
+public final class ConfigurationsFxController {
 
     @Inject
     @LocalInstance
@@ -39,8 +36,8 @@ public final class ConfigurationsFxController implements Initializable {
     private BundleContext                                                  context;
     private TableRowExpanderColumn.TableRowDataFeatures<XConfigurationDTO> selectedConfiguration;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         createControls();
     }

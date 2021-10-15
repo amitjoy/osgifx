@@ -1,31 +1,22 @@
 package in.bytehue.osgifx.console.application.fxml.controller;
 
 import java.io.File;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import org.controlsfx.control.ToggleSwitch;
 
 import in.bytehue.osgifx.console.application.dialog.InstallBundleDTO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 
-public final class InstallBundleDialogController implements Initializable {
+public final class InstallBundleDialogController {
 
     @FXML
-    private Button fileChooser;
-
+    private Button       fileChooser;
     @FXML
     private ToggleSwitch startBundleToggle;
-
-    private File bundle;
-
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
-    }
+    private File         bundle;
 
     @FXML
     private void chooseBundle(final ActionEvent event) {

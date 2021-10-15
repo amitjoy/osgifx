@@ -1,15 +1,11 @@
 package in.bytehue.osgifx.console.ui.components;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 
-public final class ReferenceDetailsFxController implements Initializable {
+public final class ReferenceDetailsFxController {
 
     @FXML
     private Label nameLabel;
@@ -39,10 +35,6 @@ public final class ReferenceDetailsFxController implements Initializable {
     private Label parameterLabel;
     @FXML
     private Label collectionTypeLabel;
-
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
-    }
 
     void initControls(final ReferenceDTO reference) {
         nameLabel.setText(reference.name);

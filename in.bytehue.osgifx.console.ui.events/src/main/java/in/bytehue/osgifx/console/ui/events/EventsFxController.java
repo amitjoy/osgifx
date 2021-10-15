@@ -1,8 +1,6 @@
 package in.bytehue.osgifx.console.ui.events;
 
-import java.net.URL;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,12 +18,11 @@ import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 
-public final class EventsFxController implements Initializable {
+public final class EventsFxController {
 
     @Inject
     @LocalInstance
@@ -40,8 +37,8 @@ public final class EventsFxController implements Initializable {
 
     private TableRowExpanderColumn.TableRowDataFeatures<XEventDTO> selectedEvent;
 
-    @Override
-    public void initialize(final URL location, final ResourceBundle resources) {
+    @FXML
+    public void initialize() {
         table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         createControls();
     }
