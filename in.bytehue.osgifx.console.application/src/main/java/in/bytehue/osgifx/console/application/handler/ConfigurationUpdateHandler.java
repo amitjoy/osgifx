@@ -22,13 +22,11 @@ public final class ConfigurationUpdateHandler {
 
     @Log
     @Inject
-    private Logger logger;
-
+    private Logger       logger;
     @Inject
     private IEventBroker eventBroker;
-
     @Inject
-    private Supervisor supervisor;
+    private Supervisor   supervisor;
 
     @Execute
     public void execute(@Named("pid") final String pid, @Named("properties") final String properties) {

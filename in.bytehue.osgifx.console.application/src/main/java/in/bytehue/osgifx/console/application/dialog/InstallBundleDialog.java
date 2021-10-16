@@ -1,5 +1,9 @@
 package in.bytehue.osgifx.console.application.dialog;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.application.fxml.controller.InstallBundleDialogController;
@@ -15,7 +19,14 @@ import javafx.stage.StageStyle;
 
 public final class InstallBundleDialog extends Dialog<InstallBundleDTO> {
 
-    public InstallBundleDialog(final FXMLLoader loader, final BundleContext context) {
+    @Inject
+    @LocalInstance
+    private FXMLLoader    loader;
+    @Inject
+    @Named("in.bytehue.osgifx.console.application")
+    private BundleContext context;
+
+    public void init() {
         final DialogPane dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
         dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
