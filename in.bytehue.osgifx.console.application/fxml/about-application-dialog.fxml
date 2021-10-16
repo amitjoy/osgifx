@@ -24,19 +24,19 @@
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements" wrappingWidth="341.22393798828125" GridPane.columnSpan="2" GridPane.rowIndex="1">
                <GridPane.margin>
-                  <Insets left="30.0" right="30.0" top="-5.0" />
+                  <Insets left="20.0" right="30.0" top="-5.0" />
                </GridPane.margin>
             </Text>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="OSGi.fx Console (Version 0.1.0)">
+                  <Text fx:id="appName" strokeType="OUTSIDE" strokeWidth="0.0" text="OSGi.fx Console (Version 0.1.0)">
                      <VBox.margin>
-                        <Insets left="30.0" />
+                        <Insets left="20.0" />
                      </VBox.margin>
                   </Text>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by Amit Kumar Mondal">
                      <VBox.margin>
-                        <Insets left="30.0" />
+                        <Insets left="20.0" />
                      </VBox.margin>
                   </Text>
                </children>
@@ -46,7 +46,7 @@
             </VBox>
             <HyperlinkLabel fx:id="hyperlink" prefHeight="48.0" prefWidth="343.0" text="This product includes software developed by other open source projects including the Eclipse Foundation, [https://www.eclipse.org]/" GridPane.columnSpan="2" GridPane.rowIndex="2">
                <GridPane.margin>
-                  <Insets left="30.0" right="25.0" />
+                  <Insets left="20.0" right="25.0" />
                </GridPane.margin>
             </HyperlinkLabel>
          </children>
