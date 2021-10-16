@@ -24,14 +24,11 @@ import in.bytehue.osgifx.console.util.fx.Fx;
 public final class EventReceiveMenuContributionHandler {
 
     @Inject
-    private Supervisor supervisor;
-
+    private Supervisor          supervisor;
     @Inject
-    private DataProvider dataProvider;
-
+    private DataProvider        dataProvider;
     @Inject
-    private EModelService modelService;
-
+    private EModelService       modelService;
     @Inject
     @Preference(nodePath = "osgi.fx.event")
     private IEclipsePreferences preferences;

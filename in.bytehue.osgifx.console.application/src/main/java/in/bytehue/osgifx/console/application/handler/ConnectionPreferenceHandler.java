@@ -24,12 +24,10 @@ public final class ConnectionPreferenceHandler {
 
     @Log
     @Inject
-    private Logger logger;
-
+    private Logger              logger;
     @Inject
     @Preference(nodePath = "osgi.fx.connections")
     private IEclipsePreferences preferences;
-
     @Inject
     private ConnectionsProvider connectionsProvider;
 

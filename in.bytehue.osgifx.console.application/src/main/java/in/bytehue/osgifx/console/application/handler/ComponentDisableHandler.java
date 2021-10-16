@@ -17,13 +17,11 @@ public final class ComponentDisableHandler {
 
     @Log
     @Inject
-    private Logger logger;
-
+    private Logger       logger;
     @Inject
     private IEventBroker eventBroker;
-
     @Inject
-    private Supervisor supervisor;
+    private Supervisor   supervisor;
 
     @Execute
     public void execute(@Named("id") final String id) {

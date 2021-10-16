@@ -3,11 +3,10 @@ package in.bytehue.osgifx.console.application.handler;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.fx.core.di.LocalInstance;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.dto.BundleDTO;
 
 import com.google.common.io.Files;
@@ -17,20 +16,21 @@ import in.bytehue.osgifx.console.application.dialog.InstallBundleDTO;
 import in.bytehue.osgifx.console.application.dialog.InstallBundleDialog;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.Fx;
-import javafx.fxml.FXMLLoader;
 
 public final class InstallBundleHandler {
 
     @Inject
-    @Named("in.bytehue.osgifx.console.application")
-    private BundleContext context;
-
+    private IEclipseContext context;
     @Inject
-    private Supervisor supervisor;
+    private Supervisor      supervisor;
 
     @Execute
-    public void execute(@LocalInstance final FXMLLoader loader) {
-        final InstallBundleDialog        dialog        = new InstallBundleDialog(loader, context);
+    public void execute() {
+        final InstallBundleDialog dialog = new InstallBundleDialog();
+
+        ContextInjectionFactory.inject(dialog, context);
+        dialog.init();
+
         final Optional<InstallBundleDTO> remoteInstall = dialog.showAndWait();
         if (remoteInstall.isPresent()) {
             try {

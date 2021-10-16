@@ -22,8 +22,7 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 public final class ExtensionListMenuContributionHandler {
 
     @Inject
-    private EPartService partService;
-
+    private EPartService  partService;
     @Inject
     private EModelService modelService;
 
