@@ -69,6 +69,7 @@ public final class ComponentsFxController {
 
         final ObservableList<XComponentDTO> bundles = dataProvider.components();
         table.setItems(bundles);
+        Fx.sortBy(table, componentNameColumn);
 
         TableFilter.forTableView(table).apply();
     }

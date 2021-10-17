@@ -82,6 +82,7 @@ public final class ConfigurationsFxController {
 
         final ObservableList<XConfigurationDTO> configurations = dataProvider.configurations();
         table.setItems(configurations);
+        Fx.sortBy(table, pidColumn);
 
         TableFilter.forTableView(table).apply();
     }

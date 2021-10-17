@@ -9,6 +9,7 @@ import org.osgi.framework.BundleContext;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -29,6 +30,12 @@ public final class Fx {
         } catch (final IOException e) {
         }
         return null;
+    }
+
+    public static <S, T> void sortBy(final TableView<S> table, final TableColumn<S, T> column) {
+        column.setSortType(TableColumn.SortType.ASCENDING);
+        table.getSortOrder().add(column);
+        table.sort();
     }
 
     public static void autoResizeColumns(final TableView<?> table) {

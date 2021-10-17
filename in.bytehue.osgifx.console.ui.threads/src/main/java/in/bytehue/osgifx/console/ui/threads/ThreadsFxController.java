@@ -7,6 +7,7 @@ import org.controlsfx.control.table.TableFilter;
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -49,6 +50,7 @@ public final class ThreadsFxController {
         isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
 
         table.setItems(dataProvider.threads());
+        Fx.sortBy(table, nameColumn);
 
         TableFilter.forTableView(table).apply();
     }

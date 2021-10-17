@@ -76,6 +76,7 @@ public final class ServicesFxController {
 
         final ObservableList<XServiceDTO> services = dataProvider.services();
         table.setItems(services);
+        Fx.sortBy(table, objectClassColumn);
 
         TableFilter.forTableView(table).apply();
     }
