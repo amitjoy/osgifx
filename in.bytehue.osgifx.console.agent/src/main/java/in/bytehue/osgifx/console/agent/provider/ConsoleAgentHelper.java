@@ -16,7 +16,7 @@ import org.osgi.framework.BundleContext;
 public final class ConsoleAgentHelper {
 
     private ConsoleAgentHelper() {
-        throw new IllegalAccessError("Cannot be instanntiated");
+        throw new IllegalAccessError("Cannot be instantiated");
     }
 
     public static String bsn(final long id, final BundleContext context) {
