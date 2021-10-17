@@ -75,6 +75,7 @@ public final class BundlesFxController {
 
         final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
         table.setItems(bundles);
+        Fx.sortBy(table, symbolicNameColumn);
 
         TableFilter.forTableView(table).apply();
     }

@@ -7,6 +7,7 @@ import org.controlsfx.control.table.TableFilter;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -34,6 +35,7 @@ public final class PropertiesFxController {
         propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
         propertyTable.setItems(dataProvider.properties());
+        Fx.sortBy(propertyTable, propertyName);
 
         TableFilter.forTableView(propertyTable).apply();
     }
