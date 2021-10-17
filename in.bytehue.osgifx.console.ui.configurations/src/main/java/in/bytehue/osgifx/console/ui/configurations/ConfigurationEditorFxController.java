@@ -208,12 +208,15 @@ public final class ConfigurationEditorFxController {
         return initFieldFromType(currentValue, type, id, options).label(ad.id).labelDescription(ad.description);
     }
 
-    private Field<?> initFieldFromType(final Object currentValue, final int type, final String id, final List<String> options) {
+    private Field<?> initFieldFromType(Object currentValue, final int type, final String id, final List<String> options) {
         Field<?> field;
         switch (type) {
             case AttributeDefinition.LONG:
             case AttributeDefinition.INTEGER:
                 if (options != null && !options.isEmpty()) {
+                    if (currentValue instanceof List<?>) {
+                        currentValue = converter.convert(currentValue).to(String.class);
+                    }
                     final int selection = options.indexOf(currentValue);
                     field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
                     }), selection);
@@ -224,6 +227,9 @@ public final class ConfigurationEditorFxController {
             case AttributeDefinition.FLOAT:
             case AttributeDefinition.DOUBLE:
                 if (options != null && !options.isEmpty()) {
+                    if (currentValue instanceof List<?>) {
+                        currentValue = converter.convert(currentValue).to(String.class);
+                    }
                     final int selection = options.indexOf(currentValue);
                     field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
                     }), selection);
@@ -233,6 +239,9 @@ public final class ConfigurationEditorFxController {
                 break;
             case AttributeDefinition.BOOLEAN:
                 if (options != null && !options.isEmpty()) {
+                    if (currentValue instanceof List<?>) {
+                        currentValue = converter.convert(currentValue).to(String.class);
+                    }
                     final int selection = options.indexOf(currentValue);
                     field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
                     }), selection);
@@ -245,6 +254,9 @@ public final class ConfigurationEditorFxController {
                 break;
             case AttributeDefinition.CHARACTER:
                 if (options != null && !options.isEmpty()) {
+                    if (currentValue instanceof List<?>) {
+                        currentValue = converter.convert(options).to(String.class);
+                    }
                     final int selection = options.indexOf(currentValue);
                     field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
                     }), selection);
@@ -256,6 +268,9 @@ public final class ConfigurationEditorFxController {
             case AttributeDefinition.STRING:
             default:
                 if (options != null && !options.isEmpty()) {
+                    if (currentValue instanceof List<?>) {
+                        currentValue = converter.convert(currentValue).to(String.class);
+                    }
                     final int selection = options.indexOf(currentValue);
                     field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
                     }), selection);
