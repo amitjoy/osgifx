@@ -38,7 +38,7 @@ import in.bytehue.osgifx.console.supervisor.Supervisor;
 @RequireMetaTypeImplementation
 @RequireServiceComponentRuntime
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
-@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.agent.ConsoleAgent")
+@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=org.osgi.service.event.EventHandler")
 public final class Activator extends Thread implements BundleActivator {
 
     private File                              cache;
