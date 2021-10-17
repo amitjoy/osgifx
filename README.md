@@ -4,12 +4,12 @@
   <p align="center">This repository provides a desktop application to remotely manage OSGi runtimes</p>
 </p>
 <p align="center">
-  <a href="https://github.com/amitjoy/osgifx-console"><img width="120" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=osgi-fx&color=blue&logo=github" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console"><img width="170" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=osgi-fx-console&color=blue&logo=github" /></a>
   <a href="https://github.com/amitjoy/osgifx-console"><img width="80" alt="logo" src="https://img.shields.io/github/stars/amitjoy/osgifx-console?style=social" /></a>
   <a href="https://github.com/amitjoy/osgifx-console"><img width="80" alt="logo" src="https://img.shields.io/github/forks/amitjoy/osgi-messaging?style=social" /></a>
-  <a href="#license"><img width="100" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
-  <a href="https://github.com/amitjoy/osgifx-console/runs/1485969918"><img width="90" alt="logo" src="https://img.shields.io/badge/Build-Passing-brightgreen" /></a>
-  <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="120" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
+  <a href="#license"><img width="110" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console/runs/1485969918"><img width="95" alt="logo" src="https://img.shields.io/badge/Build-Passing-brightgreen" /></a>
+  <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="134" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
   </p>
 
 ![1](https://user-images.githubusercontent.com/13380182/137404709-f567056b-59e9-4298-943c-515ac624c961.png)
@@ -23,37 +23,39 @@
 
 --------------------------------------------------------------------------------------------------------------
 
-### Tools and technologies for the desktop application
+### Tools and Technologies
 
-1. Java 8
-2. Eclipse 4 (e4) RCP
-3. JavaFX 8
-4. e(fx)clipse 3.7
-5. Bndtools 6
+|                      	|                                             	|
+|----------------------	|---------------------------------------------	|
+| Java                 	| 1.8                                         	|
+| Rich Client Platform 	| JavaFX 8                                    	|
+| Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
+| UI Libraries         	| ControlsFX, TilesFX                         	|
+| Tools                	| Bndtools 6                                  	|
 
 ------------------------------------------------------------------------------------------------------------
 
-### Minimum requirements for installing agent in remote runtime
+### Minimum Requirements for Runtime Agent
 
 1. Java 8
 2. OSGi R6
 
 ------------------------------------------------------------------------------------------------------------
 
-### Installation
+### Installation of Agent
 
 To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent` and set `osgi.fx.agent.port` system property in the runtime
 
 --------------------------------------------------------------------------------------------------------------
 
-#### Project import for development
+### Project Import for Development
 
-1. Install Bndtools
-2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace`)
+1. Install Bndtools from Eclipse Marketplace
+2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
 
 --------------------------------------------------------------------------------------------------------------
 
-#### Building from Source
+### Building from Source
 
 Run `./gradlew clean build` in the project root directory
 
