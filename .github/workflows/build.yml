@@ -1,0 +1,28 @@
+name: CI Build
+  
+on: 
+    push:
+      branches-ignore: ["release"]
+    pull_request:
+
+env:
+    LC_ALL:       en_US.UTF-8
+    GRADLE_OPTS: -Dorg.gradle.parallel=false
+
+jobs:
+    build:
+        name:     build on OpenJDK JDK
+        runs-on:  ubuntu-latest
+        steps:
+        -   name: Git Checkout
+            uses: actions/checkout@v1
+        -   name: Gradle Wrapper Validation
+            uses: gradle/wrapper-validation-action@v1
+        -   name: Set up Java
+            uses: actions/setup-java@v1
+            with: 
+                java-version: 1.8
+                java-package: jdk+fx
+        -   name: Build
+            shell: bash
+            run: ./gradlew build
