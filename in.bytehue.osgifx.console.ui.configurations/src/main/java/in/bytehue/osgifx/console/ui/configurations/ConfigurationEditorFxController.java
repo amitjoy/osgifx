@@ -11,7 +11,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.command.CommandService;
-import org.osgi.service.metatype.AttributeDefinition;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 import org.osgi.util.converter.TypeReference;
@@ -26,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
 import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
+import in.bytehue.osgifx.console.agent.dto.XAttributeDefType;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XObjectClassDefDTO;
 import javafx.fxml.FXML;
@@ -41,22 +41,24 @@ public final class ConfigurationEditorFxController {
     private static final String CONFIG_FACTORY_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.factory";
 
     @FXML
-    private BorderPane     rootPanel;
+    private BorderPane             rootPanel;
     @FXML
-    private Button         cancelButton;
+    private Button                 cancelButton;
     @FXML
-    private Button         saveConfigButton;
+    private Button                 saveConfigButton;
     @FXML
-    private Button         deleteConfigButton;
+    private Button                 deleteConfigButton;
     @Inject
-    private CommandService commandService;
-    private Form           form;
-    private Converter      converter;
-    private FormRenderer   formRenderer;
-    private List<String>   uneditableProperties;
+    private CommandService         commandService;
+    private Form                   form;
+    private Converter              converter;
+    private FormRenderer           formRenderer;
+    private List<String>           uneditableProperties;
+    private Map<Field<?>, Integer> typeMappings;
 
     @FXML
     public void initialize() {
+        typeMappings         = new HashMap<>();
         uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
         converter            = Converters.standardConverter();
     }
@@ -71,16 +73,16 @@ public final class ConfigurationEditorFxController {
     }
 
     private void initButtons(final XConfigurationDTO config) {
-        final String             pid        = config.pid;
-        final XObjectClassDefDTO ocd        = config.ocd;
-        final String             properties = convertFieldValuesToGson();
+        final String             pid = config.pid;
+        final XObjectClassDefDTO ocd = config.ocd;
 
         deleteConfigButton.setDisable(config.properties == null || config.isFactory || config.pid == null);
         deleteConfigButton.setOnAction(event -> {
             commandService.execute(CONFIG_DELETE_COMMAND_ID, createCommandMap(pid, null, null));
         });
         saveConfigButton.setOnAction(event -> {
-            String effectivePID = null;
+            final String properties   = convertFieldValuesToGson();
+            String       effectivePID = null;
             if (pid == null && ocd != null) {
                 effectivePID = ocd.pid;
             }
@@ -125,11 +127,14 @@ public final class ConfigurationEditorFxController {
             final String id    = entry.getKey();
             final Object value = entry.getValue();
 
-            final Field<?> field = initFieldFromType(value, Clazz.valueOf(value.getClass()), id, null).label(id);
+            final XAttributeDefType attrDefType = XAttributeDefType.getType(value);
+            final Field<?>          field       = initFieldFromType(value, null, attrDefType, null).label(id);
+
             if (uneditableProperties.contains(field.getLabel())) {
                 continue;
             }
             fields.add(field);
+            typeMappings.put(field, attrDefType.ordinal());
         }
         return fields;
     }
@@ -139,40 +144,9 @@ public final class ConfigurationEditorFxController {
         for (final XAttributeDefDTO ad : config.ocd.attributeDefs) {
             final Field<?> field = toFxField(ad, config);
             fields.add(field);
+            typeMappings.put(field, ad.type);
         }
         return fields;
-    }
-
-    enum Clazz {
-        STRING(String.class, AttributeDefinition.STRING),
-        INTEGER(Integer.class, AttributeDefinition.INTEGER),
-        INT(int.class, AttributeDefinition.INTEGER),
-        DOUBLE(Double.class, AttributeDefinition.DOUBLE),
-        Double(double.class, AttributeDefinition.DOUBLE),
-        FLOAT(Float.class, AttributeDefinition.FLOAT),
-        Float(float.class, AttributeDefinition.FLOAT),
-        CHAR(Character.class, AttributeDefinition.CHARACTER),
-        Char(String.class, AttributeDefinition.CHARACTER),
-        LONG(Long.class, AttributeDefinition.LONG),
-        Long(String.class, AttributeDefinition.LONG);
-
-        final int      type;
-        final Class<?> clazz;
-
-        Clazz(final Class<?> clazz, final int type) {
-            this.type  = type;
-            this.clazz = clazz;
-        }
-
-        public static int valueOf(final Class<?> clazz) {
-            for (final Clazz v : values()) {
-                if (v.clazz.equals(clazz)) {
-                    return v.type;
-                }
-            }
-            return AttributeDefinition.STRING;
-        }
-
     }
 
     private List<Field<?>> initGenericFields(final XConfigurationDTO config) {
@@ -198,86 +172,151 @@ public final class ConfigurationEditorFxController {
         return fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(true);
     }
 
-    private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, Object currentValue) {
-        final int          type       = ad.type;
-        final List<String> options    = ad.optionValues;
-        final List<String> defaultVal = ad.defaultValue;
-        final String       id         = ad.id;
+    private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, final Object currentValue) {
+        final XAttributeDefType type       = XAttributeDefType.values()[ad.type];
+        final List<String>      options    = ad.optionValues;
+        final List<String>      defaultVal = ad.defaultValue;
+        final String            id         = ad.id;
 
-        currentValue = currentValue != null ? currentValue : defaultVal;
-        return initFieldFromType(currentValue, type, id, options).label(ad.id).labelDescription(ad.description);
+        return initFieldFromType(currentValue, defaultVal, type, options).label(id).labelDescription(ad.description);
     }
 
-    private Field<?> initFieldFromType(Object currentValue, final int type, final String id, final List<String> options) {
-        Field<?> field;
-        switch (type) {
-            case AttributeDefinition.LONG:
-            case AttributeDefinition.INTEGER:
+    private Field<?> initFieldFromType(final Object currentValue, final List<String> defaultValue, final XAttributeDefType adType,
+            final List<String> options) {
+        Field<?> field = null;
+        switch (adType) {
+            case LONG:
+            case INTEGER:
                 if (options != null && !options.isEmpty()) {
-                    if (currentValue instanceof List<?>) {
-                        currentValue = converter.convert(currentValue).to(String.class);
+                    if (currentValue != null) {
+                        final int selection = options.indexOf(currentValue);
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
+                        }), selection);
+                    } else {
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
+                        }));
                     }
-                    final int selection = options.indexOf(currentValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
-                    }), selection);
                     break;
                 }
-                field = Field.ofIntegerType(converter.convert(currentValue).to(int.class));
+                if (currentValue != null) {
+                    field = Field.ofIntegerType(converter.convert(currentValue).to(int.class));
+                } else {
+                    field = Field.ofIntegerType(converter.convert(defaultValue).to(int.class));
+                }
                 break;
-            case AttributeDefinition.FLOAT:
-            case AttributeDefinition.DOUBLE:
+            case FLOAT:
+            case DOUBLE:
                 if (options != null && !options.isEmpty()) {
-                    if (currentValue instanceof List<?>) {
-                        currentValue = converter.convert(currentValue).to(String.class);
+                    if (currentValue != null) {
+                        final int selection = options.indexOf(currentValue);
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
+                        }), selection);
+                    } else {
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
+                        }));
                     }
-                    final int selection = options.indexOf(currentValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
-                    }), selection);
                     break;
                 }
-                field = Field.ofDoubleType(converter.convert(currentValue).to(double.class));
+                if (currentValue != null) {
+                    field = Field.ofDoubleType(converter.convert(currentValue).to(double.class));
+                } else {
+                    field = Field.ofDoubleType(converter.convert(defaultValue).to(double.class));
+                }
                 break;
-            case AttributeDefinition.BOOLEAN:
+            case BOOLEAN:
                 if (options != null && !options.isEmpty()) {
-                    if (currentValue instanceof List<?>) {
-                        currentValue = converter.convert(currentValue).to(String.class);
+                    if (currentValue != null) {
+                        final int selection = options.indexOf(currentValue);
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
+                        }), selection);
+                    } else {
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
+                        }));
                     }
-                    final int selection = options.indexOf(currentValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
-                    }), selection);
                     break;
                 }
-                field = Field.ofBooleanType(converter.convert(currentValue).to(boolean.class));
+                if (currentValue != null) {
+                    field = Field.ofBooleanType(converter.convert(currentValue).to(boolean.class));
+                } else {
+                    field = Field.ofBooleanType(converter.convert(defaultValue).to(boolean.class));
+                }
                 break;
-            case AttributeDefinition.PASSWORD:
-                field = Field.ofPasswordType(currentValue.toString());
+            case PASSWORD:
+                if (currentValue != null) {
+                    field = Field.ofPasswordType(converter.convert(currentValue).to(String.class));
+                } else {
+                    field = Field.ofPasswordType(converter.convert(defaultValue).to(String.class));
+                }
                 break;
-            case AttributeDefinition.CHARACTER:
+            case CHAR:
                 if (options != null && !options.isEmpty()) {
-                    if (currentValue instanceof List<?>) {
-                        currentValue = converter.convert(options).to(String.class);
+                    if (currentValue != null) {
+                        final int selection = options.indexOf(currentValue);
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                        }), selection);
+                    } else {
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                        }));
                     }
-                    final int selection = options.indexOf(currentValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                    }), selection);
                     break;
                 }
-                field = Field.ofStringType(converter.convert(currentValue).to(String.class))
-                        .validate(StringLengthValidator.exactly(1, id + "must be of length 1"));
+                if (currentValue != null) {
+                    field = Field.ofStringType(converter.convert(currentValue).to(String.class))
+                            .validate(StringLengthValidator.exactly(1, "Length must be 1"));
+                } else {
+                    field = Field.ofStringType(converter.convert(defaultValue).to(String.class))
+                            .validate(StringLengthValidator.exactly(1, "Length must be 1"));
+                }
                 break;
-            case AttributeDefinition.STRING:
+            case BOOLEAN_ARRAY:
+            case BOOLEAN_LIST:
+            case DOUBLE_ARRAY:
+            case DOUBLE_LIST:
+            case LONG_ARRAY:
+            case LONG_LIST:
+            case INTEGER_ARRAY:
+            case INTEGER_LIST:
+            case FLOAT_ARRAY:
+            case FLOAT_LIST:
+            case CHAR_ARRAY:
+            case CHAR_LIST:
+            case STRING_ARRAY:
+            case STRING_LIST:
+                if (options != null && !options.isEmpty()) {
+                    if (currentValue != null) {
+                        final List<Integer> selections = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
+                        });
+                        field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                        }), selections);
+                    } else {
+                        field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                        }));
+                    }
+                    break;
+                }
+                break;
+            case STRING:
             default:
                 if (options != null && !options.isEmpty()) {
-                    if (currentValue instanceof List<?>) {
-                        currentValue = converter.convert(currentValue).to(String.class);
+                    if (currentValue != null) {
+                        final int selection = options.indexOf(currentValue);
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                        }), selection);
+                    } else {
+                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                        }));
                     }
-                    final int selection = options.indexOf(currentValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                    }), selection);
                     break;
                 }
-                field = Field.ofStringType(converter.convert(currentValue).to(String.class));
+                if (currentValue != null) {
+                    field = Field.ofStringType(converter.convert(currentValue).to(String.class));
+                } else {
+                    field = Field.ofStringType(converter.convert(defaultValue).to(String.class));
+                }
                 break;
+        }
+        if (field == null) {
+            field = Field.ofStringType("");
         }
         return field;
     }
@@ -291,10 +330,17 @@ public final class ConfigurationEditorFxController {
                 if (!df.isEditable()) {
                     continue;
                 }
-                properties.put(field.getLabel(), df.getValue());
+                final Object originalType = convertToRequestedType(field, df.getValue());
+                properties.put(field.getLabel(), originalType);
             }
         }
         return new Gson().toJson(properties);
+    }
+
+    private Object convertToRequestedType(final Field<?> field, final Object value) {
+        // this controller cannot be loaded if the 'typeMappings' value is of type XAttributeDefType
+        final XAttributeDefType type = XAttributeDefType.values()[typeMappings.get(field)];
+        return converter.convert(value).to(XAttributeDefType.clazz(type));
     }
 
     private Map<String, Object> createCommandMap(final String pid, final String factoryPid, final String properties) {

@@ -25,6 +25,7 @@ import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
 
 import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
+import in.bytehue.osgifx.console.agent.dto.XAttributeDefType;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XObjectClassDefDTO;
 
@@ -184,9 +185,8 @@ public final class XConfigurationtInfoProvider {
 
         dto.id           = ad.getID();
         dto.name         = ad.getName();
-        dto.cardinality  = ad.getCardinality();
         dto.description  = ad.getDescription();
-        dto.type         = ad.getType();
+        dto.type         = defType(ad.getType(), ad.getCardinality()).ordinal();
         dto.optionValues = Optional.ofNullable(ad.getOptionLabels()).map(Arrays::asList).orElse(null);
         dto.defaultValue = Optional.ofNullable(ad.getDefaultValue()).map(Arrays::asList).orElse(null);
 
@@ -216,6 +216,71 @@ public final class XConfigurationtInfoProvider {
     @SafeVarargs
     private static <T> List<T> joinLists(final List<T>... lists) {
         return Stream.of(lists).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private static XAttributeDefType defType(final int defType, final int cardinality) {
+        switch (defType) {
+            case AttributeDefinition.STRING:
+                if (cardinality > 0) {
+                    return XAttributeDefType.STRING_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.STRING_LIST;
+                }
+                return XAttributeDefType.STRING;
+            case AttributeDefinition.LONG:
+                if (cardinality > 0) {
+                    return XAttributeDefType.LONG_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.LONG_LIST;
+                }
+                return XAttributeDefType.LONG;
+            case AttributeDefinition.INTEGER:
+                if (cardinality > 0) {
+                    return XAttributeDefType.INTEGER_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.INTEGER_LIST;
+                }
+                return XAttributeDefType.INTEGER;
+            case AttributeDefinition.CHARACTER:
+                if (cardinality > 0) {
+                    return XAttributeDefType.CHAR_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.CHAR_LIST;
+                }
+                return XAttributeDefType.CHAR;
+            case AttributeDefinition.DOUBLE:
+                if (cardinality > 0) {
+                    return XAttributeDefType.DOUBLE_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.DOUBLE_LIST;
+                }
+                return XAttributeDefType.DOUBLE;
+            case AttributeDefinition.FLOAT:
+                if (cardinality > 0) {
+                    return XAttributeDefType.FLOAT_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.FLOAT_LIST;
+                }
+                return XAttributeDefType.FLOAT;
+            case AttributeDefinition.BOOLEAN:
+                if (cardinality > 0) {
+                    return XAttributeDefType.BOOLEAN_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.BOOLEAN_LIST;
+                }
+                return XAttributeDefType.BOOLEAN;
+            case AttributeDefinition.PASSWORD:
+                return XAttributeDefType.PASSWORD;
+            default:
+                return XAttributeDefType.STRING;
+        }
     }
 
     private enum ConfigurationType {
