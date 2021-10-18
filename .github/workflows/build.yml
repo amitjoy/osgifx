@@ -24,5 +24,6 @@ jobs:
                 java-version: 1.8
                 java-package: jdk+fx
         -   name: Build
-            shell: bash
             run: ./gradlew build
+        -   name: Extract Executable JAR
+            run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
