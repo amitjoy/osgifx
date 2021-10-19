@@ -2,7 +2,11 @@ package in.bytehue.osgifx.console.ui.services;
 
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,6 +19,9 @@ import javafx.scene.control.TableView;
 
 public final class ServiceDetailsFxController {
 
+    @Log
+    @Inject
+    private Logger                                     logger;
     @FXML
     private Label                                      idLabel;
     @FXML
@@ -29,6 +36,11 @@ public final class ServiceDetailsFxController {
     private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
     @FXML
     private ListView<String>                           objectClassesList;
+
+    @FXML
+    public void initialize() {
+        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+    }
 
     void initControls(final XServiceDTO service) {
         idLabel.setText(String.valueOf(service.id));

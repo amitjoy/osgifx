@@ -32,6 +32,7 @@ public final class ConfigurationDeleteHandler {
         }
         try {
             agent.deleteConfiguration(pid);
+            logger.info("Configuration with PID '" + pid + "' has been deleted");
             eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
         } catch (final Exception e) {
             logger.error("Configuration with PID " + pid + "cannot be deleted", e);

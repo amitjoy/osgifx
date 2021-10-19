@@ -11,6 +11,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.command.CommandService;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 import org.osgi.util.converter.TypeReference;
@@ -40,6 +42,9 @@ public final class ConfigurationEditorFxController {
     private static final String CONFIG_UPDATE_COMMAND_ID  = "in.bytehue.osgifx.console.application.command.configuration.update";
     private static final String CONFIG_FACTORY_COMMAND_ID = "in.bytehue.osgifx.console.application.command.configuration.factory";
 
+    @Log
+    @Inject
+    private Logger                 logger;
     @FXML
     private BorderPane             rootPanel;
     @FXML
@@ -61,6 +66,7 @@ public final class ConfigurationEditorFxController {
         typeMappings         = new HashMap<>();
         uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
         converter            = Converters.standardConverter();
+        logger.debug("FXML controller (" + getClass() + ") has been initialized");
     }
 
     void initControls(final XConfigurationDTO config) {
@@ -78,6 +84,7 @@ public final class ConfigurationEditorFxController {
 
         deleteConfigButton.setDisable(config.properties == null || config.isFactory || config.pid == null);
         deleteConfigButton.setOnAction(event -> {
+            logger.info("Configuration delete request has been sent for " + pid);
             commandService.execute(CONFIG_DELETE_COMMAND_ID, createCommandMap(pid, null, null));
         });
         saveConfigButton.setOnAction(event -> {
@@ -88,9 +95,11 @@ public final class ConfigurationEditorFxController {
             }
             if (config.isFactory) {
                 final String ocdFactoryPid = ocd.factoryPid;
+                logger.info("Factory configuration create request has been sent for " + ocdFactoryPid);
                 commandService.execute(CONFIG_FACTORY_COMMAND_ID, createCommandMap(null, ocdFactoryPid, properties));
                 return;
             }
+            logger.info("Configuration create request has been sent for " + effectivePID);
             commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(effectivePID, null, properties));
         });
         cancelButton.setOnAction(e -> form.reset());

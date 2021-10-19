@@ -14,6 +14,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 import org.osgi.service.prefs.BackingStoreException;
 
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
@@ -23,6 +25,9 @@ import in.bytehue.osgifx.console.util.fx.Fx;
 
 public final class EventReceiveMenuContributionHandler {
 
+    @Log
+    @Inject
+    private Logger              logger;
     @Inject
     private Supervisor          supervisor;
     @Inject
@@ -39,8 +44,10 @@ public final class EventReceiveMenuContributionHandler {
         final boolean currentState = getCurrentState();
         if (currentState) {
             supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
+            logger.info("OSGi event consmer has been added");
         } else {
             supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
+            logger.info("OSGi event consmer has been removed");
         }
     }
 

@@ -16,6 +16,8 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.util.fx.Fx;
@@ -34,6 +36,9 @@ import javafx.scene.paint.Color;
 
 public final class BundlesFxUI {
 
+    @Log
+    @Inject
+    private Logger           logger;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.bundles")
     private BundleContext    context;
@@ -43,6 +48,7 @@ public final class BundlesFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
+        logger.debug("Bundles part has been initialized");
     }
 
     @Focus
@@ -56,6 +62,7 @@ public final class BundlesFxUI {
             @UIEventTopic(BUNDLE_ACTION_EVENT_TOPICS) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
+        logger.debug("Bundle action event received by " + getClass().getName());
         createControls(parent, loader);
     }
 
@@ -65,6 +72,7 @@ public final class BundlesFxUI {
             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
+        logger.info("Agent connected event received by " + getClass().getName());
         createControls(parent, loader);
     }
 
@@ -74,6 +82,7 @@ public final class BundlesFxUI {
             @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
+        logger.info("Agent disconnected event received by " + getClass().getName());
         createControls(parent, loader);
     }
 

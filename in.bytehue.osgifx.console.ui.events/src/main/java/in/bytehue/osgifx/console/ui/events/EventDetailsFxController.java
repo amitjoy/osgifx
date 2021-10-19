@@ -3,6 +3,10 @@ package in.bytehue.osgifx.console.ui.events;
 import java.util.Date;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 
@@ -16,6 +20,9 @@ import javafx.scene.control.TableView;
 
 public final class EventDetailsFxController {
 
+    @Log
+    @Inject
+    private Logger                                     logger;
     @FXML
     private Label                                      receivedAtLabel;
     @FXML
@@ -31,6 +38,7 @@ public final class EventDetailsFxController {
     @FXML
     public void initialize() {
         converter = Converters.standardConverter();
+        logger.debug("FXML controller (" + getClass() + ") has been initialized");
     }
 
     public void initControls(final XEventDTO event) {

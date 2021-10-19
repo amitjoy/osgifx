@@ -39,9 +39,10 @@ public final class FactoryConfigurationCreateHandler {
             final Map<String, Object> props = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
             }.getType());
             agent.createFactoryConfiguration(factoryPID, props);
+            logger.info("Factory configuration with factory PID '" + factoryPID + "' has been created");
             eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
         } catch (final Exception e) {
-            logger.error("Factory Configuration with Factory PID " + factoryPID + "cannot be created", e);
+            logger.error("Factory Configuration with factory PID '" + factoryPID + "' cannot be created", e);
         }
     }
 

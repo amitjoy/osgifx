@@ -33,6 +33,7 @@ public final class ComponentEnableHandler {
         try {
             final String error = agent.enableComponent(name);
             if (error == null) {
+                logger.info("Component with name " + name + " has been enabled");
                 eventBroker.send(COMPONENT_ENABLED_EVENT_TOPIC, name);
             } else {
                 logger.error(error);

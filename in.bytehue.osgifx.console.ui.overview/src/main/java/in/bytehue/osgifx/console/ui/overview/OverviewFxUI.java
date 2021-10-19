@@ -7,6 +7,7 @@ import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,6 +23,10 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
+
+import com.google.common.collect.Maps;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
@@ -30,6 +35,7 @@ import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
+import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -55,6 +61,9 @@ public final class OverviewFxUI {
     private static final double TILE_WIDTH  = 400;
     private static final double TILE_HEIGHT = 200;
 
+    @Log
+    @Inject
+    private Logger          logger;
     @Inject
     private Supervisor      supervisor;
     private final StatusBar statusBar = new StatusBar();
@@ -64,6 +73,7 @@ public final class OverviewFxUI {
         // hack to reset the css
         parent.setOnMouseClicked(event -> createControls(parent));
         createControls(parent);
+        logger.debug("Overview part has been initialized");
     }
 
     @Focus
@@ -92,7 +102,8 @@ public final class OverviewFxUI {
         clockTile.setRoundedCorners(false);
 
         final double noOfThreads = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                     .map(agent -> agent.getAllThreads().size())
+                                                     .map(Agent::getAllThreads)
+                                                     .map(List::size)
                                                      .map(Double::valueOf)
                                                      .orElse(0.0d);
         final Tile noOfThreadsTile = TileBuilder.create()
@@ -108,7 +119,8 @@ public final class OverviewFxUI {
         noOfThreadsTile.setRoundedCorners(false);
 
         final Map<String, String> runtimeInfo = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                                  .map(agent -> new HashMap<>(agent.runtimeInfo()))
+                                                                  .map(Agent::runtimeInfo)
+                                                                  .map(Maps::newHashMap)
                                                                   .orElse(new HashMap<>());
         final Tile runtimeInfoTile = TileBuilder.create()
                                                 .skinType(SkinType.CUSTOM)
@@ -120,7 +132,8 @@ public final class OverviewFxUI {
         runtimeInfoTile.setRoundedCorners(false);
 
         final double noOfInstalledBundles = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                              .map(agent -> agent.getAllBundles().size())
+                                                              .map(Agent::getAllBundles)
+                                                              .map(List::size)
                                                               .map(Double::valueOf)
                                                               .orElse(0.0d);
         final Tile noOfBundlesTile = TileBuilder.create()
@@ -136,7 +149,8 @@ public final class OverviewFxUI {
         noOfBundlesTile.setRoundedCorners(false);
 
         final double noOfServices = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                      .map(agent -> agent.getAllServices().size())
+                                                      .map(Agent::getAllServices)
+                                                      .map(List::size)
                                                       .map(Double::valueOf)
                                                       .orElse(0.0d);
         final Tile noOfServicesTile = TileBuilder.create()
@@ -153,7 +167,8 @@ public final class OverviewFxUI {
         noOfServicesTile.setRoundedCorners(false);
 
         final double noOfComponents = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                        .map(agent -> agent.getAllComponents().size())
+                                                        .map(Agent::getAllComponents)
+                                                        .map(List::size)
                                                         .map(Double::valueOf)
                                                         .orElse(0.0d);
         final Tile noOfComponentsTile = TileBuilder.create()
@@ -224,7 +239,8 @@ public final class OverviewFxUI {
         availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
 
         final UptimeDTO uptime = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                   .map(agent -> new HashMap<>(agent.runtimeInfo()))
+                                                   .map(Agent::runtimeInfo)
+                                                   .map(Maps::newHashMap)
                                                    .filter(info -> !info.isEmpty())
                                                    .map(info -> info.get("Uptime"))
                                                    .map(Long::valueOf)
@@ -355,7 +371,8 @@ public final class OverviewFxUI {
     private long getMemory(final String key) {
         // @formatter:off
         return java.util.Optional.ofNullable(supervisor.getAgent())
-                                 .map(agent -> new HashMap<>(agent.runtimeInfo()))
+                                 .map(Agent::runtimeInfo)
+                                 .map(Maps::newHashMap)
                                  .filter(info -> !info.isEmpty())
                                  .map(info -> info.get(key))
                                  .map(Long::valueOf)
@@ -369,6 +386,7 @@ public final class OverviewFxUI {
             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
+        logger.info("Agent connected event received by " + getClass().getName());
         createWidgets(parent);
     }
 
@@ -378,6 +396,7 @@ public final class OverviewFxUI {
             @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
+        logger.info("Agent disconnected event received by " + getClass().getName());
         createWidgets(parent);
     }
 

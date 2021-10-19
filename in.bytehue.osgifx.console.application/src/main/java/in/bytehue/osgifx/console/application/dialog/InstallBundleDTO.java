@@ -2,7 +2,9 @@ package in.bytehue.osgifx.console.application.dialog;
 
 import java.io.File;
 
-public final class InstallBundleDTO {
+import org.osgi.dto.DTO;
+
+public final class InstallBundleDTO extends DTO {
 
     public File    file;
     public boolean startBundle;
