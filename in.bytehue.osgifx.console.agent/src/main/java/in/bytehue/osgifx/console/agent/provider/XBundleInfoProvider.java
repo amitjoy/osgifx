@@ -72,6 +72,10 @@ public final class XBundleInfoProvider {
         final List<XBundleInfoDTO> attachedHosts = new ArrayList<>();
         final BundleWiring         wiring        = bundle.adapt(BundleWiring.class);
 
+        // wiring can be null for non-started installed bundles
+        if (wiring == null) {
+            return Collections.emptyList();
+        }
         for (final BundleWire wire : wiring.getRequiredWires(HOST_NAMESPACE)) {
             final Bundle         b   = wire.getProviderWiring().getBundle();
             final XBundleInfoDTO dto = new XBundleInfoDTO();
@@ -87,6 +91,10 @@ public final class XBundleInfoProvider {
         final List<XBundleInfoDTO> attachedFragments = new ArrayList<>();
         final BundleWiring         wiring            = bundle.adapt(BundleWiring.class);
 
+        // wiring can be null for non-started installed bundles
+        if (wiring == null) {
+            return Collections.emptyList();
+        }
         for (final BundleWire wire : wiring.getProvidedWires(HOST_NAMESPACE)) {
             final Bundle         b   = wire.getRequirerWiring().getBundle();
             final XBundleInfoDTO dto = new XBundleInfoDTO();
