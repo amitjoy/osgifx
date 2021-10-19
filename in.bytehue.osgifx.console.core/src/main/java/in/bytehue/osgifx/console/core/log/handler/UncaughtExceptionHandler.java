@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.core.data.log.handler;
+package in.bytehue.osgifx.console.core.log.handler;
 
 import org.eclipse.fx.core.ExceptionHandler;
 import org.eclipse.fx.core.log.Logger;

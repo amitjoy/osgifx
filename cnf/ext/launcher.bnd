@@ -8,7 +8,7 @@
 -runsystemcapabilities          =         ${native_capability}
 -runpath.efx                    =         org.eclipse.fx.osgi
 -runproperties.scr              =         ds.log.enabled=false
-#-runproperties.workspace        =         osgi.instance.area.default=${target-dir}
+-runproperties.workspace        =         osgi.instance.area.default=osgifx-ws
 -runblacklist                   =         in.bytehue.osgifx.console.api 
 
 -runproperties.efx              =         osgi.framework.extensions=org.eclipse.fx.osgi,\
