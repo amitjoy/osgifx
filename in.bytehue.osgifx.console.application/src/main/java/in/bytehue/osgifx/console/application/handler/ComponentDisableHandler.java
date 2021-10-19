@@ -33,6 +33,7 @@ public final class ComponentDisableHandler {
         try {
             final String error = agent.disableComponent(Long.parseLong(id));
             if (error == null) {
+                logger.info("Component with ID " + id + " has been disabled");
                 eventBroker.send(COMPONENT_DISABLED_EVENT_TOPIC, id);
             } else {
                 logger.error(error);

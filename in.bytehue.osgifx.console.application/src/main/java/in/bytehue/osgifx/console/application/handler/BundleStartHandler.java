@@ -33,6 +33,7 @@ public final class BundleStartHandler {
         try {
             final String error = agent.start(Long.parseLong(id));
             if (error == null) {
+                logger.info("Bundle with ID " + id + " has been started");
                 eventBroker.send(BUNDLE_STARTED_EVENT_TOPIC, id);
             } else {
                 logger.error(error);

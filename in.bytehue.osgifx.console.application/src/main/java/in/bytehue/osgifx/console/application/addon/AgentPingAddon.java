@@ -18,6 +18,8 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
@@ -25,6 +27,9 @@ public final class AgentPingAddon {
 
     private static final String CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.connection";
 
+    @Log
+    @Inject
+    private Logger                   logger;
     @Inject
     private Supervisor               supervisor;
     @Inject
@@ -37,7 +42,8 @@ public final class AgentPingAddon {
 
     @PostConstruct
     public void init() {
-        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "agent-ping"));
+        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "osgifx-agent-ping"));
+        logger.info("Agent ping addon has been initialized");
     }
 
     @Inject
@@ -60,6 +66,7 @@ public final class AgentPingAddon {
     @PreDestroy
     private void destory() {
         executor.shutdownNow();
+        logger.info("Agent ping addon has been destroyed");
     }
 
 }

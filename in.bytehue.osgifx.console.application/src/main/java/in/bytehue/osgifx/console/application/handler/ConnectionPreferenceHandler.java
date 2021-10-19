@@ -50,9 +50,11 @@ public final class ConnectionPreferenceHandler {
         if ("ADD".equals(type)) {
             connections.add(dto);
             connectionsProvider.addConnection(dto);
+            logger.info("New connection has been added: " + dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
             connectionsProvider.removeConnection(dto);
+            logger.info("Connection has been deleted: " + dto);
         } else {
             logger.warning(String.format("Cannot execute command %s}' with type '%s'", getClass().getSimpleName(), type));
         }

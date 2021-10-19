@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.command.CommandService;
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 
@@ -111,6 +113,9 @@ public final class BundleDetailsFxController {
     private TableColumn<XBundleInfoDTO, String>        attachedFragmentsIdTableColumn;
     @FXML
     private TableColumn<XBundleInfoDTO, String>        attachedFragmentsBsnTableColumn;
+    @Log
+    @Inject
+    private Logger                                     logger;
     @Inject
     private CommandService                             commandService;
     private Converter                                  converter;
@@ -118,6 +123,7 @@ public final class BundleDetailsFxController {
     @FXML
     public void initialize() {
         converter = Converters.standardConverter();
+        logger.debug("FXML controller (" + getClass() + ") has been initialized");
     }
 
     void initControls(final XBundleDTO bundle) {
@@ -186,12 +192,15 @@ public final class BundleDetailsFxController {
 
     private void registerButtonHandlers(final XBundleDTO bundle) {
         startBundleButton.setOnAction(a -> {
+            logger.info("Bundle start request has been sent for " + bundle.id);
             commandService.execute(BUNDLE_START_COMMAND_ID, createCommandMap(bundle.id));
         });
         stopBundleButton.setOnAction(a -> {
+            logger.info("Bundle stop request has been sent for " + bundle.id);
             commandService.execute(BUNDLE_STOP_COMMAND_ID, createCommandMap(bundle.id));
         });
         uninstallBundleButton.setOnAction(a -> {
+            logger.info("Bundle uninstall request has been sent for " + bundle.id);
             commandService.execute(BUNDLE_UNINSTALL_COMMAND_ID, createCommandMap(bundle.id));
         });
     }

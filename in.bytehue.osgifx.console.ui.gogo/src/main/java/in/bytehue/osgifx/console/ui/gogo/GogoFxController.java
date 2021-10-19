@@ -2,6 +2,9 @@ package in.bytehue.osgifx.console.ui.gogo;
 
 import javax.inject.Inject;
 
+import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.log.Logger;
+
 import com.google.common.base.Throwables;
 
 import in.bytehue.osgifx.console.agent.Agent;
@@ -13,6 +16,9 @@ import javafx.scene.input.KeyEvent;
 
 public final class GogoFxController {
 
+    @Log
+    @Inject
+    private Logger             logger;
     @FXML
     private TextField          input;
     @FXML
@@ -28,6 +34,7 @@ public final class GogoFxController {
     public void initialize() {
         historyPointer = 0;
         agent          = supervisor.getAgent();
+        logger.debug("FXML controller (" + getClass() + ") has been initialized");
     }
 
     @FXML

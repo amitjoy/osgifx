@@ -39,6 +39,7 @@ public final class ConfigurationUpdateHandler {
             final Map<String, Object> props = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
             }.getType());
             agent.updateConfiguration(pid, props);
+            logger.info("Configuration with PID '" + pid + "' has been updated");
             eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
         } catch (final Exception e) {
             logger.error("Configuration with PID " + pid + "cannot be updated", e);

@@ -33,6 +33,7 @@ public final class BundleStopHandler {
         try {
             final String error = agent.stop(Long.parseLong(id));
             if (error == null) {
+                logger.info("Bundle with ID " + id + " has been stopped");
                 eventBroker.send(BUNDLE_STOPPED_EVENT_TOPIC, id);
             } else {
                 logger.error(error);

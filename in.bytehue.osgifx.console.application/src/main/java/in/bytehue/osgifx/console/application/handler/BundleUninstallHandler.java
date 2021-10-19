@@ -33,6 +33,7 @@ public final class BundleUninstallHandler {
         try {
             final String error = agent.uninstall(Long.parseLong(id));
             if (error == null) {
+                logger.info("Bundle with ID " + id + " has been uninstalled");
                 eventBroker.send(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
             } else {
                 logger.error(error);

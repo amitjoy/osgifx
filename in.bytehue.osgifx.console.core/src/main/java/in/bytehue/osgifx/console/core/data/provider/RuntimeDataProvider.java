@@ -1,7 +1,11 @@
 package in.bytehue.osgifx.console.core.data.provider;
 
+import static in.bytehue.osgifx.console.util.fx.ConsoleFXHelper.makeNullSafe;
+
 import java.util.function.Consumer;
 
+import org.eclipse.fx.core.log.Logger;
+import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -24,8 +28,11 @@ import javafx.collections.ObservableList;
 @Component
 public final class RuntimeDataProvider implements DataProvider, Consumer<XEventDTO> {
 
+    private Logger        logger;
     @Reference
-    private Supervisor supervisor;
+    private Supervisor    supervisor;
+    @Reference
+    private LoggerFactory factory;
 
     private final ObservableList<XBundleDTO>        bundles        = FXCollections.observableArrayList();
     private final ObservableList<XServiceDTO>       services       = FXCollections.observableArrayList();
@@ -35,14 +42,19 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableList<XThreadDTO>        threads        = FXCollections.observableArrayList();
     private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
 
+    void activate() {
+        logger = factory.createLogger(getClass().getName());
+    }
+
     @Override
     public synchronized ObservableList<XBundleDTO> bundles() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
+            logger.warning("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         bundles.clear();
-        bundles.addAll(agent.getAllBundles());
+        bundles.addAll(makeNullSafe(agent.getAllBundles()));
         return bundles;
     }
 
@@ -50,10 +62,11 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XServiceDTO> services() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
+            logger.warning("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         services.clear();
-        services.addAll(agent.getAllServices());
+        services.addAll(makeNullSafe(agent.getAllServices()));
         return services;
     }
 
@@ -61,10 +74,11 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XComponentDTO> components() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
+            logger.warning("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         components.clear();
-        components.addAll(agent.getAllComponents());
+        components.addAll(makeNullSafe(agent.getAllComponents()));
         return components;
     }
 
@@ -72,10 +86,11 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XConfigurationDTO> configurations() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
+            logger.warning("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         configurations.clear();
-        configurations.addAll(agent.getAllConfigurations());
+        configurations.addAll(makeNullSafe(agent.getAllConfigurations()));
         return configurations;
     }
 
@@ -93,10 +108,11 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XPropertyDTO> properties() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
+            logger.warning("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         properties.clear();
-        properties.addAll(agent.getAllProperties());
+        properties.addAll(makeNullSafe(agent.getAllProperties()));
         return properties;
     }
 
@@ -104,10 +120,11 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XThreadDTO> threads() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
+            logger.warning("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         threads.clear();
-        threads.addAll(agent.getAllThreads());
+        threads.addAll(makeNullSafe(agent.getAllThreads()));
         return threads;
     }
 
