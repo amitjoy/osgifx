@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.FieldPosition;
-import java.text.Format;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,20 +33,19 @@ import java.util.logging.Logger;
  * Based on http://javablog.co.uk/2008/07/12/logging-with-javautillogging/
  * %E Eclipse format was added with flag to avoid Stack trace generation if Eclipse format not used.
  */
-public class CustomFormatter extends Formatter {
+public final class CustomLogFormatter extends Formatter {
 
     // milliseconds can be nice for rough performance numbers
-    public static final String      DATE_FORMAT       = "yyyy-MM-dd HH:mm:ss.SSS Z";
-    private static final DateFormat defaultDateFormat = new SimpleDateFormat(DATE_FORMAT);
-    // private static final String USACE_DATE_FORMAT = "yyyyMMdd HHmmss Z";
-    public static final String               DEFAULT_FORMAT = "%t %L: %E %m";
-    protected static final StackTraceElement nullElement    = new StackTraceElement("?", "?", "?", -1);
+    public static final String               DATE_FORMAT         = "yyyy-MM-dd HH:mm:ss.SSS Z";
+    private static final DateFormat          DEFAULT_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
+    public static final String               DEFAULT_FORMAT      = "%t [%L] [%c] %m";
+    protected static final StackTraceElement nullElement         = new StackTraceElement("?", "?", "?", -1);
 
     private final MessageFormat messageFormat;
     private final boolean[]     needsArg;
     private final DateFormat    dateFormat;
 
-    public CustomFormatter() {
+    public CustomLogFormatter() {
         final LogManager logManager = LogManager.getLogManager();
         final String     classname  = getClass().getName();
 
@@ -59,7 +57,7 @@ public class CustomFormatter extends Formatter {
         if (strDateFormat != null) {
             dateFormat = new SimpleDateFormat(strDateFormat);
         } else {
-            dateFormat = defaultDateFormat;
+            dateFormat = DEFAULT_DATE_FORMAT;
         }
         final String dateFormatTimeZoneKey = classname + ".date.timezone";
         final String strDateFormatTimeZone = logManager.getProperty(dateFormatTimeZoneKey);
@@ -81,9 +79,8 @@ public class CustomFormatter extends Formatter {
                 .replace("%T", "{5}").replace("%n", "{6}").replace("%C", "{7}").replace("%E", "{8}") + "\n";
 
         messageFormat = new MessageFormat(format);
-        final Format[] formatsByArgumentIndex = messageFormat.getFormatsByArgumentIndex();
-        needsArg = new boolean[formatsByArgumentIndex.length];
-        for (int i = 0; i < formatsByArgumentIndex.length; i++) {
+        needsArg      = new boolean[9];
+        for (int i = 0; i < 9; i++) {
             needsArg[i] = format.contains("{" + i + "}");
         }
     }
@@ -197,7 +194,7 @@ public class CustomFormatter extends Formatter {
      * @param result the StringBuffer where the message text is to be appended
      * @return StringBuffer where the message text was appended
      */
-    public synchronized StringBuffer formatMessage(final LogRecord record, final StringBuffer result) { 
+    public synchronized StringBuffer formatMessage(final LogRecord record, final StringBuffer result) {
         // This is the default formatMessage implementation from
         // java.util.logging.Formatter except that it has been
         // modified to operate on the passed in StringBuffer.

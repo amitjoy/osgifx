@@ -42,7 +42,7 @@ public final class ConfigurationUpdateHandler {
             logger.info("Configuration with PID '" + pid + "' has been updated");
             eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
         } catch (final Exception e) {
-            logger.error("Configuration with PID " + pid + "cannot be updated", e);
+            logger.error("Configuration with PID " + pid + " cannot be updated", e);
         }
     }
 
