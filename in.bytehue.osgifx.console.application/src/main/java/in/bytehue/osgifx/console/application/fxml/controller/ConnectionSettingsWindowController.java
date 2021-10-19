@@ -126,7 +126,7 @@ public final class ConnectionSettingsWindowController {
                     supervisor.connect(selectedConnection.host, selectedConnection.port, selectedConnection.timeout);
                     logger.info("Successfully connected to " + selectedConnection);
                 } catch (final Exception e) {
-                    logger.info("Cannot connect to " + selectedConnection);
+                    logger.error("Cannot connect to " + selectedConnection, e);
                     Platform.runLater(() -> {
                         progressDialog.close();
                         final ExceptionDialog dialog = new ExceptionDialog(e);

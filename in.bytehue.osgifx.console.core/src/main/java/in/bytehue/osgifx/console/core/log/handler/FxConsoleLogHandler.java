@@ -12,7 +12,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 
-import in.bytehue.osgifx.console.util.fx.CustomFormatter;
+import in.bytehue.osgifx.console.util.fx.CustomLogFormatter;
 
 @Component(service = Handler.class)
 public final class FxConsoleLogHandler extends Handler {
@@ -20,7 +20,7 @@ public final class FxConsoleLogHandler extends Handler {
     private static final String LOG_FILE_NAME = "log.txt";
 
     private final FileHandler     fileHandler;
-    private final CustomFormatter formatter;
+    private final CustomLogFormatter formatter;
 
     @Activate
     public FxConsoleLogHandler(final BundleContext context) throws SecurityException, IOException, URISyntaxException {
@@ -37,7 +37,7 @@ public final class FxConsoleLogHandler extends Handler {
         // create missing directories
         logDirectory.mkdirs();
 
-        formatter   = new CustomFormatter();
+        formatter   = new CustomLogFormatter();
         fileHandler = new FileHandler(logDirectory.getPath() + "/" + LOG_FILE_NAME, true);
         fileHandler.setFormatter(formatter);
     }
