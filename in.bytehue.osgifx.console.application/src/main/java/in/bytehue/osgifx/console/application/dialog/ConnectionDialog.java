@@ -9,6 +9,8 @@ import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.Log;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -22,6 +24,9 @@ import javafx.stage.StageStyle;
 
 public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
+    @Log
+    @Inject
+    private FluentLogger      logger;
     @Inject
     private ThreadSynchronize threadSync;
     private ButtonType        saveButtonType;
@@ -114,11 +119,16 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 }
             }, String.format(requiredNumberFormat, portCaption)));
         });
-        setResultConverter(
-                dialogButton -> dialogButton == saveButtonType
-                        ? new ConnectionSettingDTO(txtHostname.getText(), Integer.parseInt(txtPort.getText()),
-                                Integer.parseInt(txtTimeout.getText()))
-                        : null);
+        setResultConverter(dialogButton -> {
+            try {
+                final int port    = Integer.parseInt(txtPort.getText());
+                final int timeout = Integer.parseInt(txtTimeout.getText());
+                return dialogButton == saveButtonType ? new ConnectionSettingDTO(txtHostname.getText(), port, timeout) : null;
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Connection settings cannot be added due to validation problem");
+                throw e;
+            }
+        });
     }
 
 }
