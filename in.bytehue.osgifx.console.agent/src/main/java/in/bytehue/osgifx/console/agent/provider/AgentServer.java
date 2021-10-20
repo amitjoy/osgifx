@@ -44,6 +44,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
@@ -91,6 +93,7 @@ import in.bytehue.osgifx.console.supervisor.Supervisor;
  * interfaces and communicates with a Supervisor interfaces.
  */
 public final class AgentServer implements Agent, Closeable, EventHandler {
+
     private static final Pattern       BSN_P    = Pattern.compile("\\s*([^;\\s]+).*");
     private static final AtomicInteger sequence = new AtomicInteger(1000);
 
@@ -134,11 +137,14 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
 
     private final ServiceTracker<MetaTypeService, MetaTypeService>                 metatypeTracker;
     private final ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
+    private final ServiceTracker<Object, Object>                                   gogoCommandsTracker;
     private final ServiceTracker<ConfigurationAdmin, ConfigurationAdmin>           configAdminTracker;
 
     private final AtomicInteger infoFrameworkEvents    = new AtomicInteger();
     private final AtomicInteger warningFrameworkEvents = new AtomicInteger();
     private final AtomicInteger errorFrameworkEvents   = new AtomicInteger();
+
+    private final Set<String> gogoCommands = new HashSet<>();
 
     /**
      * An agent server is based on a context and takes a name and cache
@@ -147,13 +153,14 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
      * @param name the name of the agent's framework
      * @param context a bundle context of the framework
      * @param cache the directory for caching
+     * @throws InvalidSyntaxException if the filter is erroneous
      */
-
-    public AgentServer(final String name, final BundleContext context, final File cache) {
+    public AgentServer(final String name, final BundleContext context, final File cache) throws InvalidSyntaxException {
         this(name, context, cache, StartLevelRuntimeHandler.absent());
     }
 
-    public AgentServer(final String name, final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels) {
+    public AgentServer(final String name, final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels)
+            throws InvalidSyntaxException {
         this.context = context;
 
         final boolean eager = context.getProperty(aQute.bnd.osgi.Constants.LAUNCH_ACTIVATION_EAGER) != null;
@@ -162,13 +169,51 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
         this.cache       = new ShaCache(cache);
         this.startlevels = startlevels;
 
-        metatypeTracker    = new ServiceTracker<>(context, MetaTypeService.class, null);
-        scrTracker         = new ServiceTracker<>(context, ServiceComponentRuntime.class, null);
-        configAdminTracker = new ServiceTracker<>(context, ConfigurationAdmin.class, null);
+        final Filter filter = context.createFilter("(osgi.command.scope=*)");
+
+        metatypeTracker     = new ServiceTracker<>(context, MetaTypeService.class, null);
+        scrTracker          = new ServiceTracker<>(context, ServiceComponentRuntime.class, null);
+        configAdminTracker  = new ServiceTracker<>(context, ConfigurationAdmin.class, null);
+        gogoCommandsTracker = new ServiceTracker<Object, Object>(context, filter, null) {
+                                @Override
+                                public Object addingService(final ServiceReference<Object> reference) {
+                                    final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
+                                    final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                    addCommand(scope, functions);
+                                    return super.addingService(reference);
+                                }
+
+                                @Override
+                                public void removedService(final ServiceReference<Object> reference, final Object service) {
+                                    final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
+                                    final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                    removeCommand(scope, functions);
+                                }
+
+                                private String[] adapt(final Object value) {
+                                    if (value instanceof String[]) {
+                                        return (String[]) value;
+                                    }
+                                    return new String[] { value.toString() };
+                                }
+
+                                private void addCommand(final String scope, final String... commands) {
+                                    for (final String command : commands) {
+                                        gogoCommands.add(scope + ":" + command);
+                                    }
+                                }
+
+                                private void removeCommand(final String scope, final String... commands) {
+                                    for (final String command : commands) {
+                                        gogoCommands.remove(scope + ":" + command);
+                                    }
+                                }
+                            };
 
         scrTracker.open();
         metatypeTracker.open();
         configAdminTracker.open();
+        gogoCommandsTracker.open();
     }
 
     /**
@@ -592,6 +637,7 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
             scrTracker.close();
             metatypeTracker.close();
             configAdminTracker.close();
+            gogoCommandsTracker.close();
             cleanup(-2);
             startlevels.close();
         } catch (final Exception e) {
@@ -1038,6 +1084,11 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
 
         final Supervisor supervisor = getSupervisor();
         supervisor.onOSGiEvent(dto);
+    }
+
+    @Override
+    public Set<String> getGogoCommands() {
+        return gogoCommands;
     }
 
     private Map<String, String> initProperties(final Event event) {

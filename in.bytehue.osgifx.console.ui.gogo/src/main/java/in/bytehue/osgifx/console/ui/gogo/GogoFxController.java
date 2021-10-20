@@ -1,7 +1,10 @@
 package in.bytehue.osgifx.console.ui.gogo;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 
+import org.controlsfx.control.textfield.TextFields;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -35,6 +38,10 @@ public final class GogoFxController {
         historyPointer = 0;
         agent          = supervisor.getAgent();
         logger.atDebug().log("FXML controller has been initialized");
+        final Set<String> gogoCommands = agent.getGogoCommands();
+        if (gogoCommands != null) {
+            TextFields.bindAutoCompletion(input, gogoCommands);
+        }
     }
 
     @FXML
