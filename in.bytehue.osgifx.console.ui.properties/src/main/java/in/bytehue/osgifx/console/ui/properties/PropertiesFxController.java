@@ -3,8 +3,8 @@ package in.bytehue.osgifx.console.ui.properties;
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
@@ -19,7 +19,7 @@ public final class PropertiesFxController {
 
     @Log
     @Inject
-    private Logger                            logger;
+    private FluentLogger                      logger;
     @FXML
     private TableView<XPropertyDTO>           propertyTable;
     @FXML
@@ -44,7 +44,7 @@ public final class PropertiesFxController {
 
         TableFilter.forTableView(propertyTable).apply();
 
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
 }

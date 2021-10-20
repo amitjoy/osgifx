@@ -7,8 +7,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
@@ -17,7 +17,7 @@ public final class BundleUninstallHandler {
 
     @Log
     @Inject
-    private Logger       logger;
+    private FluentLogger logger;
     @Inject
     private IEventBroker eventBroker;
     @Inject
@@ -27,19 +27,19 @@ public final class BundleUninstallHandler {
     public void execute(@Named("id") final String id) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
-            logger.error("Remote agent cannot be connected");
+            logger.atWarning().log("Remote agent cannot be connected");
             return;
         }
         try {
             final String error = agent.uninstall(Long.parseLong(id));
             if (error == null) {
-                logger.info("Bundle with ID " + id + " has been uninstalled");
+                logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
                 eventBroker.send(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
             } else {
-                logger.error(error);
+                logger.atError().log(error);
             }
         } catch (final Exception e) {
-            logger.error("Bundle " + id + "cannot be uninstalled", e);
+            logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);
         }
     }
 

@@ -5,8 +5,8 @@ import java.io.File;
 import javax.inject.Inject;
 
 import org.controlsfx.control.ToggleSwitch;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.application.dialog.InstallBundleDTO;
 import javafx.event.ActionEvent;
@@ -16,23 +16,23 @@ import javafx.stage.FileChooser;
 
 public final class InstallBundleDialogController {
 
+    @Log
+    @Inject
+    private FluentLogger logger;
+    private File         bundle;
     @FXML
     private Button       fileChooser;
     @FXML
     private ToggleSwitch startBundleToggle;
-    @Log
-    @Inject
-    private Logger       logger;
-    private File         bundle;
 
     @FXML
     public void initialize() {
-        logger.info("FXML controller (" + getClass() + ") has been initialized");
+        logger.atInfo().log("FXML controller has been initialized");
     }
 
     @FXML
     private void chooseBundle(final ActionEvent event) {
-        logger.debug("FXML controller (" + getClass() + ") 'chooseBundle(..)' event has been invoked");
+        logger.atInfo().log("FXML controller 'chooseBundle(..)' event has been invoked");
         final FileChooser bundleChooser = new FileChooser();
         bundleChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JAR Files", "*.jar"));
         bundle = bundleChooser.showOpenDialog(null);

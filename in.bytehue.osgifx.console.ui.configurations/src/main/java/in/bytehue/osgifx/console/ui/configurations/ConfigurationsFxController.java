@@ -8,8 +8,8 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
@@ -28,7 +28,7 @@ public final class ConfigurationsFxController {
 
     @Log
     @Inject
-    private Logger                                                         logger;
+    private FluentLogger                                                   logger;
     @Inject
     @LocalInstance
     private FXMLLoader                                                     loader;
@@ -45,7 +45,7 @@ public final class ConfigurationsFxController {
     public void initialize() {
         table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         createControls();
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     private void createControls() {

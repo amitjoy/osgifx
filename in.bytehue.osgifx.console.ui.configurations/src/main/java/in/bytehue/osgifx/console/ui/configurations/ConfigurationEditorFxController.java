@@ -11,8 +11,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.command.CommandService;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 import org.osgi.util.converter.TypeReference;
@@ -44,7 +44,7 @@ public final class ConfigurationEditorFxController {
 
     @Log
     @Inject
-    private Logger                 logger;
+    private FluentLogger           logger;
     @FXML
     private BorderPane             rootPanel;
     @FXML
@@ -66,7 +66,7 @@ public final class ConfigurationEditorFxController {
         typeMappings         = new HashMap<>();
         uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
         converter            = Converters.standardConverter();
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     void initControls(final XConfigurationDTO config) {
@@ -84,7 +84,7 @@ public final class ConfigurationEditorFxController {
 
         deleteConfigButton.setDisable(config.properties == null || config.isFactory || config.pid == null);
         deleteConfigButton.setOnAction(event -> {
-            logger.info("Configuration delete request has been sent for " + pid);
+            logger.atInfo().log("Configuration delete request has been sent for PID '%s'", pid);
             commandService.execute(CONFIG_DELETE_COMMAND_ID, createCommandMap(pid, null, null));
         });
         saveConfigButton.setOnAction(event -> {
@@ -95,11 +95,11 @@ public final class ConfigurationEditorFxController {
             }
             if (config.isFactory) {
                 final String ocdFactoryPid = ocd.factoryPid;
-                logger.info("Factory configuration create request has been sent for " + ocdFactoryPid);
+                logger.atInfo().log("Factory configuration create request has been sent for factory PID '%s'", ocdFactoryPid);
                 commandService.execute(CONFIG_FACTORY_COMMAND_ID, createCommandMap(null, ocdFactoryPid, properties));
                 return;
             }
-            logger.info("Configuration create request has been sent for " + effectivePID);
+            logger.atInfo().log("Configuration create request has been sent for PID '%s'", effectivePID);
             commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(effectivePID, null, properties));
         });
         cancelButton.setOnAction(e -> form.reset());
@@ -347,7 +347,7 @@ public final class ConfigurationEditorFxController {
     }
 
     private Object convertToRequestedType(final Field<?> field, final Object value) {
-        // this controller cannot be loaded if the 'typeMappings' value is of type XAttributeDefType
+        // this controller cannot be loaded by FXMLLoader if the 'typeMappings' values are of type XAttributeDefType
         final XAttributeDefType type = XAttributeDefType.values()[typeMappings.get(field)];
         return converter.convert(value).to(XAttributeDefType.clazz(type));
     }

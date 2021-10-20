@@ -18,9 +18,14 @@ import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.Log;
 
 public final class ExtensionListMenuContributionHandler {
 
+    @Log
+    @Inject
+    private FluentLogger  logger;
     @Inject
     private EPartService  partService;
     @Inject
@@ -36,7 +41,9 @@ public final class ExtensionListMenuContributionHandler {
 
     @Execute
     public void execute(final MDirectMenuItem menuItem) {
-        partService.showPart(menuItem.getAccessibilityPhrase(), ACTIVATE);
+        final String partId = menuItem.getAccessibilityPhrase();
+        logger.atInfo().log("Activating part '%s'", partId);
+        partService.showPart(partId, ACTIVATE);
     }
 
     private List<MStackElement> getRegisteredTabs(final MWindow window) {

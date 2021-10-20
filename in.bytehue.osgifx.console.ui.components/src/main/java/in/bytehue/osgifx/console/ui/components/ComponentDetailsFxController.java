@@ -12,8 +12,8 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
@@ -98,7 +98,7 @@ public final class ComponentDetailsFxController {
     private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesClassColumn;
     @Log
     @Inject
-    private Logger                                                    logger;
+    private FluentLogger                                              logger;
     @Inject
     @LocalInstance
     private FXMLLoader                                                loader;
@@ -112,7 +112,7 @@ public final class ComponentDetailsFxController {
 
     @FXML
     public void initialize() {
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     void initControls(final XComponentDTO component) {
@@ -200,12 +200,12 @@ public final class ComponentDetailsFxController {
 
     private void registerButtonHandlers(final XComponentDTO component) {
         enableComponentButton.setOnAction(a -> {
-            logger.info("Component enable request has been sent for " + component.name);
+            logger.atInfo().log("Component enable request has been sent for %s", component.name);
             // to enable a component, we need the name primarily as there is no associated component ID
             commandService.execute(COMPONENT_ENABLE_COMMAND_ID, createCommandMap(component.name, null));
         });
         disableComponentButton.setOnAction(a -> {
-            logger.info("Component disable request has been sent for " + component.id);
+            logger.atInfo().log("Component disable request has been sent for %s", component.id);
             // to disable a component, we need the id primarily as there is already an associated component ID
             commandService.execute(COMPONENT_DISABLE_COMMAND_ID, createCommandMap(null, component.id));
         });

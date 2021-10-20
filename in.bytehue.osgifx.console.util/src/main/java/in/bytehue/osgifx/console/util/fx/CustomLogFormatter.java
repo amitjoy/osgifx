@@ -38,7 +38,7 @@ public final class CustomLogFormatter extends Formatter {
     // milliseconds can be nice for rough performance numbers
     public static final String               DATE_FORMAT         = "yyyy-MM-dd HH:mm:ss.SSS Z";
     private static final DateFormat          DEFAULT_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
-    public static final String               DEFAULT_FORMAT      = "%t [%L] [%c] %m";
+    public static final String               DEFAULT_FORMAT      = "%t [%L] [%n] %m";
     protected static final StackTraceElement nullElement         = new StackTraceElement("?", "?", "?", -1);
 
     private final MessageFormat messageFormat;

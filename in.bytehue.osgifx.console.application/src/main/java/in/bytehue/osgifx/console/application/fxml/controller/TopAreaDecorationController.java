@@ -2,8 +2,8 @@ package in.bytehue.osgifx.console.application.fxml.controller;
 
 import javax.inject.Inject;
 
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,13 +15,13 @@ public final class TopAreaDecorationController {
 
     @Log
     @Inject
-    private Logger  logger;
+    private FluentLogger logger;
     @FXML
-    private ToolBar decorationArea;
+    private ToolBar      decorationArea;
 
     @FXML
     public void initialize() {
-        logger.info("FXML controller (" + getClass() + ") has been initialized");
+        logger.atInfo().log("FXML controller has been initialized");
     }
 
     @FXML

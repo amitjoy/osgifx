@@ -17,8 +17,8 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.command.CommandService;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.application.dialog.ConnectionDialog;
 import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
@@ -55,7 +55,7 @@ public final class ConnectionSettingsWindowController {
     private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
     @Log
     @Inject
-    private Logger                                     logger;
+    private FluentLogger                               logger;
     @Inject
     private EModelService                              model;
     @Inject
@@ -84,49 +84,49 @@ public final class ConnectionSettingsWindowController {
             }
         });
         TableFilter.forTableView(connectionTable).apply();
-        logger.info("FXML controller (" + getClass() + ") has been initialized");
+        logger.atInfo().log("FXML controller has been initialized");
     }
 
     @FXML
     public void handleClose(final ActionEvent event) {
-        logger.info("Platform is going to shutdown");
+        logger.atInfo().log("Platform is going to shutdown");
         Platform.exit();
     }
 
     @FXML
     public void addConnection(final ActionEvent event) {
-        logger.info("FXML controller (" + getClass() + ") 'addConnection(..)' event has been invoked");
+        logger.atInfo().log("FXML controller 'addConnection(..)' event has been invoked");
         final ConnectionDialog               connectionDialog = new ConnectionDialog();
         final Optional<ConnectionSettingDTO> value            = connectionDialog.showAndWait();
         if (value.isPresent()) {
             final ConnectionSettingDTO dto = value.get();
             triggerCommand(dto, "ADD");
-            logger.info("ADD command has been invoked for " + dto);
+            logger.atInfo().log("ADD command has been invoked for %s", dto);
         }
     }
 
     @FXML
     public void removeConnection(final ActionEvent event) {
-        logger.info("FXML controller (" + getClass() + ") 'removeConnection(..)' event has been invoked");
+        logger.atInfo().log("FXML controller 'removeConnection(..)' event has been invoked");
         final ConnectionSettingDTO dto = connectionTable.getSelectionModel().getSelectedItem();
         triggerCommand(dto, "REMOVE");
-        logger.info("REMOVE command has been invoked for " + dto);
+        logger.atInfo().log("REMOVE command has been invoked for %s", dto);
     }
 
     @FXML
     public void connectAgent(final ActionEvent event) {
-        logger.info("FXML controller (" + getClass() + ") 'connectAgent(..)' event has been invoked");
+        logger.atInfo().log("FXML controller 'connectAgent(..)' event has been invoked");
         final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
-        logger.info("Selected connection: " + selectedConnection);
+        logger.atInfo().log("Selected connection: %s", selectedConnection);
         final Task<Void> connectTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 try {
                     updateMessage("Connecting to " + selectedConnection.host + ":" + selectedConnection.port);
                     supervisor.connect(selectedConnection.host, selectedConnection.port, selectedConnection.timeout);
-                    logger.info("Successfully connected to " + selectedConnection);
+                    logger.atInfo().log("Successfully connected to %s", selectedConnection);
                 } catch (final Exception e) {
-                    logger.error("Cannot connect to " + selectedConnection, e);
+                    logger.atError().withException(e).log("Cannot connect to %s", selectedConnection);
                     Platform.runLater(() -> {
                         progressDialog.close();
                         final ExceptionDialog dialog = new ExceptionDialog(e);
@@ -141,7 +141,7 @@ public final class ConnectionSettingsWindowController {
 
             @Override
             protected void succeeded() {
-                logger.debug("Agent connected event has been sent for " + selectedConnection);
+                logger.atInfo().log("Agent connected event has been sent for %s", selectedConnection);
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, selectedConnection.host + ":" + selectedConnection.port);
             }
         };
@@ -171,7 +171,7 @@ public final class ConnectionSettingsWindowController {
     @Inject
     @org.eclipse.e4.core.di.annotations.Optional
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-        logger.debug("Agent connected event received");
+        logger.atInfo().log("Agent connected event received");
         final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
         connectionChooserWindow.setVisible(false);
         progressDialog.close();

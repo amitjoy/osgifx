@@ -13,19 +13,19 @@ public final class ConnectionsProvider {
 
     private final ObservableList<ConnectionSettingDTO> connections = FXCollections.observableArrayList();
 
-    public void addConnection(final ConnectionSettingDTO connection) {
+    public synchronized void addConnection(final ConnectionSettingDTO connection) {
         connections.add(connection);
     }
 
-    public void removeConnection(final ConnectionSettingDTO connection) {
+    public synchronized void removeConnection(final ConnectionSettingDTO connection) {
         connections.remove(connection);
     }
 
-    public void addConnections(final List<ConnectionSettingDTO> connections) {
+    public synchronized void addConnections(final List<ConnectionSettingDTO> connections) {
         this.connections.addAll(connections);
     }
 
-    public ObservableList<ConnectionSettingDTO> getConnections() {
+    public synchronized ObservableList<ConnectionSettingDTO> getConnections() {
         return connections;
     }
 

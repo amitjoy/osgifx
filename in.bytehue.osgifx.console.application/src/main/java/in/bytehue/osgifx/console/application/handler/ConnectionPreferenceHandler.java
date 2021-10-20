@@ -10,8 +10,8 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.google.gson.Gson;
@@ -24,7 +24,7 @@ public final class ConnectionPreferenceHandler {
 
     @Log
     @Inject
-    private Logger              logger;
+    private FluentLogger        logger;
     @Inject
     @Preference(nodePath = "osgi.fx.connections")
     private IEclipsePreferences preferences;
@@ -50,13 +50,13 @@ public final class ConnectionPreferenceHandler {
         if ("ADD".equals(type)) {
             connections.add(dto);
             connectionsProvider.addConnection(dto);
-            logger.info("New connection has been added: " + dto);
+            logger.atInfo().log("New connection has been added: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
             connectionsProvider.removeConnection(dto);
-            logger.info("Connection has been deleted: " + dto);
+            logger.atInfo().log("Existing connection has been deleted: %s", dto);
         } else {
-            logger.warning(String.format("Cannot execute command %s}' with type '%s'", getClass().getSimpleName(), type));
+            logger.atWarning().log("Cannot execute command with type '%s'", type);
         }
         preferences.put("settings", gson.toJson(connections));
         preferences.flush();

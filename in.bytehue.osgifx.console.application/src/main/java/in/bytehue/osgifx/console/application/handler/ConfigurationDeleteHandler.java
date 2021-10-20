@@ -7,8 +7,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
@@ -17,7 +17,7 @@ public final class ConfigurationDeleteHandler {
 
     @Log
     @Inject
-    private Logger       logger;
+    private FluentLogger logger;
     @Inject
     private IEventBroker eventBroker;
     @Inject
@@ -27,15 +27,15 @@ public final class ConfigurationDeleteHandler {
     public void execute(@Named("pid") final String pid) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
-            logger.error("Remote agent cannot be connected");
+            logger.atWarning().log("Remote agent cannot be connected");
             return;
         }
         try {
             agent.deleteConfiguration(pid);
-            logger.info("Configuration with PID '" + pid + "' has been deleted");
+            logger.atInfo().log("Configuration with PID '%s' has been deleted", pid);
             eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
         } catch (final Exception e) {
-            logger.error("Configuration with PID " + pid + " cannot be deleted", e);
+            logger.atError().withException(e).log("Configuration with PID '%s' cannot be deleted", pid);
         }
     }
 

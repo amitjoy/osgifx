@@ -14,8 +14,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.service.prefs.BackingStoreException;
 
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
@@ -27,7 +27,7 @@ public final class EventReceiveMenuContributionHandler {
 
     @Log
     @Inject
-    private Logger              logger;
+    private FluentLogger        logger;
     @Inject
     private Supervisor          supervisor;
     @Inject
@@ -44,10 +44,10 @@ public final class EventReceiveMenuContributionHandler {
         final boolean currentState = getCurrentState();
         if (currentState) {
             supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
-            logger.info("OSGi event consmer has been added");
+            logger.atInfo().log("OSGi event consumer has been added");
         } else {
             supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
-            logger.info("OSGi event consmer has been removed");
+            logger.atInfo().log("OSGi event consumer has been removed");
         }
     }
 
@@ -66,9 +66,11 @@ public final class EventReceiveMenuContributionHandler {
         if (accessibilityPhrase) {
             supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
             Fx.showSuccessNotification("Event Notification", "Events will now be received", getClass().getClassLoader());
+            logger.atInfo().log("OSGi events will now be received");
         } else {
             supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
             Fx.showSuccessNotification("Event Notification", "Events will not be received anymore", getClass().getClassLoader());
+            logger.atInfo().log("OSGi events will not be received anymore");
         }
     }
 
