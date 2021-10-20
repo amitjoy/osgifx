@@ -2,6 +2,8 @@ package in.bytehue.osgifx.console.util.fx;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.controlsfx.control.Notifications;
@@ -10,10 +12,17 @@ import org.osgi.framework.BundleContext;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -95,4 +104,59 @@ public final class Fx {
         Stream.of(tableViews).forEach(t -> t.setSelectionModel(new NullTableViewSelectionModel<>(t)));
     }
 
+    @SuppressWarnings("rawtypes")
+    public static <S> void addContextMenuToCopyContent(final TableView<S> table) {
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        final MenuItem item = new MenuItem("Copy");
+        item.setOnAction(event -> {
+
+            final Set<Integer> rows = new TreeSet<>();
+            for (final TablePosition tablePosition : table.getSelectionModel().getSelectedCells()) {
+                rows.add(tablePosition.getRow());
+            }
+            final StringBuilder strb     = new StringBuilder();
+            boolean             firstRow = true;
+            for (final Integer row : rows) {
+                if (!firstRow) {
+                    strb.append('\n');
+                }
+                firstRow = false;
+                boolean firstCol = true;
+                for (final TableColumn<?, ?> column : table.getColumns()) {
+                    if (!firstCol) {
+                        strb.append('\t');
+                    }
+                    firstCol = false;
+                    final Object cellData = column.getCellData(row);
+                    strb.append(cellData == null ? "" : cellData.toString());
+                }
+            }
+            final ClipboardContent content = new ClipboardContent();
+
+            content.putString(strb.toString());
+            Clipboard.getSystemClipboard().setContent(content);
+        });
+        final ContextMenu menu = new ContextMenu();
+        menu.getItems().add(item);
+        table.setContextMenu(menu);
+    }
+
+    public static <S> void addContextMenuToCopyContent(final ListView<S> list) {
+        list.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        final MenuItem item = new MenuItem("Copy");
+        item.setOnAction(event -> {
+            final StringBuilder strb = new StringBuilder();
+            for (final int index : list.getSelectionModel().getSelectedIndices()) {
+                final S content = list.getItems().get(index);
+                strb.append(content == null ? "" : content.toString());
+            }
+            final ClipboardContent content = new ClipboardContent();
+
+            content.putString(strb.toString());
+            Clipboard.getSystemClipboard().setContent(content);
+        });
+        final ContextMenu menu = new ContextMenu();
+        menu.getItems().add(item);
+        list.setContextMenu(menu);
+    }
 }

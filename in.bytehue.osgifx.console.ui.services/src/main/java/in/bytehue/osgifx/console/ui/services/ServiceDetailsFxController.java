@@ -57,7 +57,8 @@ public final class ServiceDetailsFxController {
 
         applyTableFilter();
 
-        Fx.disableSelectionModel(propertiesTable);
+        Fx.addContextMenuToCopyContent(propertiesTable);
+        Fx.addContextMenuToCopyContent(objectClassesList);
     }
 
     private void applyTableFilter() {

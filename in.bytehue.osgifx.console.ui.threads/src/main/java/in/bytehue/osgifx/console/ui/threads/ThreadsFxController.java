@@ -41,7 +41,7 @@ public final class ThreadsFxController {
     @FXML
     public void initialize() {
         initCells();
-        Fx.disableSelectionModel(table);
+        Fx.addContextMenuToCopyContent(table);
         logger.atDebug().log("FXML controller has been initialized");
     }
 
