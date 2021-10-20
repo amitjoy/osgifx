@@ -322,9 +322,11 @@ public final class ConfigurationEditorFxController {
                     break;
                 }
                 if (currentValue != null) {
-                    field = Field.ofStringType(converter.convert(currentValue).to(String.class));
+                    final String convertedValue = converter.convert(currentValue).to(String.class);
+                    field = Field.ofStringType(converter.convert(currentValue).to(String.class)).multiline(convertedValue.length() > 100);
                 } else {
-                    field = Field.ofStringType(converter.convert(defaultValue).to(String.class));
+                    final String convertedValue = converter.convert(defaultValue).to(String.class);
+                    field = Field.ofStringType(converter.convert(defaultValue).to(String.class)).multiline(convertedValue.length() > 100);
                 }
                 break;
         }
