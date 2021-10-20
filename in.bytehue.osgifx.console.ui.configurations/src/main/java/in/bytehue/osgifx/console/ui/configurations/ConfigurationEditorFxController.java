@@ -303,6 +303,10 @@ public final class ConfigurationEditorFxController {
                     }
                     break;
                 }
+                if (currentValue != null) {
+                    final String convertedValue = converter.convert(currentValue).to(String.class);
+                    field = Field.ofStringType(convertedValue).multiline(convertedValue.length() > 100);
+                }
                 break;
             case STRING:
             default:
