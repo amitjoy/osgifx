@@ -44,10 +44,10 @@ public final class EventReceiveMenuContributionHandler {
         final boolean currentState = getCurrentState();
         if (currentState) {
             supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
-            logger.atInfo().log("OSGi event consumer has been added");
+            logger.atInfo().throttleByCount(10).log("OSGi event consumer has been added");
         } else {
             supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
-            logger.atInfo().log("OSGi event consumer has been removed");
+            logger.atInfo().throttleByCount(10).log("OSGi event consumer has been removed");
         }
     }
 
