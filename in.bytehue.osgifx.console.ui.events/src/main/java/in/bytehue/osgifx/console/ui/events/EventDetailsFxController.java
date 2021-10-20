@@ -50,7 +50,7 @@ public final class EventDetailsFxController {
         propertiesValueTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
         propertiesTable.setItems(FXCollections.observableArrayList(event.properties.entrySet()));
 
-        Fx.disableSelectionModel(propertiesTable);
+        Fx.addContextMenuToCopyContent(propertiesTable);
     }
 
     private String formatReceivedAt(final long receivedAt) {

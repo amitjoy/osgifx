@@ -158,7 +158,13 @@ public final class ComponentDetailsFxController {
         createReferenceExpandedTable(component);
         applyTableFilters();
 
-        Fx.disableSelectionModel(referencesTable, propertiesTable, boundServicesTable, unboundServicesTable);
+        Fx.addContextMenuToCopyContent(pidsList);
+        Fx.addContextMenuToCopyContent(interfacesList);
+        Fx.addContextMenuToCopyContent(propertiesTable);
+        Fx.addContextMenuToCopyContent(boundServicesTable);
+        Fx.addContextMenuToCopyContent(unboundServicesTable);
+
+        Fx.disableSelectionModel(referencesTable);
     }
 
     private void initConditionalComponents(final XComponentDTO component) {

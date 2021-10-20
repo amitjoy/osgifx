@@ -175,17 +175,15 @@ public final class BundleDetailsFxController {
         manifestHeadersTable.setItems(FXCollections.observableArrayList(bundle.manifestHeaders.entrySet()));
 
         applyTableFilters();
-        // @formatter:off
-        Fx.disableSelectionModel(
-                exportedPackagesNameTable,
-                registeredServicesTable,
-                manifestHeadersTable,
-                importedPackagesTable,
-                wiredBundlesTable,
-                usedServicesTable,
-                hostBundlesTable,
-                attachedFragmentsTable);
-        // @formatter:on
+
+        Fx.addContextMenuToCopyContent(exportedPackagesNameTable);
+        Fx.addContextMenuToCopyContent(registeredServicesTable);
+        Fx.addContextMenuToCopyContent(manifestHeadersTable);
+        Fx.addContextMenuToCopyContent(importedPackagesTable);
+        Fx.addContextMenuToCopyContent(wiredBundlesTable);
+        Fx.addContextMenuToCopyContent(usedServicesTable);
+        Fx.addContextMenuToCopyContent(hostBundlesTable);
+        Fx.addContextMenuToCopyContent(attachedFragmentsTable);
     }
 
     private String formatLastModified(final long lastModified) {

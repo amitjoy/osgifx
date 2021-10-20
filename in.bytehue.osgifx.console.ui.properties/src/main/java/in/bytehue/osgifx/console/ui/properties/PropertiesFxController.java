@@ -10,7 +10,6 @@ import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.Fx;
-import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -33,8 +32,6 @@ public final class PropertiesFxController {
 
     @FXML
     public void initialize() {
-        propertyTable.setSelectionModel(new NullTableViewSelectionModel<>(propertyTable));
-
         propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
         propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
         propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
@@ -43,6 +40,7 @@ public final class PropertiesFxController {
         Fx.sortBy(propertyTable, propertyName);
 
         TableFilter.forTableView(propertyTable).apply();
+        Fx.addContextMenuToCopyContent(propertyTable);
 
         logger.atDebug().log("FXML controller has been initialized");
     }
