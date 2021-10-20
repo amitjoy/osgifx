@@ -157,6 +157,8 @@ public final class ComponentDetailsFxController {
 
         createReferenceExpandedTable(component);
         applyTableFilters();
+
+        Fx.disableSelectionModel(referencesTable, propertiesTable, boundServicesTable, unboundServicesTable);
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
@@ -221,7 +223,6 @@ public final class ComponentDetailsFxController {
     private void applyTableFilters() {
         TableFilter.forTableView(referencesTable).apply();
         TableFilter.forTableView(propertiesTable).apply();
-        TableFilter.forTableView(referencesTable).apply();
         TableFilter.forTableView(boundServicesTable).apply();
         TableFilter.forTableView(unboundServicesTable).apply();
     }

@@ -16,7 +16,6 @@ import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.Fx;
-import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,8 +42,8 @@ public final class ConfigurationsFxController {
 
     @FXML
     public void initialize() {
-        table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         createControls();
+        Fx.disableSelectionModel(table);
         logger.atDebug().log("FXML controller has been initialized");
     }
 

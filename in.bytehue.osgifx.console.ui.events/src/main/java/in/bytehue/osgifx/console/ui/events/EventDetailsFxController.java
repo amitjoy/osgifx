@@ -11,6 +11,7 @@ import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -48,6 +49,8 @@ public final class EventDetailsFxController {
         propertiesKeyTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         propertiesValueTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
         propertiesTable.setItems(FXCollections.observableArrayList(event.properties.entrySet()));
+
+        Fx.disableSelectionModel(propertiesTable);
     }
 
     private String formatReceivedAt(final long receivedAt) {

@@ -20,6 +20,7 @@ import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
 import in.bytehue.osgifx.console.agent.dto.XPackageDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceInfoDTO;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -174,6 +175,17 @@ public final class BundleDetailsFxController {
         manifestHeadersTable.setItems(FXCollections.observableArrayList(bundle.manifestHeaders.entrySet()));
 
         applyTableFilters();
+        // @formatter:off
+        Fx.disableSelectionModel(
+                exportedPackagesNameTable,
+                registeredServicesTable,
+                manifestHeadersTable,
+                importedPackagesTable,
+                wiredBundlesTable,
+                usedServicesTable,
+                hostBundlesTable,
+                attachedFragmentsTable);
+        // @formatter:on
     }
 
     private String formatLastModified(final long lastModified) {

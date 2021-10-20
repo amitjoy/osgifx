@@ -2,6 +2,7 @@ package in.bytehue.osgifx.console.util.fx;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.stream.Stream;
 
 import org.controlsfx.control.Notifications;
 import org.osgi.framework.BundleContext;
@@ -87,6 +88,11 @@ public final class Fx {
                              .position(Pos.CENTER);
         // @formatter:on
         notification.show();
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static void disableSelectionModel(final TableView... tableViews) {
+        Stream.of(tableViews).forEach(t -> t.setSelectionModel(new NullTableViewSelectionModel<>(t)));
     }
 
 }

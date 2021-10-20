@@ -9,6 +9,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -55,6 +56,8 @@ public final class ServiceDetailsFxController {
         objectClassesList.getItems().addAll(service.types);
 
         applyTableFilter();
+
+        Fx.disableSelectionModel(propertiesTable);
     }
 
     private void applyTableFilter() {
