@@ -10,7 +10,6 @@ import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.Fx;
-import in.bytehue.osgifx.console.util.fx.NullTableViewSelectionModel;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -41,8 +40,8 @@ public final class ThreadsFxController {
 
     @FXML
     public void initialize() {
-        table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         initCells();
+        Fx.disableSelectionModel(table);
         logger.atDebug().log("FXML controller has been initialized");
     }
 
