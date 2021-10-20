@@ -98,8 +98,8 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             validationSupport.registerValidator(txtPort, Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
             validationSupport.registerValidator(txtPort, Validator.createPredicateValidator(value -> {
                 try {
-                    final int integer = Integer.parseInt(value.toString());
-                    return integer > 0 || integer > 65536;
+                    final int port = Integer.parseInt(value.toString());
+                    return port > 0 && port < 65536;
                 } catch (final Exception e) {
                     return false;
                 }
