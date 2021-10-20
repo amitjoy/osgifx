@@ -11,11 +11,14 @@ import javax.inject.Inject;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -57,6 +60,10 @@ public final class ConnectionSettingsWindowController {
     @Inject
     private FluentLogger                               logger;
     @Inject
+    private ThreadSynchronize                          threadSync;
+    @Inject
+    private IEclipseContext                            context;
+    @Inject
     private EModelService                              model;
     @Inject
     private MApplication                               application;
@@ -96,8 +103,14 @@ public final class ConnectionSettingsWindowController {
     @FXML
     public void addConnection(final ActionEvent event) {
         logger.atInfo().log("FXML controller 'addConnection(..)' event has been invoked");
-        final ConnectionDialog               connectionDialog = new ConnectionDialog();
-        final Optional<ConnectionSettingDTO> value            = connectionDialog.showAndWait();
+
+        final ConnectionDialog connectionDialog = new ConnectionDialog();
+        ContextInjectionFactory.inject(connectionDialog, context);
+        logger.atInfo().log("Injected connection dialog to eclipse context");
+        connectionDialog.init();
+
+        final Optional<ConnectionSettingDTO> value = connectionDialog.showAndWait();
+
         if (value.isPresent()) {
             final ConnectionSettingDTO dto = value.get();
             triggerCommand(dto, "ADD");
@@ -127,7 +140,7 @@ public final class ConnectionSettingsWindowController {
                     logger.atInfo().log("Successfully connected to %s", selectedConnection);
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot connect to %s", selectedConnection);
-                    Platform.runLater(() -> {
+                    threadSync.asyncExec(() -> {
                         progressDialog.close();
                         final ExceptionDialog dialog = new ExceptionDialog(e);
                         dialog.initStyle(StageStyle.UNDECORATED);
