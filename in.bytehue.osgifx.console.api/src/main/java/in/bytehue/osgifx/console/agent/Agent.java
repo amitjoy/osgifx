@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -449,5 +450,12 @@ public interface Agent {
      * @return the overview of the framework events
      */
     XFrameworkEventsDTO getFrameworkEventsOverview();
+
+    /**
+     * Returns set of registered Gogo commands
+     *
+     * @return the set of registered Gogo commands
+     */
+    Set<String> getGogoCommands();
 
 }
