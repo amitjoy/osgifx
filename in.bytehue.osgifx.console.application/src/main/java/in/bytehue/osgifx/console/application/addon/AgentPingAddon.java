@@ -18,8 +18,8 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
@@ -29,7 +29,7 @@ public final class AgentPingAddon {
 
     @Log
     @Inject
-    private Logger                   logger;
+    private FluentLogger             logger;
     @Inject
     private Supervisor               supervisor;
     @Inject
@@ -43,12 +43,13 @@ public final class AgentPingAddon {
     @PostConstruct
     public void init() {
         executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "osgifx-agent-ping"));
-        logger.info("Agent ping addon has been initialized");
+        logger.atInfo().log("Agent ping addon has been initialized");
     }
 
     @Inject
     @Optional
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event has been received");
         executor.scheduleWithFixedDelay(() -> {
             try {
                 supervisor.getAgent().ping();
@@ -61,12 +62,13 @@ public final class AgentPingAddon {
                 }
             }
         }, 0, 20, TimeUnit.SECONDS);
+        logger.atInfo().log("Agent ping scheduler has been started");
     }
 
     @PreDestroy
     private void destory() {
         executor.shutdownNow();
-        logger.info("Agent ping addon has been destroyed");
+        logger.atInfo().log("Agent ping addon has been destroyed");
     }
 
 }

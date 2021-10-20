@@ -45,7 +45,7 @@ public final class ReferenceDetailsFxController {
 
     @FXML
     public void initialize() {
-        logger.info("FXML controller (" + getClass() + ") has been initialized");
+        logger.info("FXML controller has been initialized");
     }
 
     void initControls(final ReferenceDTO reference) {

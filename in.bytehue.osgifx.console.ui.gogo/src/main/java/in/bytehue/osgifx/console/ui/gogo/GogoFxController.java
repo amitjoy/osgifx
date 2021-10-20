@@ -2,8 +2,8 @@ package in.bytehue.osgifx.console.ui.gogo;
 
 import javax.inject.Inject;
 
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import com.google.common.base.Throwables;
 
@@ -18,7 +18,7 @@ public final class GogoFxController {
 
     @Log
     @Inject
-    private Logger             logger;
+    private FluentLogger       logger;
     @FXML
     private TextField          input;
     @FXML
@@ -34,7 +34,7 @@ public final class GogoFxController {
     public void initialize() {
         historyPointer = 0;
         agent          = supervisor.getAgent();
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     @FXML
@@ -79,8 +79,11 @@ public final class GogoFxController {
 
     private String executeGogoCommand(final String command) {
         try {
-            return agent.shell(command);
+            final String output = agent.shell(command);
+            logger.atInfo().log("Command '%s' has been successfully executed", command);
+            return output;
         } catch (final Exception e) {
+            logger.atInfo().withException(e).log("Command '%s' cannot be executed properly", command);
             return Throwables.getStackTraceAsString(e);
         }
     }

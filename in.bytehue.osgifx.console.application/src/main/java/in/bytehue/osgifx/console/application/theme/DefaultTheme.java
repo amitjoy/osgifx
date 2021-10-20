@@ -21,12 +21,12 @@ public final class DefaultTheme extends AbstractTheme {
 
     @Override
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    public void registerStylesheet(final Stylesheet stylesheet) {
+    public synchronized void registerStylesheet(final Stylesheet stylesheet) {
         super.registerStylesheet(stylesheet);
     }
 
     @Override
-    public void unregisterStylesheet(final Stylesheet stylesheet) {
+    public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
         super.unregisterStylesheet(stylesheet);
     }
 

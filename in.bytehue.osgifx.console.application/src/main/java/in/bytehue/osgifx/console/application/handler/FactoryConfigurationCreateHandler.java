@@ -9,8 +9,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -22,7 +22,7 @@ public final class FactoryConfigurationCreateHandler {
 
     @Log
     @Inject
-    private Logger       logger;
+    private FluentLogger logger;
     @Inject
     private IEventBroker eventBroker;
     @Inject
@@ -32,17 +32,17 @@ public final class FactoryConfigurationCreateHandler {
     public void execute(@Named("factoryPID") final String factoryPID, @Named("properties") final String properties) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
-            logger.error("Remote agent cannot be connected");
+            logger.atWarning().log("Remote agent cannot be connected");
             return;
         }
         try {
             final Map<String, Object> props = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
             }.getType());
             agent.createFactoryConfiguration(factoryPID, props);
-            logger.info("Factory configuration with factory PID '" + factoryPID + "' has been created");
+            logger.atInfo().log("Factory configuration with factory PID '%s' has been created", factoryPID);
             eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
         } catch (final Exception e) {
-            logger.error("Factory Configuration with factory PID '" + factoryPID + "' cannot be created", e);
+            logger.atError().log("Factory Configuration with factory PID '%s' cannot be created", factoryPID);
         }
     }
 

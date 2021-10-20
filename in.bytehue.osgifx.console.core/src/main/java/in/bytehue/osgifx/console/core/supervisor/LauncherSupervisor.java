@@ -13,13 +13,9 @@ import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
-/**
- * This is the supervisor on the bnd launcher side. It provides the SHA
- * repository for the agent and handles the redirection. It also handles the
- * events.
- */
 @Component
-public class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
+public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
+
     private Appendable stdout;
     private Appendable stderr;
     private Thread     stdin;
@@ -136,7 +132,7 @@ public class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> imple
     }
 
     @Override
-    public void addOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
+    public synchronized void addOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
         if (eventConsumers.contains(eventConsumer)) {
             return;
         }
@@ -144,7 +140,7 @@ public class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> imple
     }
 
     @Override
-    public void removeOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
+    public synchronized void removeOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
         eventConsumers.remove(eventConsumer);
     }
 

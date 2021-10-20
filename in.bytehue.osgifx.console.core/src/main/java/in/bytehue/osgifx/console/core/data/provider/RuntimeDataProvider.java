@@ -4,8 +4,9 @@ import static in.bytehue.osgifx.console.util.fx.ConsoleFXHelper.makeNullSafe;
 
 import java.util.function.Consumer;
 
-import org.eclipse.fx.core.log.Logger;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -28,11 +29,11 @@ import javafx.collections.ObservableList;
 @Component
 public final class RuntimeDataProvider implements DataProvider, Consumer<XEventDTO> {
 
-    private Logger        logger;
-    @Reference
-    private Supervisor    supervisor;
     @Reference
     private LoggerFactory factory;
+    @Reference
+    private Supervisor    supervisor;
+    private FluentLogger  logger;
 
     private final ObservableList<XBundleDTO>        bundles        = FXCollections.observableArrayList();
     private final ObservableList<XServiceDTO>       services       = FXCollections.observableArrayList();
@@ -42,15 +43,16 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private final ObservableList<XThreadDTO>        threads        = FXCollections.observableArrayList();
     private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
 
+    @Activate
     void activate() {
-        logger = factory.createLogger(getClass().getName());
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
     @Override
     public synchronized ObservableList<XBundleDTO> bundles() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
-            logger.warning("Agent is not connected");
+            logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         bundles.clear();
@@ -62,7 +64,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XServiceDTO> services() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
-            logger.warning("Agent is not connected");
+            logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         services.clear();
@@ -74,7 +76,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XComponentDTO> components() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
-            logger.warning("Agent is not connected");
+            logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         components.clear();
@@ -86,7 +88,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XConfigurationDTO> configurations() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
-            logger.warning("Agent is not connected");
+            logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         configurations.clear();
@@ -108,7 +110,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XPropertyDTO> properties() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
-            logger.warning("Agent is not connected");
+            logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         properties.clear();
@@ -120,7 +122,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     public synchronized ObservableList<XThreadDTO> threads() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
-            logger.warning("Agent is not connected");
+            logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
         threads.clear();

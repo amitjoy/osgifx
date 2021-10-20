@@ -23,8 +23,8 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import com.google.common.collect.Maps;
 
@@ -63,7 +63,7 @@ public final class OverviewFxUI {
 
     @Log
     @Inject
-    private Logger          logger;
+    private FluentLogger    logger;
     @Inject
     private Supervisor      supervisor;
     private final StatusBar statusBar = new StatusBar();
@@ -73,7 +73,7 @@ public final class OverviewFxUI {
         // hack to reset the css
         parent.setOnMouseClicked(event -> createControls(parent));
         createControls(parent);
-        logger.debug("Overview part has been initialized");
+        logger.atDebug().log("Overview part has been initialized");
     }
 
     @Focus
@@ -386,7 +386,7 @@ public final class OverviewFxUI {
             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
-        logger.info("Agent connected event received by " + getClass().getName());
+        logger.atInfo().log("Agent connected event received");
         createWidgets(parent);
     }
 
@@ -396,7 +396,7 @@ public final class OverviewFxUI {
             @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
-        logger.info("Agent disconnected event received by " + getClass().getName());
+        logger.atInfo().log("Agent disconnected event received");
         createWidgets(parent);
     }
 

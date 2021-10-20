@@ -5,8 +5,8 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,7 +21,7 @@ public final class ServiceDetailsFxController {
 
     @Log
     @Inject
-    private Logger                                     logger;
+    private FluentLogger                               logger;
     @FXML
     private Label                                      idLabel;
     @FXML
@@ -39,7 +39,7 @@ public final class ServiceDetailsFxController {
 
     @FXML
     public void initialize() {
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     void initControls(final XServiceDTO service) {

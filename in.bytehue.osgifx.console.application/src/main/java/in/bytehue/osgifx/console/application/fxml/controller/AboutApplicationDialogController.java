@@ -4,8 +4,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.HyperlinkLabel;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.framework.BundleContext;
 
 import javafx.application.Application;
@@ -20,7 +20,7 @@ public final class AboutApplicationDialogController {
 
     @Log
     @Inject
-    private Logger         logger;
+    private FluentLogger   logger;
     @FXML
     private Text           appName;
     @FXML
@@ -43,7 +43,7 @@ public final class AboutApplicationDialogController {
             final String    eclipseWebLink = link.getText();
             jfxApplication.getHostServices().showDocument(eclipseWebLink);
         });
-        logger.info("FXML controller (" + getClass() + ") has been initialized");
+        logger.atInfo().log("FXML controller (%s) has been initialized", getClass());
     }
 
     public Node getHeader() {

@@ -5,8 +5,8 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 
@@ -22,7 +22,7 @@ public final class EventDetailsFxController {
 
     @Log
     @Inject
-    private Logger                                     logger;
+    private FluentLogger                               logger;
     @FXML
     private Label                                      receivedAtLabel;
     @FXML
@@ -38,11 +38,11 @@ public final class EventDetailsFxController {
     @FXML
     public void initialize() {
         converter = Converters.standardConverter();
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     public void initControls(final XEventDTO event) {
-        receivedAtLabel.setText(formateReceivedAt(event.received));
+        receivedAtLabel.setText(formatReceivedAt(event.received));
         topicLabel.setText(event.topic);
 
         propertiesKeyTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
@@ -50,7 +50,7 @@ public final class EventDetailsFxController {
         propertiesTable.setItems(FXCollections.observableArrayList(event.properties.entrySet()));
     }
 
-    private String formateReceivedAt(final long receivedAt) {
+    private String formatReceivedAt(final long receivedAt) {
         if (receivedAt == 0) {
             return "No received timestamp";
         }

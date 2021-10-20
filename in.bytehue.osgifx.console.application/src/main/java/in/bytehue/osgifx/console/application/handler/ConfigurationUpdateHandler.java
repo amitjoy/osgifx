@@ -9,8 +9,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -22,7 +22,7 @@ public final class ConfigurationUpdateHandler {
 
     @Log
     @Inject
-    private Logger       logger;
+    private FluentLogger logger;
     @Inject
     private IEventBroker eventBroker;
     @Inject
@@ -32,17 +32,17 @@ public final class ConfigurationUpdateHandler {
     public void execute(@Named("pid") final String pid, @Named("properties") final String properties) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
-            logger.error("Remote agent cannot be connected");
+            logger.atWarning().log("Remote agent cannot be connected");
             return;
         }
         try {
             final Map<String, Object> props = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
             }.getType());
             agent.updateConfiguration(pid, props);
-            logger.info("Configuration with PID '" + pid + "' has been updated");
+            logger.atInfo().log("Configuration with PID '%s' has been updated", pid);
             eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
         } catch (final Exception e) {
-            logger.error("Configuration with PID " + pid + " cannot be updated", e);
+            logger.atError().withException(e).log("Configuration with PID '%s' cannot be updated", pid);
         }
     }
 

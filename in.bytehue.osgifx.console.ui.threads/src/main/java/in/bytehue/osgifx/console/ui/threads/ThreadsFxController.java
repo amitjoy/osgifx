@@ -3,8 +3,8 @@ package in.bytehue.osgifx.console.ui.threads;
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.ui.service.DataProvider;
@@ -19,7 +19,7 @@ public final class ThreadsFxController {
 
     @Log
     @Inject
-    private Logger                          logger;
+    private FluentLogger                    logger;
     @FXML
     private TableView<XThreadDTO>           table;
     @FXML
@@ -43,7 +43,7 @@ public final class ThreadsFxController {
     public void initialize() {
         table.setSelectionModel(new NullTableViewSelectionModel<>(table));
         initCells();
-        logger.debug("FXML controller (" + getClass() + ") has been initialized");
+        logger.atDebug().log("FXML controller has been initialized");
     }
 
     private void initCells() {
