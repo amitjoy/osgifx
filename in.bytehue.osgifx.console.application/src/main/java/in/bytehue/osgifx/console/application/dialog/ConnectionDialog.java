@@ -1,13 +1,15 @@
 package in.bytehue.osgifx.console.application.dialog;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.eclipse.fx.core.ThreadSynchronize;
 
-import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -20,13 +22,14 @@ import javafx.stage.StageStyle;
 
 public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
-    private final ButtonType saveButtonType;
+    @Inject
+    private ThreadSynchronize threadSync;
+    private ButtonType        saveButtonType;
+    private CustomTextField   txtHostname;
+    private CustomTextField   txtPort;
+    private CustomTextField   txtTimeout;
 
-    private final CustomTextField txtHostname;
-    private final CustomTextField txtPort;
-    private final CustomTextField txtTimeout;
-
-    public ConnectionDialog() {
+    public void init() {
         final DialogPane dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
@@ -86,7 +89,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         txtTimeout.setPromptText(timeoutCaption);
 
         final ValidationSupport validationSupport = new ValidationSupport();
-        Platform.runLater(() -> {
+        threadSync.asyncExec(() -> {
             final String requiredFormat       = "'%s' is required";
             final String requiredPortFormat   = "'%s' should be a valid port number";
             final String requiredNumberFormat = "'%s' should be a valid integer number";
