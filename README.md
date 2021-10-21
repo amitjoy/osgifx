@@ -21,7 +21,7 @@
 ![7](https://user-images.githubusercontent.com/13380182/137404725-61553ff7-32c3-45ec-99bb-1c55bf4e03ab.png)
 ![8](https://user-images.githubusercontent.com/13380182/137404726-eb341a40-ca9d-4bb5-981c-c182f37ec9e0.png)
 
---------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------
 
 ### Tools and Technologies
 
@@ -34,6 +34,30 @@
 | Tools                	| Bndtools 6                                  	|
 
 ------------------------------------------------------------------------------------------------------------
+
+### Features
+
+|                                                                                                                                                                         	|   	|
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|:-:	|
+| List all installed bundles and fragments                                                                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| List all registered services                                                                                                                                                    	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| List all registered DS components                                                                                                                                               	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| List all available system and framework properties                                                                                                                              	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| List all daemon and non-daemon threads                                                                                                                                          	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Receive events on demand (option to start and stop receiving events)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Execute Gogo command                                                                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Install or update bundle                                                                                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| List available configurations from `ConfigurationAdmin`                                                                                                                             |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List property descriptors (`Metatype`)                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Start/stop/uninstall bundle or fragment                                                                                                                                         	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Enable/disable DS component                                                                                                                                                     	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Update/delete existing configuration                                                                                                                                            	 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	 |
+| Create new configuration using metatype descriptor                                                                                                                              	 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	 |
+| Overview of the remote OSGi framework (memory consumption, uptime, framework information, number of bundles, number of threads, number of services and number of DS components) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+
+--------------------------------------------------------------------------------------------------------------
 
 ### Minimum Requirements for Runtime Agent
 
