@@ -197,14 +197,15 @@ public final class ConfigurationEditorFxController {
             case LONG:
             case INTEGER:
                 if (options != null && !options.isEmpty()) {
+                    String effectiveValue = null;
                     if (currentValue != null) {
-                        final int selection = options.indexOf(currentValue);
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
-                        }), selection);
+                        effectiveValue = converter.convert(currentValue).to(String.class);
                     } else {
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
-                        }));
+                        effectiveValue = converter.convert(defaultValue).to(String.class);
                     }
+                    final int selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
+                    }), selection);
                     break;
                 }
                 if (currentValue != null) {
@@ -216,14 +217,15 @@ public final class ConfigurationEditorFxController {
             case FLOAT:
             case DOUBLE:
                 if (options != null && !options.isEmpty()) {
+                    String effectiveValue = null;
                     if (currentValue != null) {
-                        final int selection = options.indexOf(currentValue);
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
-                        }), selection);
+                        effectiveValue = converter.convert(currentValue).to(String.class);
                     } else {
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
-                        }));
+                        effectiveValue = converter.convert(defaultValue).to(String.class);
                     }
+                    final int selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
+                    }), selection);
                     break;
                 }
                 if (currentValue != null) {
@@ -234,14 +236,15 @@ public final class ConfigurationEditorFxController {
                 break;
             case BOOLEAN:
                 if (options != null && !options.isEmpty()) {
+                    String effectiveValue = null;
                     if (currentValue != null) {
-                        final int selection = options.indexOf(currentValue);
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
-                        }), selection);
+                        effectiveValue = converter.convert(currentValue).to(String.class);
                     } else {
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
-                        }));
+                        effectiveValue = converter.convert(defaultValue).to(String.class);
                     }
+                    final int selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
+                    }), selection);
                     break;
                 }
                 if (currentValue != null) {
@@ -259,14 +262,15 @@ public final class ConfigurationEditorFxController {
                 break;
             case CHAR:
                 if (options != null && !options.isEmpty()) {
+                    String effectiveValue = null;
                     if (currentValue != null) {
-                        final int selection = options.indexOf(currentValue);
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                        }), selection);
+                        effectiveValue = converter.convert(currentValue).to(String.class);
                     } else {
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                        }));
+                        effectiveValue = converter.convert(defaultValue).to(String.class);
                     }
+                    final int selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    }), selection);
                     break;
                 }
                 if (currentValue != null) {
@@ -292,15 +296,15 @@ public final class ConfigurationEditorFxController {
             case STRING_ARRAY:
             case STRING_LIST:
                 if (options != null && !options.isEmpty()) {
+                    String effectiveValue = null;
                     if (currentValue != null) {
-                        final List<Integer> selections = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
-                        });
-                        field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                        }), selections);
+                        effectiveValue = converter.convert(currentValue).to(String.class);
                     } else {
-                        field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                        }));
+                        effectiveValue = converter.convert(defaultValue).to(String.class);
                     }
+                    final int selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    }), selection);
                     break;
                 }
                 if (currentValue != null) {
@@ -311,14 +315,15 @@ public final class ConfigurationEditorFxController {
             case STRING:
             default:
                 if (options != null && !options.isEmpty()) {
+                    String effectiveValue = null;
                     if (currentValue != null) {
-                        final int selection = options.indexOf(currentValue);
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                        }), selection);
+                        effectiveValue = converter.convert(currentValue).to(String.class);
                     } else {
-                        field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                        }));
+                        effectiveValue = converter.convert(defaultValue).to(String.class);
                     }
+                    final int selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    }), selection);
                     break;
                 }
                 if (currentValue != null) {
