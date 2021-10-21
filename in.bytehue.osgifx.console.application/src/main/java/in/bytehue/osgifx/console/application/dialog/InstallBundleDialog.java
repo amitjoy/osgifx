@@ -41,7 +41,10 @@ public final class InstallBundleDialog extends Dialog<InstallBundleDTO> {
         dialogPane.setContent(dialogContent);
 
         final InstallBundleDialogController controller = (InstallBundleDialogController) loader.getController();
-        setResultConverter(dialogButton -> controller.getInstallDTO());
+        setResultConverter(dialogButton -> {
+            final ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
+            return data == ButtonData.OK_DONE ? controller.getInstallDTO() : null;
+        });
     }
 
 }
