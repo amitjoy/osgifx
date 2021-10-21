@@ -35,12 +35,18 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private Supervisor    supervisor;
     private FluentLogger  logger;
 
-    private final ObservableList<XBundleDTO>        bundles        = FXCollections.observableArrayList();
-    private final ObservableList<XServiceDTO>       services       = FXCollections.observableArrayList();
-    private final ObservableList<XComponentDTO>     components     = FXCollections.observableArrayList();
-    private final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
-    private final ObservableList<XPropertyDTO>      properties     = FXCollections.observableArrayList();
-    private final ObservableList<XThreadDTO>        threads        = FXCollections.observableArrayList();
+    private final ObservableList<XBundleDTO>        bundles        = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<XServiceDTO>       services       = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<XComponentDTO>     components     = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<XConfigurationDTO> configurations = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<XPropertyDTO>      properties     = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<XThreadDTO>        threads        = FXCollections
+            .synchronizedObservableList(FXCollections.observableArrayList());
     private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
 
     @Activate
