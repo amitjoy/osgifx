@@ -17,7 +17,7 @@ import in.bytehue.osgifx.console.propertytypes.MainThread;
 @MainThread
 public final class Launcher implements Runnable {
 
-    private static final String APPLICATION_ID = "org.eclipse.fx.ui.workbench.fx.application";
+    private static final String APPLICATION_ID = "in.bytehue.osgifx.console.application.osgifx";
 
     @Reference(target = "(" + SERVICE_PID + "=" + APPLICATION_ID + ")", cardinality = OPTIONAL)
     private volatile ApplicationDescriptor applicationDescriptor;
