@@ -383,7 +383,7 @@ public final class OverviewFxUI {
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");
-        createWidgets(parent);
+        createControls(parent);
     }
 
     @Inject
@@ -393,7 +393,7 @@ public final class OverviewFxUI {
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
-        createWidgets(parent);
+        createControls(parent);
     }
 
 }
