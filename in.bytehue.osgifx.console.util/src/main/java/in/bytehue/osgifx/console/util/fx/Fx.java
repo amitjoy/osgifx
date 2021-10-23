@@ -1,5 +1,10 @@
 package in.bytehue.osgifx.console.util.fx;
 
+import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
+import static javafx.geometry.Orientation.VERTICAL;
+import static javafx.scene.paint.Color.GREEN;
+import static javafx.scene.paint.Color.TRANSPARENT;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
@@ -7,15 +12,20 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.controlsfx.control.Notifications;
+import org.controlsfx.control.StatusBar;
+import org.controlsfx.glyphfont.Glyph;
 import org.osgi.framework.BundleContext;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -23,6 +33,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -158,5 +172,28 @@ public final class Fx {
         final ContextMenu menu = new ContextMenu();
         menu.getItems().add(item);
         list.setContextMenu(menu);
+    }
+
+    public static void initStatusBar(final BorderPane parent, final StatusBar statusBar) {
+        final Glyph glyph = new Glyph("FontAwesome", "DESKTOP");
+        glyph.useGradientEffect();
+        glyph.useHoverEffect();
+
+        final Button button = new Button("", glyph);
+        button.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
+        statusBar.getLeftItems().clear();
+        statusBar.getLeftItems().add(button);
+        statusBar.getLeftItems().add(new Separator(VERTICAL));
+
+        final String property = System.getProperty(CONNECTED_AGENT);
+        final String statusBarText;
+        if (property != null) {
+            glyph.color(GREEN);
+            statusBarText = "Connected to " + property;
+        } else {
+            statusBarText = "Disconnected";
+        }
+        statusBar.setText(statusBarText);
+        parent.setBottom(statusBar);
     }
 }
