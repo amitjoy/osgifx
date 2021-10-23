@@ -10,7 +10,6 @@ import javax.inject.Named;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.StatusBar;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -38,11 +37,6 @@ public final class GogoFxUI {
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
         logger.atDebug().log("Gogo part has been initialized");
-    }
-
-    @Focus
-    public void focus(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-        createControls(parent, loader);
     }
 
     @Inject
