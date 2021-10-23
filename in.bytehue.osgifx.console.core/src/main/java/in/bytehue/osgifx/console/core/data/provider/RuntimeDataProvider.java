@@ -35,19 +35,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private Supervisor    supervisor;
     private FluentLogger  logger;
 
-    private final ObservableList<XBundleDTO>        bundles        = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableList<XServiceDTO>       services       = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableList<XComponentDTO>     components     = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableList<XConfigurationDTO> configurations = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableList<XPropertyDTO>      properties     = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableList<XThreadDTO>        threads        = FXCollections
-            .synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableQueue<XEventDTO>        events         = new ObservableQueue<>(EvictingQueue.create(200));
+    private final ObservableQueue<XEventDTO> events = new ObservableQueue<>(EvictingQueue.create(200));
 
     @Activate
     void activate() {
@@ -61,7 +49,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
             logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
-        bundles.clear();
+        final ObservableList<XBundleDTO> bundles = FXCollections.observableArrayList();
         bundles.addAll(makeNullSafe(agent.getAllBundles()));
         return bundles;
     }
@@ -73,7 +61,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
             logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
-        services.clear();
+        final ObservableList<XServiceDTO> services = FXCollections.observableArrayList();
         services.addAll(makeNullSafe(agent.getAllServices()));
         return services;
     }
@@ -85,7 +73,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
             logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
-        components.clear();
+        final ObservableList<XComponentDTO> components = FXCollections.observableArrayList();
         components.addAll(makeNullSafe(agent.getAllComponents()));
         return components;
     }
@@ -97,7 +85,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
             logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
-        configurations.clear();
+        final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
         configurations.addAll(makeNullSafe(agent.getAllConfigurations()));
         return configurations;
     }
@@ -119,7 +107,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
             logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
-        properties.clear();
+        final ObservableList<XPropertyDTO> properties = FXCollections.observableArrayList();
         properties.addAll(makeNullSafe(agent.getAllProperties()));
         return properties;
     }
@@ -131,7 +119,7 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
             logger.atWarning().log("Agent is not connected");
             return FXCollections.emptyObservableList();
         }
-        threads.clear();
+        final ObservableList<XThreadDTO> threads = FXCollections.observableArrayList();
         threads.addAll(makeNullSafe(agent.getAllThreads()));
         return threads;
     }
