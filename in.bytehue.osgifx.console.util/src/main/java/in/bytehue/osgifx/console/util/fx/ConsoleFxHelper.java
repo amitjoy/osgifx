@@ -3,9 +3,9 @@ package in.bytehue.osgifx.console.util.fx;
 import java.util.Collections;
 import java.util.List;
 
-public final class ConsoleFXHelper {
+public final class ConsoleFxHelper {
 
-    private ConsoleFXHelper() {
+    private ConsoleFxHelper() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 

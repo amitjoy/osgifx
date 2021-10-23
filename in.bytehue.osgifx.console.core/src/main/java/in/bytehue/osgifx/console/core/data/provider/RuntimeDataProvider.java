@@ -1,6 +1,6 @@
 package in.bytehue.osgifx.console.core.data.provider;
 
-import static in.bytehue.osgifx.console.util.fx.ConsoleFXHelper.makeNullSafe;
+import static in.bytehue.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 
 import java.util.function.Consumer;
 
