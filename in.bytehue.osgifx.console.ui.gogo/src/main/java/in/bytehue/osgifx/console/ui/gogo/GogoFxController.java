@@ -37,11 +37,14 @@ public final class GogoFxController {
     public void initialize() {
         historyPointer = 0;
         agent          = supervisor.getAgent();
-        logger.atDebug().log("FXML controller has been initialized");
-        final Set<String> gogoCommands = agent.getGogoCommands();
-        if (gogoCommands != null) {
-            TextFields.bindAutoCompletion(input, gogoCommands);
+        final Agent agent = supervisor.getAgent();
+        Set<String> gogoCommands;
+        if (agent == null || (gogoCommands = agent.getGogoCommands()) != null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
         }
+        logger.atDebug().log("FXML controller has been initialized");
+        TextFields.bindAutoCompletion(input, gogoCommands);
     }
 
     @FXML
@@ -86,7 +89,11 @@ public final class GogoFxController {
 
     private String executeGogoCommand(final String command) {
         try {
-            final String output = agent.shell(command);
+            String output;
+            if (agent == null || (output = agent.shell(command)) != null) {
+                logger.atWarning().log("Agent is not connected");
+                return "Agent is not connected";
+            }
             logger.atInfo().log("Command '%s' has been successfully executed", command);
             return output;
         } catch (final Exception e) {
