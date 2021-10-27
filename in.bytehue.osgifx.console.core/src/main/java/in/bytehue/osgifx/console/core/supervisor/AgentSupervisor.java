@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.core.supervisor;
 
+import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -24,18 +26,19 @@ import aQute.remote.util.Link;
  * In general an actual supervisor extends this class to provide the
  * functionality to use on the client side.
  *
- * @param <Supervisor> The supervisor type
- * @param <Agent> The agent type
+ * @param <S> The supervisor type
+ * @param <A> The agent type
  */
-public class AgentSupervisor<Supervisor, Agent> {
+public class AgentSupervisor<S, A> {
+
     private static final Map<File, Info>          fileInfo    = new ConcurrentHashMap<>();
     private static final MultiMap<String, String> shaInfo     = new MultiMap<>();
     private static final int                      connectWait = 200;
     private static byte[]                         EMPTY       = {};
-    private Agent                                 agent;
+    private A                                     agent;
     private final CountDownLatch                  latch       = new CountDownLatch(1);
     protected volatile int                        exitCode;
-    private Link<Supervisor, Agent>               link;
+    private Link<S, A>                            link;
     private final AtomicBoolean                   quit        = new AtomicBoolean(false);
     protected String                              host;
     protected int                                 port;
@@ -46,11 +49,11 @@ public class AgentSupervisor<Supervisor, Agent> {
         public long   lastModified;
     }
 
-    protected void connect(final Class<Agent> agent, final Supervisor supervisor, final String host, final int port) throws Exception {
+    protected void connect(final Class<A> agent, final S supervisor, final String host, final int port) throws Exception {
         connect(agent, supervisor, host, port, -1);
     }
 
-    protected void connect(final Class<Agent> agent, final Supervisor supervisor, final String host, final int port, final int timeout)
+    protected void connect(final Class<A> agent, final S supervisor, final String host, final int port, final int timeout)
             throws Exception {
         if (timeout < -1) {
             throw new IllegalArgumentException("timeout can not be less than -1");
@@ -60,7 +63,8 @@ public class AgentSupervisor<Supervisor, Agent> {
         this.host    = host;
         this.port    = port;
         this.timeout = timeout;
-        System.setProperty(in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT, host + ":" + port);
+
+        System.setProperty(CONNECTED_AGENT, host + ":" + port);
 
         while (true) {
             try {
@@ -101,7 +105,7 @@ public class AgentSupervisor<Supervisor, Agent> {
         return EMPTY;
     }
 
-    public void setAgent(final Link<Supervisor, Agent> link) {
+    public void setAgent(final Link<S, A> link) {
         this.agent = link.getRemote();
         this.link  = link;
     }
@@ -132,7 +136,7 @@ public class AgentSupervisor<Supervisor, Agent> {
         }
     }
 
-    public Agent getAgent() {
+    public A getAgent() {
         return agent;
     }
 
