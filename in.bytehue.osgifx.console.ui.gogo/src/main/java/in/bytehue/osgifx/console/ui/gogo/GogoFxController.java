@@ -39,7 +39,7 @@ public final class GogoFxController {
         agent          = supervisor.getAgent();
         final Agent agent = supervisor.getAgent();
         Set<String> gogoCommands;
-        if (agent == null || (gogoCommands = agent.getGogoCommands()) != null) {
+        if (agent == null || (gogoCommands = agent.getGogoCommands()) == null) {
             logger.atWarning().log("Agent is not connected");
             return;
         }
@@ -90,7 +90,7 @@ public final class GogoFxController {
     private String executeGogoCommand(final String command) {
         try {
             String output;
-            if (agent == null || (output = agent.shell(command)) != null) {
+            if (agent == null || (output = agent.shell(command)) == null) {
                 logger.atWarning().log("Agent is not connected");
                 return "Agent is not connected";
             }
