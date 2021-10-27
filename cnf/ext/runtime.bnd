@@ -84,3 +84,7 @@ bundles.required: \
                 in.bytehue.osgifx.console.util,\
                 in.bytehue.osgifx.console.wrapper.tilesfx,\
                 in.bytehue.osgifx.console.wrapper.formsfx
+                
+bundles.configurations: \
+                org.apache.felix.configurator,\
+                org.apache.felix.feature
