@@ -1,5 +1,6 @@
 package in.bytehue.osgifx.console.agent.provider;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Constants.OBJECTCLASS;
@@ -31,14 +32,15 @@ import in.bytehue.osgifx.console.agent.dto.XPackageDTO;
 import in.bytehue.osgifx.console.agent.dto.XPackageDTO.XpackageType;
 import in.bytehue.osgifx.console.agent.dto.XServiceInfoDTO;
 
-public final class XBundleInfoProvider {
+public class XBundleAdmin {
 
-    private XBundleInfoProvider() {
+    private XBundleAdmin() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
     public static List<XBundleDTO> get(final BundleContext context) {
-        return Stream.of(context.getBundles()).map(XBundleInfoProvider::toDTO).collect(toList());
+        requireNonNull(context);
+        return Stream.of(context.getBundles()).map(XBundleAdmin::toDTO).collect(toList());
     }
 
     private static XBundleDTO toDTO(final Bundle bundle) {

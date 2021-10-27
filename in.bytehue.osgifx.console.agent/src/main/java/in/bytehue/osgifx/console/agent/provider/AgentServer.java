@@ -1,9 +1,7 @@
 package in.bytehue.osgifx.console.agent.provider;
 
-import static java.lang.System.lineSeparator;
-import static java.util.Collections.emptyList;
+import static in.bytehue.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static java.util.Objects.requireNonNull;
-import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -13,23 +11,23 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Attributes;
@@ -45,7 +43,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
@@ -58,17 +57,7 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.dto.CapabilityDTO;
 import org.osgi.resource.dto.RequirementDTO;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.runtime.ServiceComponentRuntime;
-import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
-import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
-import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
@@ -76,14 +65,15 @@ import aQute.lib.io.ByteBufferInputStream;
 import aQute.lib.startlevel.StartLevelRuntimeHandler;
 import aQute.libg.shacache.ShaCache;
 import aQute.libg.shacache.ShaSource;
+import aQute.remote.agent.AgentDispatcher.Descriptor;
 import aQute.remote.util.Link;
 import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.agent.AgentExtension;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
-import in.bytehue.osgifx.console.agent.dto.XEventDTO;
-import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
+import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
@@ -92,8 +82,7 @@ import in.bytehue.osgifx.console.supervisor.Supervisor;
  * Implementation of the Agent. This implementation implements the Agent
  * interfaces and communicates with a Supervisor interfaces.
  */
-public final class AgentServer implements Agent, Closeable, EventHandler {
-
+public class AgentServer implements Agent, Closeable, FrameworkListener {
     private static final Pattern       BSN_P    = Pattern.compile("\\s*([^;\\s]+).*");
     private static final AtomicInteger sequence = new AtomicInteger(1000);
 
@@ -105,8 +94,6 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
     };
 
     private static final long[] EMPTY = {};
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     //
     // Known keys in the framework properties since we cannot
@@ -124,7 +111,7 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
             Constants.FRAMEWORK_WINDOWSYSTEM, };
 
     private Supervisor                     remote;
-    private final BundleContext            context;
+    private BundleContext                  context;
     private final ShaCache                 cache;
     private ShaSource                      source;
     private final Map<String, String>      installed  = new HashMap<>();
@@ -135,16 +122,14 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
     private final StartLevelRuntimeHandler startlevels;
     private final int                      startOptions;
 
-    private final ServiceTracker<MetaTypeService, MetaTypeService>                 metatypeTracker;
-    private final ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
-    private final ServiceTracker<Object, Object>                                   gogoCommandsTracker;
-    private final ServiceTracker<ConfigurationAdmin, ConfigurationAdmin>           configAdminTracker;
+    private final ServiceTracker<Object, Object>                 scrTracker;
+    private final ServiceTracker<Object, Object>                 metatypeTracker;
+    private final ServiceTracker<Object, Object>                 configAdminTracker;
+    private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
+    private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
 
-    private final AtomicInteger infoFrameworkEvents    = new AtomicInteger();
-    private final AtomicInteger warningFrameworkEvents = new AtomicInteger();
-    private final AtomicInteger errorFrameworkEvents   = new AtomicInteger();
-
-    private final Set<String> gogoCommands = new HashSet<>();
+    private final Set<String>                 gogoCommands    = new CopyOnWriteArraySet<>();
+    private final Map<String, AgentExtension> agentExtensions = new ConcurrentHashMap<>();
 
     /**
      * An agent server is based on a context and takes a name and cache
@@ -153,14 +138,15 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
      * @param name the name of the agent's framework
      * @param context a bundle context of the framework
      * @param cache the directory for caching
-     * @throws InvalidSyntaxException if the filter is erroneous
      */
-    public AgentServer(final String name, final BundleContext context, final File cache) throws InvalidSyntaxException {
+
+    public AgentServer(final String name, final BundleContext context, final File cache) throws Exception {
         this(name, context, cache, StartLevelRuntimeHandler.absent());
     }
 
     public AgentServer(final String name, final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels)
-            throws InvalidSyntaxException {
+            throws Exception {
+        requireNonNull(context, "Bundle context cannot be null");
         this.context = context;
 
         final boolean eager = context.getProperty(aQute.bnd.osgi.Constants.LAUNCH_ACTIVATION_EAGER) != null;
@@ -168,52 +154,83 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
 
         this.cache       = new ShaCache(cache);
         this.startlevels = startlevels;
+        this.context.addFrameworkListener(this);
 
-        final Filter filter = context.createFilter("(osgi.command.scope=*)");
+        final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
-        metatypeTracker     = new ServiceTracker<>(context, MetaTypeService.class, null);
-        scrTracker          = new ServiceTracker<>(context, ServiceComponentRuntime.class, null);
-        configAdminTracker  = new ServiceTracker<>(context, ConfigurationAdmin.class, null);
-        gogoCommandsTracker = new ServiceTracker<Object, Object>(context, filter, null) {
-                                @Override
-                                public Object addingService(final ServiceReference<Object> reference) {
-                                    final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                    final String[] functions = adapt(reference.getProperty("osgi.command.function"));
-                                    addCommand(scope, functions);
-                                    return super.addingService(reference);
-                                }
+        metatypeTracker       = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
+        configAdminTracker    = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
+        scrTracker            = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
+        agentExtensionTracker = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
 
-                                @Override
-                                public void removedService(final ServiceReference<Object> reference, final Object service) {
-                                    final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                    final String[] functions = adapt(reference.getProperty("osgi.command.function"));
-                                    removeCommand(scope, functions);
-                                }
+                                  @Override
+                                  public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
+                                      final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
+                                      if (name == null) {
+                                          return null;
+                                      }
+                                      final AgentExtension tracked = super.addingService(reference);
+                                      agentExtensions.put(name.toString(), tracked);
+                                      return tracked;
+                                  }
 
-                                private String[] adapt(final Object value) {
-                                    if (value instanceof String[]) {
-                                        return (String[]) value;
-                                    }
-                                    return new String[] { value.toString() };
-                                }
+                                  @Override
+                                  public void modifiedService(final ServiceReference<AgentExtension> reference,
+                                          final AgentExtension service) {
+                                      removedService(reference, service);
+                                      addingService(reference);
+                                  }
 
-                                private void addCommand(final String scope, final String... commands) {
-                                    for (final String command : commands) {
-                                        gogoCommands.add(scope + ":" + command);
-                                    }
-                                }
+                                  @Override
+                                  public void removedService(final ServiceReference<AgentExtension> reference,
+                                          final AgentExtension service) {
+                                      final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
+                                      if (name == null) {
+                                          return;
+                                      }
+                                      agentExtensions.remove(name);
+                                  }
+                              };
+        gogoCommandsTracker   = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
+                                  @Override
+                                  public Object addingService(final ServiceReference<Object> reference) {
+                                      final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
+                                      final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                      addCommand(scope, functions);
+                                      return super.addingService(reference);
+                                  }
 
-                                private void removeCommand(final String scope, final String... commands) {
-                                    for (final String command : commands) {
-                                        gogoCommands.remove(scope + ":" + command);
-                                    }
-                                }
-                            };
+                                  @Override
+                                  public void removedService(final ServiceReference<Object> reference, final Object service) {
+                                      final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
+                                      final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                      removeCommand(scope, functions);
+                                  }
 
+                                  private String[] adapt(final Object value) {
+                                      if (value instanceof String[]) {
+                                          return (String[]) value;
+                                      }
+                                      return new String[] { value.toString() };
+                                  }
+
+                                  private void addCommand(final String scope, final String... commands) {
+                                      Stream.of(commands).forEach(cmd -> gogoCommands.add(scope + ":" + cmd));
+                                  }
+
+                                  private void removeCommand(final String scope, final String... commands) {
+                                      Stream.of(commands).forEach(cmd -> gogoCommands.remove(scope + ":" + cmd));
+                                  }
+                              };
         scrTracker.open();
         metatypeTracker.open();
         configAdminTracker.open();
         gogoCommandsTracker.open();
+        agentExtensionTracker.open();
+    }
+
+    AgentServer(final Descriptor d) throws Exception {
+        this(d.name, d.framework.getBundleContext(), d.shaCache, d.startlevels);
     }
 
     /**
@@ -634,12 +651,14 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
     @Override
     public void close() throws IOException {
         try {
+            cleanup(-2);
+            startlevels.close();
+
             scrTracker.close();
             metatypeTracker.close();
             configAdminTracker.close();
             gogoCommandsTracker.close();
-            cleanup(-2);
-            startlevels.close();
+            agentExtensionTracker.close();
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -648,6 +667,11 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
     @Override
     public void abort() throws Exception {
         cleanup(-3);
+    }
+
+    @Override
+    public void frameworkEvent(final FrameworkEvent event) {
+
     }
 
     private void printStack(final Exception e1) {
@@ -896,155 +920,142 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
 
     @Override
     public List<XBundleDTO> getAllBundles() {
-        return XBundleInfoProvider.get(getContext());
+        return XBundleAdmin.get(context);
     }
 
     @Override
     public List<XComponentDTO> getAllComponents() {
-        return XComponentInfoProvider.get(scrTracker.getService());
+        final boolean isScrAvailable = PackageWirings.isScrWired(context);
+        if (isScrAvailable) {
+            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
+            return scrAdmin.getComponents();
+        }
+        return Collections.emptyList();
     }
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        return XConfigurationtInfoProvider.get(getContext(), configAdminTracker.getService(), metatypeTracker.getService());
+        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
+        final boolean isMetatypeAvailable    = PackageWirings.isMetatypeWired(context);
+
+        final List<XConfigurationDTO> configs = new ArrayList<>();
+        if (isConfigAdminAvailable) {
+            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
+                    metatypeTracker.getService());
+            configs.addAll(configAdmin.getConfigurations());
+        }
+        if (isMetatypeAvailable) {
+            final XMetaTypeAdmin metatypeAdmin = new XMetaTypeAdmin(context, configAdminTracker.getService(), metatypeTracker.getService());
+            configs.addAll(metatypeAdmin.getConfigurations());
+        }
+        return configs;
     }
 
     @Override
     public List<XPropertyDTO> getAllProperties() {
-        return XPropertytInfoProvider.get(getContext());
+        return XPropertyAdmin.get(context);
     }
 
     @Override
     public List<XServiceDTO> getAllServices() {
-        return XServiceInfoProvider.get(getContext());
+        return XServiceAdmin.get(context);
     }
 
     @Override
     public List<XThreadDTO> getAllThreads() {
-        return XThreadInfoProvider.get();
+        return XThreadAdmin.get();
     }
 
     @Override
-    public Collection<ComponentDescriptionDTO> getComponentDescriptionDTOs() {
-        // @formatter:off
-        return Optional.ofNullable(scrTracker.getService())
-                       .map(ServiceComponentRuntime::getComponentDescriptionDTOs)
-                       .orElse(emptyList());
-        // @formatter:on
+    public XResultDTO enableComponent(final long id) {
+        final boolean isScrAvailable = PackageWirings.isScrWired(context);
+        if (isScrAvailable) {
+            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
+            return scrAdmin.enableComponent(id);
+        }
+        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
     }
 
     @Override
-    public Collection<ComponentConfigurationDTO> getComponentConfigurationDTOs(final ComponentDescriptionDTO description) {
-        // @formatter:off
-        return Optional.ofNullable(scrTracker.getService())
-                       .map(scr -> scr.getComponentConfigurationDTOs(description))
-                       .orElse(emptyList());
-        // @formatter:on
+    public XResultDTO enableComponent(final String name) {
+        requireNonNull(name, "Component name cannot be null");
+
+        final boolean isScrAvailable = PackageWirings.isScrWired(context);
+        if (isScrAvailable) {
+            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
+            return scrAdmin.enableComponent(name);
+        }
+        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
     }
 
     @Override
-    public String enableComponent(final String name) {
-        final ServiceComponentRuntime service = scrTracker.getService();
-        if (service == null) {
-            return "Service Component Runtime service is unavailable";
+    public XResultDTO disableComponent(final long id) {
+        final boolean isScrAvailable = PackageWirings.isScrWired(getContext());
+        if (isScrAvailable) {
+            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
+            return scrAdmin.disableComponent(id);
         }
-        final StringBuilder                       builder         = new StringBuilder();
-        final Collection<ComponentDescriptionDTO> descriptionDTOs = service.getComponentDescriptionDTOs();
-
-        for (final ComponentDescriptionDTO dto : descriptionDTOs) {
-            if (dto.name.equals(name)) {
-                try {
-                    service.enableComponent(dto).onFailure(e -> builder.append(e.getMessage()).append(lineSeparator())).getValue();
-                } catch (InvocationTargetException | InterruptedException e) {
-                    builder.append(e.getMessage()).append(lineSeparator());
-                }
-                final String response = builder.toString();
-                return response.isEmpty() ? null : response;
-            }
-        }
-        return null;
+        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
     }
 
     @Override
-    public String disableComponent(final long id) {
-        final ServiceComponentRuntime service = scrTracker.getService();
-        if (service == null) {
-            return "Service Component Runtime service is unavailable";
-        }
-        final StringBuilder                       builder         = new StringBuilder();
-        final Collection<ComponentDescriptionDTO> descriptionDTOs = service.getComponentDescriptionDTOs();
+    public XResultDTO disableComponent(final String name) {
+        requireNonNull(name, "Component name cannot be null");
 
-        for (final ComponentDescriptionDTO dto : descriptionDTOs) {
-            final Collection<ComponentConfigurationDTO> configurationDTOs = service.getComponentConfigurationDTOs(dto);
-            for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
-                if (configDTO.id == id) {
-                    try {
-                        service.disableComponent(dto).onFailure(e -> builder.append(e.getMessage()).append(lineSeparator())).getValue();
-                    } catch (InvocationTargetException | InterruptedException e) {
-                        builder.append(e.getMessage()).append(lineSeparator());
-                    }
-                    final String response = builder.toString();
-                    return response.isEmpty() ? null : response;
-                }
-            }
+        final boolean isScrAvailable = PackageWirings.isScrWired(getContext());
+        if (isScrAvailable) {
+            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
+            return scrAdmin.disableComponent(name);
         }
-        return null;
+        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
     }
 
     @Override
-    public Collection<ServiceReferenceDTO> getServiceReferences(final String filter) throws Exception {
-        return getFramework().services;
+    public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
+        requireNonNull(pid, "Configuration PID cannot be null");
+        requireNonNull(newProperties, "Configuration properties cannot be null");
+
+        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
+        if (isConfigAdminAvailable) {
+            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
+                    metatypeTracker.getService());
+            return configAdmin.createOrUpdateConfiguration(pid, newProperties);
+        }
+        return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
     }
 
     @Override
-    public void deleteConfiguration(final String pid) throws IOException {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return;
+    public XResultDTO deleteConfiguration(final String pid) {
+        requireNonNull(pid, "Configuration PID cannot be null");
+
+        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(getContext());
+        if (isConfigAdminAvailable) {
+            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
+                    metatypeTracker.getService());
+            return configAdmin.deleteConfiguration(pid);
         }
-        try {
-            for (final Configuration configuration : configAdmin.listConfigurations(null)) {
-                if (configuration.getPid().equals(pid)) {
-                    configuration.delete();
-                }
-            }
-        } catch (final Exception e) {
-            logger.error("Cannot delete configuration '{}'", pid);
-        }
+        return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
     }
 
     @Override
-    public void updateConfiguration(final String pid, final Map<String, Object> newProperties) throws IOException {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return;
+    public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
+        requireNonNull(factoryPid, "Configuration factory PID cannot be null");
+        requireNonNull(newProperties, "Configuration properties cannot be null");
+
+        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
+
+        if (isConfigAdminAvailable) {
+            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
+                    metatypeTracker.getService());
+            return configAdmin.createFactoryConfiguration(factoryPid, newProperties);
         }
-        try {
-            final Configuration configuration = configAdmin.getConfiguration(pid, "?");
-            configuration.update(new Hashtable<>(newProperties));
-        } catch (final Exception e) {
-            logger.error("Cannot update configuration '{}'", pid);
-        }
+        return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
     }
 
     @Override
-    public void createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) throws IOException {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return;
-        }
-        try {
-            final Configuration configuration = configAdmin.getFactoryConfiguration(factoryPid, "?");
-            configuration.update(new Hashtable<>(newProperties));
-        } catch (final Exception e) {
-            logger.error("Cannot update configuration '{}'", factoryPid);
-        }
-    }
-
-    @Override
-    public Map<String, String> runtimeInfo() {
+    public Map<String, String> getRuntimeInfo() {
         final Map<String, String> runtime      = new HashMap<>();
-        final Bundle              systemBundle = getContext().getBundle(SYSTEM_BUNDLE_ID);
+        final Bundle              systemBundle = getContext().getBundle(0);
 
         runtime.put("Framework", systemBundle.getSymbolicName());
         runtime.put("Framework Version", systemBundle.getVersion().toString());
@@ -1058,50 +1069,44 @@ public final class AgentServer implements Agent, Closeable, EventHandler {
         return runtime;
     }
 
+    @Override
+    public Set<String> getGogoCommands() {
+        return new HashSet<>(gogoCommands);
+    }
+
+    @Override
+    public Object executeExtension(final String name, final Map<String, Object> context) {
+        if (!agentExtensions.containsKey(name)) {
+            return "Agent extension with name '" + name + "' doesn't exist";
+        }
+        return agentExtensions.get(name).execute(context);
+    }
+
     private static long getSystemUptime() {
         final RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
         return rb.getUptime();
     }
 
-    @Override
-    public XFrameworkEventsDTO getFrameworkEventsOverview() {
-        final XFrameworkEventsDTO dto = new XFrameworkEventsDTO();
+    public static <K, V> Map<K, V> valueOf(final Dictionary<K, V> dictionary) {
+        if (dictionary == null) {
+            return null;
+        }
+        final Map<K, V>      map  = new HashMap<>(dictionary.size());
+        final Enumeration<K> keys = dictionary.keys();
+        while (keys.hasMoreElements()) {
+            final K key = keys.nextElement();
+            map.put(key, dictionary.get(key));
+        }
+        return map;
+    }
 
-        dto.info    = infoFrameworkEvents.get();
-        dto.warning = warningFrameworkEvents.get();
-        dto.error   = errorFrameworkEvents.get();
+    public static XResultDTO createResult(final int result, final String response) {
+        final XResultDTO dto = new XResultDTO();
+
+        dto.result   = result;
+        dto.response = response;
 
         return dto;
-    }
-
-    @Override
-    public void handleEvent(final Event event) {
-        final XEventDTO dto = new XEventDTO();
-
-        dto.received   = System.currentTimeMillis();
-        dto.properties = initProperties(event);
-        dto.topic      = event.getTopic();
-
-        final Supervisor supervisor = getSupervisor();
-        supervisor.onOSGiEvent(dto);
-    }
-
-    @Override
-    public Set<String> getGogoCommands() {
-        return gogoCommands;
-    }
-
-    private Map<String, String> initProperties(final Event event) {
-        final Map<String, String> properties = new HashMap<>();
-
-        for (final String propertyName : event.getPropertyNames()) {
-            Object propertyValue = event.getProperty(propertyName);
-            if (propertyValue instanceof String[]) {
-                propertyValue = Arrays.asList((String[]) propertyValue);
-            }
-            properties.put(propertyName, propertyValue.toString());
-        }
-        return properties;
     }
 
 }

@@ -4,8 +4,8 @@ import javax.inject.Inject;
 
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.log.Logger;
-import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
+import in.bytehue.osgifx.console.agent.dto.XReferenceDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
@@ -48,7 +48,7 @@ public final class ReferenceDetailsFxController {
         logger.info("FXML controller has been initialized");
     }
 
-    void initControls(final ReferenceDTO reference) {
+    void initControls(final XReferenceDTO reference) {
         nameLabel.setText(reference.name);
         interfaceLabel.setText(reference.interfaceName);
         cardinalityLabel.setText(reference.cardinality);

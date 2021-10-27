@@ -1,5 +1,6 @@
 package in.bytehue.osgifx.console.agent.provider;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.dto.FrameworkDTO;
@@ -16,13 +18,14 @@ import org.osgi.framework.dto.ServiceReferenceDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 
-public final class XServiceInfoProvider {
+public class XServiceAdmin {
 
-    private XServiceInfoProvider() {
+    private XServiceAdmin() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
     public static List<XServiceDTO> get(final BundleContext context) {
+        requireNonNull(context);
         final FrameworkDTO dto = context.getBundle(Constants.SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
         return dto.services.stream().map(s -> toDTO(s, context)).collect(toList());
     }
@@ -32,7 +35,7 @@ public final class XServiceInfoProvider {
 
         final XBundleInfoDTO bundleInfo = new XBundleInfoDTO();
         bundleInfo.id           = refDTO.bundle;
-        bundleInfo.symbolicName = ConsoleAgentHelper.bsn(refDTO.bundle, context);
+        bundleInfo.symbolicName = bsn(refDTO.bundle, context);
 
         dto.id                = refDTO.id;
         dto.bundleId          = bundleInfo.id;
@@ -59,7 +62,7 @@ public final class XServiceInfoProvider {
     private static List<XBundleInfoDTO> getUsingBundles(final long[] usingBundles, final BundleContext context) {
         final List<XBundleInfoDTO> bundles = new ArrayList<>();
         for (final long id : usingBundles) {
-            final String bsn = ConsoleAgentHelper.bsn(id, context);
+            final String bsn = bsn(id, context);
 
             final XBundleInfoDTO dto = new XBundleInfoDTO();
             dto.id           = id;
@@ -68,6 +71,15 @@ public final class XServiceInfoProvider {
             bundles.add(dto);
         }
         return bundles;
+    }
+
+    private static String bsn(final long id, final BundleContext context) {
+        for (final Bundle b : context.getBundles()) {
+            if (b.getBundleId() == id) {
+                return b.getSymbolicName();
+            }
+        }
+        return null;
     }
 
 }

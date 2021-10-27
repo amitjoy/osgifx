@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.dto.DTO;
-import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
 public class XComponentDTO extends DTO {
 
@@ -20,7 +19,7 @@ public class XComponentDTO extends DTO {
     public List<String>                   serviceInterfaces;
     public List<String>                   configurationPid;
     public Map<String, String>            properties;
-    public List<ReferenceDTO>             references;
+    public List<XReferenceDTO>            references;
     public String                         failure;
     public String                         activate;
     public String                         deactivate;

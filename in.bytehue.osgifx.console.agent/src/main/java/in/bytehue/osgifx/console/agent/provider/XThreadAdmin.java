@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 
-public final class XThreadInfoProvider {
+public class XThreadAdmin {
 
-    private XThreadInfoProvider() {
+    private XThreadAdmin() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
     public static List<XThreadDTO> get() {
         final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
         final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
-        return threadList.stream().map(XThreadInfoProvider::toDTO).collect(Collectors.toList());
+        return threadList.stream().map(XThreadAdmin::toDTO).collect(Collectors.toList());
     }
 
     private static XThreadDTO toDTO(final Thread thread) {

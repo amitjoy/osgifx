@@ -15,9 +15,9 @@ import org.osgi.framework.dto.FrameworkDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO.XPropertyType;
 
-public final class XPropertytInfoProvider {
+public class XPropertyAdmin {
 
-    private XPropertytInfoProvider() {
+    private XPropertyAdmin() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 

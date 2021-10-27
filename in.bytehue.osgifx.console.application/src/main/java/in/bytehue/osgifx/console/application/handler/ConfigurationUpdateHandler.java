@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 public final class ConfigurationUpdateHandler {
@@ -36,11 +37,17 @@ public final class ConfigurationUpdateHandler {
             return;
         }
         try {
-            final Map<String, Object> props = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
-            }.getType());
-            agent.updateConfiguration(pid, props);
-            logger.atInfo().log("Configuration with PID '%s' has been updated", pid);
-            eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+            final Map<String, Object> props  = new Gson().fromJson(properties, new TypeToken<Map<String, Object>>() {
+                                             }.getType());
+            final XResultDTO          result = agent.createOrUpdateConfiguration(pid, props);
+            if (result.result == XResultDTO.SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+            } else if (result.result == XResultDTO.SKIPPED) {
+                logger.atWarning().log(result.response);
+            } else {
+                logger.atError().log(result.response);
+            }
         } catch (final Exception e) {
             logger.atError().withException(e).log("Configuration with PID '%s' cannot be updated", pid);
         }
