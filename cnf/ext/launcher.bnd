@@ -1,5 +1,5 @@
 -runrepos                       =         Workspace, Runtime, e(fx)clipse
--runfw                          =         org.eclipse.osgi
+-runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         false
 -runtrace                       =         true 
 -runee                          =         JavaSE-1.8
