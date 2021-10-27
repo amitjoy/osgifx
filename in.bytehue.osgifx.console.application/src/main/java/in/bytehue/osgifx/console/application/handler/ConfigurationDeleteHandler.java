@@ -11,6 +11,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 public final class ConfigurationDeleteHandler {
@@ -31,9 +32,15 @@ public final class ConfigurationDeleteHandler {
             return;
         }
         try {
-            agent.deleteConfiguration(pid);
-            logger.atInfo().log("Configuration with PID '%s' has been deleted", pid);
-            eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
+            final XResultDTO result = agent.deleteConfiguration(pid);
+            if (result.result == XResultDTO.SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
+            } else if (result.result == XResultDTO.SKIPPED) {
+                logger.atWarning().log(result.response);
+            } else {
+                logger.atError().log(result.response);
+            }
         } catch (final Exception e) {
             logger.atError().withException(e).log("Configuration with PID '%s' cannot be deleted", pid);
         }

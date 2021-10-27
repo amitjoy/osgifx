@@ -115,7 +115,7 @@ public final class OverviewFxUI {
         noOfThreadsTile.setRoundedCorners(false);
 
         final Map<String, String> runtimeInfo = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                                  .map(Agent::runtimeInfo)
+                                                                  .map(Agent::getRuntimeInfo)
                                                                   .map(Maps::newHashMap)
                                                                   .orElse(new HashMap<>());
         final Tile runtimeInfoTile = TileBuilder.create()
@@ -235,7 +235,7 @@ public final class OverviewFxUI {
         availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
 
         final UptimeDTO uptime = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                   .map(Agent::runtimeInfo)
+                                                   .map(Agent::getRuntimeInfo)
                                                    .map(Maps::newHashMap)
                                                    .filter(info -> !info.isEmpty())
                                                    .map(info -> info.get("Uptime"))
@@ -367,7 +367,7 @@ public final class OverviewFxUI {
     private long getMemory(final String key) {
         // @formatter:off
         return java.util.Optional.ofNullable(supervisor.getAgent())
-                                 .map(Agent::runtimeInfo)
+                                 .map(Agent::getRuntimeInfo)
                                  .map(Maps::newHashMap)
                                  .filter(info -> !info.isEmpty())
                                  .map(info -> info.get(key))

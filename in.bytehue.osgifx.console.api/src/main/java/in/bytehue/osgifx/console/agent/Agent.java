@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.agent;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,25 +7,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.osgi.annotation.versioning.ProviderType;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.dto.FrameworkDTO;
-import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
-import org.osgi.service.cm.Configuration.ConfigurationAttribute;
-import org.osgi.service.cm.ConfigurationEvent;
-import org.osgi.service.cm.ManagedService;
-import org.osgi.service.cm.ManagedServiceFactory;
-import org.osgi.service.cm.ReadOnlyConfigurationException;
-import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
-import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
-import in.bytehue.osgifx.console.agent.dto.XFrameworkEventsDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
+import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
@@ -47,7 +36,9 @@ public interface Agent {
      */
     int DEFAULT_PORT = 29998;
 
-    /** The system property to set the port for communication */
+    /**
+     * The property key to set the agent's port.
+     */
     String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
 
     /**
@@ -260,8 +251,12 @@ public interface Agent {
      */
     boolean ping();
 
+    /*******************************************************************
+     * Extended usages to manage runtime in all respects
+     *******************************************************************/
+
     /**
-     * Get the detailed information of all the installed bundles
+     * Returns the detailed information of all the installed bundles
      *
      * @return the detailed information of all the installed bundles
      */
@@ -269,15 +264,28 @@ public interface Agent {
 
     /**
      * Get the detailed information of all the registered DS service components
+     * <p>
+     * Note that, this is only possible if the remote runtime has SCR bundle
+     * installed.
      *
-     * @return the detailed information of all the registered DS service components
+     * @return the detailed information of all the registered DS service
+     *         components, otherwise {@code empty} list if the remote runtime
+     *         does not have SCR bundle installed
      */
     List<XComponentDTO> getAllComponents();
 
     /**
      * Get the detailed information of all the configurations
+     * <p>
+     * Note that, this is only possible if the remote runtime has ConfigAdmin
+     * (CM) bundle installed.
+     * <p>
+     * Also note that, if metatype bundle is installed, the property descriptors
+     * will also be included.
      *
-     * @return the detailed information of all the configurations
+     * @return the detailed information of all the configurations, otherwise
+     *         {@code empty} list if the remote runtime does not have CM bundle
+     *         installed
      */
     List<XConfigurationDTO> getAllConfigurations();
 
@@ -303,159 +311,113 @@ public interface Agent {
     List<XThreadDTO> getAllThreads();
 
     /**
-     * Returns all the component descriptions.
-     *
-     * <p>
-     * Only component descriptions from active bundles are returned.
-     *
-     * @return The declared component descriptions of all the active {@code bundles}.
-     *         An empty collection is returned if there are no component descriptions
-     *         for the specified active bundles.
-     */
-    Collection<ComponentDescriptionDTO> getComponentDescriptionDTOs();
-
-    /**
-     * Returns the component configurations for the specified component
-     * description.
-     *
-     * @param description The component description. Must not be {@code null}.
-     * @return A collection containing a snapshot of the current component
-     *         configurations for the specified component description. An empty
-     *         collection is returned if there are none or if the provided
-     *         component description does not belong to an active bundle.
-     */
-    Collection<ComponentConfigurationDTO> getComponentConfigurationDTOs(ComponentDescriptionDTO description);
-
-    /**
-     * Enables the specified component description.
-     *
-     * <p>
-     * If the specified component description is currently enabled, this method
-     * has no effect.
-     *
-     * <p>
-     * This method must return after changing the enabled state of the specified
-     * component description. Any actions that result from this, such as
-     * activating or deactivating a component configuration, must occur
-     * asynchronously to this method call.
+     * Enables the component description by name
      *
      * @param name The name of the component description to enable.
-     * @return the error response as string
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
      */
-    String enableComponent(String name);
+    XResultDTO enableComponent(String name);
 
     /**
-     * Disables the specified component description.
-     * <p>
-     * If the specified component description is currently disabled, this method
-     * has no effect.
-     * <p>
-     * This method must return after changing the enabled state of the specified
-     * component description. Any actions that result from this, such as
-     * activating or deactivating a component configuration, must occur
-     * asynchronously to this method call.
+     * Enables the component description by identifier
      *
-     * @param id The id of component description to enable.
-     * @return the error response as string
+     * @param id The id of the component description to enable.
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
      */
-    String disableComponent(long id);
+    XResultDTO enableComponent(long id);
 
     /**
+     * Disables the component description by name
      *
-     * Returns an array of {@code ServiceReferenceDTO} objects. The returned array
-     * of {@code ServiceReferenceDTO} objects contains services that were
-     * registered under the specified class and match the specified filter
-     * expression.
-     *
-     * <p>
-     * The list is valid at the time of the call to this method. However since
-     * the Framework is a very dynamic environment, services can be modified or
-     * unregistered at any time.
-     *
-     * <p>
-     * The specified {@code filter} expression is used to select the registered
-     * services whose service properties contain keys and values which satisfy
-     * the filter expression. See {@link Filter} for a description of the filter
-     * syntax. If the specified {@code filter} is {@code null}, all registered
-     * services are considered to match the filter. If the specified
-     * {@code filter} expression cannot be parsed, an
-     * {@link InvalidSyntaxException} will be thrown with a human readable
-     * message where the filter became unparsable.
-     *
-     * @param filter The filter expression or {@code null} for all services
-     * @return An array of {@code ServiceReferenceDTO} objects or {@code empty} array if
-     *         no services are registered which satisfy the search.
-     * @throws InvalidSyntaxException If the specified {@code filter} contains
-     *             an invalid filter expression that cannot be parsed.
-     * @throws IllegalStateException If this BundleContext is no longer valid.
+     * @param name The name of component description to disable.
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
      */
-    Collection<ServiceReferenceDTO> getServiceReferences(String filter) throws Exception;
+    XResultDTO disableComponent(String name);
 
     /**
-     * Delete the associated {@code Configuration} object.
-     * <p>
-     * Removes this configuration object from the persistent store. Notify
-     * asynchronously the corresponding Managed Service or Managed Service
-     * Factory. A {@link ManagedService} object is notified by a call to its
-     * {@code updated} method with a {@code null} properties argument. A
-     * {@link ManagedServiceFactory} object is notified by a call to its
-     * {@code deleted} method.
-     * <p>
-     * Also notifies all Configuration Listeners with a
-     * {@link ConfigurationEvent#CM_DELETED} event.
+     * Disables the component description by identifier
      *
-     * @throws ReadOnlyConfigurationException If the configuration is
-     *             {@link ConfigurationAttribute#READ_ONLY read only}.
-     * @throws IOException If delete fails.
-     * @throws IllegalStateException If this configuration has been deleted.
+     * @param id The id of component description to disable.
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
      */
-    void deleteConfiguration(String pid) throws IOException;
+    XResultDTO disableComponent(long id);
 
     /**
-     * Update the {@code Configuration} object associated with the specified
-     * {@code pid} with the current properties.
+     * Creates or updates the associated {@code Configuration} object with the
+     * specified properties.
+     * <p>
+     * Note that, this is only possible if the remote runtime has ConfigAdmin
+     * (CM) bundle installed.
      *
-     * @param pid the Configuration PID to update
+     * @param pid the configuration PID to update
      * @param newProperties the new properties to associate
-     *
-     * @throws IOException if update cannot access the properties in persistent
-     *             storage
-     * @throws IllegalStateException If this configuration has been deleted.
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
      */
-    void updateConfiguration(String pid, Map<String, Object> newProperties) throws IOException;
+    XResultDTO createOrUpdateConfiguration(String pid, Map<String, Object> newProperties);
+
+    /**
+     * Deletes the associated {@code Configuration} object that corresponds to
+     * the specified {@code pid}.
+     * <p>
+     * Note that, this is only possible if the remote runtime has ConfigAdmin CM
+     * bundle installed.
+     *
+     * @param pid The configuration PID to delete.
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
+     */
+    XResultDTO deleteConfiguration(String pid);
 
     /**
      * Create the {@code Configuration} object associated with the specified
-     * {@code factoryPid} with the current properties.
+     * {@code factoryPid} with the specified properties.
+     * <p>
+     * Note that, this is only possible if the remote runtime has ConfigAdmin
+     * (CM) bundle installed.
      *
      * @param factoryPid the Configuration Factory PID
      * @param newProperties the new properties to associate
-     *
-     * @throws IOException if update cannot access the properties in persistent
-     *             storage
-     * @throws IllegalStateException If this configuration has been deleted.
+     * @return the detailed information about the operation whether it succeeded
+     *         or failed
      */
-    void createFactoryConfiguration(String factoryPid, Map<String, Object> newProperties) throws IOException;
+    XResultDTO createFactoryConfiguration(String factoryPid, Map<String, Object> newProperties);
 
     /**
      * Returns the runtime information of the remote system
      *
      * @return the runtime information
      */
-    Map<String, String> runtimeInfo();
+    Map<String, String> getRuntimeInfo();
 
     /**
-     * Returns the overview of the framework events
+     * Returns the set of registered Gogo commands
+     * <p>
+     * Note that, this is only possible if the remote runtime has Gogo bundle(s)
+     * installed
      *
-     * @return the overview of the framework events
-     */
-    XFrameworkEventsDTO getFrameworkEventsOverview();
-
-    /**
-     * Returns set of registered Gogo commands
-     *
-     * @return the set of registered Gogo commands
+     * @return the set of registered Gogo commands, otherwise {@code empty} set
+     *         if the remote runtime does not have Gogo bundle(s) installed
      */
     Set<String> getGogoCommands();
 
+    /**
+     * Returns the result from the specified agent extension.
+     * <p>
+     * <b>Note that,</b> the extension should be registered as a service that
+     * implements {@link AgentExtension} and the service must provide a readable
+     * name in its {@code agent.extension.name} service property.
+     *
+     * @param name the name of the extension
+     * @param context the context for the extension to be provided for execution
+     *            (note that, the map should also contain values supported by
+     *            bnd's {@code Converter})
+     * @return the value having the type supported by bnd's {@code Converter}
+     * @see AgentExtension
+     */
+    Object executeExtension(String name, Map<String, Object> context);
 }

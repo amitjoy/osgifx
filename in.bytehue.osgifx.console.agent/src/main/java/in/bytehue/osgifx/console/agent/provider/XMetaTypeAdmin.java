@@ -1,6 +1,9 @@
 package in.bytehue.osgifx.console.agent.provider;
 
-import static in.bytehue.osgifx.console.agent.provider.ConsoleAgentHelper.valueOf;
+import static in.bytehue.osgifx.console.agent.dto.XResultDTO.ERROR;
+import static in.bytehue.osgifx.console.agent.dto.XResultDTO.SUCCESS;
+import static in.bytehue.osgifx.console.agent.provider.AgentServer.createResult;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
@@ -9,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,57 +33,103 @@ import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
 import in.bytehue.osgifx.console.agent.dto.XAttributeDefType;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XObjectClassDefDTO;
+import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 
-public final class XConfigurationtInfoProvider {
+public class XMetaTypeAdmin {
 
-    private XConfigurationtInfoProvider() {
-        throw new IllegalAccessError("Cannot be instantiated");
+    private final BundleContext      context;
+    private final MetaTypeService    metatype;
+    private final ConfigurationAdmin configAdmin;
+
+    public XMetaTypeAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
+        this.context     = requireNonNull(context);
+        this.configAdmin = (ConfigurationAdmin) configAdmin;
+        this.metatype    = (MetaTypeService) metatype;
     }
 
-    public static List<XConfigurationDTO> get(final BundleContext context, final ConfigurationAdmin configAdmin,
-            final MetaTypeService metatype) {
-        List<XConfigurationDTO> configsWithoutMetatype = null;
+    public List<XConfigurationDTO> getConfigurations() {
+        if (configAdmin == null || metatype == null) {
+            return Collections.emptyList();
+        }
         List<XConfigurationDTO> configsWithMetatype    = null;
         List<XConfigurationDTO> metatypeWithoutConfigs = null;
         List<XConfigurationDTO> metatypeFactories      = null;
-
         try {
-            configsWithoutMetatype = findConfigsWithoutMetatype(context, configAdmin, metatype);
-            configsWithMetatype    = findConfigsWithMetatype(context, configAdmin, metatype);
-            metatypeWithoutConfigs = findMetatypeWithoutConfigs(context, configAdmin, metatype);
-            metatypeFactories      = findMetatypeFactories(context, metatype);
+            configsWithMetatype    = findConfigsWithMetatype();
+            metatypeWithoutConfigs = findMetatypeWithoutConfigs();
+            metatypeFactories      = findMetatypeFactories();
         } catch (IOException | InvalidSyntaxException e) {
             return Collections.emptyList();
         }
-        return joinLists(configsWithoutMetatype, configsWithMetatype, metatypeWithoutConfigs, metatypeFactories);
+        return joinLists(configsWithMetatype, metatypeWithoutConfigs, metatypeFactories);
     }
 
-    private static List<XConfigurationDTO> findConfigsWithoutMetatype(final BundleContext context, final ConfigurationAdmin configAdmin,
-            final MetaTypeService metatype) throws IOException, InvalidSyntaxException {
-        final List<XConfigurationDTO> dtos = new ArrayList<>();
-        for (final Configuration config : configAdmin.listConfigurations(null)) {
-            final boolean hasMetatype = hasMetatype(config, context, metatype);
-            if (!hasMetatype) {
-                dtos.add(toConfigDTO(config, null));
-            }
+    public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
+        if (configAdmin == null || metatype == null) {
+            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
         }
-        return dtos;
+        XResultDTO result = null;
+        try {
+            String              action        = null;
+            final Configuration configuration = configAdmin.getConfiguration(pid, "?");
+            if (configuration.getProperties() == null) { // new configuration
+                action = "created";
+            } else {
+                action = "updated";
+            }
+            configuration.update(new Hashtable<>(newProperties));
+            result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been " + action);
+        } catch (final Exception e) {
+            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
+        }
+        return result;
     }
 
-    private static List<XConfigurationDTO> findConfigsWithMetatype(final BundleContext context, final ConfigurationAdmin configAdmin,
-            final MetaTypeService metatype) throws IOException, InvalidSyntaxException {
+    public XResultDTO deleteConfiguration(final String pid) {
+        if (configAdmin == null || metatype == null) {
+            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+        }
+        XResultDTO result = null;
+        try {
+            for (final Configuration configuration : configAdmin.listConfigurations(null)) {
+                if (configuration.getPid().equals(pid)) {
+                    configuration.delete();
+                    result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been deleted");
+                }
+            }
+        } catch (final Exception e) {
+            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
+        }
+        return result;
+    }
+
+    public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
+        if (configAdmin == null || metatype == null) {
+            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+        }
+        XResultDTO result = null;
+        try {
+            final Configuration configuration = configAdmin.getFactoryConfiguration(factoryPid, "?");
+            configuration.update(new Hashtable<>(newProperties));
+            result = createResult(SUCCESS, "Configuration with factory PID '" + factoryPid + " ' has been created");
+        } catch (final Exception e) {
+            result = createResult(ERROR, "Configuration with factory PID '" + factoryPid + "' cannot be created due to " + e.getMessage());
+        }
+        return result;
+    }
+
+    private List<XConfigurationDTO> findConfigsWithMetatype() throws IOException, InvalidSyntaxException {
         final List<XConfigurationDTO> dtos = new ArrayList<>();
         for (final Configuration config : configAdmin.listConfigurations(null)) {
-            final boolean hasMetatype = hasMetatype(config, context, metatype);
+            final boolean hasMetatype = hasMetatype(context, metatype, config);
             if (hasMetatype) {
-                dtos.add(toConfigDTO(config, toOCD(config, context, metatype)));
+                dtos.add(toConfigDTO(config, toOCD(config)));
             }
         }
         return dtos;
     }
 
-    private static List<XConfigurationDTO> findMetatypeWithoutConfigs(final BundleContext context, final ConfigurationAdmin configAdmin,
-            final MetaTypeService metatype) throws IOException, InvalidSyntaxException {
+    private List<XConfigurationDTO> findMetatypeWithoutConfigs() throws IOException, InvalidSyntaxException {
         final List<XConfigurationDTO> dtos = new ArrayList<>();
         for (final Bundle bundle : context.getBundles()) {
             final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
@@ -86,14 +137,14 @@ public final class XConfigurationtInfoProvider {
                 continue;
             }
             for (final String pid : metatypeInfo.getPids()) {
-                final boolean hasAssociatedConfiguration = checkConfigurationExistence(pid, configAdmin);
+                final boolean hasAssociatedConfiguration = checkConfigurationExistence(pid);
                 if (!hasAssociatedConfiguration) {
-                    final XObjectClassDefDTO ocd = toOcdDTO(pid, metatypeInfo, ConfigurationType.SIMPLE);
+                    final XObjectClassDefDTO ocd = toOcdDTO(pid, metatypeInfo, ConfigurationType.SINGLETON);
                     dtos.add(toConfigDTO(null, ocd));
                 }
             }
             for (final String fpid : metatypeInfo.getFactoryPids()) {
-                final boolean hasAssociatedConfiguration = checkFactoryConfigurationExistence(fpid, configAdmin);
+                final boolean hasAssociatedConfiguration = checkFactoryConfigurationExistence(fpid);
                 if (!hasAssociatedConfiguration) {
                     final XObjectClassDefDTO ocd = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
                     dtos.add(toConfigDTO(null, ocd));
@@ -103,7 +154,7 @@ public final class XConfigurationtInfoProvider {
         return dtos;
     }
 
-    private static List<XConfigurationDTO> findMetatypeFactories(final BundleContext context, final MetaTypeService metatype) {
+    private List<XConfigurationDTO> findMetatypeFactories() {
         final List<XConfigurationDTO> dtos = new ArrayList<>();
         for (final Bundle bundle : context.getBundles()) {
             final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
@@ -120,29 +171,27 @@ public final class XConfigurationtInfoProvider {
         return dtos;
     }
 
-    private static boolean checkConfigurationExistence(final String pid, final ConfigurationAdmin configAdmin)
-            throws IOException, InvalidSyntaxException {
+    private boolean checkConfigurationExistence(final String pid) throws IOException, InvalidSyntaxException {
         return configAdmin.listConfigurations("(service.pid=" + pid + ")") != null;
     }
 
-    private static boolean checkFactoryConfigurationExistence(final String factoryPid, final ConfigurationAdmin configAdmin)
-            throws IOException, InvalidSyntaxException {
+    private boolean checkFactoryConfigurationExistence(final String factoryPid) throws IOException, InvalidSyntaxException {
         return configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")") != null;
     }
 
-    private static XConfigurationDTO toConfigDTO(final Configuration configuration, final XObjectClassDefDTO ocd) {
+    private XConfigurationDTO toConfigDTO(final Configuration configuration, final XObjectClassDefDTO ocd) {
         final XConfigurationDTO dto = new XConfigurationDTO();
 
         dto.ocd        = ocd;
         dto.pid        = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
         dto.factoryPid = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties = Optional.ofNullable(configuration).map(c -> valueOf(configuration.getProperties())).orElse(null);
+        dto.properties = Optional.ofNullable(configuration).map(c -> AgentServer.valueOf(configuration.getProperties())).orElse(null);
         dto.location   = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
 
         return dto;
     }
 
-    private static XObjectClassDefDTO toOCD(final Configuration config, final BundleContext context, final MetaTypeService metatype) {
+    private XObjectClassDefDTO toOCD(final Configuration config) {
         for (final Bundle bundle : context.getBundles()) {
             final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
             if (metatypeInfo == null) {
@@ -153,7 +202,7 @@ public final class XConfigurationtInfoProvider {
 
             for (final String pid : metatypeInfo.getPids()) {
                 if (pid.equals(configPID)) {
-                    return toOcdDTO(configPID, metatypeInfo, ConfigurationType.SIMPLE);
+                    return toOcdDTO(configPID, metatypeInfo, ConfigurationType.SINGLETON);
                 }
             }
             for (final String fPid : metatypeInfo.getFactoryPids()) {
@@ -165,22 +214,22 @@ public final class XConfigurationtInfoProvider {
         return null;
     }
 
-    private static XObjectClassDefDTO toOcdDTO(final String ocdId, final MetaTypeInformation metatypeInfo, final ConfigurationType type) {
+    private XObjectClassDefDTO toOcdDTO(final String ocdId, final MetaTypeInformation metatypeInfo, final ConfigurationType type) {
         final ObjectClassDefinition ocd = metatypeInfo.getObjectClassDefinition(ocdId, null);
         final XObjectClassDefDTO    dto = new XObjectClassDefDTO();
 
         dto.id                 = ocd.getID();
-        dto.pid                = type == ConfigurationType.SIMPLE ? ocdId : null;
+        dto.pid                = type == ConfigurationType.SINGLETON ? ocdId : null;
         dto.factoryPid         = type == ConfigurationType.FACTORY ? ocdId : null;
         dto.name               = ocd.getName();
         dto.description        = ocd.getDescription();
         dto.descriptorLocation = metatypeInfo.getBundle().getSymbolicName();
-        dto.attributeDefs      = Stream.of(ocd.getAttributeDefinitions(ALL)).map(XConfigurationtInfoProvider::toAdDTO).collect(toList());
+        dto.attributeDefs      = Stream.of(ocd.getAttributeDefinitions(ALL)).map(this::toAdDTO).collect(toList());
 
         return dto;
     }
 
-    private static XAttributeDefDTO toAdDTO(final AttributeDefinition ad) {
+    private XAttributeDefDTO toAdDTO(final AttributeDefinition ad) {
         final XAttributeDefDTO dto = new XAttributeDefDTO();
 
         dto.id           = ad.getID();
@@ -193,7 +242,8 @@ public final class XConfigurationtInfoProvider {
         return dto;
     }
 
-    private static boolean hasMetatype(final Configuration config, final BundleContext context, final MetaTypeService metatype) {
+    public static boolean hasMetatype(final BundleContext context, final Object metatypeService, final Configuration config) {
+        final MetaTypeService metatype = (MetaTypeService) metatypeService;
         for (final Bundle bundle : context.getBundles()) {
             final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
             if (metatypeInfo == null) {
@@ -284,7 +334,7 @@ public final class XConfigurationtInfoProvider {
     }
 
     private enum ConfigurationType {
-        SIMPLE,
+        SINGLETON,
         FACTORY
     }
 

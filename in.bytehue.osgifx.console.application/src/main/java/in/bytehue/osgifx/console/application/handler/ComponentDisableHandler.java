@@ -11,6 +11,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import in.bytehue.osgifx.console.agent.Agent;
+import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 public final class ComponentDisableHandler {
@@ -31,12 +32,14 @@ public final class ComponentDisableHandler {
             return;
         }
         try {
-            final String error = agent.disableComponent(Long.parseLong(id));
-            if (error == null) {
-                logger.atInfo().log("Component with ID '%s' has been disabled", id);
+            final XResultDTO result = agent.disableComponent(Long.parseLong(id));
+            if (result.result == XResultDTO.SUCCESS) {
+                logger.atInfo().log(result.response);
                 eventBroker.send(COMPONENT_DISABLED_EVENT_TOPIC, id);
+            } else if (result.result == XResultDTO.SKIPPED) {
+                logger.atWarning().log(result.response);
             } else {
-                logger.atError().log(error);
+                logger.atError().log(result.response);
             }
         } catch (final Exception e) {
             logger.atError().withException(e).log("Service component with ID '%s' cannot be disabled", id);

@@ -15,9 +15,9 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.component.runtime.dto.ReferenceDTO;
 
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
+import in.bytehue.osgifx.console.agent.dto.XReferenceDTO;
 import in.bytehue.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import in.bytehue.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
@@ -39,76 +39,76 @@ public final class ComponentDetailsFxController {
     private static final String COMPONENT_DISABLE_COMMAND_ID = "in.bytehue.osgifx.console.application.command.component.disable";
 
     @FXML
-    private Label                                                     idLabel;
+    private Label                                                      idLabel;
     @FXML
-    private Label                                                     componentNameLabel;
+    private Label                                                      componentNameLabel;
     @FXML
-    private Label                                                     stateLabel;
+    private Label                                                      stateLabel;
     @FXML
-    private Label                                                     bundleLabel;
+    private Label                                                      bundleLabel;
     @FXML
-    private Label                                                     bundleIdLabel;
+    private Label                                                      bundleIdLabel;
     @FXML
-    private Label                                                     factoryLabel;
+    private Label                                                      factoryLabel;
     @FXML
-    private Label                                                     scopeLabel;
+    private Label                                                      scopeLabel;
     @FXML
-    private Label                                                     classLabel;
+    private Label                                                      classLabel;
     @FXML
-    private Label                                                     policyLabel;
+    private Label                                                      policyLabel;
     @FXML
-    private Label                                                     failureLabel;
+    private Label                                                      failureLabel;
     @FXML
-    private Label                                                     activateLabel;
+    private Label                                                      activateLabel;
     @FXML
-    private Label                                                     deactivateLabel;
+    private Label                                                      deactivateLabel;
     @FXML
-    private Label                                                     modifiedLabel;
+    private Label                                                      modifiedLabel;
     @FXML
-    private Button                                                    enableComponentButton;
+    private Button                                                     enableComponentButton;
     @FXML
-    private Button                                                    disableComponentButton;
+    private Button                                                     disableComponentButton;
     @FXML
-    private ListView<String>                                          pidsList;
+    private ListView<String>                                           pidsList;
     @FXML
-    private ListView<String>                                          interfacesList;
+    private ListView<String>                                           interfacesList;
     @FXML
-    private TableView<Entry<String, String>>                          propertiesTable;
+    private TableView<Entry<String, String>>                           propertiesTable;
     @FXML
-    private TableColumn<Entry<String, String>, String>                propertiesTableColumn1;
+    private TableColumn<Entry<String, String>, String>                 propertiesTableColumn1;
     @FXML
-    private TableColumn<Entry<String, String>, String>                propertiesTableColumn2;
+    private TableColumn<Entry<String, String>, String>                 propertiesTableColumn2;
     @FXML
-    private TableView<ReferenceDTO>                                   referencesTable;
+    private TableView<XReferenceDTO>                                   referencesTable;
     @FXML
-    private TableView<XSatisfiedReferenceDTO>                         boundServicesTable;
+    private TableView<XSatisfiedReferenceDTO>                          boundServicesTable;
     @FXML
-    private TableColumn<XSatisfiedReferenceDTO, String>               boundServicesNameColumn;
+    private TableColumn<XSatisfiedReferenceDTO, String>                boundServicesNameColumn;
     @FXML
-    private TableColumn<XSatisfiedReferenceDTO, String>               boundServicesTargetColumn;
+    private TableColumn<XSatisfiedReferenceDTO, String>                boundServicesTargetColumn;
     @FXML
-    private TableColumn<XSatisfiedReferenceDTO, String>               boundServicesClassColumn;
+    private TableColumn<XSatisfiedReferenceDTO, String>                boundServicesClassColumn;
     @FXML
-    private TableView<XUnsatisfiedReferenceDTO>                       unboundServicesTable;
+    private TableView<XUnsatisfiedReferenceDTO>                        unboundServicesTable;
     @FXML
-    private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesNameColumn;
+    private TableColumn<XUnsatisfiedReferenceDTO, String>              unboundServicesNameColumn;
     @FXML
-    private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesTargetColumn;
+    private TableColumn<XUnsatisfiedReferenceDTO, String>              unboundServicesTargetColumn;
     @FXML
-    private TableColumn<XUnsatisfiedReferenceDTO, String>             unboundServicesClassColumn;
+    private TableColumn<XUnsatisfiedReferenceDTO, String>              unboundServicesClassColumn;
     @Log
     @Inject
-    private FluentLogger                                              logger;
+    private FluentLogger                                               logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                                                loader;
+    private FXMLLoader                                                 loader;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.components")
-    private BundleContext                                             context;
+    private BundleContext                                              context;
     @Inject
-    private CommandService                                            commandService;
-    private final AtomicBoolean                                       areReferenceTableNodesLoader = new AtomicBoolean();
-    private TableRowExpanderColumn.TableRowDataFeatures<ReferenceDTO> selectedReference;
+    private CommandService                                             commandService;
+    private final AtomicBoolean                                        areReferenceTableNodesLoader = new AtomicBoolean();
+    private TableRowExpanderColumn.TableRowDataFeatures<XReferenceDTO> selectedReference;
 
     @FXML
     public void initialize() {
@@ -173,24 +173,24 @@ public final class ComponentDetailsFxController {
     }
 
     private void createReferenceExpandedTable(final XComponentDTO component) {
-        final GridPane                             expandedNode   = (GridPane) Fx.loadFXML(loader, context,
+        final GridPane                              expandedNode   = (GridPane) Fx.loadFXML(loader, context,
                 "/fxml/sub-expander-column-content.fxml");
-        final ReferenceDetailsFxController         controller     = loader.getController();
-        final TableRowExpanderColumn<ReferenceDTO> expanderColumn = new TableRowExpanderColumn<>(expandedReference -> {
-                                                                      controller.initControls(expandedReference.getValue());
-                                                                      if (selectedReference != null) {
-                                                                          selectedReference.toggleExpanded();
-                                                                      }
-                                                                      selectedReference = expandedReference;
-                                                                      return expandedNode;
-                                                                  });
+        final ReferenceDetailsFxController          controller     = loader.getController();
+        final TableRowExpanderColumn<XReferenceDTO> expanderColumn = new TableRowExpanderColumn<>(expandedReference -> {
+                                                                       controller.initControls(expandedReference.getValue());
+                                                                       if (selectedReference != null) {
+                                                                           selectedReference.toggleExpanded();
+                                                                       }
+                                                                       selectedReference = expandedReference;
+                                                                       return expandedNode;
+                                                                   });
 
-        final TableColumn<ReferenceDTO, String> nameColumn = new TableColumn<>("Name");
+        final TableColumn<XReferenceDTO, String> nameColumn = new TableColumn<>("Name");
 
         nameColumn.setPrefWidth(200);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-        final TableColumn<ReferenceDTO, String> interfaceColumn = new TableColumn<>("Interface");
+        final TableColumn<XReferenceDTO, String> interfaceColumn = new TableColumn<>("Interface");
 
         interfaceColumn.setPrefWidth(550);
         interfaceColumn.setCellValueFactory(new DTOCellValueFactory<>("interfaceName", String.class));
