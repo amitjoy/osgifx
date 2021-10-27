@@ -121,9 +121,10 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         });
         setResultConverter(dialogButton -> {
             try {
-                final int port    = Integer.parseInt(txtPort.getText());
-                final int timeout = Integer.parseInt(txtTimeout.getText());
-                return dialogButton == saveButtonType ? new ConnectionSettingDTO(txtHostname.getText(), port, timeout) : null;
+                return dialogButton == saveButtonType
+                        ? new ConnectionSettingDTO(txtHostname.getText(), Integer.parseInt(txtPort.getText()),
+                                Integer.parseInt(txtTimeout.getText()))
+                        : null;
             } catch (final Exception e) {
                 logger.atError().withException(e).log("Connection settings cannot be added due to validation problem");
                 throw e;
