@@ -12,6 +12,7 @@ import com.google.common.base.Throwables;
 
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -58,11 +59,7 @@ public final class GogoFxController {
                     return;
                 }
                 output.appendText("$ " + command + System.lineSeparator());
-                output.appendText(executeGogoCommand(command));
-                output.appendText(System.lineSeparator());
-                history.add(command);
-                historyPointer = history.size();
-                input.clear();
+                executeGogoCommand(command);
                 break;
             case UP:
                 if (historyPointer == 0) {
@@ -87,19 +84,36 @@ public final class GogoFxController {
         }
     }
 
-    private String executeGogoCommand(final String command) {
-        try {
-            String output;
-            if (agent == null || (output = agent.shell(command)) == null) {
-                logger.atWarning().log("Agent is not connected");
-                return "Agent is not connected";
+    private void executeGogoCommand(final String command) {
+        final Task<String> task = new Task<String>() {
+
+            @Override
+            protected String call() throws Exception {
+                String outputText;
+                try {
+                    if (agent == null || (outputText = agent.shell(command)) == null) {
+                        logger.atWarning().log("Agent is not connected");
+                        outputText = "Agent is not connected";
+                    }
+                    logger.atInfo().log("Command '%s' has been successfully executed", command);
+                } catch (final Exception e) {
+                    logger.atInfo().withException(e).log("Command '%s' cannot be executed properly", command);
+                    outputText = Throwables.getStackTraceAsString(e);
+                }
+                return outputText;
             }
-            logger.atInfo().log("Command '%s' has been successfully executed", command);
-            return output;
-        } catch (final Exception e) {
-            logger.atInfo().withException(e).log("Command '%s' cannot be executed properly", command);
-            return Throwables.getStackTraceAsString(e);
-        }
+        };
+        task.setOnSucceeded(t -> {
+            output.appendText(task.getValue());
+            output.appendText(System.lineSeparator());
+            history.add(command);
+            historyPointer = history.size();
+            input.clear();
+        });
+
+        final Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
 }
