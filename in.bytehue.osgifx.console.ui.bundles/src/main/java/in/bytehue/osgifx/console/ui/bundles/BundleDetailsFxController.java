@@ -57,6 +57,12 @@ public final class BundleDetailsFxController {
     @FXML
     private Label                                      vendorLabel;
     @FXML
+    private Label                                      revisionsLabel;
+    @FXML
+    private ToggleSwitch                               isPersistentlyStartedLabel;
+    @FXML
+    private ToggleSwitch                               isActivationPolicyUsedLabel;
+    @FXML
     private Label                                      descLabel;
     @FXML
     private Label                                      startLevelLabel;
@@ -134,11 +140,14 @@ public final class BundleDetailsFxController {
         versionLabel.setText(bundle.version);
         locationLabel.setText(bundle.location);
         categoryLabel.setText(bundle.category);
-        initConditionalControls(bundle);
+        initFragment(bundle);
+        initIsPersistentlyStarted(bundle);
+        initIsActivationPolicyUsed(bundle);
         registerButtonHandlers(bundle);
         lasModifiedLabel.setText(formatLastModified(bundle.lastModified));
         docLabel.setText(bundle.documentation);
         vendorLabel.setText(bundle.vendor);
+        revisionsLabel.setText(String.valueOf(bundle.revisions));
         descLabel.setText(bundle.description);
         startLevelLabel.setText(String.valueOf(bundle.startLevel));
 
@@ -193,11 +202,19 @@ public final class BundleDetailsFxController {
         return converter.convert(lastModified).to(Date.class).toString();
     }
 
-    private void initConditionalControls(final XBundleDTO bundle) {
+    private void initFragment(final XBundleDTO bundle) {
         startBundleButton.setDisable(bundle.isFragment || "ACTIVE".equals(bundle.state));
         stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state) || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         uninstallBundleButton.setDisable(AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         fragmentLabel.setSelected(bundle.isFragment);
+    }
+
+    private void initIsPersistentlyStarted(final XBundleDTO bundle) {
+        isPersistentlyStartedLabel.setSelected(bundle.isPersistentlyStarted);
+    }
+
+    private void initIsActivationPolicyUsed(final XBundleDTO bundle) {
+        isActivationPolicyUsedLabel.setSelected(bundle.isActivationPolicyUsed);
     }
 
     private void registerButtonHandlers(final XBundleDTO bundle) {

@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.controlsfx.control.ToggleSwitch?>
 <?import org.controlsfx.glyphfont.Glyph?>
-<?import javafx.scene.control.Tooltip?>
 
 <GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2300.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.bundles.BundleDetailsFxController">
   <columnConstraints>
@@ -20,7 +19,7 @@
   </columnConstraints>
   <rowConstraints>
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="15.0" vgrow="SOMETIMES" />
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -33,24 +32,25 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="44.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="0.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="199.0" minHeight="10.0" prefHeight="199.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="0.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="200.0" minHeight="0.0" prefHeight="194.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="0.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="206.0" minHeight="10.0" prefHeight="205.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="8.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="216.0" minHeight="10.0" prefHeight="216.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="10.0" prefHeight="14.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="14.0" minHeight="0.0" prefHeight="14.0" />
+      <RowConstraints maxHeight="200.0" minHeight="189.0" prefHeight="189.0" />
   </rowConstraints>
    <children>
       <Button fx:id="startBundleButton" mnemonicParsing="false">
@@ -67,7 +67,7 @@
             <Insets left="90.0" />
          </GridPane.margin>
          <graphic>
-        	<Glyph fontFamily="FontAwesome" icon="STOP"/>
+        	<Glyph fontFamily="FontAwesome" icon="STOP" />
     	</graphic>
     	<tooltip><Tooltip text="Stop Bundle" /></tooltip>
       </Button>
@@ -110,72 +110,87 @@
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Is Fragment?" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
+      <Label text="Revisions" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Last Modified" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
+      <Label text="Is Fragment?" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
+      <Label text="Is Persistently Started?" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Vendor" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
+      <Label text="Is Activation Policy Used?" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
+      <Label text="Last Modified" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Start Level" GridPane.halignment="RIGHT" GridPane.rowIndex="13">
+      <Label text="Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="13">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Exported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="15">
+      <Label text="Vendor" GridPane.halignment="RIGHT" GridPane.rowIndex="14">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Imported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="17">
+      <Label text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="15">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Wired Bundles" GridPane.halignment="RIGHT" GridPane.rowIndex="19">
+      <Label text="Start Level" GridPane.halignment="RIGHT" GridPane.rowIndex="16">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Registered Services" GridPane.halignment="RIGHT" GridPane.rowIndex="21">
+      <Label text="Exported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="18">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Manifest Headers" GridPane.halignment="RIGHT" GridPane.rowIndex="23">
+      <Label text="Imported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="20">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Used Services" GridPane.halignment="RIGHT" GridPane.rowIndex="26">
+      <Label text="Wired Bundles" GridPane.halignment="RIGHT" GridPane.rowIndex="22">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Host Bundles" GridPane.halignment="RIGHT" GridPane.rowIndex="28">
+      <Label text="Registered Services" GridPane.halignment="RIGHT" GridPane.rowIndex="24">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Attached Fragments" GridPane.halignment="RIGHT" GridPane.rowIndex="30">
+      <Label text="Manifest Headers" GridPane.halignment="RIGHT" GridPane.rowIndex="26">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Used Services" GridPane.halignment="RIGHT" GridPane.rowIndex="28">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Host Bundles" GridPane.halignment="RIGHT" GridPane.rowIndex="30">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Attached Fragments" GridPane.halignment="RIGHT" GridPane.rowIndex="32">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
@@ -210,36 +225,43 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <ToggleSwitch fx:id="fragmentLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-      <Label fx:id="lasModifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9">
+      <Label fx:id="revisionsLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="docLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10">
+      <ToggleSwitch fx:id="fragmentLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+      <ToggleSwitch fx:id="isPersistentlyStartedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+      <ToggleSwitch fx:id="isActivationPolicyUsedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+      <Label fx:id="lasModifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="vendorLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11">
+      <Label fx:id="docLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="descLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12">
+      <Label fx:id="vendorLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="14">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="startLevelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13">
+      <Label fx:id="descLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="15">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <TableView fx:id="exportedPackagesNameTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="15" GridPane.vgrow="ALWAYS">
+      <Label fx:id="startLevelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="16">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <TableView fx:id="exportedPackagesNameTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="exportedPackagesNameTableColumn" prefWidth="350.0" text="Name" />
-          <TableColumn fx:id="exportedPackagesVersionTableColumn" minWidth="0.0" prefWidth="218.0" text="Version" />
+          <TableColumn fx:id="exportedPackagesNameTableColumn" prefWidth="339.0" text="Name" />
+          <TableColumn fx:id="exportedPackagesVersionTableColumn" minWidth="0.0" prefWidth="220.0" text="Version" />
         </columns>
          <opaqueInsets>
             <Insets />
@@ -248,7 +270,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="registeredServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="21" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="registeredServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="24" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="registeredServicesIdTableColumn" prefWidth="124.0" text="ID" />
           <TableColumn fx:id="registeredServicesClassTableColumn" prefWidth="437.0" text="Object Class" />
@@ -257,7 +279,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="manifestHeadersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="23" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="manifestHeadersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="26" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="manifestHeadersTableColumn1" prefWidth="259.0" />
           <TableColumn fx:id="manifestHeadersTableColumn2" minWidth="0.0" prefWidth="299.0" />
@@ -266,7 +288,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="importedPackagesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="17" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="importedPackagesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="20" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="importedPackagesNameTableColumn" prefWidth="353.0" text="Name" />
           <TableColumn fx:id="importedPackagesVersionTableColumn" prefWidth="209.0" text="Version" />
@@ -275,7 +297,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="wiredBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="19" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="wiredBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="22" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="wiredBundlesIdTableColumn" prefWidth="118.0" text="ID" />
           <TableColumn fx:id="wiredBundlesBsnTableColumn" prefWidth="444.0" text="Symbolic Name" />
@@ -284,7 +306,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="usedServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="26" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="usedServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="28" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="usedServicesIdTableColumn" prefWidth="111.0" text="ID" />
           <TableColumn fx:id="usedServicesClassTableColumn" prefWidth="442.0" text="Object Class" />
@@ -293,7 +315,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="hostBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="28" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="hostBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="30" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="hostBundlesIdTableColumn" prefWidth="110.0" text="ID" />
           <TableColumn fx:id="hostBundlesBsnTableColumn" prefWidth="437.0" text="Symbolic Name" />
@@ -302,7 +324,7 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
-      <TableView fx:id="attachedFragmentsTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="30" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="attachedFragmentsTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="32" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="attachedFragmentsIdTableColumn" prefWidth="109.0" text="ID" />
           <TableColumn fx:id="attachedFragmentsBsnTableColumn" prefWidth="438.0" text="Symbolic Name" />

@@ -23,6 +23,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
+import org.osgi.framework.wiring.BundleRevisions;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 
@@ -46,28 +47,52 @@ public class XBundleAdmin {
     private static XBundleDTO toDTO(final Bundle bundle) {
         final XBundleDTO dto = new XBundleDTO();
 
-        dto.id                 = bundle.getBundleId();
-        dto.state              = findState(bundle.getState());
-        dto.symbolicName       = bundle.getSymbolicName();
-        dto.version            = bundle.getVersion().toString();
-        dto.location           = bundle.getLocation();
-        dto.category           = getHeader(bundle, Constants.BUNDLE_CATEGORY);
-        dto.isFragment         = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
-        dto.lastModified       = bundle.getLastModified();
-        dto.documentation      = getHeader(bundle, Constants.BUNDLE_DOCURL);
-        dto.vendor             = getHeader(bundle, Constants.BUNDLE_VENDOR);
-        dto.description        = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
-        dto.startLevel         = bundle.adapt(BundleStartLevel.class).getStartLevel();
-        dto.exportedPackages   = getExportedPackages(bundle);
-        dto.importedPackages   = getImportedPackages(bundle);
-        dto.wiredBundles       = getWiredBundles(bundle);
-        dto.registeredServices = getRegisteredServices(bundle);
-        dto.manifestHeaders    = toMap(bundle.getHeaders());
-        dto.usedServices       = getUsedServices(bundle);
-        dto.hostBundles        = getHostBundles(bundle);
-        dto.fragmentsAttached  = getAttachedFragements(bundle);
+        dto.id                     = bundle.getBundleId();
+        dto.state                  = findState(bundle.getState());
+        dto.symbolicName           = bundle.getSymbolicName();
+        dto.version                = bundle.getVersion().toString();
+        dto.location               = bundle.getLocation();
+        dto.category               = getHeader(bundle, Constants.BUNDLE_CATEGORY);
+        dto.isFragment             = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
+        dto.lastModified           = bundle.getLastModified();
+        dto.documentation          = getHeader(bundle, Constants.BUNDLE_DOCURL);
+        dto.vendor                 = getHeader(bundle, Constants.BUNDLE_VENDOR);
+        dto.description            = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
+        dto.startLevel             = bundle.adapt(BundleStartLevel.class).getStartLevel();
+        dto.exportedPackages       = getExportedPackages(bundle);
+        dto.importedPackages       = getImportedPackages(bundle);
+        dto.wiredBundles           = getWiredBundles(bundle);
+        dto.registeredServices     = getRegisteredServices(bundle);
+        dto.manifestHeaders        = toMap(bundle.getHeaders());
+        dto.usedServices           = getUsedServices(bundle);
+        dto.hostBundles            = getHostBundles(bundle);
+        dto.fragmentsAttached      = getAttachedFragements(bundle);
+        dto.revisions              = getBundleRevisions(bundle);
+        dto.isPersistentlyStarted  = getPeristentlyStarted(bundle);
+        dto.isActivationPolicyUsed = getActivationPolicyUsed(bundle);
 
         return dto;
+    }
+
+    private static boolean getActivationPolicyUsed(final Bundle bundle) {
+        final BundleStartLevel startLevel = bundle.adapt(BundleStartLevel.class);
+        if (startLevel != null) {
+            return startLevel.isActivationPolicyUsed();
+        }
+        return false;
+    }
+
+    private static boolean getPeristentlyStarted(final Bundle bundle) {
+        final BundleStartLevel startLevel = bundle.adapt(BundleStartLevel.class);
+        if (startLevel != null) {
+            return startLevel.isPersistentlyStarted();
+        }
+        return false;
+    }
+
+    private static int getBundleRevisions(final Bundle bundle) {
+        final BundleRevisions revisions = bundle.adapt(BundleRevisions.class);
+        return revisions.getRevisions().size();
     }
 
     private static List<XBundleInfoDTO> getHostBundles(final Bundle bundle) {
