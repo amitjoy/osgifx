@@ -3,16 +3,14 @@ package in.bytehue.osgifx.console.agent.dto;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.dto.DTO;
+import org.osgi.framework.dto.BundleDTO;
 
-public class XBundleDTO extends DTO {
+public class XBundleDTO extends BundleDTO {
 
-    public long                  id;
     public String                state;
-    public String                symbolicName;
-    public String                version;
     public String                location;
     public String                category;
+    public int                   revisions;
     public boolean               isFragment;
     public long                  lastModified;
     public String                documentation;
@@ -27,5 +25,7 @@ public class XBundleDTO extends DTO {
     public List<XServiceInfoDTO> usedServices;
     public List<XBundleInfoDTO>  hostBundles;
     public List<XBundleInfoDTO>  fragmentsAttached;
+    public boolean               isPersistentlyStarted;
+    public boolean               isActivationPolicyUsed;
 
 }
