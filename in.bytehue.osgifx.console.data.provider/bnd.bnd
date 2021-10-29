@@ -1,0 +1,2 @@
+-buildpath          : ${bundles.required}
+-privatepackage     : in.bytehue.osgifx.console.data.*

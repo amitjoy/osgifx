@@ -2,8 +2,8 @@
 -runproperties   :   eclipse.product=in.bytehue.osgifx.console.application.product
 -runrequires     :   \
                      bnd.identity;id='in.bytehue.osgifx.console.application',\
-                     bnd.identity;id='in.bytehue.osgifx.console.core',\
                      bnd.identity;id='in.bytehue.osgifx.console.launcher',\
+                     bnd.identity;id='in.bytehue.osgifx.console.logging',\
                      \
                      bnd.identity;id='in.bytehue.osgifx.console.ui.bundles',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.components',\
@@ -39,8 +39,10 @@ install.order    :   \
 	com.ibm.icu.base;version='[58.2.0,58.2.1)';startlevel=1,\
 	controlsfx;version='[8.40.18,8.40.19)';startlevel=1,\
 	in.bytehue.osgifx.console.application;version=snapshot;startlevel=1,\
-	in.bytehue.osgifx.console.core;version=snapshot;startlevel=1,\
+	in.bytehue.osgifx.console.data.provider;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.launcher;version=snapshot;startlevel=1,\
+	in.bytehue.osgifx.console.logging;version=snapshot;startlevel=1,\
+	in.bytehue.osgifx.console.supervisor;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.util;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=1,\

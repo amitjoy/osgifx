@@ -2,6 +2,7 @@ package in.bytehue.osgifx.console.ui.overview;
 
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
@@ -23,6 +24,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.annotation.bundle.Capability;
 
 import com.google.common.collect.Maps;
 
@@ -52,6 +54,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 
+@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.supervisor.Supervisor")
 public final class OverviewFxUI {
 
     private static final double TILE_WIDTH  = 400;
