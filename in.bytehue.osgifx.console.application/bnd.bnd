@@ -8,9 +8,9 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  css = css,\
 					  fxml = fxml,\
 					  graphic = graphic
--buildpath: \
-	${bundles.required},\
-	de.jensd:fontawesomefx;packages='*',\
-	com.google.gson,\
-	org.eclipse.equinox.app
+-buildpath          : \
+                      ${bundles.required},\
+                      de.jensd:fontawesomefx;packages='*',\
+                      com.google.gson,\
+                      org.eclipse.equinox.app
 Import-Package      : org.controlsfx.glyphfont, org.controlsfx.control, * 

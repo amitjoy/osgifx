@@ -1,9 +1,0 @@
-Bundle-SymbolicName : ${p}; singleton:=true
--buildpath          : ${bundles.required}, biz.aQute.remote.agent;packages=*
--includepackage     : in.bytehue.osgifx.console.supervisor
--privatepackage     : \
-	in.bytehue.osgifx.console.agent.*,\
-	in.bytehue.osgifx.console.core.*,\
-	in.bytehue.osgifx.console.ui.*
--conditionalpackage : aQute.*
--fixupmessages      : 'private reference'

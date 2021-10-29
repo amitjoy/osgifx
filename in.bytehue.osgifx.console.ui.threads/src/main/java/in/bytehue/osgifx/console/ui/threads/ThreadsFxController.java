@@ -1,19 +1,23 @@
 package in.bytehue.osgifx.console.ui.threads;
 
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.annotation.bundle.Capability;
 
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
-import in.bytehue.osgifx.console.ui.service.DataProvider;
+import in.bytehue.osgifx.console.data.provider.DataProvider;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.data.provider.DataProvider")
 public final class ThreadsFxController {
 
     @Log

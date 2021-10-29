@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.ui.gogo;
 
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -7,6 +9,7 @@ import javax.inject.Inject;
 import org.controlsfx.control.textfield.TextFields;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.annotation.bundle.Capability;
 
 import com.google.common.base.Throwables;
 
@@ -18,6 +21,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
+@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.supervisor.Supervisor")
 public final class GogoFxController {
 
     @Log
