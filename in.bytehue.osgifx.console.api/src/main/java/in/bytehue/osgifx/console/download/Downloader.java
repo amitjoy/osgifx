@@ -7,7 +7,5 @@ public interface Downloader {
 
     void download(DownloadTask task);
 
-    void shutdown();
-
     void cancelAll();
 }
