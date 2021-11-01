@@ -2,17 +2,18 @@ package in.bytehue.osgifx.console.download;
 
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DownloadTask {
+
     private URL                          url;
     private OutputStream                 outputStream;
-    private final List<DownloadListener> listeners = new ArrayList<>();
+    private final List<DownloadListener> listeners = new CopyOnWriteArrayList<>();
 
-    private boolean paused    = false;
-    private boolean cancelled = false;
-    private int     timeout   = 15000;
+    private boolean paused;
+    private boolean cancelled;
+    private int     timeout = 15000;
 
     private Authentication authentication;
 

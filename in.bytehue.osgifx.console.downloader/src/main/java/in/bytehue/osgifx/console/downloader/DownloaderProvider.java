@@ -10,12 +10,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import in.bytehue.osgifx.console.download.Authentication;
@@ -24,51 +27,70 @@ import in.bytehue.osgifx.console.download.DownloadTask;
 import in.bytehue.osgifx.console.download.Downloader;
 import in.bytehue.osgifx.console.download.HttpConnector;
 
-@Component
+@Component(immediate = true)
 public final class DownloaderProvider extends HttpConnector implements Downloader {
 
+    private static final int POOL_SIZE = 10;
+
     @Reference
-    private LoggerFactory factory;
-
-    private FluentLogger logger;
-
-    private final int poolSize   = 3;
-    private final int bufferSize = 2048;
-
-    private DirectDownloadThread[]            dts;
-    private Proxy                             proxy;
-    private final BlockingQueue<DownloadTask> tasks = new LinkedBlockingQueue<>();
+    private LoggerFactory               factory;
+    private FluentLogger                logger;
+    private Proxy                       proxy;
+    private BlockingQueue<DownloadTask> tasks;
+    private ExecutorService             taskExecutor;
 
     @Activate
     void activate() {
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+        tasks        = new LinkedBlockingQueue<>();
+        taskExecutor = Executors.newFixedThreadPool(POOL_SIZE, r -> new Thread(r, "downloader"));
+        logger       = FluentLogger.of(factory.createLogger(getClass().getName()));
+
+        taskExecutor.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    final DirectDownload dl = new DirectDownload(tasks.take());
+                    dl.download();
+                } catch (final InterruptedException e) {
+                    logger.atInfo().log("Stopping download thread");
+                    Thread.currentThread().interrupt();
+                    break;
+                } catch (final Exception e) {
+                    logger.atWarning().log(e.getMessage());
+                }
+            }
+        });
     }
 
-    protected class DirectDownloadThread extends Thread {
+    @Deactivate
+    void deactivate() {
+        taskExecutor.shutdownNow();
+    }
+
+    protected class DirectDownload {
+
         private static final String CD_FNAME            = "fname=";
         private static final String CONTENT_DISPOSITION = "Content-Disposition";
 
-        private boolean cancel = false;
-        private boolean stop   = false;
+        private volatile boolean cancel;
+        private volatile boolean stop;
 
-        private final BlockingQueue<DownloadTask> tasks;
+        private final DownloadTask task;
 
-        public DirectDownloadThread(final BlockingQueue<DownloadTask> tasks) {
-            this.tasks = tasks;
+        public DirectDownload(final DownloadTask task) {
+            this.task = task;
         }
 
-        protected void download(final DownloadTask dt)
-                throws IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
+        protected void download() throws IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
 
-            final HttpURLConnection conn = (HttpURLConnection) getConnection(dt.getUrl(), proxy);
+            final HttpURLConnection conn = (HttpURLConnection) getConnection(task.getUrl(), proxy);
 
-            if (dt.getAuthentication() != null) {
-                final Authentication auth       = dt.getAuthentication();
+            if (task.getAuthentication() != null) {
+                final Authentication auth       = task.getAuthentication();
                 final String         authString = auth.getUsername() + ":" + auth.getPassword();
                 conn.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encode(authString.getBytes()));
             }
 
-            conn.setReadTimeout(dt.getTimeout());
+            conn.setReadTimeout(task.getTimeout());
             conn.setDoOutput(true);
             conn.connect();
 
@@ -80,17 +102,15 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
             if (cd != null) {
                 fname = cd.substring(cd.indexOf(CD_FNAME) + 1, cd.length() - 1);
             } else {
-                final String url = dt.getUrl().toString();
+                final String url = task.getUrl().toString();
                 fname = url.substring(url.lastIndexOf('/') + 1);
             }
 
-            final InputStream is = conn.getInputStream();
-
-            final OutputStream           os        = dt.getOutputStream();
-            final List<DownloadListener> listeners = dt.getListeners();
-
-            final byte[] buff = new byte[bufferSize];
-            int          res;
+            final InputStream            is        = conn.getInputStream();
+            final OutputStream           os        = task.getOutputStream();
+            final List<DownloadListener> listeners = task.getListeners();
+            final byte[]                 buff      = new byte[BUFFER_SIZE];
+            int                          res;
 
             for (final DownloadListener listener : listeners) {
                 listener.onStart(fname, fsize);
@@ -103,30 +123,25 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
                 for (final DownloadListener listener : listeners) {
                     listener.onUpdate(res, total);
                 }
-
-                synchronized (dt) {
+                synchronized (task) {
                     // cancel download
-                    if (cancel || dt.isCancelled()) {
+                    if (cancel || task.isCancelled()) {
                         close(is, os);
                         for (final DownloadListener listener : listeners) {
                             listener.onCancel();
                         }
-
                         throw new RuntimeException("Cancelled download");
                     }
-
                     // stop thread
                     if (stop) {
                         close(is, os);
                         for (final DownloadListener listener : listeners) {
                             listener.onCancel();
                         }
-
                         throw new InterruptedException("Shutdown");
                     }
-
                     // pause thread
-                    while (dt.isPaused()) {
+                    while (task.isPaused()) {
                         try {
                             wait();
                         } catch (final Exception e) {
@@ -134,11 +149,9 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
                     }
                 }
             }
-
             for (final DownloadListener listener : listeners) {
                 listener.onComplete();
             }
-
             close(is, os);
         }
 
@@ -147,20 +160,6 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
                 is.close();
                 os.close();
             } catch (final IOException e) {
-            }
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    download(tasks.take());
-                } catch (final InterruptedException e) {
-                    logger.atInfo().log("Stopping download thread");
-                    break;
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
             }
         }
 
@@ -174,27 +173,8 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
     }
 
     @Override
-    public void download(final DownloadTask dt) {
-        tasks.add(dt);
-    }
-
-    public void run() {
-        logger.atInfo().log("Initializing downloader...");
-        dts = new DirectDownloadThread[poolSize];
-        for (int i = 0; i < dts.length; i++) {
-            dts[i] = new DirectDownloadThread(tasks);
-            dts[i].start();
-        }
-        logger.atInfo().log("Downloader started, waiting for tasks.");
-    }
-
-    @Override
-    public void cancelAll() {
-        for (final DirectDownloadThread dt : dts) {
-            if (dt != null) {
-                dt.cancel();
-            }
-        }
+    public void download(final DownloadTask task) {
+        tasks.add(task);
     }
 
 }
