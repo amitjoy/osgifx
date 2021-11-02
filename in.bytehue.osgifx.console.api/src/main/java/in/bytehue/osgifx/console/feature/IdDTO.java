@@ -1,6 +1,8 @@
 package in.bytehue.osgifx.console.feature;
 
-public class IdDTO {
+import org.osgi.dto.DTO;
+
+public class IdDTO extends DTO {
 
     String groupId;
     String artifactId;

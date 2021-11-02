@@ -27,7 +27,7 @@ import in.bytehue.osgifx.console.download.DownloadTask;
 import in.bytehue.osgifx.console.download.Downloader;
 import in.bytehue.osgifx.console.download.HttpConnector;
 
-@Component(immediate = true)
+@Component
 public final class DownloaderProvider extends HttpConnector implements Downloader {
 
     private static final int POOL_SIZE = 10;
