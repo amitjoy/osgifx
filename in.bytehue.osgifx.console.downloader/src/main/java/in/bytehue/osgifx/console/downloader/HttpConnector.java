@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.download;
+package in.bytehue.osgifx.console.downloader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,9 +26,9 @@ import javax.net.ssl.X509TrustManager;
 
 public class HttpConnector {
 
-    protected int BUFFER_SIZE                = 2048;
-    protected int DEFAULT_STREAM_BUFFER_SIZE = 3072;
-    protected int DEFAULT_CONNECT_TIMEOUT    = 13000;
+    protected static final int BUFFER_SIZE                = 2048;
+    protected static final int DEFAULT_STREAM_BUFFER_SIZE = 3072;
+    protected static final int DEFAULT_CONNECT_TIMEOUT    = 13000;
 
     private int connectionTimeout = DEFAULT_CONNECT_TIMEOUT;
 
@@ -39,13 +39,6 @@ public class HttpConnector {
         HttpURLConnection.setFollowRedirects(true);
     }
 
-    /**
-     * @param url
-     * @return
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     */
     protected URLConnection getConnection(final URL url) throws IOException, KeyManagementException, NoSuchAlgorithmException {
         if ("http".equalsIgnoreCase(url.getProtocol()) || "ftp".equalsIgnoreCase(url.getProtocol())) {
             return getConnection(url, null);
@@ -53,18 +46,9 @@ public class HttpConnector {
         if ("https".equalsIgnoreCase(url.getProtocol())) {
             return getSecureConnection(url);
         }
-
         return null;
     }
 
-    /**
-     * @param url
-     * @param proxy
-     * @return
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     */
     protected URLConnection getConnection(final URL url, final Proxy proxy)
             throws IOException, KeyManagementException, NoSuchAlgorithmException {
         if ("http".equalsIgnoreCase(url.getProtocol()) || "ftp".equalsIgnoreCase(url.getProtocol())) {
@@ -76,29 +60,13 @@ public class HttpConnector {
         if ("https".equalsIgnoreCase(url.getProtocol())) {
             return getSecureConnection(url, proxy);
         }
-
         return null;
     }
 
-    /**
-     * @param url
-     * @return
-     * @throws IOException
-     * @throws KeyManagementException
-     * @throws NoSuchAlgorithmException
-     */
     protected HttpsURLConnection getSecureConnection(final URL url) throws IOException, KeyManagementException, NoSuchAlgorithmException {
         return getSecureConnection(url, null);
     }
 
-    /**
-     * @param url
-     * @param proxy
-     * @return
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     */
     protected HttpsURLConnection getSecureConnection(final URL url, final Proxy proxy)
             throws IOException, NoSuchAlgorithmException, KeyManagementException {
 
@@ -116,11 +84,6 @@ public class HttpConnector {
         return conn;
     }
 
-    /**
-     * @param conn
-     * @param data
-     * @throws IOException
-     */
     protected void doOutput(final URLConnection conn, final String data) throws IOException {
         final BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()), DEFAULT_STREAM_BUFFER_SIZE);
 
@@ -129,11 +92,6 @@ public class HttpConnector {
         wr.close();
     }
 
-    /**
-     * @param conn
-     * @return
-     * @throws IOException
-     */
     protected StringBuffer doInput(final URLConnection conn) throws IOException {
         final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()), DEFAULT_STREAM_BUFFER_SIZE);
 
@@ -151,7 +109,7 @@ public class HttpConnector {
         return buff;
     }
 
-    protected final static class DefaultTrustManager implements X509TrustManager {
+    protected static final class DefaultTrustManager implements X509TrustManager {
 
         @Override
         public void checkClientTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {

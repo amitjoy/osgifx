@@ -8,14 +8,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class DownloadTask {
 
     private URL                          url;
+    private boolean                      paused;
+    private boolean                      cancelled;
     private OutputStream                 outputStream;
+    private int                          timeout   = 15000;
+    private Authentication               authentication;
     private final List<DownloadListener> listeners = new CopyOnWriteArrayList<>();
-
-    private boolean paused;
-    private boolean cancelled;
-    private int     timeout = 15000;
-
-    private Authentication authentication;
 
     public DownloadTask(final URL url, final OutputStream outputStream) {
         this.url          = url;

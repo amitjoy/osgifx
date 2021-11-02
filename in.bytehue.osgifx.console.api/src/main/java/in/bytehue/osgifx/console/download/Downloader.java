@@ -9,7 +9,7 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface Downloader {
 
     /**
-     * Downloads the file associated from the specified task
+     * Downloads the file associated with the specified task
      *
      * @param task the download task
      */

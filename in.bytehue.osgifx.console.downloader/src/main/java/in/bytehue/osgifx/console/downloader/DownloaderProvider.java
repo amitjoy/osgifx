@@ -25,31 +25,44 @@ import in.bytehue.osgifx.console.download.Authentication;
 import in.bytehue.osgifx.console.download.DownloadListener;
 import in.bytehue.osgifx.console.download.DownloadTask;
 import in.bytehue.osgifx.console.download.Downloader;
-import in.bytehue.osgifx.console.download.HttpConnector;
 
 @Component
 public final class DownloaderProvider extends HttpConnector implements Downloader {
 
-    private static final int POOL_SIZE = 10;
+    private static final int POOL_SIZE = 20;
 
     @Reference
     private LoggerFactory               factory;
     private FluentLogger                logger;
     private Proxy                       proxy;
     private BlockingQueue<DownloadTask> tasks;
+    private ExecutorService             mainExecutor;
     private ExecutorService             taskExecutor;
 
     @Activate
     void activate() {
         tasks        = new LinkedBlockingQueue<>();
+        mainExecutor = Executors.newSingleThreadExecutor();
         taskExecutor = Executors.newFixedThreadPool(POOL_SIZE, r -> new Thread(r, "downloader"));
         logger       = FluentLogger.of(factory.createLogger(getClass().getName()));
 
-        taskExecutor.submit(() -> {
+        mainExecutor.submit(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    final DirectDownload dl = new DirectDownload(tasks.take());
-                    dl.download();
+                    final DownloadTask task = tasks.take();
+                    taskExecutor.submit(() -> {
+                        final DirectDownload dl = new DirectDownload(task);
+                        try {
+                            dl.download();
+                        } catch (final InterruptedException e) {
+                            logger.atInfo().log("Stopping download operation");
+                            Thread.currentThread().interrupt();
+                        } catch (KeyManagementException | NoSuchAlgorithmException | IOException e) {
+                            logger.atWarning().log(e.getMessage());
+                        } catch (final RuntimeException e) {
+                            logger.atInfo().log("Canceling download operation");
+                        }
+                    });
                 } catch (final InterruptedException e) {
                     logger.atInfo().log("Stopping download thread");
                     Thread.currentThread().interrupt();
@@ -64,6 +77,7 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
     @Deactivate
     void deactivate() {
         taskExecutor.shutdownNow();
+        mainExecutor.shutdownNow();
     }
 
     protected class DirectDownload {
@@ -81,23 +95,19 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
         }
 
         protected void download() throws IOException, InterruptedException, KeyManagementException, NoSuchAlgorithmException {
-
             final HttpURLConnection conn = (HttpURLConnection) getConnection(task.getUrl(), proxy);
-
             if (task.getAuthentication() != null) {
                 final Authentication auth       = task.getAuthentication();
-                final String         authString = auth.getUsername() + ":" + auth.getPassword();
+                final String         authString = auth.username + ":" + auth.password;
                 conn.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encode(authString.getBytes()));
             }
-
             conn.setReadTimeout(task.getTimeout());
             conn.setDoOutput(true);
             conn.connect();
 
-            final int fsize = conn.getContentLength();
-            String    fname;
-
-            final String cd = conn.getHeaderField(CONTENT_DISPOSITION);
+            final int    fsize = conn.getContentLength();
+            String       fname;
+            final String cd    = conn.getHeaderField(CONTENT_DISPOSITION);
 
             if (cd != null) {
                 fname = cd.substring(cd.indexOf(CD_FNAME) + 1, cd.length() - 1);
@@ -145,6 +155,7 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
                         try {
                             wait();
                         } catch (final Exception e) {
+                            logger.atError().log(e.getMessage());
                         }
                     }
                 }
@@ -160,6 +171,7 @@ public final class DownloaderProvider extends HttpConnector implements Downloade
                 is.close();
                 os.close();
             } catch (final IOException e) {
+                logger.atError().log("Streams cannot be closed");
             }
         }
 
