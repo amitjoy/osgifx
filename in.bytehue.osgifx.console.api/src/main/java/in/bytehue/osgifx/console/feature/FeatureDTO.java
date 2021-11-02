@@ -19,6 +19,5 @@ public class FeatureDTO extends DTO {
     List<FeatureBundleDTO>               bundles;
     Map<String, FeatureConfigurationDTO> configurations;
     Map<String, FeatureExtensionDTO>     extensions;
-    Map<String, Object>                  variables;
 
 }
