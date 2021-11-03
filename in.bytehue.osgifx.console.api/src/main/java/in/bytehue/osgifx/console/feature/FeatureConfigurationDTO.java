@@ -6,8 +6,8 @@ import org.osgi.dto.DTO;
 
 public class FeatureConfigurationDTO extends DTO {
 
-    String              pid;
-    String              factoryPid;
-    Map<String, Object> values;
+    public String              pid;
+    public String              factoryPid;
+    public Map<String, Object> values;
 
 }
