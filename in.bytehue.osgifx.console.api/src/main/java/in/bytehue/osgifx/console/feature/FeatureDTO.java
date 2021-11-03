@@ -7,17 +7,17 @@ import org.osgi.dto.DTO;
 
 public class FeatureDTO extends DTO {
 
-    IdDTO                                id;
-    String                               name;
-    List<String>                         categories;
-    String                               description;
-    String                               docURL;
-    String                               vendor;
-    String                               license;
-    String                               scm;
-    boolean                              isComplete;
-    List<FeatureBundleDTO>               bundles;
-    Map<String, FeatureConfigurationDTO> configurations;
-    Map<String, FeatureExtensionDTO>     extensions;
+    public IdDTO                                id;
+    public String                               name;
+    public List<String>                         categories;
+    public String                               description;
+    public String                               docURL;
+    public String                               vendor;
+    public String                               license;
+    public String                               scm;
+    public boolean                              isComplete;
+    public List<FeatureBundleDTO>               bundles;
+    public Map<String, FeatureConfigurationDTO> configurations;
+    public Map<String, FeatureExtensionDTO>     extensions;
 
 }

@@ -6,7 +6,7 @@ import org.osgi.dto.DTO;
 
 public class FeatureBundleDTO extends DTO {
 
-    IdDTO               id;
-    Map<String, Object> metadata;
+    public IdDTO               id;
+    public Map<String, Object> metadata;
 
 }
