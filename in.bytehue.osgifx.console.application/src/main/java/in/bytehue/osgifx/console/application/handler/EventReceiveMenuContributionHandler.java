@@ -18,7 +18,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Capability;
+import org.osgi.annotation.bundle.Requirement;
 import org.osgi.service.prefs.BackingStoreException;
 
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
@@ -26,7 +26,7 @@ import in.bytehue.osgifx.console.data.provider.DataProvider;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.Fx;
 
-@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.data.provider.DataProvider")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, attribute = "(objectClass=in.bytehue.osgifx.console.data.provider.DataProvider)")
 public final class EventReceiveMenuContributionHandler {
 
     @Log
