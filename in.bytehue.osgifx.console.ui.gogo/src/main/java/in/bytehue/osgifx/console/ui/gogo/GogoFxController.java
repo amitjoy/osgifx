@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import org.controlsfx.control.textfield.TextFields;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Capability;
+import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Throwables;
 
@@ -21,7 +21,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
-@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.supervisor.Supervisor")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, attribute = "(objectClass=in.bytehue.osgifx.console.supervisor.Supervisor)")
 public final class GogoFxController {
 
     @Log
