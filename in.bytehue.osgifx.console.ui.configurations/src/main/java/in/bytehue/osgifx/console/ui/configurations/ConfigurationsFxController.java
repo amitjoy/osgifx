@@ -12,7 +12,7 @@ import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Capability;
+import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
@@ -26,7 +26,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
-@Capability(namespace = SERVICE_NAMESPACE, attribute = "objectClass:List<String>=in.bytehue.osgifx.console.data.provider.DataProvider")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, attribute = "(objectClass=in.bytehue.osgifx.console.data.provider.DataProvider)")
 public final class ConfigurationsFxController {
 
     @Log
