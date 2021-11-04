@@ -1,2 +1,0 @@
--buildpath          : org.osgi.service.feature
--privatepackage     : in.bytehue.osgifx.console.feature.*

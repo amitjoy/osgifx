@@ -7,6 +7,7 @@ import org.osgi.dto.DTO;
 
 public class FeatureDTO extends DTO {
 
+    public String                               archiveURL;
     public IdDTO                                id;
     public String                               name;
     public List<String>                         categories;
