@@ -19,6 +19,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 
 import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog;
+import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
 import javafx.concurrent.Task;
 import javafx.stage.StageStyle;
@@ -45,19 +46,20 @@ public final class InstallFeatureHandler {
         logger.atInfo().log("Injected install feature dialog to eclipse context");
         dialog.init();
 
-        final Optional<List<File>> selectedFeatures = dialog.showAndWait();
+        final Optional<SelectedFeaturesDTO> selectedFeatures = dialog.showAndWait();
         if (selectedFeatures.isPresent()) {
-            udpateOrInstallFeatures(selectedFeatures.get());
+            final SelectedFeaturesDTO selected = selectedFeatures.get();
+            udpateOrInstallFeatures(selected.features, selected.archiveURL);
         }
     }
 
-    private void udpateOrInstallFeatures(final List<File> features) {
+    private void udpateOrInstallFeatures(final List<File> features, final String archiveURL) {
         final Task<Void> task = new Task<Void>() {
                                   @Override
                                   protected Void call() throws Exception {
                                       try {
                                           for (final File feature : features) {
-                                              updateAgent.updateOrInstall(feature);
+                                              updateAgent.updateOrInstall(feature, archiveURL);
                                               logger.atInfo().log("Feature '%s' has been successfuly installed/updated", feature.getName());
                                           }
                                       } catch (final Exception e) {
