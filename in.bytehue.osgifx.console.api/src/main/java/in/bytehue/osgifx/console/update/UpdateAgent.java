@@ -76,9 +76,10 @@ public interface UpdateAgent {
      * Removes the specified feature.
      *
      * @param featureId the feature ID to be removed
-     * @return {@code true} if the feature has been successfully removed, otherwise, {@code false}
+     * @return the feature has been successfully removed
+     * @throws Exception if the feature cannot be removed successfully
      */
-    boolean remove(String featureId);
+    FeatureDTO remove(String featureId) throws Exception;
 
     /**
      * Returns the list of features that can be updated.
