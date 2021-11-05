@@ -22,12 +22,13 @@ import in.bytehue.osgifx.console.feature.IdDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
@@ -59,9 +60,9 @@ public final class InstallFeatureDialogController {
     public void initialize() {
         registerDragAndDropSupport();
         featuresList.getSelectionModel().setSelectionMode(MULTIPLE);
-        featuresList.setCellFactory(param -> new ListCell<XFeatureDTO>() {
+        featuresList.setCellFactory(param -> new CheckBoxListCell<XFeatureDTO>(featuresList::getItemBooleanProperty) {
             @Override
-            protected void updateItem(final XFeatureDTO feature, final boolean empty) {
+            public void updateItem(final XFeatureDTO feature, final boolean empty) {
                 super.updateItem(feature, empty);
 
                 if (empty || feature == null) {
@@ -83,6 +84,7 @@ public final class InstallFeatureDialogController {
                 }
                 return cellId.toString();
             }
+
         });
         analyzeButton.disableProperty()
                 .bind(Bindings.createBooleanBinding(() -> archiveUrlText.getText().trim().isEmpty(), archiveUrlText.textProperty()));
@@ -138,7 +140,8 @@ public final class InstallFeatureDialogController {
     public SelectedFeaturesDTO getSelectedFeatures() {
         final SelectedFeaturesDTO dto = new SelectedFeaturesDTO();
 
-        dto.features   = featuresList.getSelectionModel().getSelectedItems().stream().map(f -> f.json).collect(toList());
+        final ObservableList<XFeatureDTO> selectedItems = featuresList.getCheckModel().getCheckedItems();
+        dto.features   = selectedItems.stream().map(f -> f.json).collect(toList());
         dto.archiveURL = archiveUrlText.getText();
 
         return dto;
