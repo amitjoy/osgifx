@@ -35,7 +35,7 @@ public final class InstallFeatureDialog extends Dialog<SelectedFeaturesDTO> {
         initStyle(StageStyle.UNDECORATED);
         dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
 
-        dialogPane.setHeaderText("External Feature Install");
+        dialogPane.setHeaderText("Install External Feature(s)");
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/feature-install.png").toString()));
 
         final ButtonType loginButtonType = new ButtonType("Install", ButtonData.OK_DONE);
