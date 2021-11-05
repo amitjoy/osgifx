@@ -5,6 +5,7 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -21,6 +22,7 @@ import org.osgi.annotation.bundle.Requirement;
 import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog;
 import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
+import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.concurrent.Task;
 import javafx.stage.StageStyle;
 
@@ -37,9 +39,11 @@ public final class InstallFeatureHandler {
     @Inject
     private ThreadSynchronize threadSync;
     private ProgressDialog    progressDialog;
+    private AtomicBoolean     noFeatureInstallationError;
 
     @Execute
     public void execute() {
+        noFeatureInstallationError = new AtomicBoolean();
         final InstallFeatureDialog dialog = new InstallFeatureDialog();
 
         ContextInjectionFactory.inject(dialog, context);
@@ -63,6 +67,7 @@ public final class InstallFeatureHandler {
                                               logger.atInfo().log("Feature '%s' has been successfuly installed/updated", feature.getName());
                                           }
                                       } catch (final Exception e) {
+                                          noFeatureInstallationError.set(true);
                                           logger.atError().withException(e).log("Cannot update or install feature");
                                           threadSync.asyncExec(() -> {
                                                                     progressDialog.close();
@@ -79,6 +84,10 @@ public final class InstallFeatureHandler {
                                   @Override
                                   protected void succeeded() {
                                       progressDialog.close();
+                                      if (!noFeatureInstallationError.get()) {
+                                          Fx.showSuccessNotification("Remote Feature Installation", "Successfully installed",
+                                                  getClass().getClassLoader());
+                                      }
                                   }
                               };
         final Thread     th   = new Thread(task);
@@ -90,7 +99,7 @@ public final class InstallFeatureHandler {
 
     private void createProgressDialog(final Task<?> task) {
         progressDialog = new ProgressDialog(task);
-        progressDialog.setHeaderText("Remote Connection");
+        progressDialog.setHeaderText("External Feature Installation");
         progressDialog.initStyle(StageStyle.UNDECORATED);
         progressDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
         progressDialog.show();
