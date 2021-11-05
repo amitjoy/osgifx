@@ -20,6 +20,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -31,12 +32,13 @@ import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -54,6 +56,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import in.bytehue.osgifx.console.feature.FeatureBundleDTO;
+import in.bytehue.osgifx.console.feature.FeatureConfigurationDTO;
 import in.bytehue.osgifx.console.feature.FeatureDTO;
 import in.bytehue.osgifx.console.feature.IdDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
@@ -61,12 +65,13 @@ import in.bytehue.osgifx.console.update.UpdateAgent;
 @Component
 public final class UpdateAgentProvider implements UpdateAgent {
 
-    private static final String LOCATION_PREFIX     = "osgifx://";
-    private static final String STARTLEVEL_KEY      = "start-order";
-    private static final String CONFIG_KEY          = "features";
-    private static final String BUNDLES_DIRECTORY   = "bundles";
-    private static final String FEATURE_STORAGE_PID = "fx.features";
-    private static final int    DEAFULT_START_LEVEL = 100;
+    private static final String LOCATION_PREFIX       = "osgifx:";
+    private static final String TEMP_DIRECTORY_PREFIX = "osgifx.console_";
+    private static final String STARTLEVEL_KEY        = "start-order";
+    private static final String CONFIG_KEY            = "features";
+    private static final String BUNDLES_DIRECTORY     = "bundles";
+    private static final String FEATURE_STORAGE_PID   = "osgifx.features";
+    private static final int    DEAFULT_START_LEVEL   = 100;
 
     @Reference
     private LoggerFactory      factory;
@@ -82,12 +87,17 @@ public final class UpdateAgentProvider implements UpdateAgent {
     @Activate
     void activate() throws IOException {
         logger          = FluentLogger.of(factory.createLogger(getClass().getName()));
-        cachedDirectory = Files.createTempDirectory("fx.console_");
+        cachedDirectory = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
     }
 
     @Deactivate
     void deactivate() throws IOException {
-        deleteFileOrFolder(cachedDirectory);
+        cleanDirectory(cachedDirectory);
+        final File   file = cachedDirectory.toFile();
+        final String path = file.getAbsolutePath();
+        if (file.delete()) {
+            logger.atInfo().log("Removed '%s' directory", path);
+        }
     }
 
     @Override
@@ -174,14 +184,22 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     @Override
-    public boolean remove(final String featureId) {
+    public FeatureDTO remove(final String featureId) throws Exception {
         logger.atInfo().log("Removing feature: %s", featureId);
-        try {
-            removeFeature(featureId);
-            return true;
-        } catch (final Exception e) {
-            return false;
+        final Optional<FeatureDTO> featureToBeRemoved = removeFeature(featureId);
+        if (featureToBeRemoved.isPresent()) {
+            final FeatureDTO feature = featureToBeRemoved.get();
+            // uninstall all associated bundles
+            for (final FeatureBundleDTO bundle : feature.bundles) {
+                uninstallBundle(bundle);
+            }
+            // remove associated configurations
+            for (final FeatureConfigurationDTO config : feature.configurations.values()) {
+                removeConfiguration(config);
+            }
+            return feature;
         }
+        return null;
     }
 
     @Override
@@ -202,11 +220,23 @@ public final class UpdateAgentProvider implements UpdateAgent {
         if (existingBundle.isPresent()) {
             try (InputStream is = new FileInputStream(bundleFile.get())) {
                 existingBundle.get().update(is);
+                final BundleStartLevel sl = existingBundle.get().adapt(BundleStartLevel.class);
+                sl.setStartLevel(startLevel);
             }
         } else {
-            final Bundle           installedBundle = bundleContext.installBundle(LOCATION_PREFIX + bsn);
-            final BundleStartLevel sl              = installedBundle.adapt(BundleStartLevel.class);
-            sl.setStartLevel(startLevel);
+            try (InputStream is = new FileInputStream(bundleFile.get())) {
+                final Bundle           installedBundle = bundleContext.installBundle(LOCATION_PREFIX + bsn, is);
+                final BundleStartLevel sl              = installedBundle.adapt(BundleStartLevel.class);
+                sl.setStartLevel(startLevel);
+                installedBundle.start();
+            }
+        }
+    }
+
+    private void uninstallBundle(final FeatureBundleDTO bundle) throws BundleException {
+        final Optional<Bundle> existingBundle = getExistingBundle(bundle);
+        if (existingBundle.isPresent()) {
+            existingBundle.get().uninstall();
         }
     }
 
@@ -228,8 +258,12 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     private Optional<File> findBundleInBundlesDirectory(final File directory, final String bsn, final String version) throws Exception {
-        final File   bundleDir = new File(directory, BUNDLES_DIRECTORY);
-        final File[] files     = bundleDir.listFiles();
+        final File bundleDir = new File(directory, BUNDLES_DIRECTORY);
+        if (!bundleDir.exists()) {
+            throw new RuntimeException(
+                    "Feature associated bundles are missing. Make sure they are kept in the 'bundles' folder inside the archive.");
+        }
+        final File[] files = bundleDir.listFiles();
         for (final File f : files) {
             if (matchBundle(f, bsn, version)) {
                 return Optional.of(f);
@@ -256,6 +290,24 @@ public final class UpdateAgentProvider implements UpdateAgent {
         }
     }
 
+    private void removeConfiguration(final FeatureConfigurationDTO configuration) throws Exception {
+        final String factoryPid = configuration.factoryPid;
+        final String pid        = configuration.pid;
+        if (factoryPid != null) {
+            final Configuration[] factoryConfigurations = configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")");
+            for (final Configuration config : factoryConfigurations) {
+                config.delete();
+            }
+        } else {
+            final Configuration config = configAdmin.getConfiguration(pid, "?");
+            config.delete();
+        }
+    }
+
+    private Optional<Bundle> getExistingBundle(final FeatureBundleDTO bundle) {
+        return Stream.of(bundleContext.getBundles()).filter(b -> b.getSymbolicName().equals(bundle.id.artifactId)).findAny();
+    }
+
     private Optional<Bundle> getExistingBundle(final FeatureBundle bundle) {
         return Stream.of(bundleContext.getBundles()).filter(b -> b.getSymbolicName().equals(bundle.getID().getArtifactId())).findAny();
     }
@@ -266,7 +318,11 @@ public final class UpdateAgentProvider implements UpdateAgent {
             if (manifest == null) {
                 throw new RuntimeException(jarResource + " is not a valid JAR");
             }
-            return manifest.getMainAttributes().getValue(attribute);
+            final String value = manifest.getMainAttributes().getValue(attribute);
+            if (value.contains(";")) {
+                return value.split(";")[0];
+            }
+            return value;
         }
     }
 
@@ -288,13 +344,13 @@ public final class UpdateAgentProvider implements UpdateAgent {
         return outputPath;
     }
 
-    private List<File> extractFeatures(final File archive) {
-        unzip(archive, cachedDirectory.toFile());
+    private List<File> extractFeatures(final File archive) throws IOException {
+        unzip(archive);
         final File[] files = cachedDirectory.toFile().listFiles((FilenameFilter) (dir, name) -> name.endsWith(".json"));
         return Stream.of(files).collect(Collectors.toList());
     }
 
-    public static void deleteFileOrFolder(final Path path) throws IOException {
+    public void cleanDirectory(final Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
@@ -308,7 +364,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
             }
 
             private FileVisitResult handleException(final IOException e) {
-                e.printStackTrace(); // replace with more robust error handling
+                logger.atError().withException(e).log("Exception occurred while walking down the file tree");
                 return FileVisitResult.TERMINATE;
             }
 
@@ -317,54 +373,56 @@ public final class UpdateAgentProvider implements UpdateAgent {
                 if (e != null) {
                     return handleException(e);
                 }
-                Files.delete(dir);
+                if (path != dir) {
+                    Files.delete(dir);
+                }
                 return FileVisitResult.CONTINUE;
             }
         });
     }
 
-    private void unzip(final File zipFilePath, final File destDir) {
-        // create output directory if it doesn't exist
-        if (!destDir.exists()) {
-            destDir.mkdirs();
-        }
-        FileInputStream fis;
-        // buffer for read and write data to file
-        final byte[] buffer = new byte[1024];
-        try {
-            fis = new FileInputStream(zipFilePath);
-            final ZipInputStream zis = new ZipInputStream(fis);
-            ZipEntry             ze  = zis.getNextEntry();
-            while (ze != null) {
-                final String fileName = ze.getName();
-                final File   newFile  = new File(destDir + File.separator + fileName);
-                logger.atInfo().log("Unzipping to %s", newFile.getAbsolutePath());
-                // create directories for sub directories in zip
-                new File(newFile.getParent()).mkdirs();
-                final FileOutputStream fos = new FileOutputStream(newFile);
-                int                    len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
+    private void unzip(final File zipFilePath) throws IOException {
+        cleanDirectory(cachedDirectory);
+        try (final ZipFile zipFile = new ZipFile(zipFilePath)) {
+            final Enumeration<?> enu = zipFile.entries();
+            while (enu.hasMoreElements()) {
+                final ZipEntry zipEntry = (ZipEntry) enu.nextElement();
+
+                final String name           = zipEntry.getName();
+                final long   size           = zipEntry.getSize();
+                final long   compressedSize = zipEntry.getCompressedSize();
+                logger.atInfo().log("[Extracting Archive] Name: %s | Size: %s | Compressed Size: %s ", name, size, compressedSize);
+
+                final File file = new File(cachedDirectory.toFile(), name);
+                if (name.endsWith("/")) {
+                    file.mkdirs();
+                    continue;
                 }
-                fos.close();
-                // close this ZipEntry
-                zis.closeEntry();
-                ze = zis.getNextEntry();
+
+                final File parent = file.getParentFile();
+                if (parent != null) {
+                    parent.mkdirs();
+                }
+
+                try (InputStream is = zipFile.getInputStream(zipEntry); FileOutputStream fos = new FileOutputStream(file)) {
+                    final byte[] bytes = new byte[1024];
+                    int          length;
+                    while ((length = is.read(bytes)) >= 0) {
+                        fos.write(bytes, 0, length);
+                    }
+                }
             }
-            // close last ZipEntry
-            zis.closeEntry();
-            zis.close();
-            fis.close();
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
     private void storeFeature(final FeatureDTO dto) throws IOException {
-        final Configuration              configuration = configAdmin.getConfiguration(FEATURE_STORAGE_PID, "?");
-        final Dictionary<String, Object> properties    = configuration.getProperties();
-        final Object                     features      = properties.get(CONFIG_KEY);
-        final Gson                       gson          = new Gson();
+        final Configuration        configuration = configAdmin.getConfiguration(FEATURE_STORAGE_PID, "?");
+        Dictionary<String, Object> properties    = configuration.getProperties();
+        if (properties == null) {
+            properties = new Hashtable<>();
+        }
+        final Object features = properties.get(CONFIG_KEY);
+        final Gson   gson     = new Gson();
         if (features == null) {
             final String json = gson.toJson(Lists.newArrayList(dto).toArray(new FeatureDTO[0]));
 
@@ -373,10 +431,10 @@ public final class UpdateAgentProvider implements UpdateAgent {
 
             configuration.update(new Hashtable<>(props));
         } else {
-            final String[]     fs     = (String[]) features;
-            final FeatureDTO[] result = Stream.of(fs).map(e -> gson.fromJson(e, FeatureDTO.class)).toArray(FeatureDTO[]::new);
+            final FeatureDTO[] result = gson.fromJson(features.toString(), FeatureDTO[].class);
 
             final List<FeatureDTO> toBeStored = Lists.newArrayList(result);
+            toBeStored.removeIf(f -> checkIdEquals(f.id, dto.id));
             toBeStored.add(dto);
 
             final String              json  = gson.toJson(toBeStored);
@@ -387,18 +445,19 @@ public final class UpdateAgentProvider implements UpdateAgent {
         }
     }
 
-    private void removeFeature(final String featureId) throws IOException {
+    private Optional<FeatureDTO> removeFeature(final String featureId) throws IOException {
         final Configuration              configuration = configAdmin.getConfiguration(FEATURE_STORAGE_PID, "?");
         final Dictionary<String, Object> properties    = configuration.getProperties();
         final Object                     features      = properties.get(CONFIG_KEY);
         final Gson                       gson          = new Gson();
         if (features == null) {
-            return;
+            return Optional.empty();
         }
         final String[]     fs     = (String[]) features;
         final FeatureDTO[] result = Stream.of(fs).map(e -> gson.fromJson(e, FeatureDTO.class)).toArray(FeatureDTO[]::new);
 
-        final List<FeatureDTO> finalList = Lists.newArrayList(result);
+        final List<FeatureDTO>     finalList           = Lists.newArrayList(result);
+        final Optional<FeatureDTO> featuredToBeRemoved = finalList.stream().filter(f -> checkIdEquals(f.id, featureId)).findAny();
         finalList.removeIf(f -> checkIdEquals(f.id, featureId));
 
         final String              json  = gson.toJson(finalList);
@@ -406,6 +465,12 @@ public final class UpdateAgentProvider implements UpdateAgent {
 
         props.put("features", json);
         configuration.update(new Hashtable<>(props));
+        return featuredToBeRemoved;
+    }
+
+    private boolean checkIdEquals(final IdDTO id1, final IdDTO id2) {
+        final String idToCompare = id2.groupId + ":" + id2.artifactId + ":" + id2.version;
+        return checkIdEquals(id1, idToCompare);
     }
 
     private boolean checkIdEquals(final IdDTO id, final String featureId) {
