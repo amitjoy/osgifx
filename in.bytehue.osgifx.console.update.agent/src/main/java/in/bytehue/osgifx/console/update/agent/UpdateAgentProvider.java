@@ -65,7 +65,7 @@ import in.bytehue.osgifx.console.update.UpdateAgent;
 @Component
 public final class UpdateAgentProvider implements UpdateAgent {
 
-    private static final String LOCATION_PREFIX       = "osgifx:";
+    private static final String LOCATION_PREFIX       = "osgifx-feature:";
     private static final String TEMP_DIRECTORY_PREFIX = "osgifx.console_";
     private static final String STARTLEVEL_KEY        = "start-order";
     private static final String CONFIG_KEY            = "features";
@@ -95,7 +95,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
         cleanDirectory(cachedDirectory);
         final File   file = cachedDirectory.toFile();
         final String path = file.getAbsolutePath();
-        if (file.delete()) {
+        if (Files.deleteIfExists(file.toPath())) {
             logger.atInfo().log("Removed '%s' directory", path);
         }
     }
