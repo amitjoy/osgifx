@@ -9,6 +9,7 @@ import javax.inject.Named;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
+import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.application.fxml.controller.InstallFeatureDialogController;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +21,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
-public final class InstallFeatureDialog extends Dialog<List<File>> {
+public final class InstallFeatureDialog extends Dialog<SelectedFeaturesDTO> {
 
     @Inject
     @LocalInstance
@@ -48,6 +49,11 @@ public final class InstallFeatureDialog extends Dialog<List<File>> {
             final ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
             return data == ButtonData.OK_DONE ? controller.getSelectedFeatures() : null;
         });
+    }
+
+    public static class SelectedFeaturesDTO {
+        public List<File> features;
+        public String     archiveURL;
     }
 
 }
