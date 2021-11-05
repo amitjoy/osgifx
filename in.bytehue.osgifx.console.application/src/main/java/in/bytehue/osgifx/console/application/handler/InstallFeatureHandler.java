@@ -39,11 +39,11 @@ public final class InstallFeatureHandler {
     @Inject
     private ThreadSynchronize threadSync;
     private ProgressDialog    progressDialog;
-    private AtomicBoolean     noFeatureInstallationError;
+    private AtomicBoolean     hasFeatureInstallationError;
 
     @Execute
     public void execute() {
-        noFeatureInstallationError = new AtomicBoolean();
+        hasFeatureInstallationError = new AtomicBoolean();
         final InstallFeatureDialog dialog = new InstallFeatureDialog();
 
         ContextInjectionFactory.inject(dialog, context);
@@ -58,6 +58,9 @@ public final class InstallFeatureHandler {
     }
 
     private void udpateOrInstallFeatures(final List<File> features, final String archiveURL) {
+        if (features.isEmpty()) {
+            return;
+        }
         final Task<Void> task = new Task<Void>() {
                                   @Override
                                   protected Void call() throws Exception {
@@ -67,7 +70,7 @@ public final class InstallFeatureHandler {
                                               logger.atInfo().log("Feature '%s' has been successfuly installed/updated", feature.getName());
                                           }
                                       } catch (final Exception e) {
-                                          noFeatureInstallationError.set(true);
+                                          hasFeatureInstallationError.set(true);
                                           logger.atError().withException(e).log("Cannot update or install feature");
                                           threadSync.asyncExec(() -> {
                                                                     progressDialog.close();
@@ -84,7 +87,7 @@ public final class InstallFeatureHandler {
                                   @Override
                                   protected void succeeded() {
                                       progressDialog.close();
-                                      if (!noFeatureInstallationError.get()) {
+                                      if (!hasFeatureInstallationError.get()) {
                                           Fx.showSuccessNotification("Remote Feature Installation", "Successfully installed",
                                                   getClass().getClassLoader());
                                       }
