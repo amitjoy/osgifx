@@ -5,16 +5,24 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.controlsfx.control.CheckListView;
+import org.controlsfx.control.PrefixSelectionComboBox;
 import org.controlsfx.dialog.ExceptionDialog;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.feature.FeatureDTO;
@@ -26,7 +34,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.input.Dragboard;
@@ -39,25 +46,30 @@ public final class InstallFeatureDialogController {
 
     @Log
     @Inject
-    private FluentLogger               logger;
+    private FluentLogger                    logger;
     @Inject
-    private ThreadSynchronize          threadSync;
+    private ThreadSynchronize               threadSync;
     @Inject
-    private UpdateAgent                updateAgent;
+    private UpdateAgent                     updateAgent;
+    @Inject
+    @Preference(nodePath = "osgi.fx.feature")
+    private IEclipsePreferences             preferences;
     @FXML
-    private TextField                  archiveUrlText;
+    private PrefixSelectionComboBox<String> archiveUrlCombo;
     @FXML
-    private Button                     analyzeButton;
+    private Button                          analyzeButton;
     @FXML
-    private Button                     localArchiveButton;
+    private Button                          localArchiveButton;
     @FXML
-    private CheckListView<XFeatureDTO> featuresList;
+    private CheckListView<XFeatureDTO>      featuresList;
     @FXML
-    private GridPane                   featureInstallPane;
-    private File                       localArchive;
+    private GridPane                        featureInstallPane;
+    private File                            localArchive;
 
     @FXML
     public void initialize() {
+        archiveUrlCombo.setEditable(true);
+        initCombo();
         registerDragAndDropSupport();
         featuresList.getSelectionModel().setSelectionMode(MULTIPLE);
         featuresList.setCellFactory(param -> new CheckBoxListCell<XFeatureDTO>(featuresList::getItemBooleanProperty) {
@@ -86,15 +98,25 @@ public final class InstallFeatureDialogController {
             }
 
         });
-        analyzeButton.disableProperty()
-                .bind(Bindings.createBooleanBinding(() -> archiveUrlText.getText().trim().isEmpty(), archiveUrlText.textProperty()));
+        analyzeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> archiveUrlCombo.getEditor().getText().trim().isEmpty(),
+                archiveUrlCombo.getEditor().textProperty()));
         logger.atInfo().log("FXML controller has been initialized");
+    }
+
+    private void initCombo() {
+        final String repos = preferences.get("repos", "");
+        if (!repos.isEmpty()) {
+            final Gson         gson         = new Gson();
+            final List<String> repositories = gson.fromJson(repos, new TypeToken<ArrayList<String>>() {
+                                            }.getType());
+            archiveUrlCombo.setItems(FXCollections.observableList(repositories));
+        }
     }
 
     @FXML
     private void processArchive(final ActionEvent event) {
         logger.atInfo().log("FXML controller 'processArchive(..)' event has been invoked");
-        final String          url       = archiveUrlText.getText();
+        final String          url       = archiveUrlCombo.getEditor().getText();
         Map<File, FeatureDTO> features;
         final URL             parsedURL = parseAsURL(url);
         try {
@@ -123,7 +145,6 @@ public final class InstallFeatureDialogController {
             dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
             dialog.show();
         }
-        // TODO store the repo details in storage
     }
 
     @FXML
@@ -133,7 +154,7 @@ public final class InstallFeatureDialogController {
         archiveChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archive Files", "*.zip"));
         localArchive = archiveChooser.showOpenDialog(null);
         if (localArchive != null) {
-            archiveUrlText.setText(localArchive.getAbsolutePath());
+            archiveUrlCombo.getEditor().setText(localArchive.getAbsolutePath());
         }
     }
 
@@ -142,7 +163,7 @@ public final class InstallFeatureDialogController {
 
         final ObservableList<XFeatureDTO> selectedItems = featuresList.getCheckModel().getCheckedItems();
         dto.features   = selectedItems.stream().map(f -> f.json).collect(toList());
-        dto.archiveURL = archiveUrlText.getText();
+        dto.archiveURL = archiveUrlCombo.getEditor().getText();
 
         return dto;
     }
@@ -166,9 +187,9 @@ public final class InstallFeatureDialogController {
                 // Only get the first file from the list
                 final File file = db.getFiles().get(0);
                 threadSync.asyncExec(() -> {
-                    archiveUrlText.setText(file.getName());
+                    archiveUrlCombo.setItems(FXCollections.observableArrayList(file.getName()));
                     localArchive = file;
-                    archiveUrlText.setTooltip(new Tooltip(localArchive.getName()));
+                    archiveUrlCombo.setTooltip(new Tooltip(localArchive.getName()));
                 });
             }
             event.setDropCompleted(success);

@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.controlsfx.control.CheckListView?>
+<?import org.controlsfx.control.PrefixSelectionComboBox?>
 
 <GridPane fx:id="featureInstallPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.application.fxml.controller.InstallFeatureDialogController">
   <columnConstraints>
@@ -18,14 +19,14 @@
     <RowConstraints maxHeight="351.0" minHeight="10.0" prefHeight="260.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <TextField fx:id="archiveUrlText" promptText="Please enter a URL or choose a local archive">
+      <PrefixSelectionComboBox fx:id="archiveUrlCombo" promptText="Please enter a URL or choose a local archive" prefWidth="510.0">
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
          <GridPane.margin>
             <Insets top="2.0" />
          </GridPane.margin>
-      </TextField>
+      </PrefixSelectionComboBox>
       <Button fx:id="localArchiveButton" mnemonicParsing="false" onAction="#chooseArchive" prefHeight="27.0" prefWidth="91.0" text="Archive" GridPane.columnIndex="1">
          <GridPane.margin>
             <Insets left="4.0" />
