@@ -65,13 +65,14 @@ import in.bytehue.osgifx.console.update.UpdateAgent;
 @Component
 public final class UpdateAgentProvider implements UpdateAgent {
 
-    private static final String LOCATION_PREFIX       = "osgifx-feature:";
-    private static final String TEMP_DIRECTORY_PREFIX = "osgifx.console_";
-    private static final String STARTLEVEL_KEY        = "start-order";
-    private static final String CONFIG_KEY            = "features";
-    private static final String BUNDLES_DIRECTORY     = "bundles";
-    private static final String FEATURE_STORAGE_PID   = "osgifx.features";
-    private static final int    DEAFULT_START_LEVEL   = 100;
+    private static final String LOCATION_PREFIX                     = "osgifx-feature:";
+    private static final String TEMP_DIRECTORY_PREFIX               = "osgifx.console_";
+    private static final String STARTLEVEL_KEY                      = "start-order";
+    private static final String CONFIG_KEY                          = "features";
+    private static final String BUNDLES_DIRECTORY                   = "bundles";
+    private static final String FEATURE_STORAGE_PID                 = "osgifx.features";
+    private static final String BND_LAUNCHER_BUNDLE_LOCATION_PREFIX = "reference:file:";
+    private static final int    DEAFULT_START_LEVEL                 = 100;
 
     @Reference
     private LoggerFactory      factory;
@@ -253,8 +254,17 @@ public final class UpdateAgentProvider implements UpdateAgent {
         }
     }
 
+    /**
+     * Ensures that no external feature would be able to update any bundle
+     * which has been delivered with the application
+     */
     private boolean checkIfSystemBundle(final FeatureBundle bundle) {
-        return Stream.of(bundleContext.getBundles()).anyMatch(b -> b.getLocation().startsWith("reference://"));
+        // @formatter:off
+        return Stream.of(bundleContext.getBundles())
+                     .filter(b -> b.getSymbolicName().equals(bundle.getID().getArtifactId()))
+                     .anyMatch(b -> b.getLocation()
+                             .startsWith(BND_LAUNCHER_BUNDLE_LOCATION_PREFIX));
+        // @formatter:on
     }
 
     private Optional<File> findBundleInBundlesDirectory(final File directory, final String bsn, final String version) throws Exception {
