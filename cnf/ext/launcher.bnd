@@ -1,4 +1,4 @@
-workspace.directory             =         osgifx-ws
+workspace.directory             =         .osgifx-ws
 -runrepos                       =         Workspace, Runtime, e(fx)clipse
 -runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         true
