@@ -7,4 +7,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  graphic = graphic
 -buildpath          : ${bundles.required}, com.google.gson
 -privatepackage     : in.bytehue.osgifx.console.ui.configurations
-Import-Package      : org.controlsfx.glyphfont, org.controlsfx.control, *
+Import-Package      : org.controlsfx.glyphfont, *
