@@ -11,6 +11,7 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.packages',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.properties',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.threads',\
@@ -23,6 +24,7 @@
 install.order    :   \
                      in.bytehue.osgifx.console.ui.overview,\
                      in.bytehue.osgifx.console.ui.bundles,\
+                     in.bytehue.osgifx.console.ui.packages,\
                      in.bytehue.osgifx.console.ui.services,\
                      in.bytehue.osgifx.console.ui.components,\
                      in.bytehue.osgifx.console.ui.configurations,\
