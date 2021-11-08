@@ -85,10 +85,8 @@ public final class ConnectionSettingsWindowController {
 
         connectionTable.setItems(connectionsProvider.getConnections());
         connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                connectButton.setDisable(false);
-                removeConnectionButton.setDisable(false);
-            }
+            connectButton.setDisable(newSelection == null);
+            removeConnectionButton.setDisable(newSelection == null);
         });
         TableFilter.forTableView(connectionTable).apply();
         logger.atInfo().log("FXML controller has been initialized");
