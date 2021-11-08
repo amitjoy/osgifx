@@ -14,7 +14,6 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.PrefixSelectionComboBox;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -28,6 +27,7 @@ import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.Selecte
 import in.bytehue.osgifx.console.feature.FeatureDTO;
 import in.bytehue.osgifx.console.feature.IdDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +40,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
-import javafx.stage.StageStyle;
 
 public final class InstallFeatureDialogController {
 
@@ -140,10 +139,7 @@ public final class InstallFeatureDialogController {
             updateList(features);
         } catch (final Exception e) {
             logger.atError().withException(e).log("Cannot process archive '%s'", url);
-            final ExceptionDialog dialog = new ExceptionDialog(e);
-            dialog.initStyle(StageStyle.UNDECORATED);
-            dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
-            dialog.show();
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
         }
     }
 

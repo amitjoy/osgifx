@@ -12,6 +12,7 @@ import org.eclipse.fx.core.log.Log;
 
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 
 public final class BundleStartHandler {
 
@@ -37,9 +38,11 @@ public final class BundleStartHandler {
                 eventBroker.send(BUNDLE_STARTED_EVENT_TOPIC, id);
             } else {
                 logger.atError().log(error);
+                FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader());
             }
         } catch (final Exception e) {
             logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
         }
     }
 

@@ -13,6 +13,7 @@ import org.eclipse.fx.core.log.Log;
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 
 public final class ComponentEnableHandler {
 
@@ -40,9 +41,11 @@ public final class ComponentEnableHandler {
                 logger.atWarning().log(result.response);
             } else {
                 logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
             }
         } catch (final Exception e) {
             logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
         }
     }
 

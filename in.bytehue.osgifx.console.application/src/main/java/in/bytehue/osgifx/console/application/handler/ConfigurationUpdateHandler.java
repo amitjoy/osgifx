@@ -18,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XResultDTO;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 
 public final class ConfigurationUpdateHandler {
 
@@ -47,9 +48,11 @@ public final class ConfigurationUpdateHandler {
                 logger.atWarning().log(result.response);
             } else {
                 logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Configuration Update Error", result.response, getClass().getClassLoader());
             }
         } catch (final Exception e) {
             logger.atError().withException(e).log("Configuration with PID '%s' cannot be updated", pid);
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
         }
     }
 

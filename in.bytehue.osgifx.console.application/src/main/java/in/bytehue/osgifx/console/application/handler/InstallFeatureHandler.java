@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
-import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -32,6 +31,7 @@ import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog;
 import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
 import in.bytehue.osgifx.console.util.fx.Fx;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.concurrent.Task;
 import javafx.stage.StageStyle;
 
@@ -86,11 +86,7 @@ public final class InstallFeatureHandler {
                                           logger.atError().withException(e).log("Cannot update or install feature");
                                           threadSync.asyncExec(() -> {
                                                                     progressDialog.close();
-                                                                    final ExceptionDialog dialog = new ExceptionDialog(e);
-                                                                    dialog.initStyle(StageStyle.UNDECORATED);
-                                                                    dialog.getDialogPane().getStylesheets().add(
-                                                                            getClass().getResource("/css/default.css").toExternalForm());
-                                                                    dialog.show();
+                                                                    FxDialog.showExceptionDialog(e, getClass().getClassLoader());
                                                                 });
                                       }
                                       return null;
