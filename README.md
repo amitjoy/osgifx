@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="600" alt="logo" src="https://user-images.githubusercontent.com/13380182/137404892-2e90dbfb-c20d-4267-b1b9-672597d7f2a2.png" />
+  <img width="300" alt="logo" src="https://user-images.githubusercontent.com/13380182/140794373-b357f431-d86b-421c-aca7-0102d85e1bc8.png" />
   <br/>
   <p align="center">This repository provides a desktop application to remotely manage OSGi runtimes</p>
 </p>
