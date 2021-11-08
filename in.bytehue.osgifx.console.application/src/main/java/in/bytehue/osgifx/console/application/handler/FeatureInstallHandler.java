@@ -27,8 +27,8 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog;
-import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
+import in.bytehue.osgifx.console.application.dialog.FeatureInstallDialog;
+import in.bytehue.osgifx.console.application.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import in.bytehue.osgifx.console.util.fx.FxDialog;
@@ -36,7 +36,7 @@ import javafx.concurrent.Task;
 import javafx.stage.StageStyle;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.update.UpdateAgent)")
-public final class InstallFeatureHandler {
+public final class FeatureInstallHandler {
 
     @Log
     @Inject
@@ -56,7 +56,7 @@ public final class InstallFeatureHandler {
     @Execute
     public void execute() {
         hasFeatureInstallationError = new AtomicBoolean();
-        final InstallFeatureDialog dialog = new InstallFeatureDialog();
+        final FeatureInstallDialog dialog = new FeatureInstallDialog();
 
         ContextInjectionFactory.inject(dialog, context);
         logger.atInfo().log("Injected install feature dialog to eclipse context");

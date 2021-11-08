@@ -9,7 +9,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import in.bytehue.osgifx.console.application.dialog.InstallBundleDTO;
+import in.bytehue.osgifx.console.application.dialog.BundleInstallDTO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -52,11 +52,11 @@ public final class InstallBundleDialogController {
         }
     }
 
-    public InstallBundleDTO getInstallDTO() {
+    public BundleInstallDTO getInstallDTO() {
         if (bundle == null) {
             return null;
         }
-        return new InstallBundleDTO(bundle, startBundleToggle.isSelected());
+        return new BundleInstallDTO(bundle, startBundleToggle.isSelected());
     }
 
     private void registerDragAndDropSupport() {

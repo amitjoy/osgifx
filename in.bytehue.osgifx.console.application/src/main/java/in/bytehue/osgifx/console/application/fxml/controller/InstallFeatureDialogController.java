@@ -23,7 +23,7 @@ import org.eclipse.fx.core.log.Log;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import in.bytehue.osgifx.console.application.dialog.InstallFeatureDialog.SelectedFeaturesDTO;
+import in.bytehue.osgifx.console.application.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.feature.FeatureDTO;
 import in.bytehue.osgifx.console.feature.IdDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
