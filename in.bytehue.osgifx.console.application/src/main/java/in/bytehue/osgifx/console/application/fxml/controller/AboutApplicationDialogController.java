@@ -37,7 +37,7 @@ public final class AboutApplicationDialogController {
 
     @FXML
     public void initialize() {
-        appName.setText("OSGi.fx Console (Version " + bundleContext.getBundle().getVersion() + ")");
+        appName.setText("OSGi.fx (" + bundleContext.getBundle().getVersion() + ")");
         hyperlink.setOnAction(event -> {
             final Hyperlink link           = (Hyperlink) event.getSource();
             final String    eclipseWebLink = link.getText();
