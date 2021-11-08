@@ -38,7 +38,7 @@ public final class AboutApplicationDialog extends Dialog<Void> {
 
         final Node content = Fx.loadFXML(loader, context, "/fxml/about-application-dialog.fxml");
 
-        dialogPane.setHeaderText("About OSGi.fx Console");
+        dialogPane.setHeaderText("About OSGi.fx");
         dialogPane.setContent(content);
     }
 
