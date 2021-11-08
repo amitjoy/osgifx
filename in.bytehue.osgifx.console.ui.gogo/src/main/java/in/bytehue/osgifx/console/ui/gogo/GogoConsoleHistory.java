@@ -27,6 +27,9 @@ public final class GogoConsoleHistory {
     }
 
     public synchronized String get(final int index) {
+        if (history.isEmpty()) {
+            return "";
+        }
         return history.get(index);
     }
 
