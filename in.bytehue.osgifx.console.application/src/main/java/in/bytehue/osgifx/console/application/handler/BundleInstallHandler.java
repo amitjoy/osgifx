@@ -18,12 +18,12 @@ import org.osgi.framework.dto.BundleDTO;
 import com.google.common.io.Files;
 
 import in.bytehue.osgifx.console.agent.Agent;
-import in.bytehue.osgifx.console.application.dialog.InstallBundleDTO;
-import in.bytehue.osgifx.console.application.dialog.InstallBundleDialog;
+import in.bytehue.osgifx.console.application.dialog.BundleInstallDTO;
+import in.bytehue.osgifx.console.application.dialog.BundleInstallDialog;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.Fx;
 
-public final class InstallBundleHandler {
+public final class BundleInstallHandler {
 
     @Log
     @Inject
@@ -37,16 +37,16 @@ public final class InstallBundleHandler {
 
     @Execute
     public void execute() {
-        final InstallBundleDialog dialog = new InstallBundleDialog();
+        final BundleInstallDialog dialog = new BundleInstallDialog();
 
         ContextInjectionFactory.inject(dialog, context);
         logger.atInfo().log("Injected install bundle dialog to eclipse context");
         dialog.init();
 
-        final Optional<InstallBundleDTO> remoteInstall = dialog.showAndWait();
+        final Optional<BundleInstallDTO> remoteInstall = dialog.showAndWait();
         if (remoteInstall.isPresent()) {
             try {
-                final InstallBundleDTO dto  = remoteInstall.get();
+                final BundleInstallDTO dto  = remoteInstall.get();
                 final File             file = dto.file;
                 if (file == null) {
                     return;

@@ -17,7 +17,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
-public final class InstallBundleDialog extends Dialog<InstallBundleDTO> {
+public final class BundleInstallDialog extends Dialog<BundleInstallDTO> {
 
     @Inject
     @LocalInstance
