@@ -62,6 +62,9 @@ public final class GogoFxController {
                     input.clear();
                     return;
                 }
+                if (command.trim().isEmpty()) {
+                    return;
+                }
                 output.appendText("$ " + command + System.lineSeparator());
                 executeGogoCommand(command);
                 break;
