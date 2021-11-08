@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.application.handler;
 
+import static in.bytehue.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
+
 import java.io.File;
 import java.util.Optional;
 
@@ -8,6 +10,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.dto.BundleDTO;
@@ -27,6 +30,8 @@ public final class InstallBundleHandler {
     private FluentLogger    logger;
     @Inject
     private IEclipseContext context;
+    @Inject
+    private IEventBroker    eventBroker;
     @Inject
     private Supervisor      supervisor;
 
@@ -63,6 +68,7 @@ public final class InstallBundleHandler {
                     agent.start(bundle.id);
                     logger.atInfo().log("Bundle has been started: %s", bundle);
                 }
+                eventBroker.send(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
                 Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated",
                         getClass().getClassLoader());
             } catch (final Exception e) {
