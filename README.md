@@ -12,14 +12,10 @@
   <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="134" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
   </p>
 
-![1](https://user-images.githubusercontent.com/13380182/137404709-f567056b-59e9-4298-943c-515ac624c961.png)
-![2](https://user-images.githubusercontent.com/13380182/137404712-c41ec2a2-3561-4aa0-8061-41f02e8c5819.png)
-![3](https://user-images.githubusercontent.com/13380182/137404714-46e64fe5-4a73-41e4-878d-6557e364fafa.png)
-![4](https://user-images.githubusercontent.com/13380182/137404717-8d97c245-e03f-42f0-9ebb-e4d9dd131ba0.png)
-![5](https://user-images.githubusercontent.com/13380182/137404719-05db8a30-0e97-4b37-bce8-1b03339c491c.png)
-![6](https://user-images.githubusercontent.com/13380182/137404724-949e9f07-c0d6-47c7-bf35-7ebbc1b64d2b.png)
-![7](https://user-images.githubusercontent.com/13380182/137404725-61553ff7-32c3-45ec-99bb-1c55bf4e03ab.png)
-![8](https://user-images.githubusercontent.com/13380182/137404726-eb341a40-ca9d-4bb5-981c-c182f37ec9e0.png)
+![1](https://user-images.githubusercontent.com/13380182/140800774-a95ccb9c-217a-4bb3-94e1-56772bf364cb.png)
+![2](https://user-images.githubusercontent.com/13380182/140800782-a413fcaf-8e1b-44f1-a39d-4464e2790164.png)
+![3](https://user-images.githubusercontent.com/13380182/140800788-14a18d50-0f64-4704-b217-5c9bdb8efa9b.png)
+![4](https://user-images.githubusercontent.com/13380182/140800795-ab1dca5f-d05b-47a6-9fc4-2c74cc9b85fe.png)
 
 ------------------------------------------------------------------------------------------------------------
 
