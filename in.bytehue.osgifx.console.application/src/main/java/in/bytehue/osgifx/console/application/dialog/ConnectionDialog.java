@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -12,6 +11,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -79,10 +79,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 lbMessage.setVisible(true);
                 lbMessage.setManaged(true);
                 lbMessage.setText(ex.getMessage());
-                final ExceptionDialog dialog = new ExceptionDialog(ex);
-                dialog.initStyle(StageStyle.UNDECORATED);
-                dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
-                dialog.show();
+                FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
         final String hostnameCaption = "Hostname";

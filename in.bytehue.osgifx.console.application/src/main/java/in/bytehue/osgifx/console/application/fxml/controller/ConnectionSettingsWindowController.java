@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -28,6 +27,7 @@ import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
 import in.bytehue.osgifx.console.application.preference.ConnectionsProvider;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -140,10 +140,7 @@ public final class ConnectionSettingsWindowController {
                     logger.atError().withException(e).log("Cannot connect to %s", selectedConnection);
                     threadSync.asyncExec(() -> {
                         progressDialog.close();
-                        final ExceptionDialog dialog = new ExceptionDialog(e);
-                        dialog.initStyle(StageStyle.UNDECORATED);
-                        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
-                        dialog.show();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
                     });
                     throw e;
                 }
