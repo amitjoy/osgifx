@@ -62,6 +62,9 @@
          </GridPane.margin>
       </Label>
       <TableView fx:id="propertiesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No associated properties" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="propertiesTableColumn1" prefWidth="259.0" />
           <TableColumn fx:id="propertiesTableColumn2" minWidth="0.0" prefWidth="290.0" />

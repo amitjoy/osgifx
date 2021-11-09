@@ -213,6 +213,9 @@
          </GridPane.margin>
       </Label>
       <TableView fx:id="propertiesTable" prefHeight="263.0" prefWidth="569.0" GridPane.columnIndex="1" GridPane.rowIndex="20">
+      	<placeholder>
+        	<Label text="No associated properties" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="propertiesTableColumn1" prefWidth="259.0" />
           <TableColumn fx:id="propertiesTableColumn2" minWidth="0.0" prefWidth="290.0" />
@@ -222,11 +225,17 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="referencesTable" prefHeight="7.0" prefWidth="569.0" style="-fx-table-cell-border-color: transparent;" GridPane.columnIndex="1" GridPane.rowIndex="23" GridPane.vgrow="ALWAYS">
+         <placeholder>
+        	<Label text="No associated references" />
+    	</placeholder>
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
       </TableView>
       <TableView fx:id="boundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="25" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No bound services" />
+    	</placeholder>
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
@@ -237,6 +246,9 @@
          </columns>
       </TableView>
       <TableView fx:id="unboundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="27" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No unbound services" />
+    	</placeholder>
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
