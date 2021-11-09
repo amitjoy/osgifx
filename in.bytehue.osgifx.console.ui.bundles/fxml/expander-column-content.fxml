@@ -259,6 +259,9 @@
          </GridPane.margin>
       </Label>
       <TableView fx:id="exportedPackagesNameTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No packages exported" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="exportedPackagesNameTableColumn" prefWidth="339.0" text="Name" />
           <TableColumn fx:id="exportedPackagesVersionTableColumn" minWidth="0.0" prefWidth="220.0" text="Version" />
@@ -271,6 +274,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="registeredServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="24" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No services registered" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="registeredServicesIdTableColumn" prefWidth="124.0" text="ID" />
           <TableColumn fx:id="registeredServicesClassTableColumn" prefWidth="437.0" text="Object Class" />
@@ -289,6 +295,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="importedPackagesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="20" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No packages imported" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="importedPackagesNameTableColumn" prefWidth="353.0" text="Name" />
           <TableColumn fx:id="importedPackagesVersionTableColumn" prefWidth="209.0" text="Version" />
@@ -298,6 +307,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="wiredBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="22" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No bundles wired" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="wiredBundlesIdTableColumn" prefWidth="118.0" text="ID" />
           <TableColumn fx:id="wiredBundlesBsnTableColumn" prefWidth="444.0" text="Symbolic Name" />
@@ -307,6 +319,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="usedServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="28" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No services used" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="usedServicesIdTableColumn" prefWidth="111.0" text="ID" />
           <TableColumn fx:id="usedServicesClassTableColumn" prefWidth="442.0" text="Object Class" />
@@ -316,6 +331,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="hostBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="30" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No host bundles" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="hostBundlesIdTableColumn" prefWidth="110.0" text="ID" />
           <TableColumn fx:id="hostBundlesBsnTableColumn" prefWidth="437.0" text="Symbolic Name" />
@@ -325,6 +343,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="attachedFragmentsTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="32" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No fragments attached" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="attachedFragmentsIdTableColumn" prefWidth="109.0" text="ID" />
           <TableColumn fx:id="attachedFragmentsBsnTableColumn" prefWidth="438.0" text="Symbolic Name" />

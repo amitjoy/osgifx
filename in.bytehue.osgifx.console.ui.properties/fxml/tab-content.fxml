@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -7,6 +8,9 @@
 <AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.properties.PropertiesFxController">
    <children>
       <TableView fx:id="propertyTable" layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <placeholder>
+        	<Label text="No system or framework properties" />
+    	</placeholder>
         <columns>
           <TableColumn prefWidth="30.0" text="" />
           <TableColumn fx:id="propertyName" prefWidth="515.0" text="Name" />

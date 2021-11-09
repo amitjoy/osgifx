@@ -63,6 +63,9 @@
       </Label>
       <ToggleSwitch fx:id="duplicateLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <TableView fx:id="exportersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No exporter bundle" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="exportersTableIdColumn" prefWidth="110.0" text="ID" />
           <TableColumn fx:id="exportersTableBsnColumn" prefWidth="435.0" text="Symbolic Name" />
@@ -72,6 +75,9 @@
          </GridPane.margin>
       </TableView>
       <TableView fx:id="importersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No importer bundle" />
+    	</placeholder>
         <columns>
           <TableColumn fx:id="importersTableIdColumn" prefWidth="110.0" text="ID" />
           <TableColumn fx:id="importersTableBsnColumn" prefWidth="435.0" text="Symbolic Name" />
