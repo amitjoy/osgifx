@@ -14,12 +14,14 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.PrefixSelectionComboBox;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.e4.core.di.extensions.Preference;
+import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.preferences.Preference;
+import org.eclipse.fx.core.preferences.Value;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,6 +33,7 @@ import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -51,8 +54,8 @@ public final class InstallFeatureDialogController {
     @Inject
     private UpdateAgent                     updateAgent;
     @Inject
-    @Preference(nodePath = "osgi.fx.feature")
-    private IEclipsePreferences             preferences;
+    @Preference(nodePath = "osgi.fx.feature", key = "repos", defaultValue = "")
+    private Value<String>                   preference;
     @FXML
     private PrefixSelectionComboBox<String> archiveUrlCombo;
     @FXML
@@ -64,6 +67,7 @@ public final class InstallFeatureDialogController {
     @FXML
     private GridPane                        featureInstallPane;
     private File                            localArchive;
+    private ProgressDialog                  progressDialog;
 
     @FXML
     public void initialize() {
@@ -103,7 +107,7 @@ public final class InstallFeatureDialogController {
     }
 
     private void initCombo() {
-        final String repos = preferences.get("repos", "");
+        final String repos = preference.getValue();
         if (!repos.isEmpty()) {
             final Gson         gson         = new Gson();
             final List<String> repositories = gson.fromJson(repos, new TypeToken<ArrayList<String>>() {
@@ -115,21 +119,47 @@ public final class InstallFeatureDialogController {
     @FXML
     private void processArchive(final ActionEvent event) {
         logger.atInfo().log("FXML controller 'processArchive(..)' event has been invoked");
-        final String          url       = archiveUrlCombo.getEditor().getText();
-        Map<File, FeatureDTO> features;
-        final URL             parsedURL = parseAsURL(url);
+        final String                url       = archiveUrlCombo.getEditor().getText();
+        final Map<File, FeatureDTO> features  = Maps.newHashMap();
+        final URL                   parsedURL = parseAsURL(url);
         try {
             if (parsedURL != null) {
                 logger.atInfo().log("Web URL found - '%s'", url);
                 logger.atInfo().log("Reading features from - '%s'", url);
 
-                features = updateAgent.readFeatures(parsedURL);
+                final Task<Void> task = new Task<Void>() {
+
+                    @Override
+                    protected Void call() throws Exception {
+                        try {
+                            features.putAll(updateAgent.readFeatures(parsedURL));
+                        } catch (final Exception e) {
+                            logger.atError().withException(e).log("Cannot read features from archive - '%s'", parsedURL);
+                            threadSync.asyncExec(() -> {
+                                progressDialog.close();
+                                FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                            });
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void succeeded() {
+                        threadSync.asyncExec(() -> progressDialog.close());
+                    }
+                };
+
+                final Thread th = new Thread(task);
+                th.setDaemon(true);
+                th.start();
+
+                progressDialog = FxDialog.showProgressDialog("External Feature Download", task, getClass().getClassLoader());
             } else {
                 logger.atInfo().log("Local archive found - '%s'", url);
                 logger.atInfo().log("Reading features from - '%s'", url);
 
                 localArchive = new File(url);
-                features     = updateAgent.readFeatures(localArchive);
+                features.putAll(updateAgent.readFeatures(localArchive));
             }
             if (features.isEmpty()) {
                 featuresList.setItems(FXCollections.observableArrayList(new XFeatureDTO(null, null, true)));

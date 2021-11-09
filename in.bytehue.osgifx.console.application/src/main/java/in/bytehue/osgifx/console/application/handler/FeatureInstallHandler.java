@@ -3,6 +3,7 @@ package in.bytehue.osgifx.console.application.handler;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -73,64 +74,73 @@ public final class FeatureInstallHandler {
             return;
         }
         final Task<Void> task = new Task<Void>() {
-                                  @Override
-                                  protected Void call() throws Exception {
-                                      try {
-                                          for (final File feature : features) {
-                                              updateAgent.updateOrInstall(feature, archiveURL);
-                                              logger.atInfo().log("Feature '%s' has been successfuly installed/updated", feature.getName());
-                                          }
-                                      } catch (final Exception e) {
-                                          hasFeatureInstallationError.set(true);
-                                          logger.atError().withException(e).log("Cannot update or install feature");
-                                          threadSync.asyncExec(() -> {
-                                                                    progressDialog.close();
-                                                                    FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-                                                                });
-                                      }
-                                      return null;
-                                  }
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    for (final File feature : features) {
+                        updateAgent.updateOrInstall(feature, archiveURL);
+                        logger.atInfo().log("Feature '%s' has been successfuly installed/updated", feature.getName());
+                    }
+                } catch (final Exception e) {
+                    hasFeatureInstallationError.set(true);
+                    logger.atError().withException(e).log("Cannot update or install feature");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                }
+                return null;
+            }
 
-                                  @Override
-                                  protected void succeeded() {
-                                      progressDialog.close();
-                                      if (!hasFeatureInstallationError.get()) {
-                                          final String repo = preferences.get("repos", "");
-                                          if (repo.isEmpty()) {
-                                              storeURL(archiveURL);
-                                          } else {
+            @Override
+            protected void succeeded() {
+                progressDialog.close();
+                if (!hasFeatureInstallationError.get()) {
+                    logger.atInfo().log("Features successfully installed");
+                    storeURL(archiveURL);
+                    Fx.showSuccessNotification("External Feature Installation", "Successfully installed", getClass().getClassLoader());
+                }
+            }
 
-                                          }
-                                          Fx.showSuccessNotification("External Feature Installation", "Successfully installed",
-                                                  getClass().getClassLoader());
-                                      }
-                                  }
+            private void storeURL(final String archiveURL) {
+                if (!isWebURL(archiveURL)) {
+                    return;
+                }
+                try {
+                    final String repo = preferences.get("repos", "");
+                    final Gson   gson = new Gson();
+                    Set<String>  toBeStored;
+                    if (repo.isEmpty()) {
+                        toBeStored = Sets.newHashSet(archiveURL);
+                    } else {
+                        toBeStored = gson.fromJson(repo, new TypeToken<HashSet<String>>() {
+                        }.getType());
+                        toBeStored.add(archiveURL);
+                    }
+                    final String json = gson.toJson(toBeStored);
+                    preferences.put("repos", json);
+                    preferences.flush();
+                } catch (final BackingStoreException e) {
+                    logger.atError().withException(e).log("Repo URL cannot be stored");
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+            }
+        };
 
-                                  private void storeURL(final String archiveURL) {
-                                      try {
-                                          final String repo = preferences.get("repos", "");
-                                          final Gson   gson = new Gson();
-                                          Set<String>  toBeStored;
-                                          if (repo.isEmpty()) {
-                                              toBeStored = Sets.newHashSet(archiveURL);
-                                          } else {
-                                              toBeStored = gson.fromJson(repo, new TypeToken<HashSet<String>>() {
-                                                                    }.getType());
-                                              toBeStored.add(archiveURL);
-                                          }
-                                          final String json = gson.toJson(toBeStored);
-                                          preferences.put("repos", json);
-                                          preferences.flush();
-                                      } catch (final BackingStoreException e) {
-                                          logger.atError().withException(e).log("Repo URL cannot be stored");
-                                      }
-                                  }
-                              };
-        final Thread     th   = new Thread(task);
+        final Thread th = new Thread(task);
         th.setDaemon(true);
         th.start();
 
         progressDialog = FxDialog.showProgressDialog("External Feature Installation", task, getClass().getClassLoader());
+    }
+
+    private static boolean isWebURL(final String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (final Exception e) {
+            return false;
+        }
     }
 
 }
