@@ -29,14 +29,6 @@ import in.bytehue.osgifx.console.feature.FeatureDTO;
 public interface UpdateAgent {
 
     /**
-     * Checks for updates in all available software repositories and if updates are available,
-     * synchronously updates them during application start.
-     *
-     * @return the list of features that have been updated (cannot be {@code null})
-     */
-    Collection<FeatureDTO> update();
-
-    /**
      * Reads all the features from the specified archive file.
      *
      * @param archive the archive URL to read the features from

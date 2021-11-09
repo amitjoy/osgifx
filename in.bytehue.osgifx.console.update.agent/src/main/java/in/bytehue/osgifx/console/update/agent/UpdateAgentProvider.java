@@ -1,5 +1,8 @@
 package in.bytehue.osgifx.console.update.agent;
 
+import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
+import static org.osgi.framework.Constants.BUNDLE_VERSION;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,6 +42,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -83,29 +87,24 @@ public final class UpdateAgentProvider implements UpdateAgent {
     @Activate
     private BundleContext      bundleContext;
     private FluentLogger       logger;
-    private Path               cachedDirectory;
+    private Path               downloadDirectory;
+    private Path               extractionDirectory;
 
     @Activate
     void activate() throws IOException {
-        logger          = FluentLogger.of(factory.createLogger(getClass().getName()));
-        cachedDirectory = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
+        System.setProperty("http.agent", "osgi.fx");
+        logger              = FluentLogger.of(factory.createLogger(getClass().getName()));
+        downloadDirectory   = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
+        extractionDirectory = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
     }
 
     @Deactivate
     void deactivate() throws IOException {
-        cleanDirectory(cachedDirectory);
-        final File   file = cachedDirectory.toFile();
-        final String path = file.getAbsolutePath();
-        if (Files.deleteIfExists(file.toPath())) {
-            logger.atInfo().log("Removed '%s' directory", path);
-        }
-    }
+        cleanDirectory(downloadDirectory);
+        cleanDirectory(extractionDirectory);
 
-    @Override
-    public Collection<FeatureDTO> update() {
-        logger.atInfo().log("Updating features if updates are available");
-        // TODO Auto-generated method stub
-        return null;
+        deleteDirectory(downloadDirectory);
+        deleteDirectory(extractionDirectory);
     }
 
     @Override
@@ -126,14 +125,19 @@ public final class UpdateAgentProvider implements UpdateAgent {
     @Override
     public Map<File, FeatureDTO> readFeatures(final URL archiveURL) throws Exception {
         logger.atInfo().log("Reading archive: %s", archiveURL);
-
-        final File                  file     = downloadArchive(archiveURL);
-        final Map<File, FeatureDTO> features = readFeatures(file);
-
-        for (final FeatureDTO feature : features.values()) {
-            feature.archiveURL = archiveURL.toString();
+        File file = null;
+        try {
+            file = downloadArchive(archiveURL);
+            final Map<File, FeatureDTO> features = readFeatures(file);
+            for (final FeatureDTO feature : features.values()) {
+                feature.archiveURL = archiveURL.toString();
+            }
+            return features;
+        } finally {
+            if (file != null) {
+                Files.deleteIfExists(file.toPath());
+            }
         }
-        return features;
     }
 
     @Override
@@ -153,9 +157,9 @@ public final class UpdateAgentProvider implements UpdateAgent {
         }
         // update configurations
         logger.atInfo().log("Updating configurations");
-        for (final Entry<String, FeatureConfiguration> configuration : feature.getConfigurations().entrySet()) {
-            final FeatureConfiguration config = configuration.getValue();
-            updateConfiguration(config);
+        for (final Entry<String, FeatureConfiguration> entry : feature.getConfigurations().entrySet()) {
+            final FeatureConfiguration configuration = entry.getValue();
+            updateConfiguration(configuration);
         }
         final FeatureDTO dto = FeatureHelper.toFeature(feature);
         dto.archiveURL = archiveURL;
@@ -192,10 +196,12 @@ public final class UpdateAgentProvider implements UpdateAgent {
             final FeatureDTO feature = featureToBeRemoved.get();
             // uninstall all associated bundles
             for (final FeatureBundleDTO bundle : feature.bundles) {
+                logger.atInfo().log("Uninstalling feature bundle - '%s'", bundle.id.artifactId + ":" + bundle.id.version);
                 uninstallBundle(bundle);
             }
-            // remove associated configurations
+            // remove all associated configurations
             for (final FeatureConfigurationDTO config : feature.configurations.values()) {
+                logger.atInfo().log("Removing feature configuration - '%s'", config.pid);
                 removeConfiguration(config);
             }
             return feature;
@@ -219,17 +225,36 @@ public final class UpdateAgentProvider implements UpdateAgent {
         final Optional<File>   bundleFile           = findBundleInBundlesDirectory(featureJson.getParentFile(), bsn, version);
 
         if (existingBundle.isPresent()) {
+            final Bundle    b   = existingBundle.get();
+            final BundleDTO dto = b.adapt(BundleDTO.class);
+            logger.atInfo().log("There exists a bundle with the same bsn and version - '%s', ", dto);
+
             try (InputStream is = new FileInputStream(bundleFile.get())) {
-                existingBundle.get().update(is);
-                final BundleStartLevel sl = existingBundle.get().adapt(BundleStartLevel.class);
+                logger.atInfo().log("Updating bundle - '%s', ", dto);
+                b.update(is);
+
+                logger.atInfo().log("Setting start level to %s", startLevel);
+                final BundleStartLevel sl = b.adapt(BundleStartLevel.class);
                 sl.setStartLevel(startLevel);
+
+                logger.atInfo().log("Bundle updated - '%s', ", b.adapt(BundleDTO.class));
             }
         } else {
+            logger.atInfo().log("No bundle with the same bsn - '%s' and version - '%s' exists, ", bsn, version);
+
             try (InputStream is = new FileInputStream(bundleFile.get())) {
-                final Bundle           installedBundle = bundleContext.installBundle(LOCATION_PREFIX + bsn, is);
-                final BundleStartLevel sl              = installedBundle.adapt(BundleStartLevel.class);
+                logger.atInfo().log("Installing bundle - '%s', ", bsn);
+                final Bundle installedBundle = bundleContext.installBundle(LOCATION_PREFIX + bsn, is);
+
+                final BundleStartLevel sl = installedBundle.adapt(BundleStartLevel.class);
+                logger.atInfo().log("Setting start level to %s", startLevel);
                 sl.setStartLevel(startLevel);
+
+                final BundleDTO dto = installedBundle.adapt(BundleDTO.class);
+
+                logger.atInfo().log("Bundle installed - '%s', ", dto);
                 installedBundle.start();
+                logger.atInfo().log("Bundle started - '%s', ", dto);
             }
         }
     }
@@ -237,7 +262,10 @@ public final class UpdateAgentProvider implements UpdateAgent {
     private void uninstallBundle(final FeatureBundleDTO bundle) throws BundleException {
         final Optional<Bundle> existingBundle = getExistingBundle(bundle);
         if (existingBundle.isPresent()) {
-            existingBundle.get().uninstall();
+            final Bundle    b   = existingBundle.get();
+            final BundleDTO dto = b.adapt(BundleDTO.class);
+            b.uninstall();
+            logger.atInfo().log("Feature bundle '%s' uninstsalled", dto);
         }
     }
 
@@ -250,7 +278,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
             throw new RuntimeException("Cannot use bundle with bsn '" + bsn + "' as it cannot be updated");
         }
         if (!bundleFile.isPresent()) {
-            throw new RuntimeException("Bundle with BSN '" + bsn + "' is not found in 'bundles' directory");
+            throw new RuntimeException("Bundle with BSN '" + bsn + "' is not found in 'bundles' directory inside the archive");
         }
     }
 
@@ -271,7 +299,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
         final File bundleDir = new File(directory, BUNDLES_DIRECTORY);
         if (!bundleDir.exists()) {
             throw new RuntimeException(
-                    "Feature associated bundles are missing. Make sure they are kept in the 'bundles' folder inside the archive.");
+                    "Feature associated bundles are missing. Make sure they are kept in the 'bundles' directory inside the archive.");
         }
         final File[] files = bundleDir.listFiles();
         for (final File f : files) {
@@ -283,8 +311,8 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     private boolean matchBundle(final File file, final String bsn, final String version) throws Exception {
-        final String symbolicName  = readAttributeFromManifest(file, "Bundle-SymbolicName");
-        final String bundleVersion = readAttributeFromManifest(file, "Bundle-Version");
+        final String symbolicName  = readAttributeFromManifest(file, BUNDLE_SYMBOLICNAME);
+        final String bundleVersion = readAttributeFromManifest(file, BUNDLE_VERSION);
         return symbolicName.equals(bsn) && bundleVersion.equals(version);
     }
 
@@ -304,13 +332,20 @@ public final class UpdateAgentProvider implements UpdateAgent {
         final String factoryPid = configuration.factoryPid;
         final String pid        = configuration.pid;
         if (factoryPid != null) {
+            logger.atInfo().log("Removing factory configuration - '%s'", factoryPid);
             final Configuration[] factoryConfigurations = configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")");
             for (final Configuration config : factoryConfigurations) {
+                final String persistentId = config.getPid();
+                logger.atInfo().log("Removing configuration - '%s'", persistentId);
                 config.delete();
+                logger.atInfo().log("Removed configuration - '%s'", persistentId);
             }
         } else {
-            final Configuration config = configAdmin.getConfiguration(pid, "?");
+            logger.atInfo().log("Removing non-factory configuration - '%s'", pid);
+            final Configuration config       = configAdmin.getConfiguration(pid, "?");
+            final String        persistentId = config.getPid();
             config.delete();
+            logger.atInfo().log("Removed configuration - '%s'", persistentId);
         }
     }
 
@@ -336,10 +371,10 @@ public final class UpdateAgentProvider implements UpdateAgent {
         }
     }
 
-    private File downloadArchive(final URL url) throws IOException {
-        logger.atInfo().log("Downloading archive from URL '%s'", url);
+    private File downloadArchive(final URL url) throws Exception {
+        logger.atInfo().log("Downloading feature archive from URL '%s'", url);
 
-        final File outputPath = new File(cachedDirectory.toFile(), "archive.zip");
+        final File outputPath = new File(downloadDirectory.toFile(), "archive.zip");
 
         try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
                 FileOutputStream fileOutputStream = new FileOutputStream(outputPath)) {
@@ -347,16 +382,18 @@ public final class UpdateAgentProvider implements UpdateAgent {
             fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
         } catch (final MalformedURLException e) {
             logger.atError().withException(e).log("Invalid URL - '%s'", url);
+            throw e;
         } catch (final IOException e) {
             logger.atError().withException(e).log("Download failed from '%s' to '%s'", url, outputPath);
+            throw e;
         }
-        logger.atInfo().log("Downloaded archive from URL '%s'", url);
+        logger.atInfo().log("Downloaded feature archive from URL '%s'", url);
         return outputPath;
     }
 
     private List<File> extractFeatures(final File archive) throws IOException {
         unzip(archive);
-        final File[] files = cachedDirectory.toFile().listFiles((FilenameFilter) (dir, name) -> name.endsWith(".json"));
+        final File[] files = extractionDirectory.toFile().listFiles((FilenameFilter) (dir, name) -> name.endsWith(".json"));
         return Stream.of(files).collect(Collectors.toList());
     }
 
@@ -392,7 +429,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     private void unzip(final File zipFilePath) throws IOException {
-        cleanDirectory(cachedDirectory);
+        cleanDirectory(extractionDirectory);
         try (final ZipFile zipFile = new ZipFile(zipFilePath)) {
             final Enumeration<?> enu = zipFile.entries();
             while (enu.hasMoreElements()) {
@@ -401,9 +438,9 @@ public final class UpdateAgentProvider implements UpdateAgent {
                 final String name           = zipEntry.getName();
                 final long   size           = zipEntry.getSize();
                 final long   compressedSize = zipEntry.getCompressedSize();
-                logger.atInfo().log("[Extracting Archive] Name: %s | Size: %s | Compressed Size: %s ", name, size, compressedSize);
+                logger.atInfo().log("[Extracting Feature Archive] Name: %s | Size: %s | Compressed Size: %s ", name, size, compressedSize);
 
-                final File file = new File(cachedDirectory.toFile(), name);
+                final File file = new File(extractionDirectory.toFile(), name);
                 if (name.endsWith("/")) {
                     file.mkdirs();
                     continue;
@@ -486,6 +523,14 @@ public final class UpdateAgentProvider implements UpdateAgent {
     private boolean checkIdEquals(final IdDTO id, final String featureId) {
         final String idToCompare = id.groupId + ":" + id.artifactId + ":" + id.version;
         return idToCompare.equals(featureId);
+    }
+
+    private void deleteDirectory(final Path path) throws IOException {
+        final File   file    = path.toFile();
+        final String absPath = file.getAbsolutePath();
+        if (Files.deleteIfExists(file.toPath())) {
+            logger.atInfo().log("Removed '%s' directory", absPath);
+        }
     }
 
 }
