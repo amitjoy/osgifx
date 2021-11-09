@@ -33,7 +33,6 @@ import in.bytehue.osgifx.console.update.UpdateAgent;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.concurrent.Task;
-import javafx.stage.StageStyle;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.update.UpdateAgent)")
 public final class FeatureInstallHandler {
@@ -102,7 +101,7 @@ public final class FeatureInstallHandler {
                                           } else {
 
                                           }
-                                          Fx.showSuccessNotification("Remote Feature Installation", "Successfully installed",
+                                          Fx.showSuccessNotification("External Feature Installation", "Successfully installed",
                                                   getClass().getClassLoader());
                                       }
                                   }
@@ -131,15 +130,7 @@ public final class FeatureInstallHandler {
         th.setDaemon(true);
         th.start();
 
-        createProgressDialog(task);
-    }
-
-    private void createProgressDialog(final Task<?> task) {
-        progressDialog = new ProgressDialog(task);
-        progressDialog.setHeaderText("External Feature Installation");
-        progressDialog.initStyle(StageStyle.UNDECORATED);
-        progressDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
-        progressDialog.show();
+        progressDialog = FxDialog.showProgressDialog("External Feature Installation", task, getClass().getClassLoader());
     }
 
 }

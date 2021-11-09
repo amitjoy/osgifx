@@ -35,7 +35,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.StageStyle;
 
 public final class ConnectionSettingsWindowController {
 
@@ -158,11 +157,7 @@ public final class ConnectionSettingsWindowController {
         th.setDaemon(true);
         th.start();
 
-        progressDialog = new ProgressDialog(connectTask);
-        progressDialog.setHeaderText("Remote Connection");
-        progressDialog.initStyle(StageStyle.UNDECORATED);
-        progressDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
-        progressDialog.show();
+        progressDialog = FxDialog.showProgressDialog("Remote Connection", connectTask, getClass().getClassLoader());
     }
 
     private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
