@@ -97,11 +97,17 @@ public final class BundleDetailsFxController {
     @FXML
     private TableColumn<XPackageDTO, String>           importedPackagesVersionTableColumn;
     @FXML
-    private TableView<XBundleInfoDTO>                  wiredBundlesTable;
+    private TableView<XBundleInfoDTO>                  wiredBundlesAsProviderTable;
     @FXML
-    private TableColumn<XBundleInfoDTO, String>        wiredBundlesIdTableColumn;
+    private TableColumn<XBundleInfoDTO, String>        wiredBundlesAsProviderIdTableColumn;
     @FXML
-    private TableColumn<XBundleInfoDTO, String>        wiredBundlesBsnTableColumn;
+    private TableColumn<XBundleInfoDTO, String>        wiredBundlesAsProviderBsnTableColumn;
+    @FXML
+    private TableView<XBundleInfoDTO>                  wiredBundlesAsRequirerTable;
+    @FXML
+    private TableColumn<XBundleInfoDTO, String>        wiredBundlesAsRequirerIdTableColumn;
+    @FXML
+    private TableColumn<XBundleInfoDTO, String>        wiredBundlesAsRequirerBsnTableColumn;
     @FXML
     private TableView<XServiceInfoDTO>                 usedServicesTable;
     @FXML
@@ -159,9 +165,13 @@ public final class BundleDetailsFxController {
         importedPackagesVersionTableColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
         importedPackagesTable.setItems(FXCollections.observableArrayList(bundle.importedPackages));
 
-        wiredBundlesIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
-        wiredBundlesBsnTableColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
-        wiredBundlesTable.setItems(FXCollections.observableArrayList(bundle.wiredBundles));
+        wiredBundlesAsProviderIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+        wiredBundlesAsProviderBsnTableColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        wiredBundlesAsProviderTable.setItems(FXCollections.observableArrayList(bundle.wiredBundlesAsProvider));
+
+        wiredBundlesAsRequirerIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+        wiredBundlesAsRequirerBsnTableColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        wiredBundlesAsRequirerTable.setItems(FXCollections.observableArrayList(bundle.wiredBundlesAsRequirer));
 
         registeredServicesIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
         registeredServicesClassTableColumn.setCellValueFactory(new DTOCellValueFactory<>("objectClass", String.class));
@@ -189,7 +199,8 @@ public final class BundleDetailsFxController {
         Fx.addContextMenuToCopyContent(registeredServicesTable);
         Fx.addContextMenuToCopyContent(manifestHeadersTable);
         Fx.addContextMenuToCopyContent(importedPackagesTable);
-        Fx.addContextMenuToCopyContent(wiredBundlesTable);
+        Fx.addContextMenuToCopyContent(wiredBundlesAsProviderTable);
+        Fx.addContextMenuToCopyContent(wiredBundlesAsRequirerTable);
         Fx.addContextMenuToCopyContent(usedServicesTable);
         Fx.addContextMenuToCopyContent(hostBundlesTable);
         Fx.addContextMenuToCopyContent(attachedFragmentsTable);
@@ -238,7 +249,8 @@ public final class BundleDetailsFxController {
         TableFilter.forTableView(registeredServicesTable).apply();
         TableFilter.forTableView(manifestHeadersTable).apply();
         TableFilter.forTableView(importedPackagesTable).apply();
-        TableFilter.forTableView(wiredBundlesTable).apply();
+        TableFilter.forTableView(wiredBundlesAsProviderTable).apply();
+        TableFilter.forTableView(wiredBundlesAsRequirerTable).apply();
         TableFilter.forTableView(usedServicesTable).apply();
         TableFilter.forTableView(hostBundlesTable).apply();
         TableFilter.forTableView(attachedFragmentsTable).apply();

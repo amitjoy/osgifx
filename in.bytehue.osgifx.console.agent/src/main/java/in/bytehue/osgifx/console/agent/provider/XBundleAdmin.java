@@ -61,7 +61,8 @@ public class XBundleAdmin {
         dto.startLevel             = bundle.adapt(BundleStartLevel.class).getStartLevel();
         dto.exportedPackages       = getExportedPackages(bundle);
         dto.importedPackages       = getImportedPackages(bundle);
-        dto.wiredBundles           = getWiredBundles(bundle);
+        dto.wiredBundlesAsProvider = getWiredBundlesAsProvider(bundle);
+        dto.wiredBundlesAsRequirer = getWiredBundlesAsRequirer(bundle);
         dto.registeredServices     = getRegisteredServices(bundle);
         dto.manifestHeaders        = toMap(bundle.getHeaders());
         dto.usedServices           = getUsedServices(bundle);
@@ -179,14 +180,13 @@ public class XBundleAdmin {
         return serviceInfos;
     }
 
-    private static List<XBundleInfoDTO> getWiredBundles(final Bundle bundle) {
+    private static List<XBundleInfoDTO> getWiredBundlesAsProvider(final Bundle bundle) {
         final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
         if (bundleWiring == null) {
             return Collections.emptyList();
         }
         final List<XBundleInfoDTO> bundles       = new ArrayList<>();
         final List<BundleWire>     providedWires = bundleWiring.getProvidedWires(null);
-        final List<BundleWire>     requierdWires = bundleWiring.getRequiredWires(null);
 
         for (final BundleWire wire : providedWires) {
             final BundleRevision requirer = wire.getRequirer();
@@ -199,6 +199,17 @@ public class XBundleAdmin {
                 bundles.add(dto);
             }
         }
+        return bundles;
+    }
+
+    private static List<XBundleInfoDTO> getWiredBundlesAsRequirer(final Bundle bundle) {
+        final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+        if (bundleWiring == null) {
+            return Collections.emptyList();
+        }
+        final List<XBundleInfoDTO> bundles       = new ArrayList<>();
+        final List<BundleWire>     requierdWires = bundleWiring.getRequiredWires(null);
+
         for (final BundleWire wire : requierdWires) {
             final BundleRevision provider = wire.getProvider();
             final XBundleInfoDTO dto      = new XBundleInfoDTO();
