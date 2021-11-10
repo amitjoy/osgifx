@@ -31,7 +31,8 @@ install.order    :   \
                      in.bytehue.osgifx.console.ui.events,\
                      in.bytehue.osgifx.console.ui.properties,\
                      in.bytehue.osgifx.console.ui.threads,\
-                     in.bytehue.osgifx.console.ui.gogo
+                     in.bytehue.osgifx.console.ui.gogo,\
+                     in.bytehue.osgifx.console.ui.graph
 
 -runbundles.X    :   ${install.order}
 -runbundles: \
