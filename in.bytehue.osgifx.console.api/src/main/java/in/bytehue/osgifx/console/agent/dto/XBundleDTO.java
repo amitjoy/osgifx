@@ -19,7 +19,8 @@ public class XBundleDTO extends BundleDTO {
     public int                   startLevel;
     public List<XPackageDTO>     exportedPackages;
     public List<XPackageDTO>     importedPackages;
-    public List<XBundleInfoDTO>  wiredBundles;
+    public List<XBundleInfoDTO>  wiredBundlesAsProvider;
+    public List<XBundleInfoDTO>  wiredBundlesAsRequirer;
     public List<XServiceInfoDTO> registeredServices;
     public Map<String, String>   manifestHeaders;
     public List<XServiceInfoDTO> usedServices;
