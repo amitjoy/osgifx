@@ -69,8 +69,6 @@ public final class OverviewFxUI {
 
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
-        // hack to reset the css
-        parent.setOnMouseClicked(event -> createControls(parent));
         createControls(parent);
         logger.atDebug().log("Overview part has been initialized");
     }
@@ -81,8 +79,8 @@ public final class OverviewFxUI {
     }
 
     private void createControls(final BorderPane parent) {
-        // this is required as the CSS styling of tilesfx were getting overridden after switching tabs
-        parent.getChildren().clear();
+        // don't apply the root css here, otherwise TilesFX's css won't be applied
+        parent.getStyleClass().clear();
         Fx.initStatusBar(parent, statusBar);
         createWidgets(parent);
     }
