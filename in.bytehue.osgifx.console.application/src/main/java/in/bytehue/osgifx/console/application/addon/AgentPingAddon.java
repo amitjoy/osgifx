@@ -6,6 +6,7 @@ import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -29,16 +30,17 @@ public final class AgentPingAddon {
 
     @Log
     @Inject
-    private FluentLogger             logger;
+    private FluentLogger                logger;
     @Inject
-    private Supervisor               supervisor;
+    private Supervisor                  supervisor;
     @Inject
-    private IEventBroker             eventBroker;
+    private IEventBroker                eventBroker;
     @Inject
-    private EModelService            modelService;
+    private EModelService               modelService;
     @Inject
-    private MApplication             application;
-    private ScheduledExecutorService executor;
+    private MApplication                application;
+    private ScheduledExecutorService    executor;
+    private volatile ScheduledFuture<?> future;
 
     @PostConstruct
     public void init() {
@@ -50,7 +52,7 @@ public final class AgentPingAddon {
     @Optional
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event has been received");
-        executor.scheduleWithFixedDelay(() -> {
+        future = executor.scheduleWithFixedDelay(() -> {
             try {
                 supervisor.getAgent().ping();
             } catch (final Exception e) {
@@ -60,6 +62,8 @@ public final class AgentPingAddon {
                 if (!connectionChooserWindow.isVisible()) {
                     connectionChooserWindow.setVisible(true);
                 }
+                future.cancel(true);
+                future = null;
             }
         }, 0, 20, TimeUnit.SECONDS);
         logger.atInfo().log("Agent ping scheduler has been started");
