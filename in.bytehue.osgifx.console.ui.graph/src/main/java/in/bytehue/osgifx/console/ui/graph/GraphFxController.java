@@ -20,12 +20,13 @@ import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.data.provider.DataProvider;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, attribute = "(objectClass=in.bytehue.osgifx.console.data.provider.DataProvider)")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.data.provider.DataProvider)")
 public final class GraphFxController {
 
     @Log
@@ -72,7 +73,10 @@ public final class GraphFxController {
                 return bundle.symbolicName;
             }
         });
-        bundlesList.setItems(dataProvider.bundles().sorted(Comparator.comparing(b -> b.symbolicName)));
+        final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
+        final RuntimeGraph               graph   = new RuntimeGraph(bundles);
+        System.out.println(graph.getGraph());
+        bundlesList.setItems(bundles.sorted(Comparator.comparing(b -> b.symbolicName)));
     }
 
     private void createControls() {

@@ -31,3 +31,8 @@ eu.hansolo:tilesfx:1.6.8
 # FormsFx
 
 com.dlsc.formsfx:formsfx-core:8.4.0
+
+# JGraphT
+
+org.jgrapht:jgrapht-core:1.4.0
+org.jgrapht:jgrapht-io:1.4.0
