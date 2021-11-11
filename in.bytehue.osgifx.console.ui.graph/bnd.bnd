@@ -6,4 +6,5 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : ${bundles.required}
--privatepackage     : in.bytehue.osgifx.console.ui.graph
+-privatepackage     : in.bytehue.osgifx.console.ui.graph, com.brunomnsilva.*
+Import-Package      : org.controlsfx.control, *
