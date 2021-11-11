@@ -10,6 +10,7 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.configurations',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.graph',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.packages',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.properties',\
