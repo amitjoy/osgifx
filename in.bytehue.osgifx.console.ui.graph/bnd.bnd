@@ -12,6 +12,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       com.brunomnsilva.*,\
                       org.jgrapht.* 
 Import-Package      : org.controlsfx.control,\
+                      org.controlsfx.glyphfont,\
                       !org.antlr.*,\
                       !org.apache.commons.text.*,\
                       !org.jheaps.*,\
