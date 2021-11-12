@@ -11,7 +11,7 @@
          <top>
             <BorderPane prefHeight="49.0" prefWidth="248.0" BorderPane.alignment="CENTER">
                <center>
-                  <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="218.0" text="Generate Graph" BorderPane.alignment="CENTER" />
+                  <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="218.0" text="Generate Graph" BorderPane.alignment="CENTER" onAction="#generateGraph" />
                </center>
             </BorderPane>
          </top>

@@ -4,16 +4,17 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.Comparator;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import org.controlsfx.control.CheckListView;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultEdge;
 import org.osgi.annotation.bundle.Requirement;
 
-import com.brunomnsilva.smartgraph.graph.Graph;
-import com.brunomnsilva.smartgraph.graph.GraphEdgeList;
 import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
 import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
@@ -21,6 +22,7 @@ import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.data.provider.DataProvider;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -40,18 +42,11 @@ public final class GraphFxController {
     private BorderPane                graphPane;
     @Inject
     private DataProvider              dataProvider;
+    private RuntimeGraph              runtimeGraph;
 
     @FXML
     public void initialize() {
         initBundlesList();
-        createControls();
-
-        final SmartPlacementStrategy          strategy  = new SmartCircularSortedPlacementStrategy();
-        final SmartGraphPanel<String, String> graphView = new SmartGraphPanel<>(createDummyGraph(), strategy);
-        graphView.setAutomaticLayout(true);
-        graphPane.setCenter(graphView);
-
-        graphView.init();
 
         logger.atDebug().log("FXML controller has been initialized");
     }
@@ -74,49 +69,22 @@ public final class GraphFxController {
             }
         });
         final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
-        final RuntimeGraph               graph   = new RuntimeGraph(bundles);
-        System.out.println(graph.getGraph());
+        runtimeGraph = new RuntimeGraph(bundles);
         bundlesList.setItems(bundles.sorted(Comparator.comparing(b -> b.symbolicName)));
     }
 
-    private void createControls() {
-        // TODO Auto-generated method stub
+    @FXML
+    private void generateGraph(final ActionEvent event) {
+        final ObservableList<XBundleDTO>                 selectedBundles = bundlesList.getCheckModel().getCheckedItems();
+        final List<GraphPath<BundleVertex, DefaultEdge>> dependencies    = runtimeGraph.getTransitiveDependenciesOf(selectedBundles);
+        final FxGraph                                    fxGraph         = new FxGraph(dependencies);
+
+        final SmartPlacementStrategy                strategy  = new SmartCircularSortedPlacementStrategy();
+        final SmartGraphPanel<BundleVertex, String> graphView = new SmartGraphPanel<>(fxGraph.graph, strategy);
+        graphView.setAutomaticLayout(true);
+        graphPane.setCenter(graphView);
+
+        graphView.init();
     }
 
-    private Graph<String, String> createDummyGraph() {
-        final Graph<String, String> g = new GraphEdgeList<>();
-
-        g.insertVertex("A");
-        g.insertVertex("B");
-        g.insertVertex("C");
-        g.insertVertex("D");
-        g.insertVertex("E");
-        g.insertVertex("F");
-        g.insertVertex("G");
-
-        g.insertEdge("A", "B", "1");
-        g.insertEdge("A", "C", "2");
-        g.insertEdge("A", "D", "3");
-        g.insertEdge("A", "E", "4");
-        g.insertEdge("A", "F", "5");
-        g.insertEdge("A", "G", "6");
-
-        g.insertVertex("H0");
-        g.insertVertex("I");
-        g.insertVertex("J");
-        g.insertVertex("K");
-        g.insertVertex("L");
-        g.insertVertex("M");
-        g.insertVertex("N");
-
-        g.insertEdge("H0", "I", "7");
-        g.insertEdge("H0", "J", "8");
-        g.insertEdge("H0", "K", "9");
-        g.insertEdge("H0", "L", "10");
-        g.insertEdge("H0", "M", "11");
-        g.insertEdge("H0", "N", "12");
-
-        g.insertEdge("A", "H0", "0");
-        return g;
-    }
 }
