@@ -259,8 +259,8 @@ public class SmartGraphPanel<V, E> extends Pane {
             throw new IllegalStateException("Already initialized. Use update() method instead.");
         }
 
-        final double width  = getBoundsInParent().getWidth();
-        final double height = getBoundsInParent().getHeight();
+        final double width  = getPrefWidth();
+        final double height = getPrefHeight();
 
         if (placementStrategy != null) {
             // call strategy to place the vertices in their initial locations

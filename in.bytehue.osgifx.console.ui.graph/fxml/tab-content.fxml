@@ -1,24 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.controlsfx.control.CheckListView?>
+<?import org.controlsfx.control.SegmentedButton?>
+<?import org.controlsfx.glyphfont.Glyph?>
 
-<SplitPane dividerPositions="0.23608017817371937" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.graph.GraphFxController">
+<SplitPane dividerPositions="0.27728285077951004" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="in.bytehue.osgifx.console.ui.graph.GraphFxController">
    <items>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>
             <BorderPane prefHeight="49.0" prefWidth="248.0" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+               <left>
+                  <SegmentedButton fx:id="strategyButton" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets left="5.0" />
+                     </BorderPane.margin>
+                     <buttons>
+                     	<ToggleButton fx:id="circularStrategyButton" text="Circular" selected="true" />
+                     	<ToggleButton fx:id="randomStrategyButton" text="Random" />
+                     </buttons>
+                   </SegmentedButton>
+               </left>
+               <right>
+                  <Button onAction="#generateGraph" mnemonicParsing="false" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets right="5.0" />
+                     </BorderPane.margin>
+                     <graphic>
+        				<Glyph fontFamily="FontAwesome" icon="PLAY" />
+    				 </graphic>
+                  </Button>
+               </right>
                <center>
-                  <Button mnemonicParsing="false" prefHeight="27.0" prefWidth="218.0" text="Generate Graph" BorderPane.alignment="CENTER" onAction="#generateGraph" />
+                  <Button onAction="#deselectAll" mnemonicParsing="false" prefHeight="27.0" prefWidth="118.0" text="Deselect All" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </BorderPane.margin>
+                  </Button>
                </center>
             </BorderPane>
          </top>
          <center>
-            <CheckListView fx:id="bundlesList" BorderPane.alignment="CENTER" />
+            <CheckListView fx:id="bundlesList" prefHeight="549.0" prefWidth="217.0" BorderPane.alignment="CENTER" />
          </center>
       </BorderPane>
-      <BorderPane fx:id="graphPane" prefHeight="200.0" prefWidth="200.0" />
+      <BorderPane fx:id="graphPane" />
    </items>
 </SplitPane>
