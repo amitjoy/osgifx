@@ -6,11 +6,11 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
@@ -18,10 +18,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.controlsfx.control.StatusBar;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -38,7 +36,7 @@ import eu.hansolo.tilesfx.tools.FlowGridPane;
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.Fx;
-import javafx.fxml.FXMLLoader;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -67,6 +65,14 @@ public final class OverviewFxUI {
     private Supervisor      supervisor;
     private final StatusBar statusBar = new StatusBar();
 
+    private volatile double noOfThreads;
+    private volatile double noOfServices;
+    private volatile double noOfComponents;
+    private volatile double noOfInstalledBundles;
+
+    private final Map<String, String> runtimeInfo = Maps.newConcurrentMap();
+    private UptimeDTO                 uptime      = new UptimeDTO(0, 0, 0, 0);
+
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
         createControls(parent);
@@ -82,7 +88,49 @@ public final class OverviewFxUI {
         // don't apply the root css here, otherwise TilesFX's css won't be applied
         parent.getStyleClass().clear();
         Fx.initStatusBar(parent, statusBar);
+        retrieveRuntimeInfo(parent);
         createWidgets(parent);
+    }
+
+    private void retrieveRuntimeInfo(final BorderPane parent) {
+        final Task<?> task = new Task<Void>() {
+
+            @Override
+            protected Void call() throws Exception {
+                final Agent agent = supervisor.getAgent();
+                if (agent == null) {
+                    return null;
+                }
+                noOfThreads          = Optional.ofNullable(agent.getAllThreads()).map(List::size).orElse(0);
+                noOfInstalledBundles = Optional.ofNullable(agent.getAllBundles()).map(List::size).orElse(0);
+                noOfServices         = Optional.ofNullable(agent.getAllServices()).map(List::size).orElse(0);
+                noOfComponents       = Optional.ofNullable(agent.getAllComponents()).map(List::size).orElse(0);
+
+                final Map<String, String> info = Optional.ofNullable(agent.getRuntimeInfo()).map(Maps::newHashMap)
+                        .orElse(Maps.newHashMap());
+                runtimeInfo.putAll(info);
+
+                final String up = info.get("Uptime");
+                if (up != null) {
+                    uptime = toUptimeEntry(Long.parseLong(up));
+                } else {
+                    uptime = new UptimeDTO(0, 0, 0, 0);
+                }
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                createWidgets(parent);
+                updateProgress(0, 0);
+            }
+        };
+
+        statusBar.progressProperty().bind(task.progressProperty());
+
+        final Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void createWidgets(final BorderPane parent) {
@@ -98,11 +146,6 @@ public final class OverviewFxUI {
                                           .build();
         clockTile.setRoundedCorners(false);
 
-        final double noOfThreads = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                     .map(Agent::getAllThreads)
-                                                     .map(List::size)
-                                                     .map(Double::valueOf)
-                                                     .orElse(0.0d);
         final Tile noOfThreadsTile = TileBuilder.create()
                                                 .skinType(SkinType.NUMBER)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -115,10 +158,6 @@ public final class OverviewFxUI {
                                                 .build();
         noOfThreadsTile.setRoundedCorners(false);
 
-        final Map<String, String> runtimeInfo = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                                  .map(Agent::getRuntimeInfo)
-                                                                  .map(Maps::newHashMap)
-                                                                  .orElse(new HashMap<>());
         final Tile runtimeInfoTile = TileBuilder.create()
                                                 .skinType(SkinType.CUSTOM)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -128,11 +167,6 @@ public final class OverviewFxUI {
                                                 .build();
         runtimeInfoTile.setRoundedCorners(false);
 
-        final double noOfInstalledBundles = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                              .map(Agent::getAllBundles)
-                                                              .map(List::size)
-                                                              .map(Double::valueOf)
-                                                              .orElse(0.0d);
         final Tile noOfBundlesTile = TileBuilder.create()
                                                 .skinType(SkinType.NUMBER)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -145,11 +179,6 @@ public final class OverviewFxUI {
                                                 .build();
         noOfBundlesTile.setRoundedCorners(false);
 
-        final double noOfServices = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                      .map(Agent::getAllServices)
-                                                      .map(List::size)
-                                                      .map(Double::valueOf)
-                                                      .orElse(0.0d);
         final Tile noOfServicesTile = TileBuilder.create()
                                                  .skinType(SkinType.NUMBER)
                                                  .numberFormat(new DecimalFormat("#"))
@@ -163,11 +192,6 @@ public final class OverviewFxUI {
                                                  .build();
         noOfServicesTile.setRoundedCorners(false);
 
-        final double noOfComponents = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                        .map(Agent::getAllComponents)
-                                                        .map(List::size)
-                                                        .map(Double::valueOf)
-                                                        .orElse(0.0d);
         final Tile noOfComponentsTile = TileBuilder.create()
                                                    .skinType(SkinType.NUMBER)
                                                    .numberFormat(new DecimalFormat("#"))
@@ -235,14 +259,6 @@ public final class OverviewFxUI {
         availableMemoryTile.setRoundedCorners(false);
         availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
 
-        final UptimeDTO uptime = java.util.Optional.ofNullable(supervisor.getAgent())
-                                                   .map(Agent::getRuntimeInfo)
-                                                   .map(Maps::newHashMap)
-                                                   .filter(info -> !info.isEmpty())
-                                                   .map(info -> info.get("Uptime"))
-                                                   .map(Long::valueOf)
-                                                   .map(this::toUptimeEntry)
-                                                   .orElse(new UptimeDTO(0, 0, 0, 0));
         final Tile uptimeTile = TileBuilder.create()
                                            .skinType(SkinType.TIME)
                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -274,13 +290,7 @@ public final class OverviewFxUI {
         // @formatter:on
     }
 
-    @Inject
-    @Optional
-    public void updateView(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
-        createControls(parent);
-    }
-
-    private Node createRuntimeTable(final Map<String, String> info) {
+    private synchronized Node createRuntimeTable(final Map<String, String> info) {
         final Label name = new Label("");
         name.setTextFill(Tile.FOREGROUND);
         name.setAlignment(Pos.CENTER_LEFT);
@@ -378,21 +388,15 @@ public final class OverviewFxUI {
     }
 
     @Inject
-    @Optional
-    private void updateOnAgentConnectedEvent( //
-            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+    @org.eclipse.e4.core.di.annotations.Optional
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
         logger.atInfo().log("Agent connected event received");
         createControls(parent);
     }
 
     @Inject
-    @Optional
-    private void updateOnAgentDisconnectedEvent( //
-            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+    @org.eclipse.e4.core.di.annotations.Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
         logger.atInfo().log("Agent disconnected event received");
         createControls(parent);
     }
