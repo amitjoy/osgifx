@@ -48,6 +48,7 @@ install.order    :   \
 	in.bytehue.osgifx.console.data.provider;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.launcher;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.logging;version=snapshot;startlevel=1,\
+	in.bytehue.osgifx.console.smartgraph;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.supervisor;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.update.agent;version=snapshot;startlevel=1,\
 	in.bytehue.osgifx.console.util;version=snapshot;startlevel=1,\
