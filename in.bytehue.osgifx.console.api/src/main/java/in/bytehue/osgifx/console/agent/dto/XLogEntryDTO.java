@@ -9,5 +9,7 @@ public class XLogEntryDTO extends DTO {
     public String     message;
     public String     exception;
     public long       loggedAt;
+    public String     threadInfo;
+    public String     logger;
 
 }
