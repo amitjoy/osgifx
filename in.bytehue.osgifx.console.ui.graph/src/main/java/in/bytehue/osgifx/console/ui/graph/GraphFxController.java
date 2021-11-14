@@ -33,6 +33,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
@@ -52,6 +53,8 @@ public final class GraphFxController {
     @FXML
     private CheckListView<XBundleDTO> bundlesList;
     @FXML
+    private ChoiceBox<String>         wiringSelection;
+    @FXML
     private BorderPane                graphPane;
     @Inject
     private DataProvider              dataProvider;
@@ -67,6 +70,8 @@ public final class GraphFxController {
         progressPane = new MaskerPane();
         logger.atDebug().log("FXML controller has been initialized");
         strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
+        wiringSelection.getItems().addAll("find all bundles that are required by", "find all bundles that require");
+        wiringSelection.getSelectionModel().select(0);
     }
 
     @PreDestroy
@@ -110,7 +115,14 @@ public final class GraphFxController {
             @Override
             protected Void call() throws Exception {
                 progressPane.setVisible(true);
-                final List<GraphPath<BundleVertex, DefaultEdge>> dependencies = runtimeGraph.getTransitiveDependenciesOf(selectedBundles);
+                final int selection = wiringSelection.getSelectionModel().getSelectedIndex();
+
+                final List<GraphPath<BundleVertex, DefaultEdge>> dependencies;
+                if (selection == 0) {
+                    dependencies = runtimeGraph.getAllBundlesThatAreRequiredBy(selectedBundles);
+                } else {
+                    dependencies = runtimeGraph.getAllBundlesThatRequire(selectedBundles);
+                }
                 fxGraph = new FxGraph(dependencies);
                 return null;
             }
