@@ -6,6 +6,7 @@ import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XLogEntryDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
@@ -52,6 +53,13 @@ public interface DataProvider {
      * @return the observable list of events
      */
     ObservableList<XEventDTO> events();
+
+    /**
+     * Returns the observable list of logs
+     *
+     * @return the observable list of logs
+     */
+    ObservableList<XLogEntryDTO> logs();
 
     /**
      * Returns the observable list of properties

@@ -16,6 +16,8 @@ import java.util.regex.Matcher;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
 import aQute.lib.io.IO;
 import aQute.remote.util.Link;
@@ -122,6 +124,12 @@ public class Activator extends Thread implements BundleActivator {
                         properties.put("event.topics", "*");
                         context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(link.getRemote()), properties);
                     }
+                    // initialize OSGi logging if available
+                    final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                    if (isLogAvailable) {
+                        final OSGiLogListener logListener = new OSGiLogListener(link.getRemote());
+                        trackLogReader(logListener);
+                    }
                     link.run();
                 } catch (final Exception e) {
                 } catch (final Throwable t) {
@@ -147,6 +155,31 @@ public class Activator extends Thread implements BundleActivator {
         for (final AgentServer sa : agents) {
             IO.close(sa);
         }
+    }
+
+    private void trackLogReader(final OSGiLogListener logListener) {
+        final ServiceTracker<Object, Object> logReaderTracker = new ServiceTracker<Object, Object>(context,
+                "org.osgi.service.log.LogReaderService", null) {
+
+            @Override
+            public Object addingService(final ServiceReference<Object> reference) {
+                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                final Object  service        = super.addingService(reference);
+                if (isLogAvailable) {
+                    XLogReaderAdmin.register(service, logListener);
+                }
+                return service;
+            }
+
+            @Override
+            public void removedService(final ServiceReference<Object> reference, final Object service) {
+                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                if (isLogAvailable) {
+                    XLogReaderAdmin.unregister(service, logListener);
+                }
+            }
+        };
+        logReaderTracker.open();
     }
 
 }
