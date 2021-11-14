@@ -1,9 +1,8 @@
 package in.bytehue.osgifx.console.supervisor;
 
-import java.util.function.Consumer;
-
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XLogEntryDTO;
 
 /**
  * A Supervisor handles the initiating side of a session with a remote agent.
@@ -66,18 +65,37 @@ public interface Supervisor {
     void onOSGiEvent(XEventDTO event);
 
     /**
+     * Callback method for logs
+     */
+    void logged(XLogEntryDTO event);
+
+    /**
      * Registers the specified listener to listen to the OSGi events from the remote machine
      *
-     * @param eventConsumer the event consume to register
+     * @param eventListener the event listener to register
      */
-    void addOSGiEventConsumer(Consumer<XEventDTO> eventConsumer);
+    void addOSGiEventListener(EventListener eventListener);
 
     /**
      * Deregisters previously registered listener
      *
-     * @param eventConsumer the listener to deregister
+     * @param eventListener the listener to deregister
      */
-    void removeOSGiEventConsumer(Consumer<XEventDTO> eventConsumer);
+    void removeOSGiEventListener(EventListener eventListener);
+
+    /**
+     * Registers the specified listener to receive to the OSGi logs from the remote machine
+     *
+     * @param logEntryListener the log entry listener to register
+     */
+    void addOSGiLogListener(LogEntryListener logEntryListener);
+
+    /**
+     * Deregisters previously registered log entry listener
+     *
+     * @param logEntryListener the log consumer to deregister
+     */
+    void removeOSGiLogListener(LogEntryListener logEntryListener);
 
     /**
      * Returns the associated agent

@@ -4,13 +4,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import org.osgi.service.component.annotations.Component;
 
 import aQute.bnd.util.dto.DTO;
 import in.bytehue.osgifx.console.agent.Agent;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XLogEntryDTO;
+import in.bytehue.osgifx.console.supervisor.EventListener;
+import in.bytehue.osgifx.console.supervisor.LogEntryListener;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 @Component
@@ -21,7 +23,8 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     private Thread     stdin;
     private int        shell = -100; // always invalid so we update it
 
-    private final List<Consumer<XEventDTO>> eventConsumers = new CopyOnWriteArrayList<>();
+    private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
+    private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
 
     static class Info extends DTO {
         public String sha;
@@ -128,20 +131,38 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     @Override
     public synchronized void onOSGiEvent(final XEventDTO event) {
-        eventConsumers.forEach(consumer -> consumer.accept(event));
+        eventListeners.forEach(listener -> listener.onEvent(event));
     }
 
     @Override
-    public synchronized void addOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
-        if (eventConsumers.contains(eventConsumer)) {
+    public void logged(final XLogEntryDTO logEvent) {
+        logEntryListeners.forEach(listener -> listener.logged(logEvent));
+    }
+
+    @Override
+    public synchronized void addOSGiEventListener(final EventListener eventListener) {
+        if (eventListeners.contains(eventListener)) {
             return;
         }
-        eventConsumers.add(eventConsumer);
+        eventListeners.add(eventListener);
     }
 
     @Override
-    public synchronized void removeOSGiEventConsumer(final Consumer<XEventDTO> eventConsumer) {
-        eventConsumers.remove(eventConsumer);
+    public synchronized void removeOSGiEventListener(final EventListener eventListener) {
+        eventListeners.remove(eventListener);
+    }
+
+    @Override
+    public void addOSGiLogListener(final LogEntryListener logEntryListener) {
+        if (logEntryListeners.contains(logEntryListener)) {
+            return;
+        }
+        logEntryListeners.add(logEntryListener);
+    }
+
+    @Override
+    public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
+        logEntryListeners.remove(logEntryListener);
     }
 
     @Override
