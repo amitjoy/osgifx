@@ -6,10 +6,10 @@ import java.util.List;
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.brunomnsilva.smartgraph.graph.DigraphEdgeList;
-import com.brunomnsilva.smartgraph.graph.Edge;
-import com.brunomnsilva.smartgraph.graph.Graph;
-import com.brunomnsilva.smartgraph.graph.Vertex;
+import in.bytehue.osgifx.console.smartgraph.graph.DigraphEdgeList;
+import in.bytehue.osgifx.console.smartgraph.graph.Edge;
+import in.bytehue.osgifx.console.smartgraph.graph.Graph;
+import in.bytehue.osgifx.console.smartgraph.graph.Vertex;
 
 public final class FxGraph {
 

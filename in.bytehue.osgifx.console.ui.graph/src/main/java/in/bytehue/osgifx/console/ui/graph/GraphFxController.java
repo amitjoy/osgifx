@@ -22,13 +22,12 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.osgi.annotation.bundle.Requirement;
 
-import com.brunomnsilva.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
-import com.brunomnsilva.smartgraph.graphview.SmartGraphPanel;
-import com.brunomnsilva.smartgraph.graphview.SmartPlacementStrategy;
-import com.brunomnsilva.smartgraph.graphview.SmartRandomPlacementStrategy;
-
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.data.provider.DataProvider;
+import in.bytehue.osgifx.console.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
+import in.bytehue.osgifx.console.smartgraph.graphview.SmartGraphPanel;
+import in.bytehue.osgifx.console.smartgraph.graphview.SmartPlacementStrategy;
+import in.bytehue.osgifx.console.smartgraph.graphview.SmartRandomPlacementStrategy;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
