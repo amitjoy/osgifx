@@ -26,6 +26,10 @@ public final class LogDetailsFxController {
     @FXML
     private Label        bundleLabel;
     @FXML
+    private Label        loggerLabel;
+    @FXML
+    private Label        threadLabel;
+    @FXML
     private TextArea     messageText;
     @FXML
     private TextArea     exceptionText;
@@ -40,6 +44,8 @@ public final class LogDetailsFxController {
     public void initControls(final XLogEntryDTO logEntry) {
         receivedAtLabel.setText(formatReceivedAt(logEntry.loggedAt));
         levelLabel.setText(logEntry.level);
+        loggerLabel.setText(logEntry.logger);
+        threadLabel.setText(logEntry.threadInfo);
         bundleLabel.setText(logEntry.bundle.symbolicName);
         messageText.setText(logEntry.message);
         if (logEntry.exception != null) {
