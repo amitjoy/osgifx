@@ -2,8 +2,6 @@ package in.bytehue.osgifx.console.data.manager;
 
 import static in.bytehue.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 
-import java.util.function.Consumer;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
@@ -17,17 +15,20 @@ import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XConfigurationDTO;
 import in.bytehue.osgifx.console.agent.dto.XEventDTO;
+import in.bytehue.osgifx.console.agent.dto.XLogEntryDTO;
 import in.bytehue.osgifx.console.agent.dto.XPropertyDTO;
 import in.bytehue.osgifx.console.agent.dto.XServiceDTO;
 import in.bytehue.osgifx.console.agent.dto.XThreadDTO;
 import in.bytehue.osgifx.console.data.provider.DataProvider;
+import in.bytehue.osgifx.console.supervisor.EventListener;
+import in.bytehue.osgifx.console.supervisor.LogEntryListener;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.ObservableQueue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
-public final class RuntimeDataProvider implements DataProvider, Consumer<XEventDTO> {
+public final class RuntimeDataProvider implements DataProvider, EventListener, LogEntryListener {
 
     @Reference
     private LoggerFactory factory;
@@ -35,7 +36,8 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     private Supervisor    supervisor;
     private FluentLogger  logger;
 
-    private final ObservableQueue<XEventDTO> events = new ObservableQueue<>(EvictingQueue.create(200));
+    private final ObservableQueue<XEventDTO>    events = new ObservableQueue<>(EvictingQueue.create(200));
+    private final ObservableQueue<XLogEntryDTO> logs   = new ObservableQueue<>(EvictingQueue.create(1000));
 
     @Activate
     void activate() {
@@ -96,8 +98,18 @@ public final class RuntimeDataProvider implements DataProvider, Consumer<XEventD
     }
 
     @Override
-    public synchronized void accept(final XEventDTO event) {
+    public synchronized ObservableList<XLogEntryDTO> logs() {
+        return logs;
+    }
+
+    @Override
+    public synchronized void onEvent(final XEventDTO event) {
         events.add(event);
+    }
+
+    @Override
+    public synchronized void logged(final XLogEntryDTO logEntry) {
+        logs.add(logEntry);
     }
 
     @Override
