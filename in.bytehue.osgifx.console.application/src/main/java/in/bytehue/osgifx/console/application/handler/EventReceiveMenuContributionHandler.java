@@ -3,7 +3,6 @@ package in.bytehue.osgifx.console.application.handler;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -21,12 +20,11 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 import org.osgi.service.prefs.BackingStoreException;
 
-import in.bytehue.osgifx.console.agent.dto.XEventDTO;
-import in.bytehue.osgifx.console.data.provider.DataProvider;
+import in.bytehue.osgifx.console.supervisor.EventListener;
 import in.bytehue.osgifx.console.supervisor.Supervisor;
 import in.bytehue.osgifx.console.util.fx.Fx;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.data.provider.DataProvider)")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.supervisor.EventListener)")
 public final class EventReceiveMenuContributionHandler {
 
     @Log
@@ -35,7 +33,7 @@ public final class EventReceiveMenuContributionHandler {
     @Inject
     private Supervisor          supervisor;
     @Inject
-    private DataProvider        dataProvider;
+    private EventListener       eventListener;
     @Inject
     private EModelService       modelService;
     @Inject
@@ -43,15 +41,14 @@ public final class EventReceiveMenuContributionHandler {
     private IEclipsePreferences preferences;
 
     @PostConstruct
-    @SuppressWarnings("unchecked")
     public void init() {
         final boolean currentState = getCurrentState();
         if (currentState) {
-            supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
-            logger.atInfo().throttleByCount(10).log("OSGi event consumer has been added");
+            supervisor.addOSGiEventListener(eventListener);
+            logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
         } else {
-            supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
-            logger.atInfo().throttleByCount(10).log("OSGi event consumer has been removed");
+            supervisor.removeOSGiEventListener(eventListener);
+            logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
         }
     }
 
@@ -61,18 +58,17 @@ public final class EventReceiveMenuContributionHandler {
     }
 
     @Execute
-    @SuppressWarnings("unchecked")
     public void execute(final MDirectMenuItem menuItem) throws BackingStoreException {
         final boolean accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
         preferences.putBoolean("action", accessibilityPhrase);
         preferences.flush();
 
         if (accessibilityPhrase) {
-            supervisor.addOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
+            supervisor.addOSGiEventListener(eventListener);
             Fx.showSuccessNotification("Event Notification", "Events will now be received", getClass().getClassLoader());
             logger.atInfo().log("OSGi events will now be received");
         } else {
-            supervisor.removeOSGiEventConsumer((Consumer<XEventDTO>) dataProvider);
+            supervisor.removeOSGiEventListener(eventListener);
             Fx.showSuccessNotification("Event Notification", "Events will not be received anymore", getClass().getClassLoader());
             logger.atInfo().log("OSGi events will not be received anymore");
         }
