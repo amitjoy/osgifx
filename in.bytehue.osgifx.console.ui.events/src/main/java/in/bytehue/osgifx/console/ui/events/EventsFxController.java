@@ -79,8 +79,8 @@ public final class EventsFxController {
         table.getColumns().add(receivedAtColumn);
         table.getColumns().add(topicColumn);
 
-        final ObservableList<XEventDTO> bundles = dataProvider.events();
-        table.setItems(bundles);
+        final ObservableList<XEventDTO> events = dataProvider.events();
+        table.setItems(events);
 
         TableFilter.forTableView(table).apply();
     }
