@@ -11,6 +11,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -79,16 +80,18 @@ public final class UpdateAgentProvider implements UpdateAgent {
     private static final int    DEAFULT_START_LEVEL                 = 100;
 
     @Reference
-    private LoggerFactory      factory;
+    private LoggerFactory         factory;
     @Reference
-    private FeatureService     featureService;
+    private FeatureService        featureService;
     @Reference
-    private ConfigurationAdmin configAdmin;
+    private ConfigurationAdmin    configAdmin;
     @Activate
-    private BundleContext      bundleContext;
-    private FluentLogger       logger;
-    private Path               downloadDirectory;
-    private Path               extractionDirectory;
+    private BundleContext         bundleContext;
+    private FluentLogger          logger;
+    private Path                  downloadDirectory;
+    private Path                  extractionDirectory;
+    private URI                   lastAccessedRepoURI;
+    private Map<File, FeatureDTO> lastReadFeatures;
 
     @Activate
     void activate() throws IOException {
@@ -119,12 +122,17 @@ public final class UpdateAgentProvider implements UpdateAgent {
             final FeatureDTO dto     = FeatureHelper.toFeature(feature);
             result.put(file, dto);
         }
+        lastReadFeatures = result;
         return result;
     }
 
     @Override
     public Map<File, FeatureDTO> readFeatures(final URL archiveURL) throws Exception {
         logger.atInfo().log("Reading archive: %s", archiveURL);
+        if (lastAccessedRepoURI.equals(archiveURL.toURI()) && lastReadFeatures != null) {
+            logger.atDebug().log("Last accessed repo URL is as same as '%s' which has been earlier cached locally", archiveURL);
+            return lastReadFeatures;
+        }
         File file = null;
         try {
             file = downloadArchive(archiveURL);
@@ -132,6 +140,8 @@ public final class UpdateAgentProvider implements UpdateAgent {
             for (final FeatureDTO feature : features.values()) {
                 feature.archiveURL = archiveURL.toString();
             }
+            lastReadFeatures    = features;
+            lastAccessedRepoURI = archiveURL.toURI();
             return features;
         } finally {
             if (file != null) {
@@ -212,7 +222,11 @@ public final class UpdateAgentProvider implements UpdateAgent {
     @Override
     public Collection<FeatureDTO> checkForUpdates() {
         logger.atInfo().log("Checking for updates");
-        // TODO Auto-generated method stub
+        // download all the archives from all installed features' repo URLs
+        // extract all the archives one after another
+        // for every feature from an extracted archive, check if we have an existing feature with the same feature ID
+        // if yes, check if the versions are different
+        // if yes, we have updates for that feature
         return null;
     }
 
