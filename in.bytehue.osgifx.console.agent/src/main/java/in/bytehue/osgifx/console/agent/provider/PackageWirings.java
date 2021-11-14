@@ -40,4 +40,8 @@ public final class PackageWirings {
         return PackageWirings.isWired("org.osgi.service.event", context);
     }
 
+    public static boolean isLogWired(final BundleContext context) {
+        return PackageWirings.isWired("org.osgi.service.log", context);
+    }
+
 }

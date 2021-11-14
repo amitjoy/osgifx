@@ -15,6 +15,7 @@ Import-Package        : \
                         org.osgi.service.component.runtime.dto;'resolution:'=optional,\
                         org.osgi.service.cm;'resolution:'=optional,\
                         org.osgi.service.event;'resolution:'=optional,\
+                        org.osgi.service.log;'resolution:'=optional,\
                         org.osgi.service.metatype;'resolution:'=optional,\
                         org.osgi.util.function;'resolution:'=optional,\
                         org.osgi.util.promise;'resolution:'=optional,\

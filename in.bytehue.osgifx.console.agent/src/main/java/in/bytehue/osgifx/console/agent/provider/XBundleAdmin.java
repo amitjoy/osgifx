@@ -44,7 +44,7 @@ public class XBundleAdmin {
         return Stream.of(context.getBundles()).map(XBundleAdmin::toDTO).collect(toList());
     }
 
-    private static XBundleDTO toDTO(final Bundle bundle) {
+    public static XBundleDTO toDTO(final Bundle bundle) {
         final XBundleDTO dto = new XBundleDTO();
 
         dto.id                     = bundle.getBundleId();
