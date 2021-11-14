@@ -250,10 +250,4 @@ public class SmartGraphProperties {
             return defaultValue;
         }
     }
-
-    public static void main(final String[] args) {
-        final SmartGraphProperties props = new SmartGraphProperties();
-        System.out.println("Prop vertex radius: " + props.getVertexRadius());
-        System.out.println("Prop vertex use label: " + props.getUseVertexLabel());
-    }
 }

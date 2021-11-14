@@ -30,7 +30,6 @@ public final class RuntimeGraph {
         this.bundles  = processBundles(bundles);
         providerGraph = buildGraph(bundles, Strategy.PROVIDER);
         requirerGraph = buildGraph(bundles, Strategy.REQUIRER);
-        System.out.println(requirerGraph.edgeSet());
     }
 
     public List<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatRequire(final Collection<XBundleDTO> bundles) {
