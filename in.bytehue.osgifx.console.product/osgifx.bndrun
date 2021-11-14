@@ -9,6 +9,7 @@
                      bnd.identity;id='in.bytehue.osgifx.console.ui.components',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.configurations',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
+                     bnd.identity;id='in.bytehue.osgifx.console.ui.logs',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.graph',\
                      bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
@@ -30,6 +31,7 @@ install.order    :   \
                      in.bytehue.osgifx.console.ui.components,\
                      in.bytehue.osgifx.console.ui.configurations,\
                      in.bytehue.osgifx.console.ui.events,\
+                     in.bytehue.osgifx.console.ui.logs,\
                      in.bytehue.osgifx.console.ui.properties,\
                      in.bytehue.osgifx.console.ui.threads,\
                      in.bytehue.osgifx.console.ui.gogo,\
