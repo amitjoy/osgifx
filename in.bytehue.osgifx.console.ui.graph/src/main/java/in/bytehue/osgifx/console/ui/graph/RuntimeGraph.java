@@ -22,23 +22,34 @@ import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
 
 public final class RuntimeGraph {
 
-    private final Set<String>                      processedBundles;
     private final Map<String, XBundleDTO>          bundles;
-    private final Graph<BundleVertex, DefaultEdge> graph;
+    private final Graph<BundleVertex, DefaultEdge> providerGraph;
+    private final Graph<BundleVertex, DefaultEdge> requirerGraph;
 
     public RuntimeGraph(final List<XBundleDTO> bundles) {
-        processedBundles = Sets.newHashSet();
-        this.bundles     = processBundles(bundles);
-        graph            = buildGraph(bundles);
+        this.bundles  = processBundles(bundles);
+        providerGraph = buildGraph(bundles, Strategy.PROVIDER);
+        requirerGraph = buildGraph(bundles, Strategy.REQUIRER);
+        System.out.println(requirerGraph.edgeSet());
     }
 
-    public Graph<BundleVertex, DefaultEdge> getGraph() {
-        return graph;
+    public List<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatRequire(final Collection<XBundleDTO> bundles) {
+        return getDirectedPaths(bundles, Strategy.PROVIDER);
     }
 
-    public List<GraphPath<BundleVertex, DefaultEdge>> getTransitiveDependenciesOf(final Collection<XBundleDTO> bundles) {
+    public List<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatAreRequiredBy(final Collection<XBundleDTO> bundles) {
+        return getDirectedPaths(bundles, Strategy.REQUIRER);
+    }
+
+    public List<GraphPath<BundleVertex, DefaultEdge>> getDirectedPaths(final Collection<XBundleDTO> bundles, final Strategy strategy) {
         if (bundles.isEmpty()) {
             return Collections.emptyList();
+        }
+        final Graph<BundleVertex, DefaultEdge> graph;
+        if (strategy == Strategy.REQUIRER) {
+            graph = requirerGraph;
+        } else {
+            graph = providerGraph;
         }
         final Set<BundleVertex> vertices = Sets.newHashSet();
         for (final XBundleDTO bundle : bundles) {
@@ -56,15 +67,22 @@ public final class RuntimeGraph {
         return bundles.stream().collect(toMap(b -> b.symbolicName + ":" + b.id, Functions.identity()));
     }
 
-    private Graph<BundleVertex, DefaultEdge> buildGraph(final List<XBundleDTO> bundles) {
-        final Graph<BundleVertex, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-        bundles.forEach(b -> prepareGraph(b, graph));
+    private Graph<BundleVertex, DefaultEdge> buildGraph(final List<XBundleDTO> bundles, final Strategy strategy) {
+        final Graph<BundleVertex, DefaultEdge> graph            = new DefaultDirectedGraph<>(DefaultEdge.class);
+        final Set<String>                      processedBundles = Sets.newHashSet();
+        bundles.forEach(b -> prepareGraph(b, graph, strategy, processedBundles));
         return graph;
     }
 
-    private void prepareGraph(final XBundleDTO bundle, final Graph<BundleVertex, DefaultEdge> graph) {
-        final List<XBundleInfoDTO> requiredBundles = bundle.wiredBundlesAsRequirer;
-        final BundleVertex         source          = new BundleVertex(bundle.symbolicName, bundle.id);
+    private void prepareGraph(final XBundleDTO bundle, final Graph<BundleVertex, DefaultEdge> graph, final Strategy strategy,
+            final Set<String> processedBundles) {
+        final List<XBundleInfoDTO> vertexBundles;
+        if (strategy == Strategy.REQUIRER) {
+            vertexBundles = bundle.wiredBundlesAsRequirer;
+        } else {
+            vertexBundles = bundle.wiredBundlesAsProvider;
+        }
+        final BundleVertex source = new BundleVertex(bundle.symbolicName, bundle.id);
         if (processedBundles.contains(source.toString())) {
             return;
         }
@@ -72,10 +90,10 @@ public final class RuntimeGraph {
         if (isSourceVertexAdded) {
             processedBundles.add(source.toString());
         }
-        if (requiredBundles == null || requiredBundles.isEmpty()) {
+        if (vertexBundles == null || vertexBundles.isEmpty()) {
             return;
         }
-        for (final XBundleInfoDTO b : requiredBundles) {
+        for (final XBundleInfoDTO b : vertexBundles) {
             final BundleVertex target              = new BundleVertex(b.symbolicName, b.id);
             final boolean      isTargetVertexAdded = graph.addVertex(target);
             if (isTargetVertexAdded) {
@@ -83,8 +101,13 @@ public final class RuntimeGraph {
             }
             graph.addEdge(source, target);
             final XBundleDTO dto = bundles.get(target.toString());
-            prepareGraph(dto, graph);
+            prepareGraph(dto, graph, strategy, processedBundles);
         }
+    }
+
+    private enum Strategy {
+        PROVIDER,
+        REQUIRER
     }
 
 }
