@@ -285,9 +285,8 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
         }
         if (value > max - radius) {
             return max - radius;
-        } else {
-            return value;
         }
+        return value;
     }
 
     @Override

@@ -371,7 +371,8 @@ public class SmartGraphPanel<V, E> extends Pane {
         for (final Vertex<V> vertex : listOfVertices()) {
             final SmartGraphVertexNode<V> vertexAnchor = new SmartGraphVertexNode<>(vertex, 0, 0, graphProperties.getVertexRadius(),
                     graphProperties.getVertexAllowUserMove());
-
+            final String                  styleClass   = getStyleClass(vertex, theGraph);
+            vertexAnchor.setStyleClass(styleClass);
             vertexNodes.put(vertex, vertexAnchor);
         }
 
@@ -1097,6 +1098,13 @@ public class SmartGraphPanel<V, E> extends Pane {
             }
             return true;
         }
+    }
+
+    private String getStyleClass(final Vertex<V> vertex, final Graph<V, E> graph) {
+        if (graph.incidentEdges(vertex).isEmpty()) {
+            return "root-vertex";
+        }
+        return "vertex";
     }
 
 }
