@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -47,6 +48,16 @@ public interface UpdateAgent {
     Map<File, FeatureDTO> readFeatures(URL archiveURL) throws Exception;
 
     /**
+     * Reads the specified feature from the specified archive URL.
+     *
+     * @param archiveURL the archive URL to read the feature from
+     * @param featureID the feature to read from the archive
+     * @return the entry comprising file and {@link FeatureDTO} instance (can be {@code null})
+     * @throws Exception if the provided feature cannot be read
+     */
+    Entry<File, FeatureDTO> readFeature(URL archiveURL, String featureID) throws Exception;
+
+    /**
      * Checks if the specified feature is already installed, if yes, the feature will be updated.
      * Otherwise, the feature will be installed.
      *
@@ -77,7 +88,8 @@ public interface UpdateAgent {
      * Returns the list of features that can be updated.
      *
      * @return the collection of features to be updated (cannot be {@code null})
+     * @throws Exception if the updates cannot be checked
      */
-    Collection<FeatureDTO> checkForUpdates();
+    Collection<FeatureDTO> checkForUpdates() throws Exception;
 
 }
