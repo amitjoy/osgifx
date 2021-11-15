@@ -13,6 +13,13 @@ STYLESHEET FOR JAVAFXGRAPH VISUALIZATION
     -fx-fill: #B1DFF7;
 }
 
+.root-vertex {
+    -fx-stroke-width: 3;
+    -fx-stroke: #61B5F1;
+    -fx-stroke-type: inside; /* you should keep this if using arrows */
+    -fx-fill: #ff9999;
+}
+
 .vertex-label {
     -fx-font: bold 8pt "sans-serif";
 }
