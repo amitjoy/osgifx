@@ -59,7 +59,7 @@ public final class FeatureInstallHandler {
         final FeatureInstallDialog dialog = new FeatureInstallDialog();
 
         ContextInjectionFactory.inject(dialog, context);
-        logger.atInfo().log("Injected install feature dialog to eclipse context");
+        logger.atDebug().log("Injected install feature dialog to eclipse context");
         dialog.init();
 
         final Optional<SelectedFeaturesDTO> selectedFeatures = dialog.showAndWait();

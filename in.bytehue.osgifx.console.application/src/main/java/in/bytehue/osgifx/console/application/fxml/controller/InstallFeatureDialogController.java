@@ -243,7 +243,6 @@ public final class InstallFeatureDialogController {
     }
 
     private static class XFeatureDTO {
-
         static final String PLACEHOLDER_TEXT = "No features found";
 
         FeatureDTO dto;

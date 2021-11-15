@@ -10,8 +10,10 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -21,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -30,7 +34,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
@@ -43,6 +49,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.service.cm.Configuration;
@@ -59,6 +66,7 @@ import org.osgi.service.feature.FeatureService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
 import in.bytehue.osgifx.console.feature.FeatureBundleDTO;
@@ -70,14 +78,19 @@ import in.bytehue.osgifx.console.update.UpdateAgent;
 @Component
 public final class UpdateAgentProvider implements UpdateAgent {
 
-    private static final String LOCATION_PREFIX                     = "osgifx-feature:";
-    private static final String TEMP_DIRECTORY_PREFIX               = "osgifx.console_";
-    private static final String STARTLEVEL_KEY                      = "start-order";
-    private static final String CONFIG_KEY                          = "features";
-    private static final String BUNDLES_DIRECTORY                   = "bundles";
-    private static final String FEATURE_STORAGE_PID                 = "osgifx.features";
-    private static final String BND_LAUNCHER_BUNDLE_LOCATION_PREFIX = "reference:file:";
-    private static final int    DEAFULT_START_LEVEL                 = 100;
+    private static final int          DEAFULT_START_LEVEL                 = 100;
+    private static final int          MAX_REDIRECTS                       = 50;
+    private static final long         CONNECTION_TIMEOUT_IN_MILLISECONDS  = Duration.ofSeconds(15).toMillis();
+    private static final long         READ_TIMEOUT_IN_MILLISECONDS        = Duration.ofSeconds(20).toMillis();
+    private static final String       USER_AGENT                          = "osgi.fx";
+    private static final String       LOCATION_PREFIX                     = "osgifx-feature:";
+    private static final String       TEMP_DIRECTORY_PREFIX               = "osgifx.console_";
+    private static final String       STARTLEVEL_KEY                      = "start-order";
+    private static final String       CONFIG_KEY                          = "features";
+    private static final String       BUNDLES_DIRECTORY                   = "bundles";
+    private static final String       FEATURE_STORAGE_PID                 = "osgifx.features";
+    private static final String       BND_LAUNCHER_BUNDLE_LOCATION_PREFIX = "reference:file:";
+    private static final List<String> ACCEPTABLE_MIME_TYPES               = ImmutableList.of("application/zip", "application/octet-stream");
 
     @Reference
     private LoggerFactory         factory;
@@ -92,13 +105,14 @@ public final class UpdateAgentProvider implements UpdateAgent {
     private Path                  extractionDirectory;
     private URI                   lastAccessedRepoURI;
     private Map<File, FeatureDTO> lastReadFeatures;
+    private Set<Path>             checkForUpdatesExtractionDirs;
 
     @Activate
     void activate() throws IOException {
-        System.setProperty("http.agent", "osgi.fx");
-        logger              = FluentLogger.of(factory.createLogger(getClass().getName()));
-        downloadDirectory   = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
-        extractionDirectory = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
+        checkForUpdatesExtractionDirs = Sets.newHashSet();
+        logger                        = FluentLogger.of(factory.createLogger(getClass().getName()));
+        downloadDirectory             = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
+        extractionDirectory           = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
     }
 
     @Deactivate
@@ -112,9 +126,13 @@ public final class UpdateAgentProvider implements UpdateAgent {
 
     @Override
     public Map<File, FeatureDTO> readFeatures(final File archive) throws Exception {
+        return readFeatures(archive, extractionDirectory);
+    }
+
+    private Map<File, FeatureDTO> readFeatures(final File archive, final Path extractionDirectory) throws Exception {
         logger.atInfo().log("Reading archive: %s", archive);
 
-        final List<File>            features = extractFeatures(archive);
+        final List<File>            features = extractFeatures(archive, extractionDirectory);
         final Map<File, FeatureDTO> result   = Maps.newHashMap();
 
         for (final File file : features) {
@@ -128,15 +146,19 @@ public final class UpdateAgentProvider implements UpdateAgent {
 
     @Override
     public Map<File, FeatureDTO> readFeatures(final URL archiveURL) throws Exception {
+        return readFeatures(archiveURL, extractionDirectory);
+    }
+
+    private Map<File, FeatureDTO> readFeatures(final URL archiveURL, final Path extractionDirectory) throws Exception {
         logger.atInfo().log("Reading archive: %s", archiveURL);
-        if (lastAccessedRepoURI.equals(archiveURL.toURI()) && lastReadFeatures != null) {
+        if (lastAccessedRepoURI != null && lastAccessedRepoURI.equals(archiveURL.toURI()) && lastReadFeatures != null) {
             logger.atDebug().log("Last accessed repo URL is as same as '%s' which has been earlier cached locally", archiveURL);
             return lastReadFeatures;
         }
         File file = null;
         try {
             file = downloadArchive(archiveURL);
-            final Map<File, FeatureDTO> features = readFeatures(file);
+            final Map<File, FeatureDTO> features = readFeatures(file, extractionDirectory);
             for (final FeatureDTO feature : features.values()) {
                 feature.archiveURL = archiveURL.toString();
             }
@@ -148,6 +170,19 @@ public final class UpdateAgentProvider implements UpdateAgent {
                 Files.deleteIfExists(file.toPath());
             }
         }
+    }
+
+    @Override
+    public Entry<File, FeatureDTO> readFeature(final URL archiveURL, final String featureID) throws Exception {
+        logger.atInfo().log("Reading feature '%s' from '%s'", featureID, archiveURL);
+        final Map<File, FeatureDTO> readFeatures = readFeatures(archiveURL);
+        for (final Entry<File, FeatureDTO> entry : readFeatures.entrySet()) {
+            final FeatureDTO feature = entry.getValue();
+            if (checkIdEquals(feature.id, featureID)) {
+                return new SimpleEntry<>(entry.getKey(), entry.getValue());
+            }
+        }
+        return null;
     }
 
     @Override
@@ -182,7 +217,10 @@ public final class UpdateAgentProvider implements UpdateAgent {
         try {
             final Configuration              configuration = configAdmin.getConfiguration(FEATURE_STORAGE_PID, "?");
             final Dictionary<String, Object> properties    = configuration.getProperties();
-            final Object                     features      = properties.get(CONFIG_KEY);
+            if (properties == null) {
+                return Collections.emptyList();
+            }
+            final Object features = properties.get(CONFIG_KEY);
 
             final Gson gson = new Gson();
             if (features == null) {
@@ -220,14 +258,46 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     @Override
-    public Collection<FeatureDTO> checkForUpdates() {
+    public Collection<FeatureDTO> checkForUpdates() throws Exception {
         logger.atInfo().log("Checking for updates");
-        // download all the archives from all installed features' repo URLs
-        // extract all the archives one after another
-        // for every feature from an extracted archive, check if we have an existing feature with the same feature ID
-        // if yes, check if the versions are different
-        // if yes, we have updates for that feature
-        return null;
+        final Map<File, FeatureDTO>  updateAvailableFeatures = Maps.newHashMap();
+        final Collection<FeatureDTO> installedFeatures       = getInstalledFeatures();
+        if (installedFeatures.isEmpty()) {
+            logger.atInfo().log("No features exist. Therefore, skipped checking for updates.");
+            return Collections.emptyList();
+        }
+        try {
+            for (final FeatureDTO installedFeature : installedFeatures) {
+                final String reporURL      = installedFeature.archiveURL;
+                final Path   tempDirectory = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
+                checkForUpdatesExtractionDirs.add(tempDirectory);
+                final Map<File, FeatureDTO> onlineFeatures = readFeatures(new URL(reporURL), tempDirectory);
+                for (final Entry<File, FeatureDTO> onlineFeatureEntry : onlineFeatures.entrySet()) {
+                    final File       onlineFeatureFile = onlineFeatureEntry.getKey();
+                    final FeatureDTO onlineFeature     = onlineFeatureEntry.getValue();
+                    if (idEquals(installedFeature, onlineFeature) && hasUpdates(installedFeature, onlineFeature)) {
+                        updateAvailableFeatures.put(onlineFeatureFile, onlineFeature);
+                    }
+                }
+            }
+        } finally {
+            for (final Path extDir : checkForUpdatesExtractionDirs) {
+                Files.deleteIfExists(extDir);
+            }
+        }
+        return updateAvailableFeatures.values();
+    }
+
+    private boolean hasUpdates(final FeatureDTO installedFeature, final FeatureDTO onlineFeature) {
+        final Version installedFeatureVersion = new Version(installedFeature.id.version);
+        final Version onlineFeatureVersion    = new Version(onlineFeature.id.version);
+        return onlineFeatureVersion.compareTo(installedFeatureVersion) > 0;
+    }
+
+    private boolean idEquals(final FeatureDTO installedFeature, final FeatureDTO onlineFeature) {
+        final String installedFeatureId = onlineFeature.id.groupId + ":" + onlineFeature.id.artifactId;
+        final String onlineFeatureId    = installedFeature.id.groupId + ":" + installedFeature.id.artifactId;
+        return Objects.equals(installedFeatureId, onlineFeatureId);
     }
 
     private void installOrUpdateBundle(final FeatureBundle bundle, final File featureJson) throws Exception {
@@ -388,25 +458,97 @@ public final class UpdateAgentProvider implements UpdateAgent {
     private File downloadArchive(final URL url) throws Exception {
         logger.atInfo().log("Downloading feature archive from URL '%s'", url);
 
-        final File outputPath = new File(downloadDirectory.toFile(), "archive.zip");
-
-        try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
-                FileOutputStream fileOutputStream = new FileOutputStream(outputPath)) {
-            final FileChannel fileChannel = fileOutputStream.getChannel();
-            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-        } catch (final MalformedURLException e) {
-            logger.atError().withException(e).log("Invalid URL - '%s'", url);
-            throw e;
-        } catch (final IOException e) {
-            logger.atError().withException(e).log("Download failed from '%s' to '%s'", url, outputPath);
-            throw e;
+        HttpURLConnection httpConnection = null;
+        final File        outputPath     = new File(downloadDirectory.toFile(), "archive.zip");
+        try (final FileOutputStream fileOutputStream = new FileOutputStream(outputPath)) {
+            httpConnection = createHttpConnection(url.toURI(), 0);
+            final String contentType = httpConnection.getContentType();
+            if (!ACCEPTABLE_MIME_TYPES.contains(contentType)) {
+                throw new RuntimeException("The URL is not supported. Please use a URL that refers to a ZIP archive.");
+            }
+            try (final InputStream is = getInputStream(httpConnection);
+                    ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream())) {
+                final FileChannel fileChannel = fileOutputStream.getChannel();
+                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            } catch (final MalformedURLException e) {
+                logger.atError().withException(e).log("Invalid URL - '%s'", url);
+                throw e;
+            } catch (final IOException e) {
+                logger.atError().withException(e).log("Download failed from '%s' to '%s'", url, outputPath);
+                throw e;
+            }
+        } finally {
+            if (httpConnection != null) {
+                httpConnection.disconnect();
+            }
         }
         logger.atInfo().log("Downloaded feature archive from URL '%s'", url);
         return outputPath;
     }
 
-    private List<File> extractFeatures(final File archive) throws IOException {
-        unzip(archive);
+    private HttpURLConnection createHttpConnection(final URI uri, final int redirectCount) {
+        if (redirectCount >= MAX_REDIRECTS) {
+            throw new RuntimeException(String.format("Could not establish connection to '%s'. Reached max limit of %s redirects",
+                    uri.toString(), MAX_REDIRECTS));
+        }
+        HttpURLConnection connection = null;
+        try {
+            final URL downloadUrl = uri.toURL();
+            connection = (HttpURLConnection) downloadUrl.openConnection();
+            connection.setConnectTimeout((int) CONNECTION_TIMEOUT_IN_MILLISECONDS);
+            connection.setReadTimeout((int) READ_TIMEOUT_IN_MILLISECONDS);
+            connection.setInstanceFollowRedirects(false);
+            setUserAgentHeader(connection);
+            while (isRedirected(connection)) {
+                final String redirectLocation = connection.getHeaderField("Location");
+                connection.disconnect();
+                logger.atDebug().log("Following URL redirect: '%s' -> '%s'", uri, redirectLocation);
+                connection = createHttpConnection(new URI(redirectLocation), redirectCount + 1);
+            }
+            return connection;
+        } catch (IOException | URISyntaxException | IllegalArgumentException e) {
+            final String detail = String.format("While downloading from URL '%s': %s - %s", uri, e.getClass().getSimpleName(),
+                    e.getMessage());
+            if (connection != null) {
+                connection.disconnect();
+            }
+            throw new RuntimeException(detail, e);
+        }
+    }
+
+    private void setUserAgentHeader(final HttpURLConnection httpConnection) {
+        httpConnection.setRequestProperty("User-Agent", USER_AGENT);
+    }
+
+    private boolean isRedirected(final HttpURLConnection httpConnection) throws IOException {
+        final int responseCode = httpConnection.getResponseCode();
+        return responseCode == HttpURLConnection.HTTP_MOVED_PERM || responseCode == HttpURLConnection.HTTP_MOVED_TEMP;
+    }
+
+    private InputStream getInputStream(final HttpURLConnection httpConnection) throws IOException {
+        InputStream inputStream = null;
+        try {
+            final int responseCode = httpConnection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                final String detail = String.format("Could not download file from URL '%s': Remote server response was '%s' - '%s'.",
+                        httpConnection.getURL(), responseCode, httpConnection.getResponseMessage());
+                throw new RuntimeException(detail);
+            }
+            inputStream = httpConnection.getInputStream();
+        } catch (final IOException e) {
+            final String detail = String.format("While downloading from URL '%s': %s - %s", httpConnection.getURL(),
+                    e.getClass().getSimpleName(), e.getMessage());
+            throw new RuntimeException(detail, e);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return inputStream;
+    }
+
+    private List<File> extractFeatures(final File archive, final Path extractionDirectory) throws IOException {
+        unzip(archive, extractionDirectory);
         final File[] files = extractionDirectory.toFile().listFiles((FilenameFilter) (dir, name) -> name.endsWith(".json"));
         return Stream.of(files).collect(Collectors.toList());
     }
@@ -442,7 +584,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
         });
     }
 
-    private void unzip(final File zipFilePath) throws IOException {
+    private void unzip(final File zipFilePath, final Path extractionDirectory) throws IOException {
         cleanDirectory(extractionDirectory);
         try (final ZipFile zipFile = new ZipFile(zipFilePath)) {
             final Enumeration<?> enu = zipFile.entries();
@@ -530,7 +672,8 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     private boolean checkIdEquals(final IdDTO id1, final IdDTO id2) {
-        final String idToCompare = id2.groupId + ":" + id2.artifactId + ":" + id2.version;
+        // a feature is equal to another if the group ID and artifact ID are equal
+        final String idToCompare = id2.groupId + ":" + id2.artifactId;
         return checkIdEquals(id1, idToCompare);
     }
 

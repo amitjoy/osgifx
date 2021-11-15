@@ -31,7 +31,6 @@ public final class FxDialog {
         dialog.initStyle(StageStyle.UNDECORATED);
         dialog.getDialogPane().getStylesheets().add(cssResLoader.getResource("/css/default.css").toExternalForm());
         dialog.show();
-
         return dialog;
     }
 
