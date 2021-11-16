@@ -1,7 +1,6 @@
 package in.bytehue.osgifx.console.ui.graph;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
@@ -11,11 +10,11 @@ import in.bytehue.osgifx.console.smartgraph.graph.Edge;
 import in.bytehue.osgifx.console.smartgraph.graph.Graph;
 import in.bytehue.osgifx.console.smartgraph.graph.Vertex;
 
-public final class FxGraph {
+public final class FxBundleGraph {
 
     Graph<BundleVertex, String> graph;
 
-    public FxGraph(final List<GraphPath<BundleVertex, DefaultEdge>> graphPaths) {
+    public FxBundleGraph(final Collection<GraphPath<BundleVertex, DefaultEdge>> graphPaths) {
         graph = buildGraph(graphPaths);
     }
 
@@ -23,7 +22,7 @@ public final class FxGraph {
         return graph;
     }
 
-    private Graph<BundleVertex, String> buildGraph(final List<GraphPath<BundleVertex, DefaultEdge>> graphPaths) {
+    private Graph<BundleVertex, String> buildGraph(final Collection<GraphPath<BundleVertex, DefaultEdge>> graphPaths) {
         final Graph<BundleVertex, String> graph = new DigraphEdgeList<>();
         for (final GraphPath<BundleVertex, DefaultEdge> path : graphPaths) {
             for (final DefaultEdge edge : path.getEdgeList()) {

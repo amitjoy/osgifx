@@ -10,6 +10,7 @@ import javafx.concurrent.Worker;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.stage.StageStyle;
 
 public final class FxDialog {
@@ -52,6 +53,21 @@ public final class FxDialog {
         progressDialog.show();
 
         return progressDialog;
+    }
+
+    public static ChoiceDialog<String> showChoiceDialog(final String header, final ClassLoader cssResLoader, final Consumer<String> action,
+            final String defaultChoice, final String... choices) {
+        final ChoiceDialog<String> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
+
+        choiceDialog.setHeaderText(header);
+        choiceDialog.initStyle(StageStyle.UNDECORATED);
+        choiceDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource("/css/default.css").toExternalForm());
+
+        final Optional<String> returnVal = choiceDialog.showAndWait();
+        if (action != null && returnVal.isPresent()) {
+            action.accept(returnVal.get());
+        }
+        return choiceDialog;
     }
 
     public static Alert showDialog(final AlertType type, final String title, final String header, final String content,
