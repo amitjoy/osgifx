@@ -39,9 +39,9 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setHeaderText("Add Connection Settings");
-        dialogPane.getStyleClass().add("login-dialog");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         txtHostname = (CustomTextField) TextFields.createClearableTextField();
