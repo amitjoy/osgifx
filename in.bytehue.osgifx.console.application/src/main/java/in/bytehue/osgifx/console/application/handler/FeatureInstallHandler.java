@@ -6,9 +6,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -24,14 +24,16 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import in.bytehue.osgifx.console.application.dialog.FeatureInstallDialog;
 import in.bytehue.osgifx.console.application.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
+import in.bytehue.osgifx.console.feature.FeatureDTO;
+import in.bytehue.osgifx.console.feature.IdDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
-import in.bytehue.osgifx.console.util.fx.Fx;
 import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.concurrent.Task;
 
@@ -51,11 +53,9 @@ public final class FeatureInstallHandler {
     @Preference(nodePath = "osgi.fx.feature")
     private IEclipsePreferences preferences;
     private ProgressDialog      progressDialog;
-    private AtomicBoolean       hasFeatureInstallationError;
 
     @Execute
     public void execute() {
-        hasFeatureInstallationError = new AtomicBoolean();
         final FeatureInstallDialog dialog = new FeatureInstallDialog();
 
         ContextInjectionFactory.inject(dialog, context);
@@ -69,25 +69,27 @@ public final class FeatureInstallHandler {
         }
     }
 
-    private void udpateOrInstallFeatures(final List<File> features, final String archiveURL) {
+    private void udpateOrInstallFeatures(final List<Entry<File, FeatureDTO>> features, final String archiveURL) {
         if (features.isEmpty()) {
             return;
         }
         final Task<Void> task = new Task<Void>() {
+            final List<FeatureDTO> successfullyInstalledFeatures = Lists.newArrayList();
+            final List<FeatureDTO> notInstalledFeatures          = Lists.newArrayList();
+
             @Override
             protected Void call() throws Exception {
-                try {
-                    for (final File feature : features) {
-                        updateAgent.updateOrInstall(feature, archiveURL);
-                        logger.atInfo().log("Feature '%s' has been successfuly installed/updated", feature.getName());
+                for (final Entry<File, FeatureDTO> feature : features) {
+                    final FeatureDTO f  = feature.getValue();
+                    final String     id = featureIdAsString(f.id);
+                    try {
+                        updateAgent.updateOrInstall(feature.getKey(), archiveURL);
+                        successfullyInstalledFeatures.add(f);
+                        logger.atInfo().log("Feature '%s' has been successfuly installed/updated", id);
+                    } catch (final Exception e) {
+                        notInstalledFeatures.add(f);
+                        logger.atError().withException(e).log("Cannot update or install feature '%s'", id);
                     }
-                } catch (final Exception e) {
-                    hasFeatureInstallationError.set(true);
-                    logger.atError().withException(e).log("Cannot update or install feature");
-                    threadSync.asyncExec(() -> {
-                        progressDialog.close();
-                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-                    });
                 }
                 return null;
             }
@@ -95,10 +97,35 @@ public final class FeatureInstallHandler {
             @Override
             protected void succeeded() {
                 progressDialog.close();
-                if (!hasFeatureInstallationError.get()) {
-                    logger.atInfo().log("Features successfully installed");
+                final String header = "Feature Installation";
+
+                final StringBuilder builder = new StringBuilder();
+                if (!successfullyInstalledFeatures.isEmpty()) {
+                    builder.append("Successfully installed features: ");
+                    builder.append(System.lineSeparator());
+                    for (final FeatureDTO feature : successfullyInstalledFeatures) {
+                        builder.append(featureIdAsString(feature.id));
+                        builder.append(System.lineSeparator());
+                    }
+                } else {
+                    builder.append("No features updated");
+                    builder.append(System.lineSeparator());
+                }
+                if (!notInstalledFeatures.isEmpty()) {
+                    builder.append("Features not updated: ");
+                    builder.append(System.lineSeparator());
+                    for (final FeatureDTO feature : notInstalledFeatures) {
+                        builder.append(featureIdAsString(feature.id));
+                        builder.append(System.lineSeparator());
+                    }
+                }
+                if (!notInstalledFeatures.isEmpty()) {
+                    logger.atWarning().log("Some of the features successfully installed and some not");
+                    FxDialog.showWarningDialog(header, builder.toString(), getClass().getClassLoader());
+                } else {
+                    logger.atInfo().log("All features successfully installed");
                     storeURL(archiveURL);
-                    Fx.showSuccessNotification("External Feature Installation", "Successfully installed", getClass().getClassLoader());
+                    FxDialog.showInfoDialog(header, builder.toString(), getClass().getClassLoader());
                 }
             }
 
@@ -141,6 +168,10 @@ public final class FeatureInstallHandler {
         } catch (final Exception e) {
             return false;
         }
+    }
+
+    private String featureIdAsString(final IdDTO id) {
+        return id.groupId + ":" + id.artifactId + ":" + id.version;
     }
 
 }

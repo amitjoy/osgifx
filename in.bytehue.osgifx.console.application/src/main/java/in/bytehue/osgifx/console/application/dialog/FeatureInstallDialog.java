@@ -2,6 +2,7 @@ package in.bytehue.osgifx.console.application.dialog;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -11,6 +12,7 @@ import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.application.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
 import in.bytehue.osgifx.console.application.fxml.controller.InstallFeatureDialogController;
+import in.bytehue.osgifx.console.feature.FeatureDTO;
 import in.bytehue.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -52,8 +54,8 @@ public final class FeatureInstallDialog extends Dialog<SelectedFeaturesDTO> {
     }
 
     public static class SelectedFeaturesDTO {
-        public List<File> features;
-        public String     archiveURL;
+        public String                        archiveURL;
+        public List<Entry<File, FeatureDTO>> features;
     }
 
 }

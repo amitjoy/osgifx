@@ -5,6 +5,7 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
 import java.net.URL;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -188,7 +189,7 @@ public final class InstallFeatureDialogController {
         final SelectedFeaturesDTO dto = new SelectedFeaturesDTO();
 
         final ObservableList<XFeatureDTO> selectedItems = featuresList.getCheckModel().getCheckedItems();
-        dto.features   = selectedItems.stream().map(f -> f.json).collect(toList());
+        dto.features   = selectedItems.stream().map(f -> new SimpleEntry<>(f.json, f.dto)).collect(toList());
         dto.archiveURL = archiveUrlCombo.getEditor().getText();
 
         return dto;
