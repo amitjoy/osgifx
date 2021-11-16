@@ -85,8 +85,6 @@ public final class OverviewFxUI {
     }
 
     private void createControls(final BorderPane parent) {
-        // don't apply the root css here, otherwise TilesFX's css won't be applied
-        parent.getStyleClass().clear();
         Fx.initStatusBar(parent, statusBar);
         retrieveRuntimeInfo(parent);
         createWidgets(parent);
