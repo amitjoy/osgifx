@@ -20,27 +20,28 @@ import com.google.common.collect.Sets;
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
 
-public final class RuntimeGraph {
+public final class RuntimeBundleGraph {
 
     private final Map<String, XBundleDTO>          bundles;
     private final Graph<BundleVertex, DefaultEdge> providerGraph;
     private final Graph<BundleVertex, DefaultEdge> requirerGraph;
 
-    public RuntimeGraph(final List<XBundleDTO> bundles) {
+    public RuntimeBundleGraph(final List<XBundleDTO> bundles) {
         this.bundles  = processBundles(bundles);
         providerGraph = buildGraph(bundles, Strategy.PROVIDER);
         requirerGraph = buildGraph(bundles, Strategy.REQUIRER);
     }
 
-    public List<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatRequire(final Collection<XBundleDTO> bundles) {
+    public Collection<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatRequire(final Collection<XBundleDTO> bundles) {
         return getDirectedPaths(bundles, Strategy.PROVIDER);
     }
 
-    public List<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatAreRequiredBy(final Collection<XBundleDTO> bundles) {
+    public Collection<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatAreRequiredBy(final Collection<XBundleDTO> bundles) {
         return getDirectedPaths(bundles, Strategy.REQUIRER);
     }
 
-    public List<GraphPath<BundleVertex, DefaultEdge>> getDirectedPaths(final Collection<XBundleDTO> bundles, final Strategy strategy) {
+    public Collection<GraphPath<BundleVertex, DefaultEdge>> getDirectedPaths(final Collection<XBundleDTO> bundles,
+            final Strategy strategy) {
         if (bundles.isEmpty()) {
             return Collections.emptyList();
         }

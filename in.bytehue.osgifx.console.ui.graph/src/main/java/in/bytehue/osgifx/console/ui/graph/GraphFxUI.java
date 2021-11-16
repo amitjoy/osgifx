@@ -11,12 +11,14 @@ import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.StatusBar;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import in.bytehue.osgifx.console.util.fx.Fx;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -26,12 +28,17 @@ public final class GraphFxUI {
 
     @Log
     @Inject
-    private FluentLogger     logger;
+    private FluentLogger      logger;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.graph")
-    private BundleContext    context;
-    private final StatusBar  statusBar    = new StatusBar();
-    private final MaskerPane progressPane = new MaskerPane();
+    private BundleContext     context;
+    @Inject
+    private ThreadSynchronize threadSync;
+    private final StatusBar   statusBar    = new StatusBar();
+    private final MaskerPane  progressPane = new MaskerPane();
+
+    private static final String BUNDLES_GRAPH_TYPE    = "Bundles";
+    private static final String COMPONENTS_GRAPH_TYPE = "Components";
 
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -60,33 +67,33 @@ public final class GraphFxUI {
     }
 
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
-        final Task<?> task = new Task<Void>() {
-
-            Node tabContent = null;
-
-            @Override
-            protected Void call() throws Exception {
-                progressPane.setVisible(true);
-                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
-                return null;
-            }
-
-            @Override
-            protected void succeeded() {
-                super.succeeded();
-                parent.getChildren().clear();
-                parent.setCenter(tabContent);
-                Fx.initStatusBar(parent, statusBar);
-                progressPane.setVisible(false);
-            }
-        };
-        parent.getChildren().clear();
-        parent.setCenter(progressPane);
         Fx.initStatusBar(parent, statusBar);
 
-        final Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
+        threadSync.asyncExec(() -> {
+            FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(), type -> {
+                final Task<?> task = new Task<Void>() {
+                    Node tabContent = null;
+
+                    @Override
+                    protected Void call() throws Exception {
+                        threadSync.asyncExec(() -> parent.setCenter(progressPane));
+                        if (BUNDLES_GRAPH_TYPE.equalsIgnoreCase(type)) {
+                            tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-bundles.fxml");
+                        } else {
+                            tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-components.fxml");
+                        }
+                        progressPane.setVisible(false);
+                        threadSync.asyncExec(() -> parent.setCenter(tabContent));
+                        return null;
+                    }
+                };
+
+                final Thread thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
+            }, BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE);
+        });
+
     }
 
 }

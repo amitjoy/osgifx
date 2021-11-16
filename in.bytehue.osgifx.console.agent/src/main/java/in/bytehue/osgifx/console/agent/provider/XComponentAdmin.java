@@ -216,9 +216,10 @@ public class XComponentAdmin {
     private XSatisfiedReferenceDTO toXS(final SatisfiedReferenceDTO dto) {
         final XSatisfiedReferenceDTO xsr = new XSatisfiedReferenceDTO();
 
-        xsr.name        = dto.name;
-        xsr.target      = dto.target;
-        xsr.objectClass = prepareObjectClass(dto.boundServices);
+        xsr.name              = dto.name;
+        xsr.target            = dto.target;
+        xsr.objectClass       = prepareObjectClass(dto.boundServices);
+        xsr.serviceReferences = dto.boundServices;
 
         return xsr;
     }

@@ -4,8 +4,8 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -38,7 +38,7 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.data.provider.DataProvider)")
-public final class GraphFxController {
+public final class GraphFxBundleController {
 
     @Log
     @Inject
@@ -57,7 +57,7 @@ public final class GraphFxController {
     private BorderPane                graphPane;
     @Inject
     private DataProvider              dataProvider;
-    private RuntimeGraph              runtimeGraph;
+    private RuntimeBundleGraph        runtimeGraph;
     private MaskerPane                progressPane;
     private ExecutorService           executor;
     private Future<?>                 graphGenFuture;
@@ -92,13 +92,8 @@ public final class GraphFxController {
             }
         });
         final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
-        runtimeGraph = new RuntimeGraph(bundles);
+        runtimeGraph = new RuntimeBundleGraph(bundles);
         bundlesList.setItems(bundles.sorted(Comparator.comparing(b -> b.symbolicName)));
-    }
-
-    @FXML
-    private void deselectAllBundles(final ActionEvent event) {
-        bundlesList.getCheckModel().clearChecks();
     }
 
     @FXML
@@ -109,20 +104,20 @@ public final class GraphFxController {
         }
         final Task<?> task = new Task<Void>() {
 
-            FxGraph fxGraph;
+            FxBundleGraph fxGraph;
 
             @Override
             protected Void call() throws Exception {
                 progressPane.setVisible(true);
                 final int selection = wiringSelection.getSelectionModel().getSelectedIndex();
 
-                final List<GraphPath<BundleVertex, DefaultEdge>> dependencies;
+                final Collection<GraphPath<BundleVertex, DefaultEdge>> dependencies;
                 if (selection == 0) {
                     dependencies = runtimeGraph.getAllBundlesThatAreRequiredBy(selectedBundles);
                 } else {
                     dependencies = runtimeGraph.getAllBundlesThatRequire(selectedBundles);
                 }
-                fxGraph = new FxGraph(dependencies);
+                fxGraph = new FxBundleGraph(dependencies);
                 return null;
             }
 
