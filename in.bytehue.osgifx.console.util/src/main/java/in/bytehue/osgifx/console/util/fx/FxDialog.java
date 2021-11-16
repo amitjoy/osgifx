@@ -1,11 +1,15 @@
 package in.bytehue.osgifx.console.util.fx;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 
 import javafx.concurrent.Worker;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.stage.StageStyle;
 
 public final class FxDialog {
@@ -15,15 +19,20 @@ public final class FxDialog {
     }
 
     public static Alert showInfoDialog(final String header, final String content, final ClassLoader cssResLoader) {
-        return showDialog(AlertType.INFORMATION, "", header, content, cssResLoader);
+        return showDialog(AlertType.INFORMATION, "", header, content, cssResLoader, null);
     }
 
     public static Alert showWarningDialog(final String header, final String content, final ClassLoader cssResLoader) {
-        return showDialog(AlertType.WARNING, "", header, content, cssResLoader);
+        return showDialog(AlertType.WARNING, "", header, content, cssResLoader, null);
     }
 
     public static Alert showErrorDialog(final String header, final String content, final ClassLoader cssResLoader) {
-        return showDialog(AlertType.ERROR, "", header, content, cssResLoader);
+        return showDialog(AlertType.ERROR, "", header, content, cssResLoader, null);
+    }
+
+    public static Alert showConfirmationDialog(final String header, final String content, final ClassLoader cssResLoader,
+            final Consumer<ButtonType> action) {
+        return showDialog(AlertType.CONFIRMATION, "", header, content, cssResLoader, action);
     }
 
     public static ExceptionDialog showExceptionDialog(final Throwable throwable, final ClassLoader cssResLoader) {
@@ -46,7 +55,7 @@ public final class FxDialog {
     }
 
     public static Alert showDialog(final AlertType type, final String title, final String header, final String content,
-            final ClassLoader cssResLoader) {
+            final ClassLoader cssResLoader, final Consumer<ButtonType> action) {
 
         final Alert alert = new Alert(type);
         alert.initStyle(StageStyle.UNDECORATED);
@@ -56,8 +65,10 @@ public final class FxDialog {
         alert.setHeaderText(header);
         alert.setContentText(content);
 
-        alert.showAndWait();
-
+        final Optional<ButtonType> returnVal = alert.showAndWait();
+        if (action != null && returnVal.isPresent()) {
+            action.accept(returnVal.get());
+        }
         return alert;
     }
 
