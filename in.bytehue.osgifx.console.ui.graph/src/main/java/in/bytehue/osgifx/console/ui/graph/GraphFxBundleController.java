@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -29,10 +30,12 @@ import in.bytehue.osgifx.console.smartgraph.graphview.SmartGraphPanel;
 import in.bytehue.osgifx.console.smartgraph.graphview.SmartPlacementStrategy;
 import in.bytehue.osgifx.console.smartgraph.graphview.SmartRandomPlacementStrategy;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
@@ -45,6 +48,8 @@ public final class GraphFxBundleController {
     private FluentLogger              logger;
     @FXML
     private SegmentedButton           strategyButton;
+    @FXML
+    private TextField                 searchText;
     @FXML
     private ToggleButton              circularStrategyButton;
     @FXML
@@ -69,7 +74,7 @@ public final class GraphFxBundleController {
         progressPane = new MaskerPane();
         logger.atDebug().log("FXML controller has been initialized");
         strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-        wiringSelection.getItems().addAll("find all bundles that are required by", "find all bundles that require");
+        wiringSelection.getItems().addAll("Find all bundles that are required by", "Find all bundles that require");
         wiringSelection.getSelectionModel().select(0);
     }
 
@@ -91,15 +96,32 @@ public final class GraphFxBundleController {
                 }
             }
         });
-        final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
+        final ObservableList<XBundleDTO> bundles             = dataProvider.bundles();
+        final FilteredList<XBundleDTO>   filteredBundlesList = initSearchFilter(bundles);
         runtimeGraph = new RuntimeBundleGraph(bundles);
-        bundlesList.setItems(bundles.sorted(Comparator.comparing(b -> b.symbolicName)));
+        bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.symbolicName)));
+        logger.atInfo().log("Bundles list has been initialized");
+    }
+
+    private FilteredList<XBundleDTO> initSearchFilter(final ObservableList<XBundleDTO> bundles) {
+        final FilteredList<XBundleDTO> filteredBundlesList = new FilteredList<>(bundles, s -> true);
+        searchText.textProperty().addListener(obs -> {
+            final String filter = searchText.getText();
+            if (filter == null || filter.length() == 0) {
+                filteredBundlesList.setPredicate(s -> true);
+            } else {
+                filteredBundlesList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(s.symbolicName::contains));
+            }
+        });
+        return filteredBundlesList;
     }
 
     @FXML
     private void generateGraph(final ActionEvent event) {
+        logger.atInfo().log("Generating graph for bundles");
         final ObservableList<XBundleDTO> selectedBundles = bundlesList.getCheckModel().getCheckedItems();
         if (selectedBundles.isEmpty()) {
+            logger.atInfo().log("No bundles has been selected. Skipped graph generation.");
             return;
         }
         final Task<?> task = new Task<Void>() {
@@ -113,8 +135,10 @@ public final class GraphFxBundleController {
 
                 final Collection<GraphPath<BundleVertex, DefaultEdge>> dependencies;
                 if (selection == 0) {
+                    logger.atInfo().log("Generating all graph paths for bundles that are required by '%s'", selectedBundles);
                     dependencies = runtimeGraph.getAllBundlesThatAreRequiredBy(selectedBundles);
                 } else {
+                    logger.atInfo().log("Generating all graph paths for bundles that require '%s'", selectedBundles);
                     dependencies = runtimeGraph.getAllBundlesThatRequire(selectedBundles);
                 }
                 fxGraph = new FxBundleGraph(dependencies);
