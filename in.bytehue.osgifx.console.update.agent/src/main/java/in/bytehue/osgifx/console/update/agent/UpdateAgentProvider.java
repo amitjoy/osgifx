@@ -189,27 +189,32 @@ public final class UpdateAgentProvider implements UpdateAgent {
     public FeatureDTO updateOrInstall(final File featureJson, final String archiveURL) throws Exception {
         logger.atInfo().log("Updating or installing feature: %s", featureJson);
         final Feature feature = featureService.readFeature(new FileReader(featureJson));
-
-        // validate all required constraints before processing the installation request
-        logger.atInfo().log("Validating all bundles before processing");
-        for (final FeatureBundle bundle : feature.getBundles()) {
-            validateBundle(bundle, featureJson);
+        try {
+            // validate all required constraints before processing the installation request
+            logger.atInfo().log("Validating all bundles before processing");
+            for (final FeatureBundle bundle : feature.getBundles()) {
+                validateBundle(bundle, featureJson);
+            }
+            // install or update the bundles
+            logger.atInfo().log("Installing or updating bundles");
+            for (final FeatureBundle bundle : feature.getBundles()) {
+                installOrUpdateBundle(bundle, featureJson);
+            }
+            // update configurations
+            logger.atInfo().log("Updating configurations");
+            for (final Entry<String, FeatureConfiguration> entry : feature.getConfigurations().entrySet()) {
+                final FeatureConfiguration configuration = entry.getValue();
+                updateConfiguration(configuration);
+            }
+            final FeatureDTO dto = FeatureHelper.toFeature(feature);
+            dto.archiveURL = archiveURL;
+            storeFeature(dto);
+            return dto;
+        } catch (final Exception e) {
+            // atomic operation - if any exception occurs remove the partially installed bundles and configurations
+            remove(FeatureHelper.toFeature(feature));
+            throw e;
         }
-        // install or update the bundles
-        logger.atInfo().log("Installing or updating bundles");
-        for (final FeatureBundle bundle : feature.getBundles()) {
-            installOrUpdateBundle(bundle, featureJson);
-        }
-        // update configurations
-        logger.atInfo().log("Updating configurations");
-        for (final Entry<String, FeatureConfiguration> entry : feature.getConfigurations().entrySet()) {
-            final FeatureConfiguration configuration = entry.getValue();
-            updateConfiguration(configuration);
-        }
-        final FeatureDTO dto = FeatureHelper.toFeature(feature);
-        dto.archiveURL = archiveURL;
-        storeFeature(dto);
-        return dto;
     }
 
     @Override
@@ -228,7 +233,6 @@ public final class UpdateAgentProvider implements UpdateAgent {
             }
             final String[]     fs     = (String[]) features;
             final FeatureDTO[] result = Stream.of(fs).map(e -> gson.fromJson(e, FeatureDTO.class)).toArray(FeatureDTO[]::new);
-
             return ImmutableList.copyOf(result);
         } catch (final IOException e) {
             // should not happen as location check has been disabled
@@ -242,16 +246,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
         final Optional<FeatureDTO> featureToBeRemoved = removeFeature(featureId);
         if (featureToBeRemoved.isPresent()) {
             final FeatureDTO feature = featureToBeRemoved.get();
-            // uninstall all associated bundles
-            for (final FeatureBundleDTO bundle : feature.bundles) {
-                logger.atInfo().log("Uninstalling feature bundle - '%s'", bundle.id.artifactId + ":" + bundle.id.version);
-                uninstallBundle(bundle);
-            }
-            // remove all associated configurations
-            for (final FeatureConfigurationDTO config : feature.configurations.values()) {
-                logger.atInfo().log("Removing feature configuration - '%s'", config.pid);
-                removeConfiguration(config);
-            }
+            remove(feature);
             return feature;
         }
         return null;
@@ -286,6 +281,19 @@ public final class UpdateAgentProvider implements UpdateAgent {
             }
         }
         return updateAvailableFeatures.values();
+    }
+
+    public void remove(final FeatureDTO feature) throws Exception {
+        // uninstall all associated bundles
+        for (final FeatureBundleDTO bundle : feature.bundles) {
+            logger.atInfo().log("Uninstalling feature bundle - '%s'", bundle.id.artifactId + ":" + bundle.id.version);
+            uninstallBundle(bundle);
+        }
+        // remove all associated configurations
+        for (final FeatureConfigurationDTO config : feature.configurations.values()) {
+            logger.atInfo().log("Removing feature configuration - '%s'", config.pid);
+            removeConfiguration(config);
+        }
     }
 
     private boolean hasUpdates(final FeatureDTO installedFeature, final FeatureDTO onlineFeature) {
