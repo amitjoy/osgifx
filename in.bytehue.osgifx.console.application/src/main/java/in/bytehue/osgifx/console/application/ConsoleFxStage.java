@@ -1,6 +1,7 @@
 package in.bytehue.osgifx.console.application;
 
 import static javafx.concurrent.Worker.State.SUCCEEDED;
+import static javafx.scene.paint.Color.TRANSPARENT;
 
 import org.eclipse.fx.ui.workbench.fx.DefaultJFXApp;
 
@@ -14,9 +15,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -26,13 +25,13 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 
     private static final String SPLASH_IMAGE = "/graphic/images/splash.png";
 
-    private Pane        splashLayout;
+    private VBox        splashLayout;
     private ProgressBar loadProgress;
     private Label       progressText;
     private Stage       initStage;
 
-    private static final int SPLASH_WIDTH  = 695;
-    private static final int SPLASH_HEIGHT = 227;
+    private static final double SPLASH_WIDTH  = 695d;
+    private static final double SPLASH_HEIGHT = 227d;
 
     @Override
     public void init() throws Exception {
@@ -42,6 +41,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         loadProgress.setPrefWidth(SPLASH_WIDTH - 20);
         progressText = new Label("");
         splashLayout = new VBox();
+        splashLayout.setSpacing(2);
 
         splashLayout.getChildren().addAll(splash, loadProgress, progressText);
         progressText.setAlignment(Pos.CENTER);
@@ -83,7 +83,9 @@ public final class ConsoleFxStage extends DefaultJFXApp {
                 loadProgress.progressProperty().unbind();
                 loadProgress.setProgress(1);
                 initStage.toFront();
+
                 final FadeTransition fadeSplash = new FadeTransition(Duration.seconds(1.2), splashLayout);
+
                 fadeSplash.setFromValue(1.0);
                 fadeSplash.setToValue(0.0);
                 fadeSplash.setOnFinished(actionEvent -> initStage.hide());
@@ -93,7 +95,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
             }
         });
 
-        final Scene       splashScene = new Scene(splashLayout, Color.TRANSPARENT);
+        final Scene       splashScene = new Scene(splashLayout, TRANSPARENT);
         final Rectangle2D bounds      = Screen.getPrimary().getBounds();
 
         splashScene.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
