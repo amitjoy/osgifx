@@ -82,7 +82,7 @@
 | Find all cycles between available DS components 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Install external feature (plugin) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Check and install if updates are available for installed feature(s) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List and uninstall already installed feature(s) 	|  ![not-done](https://user-images.githubusercontent.com/13380182/142088845-bb261b23-3e99-41ad-aa22-e1eef3ae419a.png) 	|
+| List and uninstall already installed feature(s) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 
 --------------------------------------------------------------------------------------------------------------
 
