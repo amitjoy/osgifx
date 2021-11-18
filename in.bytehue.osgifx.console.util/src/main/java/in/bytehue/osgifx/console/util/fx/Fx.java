@@ -5,7 +5,6 @@ import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.scene.paint.Color.GREEN;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
@@ -51,9 +50,9 @@ public final class Fx {
         loader.setLocation(fxml);
         try {
             return loader.load();
-        } catch (final IOException e) {
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     public static <S, T> void sortBy(final TableView<S> table, final TableColumn<S, T> column) {
@@ -66,7 +65,7 @@ public final class Fx {
         // Set the right policy
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         table.getColumns().stream().forEach(column -> {
-            // Minimal width = columnheader
+            // Minimal width = column header
             Text   t   = new Text(column.getText());
             double max = t.getLayoutBounds().getWidth();
             for (int i = 0; i < table.getItems().size(); i++) {
