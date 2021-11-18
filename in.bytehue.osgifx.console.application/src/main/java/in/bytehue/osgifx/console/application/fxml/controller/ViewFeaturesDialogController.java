@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -13,9 +14,13 @@ import org.osgi.annotation.bundle.Requirement;
 import in.bytehue.osgifx.console.feature.FeatureDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
 import in.bytehue.osgifx.console.util.fx.DTOCellValueFactory;
+import in.bytehue.osgifx.console.util.fx.FxDialog;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -38,12 +43,16 @@ public final class ViewFeaturesDialogController {
     @FXML
     private TableColumn<FeatureDTO, String> licenseColumn;
     @Inject
-    private UpdateAgent                     udpateAgent;
+    private UpdateAgent                     updateAgent;
+    @Inject
+    private ThreadSynchronize               threadSync;
+    private ObservableList<FeatureDTO>      features;
 
     @FXML
     public void initialize() {
-        final Collection<FeatureDTO> installedFeatures = udpateAgent.getInstalledFeatures();
-        featuresList.setItems(FXCollections.observableArrayList(installedFeatures));
+        final Collection<FeatureDTO> installedFeatures = updateAgent.getInstalledFeatures();
+        features = FXCollections.observableArrayList(installedFeatures);
+        featuresList.setItems(features);
         logger.atInfo().log("FXML controller has been initialized");
 
         idColumn.setCellValueFactory(
@@ -52,5 +61,36 @@ public final class ViewFeaturesDialogController {
         descriptionColumn.setCellValueFactory(new DTOCellValueFactory<>("description", String.class));
         vendorColumn.setCellValueFactory(new DTOCellValueFactory<>("vendor", String.class));
         licenseColumn.setCellValueFactory(new DTOCellValueFactory<>("license", String.class));
+
+        initContextMenu();
+    }
+
+    private void initContextMenu() {
+        final MenuItem item = new MenuItem("Uninstall");
+        item.setOnAction(event -> {
+            final FeatureDTO f = featuresList.getSelectionModel().getSelectedItem();
+            try {
+                final FeatureDTO removedfeature = updateAgent.remove(featureIdAsString(f));
+                if (removedfeature != null) {
+                    threadSync.asyncExec(() -> {
+                        FxDialog.showInfoDialog("Feature Uninstallation", featureIdAsString(removedfeature) + " has been uninstalled",
+                                getClass().getClassLoader());
+                        features.clear();
+                        features.addAll(updateAgent.getInstalledFeatures());
+                    });
+                }
+            } catch (final Exception e) {
+                threadSync.asyncExec(() -> {
+                    FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                });
+            }
+        });
+        final ContextMenu menu = new ContextMenu();
+        menu.getItems().add(item);
+        featuresList.setContextMenu(menu);
+    }
+
+    private String featureIdAsString(final FeatureDTO f) {
+        return f.id.groupId + ":" + f.id.artifactId + ":" + f.id.version;
     }
 }
