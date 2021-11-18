@@ -231,8 +231,9 @@ public final class UpdateAgentProvider implements UpdateAgent {
             if (features == null) {
                 return Collections.emptyList();
             }
-            final String[]     fs     = (String[]) features;
-            final FeatureDTO[] result = Stream.of(fs).map(e -> gson.fromJson(e, FeatureDTO.class)).toArray(FeatureDTO[]::new);
+
+            final String       fs     = (String) features;
+            final FeatureDTO[] result = gson.fromJson(fs, FeatureDTO[].class);
             return ImmutableList.copyOf(result);
         } catch (final IOException e) {
             // should not happen as location check has been disabled
