@@ -11,6 +11,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
 public final class FxDialog {
@@ -55,17 +56,20 @@ public final class FxDialog {
         return progressDialog;
     }
 
-    public static ChoiceDialog<String> showChoiceDialog(final String header, final ClassLoader cssResLoader, final Consumer<String> action,
-            final String defaultChoice, final String... choices) {
+    public static ChoiceDialog<String> showChoiceDialog(final String header, final ClassLoader resLoader, final String graphicPath,
+            final Consumer<String> actionOk, final Runnable actionCancel, final String defaultChoice, final String... choices) {
         final ChoiceDialog<String> choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
 
         choiceDialog.setHeaderText(header);
         choiceDialog.initStyle(StageStyle.UNDECORATED);
-        choiceDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource("/css/default.css").toExternalForm());
+        choiceDialog.getDialogPane().getStylesheets().add(resLoader.getResource("/css/default.css").toExternalForm());
+        choiceDialog.setGraphic(new ImageView(resLoader.getResource(graphicPath).toString()));
 
         final Optional<String> returnVal = choiceDialog.showAndWait();
-        if (action != null && returnVal.isPresent()) {
-            action.accept(returnVal.get());
+        if (actionOk != null && returnVal.isPresent()) {
+            actionOk.accept(returnVal.get());
+        } else if (actionCancel != null) {
+            actionCancel.run();
         }
         return choiceDialog;
     }
