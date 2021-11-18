@@ -1,11 +1,14 @@
 package in.bytehue.osgifx.console.application.fxml.controller;
 
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+
 import java.util.Collection;
 
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.annotation.bundle.Requirement;
 
 import in.bytehue.osgifx.console.feature.FeatureDTO;
 import in.bytehue.osgifx.console.update.UpdateAgent;
@@ -16,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=in.bytehue.osgifx.console.update.UpdateAgent)")
 public final class ViewFeaturesDialogController {
 
     @Log
