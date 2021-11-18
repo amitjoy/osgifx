@@ -665,8 +665,8 @@ public final class UpdateAgentProvider implements UpdateAgent {
         if (features == null) {
             return Optional.empty();
         }
-        final String[]     fs     = (String[]) features;
-        final FeatureDTO[] result = Stream.of(fs).map(e -> gson.fromJson(e, FeatureDTO.class)).toArray(FeatureDTO[]::new);
+        final String       fs     = (String) features;
+        final FeatureDTO[] result = gson.fromJson(fs, FeatureDTO[].class);
 
         final List<FeatureDTO>     finalList           = Lists.newArrayList(result);
         final Optional<FeatureDTO> featuredToBeRemoved = finalList.stream().filter(f -> checkIdEquals(f.id, featureId)).findAny();
