@@ -11,6 +11,8 @@ import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.StatusBar;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -32,6 +34,10 @@ public final class GraphFxUI {
     @Inject
     @Named("in.bytehue.osgifx.console.ui.graph")
     private BundleContext     context;
+    @Inject
+    private MPart             part;
+    @Inject
+    private EPartService      partService;
     @Inject
     private ThreadSynchronize threadSync;
     private final StatusBar   statusBar    = new StatusBar();
@@ -70,7 +76,7 @@ public final class GraphFxUI {
         Fx.initStatusBar(parent, statusBar);
 
         threadSync.asyncExec(() -> {
-            FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(), type -> {
+            FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(), "/graphic/images/graph.png", type -> {
                 final Task<?> task = new Task<Void>() {
                     Node tabContent = null;
 
@@ -91,7 +97,7 @@ public final class GraphFxUI {
                 final Thread thread = new Thread(task);
                 thread.setDaemon(true);
                 thread.start();
-            }, BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE);
+            }, () -> partService.hidePart(part), BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE);
         });
 
     }
