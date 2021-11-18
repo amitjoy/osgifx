@@ -51,7 +51,7 @@ public final class Fx {
         try {
             return loader.load();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
