@@ -16,12 +16,19 @@ import javafx.stage.StageStyle;
 
 public final class FxDialog {
 
+    private static final String DEFAULT_CSS = "/css/default.css";
+
     private FxDialog() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
     public static Alert showInfoDialog(final String header, final String content, final ClassLoader cssResLoader) {
         return showDialog(AlertType.INFORMATION, "", header, content, cssResLoader, null);
+    }
+
+    public static Alert showInfoDialog(final String header, final String content, final ClassLoader cssResLoader,
+            final Consumer<ButtonType> actionOk) {
+        return showDialog(AlertType.INFORMATION, "", header, content, cssResLoader, actionOk);
     }
 
     public static Alert showWarningDialog(final String header, final String content, final ClassLoader cssResLoader) {
@@ -40,7 +47,7 @@ public final class FxDialog {
     public static ExceptionDialog showExceptionDialog(final Throwable throwable, final ClassLoader cssResLoader) {
         final ExceptionDialog dialog = new ExceptionDialog(throwable);
         dialog.initStyle(StageStyle.UNDECORATED);
-        dialog.getDialogPane().getStylesheets().add(cssResLoader.getResource("/css/default.css").toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(DEFAULT_CSS).toExternalForm());
         dialog.show();
         return dialog;
     }
@@ -50,7 +57,7 @@ public final class FxDialog {
 
         progressDialog.setHeaderText(header);
         progressDialog.initStyle(StageStyle.UNDECORATED);
-        progressDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource("/css/default.css").toExternalForm());
+        progressDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(DEFAULT_CSS).toExternalForm());
         progressDialog.show();
 
         return progressDialog;
@@ -62,7 +69,7 @@ public final class FxDialog {
 
         choiceDialog.setHeaderText(header);
         choiceDialog.initStyle(StageStyle.UNDECORATED);
-        choiceDialog.getDialogPane().getStylesheets().add(resLoader.getResource("/css/default.css").toExternalForm());
+        choiceDialog.getDialogPane().getStylesheets().add(resLoader.getResource(DEFAULT_CSS).toExternalForm());
         choiceDialog.setGraphic(new ImageView(resLoader.getResource(graphicPath).toString()));
 
         final Optional<String> returnVal = choiceDialog.showAndWait();
@@ -79,7 +86,7 @@ public final class FxDialog {
 
         final Alert alert = new Alert(type);
         alert.initStyle(StageStyle.UNDECORATED);
-        alert.getDialogPane().getStylesheets().add(cssResLoader.getResource("/css/default.css").toExternalForm());
+        alert.getDialogPane().getStylesheets().add(cssResLoader.getResource(DEFAULT_CSS).toExternalForm());
 
         alert.setTitle(title);
         alert.setHeaderText(header);
