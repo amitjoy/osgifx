@@ -1,8 +1,6 @@
-workspace.directory             =         .osgifx-ws
 -runrepos                       =         Workspace, Runtime, e(fx)clipse
 -runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         true
--runstorage                     =         ${workspace.directory}
 -runtrace                       =         true 
 -runee                          =         JavaSE-1.8
 -runstartlevel                  =         begin = 1, step = -1, order = sortbynameversion
@@ -10,8 +8,14 @@ workspace.directory             =         .osgifx-ws
 -runsystemcapabilities          =         ${native_capability}
 -runpath.efx                    =         org.eclipse.fx.osgi
 -runproperties.scr              =         ds.log.enabled=false
--runproperties.workspace        =         osgi.instance.area.default=${workspace.directory}
 -runblacklist                   =         in.bytehue.osgifx.console.api
+
+current.directory               =         .
+storage.directory               =         ${current.directory}/.osgifx-ws
+-runproperties.storage          =         \
+                                          launch.storage.dir=${storage.directory},\
+                                          org.osgi.framework.storage=${storage.directory}
+-runproperties.equinox          =         osgi.instance.area.default=${storage.directory}
 
 -runproperties.efx              =         osgi.framework.extensions=org.eclipse.fx.osgi,\
                                           eclipse.application.launchDefault=true,\

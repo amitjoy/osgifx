@@ -1,43 +1,44 @@
--include         :   ${workspace}/cnf/efx.bndrun
--runproperties   :   eclipse.product=in.bytehue.osgifx.console.application.product
--runrequires     :   \
-                     bnd.identity;id='in.bytehue.osgifx.console.application',\
-                     bnd.identity;id='in.bytehue.osgifx.console.launcher',\
-                     bnd.identity;id='in.bytehue.osgifx.console.logging',\
-                     \
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.bundles',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.components',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.configurations',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.logs',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.graph',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.packages',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.properties',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
-                     bnd.identity;id='in.bytehue.osgifx.console.ui.threads',\
-                     \
-                     ${requirement.product}
+-include                 :   ${workspace}/cnf/efx.bndrun
+-runproperties.product   :   eclipse.product=in.bytehue.osgifx.console.application.product
+-runproperties.name      :   launch.name=OSGi.fx
+-runrequires             :   \
+                             bnd.identity;id='in.bytehue.osgifx.console.application',\
+                             bnd.identity;id='in.bytehue.osgifx.console.launcher',\
+                             bnd.identity;id='in.bytehue.osgifx.console.logging',\
+                             \
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.bundles',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.components',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.configurations',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.events',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.logs',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.gogo',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.graph',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.overview',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.packages',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.properties',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.services',\
+		                     bnd.identity;id='in.bytehue.osgifx.console.ui.threads',\
+                     		 \
+                     		 ${requirement.product}
 
 # This is required as the install order matters - not the start level. The models fragments are processed 
 # according to the install order and hence assigning start levels in increasing order does not help. That's
 # why the install order has been explicitly specified for the model fragments.
-install.order    :   \
-                     in.bytehue.osgifx.console.ui.overview,\
-                     in.bytehue.osgifx.console.ui.bundles,\
-                     in.bytehue.osgifx.console.ui.packages,\
-                     in.bytehue.osgifx.console.ui.services,\
-                     in.bytehue.osgifx.console.ui.components,\
-                     in.bytehue.osgifx.console.ui.configurations,\
-                     in.bytehue.osgifx.console.ui.events,\
-                     in.bytehue.osgifx.console.ui.logs,\
-                     in.bytehue.osgifx.console.ui.properties,\
-                     in.bytehue.osgifx.console.ui.threads,\
-                     in.bytehue.osgifx.console.ui.gogo,\
-                     in.bytehue.osgifx.console.ui.graph
+install.order         :   	 \
+		                     in.bytehue.osgifx.console.ui.overview,\
+		                     in.bytehue.osgifx.console.ui.bundles,\
+		                     in.bytehue.osgifx.console.ui.packages,\
+		                     in.bytehue.osgifx.console.ui.services,\
+		                     in.bytehue.osgifx.console.ui.components,\
+		                     in.bytehue.osgifx.console.ui.configurations,\
+		                     in.bytehue.osgifx.console.ui.events,\
+		                     in.bytehue.osgifx.console.ui.logs,\
+		                     in.bytehue.osgifx.console.ui.properties,\
+		                     in.bytehue.osgifx.console.ui.threads,\
+		                     in.bytehue.osgifx.console.ui.gogo,\
+		                     in.bytehue.osgifx.console.ui.graph
 
--runbundles.X    :   ${install.order}
+-runbundles.X    	  :      ${install.order}
 -runbundles: \
 	com.google.gson;version='[2.8.2,2.8.3)';startlevel=1,\
 	com.google.guava;version='[27.1.0,27.1.1)';startlevel=1,\
