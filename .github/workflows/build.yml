@@ -32,12 +32,12 @@ jobs:
         -   name: Change Working Directory to Product Root
             run : cd in.bytehue.osgifx.console.product
         -   name: Build MacOSX Image (DMG)
-            run : javapackager -deploy -native dmg -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx Console" -outdir deploy -outfile osgi-fx-console -v
+            run : javapackager -deploy -native dmg -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx" -outdir deploy -outfile osgi-fx -v
         -   name: Build MacOSX Image (PKG)
-            run : javapackager -deploy -native pkg -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx Console" -outdir deploy -outfile osgi-fx-console -v
+            run : javapackager -deploy -native pkg -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx" -outdir deploy -outfile osgi-fx -v
         -   name: Build Linux Image (RPM)
-            run : javapackager -deploy -native rpm -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx Console" -outdir deploy -outfile osgi-fx-console -v
+            run : javapackager -deploy -native rpm -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx" -outdir deploy -outfile osgi-fx -v
         -   name: Build Linux Image (DEB)
-            run : javapackager -deploy -native deb -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx Console" -outdir deploy -outfile osgi-fx-console -v
+            run : javapackager -deploy -native deb -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx" -outdir deploy -outfile osgi-fx -v
         -   name: Build Windows Image (EXE)
-            run : javapackager -deploy -native exe -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx Console" -outdir deploy -outfile osgi-fx-console -v
+            run : javapackager -deploy -native exe -srcfiles osgifx.jar -appclass aQute.launcher.pre.EmbeddedLauncher -name "OSGi.fx" -outdir deploy -outfile osgi-fx -v
