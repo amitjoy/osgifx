@@ -18,6 +18,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.Preference;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -49,6 +50,8 @@ public final class FeatureInstallHandler {
     private UpdateAgent         updateAgent;
     @Inject
     private ThreadSynchronize   threadSync;
+    @Inject
+    private IWorkbench          workbench;
     @Inject
     @Preference(nodePath = "osgi.fx.feature")
     private IEclipsePreferences preferences;
@@ -126,6 +129,9 @@ public final class FeatureInstallHandler {
                     logger.atInfo().log("All features successfully installed");
                     storeURL(archiveURL);
                     FxDialog.showInfoDialog(header, builder.toString(), getClass().getClassLoader());
+                    // show information about the restart of the application
+                    FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
+                            getClass().getClassLoader(), btn -> workbench.restart());
                 }
             }
 
