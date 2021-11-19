@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -45,6 +46,8 @@ public final class ViewFeaturesDialogController {
     @Inject
     private UpdateAgent                     updateAgent;
     @Inject
+    private IWorkbench                      workbench;
+    @Inject
     private ThreadSynchronize               threadSync;
     private ObservableList<FeatureDTO>      features;
 
@@ -73,16 +76,18 @@ public final class ViewFeaturesDialogController {
                 final FeatureDTO removedfeature = updateAgent.remove(featureIdAsString(f));
                 if (removedfeature != null) {
                     threadSync.asyncExec(() -> {
-                        FxDialog.showInfoDialog("Feature Uninstallation", featureIdAsString(removedfeature) + " has been uninstalled",
+                        final String header = "Feature Uninstallation";
+                        FxDialog.showInfoDialog(header, featureIdAsString(removedfeature) + " has been uninstalled",
                                 getClass().getClassLoader());
                         features.clear();
                         features.addAll(updateAgent.getInstalledFeatures());
+                        // show information about the restart of the application
+                        FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
+                                getClass().getClassLoader(), btn -> workbench.restart());
                     });
                 }
             } catch (final Exception e) {
-                threadSync.asyncExec(() -> {
-                    FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-                });
+                threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
             }
         });
         final ContextMenu menu = new ContextMenu();
