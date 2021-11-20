@@ -8,6 +8,10 @@ import javafx.geometry.Point2D;
  */
 public class UtilitiesPoint2D {
 
+    private UtilitiesPoint2D() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
+
     /**
      * Rotate a point around a pivot point by a specific degrees amount
      *
@@ -23,7 +27,7 @@ public class UtilitiesPoint2D {
         final double cos = Math.cos(angle);
 
         // translate to origin
-        Point2D result = point.subtract(pivot);
+        final Point2D result = point.subtract(pivot);
 
         // rotate point
         final Point2D rotatedOrigin = new Point2D(result.getX() * cos - result.getY() * sin, result.getX() * sin + result.getY() * cos);
