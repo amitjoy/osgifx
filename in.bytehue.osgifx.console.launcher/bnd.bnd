@@ -1,3 +1,1 @@
--privatepackage     : in.bytehue.osgifx.console.lauchner
--conditionalpackage : aQute.lib.exceptions
--buildpath          : biz.aQute.bndlib;packages=*, org.eclipse.core.runtime
+-buildpath: org.eclipse.core.runtime, org.eclipse.fx.core
