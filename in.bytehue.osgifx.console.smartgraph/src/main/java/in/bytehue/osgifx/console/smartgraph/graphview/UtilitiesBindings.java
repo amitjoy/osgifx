@@ -10,6 +10,10 @@ import javafx.beans.value.ObservableDoubleValue;
  */
 public class UtilitiesBindings {
 
+    private UtilitiesBindings() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
+
     /**
      * Binding for {@link java.lang.Math#atan2(double, double)}
      *

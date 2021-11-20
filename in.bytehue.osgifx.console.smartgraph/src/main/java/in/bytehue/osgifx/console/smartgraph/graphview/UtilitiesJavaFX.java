@@ -10,6 +10,11 @@ import javafx.scene.Parent;
  * Utility methods for JavaFX.
  */
 public class UtilitiesJavaFX {
+
+    private UtilitiesJavaFX() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
+
     /**
      * Determines the closest node that resides in the x,y scene position, if any.
      * <br>
