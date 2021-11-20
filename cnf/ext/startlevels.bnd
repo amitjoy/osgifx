@@ -1,0 +1,3 @@
+feature.start.level.increment   : 10
+default.startlevel              : 1
+startlevels                     : in.bytehue.osgifx.console.launcher;startlevel=5

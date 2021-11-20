@@ -1,6 +1,12 @@
 -include                 :   ${workspace}/cnf/efx.bndrun
+
+-runstartlevel           :   begin = 1, step = -1, order = sortbynameversion
+-runbundles+             :   ${startlevels}, *;startlevel=${default.startlevel}
+
 -runproperties.product   :   eclipse.product=in.bytehue.osgifx.console.application.product
 -runproperties.name      :   launch.name=OSGi.fx
+-runproperties.sl        :   feature.start.order=${feature.start.level.increment}
+
 -runrequires             :   \
                              bnd.identity;id='in.bytehue.osgifx.console.application',\
                              bnd.identity;id='in.bytehue.osgifx.console.launcher',\
