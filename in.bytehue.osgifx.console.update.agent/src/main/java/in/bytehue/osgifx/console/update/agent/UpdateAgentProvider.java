@@ -78,10 +78,11 @@ import in.bytehue.osgifx.console.update.UpdateAgent;
 @Component
 public final class UpdateAgentProvider implements UpdateAgent {
 
-    private static final int          DEAFULT_START_LEVEL                 = 100;
+    private static final int          DEFAULT_START_LEVEL                 = 100;
     private static final int          MAX_REDIRECTS                       = 50;
     private static final long         CONNECTION_TIMEOUT_IN_MILLISECONDS  = Duration.ofSeconds(15).toMillis();
     private static final long         READ_TIMEOUT_IN_MILLISECONDS        = Duration.ofSeconds(20).toMillis();
+    private static final String       FEATURE_START_LEVEL_PROPERTY        = "feature.start.order";
     private static final String       USER_AGENT                          = "osgi.fx";
     private static final String       LOCATION_PREFIX                     = "osgifx-feature:";
     private static final String       TEMP_DIRECTORY_PREFIX               = "osgifx.console_";
@@ -313,7 +314,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
         final Optional<Bundle> existingBundle       = getExistingBundle(bundle);
         final String           bsn                  = bundle.getID().getArtifactId();
         final String           version              = bundle.getID().getVersion();
-        final String           configuredStartLevel = bundle.getMetadata().getOrDefault(STARTLEVEL_KEY, DEAFULT_START_LEVEL).toString();
+        final String           configuredStartLevel = String.valueOf(getStartLevel(bundle.getMetadata()));
         final int              startLevel           = Integer.parseInt(configuredStartLevel);
         final Optional<File>   bundleFile           = findBundleInBundlesDirectory(featureJson.getParentFile(), bsn, version);
 
@@ -350,6 +351,16 @@ public final class UpdateAgentProvider implements UpdateAgent {
                 logger.atInfo().log("Bundle started - '%s', ", dto);
             }
         }
+    }
+
+    private int getStartLevel(final Map<String, Object> metadata) {
+        final Object startOrder = metadata.get(STARTLEVEL_KEY);
+        if (startOrder != null) {
+            // this is to ensure that all the packaged bundles get started before any feature specific bundle
+            final String configuredStartLevelIncrement = bundleContext.getProperty(FEATURE_START_LEVEL_PROPERTY);
+            return Integer.parseInt(startOrder.toString()) + Integer.parseInt(configuredStartLevelIncrement);
+        }
+        return DEFAULT_START_LEVEL;
     }
 
     private void uninstallBundle(final FeatureBundleDTO bundle) throws BundleException {
