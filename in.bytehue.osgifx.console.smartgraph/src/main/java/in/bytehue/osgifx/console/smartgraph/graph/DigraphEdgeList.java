@@ -1,10 +1,11 @@
 package in.bytehue.osgifx.console.smartgraph.graph;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Implementation of a digraph that adheres to the {@link Digraph} interface.
@@ -24,15 +25,15 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
     private final Map<E, Edge<E, V>> edges;
 
     public DigraphEdgeList() {
-        this.vertices = new HashMap<>();
-        this.edges    = new HashMap<>();
+        this.vertices = Maps.newHashMap();
+        this.edges    = Maps.newHashMap();
     }
 
     @Override
     public synchronized Collection<Edge<E, V>> incidentEdges(final Vertex<V> inbound) throws InvalidVertexException {
         checkVertex(inbound);
 
-        final List<Edge<E, V>> incidentEdges = new ArrayList<>();
+        final List<Edge<E, V>> incidentEdges = Lists.newArrayList();
         for (final Edge<E, V> edge : edges.values()) {
 
             if (((MyEdge) edge).getInbound() == inbound) {
@@ -46,7 +47,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
     public synchronized Collection<Edge<E, V>> outboundEdges(final Vertex<V> outbound) throws InvalidVertexException {
         checkVertex(outbound);
 
-        final List<Edge<E, V>> outboundEdges = new ArrayList<>();
+        final List<Edge<E, V>> outboundEdges = Lists.newArrayList();
         for (final Edge<E, V> edge : edges.values()) {
 
             if (((MyEdge) edge).getOutbound() == outbound) {
@@ -124,19 +125,15 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public synchronized Collection<Vertex<V>> vertices() {
-        final List<Vertex<V>> list = new ArrayList<>();
-        vertices.values().forEach(v -> {
-            list.add(v);
-        });
+        final List<Vertex<V>> list = Lists.newArrayList();
+        vertices.values().forEach(list::add);
         return list;
     }
 
     @Override
     public synchronized Collection<Edge<E, V>> edges() {
-        final List<Edge<E, V>> list = new ArrayList<>();
-        edges.values().forEach(e -> {
-            list.add(e);
-        });
+        final List<Edge<E, V>> list = Lists.newArrayList();
+        edges.values().forEach(list::add);
         return list;
     }
 

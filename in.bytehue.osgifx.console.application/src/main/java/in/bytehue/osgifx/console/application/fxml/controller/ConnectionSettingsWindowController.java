@@ -2,7 +2,6 @@ package in.bytehue.osgifx.console.application.fxml.controller;
 
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,6 +20,8 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+
+import com.google.common.collect.Maps;
 
 import in.bytehue.osgifx.console.application.dialog.ConnectionDialog;
 import in.bytehue.osgifx.console.application.dialog.ConnectionSettingDTO;
@@ -161,7 +162,7 @@ public final class ConnectionSettingsWindowController {
     }
 
     private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
-        final Map<String, Object> properties = new HashMap<>();
+        final Map<String, Object> properties = Maps.newHashMap();
 
         properties.put("host", dto.host);
         properties.put("port", dto.port);

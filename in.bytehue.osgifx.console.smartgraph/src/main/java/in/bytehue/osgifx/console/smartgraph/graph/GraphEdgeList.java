@@ -1,10 +1,11 @@
 package in.bytehue.osgifx.console.smartgraph.graph;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * ADT Graph implementation that stores a collection of edges (and vertices) and
@@ -27,8 +28,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
      * Creates a empty graph.
      */
     public GraphEdgeList() {
-        this.vertices = new HashMap<>();
-        this.edges    = new HashMap<>();
+        this.vertices = Maps.newHashMap();
+        this.edges    = Maps.newHashMap();
     }
 
     @Override
@@ -43,12 +44,12 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public Collection<Vertex<V>> vertices() {
-        return new ArrayList<>(vertices.values());
+        return Lists.newArrayList(vertices.values());
     }
 
     @Override
     public Collection<Edge<E, V>> edges() {
-        return new ArrayList<>(edges.values());
+        return Lists.newArrayList(edges.values());
     }
 
     @Override
@@ -56,7 +57,7 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
         checkVertex(v);
 
-        final List<Edge<E, V>> incidentEdges = new ArrayList<>();
+        final List<Edge<E, V>> incidentEdges = Lists.newArrayList();
         for (final Edge<E, V> edge : edges.values()) {
 
             if (((MyEdge) edge).contains(v)) {

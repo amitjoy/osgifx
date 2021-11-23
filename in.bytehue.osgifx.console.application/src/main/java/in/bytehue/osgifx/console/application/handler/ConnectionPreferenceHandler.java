@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.application.handler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +13,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -68,7 +68,7 @@ public final class ConnectionPreferenceHandler {
         List<ConnectionSettingDTO> connections = gson.fromJson(storedValue, new TypeToken<List<ConnectionSettingDTO>>() {
                                                }.getType());
         if (connections == null) {
-            connections = new ArrayList<>();
+            connections = Lists.newArrayList();
         }
         return connections;
     }

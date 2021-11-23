@@ -8,12 +8,13 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.google.common.collect.Lists;
 
 import aQute.bnd.util.dto.DTO;
 import aQute.lib.collections.MultiMap;
@@ -94,7 +95,7 @@ public class AgentSupervisor<S, A> {
                 return EMPTY;
             }
 
-            copy = new ArrayList<>(list);
+            copy = Lists.newArrayList(list);
         }
         for (final String path : copy) {
             final File f = new File(path);

@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
+import com.google.common.collect.Maps;
+
 import in.bytehue.osgifx.console.smartgraph.graph.Digraph;
 import in.bytehue.osgifx.console.smartgraph.graph.Edge;
 import in.bytehue.osgifx.console.smartgraph.graph.Graph;
@@ -175,9 +177,9 @@ public class SmartGraphPanel<V, E> extends Pane {
         this.attractionForce = this.graphProperties.getAttractionForce();
         this.attractionScale = this.graphProperties.getAttractionScale();
 
-        vertexNodes = new HashMap<>();
-        edgeNodes   = new HashMap<>();
-        connections = new HashMap<>();
+        vertexNodes = Maps.newHashMap();
+        edgeNodes   = Maps.newHashMap();
+        connections = Maps.newHashMap();
 
         // set stylesheet and class
         loadStylesheet(cssFile);

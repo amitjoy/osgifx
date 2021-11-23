@@ -1,14 +1,15 @@
 package in.bytehue.osgifx.console.ui.gogo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 
+import com.google.common.collect.Lists;
+
 @Component(service = GogoConsoleHistory.class)
 public final class GogoConsoleHistory {
 
-    private final List<String> history = new ArrayList<>();
+    private final List<String> history = Lists.newArrayList();
 
     public synchronized void add(final String command) {
         if (history.size() == 20) {
