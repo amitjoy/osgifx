@@ -1,6 +1,5 @@
 package in.bytehue.osgifx.console.ui.components;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,6 +15,8 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
+
+import com.google.common.collect.Maps;
 
 import in.bytehue.osgifx.console.agent.dto.XComponentDTO;
 import in.bytehue.osgifx.console.agent.dto.XReferenceDTO;
@@ -222,7 +223,7 @@ public final class ComponentDetailsFxController {
     }
 
     private Map<String, Object> createCommandMap(final String name, final String id) {
-        final Map<String, Object> properties = new HashMap<>();
+        final Map<String, Object> properties = Maps.newHashMap();
         properties.computeIfAbsent("name", key -> name);
         properties.computeIfAbsent("id", key -> id);
         return properties;

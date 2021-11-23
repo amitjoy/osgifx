@@ -1,8 +1,6 @@
 package in.bytehue.osgifx.console.ui.configurations;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +22,7 @@ import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import in.bytehue.osgifx.console.agent.dto.XAttributeDefDTO;
@@ -58,12 +57,12 @@ public final class ConfigurationEditorFxController {
     private Form                   form;
     private Converter              converter;
     private FormRenderer           formRenderer;
-    private List<String>           uneditableProperties;
     private Map<Field<?>, Integer> typeMappings;
+    private List<String>           uneditableProperties;
 
     @FXML
     public void initialize() {
-        typeMappings         = new HashMap<>();
+        typeMappings         = Maps.newHashMap();
         uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
         converter            = Converters.standardConverter();
         logger.atDebug().log("FXML controller has been initialized");
@@ -130,7 +129,7 @@ public final class ConfigurationEditorFxController {
     }
 
     private List<Field<?>> initPropertiesFromConfiguration(final XConfigurationDTO config) {
-        final List<Field<?>> fields = new ArrayList<>();
+        final List<Field<?>> fields = Lists.newArrayList();
 
         for (final Entry<String, Object> entry : config.properties.entrySet()) {
             final String id    = entry.getKey();
@@ -149,7 +148,7 @@ public final class ConfigurationEditorFxController {
     }
 
     private List<Field<?>> initPropertiesFromOCD(final XConfigurationDTO config) {
-        final List<Field<?>> fields = new ArrayList<>();
+        final List<Field<?>> fields = Lists.newArrayList();
         for (final XAttributeDefDTO ad : config.ocd.attributeDefs) {
             final Field<?> field = toFxField(ad, config);
             fields.add(field);
@@ -342,7 +341,7 @@ public final class ConfigurationEditorFxController {
     }
 
     private String convertFieldValuesToGson() {
-        final Map<String, Object> properties = new HashMap<>();
+        final Map<String, Object> properties = Maps.newHashMap();
         for (final Field<?> field : form.getFields()) {
             if (field instanceof DataField) {
                 @SuppressWarnings("rawtypes")
@@ -364,7 +363,7 @@ public final class ConfigurationEditorFxController {
     }
 
     private Map<String, Object> createCommandMap(final String pid, final String factoryPid, final String properties) {
-        final Map<String, Object> props = new HashMap<>();
+        final Map<String, Object> props = Maps.newHashMap();
         props.computeIfAbsent("pid", key -> pid);
         props.computeIfAbsent("factoryPID", key -> factoryPid);
         props.computeIfAbsent("properties", key -> properties);

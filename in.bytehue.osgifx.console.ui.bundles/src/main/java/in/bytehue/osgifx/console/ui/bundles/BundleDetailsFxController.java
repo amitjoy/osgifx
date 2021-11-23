@@ -1,7 +1,6 @@
 package in.bytehue.osgifx.console.ui.bundles;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -14,6 +13,8 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
+
+import com.google.common.collect.Maps;
 
 import in.bytehue.osgifx.console.agent.dto.XBundleDTO;
 import in.bytehue.osgifx.console.agent.dto.XBundleInfoDTO;
@@ -257,7 +258,7 @@ public final class BundleDetailsFxController {
     }
 
     private Map<String, Object> createCommandMap(final long value) {
-        final Map<String, Object> properties = new HashMap<>();
+        final Map<String, Object> properties = Maps.newHashMap();
         properties.put("id", value);
         return properties;
     }
