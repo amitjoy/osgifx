@@ -38,6 +38,7 @@ public final class Launcher implements Runnable {
         try {
             if (applicationDescriptor == null) {
                 logger.atError().log("Application descriptor '%s' not found", APPLICATION_ID);
+                return;
             }
             logger.atInfo().log("Application descriptor '%s' found", APPLICATION_ID);
             final ApplicationHandle handle = applicationDescriptor.launch(emptyMap());
