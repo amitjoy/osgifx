@@ -13,4 +13,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       de.jensd:fontawesomefx;packages='*',\
                       com.google.gson,\
                       org.eclipse.equinox.app
-Import-Package      : org.controlsfx.glyphfont, org.controlsfx.control, * 
+Import-Package      : org.controlsfx.glyphfont, org.controlsfx.control, *
