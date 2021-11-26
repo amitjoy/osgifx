@@ -4,6 +4,7 @@ import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EV
 import static in.bytehue.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static in.bytehue.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
+import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,6 +27,9 @@ import in.bytehue.osgifx.console.supervisor.Supervisor;
 
 public final class AgentPingAddon {
 
+    private static final long   INITIAL_DELAY        = Duration.ofSeconds(0).toMillis();
+    private static final long   MAX_DELAY            = Duration.ofSeconds(20).toMillis();
+    private static final String THREAD_NAME          = "osgifx-agent-ping";
     private static final String CONNECTION_WINDOW_ID = "in.bytehue.osgifx.console.window.connection";
 
     @Log
@@ -44,7 +48,7 @@ public final class AgentPingAddon {
 
     @PostConstruct
     public void init() {
-        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "osgifx-agent-ping"));
+        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, THREAD_NAME));
         logger.atInfo().log("Agent ping addon has been initialized");
     }
 
@@ -56,16 +60,18 @@ public final class AgentPingAddon {
             try {
                 supervisor.getAgent().ping();
             } catch (final Exception e) {
+                logger.atWarning().log("Agent ping request did not succeed");
                 System.clearProperty(CONNECTED_AGENT);
                 eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
                 final MWindow connectionChooserWindow = (MWindow) modelService.find(CONNECTION_WINDOW_ID, application);
                 if (!connectionChooserWindow.isVisible()) {
+                    logger.atInfo().log("Connection broken. Making connection chooser window visible.");
                     connectionChooserWindow.setVisible(true);
                 }
                 future.cancel(true);
                 future = null;
             }
-        }, 0, 20, TimeUnit.SECONDS);
+        }, INITIAL_DELAY, MAX_DELAY, TimeUnit.SECONDS);
         logger.atInfo().log("Agent ping scheduler has been started");
     }
 
