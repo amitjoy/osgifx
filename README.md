@@ -104,6 +104,8 @@ External plugins or features can easily be developed for `OSGi.fx`. Please have 
 
 Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
 
+Note that, to develop an external feature, you need to provide a ZIP archive which could comprise one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
+
 --------------------------------------------------------------------------------------------------------------
 
 ### Project Import for Development
