@@ -1,4 +1,5 @@
--privatepackage       : in.bytehue.osgifx.console.agent.*, in.bytehue.osgifx.console.supervisor
+-privatepackage       : in.bytehue.osgifx.console.agent.*,\
+                        in.bytehue.osgifx.console.supervisor
 -conditionalpackage   : aQute.*
 -buildpath            : \
                         osgi.cmpn,\

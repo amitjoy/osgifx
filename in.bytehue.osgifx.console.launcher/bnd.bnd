@@ -1,1 +1,2 @@
--buildpath: org.eclipse.core.runtime, org.eclipse.fx.core
+-buildpath: org.eclipse.core.runtime,\
+            org.eclipse.fx.core
