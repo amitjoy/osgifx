@@ -1,2 +1,5 @@
--buildpath          : ${bundles.required}, org.osgi.service.feature, com.google.gson
--privatepackage     : in.bytehue.osgifx.console.feature.*, in.bytehue.osgifx.console.update*
+-buildpath          : ${bundles.required},\
+                      org.osgi.service.feature,\
+                      com.google.gson
+-privatepackage     : in.bytehue.osgifx.console.feature.*,\
+                      in.bytehue.osgifx.console.update*
