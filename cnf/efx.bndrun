@@ -1,9 +1,7 @@
-bundles.product       : \
-                        ${bundles.deps},\
+bundles.product       : ${bundles.deps},\
                         ${bundles.e4.efxclipse},\
                         ${bundles.equinox},\
                         ${bundles.eclipse.core},\
                         ${bundles.e4.core},\
                         ${bundles.configurations}
-
 requirement.product   : ${replacelist;${bundles.product};.+;bnd.identity\\;id='$0'}
