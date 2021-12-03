@@ -7,6 +7,7 @@ import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -29,19 +30,18 @@ public final class ServicesFxController {
 
     @Log
     @Inject
-    private FluentLogger           logger;
+    private FluentLogger                      logger;
     @Inject
     @LocalInstance
-    private FXMLLoader             loader;
+    private FXMLLoader                        loader;
     @Inject
-    private DataProvider           dataProvider;
+    private DataProvider                      dataProvider;
     @FXML
-    private TableView<XServiceDTO> table;
+    private TableView<XServiceDTO>            table;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.services")
-    private BundleContext          context;
-
-    private TableRowExpanderColumn.TableRowDataFeatures<XServiceDTO> selectedService;
+    private BundleContext                     context;
+    private TableRowDataFeatures<XServiceDTO> selectedService;
 
     @FXML
     public void initialize() {

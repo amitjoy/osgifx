@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -31,18 +32,18 @@ public final class ConfigurationsFxController {
 
     @Log
     @Inject
-    private FluentLogger                                                   logger;
+    private FluentLogger                            logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                                                     loader;
+    private FXMLLoader                              loader;
     @Inject
-    private DataProvider                                                   dataProvider;
+    private DataProvider                            dataProvider;
     @FXML
-    private TableView<XConfigurationDTO>                                   table;
+    private TableView<XConfigurationDTO>            table;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.configurations")
-    private BundleContext                                                  context;
-    private TableRowExpanderColumn.TableRowDataFeatures<XConfigurationDTO> selectedConfiguration;
+    private BundleContext                           context;
+    private TableRowDataFeatures<XConfigurationDTO> selectedConfiguration;
 
     @FXML
     public void initialize() {

@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -31,19 +32,18 @@ public final class EventsFxController {
 
     @Log
     @Inject
-    private FluentLogger         logger;
+    private FluentLogger                    logger;
     @Inject
     @LocalInstance
-    private FXMLLoader           loader;
+    private FXMLLoader                      loader;
     @FXML
-    private TableView<XEventDTO> table;
+    private TableView<XEventDTO>            table;
     @Inject
-    private DataProvider         dataProvider;
+    private DataProvider                    dataProvider;
     @Inject
     @Named("in.bytehue.osgifx.console.ui.events")
-    private BundleContext        context;
-
-    private TableRowExpanderColumn.TableRowDataFeatures<XEventDTO> selectedEvent;
+    private BundleContext                   context;
+    private TableRowDataFeatures<XEventDTO> selectedEvent;
 
     @FXML
     public void initialize() {
