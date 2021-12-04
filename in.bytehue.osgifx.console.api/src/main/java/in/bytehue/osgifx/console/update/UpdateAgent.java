@@ -33,7 +33,7 @@ public interface UpdateAgent {
      * Reads all the features from the specified archive file.
      *
      * @param archive the archive URL to read the features from
-     * @return the map of features in the archive URL. The key is the feature file. (cannot be {@code null})
+     * @return the map of features in the archive URL. The key is the feature file. (cannot be {@code null} but empty)
      * @throws Exception if the provided archive cannot be read
      */
     Map<File, FeatureDTO> readFeatures(File archive) throws Exception;
@@ -42,7 +42,7 @@ public interface UpdateAgent {
      * Reads all the features from the specified archive URL.
      *
      * @param archiveURL the archive URL to read the features from
-     * @return the map of features in the archive URL. The key is the feature file. (cannot be {@code null})
+     * @return the map of features in the archive URL. The key is the feature file. (cannot be {@code null} but empty)
      * @throws Exception if the provided archive cannot be read
      */
     Map<File, FeatureDTO> readFeatures(URL archiveURL) throws Exception;
@@ -71,7 +71,7 @@ public interface UpdateAgent {
     /**
      * Returns all currently installed features.
      *
-     * @return the list of all installed features (cannot be {@code null})
+     * @return the list of all installed features (cannot be {@code null} but empty)
      */
     Collection<FeatureDTO> getInstalledFeatures();
 
@@ -87,7 +87,7 @@ public interface UpdateAgent {
     /**
      * Returns the list of features that can be updated.
      *
-     * @return the collection of features to be updated (cannot be {@code null})
+     * @return the collection of features to be updated (cannot be {@code null} but empty)
      * @throws Exception if the updates cannot be checked
      */
     Collection<FeatureDTO> checkForUpdates() throws Exception;
