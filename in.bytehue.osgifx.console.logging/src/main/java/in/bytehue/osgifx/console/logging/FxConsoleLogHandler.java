@@ -19,7 +19,7 @@ public final class FxConsoleLogHandler extends Handler {
 
     private static final String LOG_FILE_NAME = "log.txt";
 
-    private final FileHandler     fileHandler;
+    private final FileHandler        fileHandler;
     private final CustomLogFormatter formatter;
 
     @Activate
@@ -43,8 +43,8 @@ public final class FxConsoleLogHandler extends Handler {
     }
 
     @Override
-    public void publish(final LogRecord record) {
-        fileHandler.publish(record);
+    public void publish(final LogRecord logRecord) {
+        fileHandler.publish(logRecord);
     }
 
     @Override
