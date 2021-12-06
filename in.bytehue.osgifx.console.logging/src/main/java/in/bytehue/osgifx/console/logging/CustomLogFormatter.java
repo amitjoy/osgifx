@@ -1,4 +1,4 @@
-package in.bytehue.osgifx.console.util.fx;
+package in.bytehue.osgifx.console.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -86,7 +86,7 @@ public final class CustomLogFormatter extends Formatter {
     }
 
     @Override
-    public String format(final LogRecord record) {
+    public String format(final LogRecord logRecord) {
         final String[] arguments = new String[9];
 
         // This is a StringBuffer instead of StringBuilder so that
@@ -97,19 +97,19 @@ public final class CustomLogFormatter extends Formatter {
 
         if (needsArg[0]) {
             // %L
-            arguments[0] = record.getLevel().toString();
+            arguments[0] = logRecord.getLevel().toString();
         }
 
         if (needsArg[1]) {
             // %m
-            sb           = formatMessage(record, sb);
-            sb           = getThrowableMessage(record, sb); // maybe this should have been its own flag?
+            sb           = formatMessage(logRecord, sb);
+            sb           = getThrowableMessage(logRecord, sb); // maybe this should have been its own flag?
             arguments[1] = sb.toString();
         }
 
         if (needsArg[2]) {
             // %M
-            arguments[2] = record.getSourceMethodName();
+            arguments[2] = logRecord.getSourceMethodName();
         } else {
             arguments[2] = "?";
         }
@@ -118,7 +118,7 @@ public final class CustomLogFormatter extends Formatter {
             // %t
             sb.delete(0, sb.length()); // re-use
 
-            final Date          date     = new Date(record.getMillis());
+            final Date          date     = new Date(logRecord.getMillis());
             final FieldPosition fieldPos = new FieldPosition(0);
             synchronized (dateFormat) {
                 sb = dateFormat.format(date, sb, fieldPos);
@@ -129,19 +129,19 @@ public final class CustomLogFormatter extends Formatter {
 
         if (needsArg[4] || needsArg[7]) {
             // %c
-            arguments[4] = record.getSourceClassName();
+            arguments[4] = logRecord.getSourceClassName();
         } else {
             arguments[4] = "?";
         }
 
         if (needsArg[5]) {
             // %T
-            arguments[5] = Integer.toString(record.getThreadID());
+            arguments[5] = Integer.toString(logRecord.getThreadID());
         }
 
         if (needsArg[6]) {
             // %n
-            arguments[6] = record.getLoggerName();
+            arguments[6] = logRecord.getLoggerName();
         }
 
         if (needsArg[7]) {
