@@ -1,7 +1,7 @@
 <p align="center">
   <img width="300" alt="logo" src="https://user-images.githubusercontent.com/13380182/140794373-b357f431-d86b-421c-aca7-0102d85e1bc8.png" />
   <br/>
-  <p align="center">This repository provides a desktop application to remotely manage OSGi frameworks</p>
+  <p align="center">An easy-to-use desktop application to manage OSGi frameworks remotely</p>
 </p>
 <p align="center">
   <a href="https://github.com/amitjoy/osgifx"><img width="120" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=OSGi.fx&color=blue&logo=github" /></a>
