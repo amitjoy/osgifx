@@ -19,6 +19,10 @@ function printUsage() {
     exit 0
 }
 
+function command_exists() {
+    type "$1" &> /dev/null ;
+}
+
  # Parsing Platform Specific Options
 case $1 in
 'mac')
@@ -53,6 +57,8 @@ java -jar $DIR/packr-all-4.0.0.jar \
      --icon $icon \
      --bundle in.bytehue.osgifx \
      --output $output
-     
-# Distribution Image Compression
-zip -r $DIR/$output.zip $output
+
+if command_exists zip ; then
+    # Distribution Image Compression
+	zip -r $DIR/$output.zip $output
+fi
