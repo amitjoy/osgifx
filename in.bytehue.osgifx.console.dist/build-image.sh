@@ -41,12 +41,7 @@ case $1 in
  ;;
 esac
 
-# Remove all deployment directories as required by Packr
-rm -rf OSGi.fx.app
-rm -rf osgifx-linux
-rm -rf osgifx-windows
-
-# Image Preparation
+# Distribution Image Preparation
 java -jar $DIR/packr-all-4.0.0.jar \
      --verbose \
      --platform $platform \
@@ -59,7 +54,5 @@ java -jar $DIR/packr-all-4.0.0.jar \
      --bundle in.bytehue.osgifx \
      --output $output
      
-# Zip Image
+# Distribution Image Compression
 zip -r $DIR/$output.zip $output
-
-ls -al $DIR
