@@ -37,7 +37,7 @@ case $1 in
  ;;
 'windows')
     platform=windows64
-    icon=icons/macosx/OSGi.fx.icns
+    icon=icons/windows/OSGi.fx.icns
     output=OSGi.fx-windows
  ;;
 *)
@@ -54,7 +54,7 @@ java -jar $DIR/packr-all-4.0.0.jar \
      --classpath $DIR/osgifx.jar \
      --mainclass aQute.launcher.pre.EmbeddedLauncher\
      --vmargs Xmx1G \
-     --icon $icon \
+     --icon $DIR/$icon \
      --bundle in.bytehue.osgifx \
      --output $output
 
