@@ -1,94 +1,93 @@
 name: CI Build
-  
-on: 
-    push:
-      branches-ignore: ["release"]
-    pull_request:
-      branches: [ "main" ]
-
+on:
+   push:
+      branches-ignore:
+      - release
+   pull_request:
+      branches:
+      - main
 env:
-    LC_ALL:       en_US.UTF-8
-    GRADLE_OPTS: -Dorg.gradle.parallel=false
-
+   LC_ALL: en_US.UTF-8
+   GRADLE_OPTS: -Dorg.gradle.parallel=false
 jobs:
-    build-windows:
-        name:     Build on Windows
-        runs-on:  windows-latest
-        steps:
-        -   name: Git Checkout
-            uses: actions/checkout@v1
-        -   name: Gradle Wrapper Validation
-            uses: gradle/wrapper-validation-action@v1
-        -   name: Set up Java
-            uses: actions/setup-java@v1
-            with: 
-                java-version: 1.8
-                java-package: jdk+fx
-        -   name: Build Workspace
-            run : ./gradlew build
-        -   name: Build Executable JAR
-            run : ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
-        -   name: Copy Agent to Distribution Project
-            run : cp in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar in.bytehue.osgifx.console.dist/
-        -   name: Copy Executable JAR to Distribution Project
-            run : cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-        -   name: Build Windows Image (x86 64-bit)
-            run : bash in.bytehue.osgifx.console.dist/build-image.sh windows
-        -   uses: actions/upload-artifact@master
-            with:
-                name: dist
-                path: OSGi.fx-windows
-    build-linux:
-        name:     Build on Ubuntu
-        runs-on:  ubuntu-latest
-        steps:
-        -   name: Git Checkout
-            uses: actions/checkout@v1
-        -   name: Gradle Wrapper Validation
-            uses: gradle/wrapper-validation-action@v1
-        -   name: Set up Java
-            uses: actions/setup-java@v1
-            with: 
-                java-version: 1.8
-                java-package: jdk+fx
-        -   name: Build Workspace
-            run : ./gradlew build
-        -   name: Build Executable JAR
-            run : ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
-        -   name: Copy Agent to Distribution Project
-            run : cp in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar in.bytehue.osgifx.console.dist/
-        -   name: Copy Executable JAR to Distribution Project
-            run : cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-        -   name: Build Linux Image (x86 64-bit)
-            run : bash in.bytehue.osgifx.console.dist/build-image.sh linux
-        -   uses: actions/upload-artifact@master
-            with:
-                name: dist
-                path: in.bytehue.osgifx.console.dist/OSGi.fx-linux.zip
-    build-mac:
-        name:     Build on MacOSX
-        runs-on:  macos-11
-        steps:
-        -   name: Git Checkout
-            uses: actions/checkout@v1
-        -   name: Gradle Wrapper Validation
-            uses: gradle/wrapper-validation-action@v1
-        -   name: Set up Java
-            uses: actions/setup-java@v1
-            with: 
-                java-version: 1.8
-                java-package: jdk+fx
-        -   name: Build Workspace
-            run : ./gradlew build
-        -   name: Build Executable JAR
-            run : ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
-        -   name: Copy Agent to Distribution Project
-            run : cp in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar in.bytehue.osgifx.console.dist/
-        -   name: Copy Executable JAR to Distribution Project
-            run : cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-        -   name: Build MacOSX Image (x86 64-bit)
-            run : bash in.bytehue.osgifx.console.dist/build-image.sh mac
-        -   uses: actions/upload-artifact@master
-            with:
-                name: dist
-                path: in.bytehue.osgifx.console.dist/OSGi.fx.app.zip
+   build-windows:
+      name: Build on Windows
+      runs-on: windows-latest
+      steps:
+      -  name: Git Checkout
+         uses: actions/checkout@v1
+      -  name: Gradle Wrapper Validation
+         uses: gradle/wrapper-validation-action@v1
+      -  name: Set up Java
+         uses: actions/setup-java@v1
+         with:
+            java-version: 1.8
+            java-package: jdk+fx
+      -  name: Build Workspace
+         run: ./gradlew build
+      -  name: Build Executable JAR
+         run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
+      -  name: Copy Agent to Distribution Project
+         run: cp in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar in.bytehue.osgifx.console.dist/
+      -  name: Copy Executable JAR to Distribution Project
+         run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
+      -  name: Build Windows Image (x86 64-bit)
+         run: bash in.bytehue.osgifx.console.dist/build-image.sh windows
+      -  uses: actions/upload-artifact@master
+         with:
+            name: dist
+            path: OSGi.fx-windows
+   build-linux:
+      name: Build on Ubuntu
+      runs-on: ubuntu-latest
+      steps:
+      -  name: Git Checkout
+         uses: actions/checkout@v1
+      -  name: Gradle Wrapper Validation
+         uses: gradle/wrapper-validation-action@v1
+      -  name: Set up Java
+         uses: actions/setup-java@v1
+         with:
+            java-version: 1.8
+            java-package: jdk+fx
+      -  name: Build Workspace
+         run: ./gradlew build
+      -  name: Build Executable JAR
+         run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
+      -  name: Copy Agent to Distribution Project
+         run: cp in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar in.bytehue.osgifx.console.dist/
+      -  name: Copy Executable JAR to Distribution Project
+         run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
+      -  name: Build Linux Image (x86 64-bit)
+         run: bash in.bytehue.osgifx.console.dist/build-image.sh linux
+      -  uses: actions/upload-artifact@master
+         with:
+            name: dist
+            path: in.bytehue.osgifx.console.dist/OSGi.fx-linux.zip
+   build-mac:
+      name: Build on MacOSX
+      runs-on: macos-11
+      steps:
+      -  name: Git Checkout
+         uses: actions/checkout@v1
+      -  name: Gradle Wrapper Validation
+         uses: gradle/wrapper-validation-action@v1
+      -  name: Set up Java
+         uses: actions/setup-java@v1
+         with:
+            java-version: 1.8
+            java-package: jdk+fx
+      -  name: Build Workspace
+         run: ./gradlew build
+      -  name: Build Executable JAR
+         run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
+      -  name: Copy Agent to Distribution Project
+         run: cp in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar in.bytehue.osgifx.console.dist/
+      -  name: Copy Executable JAR to Distribution Project
+         run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
+      -  name: Build MacOSX Image (x86 64-bit)
+         run: bash in.bytehue.osgifx.console.dist/build-image.sh mac
+      -  uses: actions/upload-artifact@master
+         with:
+            name: dist
+            path: in.bytehue.osgifx.console.dist/OSGi.fx.app.zip
