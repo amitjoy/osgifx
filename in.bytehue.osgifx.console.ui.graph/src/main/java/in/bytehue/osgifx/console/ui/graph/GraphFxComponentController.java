@@ -116,7 +116,7 @@ public final class GraphFxComponentController {
             }
             exportToDOT(location);
             threadSync.asyncExec(() -> {
-                Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported", getClass().getClassLoader());
+                Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported");
             });
         });
         final ContextMenu menu = new ContextMenu();

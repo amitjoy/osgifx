@@ -65,11 +65,11 @@ public final class LogReceiveMenuContributionHandler {
 
         if (accessibilityPhrase) {
             supervisor.addOSGiLogListener(logEntryListener);
-            Fx.showSuccessNotification("Event Notification", "Logs will now be displayed", getClass().getClassLoader());
+            Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
             logger.atInfo().log("OSGi logs will now be received");
         } else {
             supervisor.removeOSGiLogListener(logEntryListener);
-            Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore", getClass().getClassLoader());
+            Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
             logger.atInfo().log("OSGi logs will not be received anymore");
         }
     }
