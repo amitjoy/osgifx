@@ -1,5 +1,6 @@
 package in.bytehue.osgifx.console.application;
 
+import static in.bytehue.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
@@ -98,7 +99,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         final Scene       splashScene = new Scene(splashLayout, TRANSPARENT);
         final Rectangle2D bounds      = Screen.getPrimary().getBounds();
 
-        splashScene.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
+        splashScene.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         initStage.setScene(splashScene);
         initStage.setX(bounds.getMinX() + bounds.getWidth() / 2d - SPLASH_WIDTH / 2d);

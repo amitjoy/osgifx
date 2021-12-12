@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.application.dialog;
 
+import static in.bytehue.osgifx.console.constants.FxConstants.STANDARD_CSS;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public final class CheckForUpdatesDialog extends Dialog<SelectedFeaturesForUpdat
     public void init() {
         final DialogPane dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Update Installed Feature(s)");
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/feature-install.png").toString()));

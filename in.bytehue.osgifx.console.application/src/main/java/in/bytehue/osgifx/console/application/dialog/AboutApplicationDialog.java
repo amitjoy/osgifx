@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.application.dialog;
 
+import static in.bytehue.osgifx.console.constants.FxConstants.STANDARD_CSS;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,7 +31,7 @@ public final class AboutApplicationDialog extends Dialog<Void> {
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setPrefHeight(200);
         dialogPane.setPrefWidth(400);
-        dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Remote Bundle Install");
         dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/about.png").toString()));
