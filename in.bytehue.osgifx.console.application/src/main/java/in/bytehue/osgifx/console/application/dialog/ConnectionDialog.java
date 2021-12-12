@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.application.dialog;
 
+import static in.bytehue.osgifx.console.constants.FxConstants.STANDARD_CSS;
+
 import javax.inject.Inject;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -40,7 +42,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setHeaderText("Add Connection Settings");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 

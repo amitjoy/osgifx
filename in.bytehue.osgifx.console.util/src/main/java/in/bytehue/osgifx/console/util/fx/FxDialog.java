@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.util.fx;
 
+import static in.bytehue.osgifx.console.constants.FxConstants.STANDARD_CSS;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -15,8 +17,6 @@ import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
 public final class FxDialog {
-
-    private static final String DEFAULT_CSS = "/css/default.css";
 
     private FxDialog() {
         throw new IllegalAccessError("Cannot be instantiated");
@@ -47,7 +47,7 @@ public final class FxDialog {
     public static ExceptionDialog showExceptionDialog(final Throwable throwable, final ClassLoader cssResLoader) {
         final ExceptionDialog dialog = new ExceptionDialog(throwable);
         dialog.initStyle(StageStyle.UNDECORATED);
-        dialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(DEFAULT_CSS).toExternalForm());
+        dialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(STANDARD_CSS).toExternalForm());
         dialog.show();
         return dialog;
     }
@@ -57,7 +57,7 @@ public final class FxDialog {
 
         progressDialog.setHeaderText(header);
         progressDialog.initStyle(StageStyle.UNDECORATED);
-        progressDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(DEFAULT_CSS).toExternalForm());
+        progressDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(STANDARD_CSS).toExternalForm());
         progressDialog.show();
 
         return progressDialog;
@@ -69,7 +69,7 @@ public final class FxDialog {
 
         choiceDialog.setHeaderText(header);
         choiceDialog.initStyle(StageStyle.UNDECORATED);
-        choiceDialog.getDialogPane().getStylesheets().add(resLoader.getResource(DEFAULT_CSS).toExternalForm());
+        choiceDialog.getDialogPane().getStylesheets().add(resLoader.getResource(STANDARD_CSS).toExternalForm());
         choiceDialog.setGraphic(new ImageView(resLoader.getResource(graphicPath).toString()));
 
         final Optional<String> returnVal = choiceDialog.showAndWait();
@@ -86,7 +86,7 @@ public final class FxDialog {
 
         final Alert alert = new Alert(type);
         alert.initStyle(StageStyle.UNDECORATED);
-        alert.getDialogPane().getStylesheets().add(cssResLoader.getResource(DEFAULT_CSS).toExternalForm());
+        alert.getDialogPane().getStylesheets().add(cssResLoader.getResource(STANDARD_CSS).toExternalForm());
 
         alert.setTitle(title);
         alert.setHeaderText(header);

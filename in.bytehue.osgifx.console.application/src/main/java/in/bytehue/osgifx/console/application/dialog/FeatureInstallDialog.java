@@ -1,5 +1,7 @@
 package in.bytehue.osgifx.console.application.dialog;
 
+import static in.bytehue.osgifx.console.constants.FxConstants.STANDARD_CSS;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map.Entry;
@@ -35,7 +37,7 @@ public final class FeatureInstallDialog extends Dialog<SelectedFeaturesDTO> {
     public void init() {
         final DialogPane dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.getStylesheets().add(getClass().getResource("/css/default.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Install External Feature(s)");
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/feature-install.png").toString()));
