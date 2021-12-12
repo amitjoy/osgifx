@@ -69,11 +69,10 @@ public final class BundleInstallHandler {
                     logger.atInfo().log("Bundle has been started: %s", bundle);
                 }
                 eventBroker.send(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
-                Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated",
-                        getClass().getClassLoader());
+                Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated");
             } catch (final Exception e) {
                 logger.atError().withException(e).log("Bundle cannot be installed or updated");
-                Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated", getClass().getClassLoader());
+                Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated");
             }
         }
     }

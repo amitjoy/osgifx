@@ -84,8 +84,8 @@ public final class Fx {
         });
     }
 
-    public static void showSuccessNotification(final String title, final String text, final ClassLoader classloader) {
-        final Image success = new Image(classloader.getResource("/graphic/images/success.png").toExternalForm());
+    public static void showSuccessNotification(final String title, final String text) {
+        final Image success = new Image(Fx.class.getClassLoader().getResource("/success.png").toExternalForm());
         // @formatter:off
         final Notifications notification = //
                 Notifications.create()
@@ -98,8 +98,8 @@ public final class Fx {
         notification.show();
     }
 
-    public static void showErrorNotification(final String title, final String text, final ClassLoader classloader) {
-        final Image success = new Image(classloader.getResource("/graphic/images/error.png").toExternalForm());
+    public static void showErrorNotification(final String title, final String text) {
+        final Image success = new Image(Fx.class.getClassLoader().getResource("/error.png").toExternalForm());
         // @formatter:off
         final Notifications notification = //
                 Notifications.create()
@@ -117,14 +117,13 @@ public final class Fx {
         Stream.of(tableViews).forEach(t -> t.setSelectionModel(new NullTableViewSelectionModel<>(t)));
     }
 
-    @SuppressWarnings("rawtypes")
     public static <S> void addContextMenuToCopyContent(final TableView<S> table) {
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         final MenuItem item = new MenuItem("Copy");
         item.setOnAction(event -> {
 
             final Set<Integer> rows = new TreeSet<>();
-            for (final TablePosition tablePosition : table.getSelectionModel().getSelectedCells()) {
+            for (final TablePosition<?, ?> tablePosition : table.getSelectionModel().getSelectedCells()) {
                 rows.add(tablePosition.getRow());
             }
             final StringBuilder strb     = new StringBuilder();

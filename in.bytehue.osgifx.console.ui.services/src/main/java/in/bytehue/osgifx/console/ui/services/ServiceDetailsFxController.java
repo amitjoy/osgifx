@@ -26,17 +26,17 @@ public final class ServiceDetailsFxController {
     @FXML
     private Label                                      idLabel;
     @FXML
+    private Label                                      bundleIdLabel;
+    @FXML
     private Label                                      bundleBsnLabel;
     @FXML
-    private Label                                      bundleIdLabel;
+    private ListView<String>                           objectClassesList;
     @FXML
     private TableView<Entry<String, String>>           propertiesTable;
     @FXML
     private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
     @FXML
     private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
-    @FXML
-    private ListView<String>                           objectClassesList;
 
     @FXML
     public void initialize() {
@@ -55,14 +55,10 @@ public final class ServiceDetailsFxController {
         objectClassesList.getItems().clear();
         objectClassesList.getItems().addAll(service.types);
 
-        applyTableFilter();
+        TableFilter.forTableView(propertiesTable).apply();
 
         Fx.addContextMenuToCopyContent(propertiesTable);
         Fx.addContextMenuToCopyContent(objectClassesList);
-    }
-
-    private void applyTableFilter() {
-        TableFilter.forTableView(propertiesTable).apply();
     }
 
 }

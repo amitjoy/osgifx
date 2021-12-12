@@ -65,11 +65,11 @@ public final class EventReceiveMenuContributionHandler {
 
         if (accessibilityPhrase) {
             supervisor.addOSGiEventListener(eventListener);
-            Fx.showSuccessNotification("Event Notification", "Events will now be received", getClass().getClassLoader());
+            Fx.showSuccessNotification("Event Notification", "Events will now be received");
             logger.atInfo().log("OSGi events will now be received");
         } else {
             supervisor.removeOSGiEventListener(eventListener);
-            Fx.showSuccessNotification("Event Notification", "Events will not be received anymore", getClass().getClassLoader());
+            Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
             logger.atInfo().log("OSGi events will not be received anymore");
         }
     }
