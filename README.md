@@ -93,9 +93,9 @@
 
 ------------------------------------------------------------------------------------------------------------
 
-### Installation of Agent
+### Installation of Runtime Agent
 
-To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent` and set `osgi.fx.agent.port` system property in the runtime
+To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
 
 --------------------------------------------------------------------------------------------------------------
 
