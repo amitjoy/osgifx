@@ -31,10 +31,12 @@ jobs:
          run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
       -  name: Build Windows Distribution Image (x86 64-bit)
          run: bash in.bytehue.osgifx.console.dist/build-image.sh windows
+      -  name: Compress Windows Distribution Image
+         run: jar -cMf OSGi.fx-windows.zip OSGi.fx-windows
       -  uses: actions/upload-artifact@master
          with:
             name: dist-windows-x86-64
-            path: OSGi.fx-windows
+            path: OSGi.fx-windows.zip
       -  uses: actions/upload-artifact@master
          with:
             name: runtime-agent
