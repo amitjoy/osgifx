@@ -29,14 +29,12 @@ jobs:
          run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-      -  name: Build Windows Distribution Image (x86 64-bit)
-         run: bash in.bytehue.osgifx.console.dist/build-image.sh windows
-      -  name: Compress Windows Distribution Image
-         run: jar -cMf OSGi.fx-windows.zip OSGi.fx-windows
+      -  name: Build Windows Distribution Image
+         run: ./gradlew packageForWindows
       -  uses: actions/upload-artifact@master
          with:
-            name: dist-windows-x86-64
-            path: OSGi.fx-windows.zip
+            name: dist-windows
+            path: in.bytehue.osgifx.console.dist/target/*.exe
       -  uses: actions/upload-artifact@master
          with:
             name: runtime-agent
@@ -60,12 +58,14 @@ jobs:
          run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-      -  name: Build Linux Distribution Image (x86 64-bit)
-         run: bash in.bytehue.osgifx.console.dist/build-image.sh linux
+      -  name: Build Linux Distribution Image
+         run: ./gradlew packageForLinux
       -  uses: actions/upload-artifact@master
          with:
-            name: dist-linux-x86-64
-            path: in.bytehue.osgifx.console.dist/OSGi.fx-linux.zip
+            name: dist-linux
+            path: |
+               in.bytehue.osgifx.console.dist/target/*.deb
+               in.bytehue.osgifx.console.dist/target/*.rpm
    build-mac:
       name: Build on MacOSX
       runs-on: macos-11
@@ -85,9 +85,11 @@ jobs:
          run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-      -  name: Build MacOSX Distribution Image (x86 64-bit)
-         run: bash in.bytehue.osgifx.console.dist/build-image.sh mac
+      -  name: Build MacOSX Distribution Image
+         run: ./gradlew packageForMac
       -  uses: actions/upload-artifact@master
          with:
-            name: dist-mac-x86-64
-            path: in.bytehue.osgifx.console.dist/OSGi.fx.app.zip
+            name: dist-mac
+            path: |
+               in.bytehue.osgifx.console.dist/target/*.dmg
+               in.bytehue.osgifx.console.dist/target/*.pkg               

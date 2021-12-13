@@ -1,0 +1,68 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'io.github.fvarrui:javapackager:1.6.2'
+	}
+}
+
+apply plugin: 'io.github.fvarrui.javapackager.plugin'
+
+def props = new Properties()
+file("../cnf/version.bnd").withInputStream { props.load(it) }
+
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+def projectVersion = props.getProperty("version")
+def currentBranch = gitBranch()
+
+if (!currentBranch.equals("master")) {
+	projectVersion = projectVersion + "." + new Date().format('yyyyMMddHHmmss')
+}
+
+javapackager {
+    name                = 'OSGi.fx'
+    version             = projectVersion
+    description         = 'An easy-to-use desktop application to manage OSGi frameworks remotely'
+	mainClass           = 'aQute.launcher.pre.EmbeddedLauncher'
+	bundleJre           = true
+	runnableJar         = file('osgifx.jar')
+	copyDependencies    = false
+	organizationName    = 'ByteHue'
+	organizationUrl     = 'https://bytehue.in'
+	organizationEmail   = 'admin@amitinside.com'
+	jrePath             = file(System.properties['java.home'])
+	macConfig {
+		appId        = 'in.bytehue.osgifx'
+		icnsFile     = file('icons/macosx/OSGi.fx.icns')
+	}
+	linuxConfig {
+		pngFile      = file('icons/linux/OSGi.fx.png')
+	}
+	winConfig {
+		icoFile      = file('icons/macosx/OSGi.fx.ico')
+		generateMsi  = false
+	}
+}
+
+task('packageForLinux', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
+	platform        'linux'
+	createTarball   true
+}
+
+task('packageForMac', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
+	platform        'mac'
+	createTarball   true
+}
+
+task('packageForWindows', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
+	platform        'windows'
+}
