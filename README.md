@@ -8,7 +8,7 @@
   <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/stars/amitjoy/osgifx?style=social" /></a>
   <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/forks/amitjoy/osgifx?style=social" /></a>
   <a href="#license"><img width="110" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
-  <a href="https://github.com/amitjoy/osgifx-console/runs/1485969918"><img width="95" alt="logo" src="https://img.shields.io/badge/Build-Passing-brightgreen" /></a>
+  <img width="130" alt="logo" src="https://github.com/amitjoy/osgifx/actions/workflows/build.yml/badge.svg" />
   <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="134" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
   </p>
 
