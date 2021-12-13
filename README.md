@@ -86,42 +86,6 @@
 
 --------------------------------------------------------------------------------------------------------------
 
-### Minimum Requirements for Runtime Agent
-
-1. Java 8
-2. OSGi R6
-
-------------------------------------------------------------------------------------------------------------
-
-### Installation of Runtime Agent
-
-To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
-
---------------------------------------------------------------------------------------------------------------
-
-### External Feature Development
-
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `in.bytehue.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using OSGi and Eclipse e4, you can easily use their modular functionalities to build your own feature.
-
-Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
-
-Note that, to develop an external feature, you need to provide a ZIP archive which could comprise one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
-
---------------------------------------------------------------------------------------------------------------
-
-### Project Import for Development
-
-1. Install Bndtools from Eclipse Marketplace
-2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
-
---------------------------------------------------------------------------------------------------------------
-
-### Building from Source
-
-Run `./gradlew clean build` in the project root directory
-
---------------------------------------------------------------------------------------------------------------
-
 ### Developer
 
 Amit Kumar Mondal (admin@amitinside.com)
