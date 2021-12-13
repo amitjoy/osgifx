@@ -1,3 +1,4 @@
+-include                              =         ${.}/version.bnd 
 -includeresource.all                  =         -src/main/resources
 -donotcopy                            =         \.gitignore|\.DS_Store
 
@@ -38,8 +39,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -buildpath.osgi                       =         osgi.annotation, osgi.cmpn, osgi.core
 -testpath.all                         =         osgi.enroute.junit.wrapper, osgi.enroute.hamcrest.wrapper
 
-base.version                          =         0.1.0
-Bundle-Version                        =         ${base.version}.${tstamp}-SNAPSHOT
+Bundle-Version                        =         ${version}.${tstamp}-SNAPSHOT
 
 -plugin.1.Build                       =         \
 		    aQute.bnd.repository.maven.provider.MavenBndRepository;\
