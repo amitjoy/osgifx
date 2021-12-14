@@ -24,7 +24,7 @@ def gitBranch() {
 def projectVersion = props.getProperty("version")
 def currentBranch = gitBranch()
 
-if (!currentBranch.equals("master")) {
+if (!currentBranch.startsWith("release")) {
 	projectVersion = projectVersion + "." + new Date().format('yyyyMMddHHmmss')
 }
 
@@ -40,12 +40,15 @@ javapackager {
 	organizationUrl     = 'https://bytehue.in'
 	organizationEmail   = 'admin@amitinside.com'
 	jrePath             = file(System.properties['java.home'])
+	url                 = 'https://github.com/amitjoy/osgifx'
 	macConfig {
-		appId        = 'in.bytehue.osgifx'
-		icnsFile     = file('icons/macosx/OSGi.fx.icns')
+		appId           = 'in.bytehue.osgifx'
+		icnsFile        = file('icons/macosx/OSGi.fx.icns')
+		createTarball   = true
 	}
 	linuxConfig {
-		pngFile      = file('icons/linux/OSGi.fx.png')
+		pngFile         = file('icons/linux/OSGi.fx.png')
+		createTarball   = true
 	}
 	winConfig {
 		icoFile      = file('icons/macosx/OSGi.fx.ico')
@@ -53,16 +56,6 @@ javapackager {
 	}
 }
 
-task('packageForLinux', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
-	platform        'linux'
-	createTarball   true
-}
-
-task('packageForMac', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
-	platform        'mac'
-	createTarball   true
-}
-
-task('packageForWindows', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
-	platform        'windows'
+task('packageDistro', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
+	platform        'auto'
 }

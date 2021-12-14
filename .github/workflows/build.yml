@@ -1,18 +1,19 @@
 name: CI Build
 on:
    push:
-      branches-ignore:
-      - release
    pull_request:
-      branches:
-      - main
 env:
    LC_ALL: en_US.UTF-8
-   GRADLE_OPTS: -Dorg.gradle.parallel=false
 jobs:
    build-windows:
-      name: Build on Windows
-      runs-on: windows-latest
+      name: Build
+      runs-on: ${{ matrix.config.os }}
+      strategy:
+         matrix:
+            config:
+            -  os: ubuntu-latest
+            -  os: macos-latest
+            -  os: windows-latest
       steps:
       -  name: Git Checkout
          uses: actions/checkout@v1
@@ -24,72 +25,20 @@ jobs:
             java-version: 1.8
             java-package: jdk+fx
       -  name: Build Workspace
-         run: ./gradlew build
+         run: ./gradlew build --max-workers=5 --parallel
       -  name: Build Executable JAR
          run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-      -  name: Build Windows Distribution Image
-         run: ./gradlew packageForWindows
+      -  name: Build Distribution Image for ${{ matrix.config.os }}
+         run: ./gradlew packageDistro
       -  uses: actions/upload-artifact@master
          with:
-            name: dist-windows
-            path: in.bytehue.osgifx.console.dist/target/*.exe
-      -  uses: actions/upload-artifact@master
-         with:
-            name: runtime-agent
-            path: in.bytehue.osgifx.console.agent/target/in.bytehue.osgifx.console.agent.jar
-   build-linux:
-      name: Build on Ubuntu
-      runs-on: ubuntu-latest
-      steps:
-      -  name: Git Checkout
-         uses: actions/checkout@v1
-      -  name: Gradle Wrapper Validation
-         uses: gradle/wrapper-validation-action@v1
-      -  name: Set up Java 1.8 with JavaFX
-         uses: actions/setup-java@v1
-         with:
-            java-version: 1.8
-            java-package: jdk+fx
-      -  name: Build Workspace
-         run: ./gradlew build
-      -  name: Build Executable JAR
-         run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
-      -  name: Copy Executable JAR to Distribution Project
-         run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-      -  name: Build Linux Distribution Image
-         run: ./gradlew packageForLinux
-      -  uses: actions/upload-artifact@master
-         with:
-            name: dist-linux
-            path: |
+            name: dist-${{ matrix.config.os }}
+            path: |-
                in.bytehue.osgifx.console.dist/target/*.deb
                in.bytehue.osgifx.console.dist/target/*.rpm
-   build-mac:
-      name: Build on MacOSX
-      runs-on: macos-11
-      steps:
-      -  name: Git Checkout
-         uses: actions/checkout@v1
-      -  name: Gradle Wrapper Validation
-         uses: gradle/wrapper-validation-action@v1
-      -  name: Set up Java 1.8 with JavaFX
-         uses: actions/setup-java@v1
-         with:
-            java-version: 1.8
-            java-package: jdk+fx
-      -  name: Build Workspace
-         run: ./gradlew build
-      -  name: Build Executable JAR
-         run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
-      -  name: Copy Executable JAR to Distribution Project
-         run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
-      -  name: Build MacOSX Distribution Image
-         run: ./gradlew packageForMac
-      -  uses: actions/upload-artifact@master
-         with:
-            name: dist-mac
-            path: |
                in.bytehue.osgifx.console.dist/target/*.dmg
-               in.bytehue.osgifx.console.dist/target/*.pkg               
+               in.bytehue.osgifx.console.dist/target/*.pkg
+               in.bytehue.osgifx.console.dist/target/*.exe
+               in.bytehue.osgifx.console.agent/target/*.jar
