@@ -4,4 +4,5 @@ bundles.product       : ${bundles.deps},\
                         ${bundles.eclipse.core},\
                         ${bundles.e4.core},\
                         ${bundles.configurations}
+
 requirement.product   : ${replacelist;${bundles.product};.+;bnd.identity\\;id='$0'}
