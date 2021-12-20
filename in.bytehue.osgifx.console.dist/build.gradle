@@ -51,8 +51,8 @@ javapackager {
 		createTarball   = true
 	}
 	winConfig {
-		icoFile      = file('icons/macosx/OSGi.fx.ico')
-		generateMsi  = false
+		icoFile         = file('icons/macosx/OSGi.fx.ico')
+		generateMsi     = false
 	}
 }
 
