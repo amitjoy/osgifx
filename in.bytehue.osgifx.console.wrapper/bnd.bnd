@@ -1,3 +1,4 @@
 -sub       : *.bnd
--buildpath : eu.hansolo.tilesfx,\
+-buildpath : \
+             eu.hansolo.tilesfx,\
              com.dlsc.formsfx:formsfx-core
