@@ -9,9 +9,9 @@ import com.google.common.collect.Lists;
 @Component(service = GogoConsoleHistory.class)
 public final class GogoConsoleHistory {
 
-    private final List<String> history = Lists.newArrayList();
+    private final List<String> history = Lists.newCopyOnWriteArrayList();
 
-    public synchronized void add(final String command) {
+    public void add(final String command) {
         if (history.size() == 20) {
             // evicting last element
             history.remove(history.size() - 1);
@@ -19,15 +19,15 @@ public final class GogoConsoleHistory {
         history.add(command);
     }
 
-    public synchronized void clear() {
+    public void clear() {
         history.clear();
     }
 
-    public synchronized int size() {
+    public int size() {
         return history.size();
     }
 
-    public synchronized String get(final int index) {
+    public String get(final int index) {
         if (history.isEmpty()) {
             return "";
         }
