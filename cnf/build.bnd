@@ -34,6 +34,7 @@ testbin.directory                     =         ${if;${is;${driver};gradle};targ
 bin.testbin.directory                 =         ${if;${is;${driver};gradle};target/gradle/classes,target/gradle/test-classes;target/classes,target/test-classes}
 
 -builderignore                        =         ${bin.testbin.directory}
+-removeheaders                        =         Created-By, Private-Package, Tool, Bnd-LastModified
 
 -buildpath.base.api                   =         in.bytehue.osgifx.console.api
 -buildpath.osgi                       =         osgi.annotation, osgi.cmpn, osgi.core
