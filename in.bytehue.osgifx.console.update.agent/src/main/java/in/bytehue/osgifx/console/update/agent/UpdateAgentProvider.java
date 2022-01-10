@@ -169,6 +169,7 @@ public final class UpdateAgentProvider implements UpdateAgent {
         } finally {
             if (file != null) {
                 Files.deleteIfExists(file.toPath());
+                logger.atInfo().log("Downloaded archive deleted from %s", file);
             }
         }
     }
