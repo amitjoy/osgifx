@@ -15,4 +15,5 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       org.eclipse.equinox.app
 Import-Package      : \
                       org.controlsfx.glyphfont,\
-                      org.controlsfx.control, *
+                      org.controlsfx.control,\
+                      *
