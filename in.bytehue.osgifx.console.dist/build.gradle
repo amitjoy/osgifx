@@ -29,9 +29,9 @@ if (!currentBranch.startsWith("release")) {
 }
 
 javapackager {
-    name                = 'OSGi.fx'
-    version             = projectVersion
-    description         = 'An easy-to-use desktop application to manage OSGi frameworks remotely'
+	name                = 'OSGi.fx'
+	version             = projectVersion
+	description         = 'An easy-to-use desktop application to manage OSGi frameworks remotely'
 	mainClass           = 'aQute.launcher.pre.EmbeddedLauncher'
 	bundleJre           = true
 	runnableJar         = file('osgifx.jar')
