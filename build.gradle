@@ -1,3 +1,15 @@
 tasks.named('wrapper') {
   jarFile = rootProject.file('.gradle-wrapper/gradle-wrapper.jar')
 }
+
+task copy_artifacts(type: Copy) {
+    from 'in.bytehue.osgifx.console.dist/target/'
+    from 'in.bytehue.osgifx.console.agent/target/'
+    into '.'
+    include '*.deb'
+    include '*.rpm'
+    include '*.dmg'
+    include '*.pkg'
+    include '*.exe'
+    include 'in.bytehue.osgifx.console.agent.jar'
+}
