@@ -56,6 +56,6 @@ javapackager {
 	}
 }
 
-task('packageDistro', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
+task('package_distro', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
 	platform        'auto'
 }

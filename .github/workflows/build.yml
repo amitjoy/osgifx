@@ -5,7 +5,7 @@ on:
 env:
    LC_ALL: en_US.UTF-8
 jobs:
-   build-windows:
+   build:
       name: Build
       runs-on: ${{ matrix.config.os }}
       strategy:
@@ -31,14 +31,16 @@ jobs:
       -  name: Copy Executable JAR to Distribution Project
          run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
       -  name: Build Distribution Image for ${{ matrix.config.os }}
-         run: ./gradlew packageDistro
+         run: ./gradlew package_distro
+      -  name: Copy Distribution Artifacts to Current Directory
+         run: ./gradlew copy_artifacts
       -  uses: actions/upload-artifact@master
          with:
             name: dist-${{ matrix.config.os }}
             path: |-
-               in.bytehue.osgifx.console.dist/target/*.deb
-               in.bytehue.osgifx.console.dist/target/*.rpm
-               in.bytehue.osgifx.console.dist/target/*.dmg
-               in.bytehue.osgifx.console.dist/target/*.pkg
-               in.bytehue.osgifx.console.dist/target/*.exe
-               in.bytehue.osgifx.console.agent/target/*.jar
+               *.deb
+               *.rpm
+               *.dmg
+               *.pkg
+               *.exe
+               in.bytehue.osgifx.console.agent.jar
