@@ -12,7 +12,7 @@ apply plugin: 'io.github.fvarrui.javapackager.plugin'
 def props = new Properties()
 file("../cnf/version.bnd").withInputStream { props.load(it) }
 
-def gitBranch() {
+def git_branch() {
     def branch = ""
     def proc = "git rev-parse --abbrev-ref HEAD".execute()
     proc.in.eachLine { line -> branch = line }
@@ -21,16 +21,16 @@ def gitBranch() {
     branch
 }
 
-def projectVersion = props.getProperty("version")
-def currentBranch = gitBranch()
+def project_version = props.getProperty("version")
+def current_branch = git_branch()
 
-if (!currentBranch.startsWith("release")) {
-	projectVersion = projectVersion + "." + new Date().format('yyyyMMddHHmmss')
+if (!current_branch.startsWith("release")) {
+	project_version = project_version + "." + new Date().format('yyyyMMddHHmmss')
 }
 
 javapackager {
 	name                = 'OSGi.fx'
-	version             = projectVersion
+	version             = project_version
 	description         = 'An easy-to-use desktop application to manage OSGi frameworks remotely'
 	mainClass           = 'aQute.launcher.pre.EmbeddedLauncher'
 	bundleJre           = true
