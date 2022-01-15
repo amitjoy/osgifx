@@ -1,109 +1,116 @@
-<p align="center">
-  <img width="300" alt="logo" src="https://user-images.githubusercontent.com/13380182/140794373-b357f431-d86b-421c-aca7-0102d85e1bc8.png" />
-  <br/>
-  <p align="center">An easy-to-use desktop application to manage OSGi frameworks remotely</p>
-</p>
-<p align="center">
-  <a href="https://github.com/amitjoy/osgifx"><img width="120" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=OSGi.fx&color=blue&logo=github" /></a>
-  <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/stars/amitjoy/osgifx?style=social" /></a>
-  <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/forks/amitjoy/osgifx?style=social" /></a>
-  <a href="#license"><img width="110" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
-  <img width="130" alt="logo" src="https://github.com/amitjoy/osgifx/actions/workflows/build.yml/badge.svg" />
-  <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="134" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
-  </p>
+# The Minimal theme
 
-<img src="https://user-images.githubusercontent.com/13380182/141703440-183543c1-023d-422b-816e-54e39f3e76b6.png" />
-<img src="https://user-images.githubusercontent.com/13380182/141703442-7db05142-47de-4a70-88c0-285598812d48.png" />
-<img src="https://user-images.githubusercontent.com/13380182/142087929-48a4833b-3862-4c1e-9a24-9723487cbe3b.png" />
-<img src="https://user-images.githubusercontent.com/13380182/142087932-84597b38-7a58-455b-a62c-6d5ac969e66f.png" />
-<p align="center">
-	<details>
-		<summary><b>Click here for more screenshots</b></summary>
-		<img src="https://user-images.githubusercontent.com/13380182/141703432-f43ad35b-10b9-428b-b149-20c25f28efd5.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/142088102-2b158d00-8c30-48aa-b689-c5475c4dcf23.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703439-d3735b25-862f-48f9-8f2c-5acc1b76af7d.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703445-51688a4e-add3-4e85-b4d4-801c5402e4fa.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703446-e0d7d4bc-f68b-48ee-9fbb-aefaba1a6344.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703447-5a40f376-5da1-4d16-8910-5fa67fb168a8.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703448-b536b209-3b8b-4260-9281-eb07a2dcbed0.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703450-c56e06b8-6b34-4dd2-a634-fa824512c746.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703451-11ad5cc5-ddca-44ea-8b5f-d7f8b56981c6.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703452-036696ff-325f-4692-a6cb-6bbf76b959cd.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703453-038d2deb-2a08-4d67-ac51-f891ca5f580c.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703454-e3a3347f-a65f-43e5-bafb-b0732b93a63c.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/142087918-6982e790-9b19-4c6b-90bc-1e6fd8deb477.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/142087928-20902de0-2728-423a-be10-b514574a23ff.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/142087935-7c2c0ef4-b001-429c-a01a-429790b1c2c3.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/141703457-4fdb72e7-e532-4efc-8bda-785dfc1affc8.png" />
-	</details>
-</p>
+[![.github/workflows/ci.yaml](https://github.com/pages-themes/minimal/actions/workflows/ci.yaml/badge.svg)](https://github.com/pages-themes/minimal/actions/workflows/ci.yaml) [![Gem Version](https://badge.fury.io/rb/jekyll-theme-minimal.svg)](https://badge.fury.io/rb/jekyll-theme-minimal)
 
-------------------------------------------------------------------------------------------------------------
+*Minimal is a Jekyll theme for GitHub Pages. You can [preview the theme to see what it looks like](http://pages-themes.github.io/minimal), or even [use it today](#usage).*
 
-### Tools and Technologies
+![Thumbnail of Minimal](thumbnail.png)
 
-|                      	|                                             	|
-|----------------------	|---------------------------------------------	|
-| Java                 	| 1.8                                         	|
-| Rich Client Platform 	| JavaFX 8                                    	|
-| Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
-| UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
-| Tools                	| Bndtools 6                                  	|
+## Usage
 
-------------------------------------------------------------------------------------------------------------
+To use the Minimal theme:
 
-### Features
+1. Add the following to your site's `_config.yml`:
 
-|                                                                                                                                                                         	|   	|
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|:-:	|
-| List all installed bundles and fragments                                                                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all exported and imported packages                                                                                                                                       	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all registered services                                                                                                                                                    	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all registered DS components                                                                                                                                               	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all available system and framework properties                                                                                                                              	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all daemon and non-daemon threads                                                                                                                                          	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Receive events on demand (option to start and stop receiving events)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Receive logs on demand (option to start and stop receiving logs)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Execute Gogo command                                                                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install or update bundle                                                                                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List available configurations from `ConfigurationAdmin`                                                                                                                             |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List property descriptors (`Metatype`)                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Start/stop/uninstall bundle or fragment                                                                                                                                         	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Enable/disable DS component                                                                                                                                                     	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Update/delete existing configuration                                                                                                                                            	 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	 |
-| Create new configuration using metatype descriptor                                                                                                                              	 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	 |
-| Overview of the remote OSGi framework (memory consumption, uptime, framework information, number of bundles, number of threads, number of services and number of DS components) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Generate dependency graph for bundles 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Generate dependency graph for DS components 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Find all cycles between available DS components 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Export generated dependency graph to DOT (GraphViz) format (Right click on generated graph)	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install external feature (plugin) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Check and install if updates are available for installed feature(s) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List and uninstall already installed feature(s) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Open Diagnostics (Show application log file) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+    ```yml
+    remote_theme: pages-themes/minimal@v0.2.0
+    plugins:
+    - jekyll-remote-theme # add this line to the plugins list if you already have one
+    ```
 
---------------------------------------------------------------------------------------------------------------
+2. Optionally, if you'd like to preview your site on your computer, add the following to your site's `Gemfile`:
 
-### Developer
+    ```ruby
+    gem "github-pages", group: :jekyll_plugins
+    ```
 
-Amit Kumar Mondal (admin@amitinside.com)
+## Customizing
 
---------------------------------------------------------------------------------------------------------------
+### Configuration variables
 
-### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
+Minimal will respect the following variables, if set in your site's `_config.yml`:
 
-Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/main/CONTRIBUTING.md)
+```yml
+title: [The title of your site]
+description: [A short description of your site's purpose]
+```
 
---------------------------------------------------------------------------------------------------------------
+Additionally, you may choose to set the following optional variables:
 
-### License
+```yml
+show_downloads: ["true" or "false" (unquoted) to indicate whether to provide a download URL]
+google_analytics: [Your Google Analytics tracking ID]
+```
 
-This project is licensed under Apache License Version 2.0 [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+### Stylesheet
 
---------------------------------------------------------------------------------------------------------------
+If you'd like to add your own custom styles:
 
-### User Guide
+1. Create a file called `/assets/css/style.scss` in your site
+2. Add the following content to the top of the file, exactly as shown:
+    ```scss
+    ---
+    ---
 
-For instructions on how to download and install latest snapshot version, please refer to the [Wiki](https://github.com/amitjoy/osgifx/wiki).
+    @import "{{ site.theme }}";
+    ```
+3. Add any custom CSS (or Sass, including imports) you'd like immediately after the `@import` line
+
+*Note: If you'd like to change the theme's Sass variables, you must set new values before the `@import` line in your stylesheet.*
+
+### Layouts
+
+If you'd like to change the theme's HTML layout:
+
+1. For some changes such as a custom `favicon`, you can add custom files in your local `_includes` folder. The files [provided with the theme](https://github.com/pages-themes/minimal/tree/master/_includes) provide a starting point and are included by the [original layout template](https://github.com/pages-themes/minimal/blob/master/_layouts/default.html).
+2. For more extensive changes, [copy the original template](https://github.com/pages-themes/minimal/blob/master/_layouts/default.html) from the theme's repository<br />(*Pro-tip: click "raw" to make copying easier*)
+3. Create a file called `/_layouts/default.html` in your site
+4. Paste the default layout content copied in the first step
+5. Customize the layout as you'd like
+
+### Customizing Google Analytics code
+
+Google has released several iterations to their Google Analytics code over the years since this theme was first created. If you would like to take advantage of the latest code, paste it into `_includes/head-custom-google-analytics.html` in your Jekyll site.
+
+### Overriding GitHub-generated URLs
+
+Templates often rely on URLs supplied by GitHub such as links to your repository or links to download your project. If you'd like to override one or more default URLs:
+
+1. Look at [the template source](https://github.com/pages-themes/minimal/blob/master/_layouts/default.html) to determine the name of the variable. It will be in the form of `{{ site.github.zip_url }}`.
+2. Specify the URL that you'd like the template to use in your site's `_config.yml`. For example, if the variable was `site.github.url`, you'd add the following:
+    ```yml
+    github:
+      zip_url: http://example.com/download.zip
+      another_url: another value
+    ```
+3. When your site is built, Jekyll will use the URL you specified, rather than the default one provided by GitHub.
+
+*Note: You must remove the `site.` prefix, and each variable name (after the `github.`) should be indent with two space below `github:`.*
+
+For more information, see [the Jekyll variables documentation](https://jekyllrb.com/docs/variables/).
+
+## Roadmap
+
+See the [open issues](https://github.com/pages-themes/minimal/issues) for a list of proposed features (and known issues).
+
+## Project philosophy
+
+The Minimal theme is intended to make it quick and easy for GitHub Pages users to create their first (or 100th) website. The theme should meet the vast majority of users' needs out of the box, erring on the side of simplicity rather than flexibility, and provide users the opportunity to opt-in to additional complexity if they have specific needs or wish to further customize their experience (such as adding custom CSS or modifying the default layout). It should also look great, but that goes without saying.
+
+## Contributing
+
+Interested in contributing to Minimal? We'd love your help. Minimal is an open source project, built one contribution at a time by users like you. See [the CONTRIBUTING file](docs/CONTRIBUTING.md) for instructions on how to contribute.
+
+### Previewing the theme locally
+
+If you'd like to preview the theme locally (for example, in the process of proposing a change):
+
+1. Clone down the theme's repository (`git clone https://github.com/pages-themes/minimal`)
+2. `cd` into the theme's directory
+3. Run `script/bootstrap` to install the necessary dependencies
+4. Run `bundle exec jekyll serve` to start the preview server
+5. Visit [`localhost:4000`](http://localhost:4000) in your browser to preview the theme
+
+### Running tests
+
+The theme contains a minimal test suite, to ensure a site with the theme would build successfully. To run the tests, simply run `script/cibuild`. You'll need to run `script/bootstrap` once before the test script will work.

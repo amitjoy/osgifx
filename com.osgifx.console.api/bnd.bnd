@@ -1,4 +1,0 @@
--buildpath.base.api : 
--buildpath          : biz.aQute.remote.agent;packages=*,\
-                      org.osgi.service.feature
-Require-Capability  : compile
