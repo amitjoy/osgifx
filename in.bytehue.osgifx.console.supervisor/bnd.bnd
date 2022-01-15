@@ -1,6 +1,0 @@
--buildpath          : ${bundles.required},\
-                      biz.aQute.remote.agent;packages=*
--includepackage     : in.bytehue.osgifx.console.supervisor.*
--privatepackage     : in.bytehue.osgifx.console.agent.*
--conditionalpackage : aQute.*
--fixupmessages      : 'split', 'private'

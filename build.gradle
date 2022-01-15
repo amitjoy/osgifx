@@ -3,13 +3,13 @@ tasks.named('wrapper') {
 }
 
 task copy_artifacts(type: Copy) {
-    from 'in.bytehue.osgifx.console.dist/target/'
-    from 'in.bytehue.osgifx.console.agent/target/'
+    from 'com.osgifx.console.dist/target/'
+    from 'com.osgifx.console.agent/target/'
     into '.'
     include '*.deb'
     include '*.rpm'
     include '*.dmg'
     include '*.pkg'
     include '*.exe'
-    include 'in.bytehue.osgifx.console.agent.jar'
+    include 'com.osgifx.console.agent.jar'
 }
