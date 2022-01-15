@@ -11,10 +11,6 @@ OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar 
 
 To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
 
-#### Download Runtime Agent
-
-To download the snapshot version of the runtime agent, you can go to the [Actions](https://github.com/amitjoy/osgifx/actions) tab and click on the latest CI build and you will find all the distributions for respective platforms from the `Artifacts` section including the runtime agent.
-
 #### Current Features
 
 |                                                                                                                                                                           |     |
