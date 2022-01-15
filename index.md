@@ -15,14 +15,6 @@ To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx
 
 To download the snapshot version of the runtime agent, you can go to the [Actions](https://github.com/amitjoy/osgifx/actions) tab and click on the latest CI build and you will find all the distributions for respective platforms from the `Artifacts` section including the runtime agent.
 
-#### External Feature Development
-
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `in.bytehue.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using OSGi and Eclipse e4, you can easily use their modular functionalities to build your own feature.
-
-Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
-
-Note that, to develop an external feature, you need to provide a ZIP archive which could comprise one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
-
 #### Current Features
 
 |                                                                                                                                                                           |     |
@@ -88,3 +80,11 @@ Run `./gradlew clean build` in the project root directory
 <img src="https://user-images.githubusercontent.com/13380182/142087935-7c2c0ef4-b001-429c-a01a-429790b1c2c3.png" />
 <img src="https://user-images.githubusercontent.com/13380182/141703457-4fdb72e7-e532-4efc-8bda-785dfc1affc8.png" />
 
+
+#### External Feature Development
+
+External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `in.bytehue.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using OSGi and Eclipse e4, you can easily use their modular functionalities to build your own feature.
+
+Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
+
+Note that, to develop an external feature, you need to provide a ZIP archive which could comprise one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
