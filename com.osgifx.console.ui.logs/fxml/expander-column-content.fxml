@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2022 Amit Kumar Mondal
+  
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.logs.LogDetailsFxController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.0" minWidth="10.0" prefWidth="310.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="595.0" minWidth="10.0" prefWidth="590.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="52.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="46.0" minHeight="10.0" prefHeight="46.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="36.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="50.0" minHeight="8.0" prefHeight="8.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="250.0" minHeight="0.0" prefHeight="242.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Label text="Logged At" GridPane.halignment="RIGHT">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="levelLabel" text="Level" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Exception" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="receivedAtLabel" text="Label" GridPane.columnIndex="1">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="levelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Message" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <TextArea fx:id="messageText" editable="false" prefHeight="108.0" prefWidth="569.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.rowSpan="4">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </TextArea>
+      <TextArea fx:id="exceptionText" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </TextArea>
+      <Label text="Bundle" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="bundleLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Logger" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Thread" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="loggerLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="threadLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+   </children>
+   <padding>
+      <Insets bottom="20.0" top="20.0" />
+   </padding>
+</GridPane>

@@ -1,0 +1,22 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+-includeresource    : \
+                      plugin.xml = _plugin.xml,\
+					  fragment.e4xmi = fragment.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic
+-buildpath          : \
+                      ${bundles.required},\
+                      com.osgifx.console.smartgraph,\
+                      org.jgrapht.core,\
+                      org.jgrapht.io
+-privatepackage     : \
+                      org.jgrapht.*,\
+                      com.osgifx.console.ui.graph
+Import-Package      : \
+                      org.controlsfx.control,\
+                      org.controlsfx.glyphfont,\
+                      !org.antlr.*,\
+                      !org.apache.commons.text.*,\
+                      !org.jheaps.*,\
+                      *

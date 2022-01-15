@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2022 Amit Kumar Mondal
+  
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.controlsfx.control.CheckListView?>
+<?import org.controlsfx.control.PrefixSelectionComboBox?>
+
+<GridPane fx:id="featureInstallPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.application.fxml.controller.InstallFeatureDialogController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="564.0" minWidth="10.0" prefWidth="403.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="197.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="126.0" minHeight="4.0" prefHeight="40.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="351.0" minHeight="10.0" prefHeight="260.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <PrefixSelectionComboBox fx:id="archiveUrlCombo" promptText="Please enter a URL or choose a local archive" prefWidth="510.0">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <GridPane.margin>
+            <Insets top="2.0" />
+         </GridPane.margin>
+      </PrefixSelectionComboBox>
+      <Button fx:id="localArchiveButton" mnemonicParsing="false" onAction="#chooseArchive" prefHeight="27.0" prefWidth="91.0" text="Archive" GridPane.columnIndex="1">
+         <GridPane.margin>
+            <Insets left="4.0" />
+         </GridPane.margin>
+      </Button>
+      <CheckListView fx:id="featuresList" GridPane.columnSpan="2" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets top="3.0" />
+         </GridPane.margin></CheckListView>
+      <Button fx:id="analyzeButton" mnemonicParsing="false" onAction="#processArchive" prefHeight="27.0" prefWidth="83.0" text="Analyze" GridPane.columnIndex="1">
+         <GridPane.margin>
+            <Insets left="100.0" />
+         </GridPane.margin>
+      </Button>
+   </children>
+</GridPane>

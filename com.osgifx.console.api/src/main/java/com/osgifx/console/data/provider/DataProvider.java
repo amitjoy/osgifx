@@ -1,0 +1,94 @@
+/*******************************************************************************
+ * Copyright 2022 Amit Kumar Mondal
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+package com.osgifx.console.data.provider;
+
+import org.osgi.annotation.versioning.ProviderType;
+
+import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.agent.dto.XLogEntryDTO;
+import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.dto.XThreadDTO;
+
+import javafx.collections.ObservableList;
+
+/**
+ * This service is responsible for providing the utility methods to retrieve data from the runtime
+ * so that they can be shown on the UI
+ */
+@ProviderType
+public interface DataProvider {
+
+    /**
+     * Returns the observable list of bundles
+     *
+     * @return the observable list of bundles
+     */
+    ObservableList<XBundleDTO> bundles();
+
+    /**
+     * Returns the observable list of services
+     *
+     * @return the observable list of services
+     */
+    ObservableList<XServiceDTO> services();
+
+    /**
+     * Returns the observable list of components
+     *
+     * @return the observable list of components
+     */
+    ObservableList<XComponentDTO> components();
+
+    /**
+     * Returns the observable list of configurations
+     *
+     * @return the observable list of configurations
+     */
+    ObservableList<XConfigurationDTO> configurations();
+
+    /**
+     * Returns the observable list of events
+     *
+     * @return the observable list of events
+     */
+    ObservableList<XEventDTO> events();
+
+    /**
+     * Returns the observable list of logs
+     *
+     * @return the observable list of logs
+     */
+    ObservableList<XLogEntryDTO> logs();
+
+    /**
+     * Returns the observable list of properties
+     *
+     * @return the observable list of properties
+     */
+    ObservableList<XPropertyDTO> properties();
+
+    /**
+     * Returns the observable list of threads
+     *
+     * @return the observable list of threads
+     */
+    ObservableList<XThreadDTO> threads();
+
+}

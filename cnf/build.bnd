@@ -36,7 +36,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -removeheaders                        =         Created-By, Private-Package, Tool, Bnd-LastModified
 
--buildpath.base.api                   =         in.bytehue.osgifx.console.api
+-buildpath.base.api                   =         com.osgifx.console.api
 -buildpath.osgi                       =         osgi.annotation, osgi.cmpn, osgi.core
 -testpath.all                         =         osgi.enroute.junit.wrapper, osgi.enroute.hamcrest.wrapper
 

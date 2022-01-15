@@ -1,0 +1,7 @@
+-buildpath          : \
+                      ${bundles.required},\
+                      org.osgi.service.feature,\
+                      com.google.gson
+-privatepackage     : \
+                      com.osgifx.console.feature.*,\
+                      com.osgifx.console.update*

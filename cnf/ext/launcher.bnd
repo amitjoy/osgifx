@@ -7,7 +7,7 @@
 -runsystemcapabilities          =         ${native_capability}
 -runpath.efx                    =         org.eclipse.fx.osgi
 -runproperties.scr              =         ds.log.enabled=false
--runblacklist                   =         in.bytehue.osgifx.console.api
+-runblacklist                   =         com.osgifx.console.api
 
 current.directory               =         .
 storage.directory               =         ${current.directory}/.osgifx-ws

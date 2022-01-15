@@ -27,9 +27,9 @@ jobs:
       -  name: Build Workspace
          run: ./gradlew build --max-workers=5 --parallel
       -  name: Build Executable JAR
-         run: ./gradlew :in.bytehue.osgifx.console.product:export.osgifx
+         run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
-         run: cp in.bytehue.osgifx.console.product/target/distributions/executable/osgifx.jar in.bytehue.osgifx.console.dist/
+         run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/
       -  name: Build Distribution Image for ${{ matrix.config.os }}
          run: ./gradlew package_distro
       -  name: Copy Distribution Artifacts to Current Directory
@@ -43,4 +43,4 @@ jobs:
                *.dmg
                *.pkg
                *.exe
-               in.bytehue.osgifx.console.agent.jar
+               com.osgifx.console.agent.jar

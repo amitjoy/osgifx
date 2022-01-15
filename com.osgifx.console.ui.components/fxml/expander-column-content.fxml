@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2022 Amit Kumar Mondal
+  
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import org.controlsfx.glyphfont.Glyph?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2000.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.components.ComponentDetailsFxController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.0" minWidth="10.0" prefWidth="235.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="589.0" minWidth="10.0" prefWidth="565.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="148.0" minHeight="9.0" prefHeight="9.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="125.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="0.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="44.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="150.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="106.0" minHeight="9.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="302.0" minHeight="8.0" prefHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="486.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Button fx:id="enableComponentButton" mnemonicParsing="false">
+         <GridPane.margin>
+            <Insets left="50.0" />
+         </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="PLAY" />
+    	</graphic>
+    	<tooltip><Tooltip text="Enable Component" /></tooltip>
+      </Button>
+      <Button fx:id="disableComponentButton" mnemonicParsing="false">
+         <GridPane.margin>
+            <Insets left="90.0" />
+         </GridPane.margin>
+         <graphic>
+        	<Glyph fontFamily="FontAwesome" icon="STOP" />
+    	</graphic>
+    	<tooltip><Tooltip text="Disable Component" /></tooltip>
+      </Button>
+      <Label text="ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Name" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="State" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Registering Bundle" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Registering Bundle ID" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Factory" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Scope" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Implementation Class" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Configuration Policy" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Failure" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Activate Method" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Deactivate Method" GridPane.halignment="RIGHT" GridPane.rowIndex="13">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Configuration PIDs" GridPane.halignment="RIGHT" GridPane.rowIndex="16">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Service Interfaces" GridPane.halignment="RIGHT" GridPane.rowIndex="18">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Properties" GridPane.halignment="RIGHT" GridPane.rowIndex="20">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="References" GridPane.halignment="RIGHT" GridPane.rowIndex="23">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Bound Services" GridPane.halignment="RIGHT" GridPane.rowIndex="25">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Unbound Services" GridPane.halignment="RIGHT" GridPane.rowIndex="27">
+         <GridPane.margin>
+            <Insets left="20.0" right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="idLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="componentNameLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="stateLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="bundleLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="bundleIdLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="factoryLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="classLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="policyLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="failureLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="activateLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="deactivateLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <TableView fx:id="propertiesTable" prefHeight="263.0" prefWidth="569.0" GridPane.columnIndex="1" GridPane.rowIndex="20">
+      	<placeholder>
+        	<Label text="No associated properties" />
+    	</placeholder>
+        <columns>
+          <TableColumn fx:id="propertiesTableColumn1" prefWidth="259.0" />
+          <TableColumn fx:id="propertiesTableColumn2" minWidth="0.0" prefWidth="290.0" />
+        </columns>
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </TableView>
+      <TableView fx:id="referencesTable" prefHeight="7.0" prefWidth="569.0" style="-fx-table-cell-border-color: transparent;" GridPane.columnIndex="1" GridPane.rowIndex="23" GridPane.vgrow="ALWAYS">
+         <placeholder>
+        	<Label text="No associated references" />
+    	</placeholder>
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </TableView>
+      <TableView fx:id="boundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="25" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No bound services" />
+    	</placeholder>
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <columns>
+            <TableColumn fx:id="boundServicesNameColumn" prefWidth="200.0" text="Name" />
+            <TableColumn fx:id="boundServicesTargetColumn" prefWidth="101.0" text="Target" />
+            <TableColumn fx:id="boundServicesClassColumn" prefWidth="623.0" text="Object Class" />
+         </columns>
+      </TableView>
+      <TableView fx:id="unboundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="27" GridPane.vgrow="ALWAYS">
+      	<placeholder>
+        	<Label text="No unbound services" />
+    	</placeholder>
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+         <columns>
+            <TableColumn fx:id="unboundServicesNameColumn" prefWidth="200.0" text="Name" />
+            <TableColumn fx:id="unboundServicesTargetColumn" prefWidth="101.0" text="Target" />
+            <TableColumn fx:id="unboundServicesClassColumn" prefWidth="623.0" text="Object Class" />
+         </columns>
+      </TableView>
+      <Label fx:id="scopeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <Label text="Modified Method" GridPane.halignment="RIGHT" GridPane.rowIndex="14">
+         <GridPane.margin>
+            <Insets right="50.0" />
+         </GridPane.margin>
+      </Label>
+      <Label fx:id="modifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="14">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </Label>
+      <ListView fx:id="pidsList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="16">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </ListView>
+      <ListView fx:id="interfacesList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="18">
+         <GridPane.margin>
+            <Insets left="20.0" />
+         </GridPane.margin>
+      </ListView>
+   </children>
+   <padding>
+      <Insets bottom="20.0" top="20.0" />
+   </padding>
+</GridPane>
