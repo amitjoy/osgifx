@@ -60,9 +60,9 @@ OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar 
 <img src="https://user-images.githubusercontent.com/13380182/142087935-7c2c0ef4-b001-429c-a01a-429790b1c2c3.png" />
 <img src="https://user-images.githubusercontent.com/13380182/141703457-4fdb72e7-e532-4efc-8bda-785dfc1affc8.png" />
 
-#### Technologies Involved
+--------------------------------------------------------------------------------------------------------------
 
-### Tools and Technologies
+#### Tools and Technologies
 
 |                      	|                                             	|
 |----------------------	|---------------------------------------------	|
@@ -72,11 +72,14 @@ OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar 
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
 | Tools                	| Bndtools 6                                  	|
 
+--------------------------------------------------------------------------------------------------------------
 
 #### Important Notes
 
 * The distribution packages include JRE for respective platforms
 * After application is installed, you will need to change the permission of the application to **777** or change the ownership, otherwise, the OSGi framework will not be able to create the required directories inside it
+
+--------------------------------------------------------------------------------------------------------------
 
 #### Minimum Requirements for Runtime Agent
 
@@ -85,14 +88,20 @@ OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar 
 
 To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
 
+--------------------------------------------------------------------------------------------------------------
+
 #### Project Import for Development
 
 1. Install `Bndtools` from Eclipse Marketplace
 2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
 
+--------------------------------------------------------------------------------------------------------------
+
 ##### Building from Source
 
 Run `./gradlew clean build` in the project root directory
+
+--------------------------------------------------------------------------------------------------------------
 
 #### External Feature Development
 
@@ -101,3 +110,21 @@ External plugins or features can easily be developed for `OSGi.fx`. Please have 
 Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
 
 Note that, to develop an external feature, you need to provide a ZIP archive which could comprise one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
+
+--------------------------------------------------------------------------------------------------------------
+
+### Developer
+
+Amit Kumar Mondal (admin@amitinside.com)
+
+--------------------------------------------------------------------------------------------------------------
+
+### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
+
+Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/main/CONTRIBUTING.md)
+
+--------------------------------------------------------------------------------------------------------------
+
+### License
+
+This project is licensed under Apache License Version 2.0 [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
