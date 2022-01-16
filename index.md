@@ -93,7 +93,7 @@ To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx
 
 --------------------------------------------------------------------------------------------------------------
 
-##### Building from Source
+#### Building from Source
 
 Run `./gradlew clean build` in the project root directory
 
@@ -109,18 +109,18 @@ Note that, to develop an external feature, you need to provide a ZIP archive whi
 
 --------------------------------------------------------------------------------------------------------------
 
-### Developer
+#### Developer
 
 [Amit Kumar Mondal](https://github.com/amitjoy) (admin@amitinside.com)
 
 --------------------------------------------------------------------------------------------------------------
 
-### Contribution
+#### Contribution
 
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
 
 --------------------------------------------------------------------------------------------------------------
 
-### License
+#### License
 
 [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
