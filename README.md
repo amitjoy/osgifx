@@ -106,4 +106,4 @@ This project is licensed under Apache License Version 2.0 [![License](http://img
 
 ### User Guide
 
-For instructions on how to download and install latest snapshot version, please refer to the [Wiki](https://github.com/amitjoy/osgifx/wiki).
+For instructions on how to download and install latest snapshot version, please refer to the [Project Website](https://osgifx.com).
