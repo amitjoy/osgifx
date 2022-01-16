@@ -115,7 +115,7 @@ Note that, to develop an external feature, you need to provide a ZIP archive whi
 
 ### Developer
 
-Amit Kumar Mondal (admin@amitinside.com)
+[Amit Kumar Mondal](https://github.com/amitjoy) (admin@amitinside.com)
 
 --------------------------------------------------------------------------------------------------------------
 
