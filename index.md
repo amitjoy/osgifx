@@ -4,13 +4,6 @@ layout: default
 
 OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar to Felix Web Console, this is an endeavour for desktop application users with all the necessary functionalities that one requires to remotely manage OSGi runtime.
 
-#### Minimum Requirements for Runtime Agent
-
-1. Java 8
-2. OSGi R6
-
-To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
-
 #### Current Features
 
 |                                                                                                                                                                           |     |
@@ -44,15 +37,6 @@ To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx
 | Open Diagnostics (Show application log file)  |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 
 
-#### Project Import for Development
-
-1. Install `Bndtools` from Eclipse Marketplace
-2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
-
-##### Building from Source
-
-Run `./gradlew clean build` in the project root directory
-
 #### Application Screenshots
 
 <img src="https://user-images.githubusercontent.com/13380182/141703440-183543c1-023d-422b-816e-54e39f3e76b6.png" />
@@ -76,6 +60,21 @@ Run `./gradlew clean build` in the project root directory
 <img src="https://user-images.githubusercontent.com/13380182/142087935-7c2c0ef4-b001-429c-a01a-429790b1c2c3.png" />
 <img src="https://user-images.githubusercontent.com/13380182/141703457-4fdb72e7-e532-4efc-8bda-785dfc1affc8.png" />
 
+#### Minimum Requirements for Runtime Agent
+
+1. Java 8
+2. OSGi R6
+
+To use the agent in the OSGi environment, you need to install `in.bytehue.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
+
+#### Project Import for Development
+
+1. Install `Bndtools` from Eclipse Marketplace
+2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
+
+##### Building from Source
+
+Run `./gradlew clean build` in the project root directory
 
 #### External Feature Development
 
