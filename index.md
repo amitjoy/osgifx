@@ -60,6 +60,24 @@ OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar 
 <img src="https://user-images.githubusercontent.com/13380182/142087935-7c2c0ef4-b001-429c-a01a-429790b1c2c3.png" />
 <img src="https://user-images.githubusercontent.com/13380182/141703457-4fdb72e7-e532-4efc-8bda-785dfc1affc8.png" />
 
+#### Technologies Involved
+
+### Tools and Technologies
+
+|                      	|                                             	|
+|----------------------	|---------------------------------------------	|
+| Java                 	| 1.8                                         	|
+| Rich Client Platform 	| JavaFX 8                                    	|
+| Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
+| UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
+| Tools                	| Bndtools 6                                  	|
+
+
+#### Important Notes
+
+* The distribution packages include JRE for respective platforms
+* After application is installed, you will need to change the permission of the application to **777** or change the ownership, otherwise, the OSGi framework will not be able to create the required directories inside it
+
 #### Minimum Requirements for Runtime Agent
 
 1. Java 8
@@ -78,7 +96,7 @@ Run `./gradlew clean build` in the project root directory
 
 #### External Feature Development
 
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `in.bytehue.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using OSGi and Eclipse e4, you can easily use their modular functionalities to build your own feature.
+External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `in.bytehue.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily use their modular functionalities to build your own feature.
 
 Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
 
