@@ -4,8 +4,6 @@ layout: default
 
 OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar to Felix Web Console, this is an endeavour for desktop application users with all the necessary functionalities that one requires to remotely manage OSGi runtime.
 
---------------------------------------------------------------------------------------------------------------
-
 |                                                                                                                                                                           |     |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |:-:  |
 | List all installed bundles and fragments                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
