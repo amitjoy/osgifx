@@ -6,8 +6,6 @@ OSGi.fx is an easy-to-use application to remote manage OSGi frameworks. Similar 
 
 --------------------------------------------------------------------------------------------------------------
 
-#### Current Features
-
 |                                                                                                                                                                           |     |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |:-:  |
 | List all installed bundles and fragments                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
