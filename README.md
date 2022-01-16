@@ -4,7 +4,7 @@
   <p align="center">An easy-to-use desktop application to manage OSGi frameworks remotely</p>
 </p>
 <p align="center">
-  <a href="https://github.com/amitjoy/osgifx"><img width="120" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=OSGi.fx&color=blue&logo=github" /></a>
+  <a href="https://osgifx.com"><img width="120" alt="logo" src="https://img.shields.io/static/v1?label=amitjoy&message=OSGi.fx&color=blue&logo=github" /></a>
   <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/stars/amitjoy/osgifx?style=social" /></a>
   <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/forks/amitjoy/osgifx?style=social" /></a>
   <a href="#license"><img width="110" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
