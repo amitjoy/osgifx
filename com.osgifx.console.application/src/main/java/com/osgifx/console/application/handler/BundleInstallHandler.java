@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -60,8 +60,9 @@ public final class BundleInstallHandler {
         final Optional<BundleInstallDTO> remoteInstall = dialog.showAndWait();
         if (remoteInstall.isPresent()) {
             try {
-                final BundleInstallDTO dto  = remoteInstall.get();
-                final File             file = dto.file;
+                final BundleInstallDTO dto        = remoteInstall.get();
+                final File             file       = dto.file;
+                final int              startLevel = dto.startLevel;
                 if (file == null) {
                     return;
                 }
@@ -72,7 +73,7 @@ public final class BundleInstallHandler {
                     logger.atWarning().log("Remote agent cannot be connected");
                     return;
                 }
-                final BundleDTO bundle = agent.installWithData(null, Files.toByteArray(file));
+                final BundleDTO bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
                 if (bundle == null) {
                     logger.atError().log("Bundle cannot be installed or updated");
                     return;

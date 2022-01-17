@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -29,6 +29,7 @@ import com.osgifx.console.application.dialog.BundleInstallDTO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -48,7 +49,11 @@ public final class InstallBundleDialogController {
     private ToggleSwitch      startBundleToggle;
     @FXML
     private GridPane          installBundleDialogPane;
+    @FXML
+    private TextField         startLevel;
     private File              bundle;
+
+    private static final int DEFAULT_START_LEVEL = 10;
 
     @FXML
     public void initialize() {
@@ -72,7 +77,15 @@ public final class InstallBundleDialogController {
         if (bundle == null) {
             return null;
         }
-        return new BundleInstallDTO(bundle, startBundleToggle.isSelected());
+        final String sl    = startLevel.getText();
+        int          level = DEFAULT_START_LEVEL;
+        try {
+            level = Integer.parseInt(sl);
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("Start level value cannot be parsed. Fall back to default start level - %s",
+                    DEFAULT_START_LEVEL);
+        }
+        return new BundleInstallDTO(bundle, startBundleToggle.isSelected(), level);
     }
 
     private void registerDragAndDropSupport() {

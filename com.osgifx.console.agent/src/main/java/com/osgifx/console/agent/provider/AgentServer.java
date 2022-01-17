@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -65,6 +65,7 @@ import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.dto.ServiceReferenceDTO;
+import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.FrameworkWiring;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
@@ -262,7 +263,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public BundleDTO installWithData(String location, final byte[] data) throws Exception {
+    public BundleDTO installWithData(String location, final byte[] data, final int startLevel) throws Exception {
         requireNonNull(data);
 
         Bundle installedBundle;
@@ -275,6 +276,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             installedBundle = context.getBundle(location);
             if (installedBundle == null) {
                 installedBundle = context.installBundle(location, stream);
+                installedBundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
             } else {
                 installedBundle.update(stream);
                 refresh(true);

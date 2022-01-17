@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   Copyright 2022 Amit Kumar Mondal
   
@@ -14,23 +15,26 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.controlsfx.control.ToggleSwitch?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<GridPane fx:id="installBundleDialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="90.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.application.fxml.controller.InstallBundleDialogController">
+<GridPane fx:id="installBundleDialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.application.fxml.controller.InstallBundleDialogController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="206.0" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="144.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="45.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
       <Label text="Select a JAR" GridPane.halignment="LEFT">
@@ -38,12 +42,12 @@
             <Insets left="78.0" right="20.0" />
          </GridPane.margin>
       </Label>
-      <Label text="Start Bundle" GridPane.halignment="LEFT" GridPane.rowIndex="1">
+      <Label text="Start Bundle" GridPane.halignment="LEFT" GridPane.rowIndex="2">
          <GridPane.margin>
             <Insets left="78.0" right="20.0" />
          </GridPane.margin>
       </Label>
-      <ToggleSwitch fx:id="startBundleToggle" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <ToggleSwitch fx:id="startBundleToggle" GridPane.columnIndex="1" GridPane.rowIndex="2">
          <GridPane.margin>
             <Insets left="-10.0" />
          </GridPane.margin>
@@ -61,13 +65,31 @@
         	<Glyph fontFamily="FontAwesome" icon="CUBE" />
     	</graphic>
       </Button>
-      <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;" GridPane.rowIndex="1">
+      <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;" GridPane.rowIndex="2">
          <GridPane.margin>
             <Insets left="41.0" />
          </GridPane.margin>
          <graphic>
         	<Glyph fontFamily="FontAwesome" icon="PLAY" />
     	</graphic>
+      </Button>
+      <Label text="Start Level" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets left="78.0" right="20.0" />
+         </GridPane.margin>
+      </Label>
+      <TextField fx:id="startLevel" maxWidth="72.0" prefHeight="27.0" prefWidth="64.0" text="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin>
+      </TextField>
+      <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;" GridPane.rowIndex="1">
+         <graphic>
+            <Glyph fontFamily="FontAwesome" icon="SORT_NUMERIC_ASC" />
+         </graphic>
+         <GridPane.margin>
+            <Insets left="41.0" />
+         </GridPane.margin>
       </Button>
    </children>
 </GridPane>

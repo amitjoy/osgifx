@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -116,10 +116,11 @@ public interface Agent {
      * @param location The bundle location (cannot be {@code null})
      * @param data The byte array instance from which this bundle will be read
      *            (cannot be {@code null})
+     * @param startLevel the start level of the bundle
      * @return A Bundle DTO (cannot be {@code null})
      * @throws Exception if the bundle cannot be installed or updated
      */
-    BundleDTO installWithData(String location, byte[] data) throws Exception;
+    BundleDTO installWithData(String location, byte[] data, int startLevel) throws Exception;
 
     /**
      * Install a new bundle at the given bundle location. The SHA identifies the
