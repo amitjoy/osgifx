@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -25,6 +25,8 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -36,6 +38,7 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -60,6 +63,8 @@ public final class EventsFxController {
     @Named("com.osgifx.console.ui.events")
     private BundleContext                   context;
     private TableRowDataFeatures<XEventDTO> selectedEvent;
+
+    private static final String EVENT_TOPIC = "com/osgifx/clear/events";
 
     @FXML
     public void initialize() {
@@ -99,6 +104,16 @@ public final class EventsFxController {
         table.setItems(events);
 
         TableFilter.forTableView(table).apply();
+    }
+
+    @Inject
+    @Optional
+    private synchronized void clearTableEvent(@UIEventTopic(EVENT_TOPIC) final String data) {
+        table.setItems(FXCollections.emptyObservableList());
+        final ObservableList<XEventDTO> events = dataProvider.events();
+        events.clear();
+        table.setItems(events);
+        logger.atInfo().log("Cleared events table successfully");
     }
 
 }
