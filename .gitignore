@@ -1,4 +1,4 @@
-*/target/*
+**/target/*
 cnf/*
 .gradle
 _site
@@ -8,3 +8,4 @@ Gemfile.lock
 .jekyll-cache
 .DS_Store
 com.osgifx.*/bin/*
+**/.osgifx-ws/*
