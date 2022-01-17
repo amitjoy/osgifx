@@ -26,6 +26,7 @@ import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.BundleInstallDTO;
 
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -58,6 +59,7 @@ public final class InstallBundleDialogController {
     @FXML
     public void initialize() {
         registerDragAndDropSupport();
+        registerNumberValidationListener();
         logger.atInfo().log("FXML controller has been initialized");
     }
 
@@ -116,6 +118,14 @@ public final class InstallBundleDialogController {
             event.consume();
         });
         logger.atInfo().log("Registered drag and drop support");
+    }
+
+    private void registerNumberValidationListener() {
+        startLevel.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                startLevel.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
     }
 
 }
