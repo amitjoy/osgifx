@@ -242,4 +242,4 @@ generated/
 bin_test/
 **/cnf/cache/*
 **/target/*
-
+**/.osgifx-ws/*
