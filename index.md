@@ -101,7 +101,7 @@ Run `./gradlew clean build` in the project root directory
 
 #### External Feature Development
 
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `in.bytehue.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily use their modular functionalities to build your own feature.
+External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily use their modular functionalities to build your own feature.
 
 Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
 
