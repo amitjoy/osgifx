@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -24,11 +24,9 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
 public final class AboutApplicationDialogController {
@@ -37,13 +35,11 @@ public final class AboutApplicationDialogController {
     @Inject
     private FluentLogger   logger;
     @FXML
-    private Text           appName;
+    private HyperlinkLabel appLink;
     @FXML
-    private ImageView      header;
+    private HyperlinkLabel eclipseLink;
     @FXML
-    private GridPane       content;
-    @FXML
-    private HyperlinkLabel hyperlink;
+    private Text           appVersion;
     @Inject
     private Application    jfxApplication;
     @Inject
@@ -52,21 +48,16 @@ public final class AboutApplicationDialogController {
 
     @FXML
     public void initialize() {
-        appName.setText("OSGi.fx (" + bundleContext.getBundle().getVersion() + ")");
-        hyperlink.setOnAction(event -> {
-            final Hyperlink link           = (Hyperlink) event.getSource();
-            final String    eclipseWebLink = link.getText();
-            jfxApplication.getHostServices().showDocument(eclipseWebLink);
-        });
+        appVersion.setText(bundleContext.getBundle().getVersion().toString());
+        appLink.setOnAction(this::handleLinkOnClick);
+        eclipseLink.setOnAction(this::handleLinkOnClick);
         logger.atInfo().log("FXML controller (%s) has been initialized", getClass());
     }
 
-    public Node getHeader() {
-        return header;
-    }
-
-    public Node getBody() {
-        return content;
+    private void handleLinkOnClick(final ActionEvent event) {
+        final Hyperlink link           = (Hyperlink) event.getSource();
+        final String    eclipseWebLink = link.getText();
+        jfxApplication.getHostServices().showDocument(eclipseWebLink);
     }
 
 }
