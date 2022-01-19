@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -20,6 +20,8 @@ import static javafx.concurrent.Worker.State.SUCCEEDED;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 import org.eclipse.fx.ui.workbench.fx.DefaultJFXApp;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 import javafx.animation.FadeTransition;
 import javafx.concurrent.Task;
@@ -32,6 +34,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -51,6 +54,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 
     @Override
     public void init() throws Exception {
+        loadCustomFont();
         final ImageView splash = new ImageView(new Image(SPLASH_IMAGE));
 
         loadProgress = new ProgressBar();
@@ -64,6 +68,11 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         splashLayout.setStyle("-fx-padding: 5; -fx-background-color: cornsilk; -fx-border-width:5; -fx-border-color: "
                 + "linear-gradient(to bottom, chocolate, derive(chocolate, 50%));");
         splashLayout.setEffect(new DropShadow());
+    }
+
+    private void loadCustomFont() {
+        final Bundle bundle = FrameworkUtil.getBundle(getClass());
+        Font.loadFont(bundle.getResource("/font/Gill Sans SemiBold.ttf").toExternalForm(), 11);
     }
 
     @Override
