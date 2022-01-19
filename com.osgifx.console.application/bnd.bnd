@@ -6,6 +6,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       plugin.xml = _plugin.xml,\
 					  Application.e4xmi = Application.e4xmi,\
 					  css = css,\
+					  font = font,\
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : \
