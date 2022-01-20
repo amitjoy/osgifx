@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -48,15 +48,11 @@ public final class AboutApplicationDialog extends Dialog<Void> {
         dialogPane.setPrefHeight(200);
         dialogPane.setPrefWidth(400);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-
-        dialogPane.setHeaderText("Remote Bundle Install");
         dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/about.png").toString()));
-
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.setHeaderText("About OSGi.fx");
 
         final Node content = Fx.loadFXML(loader, context, "/fxml/about-application-dialog.fxml");
-
-        dialogPane.setHeaderText("About OSGi.fx");
         dialogPane.setContent(content);
     }
 
