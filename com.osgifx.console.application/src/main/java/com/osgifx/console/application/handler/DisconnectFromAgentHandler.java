@@ -16,6 +16,7 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -58,6 +59,7 @@ public final class DisconnectFromAgentHandler {
             supervisor.getAgent().abort();
             eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
             isConnected.publish(false);
+            System.clearProperty(CONNECTED_AGENT);
             Fx.showSuccessNotification("Agent Connection", "Agent connection has been successfully aborted");
         } catch (final Exception e) {
             logger.atError().withException(e).log("Agent connection cannot be aborted");
