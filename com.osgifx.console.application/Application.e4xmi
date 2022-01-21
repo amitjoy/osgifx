@@ -1,19 +1,4 @@
 <?xml version="1.0" encoding="ASCII"?>
-<!--
-  Copyright 2022 Amit Kumar Mondal
-  
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  use this file except in compliance with the License.  You may obtain a copy
-  of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-  License for the specific language governing permissions and limitations under
-  the License.
--->
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_c376wBuoEeyWL5Ll6OkKhA" elementId="com.osgifx.console.application">
   <children xsi:type="basic:TrimmedWindow" xmi:id="_VhXHEBuuEeyWL5Ll6OkKhA" elementId="com.osgifx.console.window.main" selectedElement="_dLYzgBuuEeyWL5Ll6OkKhA" label="OSGi.fx" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/window.png" tooltip="OSGi.fx - Yet Another Console" width="1230" height="685">
     <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
@@ -21,6 +6,10 @@
     <tags>efx-center-on-screen</tags>
     <children xsi:type="basic:PartStack" xmi:id="_dLYzgBuuEeyWL5Ll6OkKhA" elementId="com.osgifx.console.ui.extensions.partstack"/>
     <mainMenu xmi:id="_IB5tkCBqEey33dbookdebQ" elementId="com.osgifx.console.application.menu.extensions" mnemonics="">
+      <children xsi:type="menu:Menu" xmi:id="_so66kHoLEeyQKID2zKUvKQ" elementId="com.osgifx.console.application.menu.connection" label="Connection">
+        <children xsi:type="menu:DirectMenuItem" xmi:id="_ywFGEHoLEeyQKID2zKUvKQ" elementId="com.osgifx.console.application.directmenuitem.connect" label="Connect to Agent" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/connected.png" tooltip="Establishes connection with the remote agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToAgentHandler"/>
+        <children xsi:type="menu:DirectMenuItem" xmi:id="_5jukIHoLEeyQKID2zKUvKQ" elementId="com.osgifx.console.application.directmenuitem.disconnect" label="Disconnect from Agent" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/disconnected.png" tooltip="Disconnects already established connection with the remote agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.DisconnectFromAgentHandler"/>
+      </children>
       <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="com.osgifx.console.application.menu.extensions.list" label="View">
         <children xsi:type="menu:DynamicMenuContribution" xmi:id="__cOGkCEsEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.extensions.list" label="" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler"/>
       </children>
@@ -39,12 +28,6 @@
         <children xsi:type="menu:DirectMenuItem" xmi:id="_vzJVkCFQEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.directmenuitem.about" label="About OSGi.fx" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/about.png" tooltip="Shows information about OSGi.fx" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.AboutApplicationHandler"/>
       </children>
     </mainMenu>
-    <windows xsi:type="basic:TrimmedWindow" xmi:id="_ZXbBkBvNEey-yMSldpSQ9g" elementId="com.osgifx.console.window.connection" label="Choose Connections" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/window.png" width="400" height="250">
-      <persistedState key="efx.window.stagestyle" value="UNDECORATED"/>
-      <persistedState key="efx.window.stagemodality" value="APPLICATION_MODAL"/>
-      <persistedState key="efx.window.decoration.fxml" value="platform:/plugin/com.osgifx.console.application/fxml/connection-chooser-window.fxml"/>
-      <tags>efx-center-on-screen</tags>
-    </windows>
   </children>
   <handlers xmi:id="_Y0EEwCWwEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.handler.preference" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
   <handlers xmi:id="_hvxvgCdFEeyh4bauXjycpA" elementId="com.osgifx.console.application.handler.bundle.start" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.BundleStartHandler" command="_vvdL4CdEEeyh4bauXjycpA"/>

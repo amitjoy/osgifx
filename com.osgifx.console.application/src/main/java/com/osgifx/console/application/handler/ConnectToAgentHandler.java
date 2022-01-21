@@ -1,19 +1,19 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.fxml.controller;
+package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
@@ -22,100 +22,89 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.CanExecute;
+import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.command.CommandService;
+import org.eclipse.fx.core.di.ContextBoundValue;
+import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Maps;
+import com.osgifx.console.application.dialog.ConnectToAgentDialog;
+import com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType;
 import com.osgifx.console.application.dialog.ConnectionDialog;
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
-import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.util.fx.DTOCellValueFactory;
+import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.ButtonType;
 
-public final class ConnectionSettingsWindowController {
+public final class ConnectToAgentHandler {
 
-    private static final String CONNECTION_WINDOW_ID         = "com.osgifx.console.window.connection";
     private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.preference";
 
-    @FXML
-    private Button                                     connectButton;
-    @FXML
-    private Button                                     addConnectionButton;
-    @FXML
-    private Button                                     removeConnectionButton;
-    @FXML
-    private TableView<ConnectionSettingDTO>            connectionTable;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, String>  hostColumn;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, Integer> portColumn;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
     @Log
     @Inject
-    private FluentLogger                               logger;
+    private FluentLogger               logger;
     @Inject
-    private ThreadSynchronize                          threadSync;
+    private ThreadSynchronize          threadSync;
     @Inject
-    private IEclipseContext                            context;
+    private IEclipseContext            context;
     @Inject
-    private EModelService                              model;
+    private IEventBroker               eventBroker;
     @Inject
-    private MApplication                               application;
+    private Supervisor                 supervisor;
     @Inject
-    private IEventBroker                               eventBroker;
+    private CommandService             commandService;
     @Inject
-    private Supervisor                                 supervisor;
-    @Inject
-    private CommandService                             commandService;
-    @Inject
-    private ConnectionsProvider                        connectionsProvider;
-    private ProgressDialog                             progressDialog;
+    @ContextValue("is_connected")
+    private ContextBoundValue<Boolean> isConnected;
+    private ProgressDialog             progressDialog;
+    private ConnectToAgentDialog       connectToAgentDialog;
 
-    @FXML
-    public void initialize() {
-        hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
-        portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
-        timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
+    @Execute
+    public void execute() {
+        connectToAgentDialog = new ConnectToAgentDialog();
+        ContextInjectionFactory.inject(connectToAgentDialog, context);
+        logger.atInfo().log("Injected connect to agent dialog to eclipse context");
+        connectToAgentDialog.init();
+        final Optional<ButtonType> result = connectToAgentDialog.showAndWait();
+        if (!result.isPresent()) {
+            logger.atInfo().log("No button has been selected");
+            return;
+        }
+        final ButtonType selectedButton = result.get();
+        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
+            addConnection();
+            return;
 
-        connectionTable.setItems(connectionsProvider.getConnections());
-        connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            connectButton.setDisable(newSelection == null);
-            removeConnectionButton.setDisable(newSelection == null);
-        });
-        TableFilter.forTableView(connectionTable).apply();
-        logger.atInfo().log("FXML controller has been initialized");
+        }
+        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
+            removeConnection();
+            return;
+        }
+        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.CONNECT)) {
+            connectAgent();
+        }
     }
 
-    @FXML
-    public void handleClose(final ActionEvent event) {
-        logger.atInfo().log("Platform is going to shutdown");
-        Platform.exit();
+    @CanExecute
+    public boolean canExecute() {
+        return supervisor.getAgent() == null;
     }
 
-    @FXML
-    public void addConnection(final ActionEvent event) {
-        logger.atInfo().log("FXML controller 'addConnection(..)' event has been invoked");
+    public void addConnection() {
+        logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
         final ConnectionDialog connectionDialog = new ConnectionDialog();
         ContextInjectionFactory.inject(connectionDialog, context);
@@ -128,21 +117,36 @@ public final class ConnectionSettingsWindowController {
             final ConnectionSettingDTO dto = value.get();
             triggerCommand(dto, "ADD");
             logger.atInfo().log("ADD command has been invoked for %s", dto);
+            Fx.showSuccessNotification("Connection Settings", "New connection settings has been added successfully");
         }
     }
 
-    @FXML
-    public void removeConnection(final ActionEvent event) {
-        logger.atInfo().log("FXML controller 'removeConnection(..)' event has been invoked");
-        final ConnectionSettingDTO dto = connectionTable.getSelectionModel().getSelectedItem();
-        triggerCommand(dto, "REMOVE");
-        logger.atInfo().log("REMOVE command has been invoked for %s", dto);
+    public void handleClose() {
+        logger.atInfo().log("Platform is going to shutdown");
+        Platform.exit();
     }
 
-    @FXML
-    public void connectAgent(final ActionEvent event) {
-        logger.atInfo().log("FXML controller 'connectAgent(..)' event has been invoked");
-        final ConnectionSettingDTO selectedConnection = connectionTable.getSelectionModel().getSelectedItem();
+    public void removeConnection() {
+        logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
+        final Optional<ConnectionSettingDTO> dto = connectToAgentDialog.getSelectedSetting();
+        if (!dto.isPresent()) {
+            logger.atInfo().log("No connection setting has been selected");
+            return;
+        }
+        final ConnectionSettingDTO setting = dto.get();
+        triggerCommand(setting, "REMOVE");
+        logger.atInfo().log("REMOVE command has been invoked for %s", setting);
+        Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
+    }
+
+    public void connectAgent() {
+        logger.atInfo().log("'%s'-'connectAgent(..)' event has been invoked", getClass().getSimpleName());
+        final Optional<ConnectionSettingDTO> dto = connectToAgentDialog.getSelectedSetting();
+        if (!dto.isPresent()) {
+            logger.atInfo().log("No connection setting has been selected");
+            return;
+        }
+        final ConnectionSettingDTO selectedConnection = dto.get();
         logger.atInfo().log("Selected connection: %s", selectedConnection);
         final Task<Void> connectTask = new Task<Void>() {
             @Override
@@ -166,6 +170,7 @@ public final class ConnectionSettingsWindowController {
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", selectedConnection);
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, selectedConnection.host + ":" + selectedConnection.port);
+                isConnected.publish(true);
             }
         };
 
@@ -191,8 +196,6 @@ public final class ConnectionSettingsWindowController {
     @org.eclipse.e4.core.di.annotations.Optional
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event received");
-        final MWindow connectionChooserWindow = (MWindow) model.find(CONNECTION_WINDOW_ID, application);
-        connectionChooserWindow.setVisible(false);
         progressDialog.close();
     }
 

@@ -21,9 +21,11 @@ import java.io.File;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -48,6 +50,9 @@ public final class BundleInstallHandler {
     private IEventBroker    eventBroker;
     @Inject
     private Supervisor      supervisor;
+    @Inject
+    @Named("is_connected")
+    private boolean         isConnected;
 
     @Execute
     public void execute() {
@@ -90,6 +95,11 @@ public final class BundleInstallHandler {
                 Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated");
             }
         }
+    }
+
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
     }
 
 }

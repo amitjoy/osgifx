@@ -16,7 +16,9 @@
 package com.osgifx.console.application.handler;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -31,11 +33,19 @@ public final class ClearEventsTableHandler {
     private FluentLogger logger;
     @Inject
     private IEventBroker eventBroker;
+    @Inject
+    @Named("is_connected")
+    private boolean      isConnected;
 
     @Execute
     public void execute() {
         eventBroker.post(EVENT_TOPIC, "");
         logger.atInfo().log("Clear events table command sent");
+    }
+
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
     }
 
 }
