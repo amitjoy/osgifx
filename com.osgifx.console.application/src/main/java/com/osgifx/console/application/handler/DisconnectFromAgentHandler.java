@@ -18,10 +18,8 @@ package com.osgifx.console.application.handler;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -39,19 +37,12 @@ public final class DisconnectFromAgentHandler {
     @Inject
     private FluentLogger               logger;
     @Inject
-    private IEclipseContext            context;
-    @Inject
     private Supervisor                 supervisor;
     @Inject
     private IEventBroker               eventBroker;
     @Inject
     @ContextValue("is_connected")
     private ContextBoundValue<Boolean> isConnected;
-
-    @PostConstruct
-    public void init() {
-        context.declareModifiable("is_connected");
-    }
 
     @Execute
     public void execute() {
@@ -69,7 +60,7 @@ public final class DisconnectFromAgentHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return supervisor.getAgent() != null;
+        return isConnected.getValue();
     }
 
 }
