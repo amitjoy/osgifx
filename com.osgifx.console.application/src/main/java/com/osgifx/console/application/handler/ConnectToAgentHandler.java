@@ -100,7 +100,7 @@ public final class ConnectToAgentHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return supervisor.getAgent() == null;
+        return !isConnected.getValue();
     }
 
     public void addConnection() {
