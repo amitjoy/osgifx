@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -156,15 +155,13 @@ public class AgentSupervisor<S, A> {
         return agent;
     }
 
-    public String addFile(File file) throws NoSuchAlgorithmException, Exception {
+    public String addFile(File file) throws Exception {
         file = file.getAbsoluteFile();
-        Info info = fileInfo.get(file);
-        if (info == null) {
-            info = new Info();
-            fileInfo.put(file, info);
-            info.lastModified = -1;
-        }
-
+        final Info info = fileInfo.computeIfAbsent(file, f -> {
+            final Info i = new Info();
+            i.lastModified = -1;
+            return i;
+        });
         synchronized (shaInfo) {
             if (info.lastModified != file.lastModified()) {
                 final String sha = SHA1.digest(file).asHex();
