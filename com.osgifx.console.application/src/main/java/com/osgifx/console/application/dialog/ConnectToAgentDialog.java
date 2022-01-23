@@ -18,7 +18,6 @@ package com.osgifx.console.application.dialog;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,7 +26,6 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.application.fxml.controller.ConnectionSettingsDialogController;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
@@ -84,14 +82,6 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
 
     public ButtonType getButtonType(final ActionType type) {
         return buttonTypes.get(type);
-    }
-
-    public ConnectionSettingsDialogController getController() {
-        return loader.getController();
-    }
-
-    public Optional<ConnectionSettingDTO> getSelectedSetting() {
-        return Optional.ofNullable(getController().getSelectedItem());
     }
 
 }
