@@ -46,6 +46,7 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.application.Platform;
+import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 
@@ -55,26 +56,28 @@ public final class ConnectToAgentHandler {
 
     @Log
     @Inject
-    private FluentLogger               logger;
+    private FluentLogger                   logger;
     @Inject
-    private ThreadSynchronize          threadSync;
+    private ThreadSynchronize              threadSync;
     @Inject
-    private IEclipseContext            context;
+    private IEclipseContext                context;
     @Inject
-    private IEventBroker               eventBroker;
+    private IEventBroker                   eventBroker;
     @Inject
-    private Supervisor                 supervisor;
+    private Supervisor                     supervisor;
     @Inject
-    private CommandService             commandService;
+    private CommandService                 commandService;
     @Inject
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean> isConnected;
-    private ProgressDialog             progressDialog;
-    private ConnectToAgentDialog       connectToAgentDialog;
+    private ContextBoundValue<Boolean>     isConnected;
+    @Inject
+    @ContextValue("selected.settings")
+    private Property<ConnectionSettingDTO> selectedSettings;
+    private ProgressDialog                 progressDialog;
 
     @Execute
     public void execute() {
-        connectToAgentDialog = new ConnectToAgentDialog();
+        final ConnectToAgentDialog connectToAgentDialog = new ConnectToAgentDialog();
         ContextInjectionFactory.inject(connectToAgentDialog, context);
         logger.atInfo().log("Injected connect to agent dialog to eclipse context");
         connectToAgentDialog.init();
@@ -128,25 +131,23 @@ public final class ConnectToAgentHandler {
 
     public void removeConnection() {
         logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
-        final Optional<ConnectionSettingDTO> dto = connectToAgentDialog.getSelectedSetting();
-        if (!dto.isPresent()) {
+        final ConnectionSettingDTO selectedConnection = selectedSettings.getValue();
+        if (selectedConnection == null) {
             logger.atInfo().log("No connection setting has been selected");
             return;
         }
-        final ConnectionSettingDTO setting = dto.get();
-        triggerCommand(setting, "REMOVE");
-        logger.atInfo().log("REMOVE command has been invoked for %s", setting);
+        triggerCommand(selectedConnection, "REMOVE");
+        logger.atInfo().log("REMOVE command has been invoked for %s", selectedConnection);
         Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
     }
 
     public void connectAgent() {
         logger.atInfo().log("'%s'-'connectAgent(..)' event has been invoked", getClass().getSimpleName());
-        final Optional<ConnectionSettingDTO> dto = connectToAgentDialog.getSelectedSetting();
-        if (!dto.isPresent()) {
+        final ConnectionSettingDTO selectedConnection = selectedSettings.getValue();
+        if (selectedConnection == null) {
             logger.atInfo().log("No connection setting has been selected");
             return;
         }
-        final ConnectionSettingDTO selectedConnection = dto.get();
         logger.atInfo().log("Selected connection: %s", selectedConnection);
         final Task<Void> connectTask = new Task<Void>() {
             @Override

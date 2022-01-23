@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.application.addon;
 
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -22,18 +24,30 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.google.common.collect.Maps;
+
 public final class ModifiablePropertyAddon {
 
-    private static final String PROPERTY = "is_connected";
+    private final Map<String, Object> modifiableProperties = Maps.newHashMap();
 
     @Log
     @Inject
     private FluentLogger logger;
 
+    public ModifiablePropertyAddon() {
+        modifiableProperties.put("is_connected", false);
+        modifiableProperties.put("selected.settings", null);
+    }
+
     @PostConstruct
     public void init(final IEclipseContext eclipseContext) {
-        eclipseContext.declareModifiable(PROPERTY);
-        eclipseContext.set(PROPERTY, false);
+        modifiableProperties.forEach((k, v) -> {
+            eclipseContext.declareModifiable(k);
+            if (v != null) {
+                eclipseContext.set(k, v);
+            }
+        });
+
         logger.atInfo().log("'%s' property has been declared as modifiable");
     }
 
