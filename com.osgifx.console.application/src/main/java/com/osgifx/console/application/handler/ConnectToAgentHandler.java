@@ -45,7 +45,6 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
-import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
@@ -90,7 +89,6 @@ public final class ConnectToAgentHandler {
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
             addConnection();
             return;
-
         }
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
             removeConnection();
@@ -106,7 +104,7 @@ public final class ConnectToAgentHandler {
         return !isConnected.getValue();
     }
 
-    public void addConnection() {
+    private void addConnection() {
         logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
         final ConnectionDialog connectionDialog = new ConnectionDialog();
@@ -124,12 +122,7 @@ public final class ConnectToAgentHandler {
         }
     }
 
-    public void handleClose() {
-        logger.atInfo().log("Platform is going to shutdown");
-        Platform.exit();
-    }
-
-    public void removeConnection() {
+    private void removeConnection() {
         logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
         final ConnectionSettingDTO selectedConnection = selectedSettings.getValue();
         if (selectedConnection == null) {
@@ -141,7 +134,7 @@ public final class ConnectToAgentHandler {
         Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
     }
 
-    public void connectAgent() {
+    private void connectAgent() {
         logger.atInfo().log("'%s'-'connectAgent(..)' event has been invoked", getClass().getSimpleName());
         final ConnectionSettingDTO selectedConnection = selectedSettings.getValue();
         if (selectedConnection == null) {
