@@ -62,3 +62,9 @@ Bundle-Version                        =         ${version}.${tstamp}-SNAPSHOT
 		    aQute.bnd.repository.osgi.OSGiRepository;\
 		          locations           =         ${efxclipse.url};\
 		          name                =         e(fx)clipse
+
+-plugin.4.Local                       =         \
+            aQute.bnd.deployer.repository.LocalIndexedRepo; \
+                  name                =         Local; \
+                  pretty              =         true; \
+                  local               =         ${build}/local
