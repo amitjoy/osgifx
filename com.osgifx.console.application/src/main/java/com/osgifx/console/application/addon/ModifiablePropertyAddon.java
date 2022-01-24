@@ -47,7 +47,6 @@ public final class ModifiablePropertyAddon {
                 eclipseContext.set(k, v);
             }
         });
-
         logger.atInfo().log("'%s' property has been declared as modifiable");
     }
 
