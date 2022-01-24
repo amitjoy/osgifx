@@ -1,0 +1,5 @@
+-distro     : com.osgifx.console.runtime
+-runrequires: bnd.identity;id='com.osgifx.console.feature.tictactoe'
+-runbundles : \
+	com.osgifx.console.feature.tictactoe;version=snapshot,\
+	com.osgifx.console.wrapper.grid;version=snapshot

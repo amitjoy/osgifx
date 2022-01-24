@@ -1,4 +1,6 @@
 -sub       : *.bnd
 -buildpath : \
              eu.hansolo.tilesfx,\
+             eu.lestard:advanced-bindings,\
+             jar/grid-0.3.0.jar;version=file,\
              com.dlsc.formsfx:formsfx-core
