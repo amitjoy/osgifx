@@ -1,31 +1,34 @@
--include                 :   ${workspace}/cnf/efx.bndrun
+-include                          :   ${workspace}/cnf/efx.bndrun
 
--runstartlevel           :   begin = 1, step = -1, order = sortbynameversion
--runbundles+             :   ${startlevels}, *;startlevel=${default.startlevel}
+-runstartlevel                    :   begin = 1, step = -1, order = sortbynameversion
+-runbundles+                      :   ${startlevels}, *;startlevel=${default.startlevel}
 
--runproperties.product   :   eclipse.product=com.osgifx.console.application.product
--runproperties.name      :   launch.name=OSGi.fx
--runproperties.sl        :   feature.start.order=${feature.start.level.increment}
+-runproperties.product            :   eclipse.product=com.osgifx.console.application.product
+-runproperties.name               :   launch.name=OSGi.fx
+-runproperties.sl                 :   feature.start.order=${feature.start.level.increment}
+-runproperties.local.agent        :   osgi.fx.agent.port=0.0.0.0:1729
 
--runrequires             :   \
-                             bnd.identity;id='com.osgifx.console.application',\
-                             bnd.identity;id='com.osgifx.console.launcher',\
-                             bnd.identity;id='com.osgifx.console.logging',\
-                             \
-		                     bnd.identity;id='com.osgifx.console.ui.bundles',\
-		                     bnd.identity;id='com.osgifx.console.ui.components',\
-		                     bnd.identity;id='com.osgifx.console.ui.configurations',\
-		                     bnd.identity;id='com.osgifx.console.ui.events',\
-		                     bnd.identity;id='com.osgifx.console.ui.logs',\
-		                     bnd.identity;id='com.osgifx.console.ui.gogo',\
-		                     bnd.identity;id='com.osgifx.console.ui.graph',\
-		                     bnd.identity;id='com.osgifx.console.ui.overview',\
-		                     bnd.identity;id='com.osgifx.console.ui.packages',\
-		                     bnd.identity;id='com.osgifx.console.ui.properties',\
-		                     bnd.identity;id='com.osgifx.console.ui.services',\
-		                     bnd.identity;id='com.osgifx.console.ui.threads',\
-                     		 \
-                     		 ${requirement.product}
+-runrequires                      :   \
+                                      bnd.identity;id='com.osgifx.console.agent',\
+                                      \
+                                      bnd.identity;id='com.osgifx.console.application',\
+                                      bnd.identity;id='com.osgifx.console.launcher',\
+                                      bnd.identity;id='com.osgifx.console.logging',\
+                                      \
+		                              bnd.identity;id='com.osgifx.console.ui.bundles',\
+		                              bnd.identity;id='com.osgifx.console.ui.components',\
+		                              bnd.identity;id='com.osgifx.console.ui.configurations',\
+		                              bnd.identity;id='com.osgifx.console.ui.events',\
+		                              bnd.identity;id='com.osgifx.console.ui.logs',\
+		                              bnd.identity;id='com.osgifx.console.ui.gogo',\
+		                              bnd.identity;id='com.osgifx.console.ui.graph',\
+		                              bnd.identity;id='com.osgifx.console.ui.overview',\
+		                              bnd.identity;id='com.osgifx.console.ui.packages',\
+		                              bnd.identity;id='com.osgifx.console.ui.properties',\
+		                              bnd.identity;id='com.osgifx.console.ui.services',\
+		                              bnd.identity;id='com.osgifx.console.ui.threads',\
+                     		          \
+                     		          ${requirement.product}
 
 # This is required as the install order matters - not the start level. The models fragments are processed 
 # according to the install order and hence assigning start levels in increasing order does not help. That's
@@ -42,7 +45,9 @@ install.order         :   	 \
 		                     com.osgifx.console.ui.properties,\
 		                     com.osgifx.console.ui.threads,\
 		                     com.osgifx.console.ui.gogo,\
-		                     com.osgifx.console.ui.graph
+		                     com.osgifx.console.ui.graph,\
+		                     \
+		                     com.osgifx.console.agent
 
 -runbundles.X    	  :      ${install.order}
 -runbundles: \
@@ -50,7 +55,6 @@ install.order         :   	 \
 	com.google.guava;version='[27.1.0,27.1.1)';startlevel=1,\
 	com.googlecode.json-simple;version='[1.1.1,1.1.2)';startlevel=1,\
 	com.ibm.icu.base;version='[58.2.0,58.2.1)';startlevel=1,\
-	controlsfx;version='[8.40.18,8.40.19)';startlevel=1,\
 	com.osgifx.console.application;version=snapshot;startlevel=1,\
 	com.osgifx.console.data.provider;version=snapshot;startlevel=1,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=1,\
@@ -61,6 +65,7 @@ install.order         :   	 \
 	com.osgifx.console.util;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=1,\
+	controlsfx;version='[8.40.18,8.40.19)';startlevel=1,\
 	javax.annotation;version='[1.2.0,1.2.1)';startlevel=1,\
 	javax.inject;version='[1.0.0,1.0.1)';startlevel=1,\
 	javax.xml.jre;version='[1.3.4,1.3.5)';startlevel=1,\
@@ -71,6 +76,9 @@ install.order         :   	 \
 	org.apache.felix.configurator;version='[1.0.14,1.0.15)';startlevel=1,\
 	org.apache.felix.converter;version='[1.0.18,1.0.19)';startlevel=1,\
 	org.apache.felix.feature;version='[0.9.4,0.9.5)';startlevel=1,\
+	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)';startlevel=1,\
+	org.apache.felix.gogo.runtime;version='[1.1.0,1.1.1)';startlevel=1,\
+	org.apache.felix.gogo.shell;version='[1.1.0,1.1.1)';startlevel=1,\
 	org.apache.felix.scr;version='[2.2.0,2.2.1)';startlevel=1,\
 	org.apache.sling.commons.johnzon;version='[1.2.6,1.2.7)';startlevel=1,\
 	org.eclipse.core.commands;version='[3.9.600,3.9.601)';startlevel=1,\
@@ -98,6 +106,7 @@ install.order         :   	 \
 	org.eclipse.emf.ecore.xmi;version='[2.16.0,2.16.1)';startlevel=1,\
 	org.eclipse.equinox.app;version='[1.4.300,1.4.301)';startlevel=1,\
 	org.eclipse.equinox.common;version='[3.10.600,3.10.601)';startlevel=1,\
+	org.eclipse.equinox.console;version='[1.4.0,1.4.1)';startlevel=1,\
 	org.eclipse.equinox.event;version='[1.5.300,1.5.301)';startlevel=1,\
 	org.eclipse.equinox.preferences;version='[3.7.600,3.7.601)';startlevel=1,\
 	org.eclipse.equinox.registry;version='[3.8.600,3.8.601)';startlevel=1,\
