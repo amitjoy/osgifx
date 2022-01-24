@@ -3,6 +3,7 @@ bundles.product       : ${bundles.deps},\
                         ${bundles.equinox},\
                         ${bundles.eclipse.core},\
                         ${bundles.e4.core},\
-                        ${bundles.configurations}
+                        ${bundles.configurations},\
+                        ${bundles.console}
 
 requirement.product   : ${replacelist;${bundles.product};.+;bnd.identity\\;id='$0'}
