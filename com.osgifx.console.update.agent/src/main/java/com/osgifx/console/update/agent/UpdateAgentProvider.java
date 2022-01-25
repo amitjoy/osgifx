@@ -42,6 +42,7 @@ import java.time.Duration;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -96,11 +97,10 @@ public final class UpdateAgentProvider implements UpdateAgent {
     private static final int          MAX_REDIRECTS                       = 50;
     private static final long         CONNECTION_TIMEOUT_IN_MILLISECONDS  = Duration.ofSeconds(15).toMillis();
     private static final long         READ_TIMEOUT_IN_MILLISECONDS        = Duration.ofSeconds(20).toMillis();
-    private static final String       FEATURE_START_LEVEL_PROPERTY        = "feature.start.order";
     private static final String       USER_AGENT                          = "osgi.fx";
     private static final String       LOCATION_PREFIX                     = "osgifx-feature:";
     private static final String       TEMP_DIRECTORY_PREFIX               = "osgifx.console_";
-    private static final String       STARTLEVEL_KEY                      = "start-order";
+    private static final String       STARTLEVEL_KEY                      = "startlevel";
     private static final String       CONFIG_KEY                          = "features";
     private static final String       BUNDLES_DIRECTORY                   = "bundles";
     private static final String       FEATURE_STORAGE_PID                 = "osgifx.features";
@@ -213,8 +213,10 @@ public final class UpdateAgentProvider implements UpdateAgent {
             }
             // install or update the bundles
             logger.atInfo().log("Installing or updating bundles");
-            for (final FeatureBundle bundle : feature.getBundles()) {
-                installOrUpdateBundle(bundle, featureJson);
+            final List<FeatureBundle> bundles = Lists.newArrayList(feature.getBundles());
+            bundles.sort(Comparator.comparingInt(b -> getStartLevel(b.getMetadata())));
+            for (final FeatureBundle bundle : bundles) {
+                installOrUpdateBundle(bundle, featureJson, getStartLevel(bundle.getMetadata()));
             }
             // update configurations
             logger.atInfo().log("Updating configurations");
@@ -325,13 +327,11 @@ public final class UpdateAgentProvider implements UpdateAgent {
         return Objects.equals(installedFeatureId, onlineFeatureId);
     }
 
-    private void installOrUpdateBundle(final FeatureBundle bundle, final File featureJson) throws Exception {
-        final Optional<Bundle> existingBundle       = getExistingBundle(bundle);
-        final String           bsn                  = bundle.getID().getArtifactId();
-        final String           version              = bundle.getID().getVersion();
-        final String           configuredStartLevel = String.valueOf(getStartLevel(bundle.getMetadata()));
-        final int              startLevel           = Integer.parseInt(configuredStartLevel);
-        final Optional<File>   bundleFile           = findBundleInBundlesDirectory(featureJson.getParentFile(), bsn, version);
+    private void installOrUpdateBundle(final FeatureBundle bundle, final File featureJson, final int startLevel) throws Exception {
+        final Optional<Bundle> existingBundle = getExistingBundle(bundle);
+        final String           bsn            = bundle.getID().getArtifactId();
+        final String           version        = bundle.getID().getVersion();
+        final Optional<File>   bundleFile     = findBundleInBundlesDirectory(featureJson.getParentFile(), bsn, version);
 
         if (existingBundle.isPresent()) {
             final Bundle    b   = existingBundle.get();
@@ -369,11 +369,9 @@ public final class UpdateAgentProvider implements UpdateAgent {
     }
 
     private int getStartLevel(final Map<String, Object> metadata) {
-        final Object startOrder = metadata.get(STARTLEVEL_KEY);
-        if (startOrder != null) {
-            // this is to ensure that all the packaged bundles get started before any feature specific bundle
-            final String configuredStartLevelIncrement = bundleContext.getProperty(FEATURE_START_LEVEL_PROPERTY);
-            return Integer.parseInt(startOrder.toString()) + Integer.parseInt(configuredStartLevelIncrement);
+        final Object startLevel = metadata.get(STARTLEVEL_KEY);
+        if (startLevel != null) {
+            return Integer.parseInt(startLevel.toString());
         }
         return DEFAULT_START_LEVEL;
     }
