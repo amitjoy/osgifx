@@ -68,3 +68,6 @@ Bundle-Version                        =         ${version}.${tstamp}-SNAPSHOT
                   name                =         Local; \
                   pretty              =         true; \
                   local               =         ${build}/local
+
+-plugin.5.Exporter                    =         com.osgifx.console.feature.exporter.FeatureExporter
+-pluginpath                           =         ${build}/plugin/com.osgifx.console.feature.exporter.jar
