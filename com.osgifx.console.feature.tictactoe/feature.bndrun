@@ -1,5 +1,25 @@
--distro     : com.osgifx.console.runtime
--runrequires: bnd.identity;id='com.osgifx.console.feature.tictactoe'
--runbundles : \
-	com.osgifx.console.feature.tictactoe;version=snapshot,\
-	com.osgifx.console.wrapper.grid;version=snapshot
+# the default start level for inbuilt bundles is 1, hence, anything larger than 1 would be good
+# for the beginning start level for any feature bundle. Note that,'leastdependenciesfirst' policy 
+# will sort the bundles topologically and place the bundles with the least dependencies first. 
+# You, can of course, manually maintain the list of bundles specified in '-runbundles' and assign
+# start levels manually but it is not a recommended way.
+#
+# In most of the scenarios, you won't need any start level if there is no start order dependency
+# between the bundles. If you use the dynamic nature of OSGi, start level is not required at all.
+# A typical anti-pattern example is to use low-level API (BundleContext#getServiceReference(..))'
+# to consume a service whereas the actual service may not be available at this time. In such a scenario,
+# a start level is required when you assign a lower start level to the bundle exposing the service and
+# a higher one to the consumer bundle. If you use ServiceTracker or DS, you won't need start level at all.
+-runstartlevel  : begin = 2, step = 1, order = leastdependenciesfirst
+
+# the 'distro' provides all the requirements and capabilities of the complete default runtime, hence,
+# resolving against the distro will only check for dependencies which only your feature requires
+-distro         : com.osgifx.console.runtime
+
+# only add the leaf feature bundle here which will be used to pull in other dependencies it requires
+-runrequires    : bnd.identity;id='com.osgifx.console.feature.tictactoe'
+
+# the following is automatically generated due to resolve operation
+-runbundles: \
+	com.osgifx.console.wrapper.grid;version=snapshot;startlevel=2,\
+	com.osgifx.console.feature.tictactoe;version=snapshot;startlevel=3
