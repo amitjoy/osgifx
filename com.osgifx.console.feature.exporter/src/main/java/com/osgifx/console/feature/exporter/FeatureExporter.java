@@ -2,6 +2,9 @@ package com.osgifx.console.feature.exporter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +16,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
-import com.google.common.io.Files;
+import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -68,10 +71,10 @@ public class FeatureExporter implements Exporter {
         feature.docURL         = docURL;
         feature.scm            = scm;
         feature.vendor         = vendor;
-        feature.categories     = parseCategories(project, categories);
+        feature.categories     = parseCategories(categories);
         feature.variables      = parseVariables(variables);
         feature.configurations = parseConfigurations(configurations);
-        feature.bundles        = prepareBundles(project, groupID, resources);
+        feature.bundles        = prepareBundles(groupID, resources);
 
         final File outputZIP = new File(project.getTargetDir(), output);
         createZip(project, feature, outputZIP);
@@ -97,8 +100,7 @@ public class FeatureExporter implements Exporter {
         return configs;
     }
 
-    private List<FeatureBundleDTO> prepareBundles(final Project project, final String groupID, final Collection<Container> resources)
-            throws Exception {
+    private List<FeatureBundleDTO> prepareBundles(final String groupID, final Collection<Container> resources) throws Exception {
         final List<FeatureBundleDTO> bundles = new ArrayList<>();
         for (final Container container : resources) {
             final File                file       = container.getFile();
@@ -123,7 +125,7 @@ public class FeatureExporter implements Exporter {
         return Splitter.on(PATTERN).withKeyValueSeparator('=').split(variables);
     }
 
-    private List<String> parseCategories(final Project project, final String categories) throws IOException {
+    private List<String> parseCategories(final String categories) throws IOException {
         if (categories == null) {
             return Collections.emptyList();
         }
@@ -154,35 +156,32 @@ public class FeatureExporter implements Exporter {
     }
 
     private void createZip(final Project project, final FeatureDTO feature, final File outputZIP) {
-        try {
-            final ZipFile zipFile = new ZipFile(outputZIP);
-            try {
-                final File bundlesDir = new File("bundles");
-                IO.mkdirs(bundlesDir);
-                for (final FeatureBundleDTO bundle : feature.bundles) {
-                    final File bundleJar = new File(bundle.file);
-                    Files.copy(bundleJar, new File(bundlesDir, bundleJar.getName()));
-                    bundle.file = null; // we don't want to include in JSON
-                }
-                zipFile.addFolder(bundlesDir);
+        try (final ZipFile zipFile = new ZipFile(outputZIP)) {
 
-                final Gson   gson        = new GsonBuilder().setPrettyPrinting().create();
-                final String json        = gson.toJson(feature);
-                final File   featureFile = new File("feature.json");
+            final Path bundlesDir = Paths.get("bundles");
+            IO.delete(bundlesDir);
+            IO.mkdirs(bundlesDir);
 
-                IO.write(json.getBytes(), featureFile);
-                zipFile.addFile(featureFile);
-
-                bundlesDir.delete();
-                featureFile.delete();
-            } finally {
-                try {
-                    zipFile.close();
-                } catch (final IOException e) {
-                    project.exception(e, "Cannot close feature archive");
-                }
+            for (final FeatureBundleDTO bundle : feature.bundles) {
+                final Path bundleJar = Paths.get(bundle.file);
+                Files.copy(bundleJar, bundlesDir.resolve(bundleJar.getFileName()));
+                bundle.file = null; // we don't want to include the file location in JSON
             }
+            zipFile.addFolder(bundlesDir.toFile());
+
+            final Gson   gson        = new GsonBuilder().setPrettyPrinting().create();
+            final String json        = gson.toJson(feature);
+            final File   featureFile = new File("feature.json");
+
+            IO.write(json.getBytes(), featureFile);
+            zipFile.addFile(featureFile);
+            IO.delete(featureFile);
         } catch (final Exception e) {
+            try {
+                IO.write(Throwables.getStackTraceAsString(e).getBytes(), new File(project.getBase(), "exception.txt"));
+            } catch (final IOException e1) {
+                project.exception(e, "Cannot write exception text file");
+            }
             project.exception(e, "Cannot create feature archive");
         }
     }
