@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.dialog;
+package com.osgifx.console.ui.bundles.dialog;
 
 import java.io.File;
 

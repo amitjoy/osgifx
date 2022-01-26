@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
 
@@ -34,9 +34,9 @@ import org.osgi.framework.dto.BundleDTO;
 
 import com.google.common.io.Files;
 import com.osgifx.console.agent.Agent;
-import com.osgifx.console.application.dialog.BundleInstallDTO;
-import com.osgifx.console.application.dialog.BundleInstallDialog;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.bundles.dialog.BundleInstallDTO;
+import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
 import com.osgifx.console.util.fx.Fx;
 
 public final class BundleInstallHandler {

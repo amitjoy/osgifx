@@ -7,4 +7,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  graphic = graphic
 -buildpath          : ${bundles.required}
 Import-Package      : org.controlsfx.glyphfont, *
--privatepackage     : com.osgifx.console.ui.components
+-privatepackage     : com.osgifx.console.ui.components.*

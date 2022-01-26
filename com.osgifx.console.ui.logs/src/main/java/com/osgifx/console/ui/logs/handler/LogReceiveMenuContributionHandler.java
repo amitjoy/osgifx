@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.logs.handler;
 
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 

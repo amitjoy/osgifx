@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.bundles.handler;
 
-import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ENABLED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_STOPPED_EVENT_TOPIC;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,11 +26,10 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.agent.Agent;
-import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
 
-public final class ComponentEnableHandler {
+public final class BundleStopHandler {
 
     @Log
     @Inject
@@ -41,25 +40,23 @@ public final class ComponentEnableHandler {
     private Supervisor   supervisor;
 
     @Execute
-    public void execute(@Named("name") final String name) {
+    public void execute(@Named("id") final String id) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
             logger.atWarning().log("Remote agent cannot be connected");
             return;
         }
         try {
-            final XResultDTO result = agent.enableComponent(name);
-            if (result.result == XResultDTO.SUCCESS) {
-                logger.atInfo().log(result.response);
-                eventBroker.send(COMPONENT_ENABLED_EVENT_TOPIC, name);
-            } else if (result.result == XResultDTO.SKIPPED) {
-                logger.atWarning().log(result.response);
+            final String error = agent.stop(Long.parseLong(id));
+            if (error == null) {
+                logger.atInfo().log("Bundle with ID '%s' has been stopped", id);
+                eventBroker.send(BUNDLE_STOPPED_EVENT_TOPIC, id);
             } else {
-                logger.atError().log(result.response);
-                FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
+                logger.atError().log(error);
+                FxDialog.showErrorDialog("Bundle Stop Error", error, getClass().getClassLoader());
             }
         } catch (final Exception e) {
-            logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
+            logger.atError().withException(e).log("Bundle with ID '%s' cannot be stopped", id);
             FxDialog.showExceptionDialog(e, getClass().getClassLoader());
         }
     }

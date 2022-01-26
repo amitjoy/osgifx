@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.dialog;
+package com.osgifx.console.ui.bundles.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
@@ -23,7 +23,6 @@ import javax.inject.Named;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.application.fxml.controller.InstallBundleDialogController;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
@@ -41,7 +40,7 @@ public final class BundleInstallDialog extends Dialog<BundleInstallDTO> {
     @LocalInstance
     private FXMLLoader    loader;
     @Inject
-    @Named("com.osgifx.console.application")
+    @Named("com.osgifx.console.ui.bundles")
     private BundleContext context;
 
     public void init() {
@@ -58,7 +57,7 @@ public final class BundleInstallDialog extends Dialog<BundleInstallDTO> {
         final Node dialogContent = Fx.loadFXML(loader, context, "/fxml/install-bundle-dialog.fxml");
         dialogPane.setContent(dialogContent);
 
-        final InstallBundleDialogController controller = (InstallBundleDialogController) loader.getController();
+        final BundleInstallDialogController controller = (BundleInstallDialogController) loader.getController();
         setResultConverter(dialogButton -> {
             final ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
             return data == ButtonData.OK_DONE ? controller.getInstallDTO() : null;

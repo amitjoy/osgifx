@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="ASCII"?>
-<!--
-  Copyright 2022 Amit Kumar Mondal
-  
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  use this file except in compliance with the License.  You may obtain a copy
-  of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-  License for the specific language governing permissions and limitations under
-  the License.
--->
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_s7J3oCBGEey33dbookdebQ">
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_s7J3oCBGEey33dbookdebQ">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack">
     <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.components" accessibilityPhrase="" contributionURI="bundleclass://com.osgifx.console.ui.components/com.osgifx.console.ui.components.ComponentsFxUI" label="Components" iconURI="platform:/plugin/com.osgifx.console.ui.components/graphic/icons/components.png" tooltip="Shows all service components registered in the remote framework" closeable="true"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_oFFuYH6-EeyYfeV-7UqQeg" featurename="handlers" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="commands:Handler" xmi:id="_oFFuYX6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.component.enable" contributionURI="bundleclass://com.osgifx.console.ui.components/com.osgifx.console.ui.components.handler.ComponentEnableHandler" command="_oFFuZH6-EeyYfeV-7UqQeg"/>
+    <elements xsi:type="commands:Handler" xmi:id="_oFFuYn6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.component.disable" contributionURI="bundleclass://com.osgifx.console.ui.components/com.osgifx.console.ui.components.handler.ComponentDisableHandler" command="_oFFuZn6-EeyYfeV-7UqQeg"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_oFFuY36-EeyYfeV-7UqQeg" featurename="commands" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="commands:Command" xmi:id="_oFFuZH6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.component.enable" commandName="Component Enable Command" description="Enables the component with the specified ID">
+      <parameters xmi:id="_oFFuZX6-EeyYfeV-7UqQeg" elementId="name" name="Name" optional="false"/>
+      <category href="../com.osgifx.console.application/Application.e4xmi#_btigQCdFEeyh4bauXjycpA"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_oFFuZn6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.component.disable" commandName="Component Disable Command" description="Disables the component with the specified ID">
+      <parameters xmi:id="_oFFuZ36-EeyYfeV-7UqQeg" elementId="id" name="ID" optional="false"/>
+      <category href="../com.osgifx.console.application/Application.e4xmi#_btigQCdFEeyh4bauXjycpA"/>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_oFFuaH6-EeyYfeV-7UqQeg" featurename="categories" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="commands:Category" xmi:id="_oFFuaX6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.category.component" name="Component Action" description="This category is used to group all commands relating to component state changes"/>
   </fragments>
 </fragment:ModelFragments>
