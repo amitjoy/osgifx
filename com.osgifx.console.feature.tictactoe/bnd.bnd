@@ -23,6 +23,6 @@ Bundle-SymbolicName : ${p}; singleton:=true
                            vendor         =  OSGi.fx;\
                            categories     =  "tictactoe,osgi.fx.feature";\
                            variables      =  "http.port=8080, db.username=dummy-user, db.password=dummy-pass";\
-                           configurations =  "org.acme.server.http=[org.osgi.service.http.port=${http.port}],\
-                                             org.acme.db=[username=${db.username}-user, password=${db.password}]";\
+                           configurations =  "{org.acme.server.http:{org.osgi.service.http.port:'${http.port}'},\
+                                              org.acme.db:{username:'${db.username}-user', password:'${db.password}'}}";\
                            output         =  tic-tac-toe-feature.zip;
