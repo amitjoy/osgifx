@@ -1,2 +1,0 @@
-default.startlevel              : 1
-startlevels                     : com.osgifx.console.launcher;startlevel=5

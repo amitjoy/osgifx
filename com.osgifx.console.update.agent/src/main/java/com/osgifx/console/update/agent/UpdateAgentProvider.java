@@ -93,7 +93,7 @@ import com.osgifx.console.update.UpdateAgent;
 @Component
 public final class UpdateAgentProvider implements UpdateAgent {
 
-    private static final int          DEFAULT_START_LEVEL                 = 100;
+    private static final int          DEFAULT_START_LEVEL                 = Integer.getInteger("launch.startlevel.default", 100);
     private static final int          MAX_REDIRECTS                       = 50;
     private static final long         CONNECTION_TIMEOUT_IN_MILLISECONDS  = Duration.ofSeconds(15).toMillis();
     private static final long         READ_TIMEOUT_IN_MILLISECONDS        = Duration.ofSeconds(20).toMillis();

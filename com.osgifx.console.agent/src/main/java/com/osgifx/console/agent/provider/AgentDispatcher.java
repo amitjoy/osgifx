@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -42,15 +42,14 @@ public class AgentDispatcher {
 
     // public because of testing
     public static class Descriptor implements Closeable {
-        public AtomicBoolean            closed     = new AtomicBoolean(false);
-        public List<AgentServer>        servers    = new CopyOnWriteArrayList<>();
-        public Framework                framework;
-        public Map<String, Object>      configuration;
-        public File                     storage;
-        public File                     shaCache;
-        public String                   name;
-        public List<BundleActivator>    activators = new ArrayList<>();
-        public StartLevelRuntimeHandler startlevels;
+        public AtomicBoolean         closed     = new AtomicBoolean(false);
+        public List<AgentServer>     servers    = new CopyOnWriteArrayList<>();
+        public Framework             framework;
+        public Map<String, Object>   configuration;
+        public File                  storage;
+        public File                  shaCache;
+        public String                name;
+        public List<BundleActivator> activators = new ArrayList<>();
 
         @Override
         public void close() throws IOException {
