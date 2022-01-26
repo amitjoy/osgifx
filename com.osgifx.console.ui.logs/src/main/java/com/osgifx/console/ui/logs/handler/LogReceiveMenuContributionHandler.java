@@ -23,10 +23,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
@@ -34,6 +32,8 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.preferences.Preference;
+import org.eclipse.fx.core.preferences.Value;
 import org.osgi.annotation.bundle.Requirement;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -46,23 +46,23 @@ public final class LogReceiveMenuContributionHandler {
 
     @Log
     @Inject
-    private FluentLogger        logger;
+    private FluentLogger     logger;
     @Inject
-    private Supervisor          supervisor;
+    private Supervisor       supervisor;
     @Inject
-    private EModelService       modelService;
+    private EModelService    modelService;
     @Inject
-    private LogEntryListener    logEntryListener;
+    private LogEntryListener logEntryListener;
     @Inject
-    @Preference(nodePath = "osgi.fx.log")
-    private IEclipsePreferences preferences;
+    @Preference(nodePath = "osgi.fx.log", key = "action")
+    private Value<Boolean>   action;
     @Inject
     @Named("is_connected")
-    private boolean             isConnected;
+    private boolean          isConnected;
 
     @PostConstruct
     public void init() {
-        final boolean currentState = getCurrentState();
+        final boolean currentState = action.getValue();
         if (currentState) {
             supervisor.addOSGiLogListener(logEntryListener);
             logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
@@ -74,14 +74,13 @@ public final class LogReceiveMenuContributionHandler {
 
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        prepareMenu(items, getCurrentState());
+        prepareMenu(items, action.getValue());
     }
 
     @Execute
     public void execute(final MDirectMenuItem menuItem) throws BackingStoreException {
         final boolean accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
-        preferences.putBoolean("action", accessibilityPhrase);
-        preferences.flush();
+        action.publish(accessibilityPhrase);
 
         if (accessibilityPhrase) {
             supervisor.addOSGiLogListener(logEntryListener);
@@ -97,10 +96,6 @@ public final class LogReceiveMenuContributionHandler {
     @CanExecute
     public boolean canExecute() {
         return isConnected;
-    }
-
-    private boolean getCurrentState() {
-        return preferences.getBoolean("action", false);
     }
 
     private void prepareMenu(final List<MMenuElement> items, final boolean value) {
@@ -129,11 +124,11 @@ public final class LogReceiveMenuContributionHandler {
         final MDirectMenuItem dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
 
         dynamicItem.setLabel(label);
-        dynamicItem.setIconURI("platform:/plugin/com.osgifx.console.application/graphic/icons/" + icon);
+        dynamicItem.setIconURI("platform:/plugin/com.osgifx.console.ui.logs/graphic/icons/" + icon);
         dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
-        dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.application");
+        dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.ui.logs");
         dynamicItem.setContributionURI(
-                "bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.LogReceiveMenuContributionHandler");
+                "bundleclass://com.osgifx.console.ui.logs/com.osgifx.console.ui.logs.handler.LogReceiveMenuContributionHandler");
 
         return dynamicItem;
     }

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -28,17 +28,15 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.controlsfx.dialog.ProgressDialog;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.core.preferences.Preference;
+import org.eclipse.fx.core.preferences.Value;
 import org.osgi.annotation.bundle.Requirement;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -58,19 +56,17 @@ public final class FeatureInstallHandler {
 
     @Log
     @Inject
-    private FluentLogger        logger;
+    private FluentLogger    logger;
     @Inject
-    private IEclipseContext     context;
+    private IEclipseContext context;
     @Inject
-    private UpdateAgent         updateAgent;
+    private UpdateAgent     updateAgent;
     @Inject
-    private ThreadSynchronize   threadSync;
+    private IWorkbench      workbench;
     @Inject
-    private IWorkbench          workbench;
-    @Inject
-    @Preference(nodePath = "osgi.fx.feature")
-    private IEclipsePreferences preferences;
-    private ProgressDialog      progressDialog;
+    @Preference(nodePath = "osgi.fx.feature", key = "repos", defaultValue = "")
+    private Value<String>   repos;
+    private ProgressDialog  progressDialog;
 
     @Execute
     public void execute() {
@@ -154,24 +150,17 @@ public final class FeatureInstallHandler {
                 if (!isWebURL(archiveURL)) {
                     return;
                 }
-                try {
-                    final String repo = preferences.get("repos", "");
-                    final Gson   gson = new Gson();
-                    Set<String>  toBeStored;
-                    if (repo.isEmpty()) {
-                        toBeStored = Sets.newHashSet(archiveURL);
-                    } else {
-                        toBeStored = gson.fromJson(repo, new TypeToken<HashSet<String>>() {
-                        }.getType());
-                        toBeStored.add(archiveURL);
-                    }
-                    final String json = gson.toJson(toBeStored);
-                    preferences.put("repos", json);
-                    preferences.flush();
-                } catch (final BackingStoreException e) {
-                    logger.atError().withException(e).log("Repo URL cannot be stored");
-                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                final Gson  gson = new Gson();
+                Set<String> toBeStored;
+                if (repos.getValue().isEmpty()) {
+                    toBeStored = Sets.newHashSet(archiveURL);
+                } else {
+                    toBeStored = gson.fromJson(repos.getValue(), new TypeToken<HashSet<String>>() {
+                    }.getType());
+                    toBeStored.add(archiveURL);
                 }
+                final String json = gson.toJson(toBeStored);
+                repos.publish(json);
             }
         };
 
