@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.components.handler;
 
-import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_DELETED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ENABLED_EVENT_TOPIC;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,7 +30,7 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
 
-public final class ConfigurationDeleteHandler {
+public final class ComponentEnableHandler {
 
     @Log
     @Inject
@@ -41,25 +41,25 @@ public final class ConfigurationDeleteHandler {
     private Supervisor   supervisor;
 
     @Execute
-    public void execute(@Named("pid") final String pid) {
+    public void execute(@Named("name") final String name) {
         final Agent agent = supervisor.getAgent();
         if (supervisor.getAgent() == null) {
             logger.atWarning().log("Remote agent cannot be connected");
             return;
         }
         try {
-            final XResultDTO result = agent.deleteConfiguration(pid);
+            final XResultDTO result = agent.enableComponent(name);
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
-                eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
+                eventBroker.send(COMPONENT_ENABLED_EVENT_TOPIC, name);
             } else if (result.result == XResultDTO.SKIPPED) {
                 logger.atWarning().log(result.response);
             } else {
                 logger.atError().log(result.response);
-                FxDialog.showErrorDialog("Configuration Delete Error", result.response, getClass().getClassLoader());
+                FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
             }
         } catch (final Exception e) {
-            logger.atError().withException(e).log("Configuration with PID '%s' cannot be deleted", pid);
+            logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
             FxDialog.showExceptionDialog(e, getClass().getClassLoader());
         }
     }

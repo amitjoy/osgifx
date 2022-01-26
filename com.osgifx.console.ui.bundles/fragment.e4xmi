@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="ASCII"?>
-<!--
-  Copyright 2022 Amit Kumar Mondal
-  
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  use this file except in compliance with the License.  You may obtain a copy
-  of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
-  License for the specific language governing permissions and limitations under
-  the License.
--->
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_s7J3oCBGEey33dbookdebQ">
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack">
     <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.bundles" accessibilityPhrase="" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.BundlesFxUI" label="Bundles" iconURI="platform:/plugin/com.osgifx.console.ui.bundles/graphic/icons/bundles.png" tooltip="Shows all installed bundles in the remote framework" closeable="true"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kPgEQH67EeyYfeV-7UqQeg" featurename="handlers" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="commands:Handler" xmi:id="_kPgEQX67EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.bundle.start" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.handler.BundleStartHandler" command="_kPgERX67EeyYfeV-7UqQeg"/>
+    <elements xsi:type="commands:Handler" xmi:id="_kPgEQn67EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.bundle.stop" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.handler.BundleStopHandler" command="_kPgER367EeyYfeV-7UqQeg"/>
+    <elements xsi:type="commands:Handler" xmi:id="_kPgEQ367EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.bundle.uninstall" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.handler.BundleUninstallHandler" command="_kPgESX67EeyYfeV-7UqQeg"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kPgERH67EeyYfeV-7UqQeg" featurename="commands" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="commands:Command" xmi:id="_kPgERX67EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.bundle.start" commandName="Bundle Start Command" description="Starts the specified bundle having the specified ID" category="_kPgETH67EeyYfeV-7UqQeg">
+      <parameters xmi:id="_kPgERn67EeyYfeV-7UqQeg" elementId="id" name="ID" optional="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_kPgER367EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.bundle.stop" commandName="Bundle Stop Command" description="Stops the specified bundle having the specified ID" category="_kPgETH67EeyYfeV-7UqQeg">
+      <parameters xmi:id="_kPgESH67EeyYfeV-7UqQeg" elementId="id" name="ID" optional="false"/>
+    </elements>
+    <elements xsi:type="commands:Command" xmi:id="_kPgESX67EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.bundle.uninstall" commandName="Bundle Uninstall Command" description="Uninstalls the specified bundle having the specified ID" category="_kPgETH67EeyYfeV-7UqQeg">
+      <parameters xmi:id="_kPgESn67EeyYfeV-7UqQeg" elementId="id" name="ID" optional="false"/>
+    </elements>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kPgES367EeyYfeV-7UqQeg" featurename="categories" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="commands:Category" xmi:id="_kPgETH67EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.category.bundle" name="Bundle Action" description="This category is used to group all commands relating to bundle state changes"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kPgET367EeyYfeV-7UqQeg" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_kPgEUH67EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.directmenuitem.install" label="Install/Update Bundle" iconURI="platform:/plugin/com.osgifx.console.ui.bundles/graphic/icons/install.png" tooltip="Install or update bundle in the remote OSGi framework" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.handler.BundleInstallHandler"/>
   </fragments>
 </fragment:ModelFragments>

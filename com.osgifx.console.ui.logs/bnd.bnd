@@ -6,4 +6,4 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : ${bundles.required}
--privatepackage     : com.osgifx.console.ui.logs
+-privatepackage     : com.osgifx.console.ui.logs.*

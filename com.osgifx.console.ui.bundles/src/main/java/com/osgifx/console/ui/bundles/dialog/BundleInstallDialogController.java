@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.fxml.controller;
+package com.osgifx.console.ui.bundles.dialog;
 
 import java.io.File;
 
@@ -23,8 +23,6 @@ import org.controlsfx.control.ToggleSwitch;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-
-import com.osgifx.console.application.dialog.BundleInstallDTO;
 
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
@@ -37,7 +35,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
-public final class InstallBundleDialogController {
+public final class BundleInstallDialogController {
 
     @Log
     @Inject

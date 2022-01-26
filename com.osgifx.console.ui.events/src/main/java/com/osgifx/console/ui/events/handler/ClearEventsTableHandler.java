@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.events.handler;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,23 +24,23 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-public final class ClearLogsTableHandler {
+public final class ClearEventsTableHandler {
 
-    private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
+    private static final String EVENT_TOPIC = "com/osgifx/clear/events";
 
     @Log
     @Inject
     private FluentLogger logger;
     @Inject
+    private IEventBroker eventBroker;
+    @Inject
     @Named("is_connected")
     private boolean      isConnected;
-    @Inject
-    private IEventBroker eventBroker;
 
     @Execute
     public void execute() {
         eventBroker.post(EVENT_TOPIC, "");
-        logger.atInfo().log("Clear logs table command sent");
+        logger.atInfo().log("Clear events table command sent");
     }
 
     @CanExecute

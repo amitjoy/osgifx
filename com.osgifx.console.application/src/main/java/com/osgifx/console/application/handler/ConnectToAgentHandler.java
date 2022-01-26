@@ -190,7 +190,9 @@ public final class ConnectToAgentHandler {
     @org.eclipse.e4.core.di.annotations.Optional
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event received");
-        progressDialog.close();
+        if (progressDialog != null) {
+            progressDialog.close();
+        }
     }
 
 }
