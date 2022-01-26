@@ -32,10 +32,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.preferences.Preference;
-import org.eclipse.fx.core.preferences.Value;
 import org.osgi.annotation.bundle.Requirement;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
@@ -43,6 +40,8 @@ import com.osgifx.console.util.fx.Fx;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class LogReceiveMenuContributionHandler {
+
+    private static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
 
     @Log
     @Inject
@@ -54,15 +53,12 @@ public final class LogReceiveMenuContributionHandler {
     @Inject
     private LogEntryListener logEntryListener;
     @Inject
-    @Preference(nodePath = "osgi.fx.log", key = "action")
-    private Value<Boolean>   action;
-    @Inject
     @Named("is_connected")
     private boolean          isConnected;
 
     @PostConstruct
     public void init() {
-        final boolean currentState = action.getValue();
+        final boolean currentState = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
         if (currentState) {
             supervisor.addOSGiLogListener(logEntryListener);
             logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
@@ -74,13 +70,14 @@ public final class LogReceiveMenuContributionHandler {
 
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        prepareMenu(items, action.getValue());
+        final boolean value = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
+        prepareMenu(items, value);
     }
 
     @Execute
-    public void execute(final MDirectMenuItem menuItem) throws BackingStoreException {
+    public void execute(final MDirectMenuItem menuItem) {
         final boolean accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
-        action.publish(accessibilityPhrase);
+        System.setProperty(PROPERTY_KEY_LOG_DISPLAY, String.valueOf(accessibilityPhrase));
 
         if (accessibilityPhrase) {
             supervisor.addOSGiLogListener(logEntryListener);
