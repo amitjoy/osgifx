@@ -89,11 +89,7 @@ public final class GameFxUI {
             @Override
             protected Void call() throws Exception {
                 progressPane.setVisible(true);
-                try {
-                    tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                }
+                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
                 return null;
             }
 
