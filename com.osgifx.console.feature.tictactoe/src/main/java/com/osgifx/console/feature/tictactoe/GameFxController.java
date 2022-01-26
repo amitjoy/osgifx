@@ -28,7 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
-public final class TicTcToeFxController {
+public final class GameFxController {
 
     @Log
     @Inject
@@ -51,12 +51,7 @@ public final class TicTcToeFxController {
 
         final GridView<States> gridView = new GridView<>();
         gridView.setGridModel(gridModel);
-
-        try {
-            gridView.setNodeFactory(cell -> States.EMPTY == cell.getState() ? null : new Label(cell.getState().name()));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        gridView.setNodeFactory(cell -> States.EMPTY == cell.getState() ? null : new Label(cell.getState().name()));
 
         final GameLogic gameLogic = new GameLogic(gridModel);
         gameLogic.start();
