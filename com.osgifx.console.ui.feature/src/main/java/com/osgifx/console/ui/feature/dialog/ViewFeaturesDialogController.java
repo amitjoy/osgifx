@@ -28,7 +28,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.feature.FeatureDTO;
-import com.osgifx.console.update.UpdateAgent;
+import com.osgifx.console.update.FeatureAgent;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -41,7 +41,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.UpdateAgent)")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.FeatureAgent)")
 public final class ViewFeaturesDialogController {
 
     @Log
@@ -60,7 +60,7 @@ public final class ViewFeaturesDialogController {
     @FXML
     private TableColumn<FeatureDTO, String> licenseColumn;
     @Inject
-    private UpdateAgent                     updateAgent;
+    private FeatureAgent                    featureAgent;
     @Inject
     private IWorkbench                      workbench;
     @Inject
@@ -69,7 +69,7 @@ public final class ViewFeaturesDialogController {
 
     @FXML
     public void initialize() {
-        final Collection<FeatureDTO> installedFeatures = updateAgent.getInstalledFeatures();
+        final Collection<FeatureDTO> installedFeatures = featureAgent.getInstalledFeatures();
         features = FXCollections.observableArrayList(installedFeatures);
         featuresList.setItems(features);
         logger.atInfo().log("FXML controller has been initialized");
@@ -89,14 +89,14 @@ public final class ViewFeaturesDialogController {
         item.setOnAction(event -> {
             final FeatureDTO f = featuresList.getSelectionModel().getSelectedItem();
             try {
-                final FeatureDTO removedfeature = updateAgent.remove(featureIdAsString(f));
+                final FeatureDTO removedfeature = featureAgent.remove(featureIdAsString(f));
                 if (removedfeature != null) {
                     threadSync.asyncExec(() -> {
                         final String header = "Feature Uninstallation";
                         FxDialog.showInfoDialog(header, featureIdAsString(removedfeature) + " has been uninstalled",
                                 getClass().getClassLoader());
                         features.clear();
-                        features.addAll(updateAgent.getInstalledFeatures());
+                        features.addAll(featureAgent.getInstalledFeatures());
                         // show information about the restart of the application
                         FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
                                 getClass().getClassLoader(), btn -> workbench.restart());

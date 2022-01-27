@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.update.agent;
+package com.osgifx.console.feature.agent;
 
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
@@ -88,10 +88,10 @@ import com.osgifx.console.feature.FeatureBundleDTO;
 import com.osgifx.console.feature.FeatureConfigurationDTO;
 import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.feature.IdDTO;
-import com.osgifx.console.update.UpdateAgent;
+import com.osgifx.console.update.FeatureAgent;
 
 @Component
-public final class UpdateAgentProvider implements UpdateAgent {
+public final class FeatureAgentProvider implements FeatureAgent {
 
     private static final int          DEFAULT_START_LEVEL                 = Integer.getInteger("launch.startlevel.default", 100);
     private static final int          MAX_REDIRECTS                       = 50;

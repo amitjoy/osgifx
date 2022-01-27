@@ -40,12 +40,12 @@ import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.feature.IdDTO;
 import com.osgifx.console.ui.feature.dialog.CheckForUpdatesDialog;
 import com.osgifx.console.ui.feature.dialog.CheckForUpdatesDialog.SelectedFeaturesForUpdateDTO;
-import com.osgifx.console.update.UpdateAgent;
+import com.osgifx.console.update.FeatureAgent;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.UpdateAgent)")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.FeatureAgent)")
 public final class CheckForUpdatesHandler {
 
     @Log
@@ -54,7 +54,7 @@ public final class CheckForUpdatesHandler {
     @Inject
     private IEclipseContext   context;
     @Inject
-    private UpdateAgent       updateAgent;
+    private FeatureAgent      featureAgent;
     @Inject
     private ThreadSynchronize threadSync;
     private ProgressDialog    updateProgressDialog;
@@ -66,7 +66,7 @@ public final class CheckForUpdatesHandler {
         final Task<Collection<FeatureDTO>> updateCheckTask = new Task<Collection<FeatureDTO>>() {
             @Override
             protected Collection<FeatureDTO> call() throws Exception {
-                final Collection<FeatureDTO> tobeUpdatedFeatures = updateAgent.checkForUpdates();
+                final Collection<FeatureDTO> tobeUpdatedFeatures = featureAgent.checkForUpdates();
                 if (tobeUpdatedFeatures.isEmpty()) {
                     threadSync.asyncExec(() -> {
                         updateCheckProgressDialog.close();
@@ -110,10 +110,10 @@ public final class CheckForUpdatesHandler {
                         for (final FeatureDTO entry : selected.features) {
                             final String repoURL = entry.archiveURL;
                             try {
-                                final Entry<File, FeatureDTO> feature = updateAgent.readFeature(new URL(repoURL),
+                                final Entry<File, FeatureDTO> feature = featureAgent.readFeature(new URL(repoURL),
                                         featureIdAsString(entry.id));
                                 logger.atInfo().log("Processing update: '%s'", feature.getValue());
-                                updateAgent.updateOrInstall(feature.getKey(), repoURL);
+                                featureAgent.updateOrInstall(feature.getKey(), repoURL);
                                 successfullyUpdatedFeatures.add(entry);
                             } catch (final Exception e) {
                                 logger.atError().withException(e).log("Cannot check for updates");
