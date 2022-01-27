@@ -23,7 +23,7 @@
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.PrefixSelectionComboBox?>
 
-<GridPane fx:id="featureInstallPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.application.fxml.controller.InstallFeatureDialogController">
+<GridPane fx:id="featureInstallPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.feature.dialog.InstallFeatureDialogController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="564.0" minWidth="10.0" prefWidth="403.0" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="197.0" />

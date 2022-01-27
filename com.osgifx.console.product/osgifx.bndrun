@@ -33,6 +33,7 @@ startlevels                       :   com.osgifx.console.launcher;startlevel=5
 		                              bnd.identity;id='com.osgifx.console.ui.components',\
 		                              bnd.identity;id='com.osgifx.console.ui.configurations',\
 		                              bnd.identity;id='com.osgifx.console.ui.events',\
+		                              bnd.identity;id='com.osgifx.console.ui.feature',\
 		                              bnd.identity;id='com.osgifx.console.ui.logs',\
 		                              bnd.identity;id='com.osgifx.console.ui.gogo',\
 		                              bnd.identity;id='com.osgifx.console.ui.graph',\
@@ -76,6 +77,7 @@ install.order                     :   \
 	com.osgifx.console.logging;version=snapshot;startlevel=1,\
 	com.osgifx.console.smartgraph;version=snapshot;startlevel=1,\
 	com.osgifx.console.supervisor;version=snapshot;startlevel=1,\
+	com.osgifx.console.ui.feature;version=snapshot;startlevel=1,\
 	com.osgifx.console.update.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.util;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=1,\
