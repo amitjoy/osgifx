@@ -18,6 +18,7 @@ package com.osgifx.console.application.fxml.controller;
 import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -26,7 +27,6 @@ import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 
-import javafx.beans.property.Property;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -48,7 +48,7 @@ public final class ConnectionSettingsDialogController {
     private ConnectionsProvider                        connectionsProvider;
     @Inject
     @ContextValue("selected.settings")
-    private Property<ConnectionSettingDTO>             selectedSettings;
+    private ContextBoundValue<ConnectionSettingDTO>    selectedSettings;
 
     @FXML
     public void initialize() {
@@ -57,7 +57,11 @@ public final class ConnectionSettingsDialogController {
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
 
         connectionTable.setItems(connectionsProvider.getConnections());
-        selectedSettings.bind(connectionTable.getSelectionModel().selectedItemProperty());
+        connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSettings, newSettings) -> {
+            if (newSettings != null) {
+                selectedSettings.publish(newSettings);
+            }
+        });
         TableFilter.forTableView(connectionTable).apply();
         logger.atInfo().log("FXML controller has been initialized");
     }
