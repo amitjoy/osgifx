@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.feature.handler;
 
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
@@ -42,10 +42,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.osgifx.console.application.dialog.FeatureInstallDialog;
-import com.osgifx.console.application.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
 import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.feature.IdDTO;
+import com.osgifx.console.ui.feature.dialog.FeatureInstallDialog;
+import com.osgifx.console.ui.feature.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
 import com.osgifx.console.update.UpdateAgent;
 import com.osgifx.console.util.fx.FxDialog;
 
