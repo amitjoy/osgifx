@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -47,10 +47,6 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
     private FluentLogger      logger;
     @Inject
     private ThreadSynchronize threadSync;
-    private ButtonType        saveButtonType;
-    private CustomTextField   txtHostname;
-    private CustomTextField   txtPort;
-    private CustomTextField   txtTimeout;
 
     public void init() {
         final DialogPane dialogPane = getDialogPane();
@@ -62,13 +58,13 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-        txtHostname = (CustomTextField) TextFields.createClearableTextField();
+        final CustomTextField txtHostname = (CustomTextField) TextFields.createClearableTextField();
         txtHostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
 
-        txtPort = (CustomTextField) TextFields.createClearableTextField();
+        final CustomTextField txtPort = (CustomTextField) TextFields.createClearableTextField();
         txtPort.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
 
-        txtTimeout = (CustomTextField) TextFields.createClearableTextField();
+        final CustomTextField txtTimeout = (CustomTextField) TextFields.createClearableTextField();
         txtTimeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
 
         final Label lbMessage = new Label("");
@@ -85,8 +81,9 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
         dialogPane.setContent(content);
 
-        saveButtonType = new javafx.scene.control.ButtonType("Save", ButtonData.OK_DONE);
+        final ButtonType saveButtonType = new ButtonType("Save", ButtonData.OK_DONE);
         dialogPane.getButtonTypes().addAll(saveButtonType);
+
         final Button loginButton = (Button) dialogPane.lookupButton(saveButtonType);
         loginButton.setOnAction(actionEvent -> {
             try {
