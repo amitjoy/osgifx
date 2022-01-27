@@ -14,6 +14,7 @@
 	com.osgifx.console.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.application;version=snapshot;startlevel=1,\
 	com.osgifx.console.data.provider;version=snapshot;startlevel=1,\
+	com.osgifx.console.feature.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.feature.tictactoe;version=snapshot;startlevel=1,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=1,\
 	com.osgifx.console.logging;version=snapshot;startlevel=1,\
@@ -23,6 +24,7 @@
 	com.osgifx.console.ui.components;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.configurations;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.events;version=snapshot;startlevel=1,\
+	com.osgifx.console.ui.feature;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.gogo;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.graph;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.logs;version=snapshot;startlevel=1,\
@@ -31,9 +33,9 @@
 	com.osgifx.console.ui.properties;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.services;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.threads;version=snapshot;startlevel=1,\
-	com.osgifx.console.update.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.util;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=1,\
+	com.osgifx.console.wrapper.grid;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=1,\
 	controlsfx;version='[8.40.18,8.40.19)';startlevel=1,\
 	javax.annotation;version='[1.2.0,1.2.1)';startlevel=1,\

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.update.agent;
+package com.osgifx.console.feature.agent;
 
 import static java.util.stream.Collectors.toList;
 

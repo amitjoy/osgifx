@@ -43,7 +43,7 @@ import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.feature.IdDTO;
 import com.osgifx.console.ui.feature.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
-import com.osgifx.console.update.UpdateAgent;
+import com.osgifx.console.update.FeatureAgent;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.beans.binding.Bindings;
@@ -68,7 +68,7 @@ public final class InstallFeatureDialogController {
     @Inject
     private ThreadSynchronize               threadSync;
     @Inject
-    private UpdateAgent                     updateAgent;
+    private FeatureAgent                    featureAgent;
     @Inject
     @Preference(nodePath = "osgi.fx.feature", key = "repos", defaultValue = "")
     private Value<String>                   preference;
@@ -148,7 +148,7 @@ public final class InstallFeatureDialogController {
                     @Override
                     protected Void call() throws Exception {
                         try {
-                            features.putAll(updateAgent.readFeatures(parsedURL));
+                            features.putAll(featureAgent.readFeatures(parsedURL));
                         } catch (final Exception e) {
                             logger.atError().withException(e).log("Cannot read features from archive - '%s'", parsedURL);
                             threadSync.asyncExec(() -> {
@@ -175,7 +175,7 @@ public final class InstallFeatureDialogController {
                 logger.atInfo().log("Reading features from - '%s'", url);
 
                 localArchive = new File(url);
-                features.putAll(updateAgent.readFeatures(localArchive));
+                features.putAll(featureAgent.readFeatures(localArchive));
             }
             if (features.isEmpty()) {
                 featuresList.setItems(FXCollections.observableArrayList(new XFeatureDTO(null, null, true)));

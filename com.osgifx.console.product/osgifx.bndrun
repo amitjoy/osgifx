@@ -73,12 +73,12 @@ install.order                     :   \
 	com.osgifx.console.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.application;version=snapshot;startlevel=1,\
 	com.osgifx.console.data.provider;version=snapshot;startlevel=1,\
+	com.osgifx.console.feature.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=1,\
 	com.osgifx.console.logging;version=snapshot;startlevel=1,\
 	com.osgifx.console.smartgraph;version=snapshot;startlevel=1,\
 	com.osgifx.console.supervisor;version=snapshot;startlevel=1,\
 	com.osgifx.console.ui.feature;version=snapshot;startlevel=1,\
-	com.osgifx.console.update.agent;version=snapshot;startlevel=1,\
 	com.osgifx.console.util;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=1,\
 	com.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=1,\

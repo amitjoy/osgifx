@@ -46,12 +46,12 @@ import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.feature.IdDTO;
 import com.osgifx.console.ui.feature.dialog.FeatureInstallDialog;
 import com.osgifx.console.ui.feature.dialog.FeatureInstallDialog.SelectedFeaturesDTO;
-import com.osgifx.console.update.UpdateAgent;
+import com.osgifx.console.update.FeatureAgent;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.UpdateAgent)")
+@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.FeatureAgent)")
 public final class FeatureInstallHandler {
 
     @Log
@@ -60,7 +60,7 @@ public final class FeatureInstallHandler {
     @Inject
     private IEclipseContext context;
     @Inject
-    private UpdateAgent     updateAgent;
+    private FeatureAgent    featureAgent;
     @Inject
     private IWorkbench      workbench;
     @Inject
@@ -97,7 +97,7 @@ public final class FeatureInstallHandler {
                     final FeatureDTO f  = feature.getValue();
                     final String     id = featureIdAsString(f.id);
                     try {
-                        updateAgent.updateOrInstall(feature.getKey(), archiveURL);
+                        featureAgent.updateOrInstall(feature.getKey(), archiveURL);
                         successfullyInstalledFeatures.add(f);
                         logger.atInfo().log("Feature '%s' has been successfuly installed/updated", id);
                     } catch (final Exception e) {

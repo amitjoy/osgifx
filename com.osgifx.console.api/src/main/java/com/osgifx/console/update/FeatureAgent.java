@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -25,16 +25,14 @@ import org.osgi.annotation.versioning.ProviderType;
 
 import com.osgifx.console.feature.FeatureDTO;
 
-import com.osgifx.console.update.UpdateAgent;
-
 /**
- * The {@link UpdateAgent} service is the application access point to update
- * functionalities. {@link UpdateAgent} service allows introspection of all
+ * The {@link FeatureAgent} service is the application access point to update
+ * functionalities. {@link FeatureAgent} service allows introspection of all
  * currently available or installed features in runtime.
  *
  * <p>
  * Access to this service requires the
- * {@code ServicePermission[UpdateAgent, GET]} permission. It is intended
+ * {@code ServicePermission[FeatureAgent, GET]} permission. It is intended
  * that only administrative bundles should be granted this permission to limit
  * access to the potentially intrusive methods provided by this service.
  *
@@ -44,7 +42,7 @@ import com.osgifx.console.update.UpdateAgent;
  * @ThreadSafe
  */
 @ProviderType
-public interface UpdateAgent {
+public interface FeatureAgent {
 
     /**
      * Reads all the features from the specified archive file.
