@@ -101,11 +101,13 @@ Run `./gradlew clean build` in the project root directory
 
 #### External Feature Development
 
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily use their modular functionalities to build your own feature.
+External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. As a starting point, please have a look at the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.feature.tictactoe). Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily use their modular functionalities to build your own features.
 
-Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option)
+Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option.
 
-Note that, to develop an external feature, you need to provide a ZIP archive which could comprise one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
+Note that, to develop an external feature, you need to provide a ZIP archive comprising one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
+
+For ease of development, you can use the OSGi.fx workspace to further develop your own features as the workspace comprises a new bnd plugin which will enable you to automatically prepare the ZIP archive from a bndrun file. As an example, please refer to the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.feature.tictactoe).
 
 --------------------------------------------------------------------------------------------------------------
 
