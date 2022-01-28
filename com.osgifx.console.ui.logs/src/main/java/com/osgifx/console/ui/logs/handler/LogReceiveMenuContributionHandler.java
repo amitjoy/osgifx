@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs.handler;
 
+import static com.osgifx.console.event.topics.CommonEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.CommonEventTopics.LOG_RECEIVE_STOPPED_EVENT_TOPIC;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.List;
@@ -25,6 +27,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
@@ -48,6 +51,8 @@ public final class LogReceiveMenuContributionHandler {
     private FluentLogger     logger;
     @Inject
     private Supervisor       supervisor;
+    @Inject
+    private IEventBroker     eventBroker;
     @Inject
     private EModelService    modelService;
     @Inject
@@ -77,6 +82,13 @@ public final class LogReceiveMenuContributionHandler {
     @Execute
     public void execute(final MDirectMenuItem menuItem) {
         final boolean accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
+
+        if (accessibilityPhrase) {
+            eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+        } else {
+            eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+        }
+
         System.setProperty(PROPERTY_KEY_LOG_DISPLAY, String.valueOf(accessibilityPhrase));
 
         if (accessibilityPhrase) {
