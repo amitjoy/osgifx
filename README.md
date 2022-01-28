@@ -27,9 +27,10 @@
 		<img src="https://user-images.githubusercontent.com/13380182/150548810-2723d931-ab75-4ced-a97d-d6656e1461a7.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548815-a876f645-86ae-44a1-b629-6ce1be249c21.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/151515110-667dfb99-517e-4701-b57d-250285f51099.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/151477116-bab6060b-d2d1-443b-9b68-afb4e7cf456a.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/151535803-6a0d263a-4fae-4e36-9b6b-5b062ed58b1e.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548818-a47f6eba-b1a2-493a-862d-6326ae2b3f3e.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/151477230-efa6983c-5b79-4ea3-9179-e3665ba3d3bd.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/151536028-3f109059-3dd3-4860-a539-90efed46360a.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/151536216-e8a78931-efc5-460f-a7e4-471b52a15f8d.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548823-49552ac5-14a6-42b8-976a-04c6434264fb.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548826-bfcdfb80-429f-4f08-94a6-f5b97ce4bdbd.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548827-aaf03eea-e52a-459e-8197-8c386fc681e6.png" />
@@ -62,6 +63,7 @@
 | List all registered DS components                                                                                                                                               	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | List all available system and framework properties                                                                                                                              	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | List all daemon and non-daemon threads                                                                                                                                          	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Send synchronous or asynchronous events on demand                                                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Receive events on demand (option to start and stop receiving events)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Receive logs on demand (option to start and stop receiving logs)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Execute Gogo command                                                                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
