@@ -16,7 +16,7 @@
 package com.osgifx.console.ui.logs;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
-import static com.osgifx.console.event.topics.CommonEventTopics.LOG_RECEIVE_EVENT_TOPICS;
+import static com.osgifx.console.event.topics.CommonEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
@@ -66,7 +66,7 @@ public final class LogsFxUI {
     @Inject
     @Optional
     private void updateOnLogReceiveStarted( //
-            @UIEventTopic(LOG_RECEIVE_EVENT_TOPICS) final String data, //
+            @UIEventTopic(LOG_RECEIVE_STARTED_EVENT_TOPIC) final String data, //
             final BorderPane parent, //
             @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
