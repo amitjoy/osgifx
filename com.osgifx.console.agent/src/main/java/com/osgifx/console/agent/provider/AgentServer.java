@@ -141,6 +141,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 
     private final ServiceTracker<Object, Object>                 scrTracker;
     private final ServiceTracker<Object, Object>                 metatypeTracker;
+    private final ServiceTracker<Object, Object>                 eventAdminTracker;
     private final ServiceTracker<Object, Object>                 configAdminTracker;
     private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
     private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
@@ -176,6 +177,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
         metatypeTracker       = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
+        eventAdminTracker     = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
         configAdminTracker    = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
         scrTracker            = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
         agentExtensionTracker = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
@@ -241,6 +243,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
                               };
         scrTracker.open();
         metatypeTracker.open();
+        eventAdminTracker.open();
         configAdminTracker.open();
         gogoCommandsTracker.open();
         agentExtensionTracker.open();
@@ -1068,6 +1071,30 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             return configAdmin.createFactoryConfiguration(factoryPid, newProperties);
         }
         return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
+    }
+
+    @Override
+    public void sendEvent(final String topic, final Map<String, Object> properties) {
+        requireNonNull(topic, "Event topic cannot be null");
+        requireNonNull(properties, "Event properties cannot be null");
+
+        final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+        if (isEventAdminAvailable) {
+            final XEventAdmin eventAdmin = new XEventAdmin(eventAdminTracker.getService());
+            eventAdmin.sendEvent(topic, properties);
+        }
+    }
+
+    @Override
+    public void postEvent(final String topic, final Map<String, Object> properties) {
+        requireNonNull(topic, "Event topic cannot be null");
+        requireNonNull(properties, "Event properties cannot be null");
+
+        final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+        if (isEventAdminAvailable) {
+            final XEventAdmin eventAdmin = new XEventAdmin(eventAdminTracker.getService());
+            eventAdmin.postEvent(topic, properties);
+        }
     }
 
     @Override
