@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -23,7 +23,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import com.google.common.collect.EvictingQueue;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -37,7 +36,6 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.util.fx.ObservableQueue;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,8 +49,8 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
     private Supervisor    supervisor;
     private FluentLogger  logger;
 
-    private final ObservableQueue<XEventDTO>    events = new ObservableQueue<>(EvictingQueue.create(200));
-    private final ObservableQueue<XLogEntryDTO> logs   = new ObservableQueue<>(EvictingQueue.create(1000));
+    private final ObservableList<XLogEntryDTO> logs   = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+    private final ObservableList<XEventDTO>    events = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
 
     @Activate
     void activate() {
