@@ -9,4 +9,7 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_2zSEUH7CEeyYfeV-7UqQeg" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
     <elements xsi:type="menu:DynamicMenuContribution" xmi:id="_2zSEUX7CEeyYfeV-7UqQeg" elementId="com.osgifx.console.application.menu.event.actions" contributionURI="bundleclass://com.osgifx.console.ui.events/com.osgifx.console.ui.events.handler.EventReceiveMenuContributionHandler"/>
   </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_IU5WEIAlEeyYfeV-7UqQeg" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_IU5WEYAlEeyYfeV-7UqQeg" elementId="com.osgifx.console.application.directmenuitem.event.send" label="Send Events" iconURI="platform:/plugin/com.osgifx.console.ui.events/graphic/icons/send-event.png" tooltip="Send OSGi EventAdmin events" contributionURI="bundleclass://com.osgifx.console.ui.events/com.osgifx.console.ui.events.handler.SendEventHandler"/>
+  </fragments>
 </fragment:ModelFragments>
