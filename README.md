@@ -18,7 +18,7 @@
 <img src="https://user-images.githubusercontent.com/13380182/150548837-0a6c16ff-eb2f-4de6-b435-a074f2b8fccc.png" />
 <p align="center">
 	<details>
-		<summary><b>Click here for more screenshots</b></summary>
+		<summary><h2>Click here for more screenshots</h2></summary>
 		<img src="https://user-images.githubusercontent.com/13380182/150548788-342365c5-19b1-4357-8222-5b4b784fd7c4.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548795-cd4bc616-29b6-4772-9e89-a30d70a0063c.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/150548797-8b4aecca-9f15-439b-858a-a22251a5527d.png" />
