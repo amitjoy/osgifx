@@ -404,6 +404,26 @@ public interface Agent {
     XResultDTO createFactoryConfiguration(String factoryPid, Map<String, Object> newProperties);
 
     /**
+     * Publish event synchronously (the method does not return until the event is processed)
+     *
+     * @param topic
+     *            topic of the event to be published
+     * @param properties
+     *            data to be published with the event
+     */
+    void sendEvent(String topic, Map<String, Object> properties);
+
+    /**
+     * Publish event asynchronously ((this method returns immediately))
+     *
+     * @param topic
+     *            topic of the event to be published
+     * @param properties
+     *            data to be published with the event
+     */
+    void postEvent(String topic, Map<String, Object> properties);
+
+    /**
      * Returns the runtime information of the remote system
      *
      * @return the runtime information
