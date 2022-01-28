@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.events;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
+import static com.osgifx.console.event.topics.CommonEventTopics.EVENT_RECEIVE_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
@@ -59,6 +60,15 @@ public final class EventsFxUI {
 
     @Focus
     public void focus(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnEventReceiveStarted( //
+            @UIEventTopic(EVENT_RECEIVE_EVENT_TOPICS) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
     }
 
