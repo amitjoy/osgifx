@@ -83,9 +83,12 @@ public final class GraphFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+    private void updateOnAgentDisconnectedEvent( //
+            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
-        partService.hidePart(part);
+        createControls(parent, loader);
     }
 
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
