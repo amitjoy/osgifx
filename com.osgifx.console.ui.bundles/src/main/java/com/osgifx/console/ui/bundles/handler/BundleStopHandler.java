@@ -50,7 +50,7 @@ public final class BundleStopHandler {
             final String error = agent.stop(Long.parseLong(id));
             if (error == null) {
                 logger.atInfo().log("Bundle with ID '%s' has been stopped", id);
-                eventBroker.send(BUNDLE_STOPPED_EVENT_TOPIC, id);
+                eventBroker.post(BUNDLE_STOPPED_EVENT_TOPIC, id);
             } else {
                 logger.atError().log(error);
                 FxDialog.showErrorDialog("Bundle Stop Error", error, getClass().getClassLoader());

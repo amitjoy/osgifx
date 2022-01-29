@@ -50,7 +50,7 @@ public final class BundleStartHandler {
             final String error = agent.start(Long.parseLong(id));
             if (error == null) {
                 logger.atInfo().log("Bundle with ID '%s' has been started", id);
-                eventBroker.send(BUNDLE_STARTED_EVENT_TOPIC, id);
+                eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
             } else {
                 logger.atError().log(error);
                 FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader());

@@ -57,7 +57,7 @@ public final class ConfigurationUpdateHandler {
             final XResultDTO          result = agent.createOrUpdateConfiguration(pid, props);
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
-                eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+                eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
             } else if (result.result == XResultDTO.SKIPPED) {
                 logger.atWarning().log(result.response);
             } else {

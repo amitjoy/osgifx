@@ -88,7 +88,7 @@ public final class BundleInstallHandler {
                     agent.start(bundle.id);
                     logger.atInfo().log("Bundle has been started: %s", bundle);
                 }
-                eventBroker.send(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
+                eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
                 Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated");
             } catch (final Exception e) {
                 logger.atError().withException(e).log("Bundle cannot be installed or updated");

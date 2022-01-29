@@ -53,7 +53,7 @@ public final class ComponentDisableHandler {
             final XResultDTO result = agent.disableComponent(Long.parseLong(id));
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
-                eventBroker.send(COMPONENT_DISABLED_EVENT_TOPIC, id);
+                eventBroker.post(COMPONENT_DISABLED_EVENT_TOPIC, id);
             } else if (result.result == XResultDTO.SKIPPED) {
                 logger.atWarning().log(result.response);
             } else {

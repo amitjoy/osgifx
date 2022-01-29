@@ -54,7 +54,7 @@ public final class FactoryConfigurationCreateHandler {
             }.getType());
             agent.createFactoryConfiguration(factoryPID, props);
             logger.atInfo().log("Factory configuration with factory PID '%s' has been created", factoryPID);
-            eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
+            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
         } catch (final Exception e) {
             logger.atError().log("Factory Configuration with factory PID '%s' cannot be created", factoryPID);
         }

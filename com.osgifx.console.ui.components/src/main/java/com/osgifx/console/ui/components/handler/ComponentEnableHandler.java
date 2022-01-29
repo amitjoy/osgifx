@@ -51,7 +51,7 @@ public final class ComponentEnableHandler {
             final XResultDTO result = agent.enableComponent(name);
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
-                eventBroker.send(COMPONENT_ENABLED_EVENT_TOPIC, name);
+                eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
             } else if (result.result == XResultDTO.SKIPPED) {
                 logger.atWarning().log(result.response);
             } else {

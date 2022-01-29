@@ -50,7 +50,7 @@ public final class BundleUninstallHandler {
             final String error = agent.uninstall(Long.parseLong(id));
             if (error == null) {
                 logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
-                eventBroker.send(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
+                eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
             } else {
                 logger.atError().log(error);
                 FxDialog.showErrorDialog("Bundle Uninstall Error", error, getClass().getClassLoader());
