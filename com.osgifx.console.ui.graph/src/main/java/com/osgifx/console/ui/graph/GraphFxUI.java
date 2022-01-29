@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -17,6 +17,8 @@ package com.osgifx.console.ui.graph;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -46,18 +48,19 @@ public final class GraphFxUI {
 
     @Log
     @Inject
-    private FluentLogger      logger;
+    private FluentLogger                  logger;
     @Inject
     @Named("com.osgifx.console.ui.graph")
-    private BundleContext     context;
+    private BundleContext                 context;
     @Inject
-    private MPart             part;
+    private MPart                         part;
     @Inject
-    private EPartService      partService;
+    private EPartService                  partService;
     @Inject
-    private ThreadSynchronize threadSync;
-    private final StatusBar   statusBar    = new StatusBar();
-    private final MaskerPane  progressPane = new MaskerPane();
+    private ThreadSynchronize             threadSync;
+    private final StatusBar               statusBar    = new StatusBar();
+    private final MaskerPane              progressPane = new MaskerPane();
+    private final AtomicReference<String> loadedType   = new AtomicReference<>();
 
     private static final String BUNDLES_GRAPH_TYPE    = "Bundles";
     private static final String COMPONENTS_GRAPH_TYPE = "Components";
@@ -87,32 +90,38 @@ public final class GraphFxUI {
 
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
         Fx.initStatusBar(parent, statusBar);
+        if (loadedType.get() == null) {
+            threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
+                    "/graphic/images/graph.png", type -> {
+                        final Task<?> task = new Task<Void>() {
+                                                 @Override
+                                                 protected Void call() throws Exception {
+                                                     loadContent(parent, loader, type);
+                                                     return null;
+                                                 }
+                                             };
+                        final Thread thread = new Thread(task);
+                        thread.setDaemon(true);
+                        thread.start();
+                    }, () -> partService.hidePart(part), BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE));
+        } else {
+            loadContent(parent, loader, loadedType.get());
+        }
+    }
 
-        threadSync.asyncExec(() -> {
-            FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(), "/graphic/images/graph.png", type -> {
-                final Task<?> task = new Task<Void>() {
-                    Node tabContent = null;
-
-                    @Override
-                    protected Void call() throws Exception {
-                        threadSync.asyncExec(() -> parent.setCenter(progressPane));
-                        if (BUNDLES_GRAPH_TYPE.equalsIgnoreCase(type)) {
-                            tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-bundles.fxml");
-                        } else {
-                            tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-components.fxml");
-                        }
-                        progressPane.setVisible(false);
-                        threadSync.asyncExec(() -> parent.setCenter(tabContent));
-                        return null;
-                    }
-                };
-
-                final Thread thread = new Thread(task);
-                thread.setDaemon(true);
-                thread.start();
-            }, () -> partService.hidePart(part), BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE);
-        });
-
+    private void loadContent(final BorderPane parent, final FXMLLoader loader, final String type) {
+        Node tabContent = null;
+        threadSync.asyncExec(() -> parent.setCenter(progressPane));
+        if (BUNDLES_GRAPH_TYPE.equalsIgnoreCase(type)) {
+            tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-bundles.fxml");
+            loadedType.set(BUNDLES_GRAPH_TYPE);
+        } else {
+            tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-components.fxml");
+            loadedType.set(COMPONENTS_GRAPH_TYPE);
+        }
+        final Node content = tabContent; // required for lambda as it needs to be effectively final
+        progressPane.setVisible(false);
+        threadSync.asyncExec(() -> parent.setCenter(content));
     }
 
 }
