@@ -84,7 +84,7 @@ public final class ConfigurationCreateHandler {
                     return;
                 }
                 if (result) {
-                    eventBroker.send(CONFIGURATION_UPDATED_EVENT_TOPIC, dto.pid);
+                    eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, dto.pid);
                     Fx.showSuccessNotification("New Configuration", "Configuration - '" + effectivePID + "' has been successfully created");
                     logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
                 } else {

@@ -51,7 +51,7 @@ public final class ConfigurationDeleteHandler {
             final XResultDTO result = agent.deleteConfiguration(pid);
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
-                eventBroker.send(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
+                eventBroker.post(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
             } else if (result.result == XResultDTO.SKIPPED) {
                 logger.atWarning().log(result.response);
             } else {
