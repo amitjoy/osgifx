@@ -114,6 +114,7 @@ public final class LogsFxController {
         table.setItems(logs);
 
         TableFilter.forTableView(table).apply();
+        sortByLoggedAt(loggedAtColumn);
     }
 
     @Inject
@@ -124,6 +125,12 @@ public final class LogsFxController {
         logs.clear();
         table.setItems(logs);
         logger.atInfo().log("Cleared logs table successfully");
+    }
+
+    private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {
+        column.setSortType(TableColumn.SortType.DESCENDING);
+        table.getSortOrder().add(column);
+        table.sort();
     }
 
 }

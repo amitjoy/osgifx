@@ -104,6 +104,7 @@ public final class EventsFxController {
         table.setItems(events);
 
         TableFilter.forTableView(table).apply();
+        sortByReceivedAt(receivedAtColumn);
     }
 
     @Inject
@@ -114,6 +115,12 @@ public final class EventsFxController {
         events.clear();
         table.setItems(events);
         logger.atInfo().log("Cleared events table successfully");
+    }
+
+    private void sortByReceivedAt(final TableColumn<XEventDTO, Date> column) {
+        column.setSortType(TableColumn.SortType.DESCENDING);
+        table.getSortOrder().add(column);
+        table.sort();
     }
 
 }
