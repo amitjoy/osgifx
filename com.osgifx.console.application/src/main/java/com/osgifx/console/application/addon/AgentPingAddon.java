@@ -30,11 +30,8 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -42,10 +39,9 @@ import com.osgifx.console.supervisor.Supervisor;
 
 public final class AgentPingAddon {
 
-    private static final long   INITIAL_DELAY        = Duration.ofSeconds(0).toMillis();
-    private static final long   MAX_DELAY            = Duration.ofSeconds(20).toMillis();
-    private static final String THREAD_NAME          = "osgifx-agent-ping";
-    private static final String CONNECTION_WINDOW_ID = "com.osgifx.console.window.connection";
+    private static final long   INITIAL_DELAY = Duration.ofSeconds(0).toMillis();
+    private static final long   MAX_DELAY     = Duration.ofSeconds(5).toMillis();
+    private static final String THREAD_NAME   = "osgifx-agent-ping";
 
     @Log
     @Inject
@@ -54,10 +50,6 @@ public final class AgentPingAddon {
     private Supervisor                  supervisor;
     @Inject
     private IEventBroker                eventBroker;
-    @Inject
-    private EModelService               modelService;
-    @Inject
-    private MApplication                application;
     private ScheduledExecutorService    executor;
     private volatile ScheduledFuture<?> future;
 
@@ -69,7 +61,7 @@ public final class AgentPingAddon {
 
     @Inject
     @Optional
-    private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+    private void agentConnected(@EventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event has been received");
         future = executor.scheduleWithFixedDelay(() -> {
             try {
@@ -78,11 +70,6 @@ public final class AgentPingAddon {
                 logger.atWarning().log("Agent ping request did not succeed");
                 System.clearProperty(CONNECTED_AGENT);
                 eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-                final MWindow connectionChooserWindow = (MWindow) modelService.find(CONNECTION_WINDOW_ID, application);
-                if (!connectionChooserWindow.isVisible()) {
-                    logger.atInfo().log("Connection broken. Making connection chooser window visible.");
-                    connectionChooserWindow.setVisible(true);
-                }
                 future.cancel(true);
                 future = null;
             }
