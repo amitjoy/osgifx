@@ -57,11 +57,9 @@ public final class ConnectionSettingsDialogController {
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
 
         connectionTable.setItems(connectionsProvider.getConnections());
-        connectionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSettings, newSettings) -> {
-            if (newSettings != null) {
-                selectedSettings.publish(newSettings);
-            }
-        });
+        connectionTable.getSelectionModel().selectedItemProperty()
+                .addListener((obs, oldSettings, newSettings) -> selectedSettings.publish(newSettings));
+
         TableFilter.forTableView(connectionTable).apply();
         logger.atInfo().log("FXML controller has been initialized");
     }
