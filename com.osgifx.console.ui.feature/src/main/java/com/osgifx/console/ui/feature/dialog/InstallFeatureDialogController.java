@@ -229,7 +229,8 @@ public final class InstallFeatureDialogController {
                 // Only get the first file from the list
                 final File file = db.getFiles().get(0);
                 threadSync.asyncExec(() -> {
-                    archiveUrlCombo.setItems(FXCollections.observableArrayList(file.getName()));
+                    archiveUrlCombo.setItems(FXCollections.observableArrayList(file.getAbsolutePath()));
+                    archiveUrlCombo.getSelectionModel().select(file.getAbsolutePath());
                     localArchive = file;
                     archiveUrlCombo.setTooltip(new Tooltip(localArchive.getName()));
                 });
