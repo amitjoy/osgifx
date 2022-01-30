@@ -28,6 +28,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 
@@ -35,14 +36,17 @@ public final class DisconnectFromAgentHandler {
 
     @Log
     @Inject
-    private FluentLogger               logger;
+    private FluentLogger                            logger;
     @Inject
-    private Supervisor                 supervisor;
+    private Supervisor                              supervisor;
     @Inject
-    private IEventBroker               eventBroker;
+    private IEventBroker                            eventBroker;
     @Inject
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean> isConnected;
+    private ContextBoundValue<Boolean>              isConnected;
+    @Inject
+    @ContextValue("selected.settings")
+    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
 
     @Execute
     public void execute() {
@@ -50,6 +54,7 @@ public final class DisconnectFromAgentHandler {
             supervisor.getAgent().abort();
             eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
             isConnected.publish(false);
+            selectedSettings.publish(null);
             System.clearProperty(CONNECTED_AGENT);
             Fx.showSuccessNotification("Agent Connection", "Agent connection has been successfully aborted");
         } catch (final Exception e) {
