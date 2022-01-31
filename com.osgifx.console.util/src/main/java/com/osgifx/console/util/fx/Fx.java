@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -23,6 +23,7 @@ import static javafx.scene.paint.Color.TRANSPARENT;
 import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.controlsfx.control.Notifications;
@@ -40,6 +41,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
@@ -51,6 +53,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -208,5 +211,27 @@ public final class Fx {
         }
         statusBar.setText(statusBarText);
         parent.setBottom(statusBar);
+    }
+
+    public static <S, T> void addCellFactory(final TableColumn<S, T> column, final Predicate<S> predicate, final Color match,
+            final Color noMatch) {
+        column.setCellFactory(c -> new TableCell<S, T>() {
+            @Override
+            protected void updateItem(final T item, final boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item.toString());
+                    final S source = getTableView().getItems().get(getIndex());
+                    if (predicate.test(source)) {
+                        setTextFill(match);
+                    } else {
+                        setTextFill(noMatch);
+                    }
+                }
+            }
+        });
     }
 }

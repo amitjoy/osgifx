@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -42,6 +42,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ConfigurationsFxController {
@@ -82,10 +83,11 @@ public final class ConfigurationsFxController {
                                                                            return expandedNode;
                                                                        });
 
-        final TableColumn<XConfigurationDTO, String> pidColumn = new TableColumn<>("PID");
+        final TableColumn<XConfigurationDTO, String> pidColumn = new TableColumn<>("PID/Factory PID");
         pidColumn.setPrefWidth(480);
         pidColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
+        Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);
 
         final TableColumn<XConfigurationDTO, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setPrefWidth(400);
