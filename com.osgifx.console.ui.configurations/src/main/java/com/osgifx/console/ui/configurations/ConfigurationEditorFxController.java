@@ -44,6 +44,10 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.When;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -119,7 +123,11 @@ public final class ConfigurationEditorFxController {
             commandService.execute(CONFIG_UPDATE_COMMAND_ID, createCommandMap(effectivePID, null, properties));
         });
         cancelButton.setOnAction(e -> form.reset());
-        saveConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
+
+        final BooleanProperty isPersisted              = new SimpleBooleanProperty(config.isPersisted);
+        final BooleanBinding  isPersistedConfigBinding = new When(isPersisted).then(true).otherwise(false);
+
+        saveConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()).and(isPersistedConfigBinding));
     }
 
     private FormRenderer createForm(final XConfigurationDTO config) {

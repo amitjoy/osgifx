@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -34,7 +34,6 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.osgifx.console.agent.dto.XConfigurationDTO;
-import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 
 public class XConfigurationAdmin {
@@ -132,20 +131,20 @@ public class XConfigurationAdmin {
         for (final Configuration config : configs) {
             final boolean hasMetatype = metatype == null ? false : XMetaTypeAdmin.hasMetatype(context, metatype, config);
             if (!hasMetatype) {
-                dtos.add(toConfigDTO(config, null));
+                dtos.add(toConfigDTO(config));
             }
         }
         return dtos;
     }
 
-    private XConfigurationDTO toConfigDTO(final Configuration configuration, final XObjectClassDefDTO ocd) {
+    private XConfigurationDTO toConfigDTO(final Configuration configuration) {
         final XConfigurationDTO dto = new XConfigurationDTO();
 
-        dto.ocd        = ocd;
-        dto.pid        = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
-        dto.factoryPid = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties = Optional.ofNullable(configuration).map(c -> AgentServer.valueOf(configuration.getProperties())).orElse(null);
-        dto.location   = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
+        dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
+        dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
+        dto.properties  = Optional.ofNullable(configuration).map(c -> AgentServer.valueOf(configuration.getProperties())).orElse(null);
+        dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
+        dto.isPersisted = true;
 
         return dto;
     }

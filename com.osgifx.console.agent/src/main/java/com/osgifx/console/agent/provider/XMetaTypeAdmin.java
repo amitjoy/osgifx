@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -68,15 +68,13 @@ public class XMetaTypeAdmin {
         }
         List<XConfigurationDTO> configsWithMetatype    = null;
         List<XConfigurationDTO> metatypeWithoutConfigs = null;
-        List<XConfigurationDTO> metatypeFactories      = null;
         try {
             configsWithMetatype    = findConfigsWithMetatype();
             metatypeWithoutConfigs = findMetatypeWithoutConfigs();
-            metatypeFactories      = findMetatypeFactories();
         } catch (IOException | InvalidSyntaxException e) {
             return Collections.emptyList();
         }
-        return joinLists(configsWithMetatype, metatypeWithoutConfigs, metatypeFactories);
+        return joinLists(configsWithMetatype, metatypeWithoutConfigs);
     }
 
     public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
@@ -138,7 +136,7 @@ public class XMetaTypeAdmin {
         for (final Configuration config : configAdmin.listConfigurations(null)) {
             final boolean hasMetatype = hasMetatype(context, metatype, config);
             if (hasMetatype) {
-                dtos.add(toConfigDTO(config, toOCD(config)));
+                dtos.add(toConfigDTO(config, null, toOCD(config)));
             }
         }
         return dtos;
@@ -155,32 +153,17 @@ public class XMetaTypeAdmin {
                 final boolean hasAssociatedConfiguration = checkConfigurationExistence(pid);
                 if (!hasAssociatedConfiguration) {
                     final XObjectClassDefDTO ocd = toOcdDTO(pid, metatypeInfo, ConfigurationType.SINGLETON);
-                    dtos.add(toConfigDTO(null, ocd));
+                    dtos.add(toConfigDTO(null, pid, ocd));
                 }
             }
             for (final String fpid : metatypeInfo.getFactoryPids()) {
                 final boolean hasAssociatedConfiguration = checkFactoryConfigurationExistence(fpid);
                 if (!hasAssociatedConfiguration) {
-                    final XObjectClassDefDTO ocd = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
-                    dtos.add(toConfigDTO(null, ocd));
+                    final XObjectClassDefDTO ocd       = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
+                    final XConfigurationDTO  configDTO = toConfigDTO(null, fpid, ocd);
+                    configDTO.isFactory = true;
+                    dtos.add(configDTO);
                 }
-            }
-        }
-        return dtos;
-    }
-
-    private List<XConfigurationDTO> findMetatypeFactories() {
-        final List<XConfigurationDTO> dtos = new ArrayList<>();
-        for (final Bundle bundle : context.getBundles()) {
-            final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
-            if (metatypeInfo == null) {
-                continue;
-            }
-            for (final String fpid : metatypeInfo.getFactoryPids()) {
-                final XObjectClassDefDTO ocd       = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
-                final XConfigurationDTO  configDTO = toConfigDTO(null, ocd);
-                configDTO.isFactory = true;
-                dtos.add(configDTO);
             }
         }
         return dtos;
@@ -194,14 +177,15 @@ public class XMetaTypeAdmin {
         return configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")") != null;
     }
 
-    private XConfigurationDTO toConfigDTO(final Configuration configuration, final XObjectClassDefDTO ocd) {
+    private XConfigurationDTO toConfigDTO(final Configuration configuration, final String metatypePID, final XObjectClassDefDTO ocd) {
         final XConfigurationDTO dto = new XConfigurationDTO();
 
-        dto.ocd        = ocd;
-        dto.pid        = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
-        dto.factoryPid = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties = Optional.ofNullable(configuration).map(c -> AgentServer.valueOf(configuration.getProperties())).orElse(null);
-        dto.location   = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
+        dto.ocd         = ocd;
+        dto.isPersisted = configuration != null;
+        dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(metatypePID);
+        dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
+        dto.properties  = Optional.ofNullable(configuration).map(c -> AgentServer.valueOf(configuration.getProperties())).orElse(null);
+        dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
 
         return dto;
     }
