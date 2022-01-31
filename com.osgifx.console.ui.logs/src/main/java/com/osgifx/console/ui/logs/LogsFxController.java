@@ -49,6 +49,8 @@ import javafx.scene.layout.GridPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogsFxController {
 
+    private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
+
     @Log
     @Inject
     private FluentLogger                       logger;
@@ -63,8 +65,6 @@ public final class LogsFxController {
     @Named("com.osgifx.console.ui.logs")
     private BundleContext                      context;
     private TableRowDataFeatures<XLogEntryDTO> selectedLog;
-
-    private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
 
     @FXML
     public void initialize() {
