@@ -1,11 +1,14 @@
-Bundle-Vendor                         =         Byte Hue
+Bundle-Vendor                         =         OSGi.fx
 Bundle-License                        =         https://www.apache.org/licenses/LICENSE-2.0.txt
 Bundle-DocURL                         =         https://osgifx.com
-Bundle-Copyright                      =         Amit Kumar Mondal (c) 2022
+Bundle-Copyright                      =         Copyright (c) Amit Kumar Mondal ${tstamp;yyyy}. All Rights Reserved.
 Bundle-Developers                     =         amit.kumar.mondal; \
                                                    email=admin@amitinside.com; \
                                                    name="Amit Kumar Mondal"; \
-                                                   organization="Deutsche Telekom AG"
+                                                   organization="Deutsche Telekom AG"; \
+                                                   organizationURL="https://www.telekom.de/"; \
+                                                   roles="architect,developer"; \
+                                                   timezone="Europe/Berlin"
 Bundle-SCM                            =         url=https://github.com/amitjoy/osgifx-console.git, \
                                                 connection=scm:git:https://github.com/amitjoy/osgifx-console.git, \
                                                 developerConnection=scm:git:git@github.com:amitjoy/osgifx-console.git

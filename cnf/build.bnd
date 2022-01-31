@@ -15,9 +15,6 @@ javac.encoding                        =         UTF-8
 -noimportjava                         =         true
 -remoteworkspace                      =         true
 
--pom                                  =         true
--groupid                              =         com.osgifx
-
 src                                   =         src/main/java, src/main/resources
 bin                                   =         ${bin.directory}
 testsrc                               =         src/test/java
@@ -37,13 +34,24 @@ testbin.directory                     =         ${if;${is;${driver};gradle};targ
 bin.testbin.directory                 =         ${if;${is;${driver};gradle};target/gradle/classes,target/gradle/test-classes;target/classes,target/test-classes}
 
 -builderignore                        =         ${bin.testbin.directory}
--removeheaders                        =         Created-By, Private-Package, Tool, Bnd-LastModified
+-noextraheaders                       =         true
 
 -buildpath.base.api                   =         com.osgifx.console.api
 -buildpath.osgi                       =         osgi.annotation, osgi.cmpn, osgi.core
 -testpath.all                         =         osgi.enroute.junit.wrapper, osgi.enroute.hamcrest.wrapper
 
+-pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
+-groupid                              =         com.osgifx
+
+# -snapshot unset (commented out) is a snapshot build. (e.g. 1.0.0-SNAPSHOT)
+# -snapshot set to a value (e.g. RC1) is a release build with the value as the maven version qualifier. (e.g. 1.0.0-RC1)
+# -snapshot set to the empty string is a release build with no maven version qualifier. (e.g. 1.0.0)
+#-snapshot                            =         
+
 Bundle-Version                        =         ${version}.${tstamp}-SNAPSHOT
+
+Git-Descriptor                        =         ${system-allow-fail;git describe --dirty --always --abbrev=9}
+Git-SHA                               =         ${system-allow-fail;git rev-list -1 --no-abbrev-commit HEAD}
 
 -plugin.1.Build                       =         \
 		    aQute.bnd.repository.maven.provider.MavenBndRepository;\
