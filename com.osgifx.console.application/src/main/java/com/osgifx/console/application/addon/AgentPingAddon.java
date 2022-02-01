@@ -17,13 +17,12 @@ package com.osgifx.console.application.addon;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -68,13 +67,18 @@ public final class AgentPingAddon {
                 supervisor.getAgent().ping();
             } catch (final Exception e) {
                 logger.atWarning().log("Agent ping request did not succeed");
-                System.clearProperty(CONNECTED_AGENT);
                 eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-                future.cancel(true);
-                future = null;
             }
-        }, INITIAL_DELAY, MAX_DELAY, TimeUnit.SECONDS);
+        }, INITIAL_DELAY, MAX_DELAY, MILLISECONDS);
         logger.atInfo().log("Agent ping scheduler has been started");
+    }
+
+    @Inject
+    @Optional
+    private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event has been received");
+        future.cancel(true);
+        future = null;
     }
 
     @PreDestroy

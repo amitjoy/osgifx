@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.controlsfx.control.StatusBar;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -42,7 +41,7 @@ import org.osgi.annotation.bundle.Requirement;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.util.fx.Fx;
+import com.osgifx.console.ui.ConsoleStatusBar;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
@@ -75,10 +74,11 @@ public final class OverviewFxUI {
 
     @Log
     @Inject
-    private FluentLogger    logger;
+    private FluentLogger     logger;
     @Inject
-    private Supervisor      supervisor;
-    private final StatusBar statusBar = new StatusBar();
+    private ConsoleStatusBar statusBar;
+    @Inject
+    private Supervisor       supervisor;
 
     private volatile double noOfThreads;
     private volatile double noOfServices;
@@ -103,7 +103,7 @@ public final class OverviewFxUI {
         runtimeInfo = Maps.newConcurrentMap();
         uptime      = new UptimeDTO(0, 0, 0, 0);
 
-        Fx.initStatusBar(parent, statusBar);
+        statusBar.addTo(parent);
         retrieveRuntimeInfo(parent);
         createWidgets(parent);
     }

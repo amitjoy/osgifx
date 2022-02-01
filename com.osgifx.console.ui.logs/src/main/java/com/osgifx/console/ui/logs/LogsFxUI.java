@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.MaskerPane;
-import org.controlsfx.control.StatusBar;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -34,6 +33,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
@@ -49,7 +49,8 @@ public final class LogsFxUI {
     @Inject
     @Named("com.osgifx.console.ui.logs")
     private BundleContext    context;
-    private final StatusBar  statusBar    = new StatusBar();
+    @Inject
+    private ConsoleStatusBar statusBar;
     private final MaskerPane progressPane = new MaskerPane();
 
     @PostConstruct
@@ -118,13 +119,13 @@ public final class LogsFxUI {
                 super.succeeded();
                 parent.getChildren().clear();
                 parent.setCenter(tabContent);
-                Fx.initStatusBar(parent, statusBar);
+                statusBar.addTo(parent);
                 progressPane.setVisible(false);
             }
         };
         parent.getChildren().clear();
         parent.setCenter(progressPane);
-        Fx.initStatusBar(parent, statusBar);
+        statusBar.addTo(parent);
 
         final Thread thread = new Thread(task);
         thread.setDaemon(true);

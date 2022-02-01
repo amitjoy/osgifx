@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.provider;
 
-import static com.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -78,8 +76,6 @@ public class AgentSupervisor<S, A> {
         this.host    = host;
         this.port    = port;
         this.timeout = timeout;
-
-        System.setProperty(CONNECTED_AGENT, host + ":" + port);
 
         while (true) {
             try {

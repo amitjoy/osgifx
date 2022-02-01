@@ -16,7 +16,6 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.Supervisor.CONNECTED_AGENT;
 
 import javax.inject.Inject;
 
@@ -45,6 +44,9 @@ public final class DisconnectFromAgentHandler {
     @ContextValue("is_connected")
     private ContextBoundValue<Boolean>              isConnected;
     @Inject
+    @ContextValue("connected.agent")
+    private ContextBoundValue<Boolean>              connectedAgent;
+    @Inject
     @ContextValue("selected.settings")
     private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
 
@@ -55,7 +57,7 @@ public final class DisconnectFromAgentHandler {
             eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
             isConnected.publish(false);
             selectedSettings.publish(null);
-            System.clearProperty(CONNECTED_AGENT);
+            connectedAgent.publish(null);
             Fx.showSuccessNotification("Agent Connection", "Agent connection has been successfully aborted");
         } catch (final Exception e) {
             logger.atError().withException(e).log("Agent connection cannot be aborted");

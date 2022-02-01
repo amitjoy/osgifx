@@ -36,6 +36,7 @@ public final class ModifiablePropertyAddon {
 
     public ModifiablePropertyAddon() {
         modifiableProperties.put("is_connected", false);
+        modifiableProperties.put("connected.agent", null);
         modifiableProperties.put("selected.settings", null);
     }
 

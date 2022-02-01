@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -32,9 +32,6 @@ public interface Supervisor {
 
     /** The topic where an event will be sent after the agent gets disconnected */
     String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
-
-    /** System property comprising the host and port of the connected agent */
-    String CONNECTED_AGENT = "osgi.fx.connected.agent";
 
     /**
      * Redirected standard output
