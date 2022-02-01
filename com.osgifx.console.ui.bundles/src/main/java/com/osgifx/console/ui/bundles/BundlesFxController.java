@@ -40,6 +40,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class BundlesFxController {
@@ -83,6 +84,7 @@ public final class BundlesFxController {
 
         symbolicNameColumn.setPrefWidth(450);
         symbolicNameColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        Fx.addCellFactory(symbolicNameColumn, b -> b.isFragment, Color.SLATEBLUE, Color.BLACK);
 
         final TableColumn<XBundleDTO, String> versionColumn = new TableColumn<>("Version");
 
