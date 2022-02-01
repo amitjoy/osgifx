@@ -52,6 +52,9 @@ public final class ConnectToLocalAgentHandler {
     @ContextValue("is_connected")
     private ContextBoundValue<Boolean> isConnected;
     @Inject
+    @ContextValue("connected.agent")
+    private ContextBoundValue<String>  connectedAgent;
+    @Inject
     @Named("local.agent.host")
     private String                     localAgentHost;
     @Inject
@@ -88,7 +91,11 @@ public final class ConnectToLocalAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for Local Agent on %s:%s", localAgentHost, localAgentPort);
-                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, localAgentHost + ":" + localAgentPort);
+
+                final String connection = localAgentHost + ":" + localAgentPort;
+
+                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
+                connectedAgent.publish(connection);
                 isConnected.publish(true);
             }
         };

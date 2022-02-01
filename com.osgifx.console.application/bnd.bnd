@@ -1,6 +1,7 @@
 Bundle-SymbolicName : ${p}; singleton:=true
 -privatepackage     : \
                       styles,\
+                      com.osgifx.console.ui.*,\
                       com.osgifx.console.application.*
 -includeresource    : \
                       plugin.xml = _plugin.xml,\

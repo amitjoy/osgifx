@@ -70,6 +70,9 @@ public final class ConnectToAgentHandler {
     @ContextValue("is_connected")
     private ContextBoundValue<Boolean> isConnected;
     @Inject
+    @ContextValue("connected.agent")
+    private ContextBoundValue<String>  connectedAgent;
+    @Inject
     @Named("selected.settings")
     private ConnectionSettingDTO       selectedSettings;
     private ProgressDialog             progressDialog;
@@ -161,7 +164,10 @@ public final class ConnectToAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", selectedSettings);
-                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, selectedSettings.host + ":" + selectedSettings.port);
+                final String connection = selectedSettings.host + ":" + selectedSettings.port;
+
+                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
+                connectedAgent.publish(connection);
                 isConnected.publish(true);
             }
         };

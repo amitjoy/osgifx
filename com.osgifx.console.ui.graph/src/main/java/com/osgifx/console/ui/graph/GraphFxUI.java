@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.MaskerPane;
-import org.controlsfx.control.StatusBar;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -36,6 +35,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -50,15 +50,16 @@ public final class GraphFxUI {
     @Inject
     private FluentLogger                  logger;
     @Inject
+    private MPart                         part;
+    @Inject
     @Named("com.osgifx.console.ui.graph")
     private BundleContext                 context;
     @Inject
-    private MPart                         part;
+    private ConsoleStatusBar              statusBar;
     @Inject
     private EPartService                  partService;
     @Inject
     private ThreadSynchronize             threadSync;
-    private final StatusBar               statusBar    = new StatusBar();
     private final MaskerPane              progressPane = new MaskerPane();
     private final AtomicReference<String> loadedType   = new AtomicReference<>();
 
@@ -92,7 +93,7 @@ public final class GraphFxUI {
     }
 
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
-        Fx.initStatusBar(parent, statusBar);
+        statusBar.addTo(parent);
         if (loadedType.get() == null) {
             threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
                     "/graphic/images/graph.png", type -> {
