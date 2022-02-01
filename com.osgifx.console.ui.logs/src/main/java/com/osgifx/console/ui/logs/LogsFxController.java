@@ -45,6 +45,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogsFxController {
@@ -104,6 +105,7 @@ public final class LogsFxController {
 
         messageColumn.setPrefWidth(750);
         messageColumn.setCellValueFactory(new DTOCellValueFactory<>("message", String.class));
+        Fx.addCellFactory(messageColumn, c -> "ERROR".equalsIgnoreCase(c.level), Color.MEDIUMVIOLETRED, Color.BLACK);
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(loggedAtColumn);
