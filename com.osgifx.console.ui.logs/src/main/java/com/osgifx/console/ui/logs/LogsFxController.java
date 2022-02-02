@@ -23,7 +23,6 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
-import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -54,18 +53,17 @@ public final class LogsFxController {
 
     @Log
     @Inject
-    private FluentLogger                       logger;
+    private FluentLogger            logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                         loader;
+    private FXMLLoader              loader;
     @FXML
-    private TableView<XLogEntryDTO>            table;
-    @Inject
-    private DataProvider                       dataProvider;
+    private TableView<XLogEntryDTO> table;
     @Inject
     @OSGiBundle
-    private BundleContext                      context;
-    private TableRowDataFeatures<XLogEntryDTO> selectedLog;
+    private BundleContext           context;
+    @Inject
+    private DataProvider            dataProvider;
 
     @FXML
     public void initialize() {
@@ -84,10 +82,6 @@ public final class LogsFxController {
         final LogDetailsFxController               controller     = loader.getController();
         final TableRowExpanderColumn<XLogEntryDTO> expanderColumn = new TableRowExpanderColumn<>(expandedLog -> {
                                                                       controller.initControls(expandedLog.getValue());
-                                                                      if (selectedLog != null && selectedLog.isExpanded()) {
-                                                                          selectedLog.toggleExpanded();
-                                                                      }
-                                                                      selectedLog = expandedLog;
                                                                       return expandedNode;
                                                                   });
 

@@ -21,7 +21,6 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
-import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -47,18 +46,17 @@ public final class BundlesFxController {
 
     @Log
     @Inject
-    private FluentLogger                     logger;
+    private FluentLogger          logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                       loader;
+    private FXMLLoader            loader;
     @FXML
-    private TableView<XBundleDTO>            table;
-    @Inject
-    private DataProvider                     dataProvider;
+    private TableView<XBundleDTO> table;
     @Inject
     @OSGiBundle
-    private BundleContext                    context;
-    private TableRowDataFeatures<XBundleDTO> selectedBundle;
+    private BundleContext         context;
+    @Inject
+    private DataProvider          dataProvider;
 
     @FXML
     public void initialize() {
@@ -73,10 +71,6 @@ public final class BundlesFxController {
         final BundleDetailsFxController          controller     = loader.getController();
         final TableRowExpanderColumn<XBundleDTO> expanderColumn = new TableRowExpanderColumn<>(expandedBundle -> {
                                                                     controller.initControls(expandedBundle.getValue());
-                                                                    if (selectedBundle != null && selectedBundle.isExpanded()) {
-                                                                        selectedBundle.toggleExpanded();
-                                                                    }
-                                                                    selectedBundle = expandedBundle;
                                                                     return expandedNode;
                                                                 });
 

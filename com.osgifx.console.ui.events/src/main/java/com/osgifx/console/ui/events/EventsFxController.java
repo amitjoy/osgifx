@@ -23,7 +23,6 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
-import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -51,18 +50,17 @@ public final class EventsFxController {
 
     @Log
     @Inject
-    private FluentLogger                    logger;
+    private FluentLogger         logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                      loader;
+    private FXMLLoader           loader;
     @FXML
-    private TableView<XEventDTO>            table;
-    @Inject
-    private DataProvider                    dataProvider;
+    private TableView<XEventDTO> table;
     @Inject
     @OSGiBundle
-    private BundleContext                   context;
-    private TableRowDataFeatures<XEventDTO> selectedEvent;
+    private BundleContext        context;
+    @Inject
+    private DataProvider         dataProvider;
 
     private static final String EVENT_TOPIC = "com/osgifx/clear/events";
 
@@ -79,10 +77,6 @@ public final class EventsFxController {
         final EventDetailsFxController          controller     = loader.getController();
         final TableRowExpanderColumn<XEventDTO> expanderColumn = new TableRowExpanderColumn<>(expandedEvent -> {
                                                                    controller.initControls(expandedEvent.getValue());
-                                                                   if (selectedEvent != null && selectedEvent.isExpanded()) {
-                                                                       selectedEvent.toggleExpanded();
-                                                                   }
-                                                                   selectedEvent = expandedEvent;
                                                                    return expandedNode;
                                                                });
 
