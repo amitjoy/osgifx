@@ -20,11 +20,11 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -58,7 +58,7 @@ public final class ConfigurationsFxController {
     @FXML
     private TableView<XConfigurationDTO>            table;
     @Inject
-    @Named("com.osgifx.console.ui.configurations")
+    @OSGiBundle
     private BundleContext                           context;
     private TableRowDataFeatures<XConfigurationDTO> selectedConfiguration;
 

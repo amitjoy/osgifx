@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
@@ -45,7 +45,7 @@ public final class CheckForUpdatesDialog extends Dialog<SelectedFeaturesForUpdat
     @LocalInstance
     private FXMLLoader    loader;
     @Inject
-    @Named("com.osgifx.console.application")
+    @OSGiBundle
     private BundleContext context;
 
     public void init() {

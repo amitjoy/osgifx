@@ -22,10 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.controlsfx.control.MaskerPane;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -52,7 +52,7 @@ public final class GraphFxUI {
     @Inject
     private MPart                         part;
     @Inject
-    @Named("com.osgifx.console.ui.graph")
+    @OSGiBundle
     private BundleContext                 context;
     @Inject
     private ConsoleStatusBar              statusBar;

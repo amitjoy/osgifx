@@ -20,8 +20,8 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
@@ -49,7 +49,7 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
     @LocalInstance
     private FXMLLoader    loader;
     @Inject
-    @Named("com.osgifx.console.application")
+    @OSGiBundle
     private BundleContext context;
 
     private final Map<ActionType, ButtonType> buttonTypes = Maps.newHashMap();

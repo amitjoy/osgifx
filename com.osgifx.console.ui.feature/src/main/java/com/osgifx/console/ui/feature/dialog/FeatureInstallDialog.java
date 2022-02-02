@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
@@ -46,7 +46,7 @@ public final class FeatureInstallDialog extends Dialog<SelectedFeaturesDTO> {
     @LocalInstance
     private FXMLLoader    loader;
     @Inject
-    @Named("com.osgifx.console.ui.feature")
+    @OSGiBundle
     private BundleContext context;
 
     public void init() {
