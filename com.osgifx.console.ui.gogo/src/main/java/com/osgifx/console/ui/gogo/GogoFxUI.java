@@ -20,10 +20,10 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.controlsfx.control.MaskerPane;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -44,7 +44,7 @@ public final class GogoFxUI {
     @Inject
     private FluentLogger     logger;
     @Inject
-    @Named("com.osgifx.console.ui.gogo")
+    @OSGiBundle
     private BundleContext    context;
     @Inject
     private ConsoleStatusBar statusBar;

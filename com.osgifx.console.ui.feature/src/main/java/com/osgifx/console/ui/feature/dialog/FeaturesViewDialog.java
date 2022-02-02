@@ -18,8 +18,8 @@ package com.osgifx.console.ui.feature.dialog;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
@@ -39,7 +39,7 @@ public final class FeaturesViewDialog extends Dialog<Void> {
     @LocalInstance
     private FXMLLoader    loader;
     @Inject
-    @Named("com.osgifx.console.ui.feature")
+    @OSGiBundle
     private BundleContext context;
 
     public void init() {

@@ -16,9 +16,9 @@
 package com.osgifx.console.application.fxml.controller;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.controlsfx.control.HyperlinkLabel;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
@@ -43,7 +43,7 @@ public final class AboutApplicationDialogController {
     @Inject
     private Application    jfxApplication;
     @Inject
-    @Named("com.osgifx.console.application")
+    @OSGiBundle
     private BundleContext  bundleContext;
 
     @FXML

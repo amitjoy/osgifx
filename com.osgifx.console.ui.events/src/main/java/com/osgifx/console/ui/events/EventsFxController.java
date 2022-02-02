@@ -20,12 +20,12 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.util.Date;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -60,7 +60,7 @@ public final class EventsFxController {
     @Inject
     private DataProvider                    dataProvider;
     @Inject
-    @Named("com.osgifx.console.ui.events")
+    @OSGiBundle
     private BundleContext                   context;
     private TableRowDataFeatures<XEventDTO> selectedEvent;
 
