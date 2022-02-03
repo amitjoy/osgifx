@@ -109,7 +109,7 @@ Once the feature is built, you can test it by installing it from the `Help -> In
 
 Note that, to develop an external feature, you need to provide a ZIP archive comprising one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
 
-For ease of development, you can use the OSGi.fx workspace to further develop your own features as the workspace comprises a new bnd plugin which will enable you to automatically prepare the ZIP archive from a bndrun file. As an example, please refer to the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.feature.tictactoe).
+For ease of development, you can use the OSGi.fx workspace to further develop your own features as the workspace comprises a new bnd plugin which will enable you to automatically prepare the ZIP archive from a bndrun file. As an example, please refer to the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.ext.feature.tictactoe).
 
 --------------------------------------------------------------------------------------------------------------
 
