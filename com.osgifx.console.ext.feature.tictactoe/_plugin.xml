@@ -15,7 +15,7 @@
   the License.
 -->
 <plugin>
-	<extension point="org.eclipse.e4.workbench.model" id="com.osgifx.console.feature.tictactoe">
+	<extension point="org.eclipse.e4.workbench.model" id="com.osgifx.console.ext.feature.tictactoe">
 		<fragment apply="always" uri="fragment.e4xmi">
 		</fragment>
 	</extension>
