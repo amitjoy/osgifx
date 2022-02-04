@@ -19,6 +19,7 @@ import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -86,6 +93,7 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.supervisor.Supervisor;
 
+import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 import aQute.lib.io.ByteBufferInputStream;
@@ -1125,6 +1133,30 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             return "Agent extension with name '" + name + "' doesn't exist";
         }
         return agentExtensions.get(name).execute(context);
+    }
+
+    @Override
+    public String exec(final String command) {
+        try {
+            final CommandLine                 cmdLine       = CommandLine.parse(command);
+            final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+
+            final ExecuteWatchdog watchdog = new ExecuteWatchdog(30_000L);
+            final Executor        executor = new DefaultExecutor();
+            executor.setExitValue(1);
+            executor.setWatchdog(watchdog);
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            final PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+            executor.setStreamHandler(streamHandler);
+            executor.execute(cmdLine, resultHandler);
+
+            resultHandler.waitFor();
+            return outputStream.toString();
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Exceptions.toString(e);
+        }
     }
 
     private static long getSystemUptime() {

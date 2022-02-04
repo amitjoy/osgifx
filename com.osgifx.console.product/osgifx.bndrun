@@ -41,6 +41,7 @@ startlevels                       :   com.osgifx.console.launcher;startlevel=5
                                       bnd.identity;id='com.osgifx.console.ui.packages',\
                                       bnd.identity;id='com.osgifx.console.ui.properties',\
                                       bnd.identity;id='com.osgifx.console.ui.services',\
+                                      bnd.identity;id='com.osgifx.console.ui.terminal',\
                                       bnd.identity;id='com.osgifx.console.ui.threads',\
                                       \
                                       ${requirement.product}
@@ -59,8 +60,9 @@ install.order                     :   \
                                       com.osgifx.console.ui.logs,\
                                       com.osgifx.console.ui.properties,\
                                       com.osgifx.console.ui.threads,\
-                                      com.osgifx.console.ui.gogo,\
                                       com.osgifx.console.ui.graph,\
+                                      com.osgifx.console.ui.gogo,\
+                                      com.osgifx.console.ui.terminal
 
 -runbundles.X    	              :   ${install.order}
 

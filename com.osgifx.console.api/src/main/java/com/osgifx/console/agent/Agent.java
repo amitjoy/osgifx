@@ -456,4 +456,12 @@ public interface Agent {
      * @see AgentExtension
      */
     Object executeExtension(String name, Map<String, Object> context);
+
+    /**
+     * Executes the specified terminal (CLI) command in a separate process.
+     *
+     * @param command the command to execute
+     * @return the response
+     */
+    String exec(String command);
 }
