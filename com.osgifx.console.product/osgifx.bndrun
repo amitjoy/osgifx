@@ -29,38 +29,38 @@ startlevels                       :   com.osgifx.console.launcher;startlevel=5
                                       bnd.identity;id='com.osgifx.console.launcher',\
                                       bnd.identity;id='com.osgifx.console.logging',\
                                       \
-		                              bnd.identity;id='com.osgifx.console.ui.bundles',\
-		                              bnd.identity;id='com.osgifx.console.ui.components',\
-		                              bnd.identity;id='com.osgifx.console.ui.configurations',\
-		                              bnd.identity;id='com.osgifx.console.ui.events',\
-		                              bnd.identity;id='com.osgifx.console.ui.feature',\
-		                              bnd.identity;id='com.osgifx.console.ui.logs',\
-		                              bnd.identity;id='com.osgifx.console.ui.gogo',\
-		                              bnd.identity;id='com.osgifx.console.ui.graph',\
-		                              bnd.identity;id='com.osgifx.console.ui.overview',\
-		                              bnd.identity;id='com.osgifx.console.ui.packages',\
-		                              bnd.identity;id='com.osgifx.console.ui.properties',\
-		                              bnd.identity;id='com.osgifx.console.ui.services',\
-		                              bnd.identity;id='com.osgifx.console.ui.threads',\
-                     		          \
-                     		          ${requirement.product}
+                                      bnd.identity;id='com.osgifx.console.ui.bundles',\
+                                      bnd.identity;id='com.osgifx.console.ui.components',\
+                                      bnd.identity;id='com.osgifx.console.ui.configurations',\
+                                      bnd.identity;id='com.osgifx.console.ui.events',\
+                                      bnd.identity;id='com.osgifx.console.ui.feature',\
+                                      bnd.identity;id='com.osgifx.console.ui.logs',\
+                                      bnd.identity;id='com.osgifx.console.ui.gogo',\
+                                      bnd.identity;id='com.osgifx.console.ui.graph',\
+                                      bnd.identity;id='com.osgifx.console.ui.overview',\
+                                      bnd.identity;id='com.osgifx.console.ui.packages',\
+                                      bnd.identity;id='com.osgifx.console.ui.properties',\
+                                      bnd.identity;id='com.osgifx.console.ui.services',\
+                                      bnd.identity;id='com.osgifx.console.ui.threads',\
+                                      \
+                                      ${requirement.product}
 
 # This is required as the install order matters - not the start level. The models fragments are processed 
 # according to the install order and hence assigning start levels in increasing order does not help. That's
 # why the install order has been explicitly specified for the model fragments.
 install.order                     :   \
-		                              com.osgifx.console.ui.overview,\
-		                              com.osgifx.console.ui.bundles,\
-		                              com.osgifx.console.ui.packages,\
-		                              com.osgifx.console.ui.services,\
-		                              com.osgifx.console.ui.components,\
-		                              com.osgifx.console.ui.configurations,\
-		                              com.osgifx.console.ui.events,\
-		                              com.osgifx.console.ui.logs,\
-		                              com.osgifx.console.ui.properties,\
-		                              com.osgifx.console.ui.threads,\
-		                              com.osgifx.console.ui.gogo,\
-		                              com.osgifx.console.ui.graph,\
+                                      com.osgifx.console.ui.overview,\
+                                      com.osgifx.console.ui.bundles,\
+                                      com.osgifx.console.ui.packages,\
+                                      com.osgifx.console.ui.services,\
+                                      com.osgifx.console.ui.components,\
+                                      com.osgifx.console.ui.configurations,\
+                                      com.osgifx.console.ui.events,\
+                                      com.osgifx.console.ui.logs,\
+                                      com.osgifx.console.ui.properties,\
+                                      com.osgifx.console.ui.threads,\
+                                      com.osgifx.console.ui.gogo,\
+                                      com.osgifx.console.ui.graph,\
 
 -runbundles.X    	              :   ${install.order}
 
