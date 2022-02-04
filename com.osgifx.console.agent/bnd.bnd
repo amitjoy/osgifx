@@ -3,11 +3,12 @@
                         com.osgifx.console.api,\
                         biz.aQute.bndlib;packages=*,\
                         biz.aQute.remote.agent;packages=*,\
+                        org.apache.commons.exec,\
                         org.slf4j.api
 -privatepackage       : \
                         com.osgifx.console.agent.*,\
                         com.osgifx.console.supervisor
--conditionalpackage   : aQute.*
+-conditionalpackage   : aQute.*, org.apache.commons.exec.*
 Import-Package        : \
                         org.osgi.framework;version='[1.5,2)',\
                         org.osgi.framework.launch;version='[1.0,2)',\

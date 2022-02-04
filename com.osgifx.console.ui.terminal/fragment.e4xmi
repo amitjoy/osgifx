@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_s7J3oCBGEey33dbookdebQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack">
+    <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.terminal" contributionURI="bundleclass://com.osgifx.console.ui.terminal/com.osgifx.console.ui.terminal.TerminalFxUI" label="Terminal" iconURI="platform:/plugin/com.osgifx.console.ui.terminal/graphic/icons/gogo.png" tooltip="Execute terminal command (CLI) in the remote machine" closeable="true"/>
+  </fragments>
+</fragment:ModelFragments>
