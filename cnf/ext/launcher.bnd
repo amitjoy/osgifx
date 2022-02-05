@@ -35,27 +35,6 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                           com.sun.javafx.tk,\
                                           com.sun.javafx.webkit,\
                                           com.sun.webkit,\
-                                          javax.annotation, \
-                                          javax.crypto,\
-                                          javax.crypto.interfaces,\
-                                          javax.crypto.spec,\
-                                          javax.imageio,\
-                                          javax.imageio.stream,\
-                                          javax.imageio.event,\
-                                          javax.imageio.metadata,\
-                                          javax.imageio.plugins,\
-                                          javax.imageio.plugins.bmp,\
-                                          javax.imageio.plugins.jpeg,\
-                                          javax.imageio.spi,\
-                                          javax.security,\
-                                          javax.security.auth,\
-                                          javax.security.auth.callback,\
-                                          javax.security.auth.kerberos,\
-                                          javax.security.auth.login,\
-                                          javax.security.auth.spi,\
-                                          javax.security.auth.x500,\
-                                          javax.security.cert,\
-                                          javax.security.sasl,\
                                           javafx.animation,\
                                           javafx.application,\
                                           javafx.beans,\
