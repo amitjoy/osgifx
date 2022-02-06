@@ -16,6 +16,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Receive events on demand (option to start and stop receiving events)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Receive logs on demand (option to start and stop receiving logs)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Execute Gogo command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Execute CLI command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Install or update bundle                                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
@@ -38,27 +39,32 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 
 #### Application Screenshots
 
-<img src="https://user-images.githubusercontent.com/13380182/150548799-933743dd-5883-4782-8eb9-1579327f722f.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548803-bbc2d8a6-157d-4997-b9a7-87fada9114e5.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548837-0a6c16ff-eb2f-4de6-b435-a074f2b8fccc.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548837-0a6c16ff-eb2f-4de6-b435-a074f2b8fccc.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548788-342365c5-19b1-4357-8222-5b4b784fd7c4.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548795-cd4bc616-29b6-4772-9e89-a30d70a0063c.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548797-8b4aecca-9f15-439b-858a-a22251a5527d.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548808-aab3fc29-f0c7-4a3f-9088-5d14b4893c90.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548809-bd34570f-2ffc-44b8-884c-fd55ab22e3f0.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548810-2723d931-ab75-4ced-a97d-d6656e1461a7.png" />
-<img src="https://user-images.githubusercontent.com/13380182/152104853-f59630f7-6696-4909-bc7c-5097a9b3bb06.png" />
-<img src="https://user-images.githubusercontent.com/13380182/151515110-667dfb99-517e-4701-b57d-250285f51099.png" />
-<img src="https://user-images.githubusercontent.com/13380182/151535803-6a0d263a-4fae-4e36-9b6b-5b062ed58b1e.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548818-a47f6eba-b1a2-493a-862d-6326ae2b3f3e.png" />
-<img src="https://user-images.githubusercontent.com/13380182/151536028-3f109059-3dd3-4860-a539-90efed46360a.png" />
-<img src="https://user-images.githubusercontent.com/13380182/151536216-e8a78931-efc5-460f-a7e4-471b52a15f8d.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548823-49552ac5-14a6-42b8-976a-04c6434264fb.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548826-bfcdfb80-429f-4f08-94a6-f5b97ce4bdbd.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548827-aaf03eea-e52a-459e-8197-8c386fc681e6.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548832-95f8f9f0-39bd-40e5-ae53-34f9c67afb97.png" />
-<img src="https://user-images.githubusercontent.com/13380182/150548840-42295131-b2b5-45b2-b23e-591820b9d4db.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663681-615aaf56-9945-41d2-9861-e68880da9f3f.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663682-d677a932-540d-4c1d-8655-31c9bd9bfc91.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663696-cce697a0-610f-4b7c-8306-843e926cdbd5.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663960-5539ada8-d9ab-4ce8-807d-8857a81360c3.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663676-f29732d5-a18f-4c1d-a88c-06aa938a101b.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663677-17ff2ba7-95cf-4113-91b2-12f40f97bb92.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663678-f18513b8-736f-4091-b942-fc4fa1f61bc6.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663680-6a4051f8-fded-41d4-bc2c-06d2d07883f7.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663683-16dc47cc-f0ce-4508-a7cb-6676bebce8bb.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663684-0a3c80ad-e539-43a6-afae-065a653213ab.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663685-457a98d7-5e6f-4c3c-abc9-4679c4056eec.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663686-b7195b97-ec78-4978-9ae1-299f4fc00c3f.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663687-af054d21-8451-4226-82dd-974491b53a4e.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663689-1c74d0b7-73a4-4bfd-854d-05e84a756cc6.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663690-2dd6b1bf-9b29-42f0-a12f-146a083e3a1a.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663691-99c457c3-8524-4d05-8e38-ab3658604f64.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663693-ada6d47e-6392-43dd-babf-c1e819cd6840.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663694-90219591-7a01-44a7-b57c-5e1cbe7f235e.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663695-5f9a53e5-a18b-46f4-8c0d-6b1ecee677a0.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663697-55c966a9-94a2-4eaf-a270-05610bbf4371.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663698-fd148901-e492-4436-986e-d958e13996ad.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663699-c5052cd6-0412-4cd5-9498-3be222a03471.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663700-ca3cc38c-74fd-4ebb-b736-66af21757123.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663701-80a05b53-a8ad-42c2-a1e1-a20073ea28b5.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663702-3a709ee4-9aee-4b2b-b861-8dc169df5d83.png" />
+<img src="https://user-images.githubusercontent.com/13380182/152663703-983aaba6-44fe-42b2-b1d0-1c10a60c8a41.png" />
 
 --------------------------------------------------------------------------------------------------------------
 
