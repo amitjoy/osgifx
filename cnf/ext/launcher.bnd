@@ -14,6 +14,7 @@ storage.directory               =         ${current.directory}/.osgifx-ws
 -runproperties.storage          =         \
                                           launch.storage.dir=${storage.directory},\
                                           org.osgi.framework.storage=${storage.directory}
+
 -runproperties.equinox          =         osgi.instance.area.default=${storage.directory}
 
 -runproperties.efx              =         osgi.framework.extensions=org.eclipse.fx.osgi,\
