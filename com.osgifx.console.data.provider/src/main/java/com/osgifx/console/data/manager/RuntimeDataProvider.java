@@ -149,4 +149,16 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
         return threads;
     }
 
+    @Override
+    public ObservableList<XBundleDTO> leaks() {
+        final Agent agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return FXCollections.emptyObservableList();
+        }
+        final ObservableList<XBundleDTO> properties = FXCollections.observableArrayList();
+        properties.addAll(makeNullSafe(agent.getClassloaderLeaks()));
+        return properties;
+    }
+
 }

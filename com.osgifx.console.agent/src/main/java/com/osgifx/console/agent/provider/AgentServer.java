@@ -157,6 +157,8 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     private final Set<String>                 gogoCommands    = new CopyOnWriteArraySet<>();
     private final Map<String, AgentExtension> agentExtensions = new ConcurrentHashMap<>();
 
+    private final ClassloaderLeakDetector classloaderLeakDetector;
+
     /**
      * An agent server is based on a context and takes a name and cache
      * directory
@@ -181,6 +183,9 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         this.cache       = new ShaCache(cache);
         this.startlevels = startlevels;
         this.context.addFrameworkListener(this);
+
+        classloaderLeakDetector = new ClassloaderLeakDetector();
+        classloaderLeakDetector.start(context);
 
         final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
@@ -688,6 +693,8 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             configAdminTracker.close();
             gogoCommandsTracker.close();
             agentExtensionTracker.close();
+
+            classloaderLeakDetector.stop();
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -1157,6 +1164,11 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             Thread.currentThread().interrupt();
             return Exceptions.toString(e);
         }
+    }
+
+    @Override
+    public Set<XBundleDTO> getClassloaderLeaks() {
+        return classloaderLeakDetector.getSuspiciousBundles();
     }
 
     private static long getSystemUptime() {
