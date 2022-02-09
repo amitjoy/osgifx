@@ -74,6 +74,11 @@ public final class ComponentsFxController {
                                                                        return expandedNode;
                                                                    });
 
+        final TableColumn<XComponentDTO, Integer> idColumn = new TableColumn<>("ID");
+
+        idColumn.setPrefWidth(90);
+        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+
         final TableColumn<XComponentDTO, String> componentNameColumn = new TableColumn<>("Name");
 
         componentNameColumn.setPrefWidth(900);
@@ -86,12 +91,13 @@ public final class ComponentsFxController {
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
         table.getColumns().add(expanderColumn);
+        table.getColumns().add(idColumn);
         table.getColumns().add(componentNameColumn);
         table.getColumns().add(stateColumn);
 
         final ObservableList<XComponentDTO> bundles = dataProvider.components();
         table.setItems(bundles);
-        Fx.sortBy(table, componentNameColumn);
+        Fx.sortBy(table, idColumn);
 
         TableFilter.forTableView(table).apply();
     }
