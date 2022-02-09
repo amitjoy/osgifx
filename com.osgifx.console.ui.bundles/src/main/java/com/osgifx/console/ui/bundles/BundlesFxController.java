@@ -74,6 +74,11 @@ public final class BundlesFxController {
                                                                     return expandedNode;
                                                                 });
 
+        final TableColumn<XBundleDTO, Integer> idColumn = new TableColumn<>("ID");
+
+        idColumn.setPrefWidth(90);
+        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+
         final TableColumn<XBundleDTO, String> symbolicNameColumn = new TableColumn<>("Symbolic Name");
 
         symbolicNameColumn.setPrefWidth(450);
@@ -91,13 +96,14 @@ public final class BundlesFxController {
         statusColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
         table.getColumns().add(expanderColumn);
+        table.getColumns().add(idColumn);
         table.getColumns().add(symbolicNameColumn);
         table.getColumns().add(versionColumn);
         table.getColumns().add(statusColumn);
 
         final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
         table.setItems(bundles);
-        Fx.sortBy(table, symbolicNameColumn);
+        Fx.sortBy(table, idColumn);
 
         TableFilter.forTableView(table).apply();
     }
