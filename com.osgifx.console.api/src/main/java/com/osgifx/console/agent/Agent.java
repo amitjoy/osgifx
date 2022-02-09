@@ -464,4 +464,11 @@ public interface Agent {
      * @return the response
      */
     String exec(String command);
+
+    /**
+     * Returns the list of suspicious bundles causing probable classloader leaks
+     *
+     * @return the set of bundles (can be empty)
+     */
+    Set<XBundleDTO> getClassloaderLeaks();
 }

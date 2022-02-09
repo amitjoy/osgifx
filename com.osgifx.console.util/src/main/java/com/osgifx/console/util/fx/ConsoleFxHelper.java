@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -15,8 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 public final class ConsoleFxHelper {
 
@@ -28,7 +28,7 @@ public final class ConsoleFxHelper {
      * This is required as the agent can be disconnected and all invoked method
      * executions will return null thereafter
      */
-    public static <T> List<T> makeNullSafe(final List<T> source) {
+    public static <T> Collection<T> makeNullSafe(final Collection<T> source) {
         if (source == null) {
             return Collections.emptyList();
         }
