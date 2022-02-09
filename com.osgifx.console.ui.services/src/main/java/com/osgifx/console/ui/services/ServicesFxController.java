@@ -73,10 +73,10 @@ public final class ServicesFxController {
                                                                      return expandedNode;
                                                                  });
 
-        final TableColumn<XServiceDTO, String> serviceIdColumn = new TableColumn<>("Service ID");
+        final TableColumn<XServiceDTO, String> idColumn = new TableColumn<>("ID");
 
-        serviceIdColumn.setPrefWidth(100);
-        serviceIdColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+        idColumn.setPrefWidth(100);
+        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
 
         final TableColumn<XServiceDTO, String> objectClassColumn = new TableColumn<>("Object Class");
 
@@ -89,13 +89,13 @@ public final class ServicesFxController {
         registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
 
         table.getColumns().add(expanderColumn);
-        table.getColumns().add(serviceIdColumn);
+        table.getColumns().add(idColumn);
         table.getColumns().add(objectClassColumn);
         table.getColumns().add(registeringBundleColumn);
 
         final ObservableList<XServiceDTO> services = dataProvider.services();
         table.setItems(services);
-        Fx.sortBy(table, objectClassColumn);
+        Fx.sortBy(table, idColumn);
 
         TableFilter.forTableView(table).apply();
     }
