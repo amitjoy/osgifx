@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -18,6 +18,7 @@ package com.osgifx.console.ui.properties;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -48,10 +49,17 @@ public final class PropertiesFxController {
     @FXML
     private TableColumn<XPropertyDTO, String> propertyType;
     @Inject
+    @Named("is_connected")
+    private boolean                           isConnected;
+    @Inject
     private DataProvider                      dataProvider;
 
     @FXML
     public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(propertyTable);
+            return;
+        }
         propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
         propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
         propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));

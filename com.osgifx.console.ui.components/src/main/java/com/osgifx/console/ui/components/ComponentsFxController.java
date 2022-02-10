@@ -18,6 +18,7 @@ package com.osgifx.console.ui.components;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
@@ -56,10 +57,17 @@ public final class ComponentsFxController {
     @OSGiBundle
     private BundleContext            context;
     @Inject
+    @Named("is_connected")
+    private boolean                  isConnected;
+    @Inject
     private DataProvider             dataProvider;
 
     @FXML
     public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
         createControls();
         Fx.disableSelectionModel(table);
         logger.atDebug().log("FXML controller has been initialized");

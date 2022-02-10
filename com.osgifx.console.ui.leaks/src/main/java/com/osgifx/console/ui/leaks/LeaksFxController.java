@@ -18,6 +18,7 @@ package com.osgifx.console.ui.leaks;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -50,10 +51,17 @@ public final class LeaksFxController {
     @FXML
     private TableColumn<XBundleDTO, String>  stateColumn;
     @Inject
+    @Named("is_connected")
+    private boolean                          isConnected;
+    @Inject
     private DataProvider                     dataProvider;
 
     @FXML
     public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
         initCells();
         Fx.addContextMenuToCopyContent(table);
         logger.atDebug().log("FXML controller has been initialized");
