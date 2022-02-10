@@ -31,6 +31,8 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.di.ContextBoundValue;
+import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -49,6 +51,9 @@ public final class AgentPingAddon {
     private Supervisor                  supervisor;
     @Inject
     private IEventBroker                eventBroker;
+    @Inject
+    @ContextValue("connected.agent")
+    private ContextBoundValue<String>   connectedAgent;
     private ScheduledExecutorService    executor;
     private volatile ScheduledFuture<?> future;
 
@@ -79,6 +84,7 @@ public final class AgentPingAddon {
         logger.atInfo().log("Agent disconnected event has been received");
         future.cancel(true);
         future = null;
+        connectedAgent.publish(null);
     }
 
     @PreDestroy

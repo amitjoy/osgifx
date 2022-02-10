@@ -45,7 +45,7 @@ public final class DisconnectFromAgentHandler {
     private ContextBoundValue<Boolean>              isConnected;
     @Inject
     @ContextValue("connected.agent")
-    private ContextBoundValue<Boolean>              connectedAgent;
+    private ContextBoundValue<String>               connectedAgent;
     @Inject
     @ContextValue("selected.settings")
     private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
