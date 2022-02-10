@@ -81,10 +81,10 @@ public final class ServicesFxController {
                                                                      return expandedNode;
                                                                  });
 
-        final TableColumn<XServiceDTO, String> idColumn = new TableColumn<>("ID");
+        final TableColumn<XServiceDTO, Integer> idColumn = new TableColumn<>("ID");
 
         idColumn.setPrefWidth(100);
-        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
         final TableColumn<XServiceDTO, String> objectClassColumn = new TableColumn<>("Object Class");
 
