@@ -26,17 +26,14 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ihqFlH6_EeyYfeV-7UqQeg" featurename="commands" parentElementId="com.osgifx.console.application">
     <elements xsi:type="commands:Command" xmi:id="_ihqFlX6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.configuration.delete" commandName="Configuration Delete Command" description="Deletes the configuration with the specified PID">
       <parameters xmi:id="_ihqFln6_EeyYfeV-7UqQeg" elementId="pid" name="PID" optional="false"/>
-      <category href="../com.osgifx.console.application/Application.e4xmi#_sT3FYCnOEeyGMrCbruHUaw"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_ihqFl36_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.configuration.update" commandName="Configuration Update Command" description="Updates the configuration of the specified PID">
       <parameters xmi:id="_ihqFmH6_EeyYfeV-7UqQeg" elementId="pid" name="PID" optional="false"/>
       <parameters xmi:id="_ihqFmX6_EeyYfeV-7UqQeg" elementId="properties" name="Properties" optional="false"/>
-      <category href="../com.osgifx.console.application/Application.e4xmi#_sT3FYCnOEeyGMrCbruHUaw"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_ihqFmn6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.configuration.factory" commandName="Factory Configuration Create Command" description="Cerates factory configuration of the specified Factory PID">
       <parameters xmi:id="_ihqFm36_EeyYfeV-7UqQeg" elementId="factoryPID" name="Factory PID" optional="false"/>
       <parameters xmi:id="_ihqFnH6_EeyYfeV-7UqQeg" elementId="properties" name="Properties" optional="false"/>
-      <category href="../com.osgifx.console.application/Application.e4xmi#_sT3FYCnOEeyGMrCbruHUaw"/>
     </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ihqFnX6_EeyYfeV-7UqQeg" featurename="categories" parentElementId="com.osgifx.console.application">
