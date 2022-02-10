@@ -22,12 +22,15 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.controlsfx.control.Notifications;
+import org.controlsfx.glyphfont.FontAwesome;
+import org.controlsfx.glyphfont.Glyph;
 import org.osgi.framework.BundleContext;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -196,5 +199,14 @@ public final class Fx {
                 }
             }
         });
+    }
+
+    public static void addTablePlaceholderWhenDisconnected(final TableView<?> table) {
+        final Label placeholder = new Label();
+
+        placeholder.setText("Agent not connected");
+        placeholder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.POWER_OFF));
+
+        table.setPlaceholder(placeholder);
     }
 }
