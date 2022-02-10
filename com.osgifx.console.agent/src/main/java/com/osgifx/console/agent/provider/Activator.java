@@ -46,14 +46,19 @@ import aQute.remote.util.Link;
  */
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public class Activator extends Thread implements BundleActivator {
-    private File                    cache;
-    private ServerSocket            server;
-    private BundleContext           context;
+    private File          cache;
+    private ServerSocket  server;
+    private BundleContext context;
+
+    private ClassloaderLeakDetector classloaderLeakDetector;
+
     private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
 
     @Override
     public void start(final BundleContext context) throws Exception {
-        this.context = context;
+        this.context            = context;
+        classloaderLeakDetector = new ClassloaderLeakDetector();
+        classloaderLeakDetector.start(context);
 
         //
         // Get the specified port in the framework properties
@@ -123,7 +128,7 @@ public class Activator extends Thread implements BundleActivator {
                     // Create a new agent, and link it up.
                     //
 
-                    final AgentServer sa = new AgentServer("<>", context, cache);
+                    final AgentServer sa = new AgentServer("<>", context, cache, classloaderLeakDetector);
                     agents.add(sa);
                     final Link<Agent, Supervisor> link = new Link<Agent, Supervisor>(Supervisor.class, sa, socket) {
                         @Override
@@ -171,6 +176,7 @@ public class Activator extends Thread implements BundleActivator {
         for (final AgentServer sa : agents) {
             IO.close(sa);
         }
+        classloaderLeakDetector.stop();
     }
 
     private void trackLogReader(final OSGiLogListener logListener) {

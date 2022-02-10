@@ -100,7 +100,6 @@ import aQute.lib.io.ByteBufferInputStream;
 import aQute.lib.startlevel.StartLevelRuntimeHandler;
 import aQute.libg.shacache.ShaCache;
 import aQute.libg.shacache.ShaSource;
-import aQute.remote.agent.AgentDispatcher.Descriptor;
 import aQute.remote.util.Link;
 
 /**
@@ -146,6 +145,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     private CountDownLatch                 refresh    = new CountDownLatch(0);
     private final StartLevelRuntimeHandler startlevels;
     private final int                      startOptions;
+    private ClassloaderLeakDetector        leakDetector;
 
     private final ServiceTracker<Object, Object>                 scrTracker;
     private final ServiceTracker<Object, Object>                 metatypeTracker;
@@ -157,8 +157,6 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     private final Set<String>                 gogoCommands    = new CopyOnWriteArraySet<>();
     private final Map<String, AgentExtension> agentExtensions = new ConcurrentHashMap<>();
 
-    private final ClassloaderLeakDetector classloaderLeakDetector;
-
     /**
      * An agent server is based on a context and takes a name and cache
      * directory
@@ -168,14 +166,16 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
      * @param cache the directory for caching
      */
 
-    public AgentServer(final String name, final BundleContext context, final File cache) throws Exception {
-        this(name, context, cache, StartLevelRuntimeHandler.absent());
+    public AgentServer(final String name, final BundleContext context, final File cache, final ClassloaderLeakDetector leakDetector)
+            throws Exception {
+        this(name, context, cache, StartLevelRuntimeHandler.absent(), leakDetector);
     }
 
-    public AgentServer(final String name, final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels)
-            throws Exception {
+    public AgentServer(final String name, final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels,
+            final ClassloaderLeakDetector leakDetector) throws Exception {
         requireNonNull(context, "Bundle context cannot be null");
-        this.context = context;
+        this.context      = context;
+        this.leakDetector = leakDetector;
 
         final boolean eager = context.getProperty(aQute.bnd.osgi.Constants.LAUNCH_ACTIVATION_EAGER) != null;
         startOptions = eager ? 0 : Bundle.START_ACTIVATION_POLICY;
@@ -183,9 +183,6 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         this.cache       = new ShaCache(cache);
         this.startlevels = startlevels;
         this.context.addFrameworkListener(this);
-
-        classloaderLeakDetector = new ClassloaderLeakDetector();
-        classloaderLeakDetector.start(context);
 
         final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
@@ -260,10 +257,6 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         configAdminTracker.open();
         gogoCommandsTracker.open();
         agentExtensionTracker.open();
-    }
-
-    AgentServer(final Descriptor d) throws Exception {
-        this(d.name, d.framework.getBundleContext(), d.shaCache, d.startlevels);
     }
 
     /**
@@ -693,8 +686,6 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             configAdminTracker.close();
             gogoCommandsTracker.close();
             agentExtensionTracker.close();
-
-            classloaderLeakDetector.stop();
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -1168,7 +1159,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 
     @Override
     public Set<XBundleDTO> getClassloaderLeaks() {
-        return classloaderLeakDetector.getSuspiciousBundles();
+        return leakDetector.getSuspiciousBundles();
     }
 
     private static long getSystemUptime() {
