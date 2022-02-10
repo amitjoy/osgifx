@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -20,6 +20,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_ID;
+import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
@@ -45,8 +46,8 @@ import org.osgi.framework.wiring.BundleWiring;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
-import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.agent.dto.XPackageDTO.XpackageType;
+import com.osgifx.console.agent.dto.XServiceInfoDTO;
 
 public class XBundleAdmin {
 
@@ -252,8 +253,9 @@ public class XBundleAdmin {
         final List<XPackageDTO> importedPackages = new ArrayList<>();
 
         for (final BundleWire bundleWire : bundleWires) {
-            final String pkg     = (String) bundleWire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
-            final String version = bundleWire.getCapability().getRevision().getVersion().toString();
+            final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
+            final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
+            final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
 
             if (!hasPackage(importedPackages, pkg, version)) {
                 final XPackageDTO dto = new XPackageDTO();
@@ -277,8 +279,9 @@ public class XBundleAdmin {
         final List<XPackageDTO> exportedPackages = new ArrayList<>();
 
         for (final BundleWire bundleWire : bundleWires) {
-            final String pkg     = (String) bundleWire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
-            final String version = bundleWire.getCapability().getRevision().getVersion().toString();
+            final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
+            final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
+            final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
 
             if (!hasPackage(exportedPackages, pkg, version)) {
                 final XPackageDTO dto = new XPackageDTO();
