@@ -227,7 +227,7 @@ public final class ComponentDetailsFxController {
         disableComponentButton.setOnAction(a -> {
             logger.atInfo().log("Component disable request has been sent for %s", component.id);
             // to disable a component, we need the id primarily as there is already an associated component ID
-            commandService.execute(COMPONENT_DISABLE_COMMAND_ID, createCommandMap(null, component.id));
+            commandService.execute(COMPONENT_DISABLE_COMMAND_ID, createCommandMap(null, String.valueOf(component.id)));
         });
     }
 

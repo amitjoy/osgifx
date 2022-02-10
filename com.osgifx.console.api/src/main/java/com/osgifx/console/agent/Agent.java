@@ -333,7 +333,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded
      *         or failed
      */
-    XResultDTO enableComponent(String name);
+    XResultDTO enableComponentByName(String name);
 
     /**
      * Enables the component description by identifier
@@ -342,7 +342,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded
      *         or failed
      */
-    XResultDTO enableComponent(long id);
+    XResultDTO enableComponentById(long id);
 
     /**
      * Disables the component description by name
@@ -351,7 +351,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded
      *         or failed
      */
-    XResultDTO disableComponent(String name);
+    XResultDTO disableComponentByName(String name);
 
     /**
      * Disables the component description by identifier
@@ -360,7 +360,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded
      *         or failed
      */
-    XResultDTO disableComponent(long id);
+    XResultDTO disableComponentById(long id);
 
     /**
      * Creates or updates the associated {@code Configuration} object with the

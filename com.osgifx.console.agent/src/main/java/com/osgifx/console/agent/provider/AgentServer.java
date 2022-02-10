@@ -1003,7 +1003,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public XResultDTO enableComponent(final long id) {
+    public XResultDTO enableComponentById(final long id) {
         final boolean isScrAvailable = PackageWirings.isScrWired(context);
         if (isScrAvailable) {
             final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
@@ -1013,7 +1013,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public XResultDTO enableComponent(final String name) {
+    public XResultDTO enableComponentByName(final String name) {
         requireNonNull(name, "Component name cannot be null");
 
         final boolean isScrAvailable = PackageWirings.isScrWired(context);
@@ -1025,7 +1025,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public XResultDTO disableComponent(final long id) {
+    public XResultDTO disableComponentById(final long id) {
         final boolean isScrAvailable = PackageWirings.isScrWired(getContext());
         if (isScrAvailable) {
             final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
@@ -1035,7 +1035,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public XResultDTO disableComponent(final String name) {
+    public XResultDTO disableComponentByName(final String name) {
         requireNonNull(name, "Component name cannot be null");
 
         final boolean isScrAvailable = PackageWirings.isScrWired(getContext());
