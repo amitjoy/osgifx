@@ -25,11 +25,9 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_oFFuY36-EeyYfeV-7UqQeg" featurename="commands" parentElementId="com.osgifx.console.application">
     <elements xsi:type="commands:Command" xmi:id="_oFFuZH6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.component.enable" commandName="Component Enable Command" description="Enables the component with the specified ID">
       <parameters xmi:id="_oFFuZX6-EeyYfeV-7UqQeg" elementId="name" name="Name" optional="false"/>
-      <category href="../com.osgifx.console.application/Application.e4xmi#_btigQCdFEeyh4bauXjycpA"/>
     </elements>
     <elements xsi:type="commands:Command" xmi:id="_oFFuZn6-EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.component.disable" commandName="Component Disable Command" description="Disables the component with the specified ID">
       <parameters xmi:id="_oFFuZ36-EeyYfeV-7UqQeg" elementId="id" name="ID" optional="false"/>
-      <category href="../com.osgifx.console.application/Application.e4xmi#_btigQCdFEeyh4bauXjycpA"/>
     </elements>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_oFFuaH6-EeyYfeV-7UqQeg" featurename="categories" parentElementId="com.osgifx.console.application">
