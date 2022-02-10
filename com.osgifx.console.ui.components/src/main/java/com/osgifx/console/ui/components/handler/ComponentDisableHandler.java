@@ -50,7 +50,7 @@ public final class ComponentDisableHandler {
             return;
         }
         try {
-            final XResultDTO result = agent.disableComponent(Long.parseLong(id));
+            final XResultDTO result = agent.disableComponentById(Long.parseLong(id));
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
                 eventBroker.post(COMPONENT_DISABLED_EVENT_TOPIC, id);

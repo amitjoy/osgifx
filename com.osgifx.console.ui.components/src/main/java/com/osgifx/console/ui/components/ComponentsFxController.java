@@ -40,7 +40,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ComponentsFxController {
@@ -91,7 +90,6 @@ public final class ComponentsFxController {
 
         componentNameColumn.setPrefWidth(900);
         componentNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-        Fx.addCellFactory(componentNameColumn, c -> "DISABLED".equalsIgnoreCase(c.state), Color.MEDIUMVIOLETRED, Color.BLACK);
 
         final TableColumn<XComponentDTO, String> stateColumn = new TableColumn<>("State");
 

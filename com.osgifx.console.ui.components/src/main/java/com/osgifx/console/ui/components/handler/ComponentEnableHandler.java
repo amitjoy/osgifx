@@ -48,7 +48,7 @@ public final class ComponentEnableHandler {
             return;
         }
         try {
-            final XResultDTO result = agent.enableComponent(name);
+            final XResultDTO result = agent.enableComponentByName(name);
             if (result.result == XResultDTO.SUCCESS) {
                 logger.atInfo().log(result.response);
                 eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
