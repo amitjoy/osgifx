@@ -27,7 +27,7 @@ jobs:
       -  name: Set up Java
          uses: actions/setup-java@v1
          with:
-            java-version: 1.8
+            java-version: 17
             java-package: jdk+fx
       -  name: Initialize CodeQL
          uses: github/codeql-action/init@v1
