@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ASCII"?>
-<!--
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
   Copyright 2022 Amit Kumar Mondal
   
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -14,30 +14,8 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack">
     <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.configurations" contributionURI="bundleclass://com.osgifx.console.ui.configurations/com.osgifx.console.ui.configurations.ConfigurationsFxUI" label="Configurations" iconURI="platform:/plugin/com.osgifx.console.ui.configurations/graphic/icons/configurations.png" tooltip="Shows all available configurations and metatype descriptors in the remote framework" closeable="true"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ihqFkH6_EeyYfeV-7UqQeg" featurename="handlers" parentElementId="com.osgifx.console.application">
-    <elements xsi:type="commands:Handler" xmi:id="_ihqFkX6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.configuration.delete" contributionURI="bundleclass://com.osgifx.console.ui.configurations/com.osgifx.console.ui.configurations.handler.ConfigurationDeleteHandler" command="_ihqFlX6_EeyYfeV-7UqQeg"/>
-    <elements xsi:type="commands:Handler" xmi:id="_ihqFkn6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.configuration.update" contributionURI="bundleclass://com.osgifx.console.ui.configurations/com.osgifx.console.ui.configurations.handler.ConfigurationUpdateHandler" command="_ihqFl36_EeyYfeV-7UqQeg"/>
-    <elements xsi:type="commands:Handler" xmi:id="_ihqFk36_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.handler.configuration.factory" contributionURI="bundleclass://com.osgifx.console.ui.configurations/com.osgifx.console.ui.configurations.handler.FactoryConfigurationCreateHandler" command="_ihqFmn6_EeyYfeV-7UqQeg"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ihqFlH6_EeyYfeV-7UqQeg" featurename="commands" parentElementId="com.osgifx.console.application">
-    <elements xsi:type="commands:Command" xmi:id="_ihqFlX6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.configuration.delete" commandName="Configuration Delete Command" description="Deletes the configuration with the specified PID">
-      <parameters xmi:id="_ihqFln6_EeyYfeV-7UqQeg" elementId="pid" name="PID" optional="false"/>
-    </elements>
-    <elements xsi:type="commands:Command" xmi:id="_ihqFl36_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.configuration.update" commandName="Configuration Update Command" description="Updates the configuration of the specified PID">
-      <parameters xmi:id="_ihqFmH6_EeyYfeV-7UqQeg" elementId="pid" name="PID" optional="false"/>
-      <parameters xmi:id="_ihqFmX6_EeyYfeV-7UqQeg" elementId="properties" name="Properties" optional="false"/>
-    </elements>
-    <elements xsi:type="commands:Command" xmi:id="_ihqFmn6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.command.configuration.factory" commandName="Factory Configuration Create Command" description="Cerates factory configuration of the specified Factory PID">
-      <parameters xmi:id="_ihqFm36_EeyYfeV-7UqQeg" elementId="factoryPID" name="Factory PID" optional="false"/>
-      <parameters xmi:id="_ihqFnH6_EeyYfeV-7UqQeg" elementId="properties" name="Properties" optional="false"/>
-    </elements>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_ihqFnX6_EeyYfeV-7UqQeg" featurename="categories" parentElementId="com.osgifx.console.application">
-    <elements xsi:type="commands:Category" xmi:id="_ihqFnn6_EeyYfeV-7UqQeg" elementId="com.osgifx.console.application.category.configuration" name="Configuration Action" description="This category is used to group all commands relating to configuration changes (ConfigurationAdmin)"/>
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gdcQYH-WEeyYfeV-7UqQeg" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
     <elements xsi:type="menu:DirectMenuItem" xmi:id="_gdcQYX-WEeyYfeV-7UqQeg" elementId="com.osgifx.console.application.directmenuitem.create.config" label="Add New Configuration" iconURI="platform:/plugin/com.osgifx.console.ui.configurations/graphic/icons/new-config.png" tooltip="Creates OSGi configuration admin configuration" contributionURI="bundleclass://com.osgifx.console.ui.configurations/com.osgifx.console.ui.configurations.handler.ConfigurationCreateHandler"/>
