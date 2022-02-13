@@ -1,3 +1,7 @@
+javac.source          : 1.8
+javac.target          : ${javac.source}
+javac.compliance      : ${javac.source}
+-noimportjava         : true
 -buildpath            : \
                         osgi.cmpn,\
                         com.osgifx.console.api,\
@@ -8,7 +12,9 @@
 -privatepackage       : \
                         com.osgifx.console.agent.*,\
                         com.osgifx.console.supervisor
--conditionalpackage   : aQute.*, org.apache.commons.exec.*
+-conditionalpackage   : \
+                        aQute.*,\
+                        org.apache.commons.exec.*
 Import-Package        : \
                         org.osgi.framework;version='[1.5,2)',\
                         org.osgi.framework.launch;version='[1.0,2)',\

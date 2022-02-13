@@ -78,7 +78,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
     @Override
     public void start(final Stage initStage) throws Exception {
         this.initStage = initStage;
-        final Task<Void> friendTask = new Task<Void>() {
+        final Task<Void> friendTask = new Task<>() {
             @Override
             protected Void call() throws InterruptedException {
                 updateMessage("Initializing Console . . .");

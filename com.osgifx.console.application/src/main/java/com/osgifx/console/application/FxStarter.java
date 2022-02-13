@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -18,9 +18,11 @@ package com.osgifx.console.application;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import org.eclipse.e4.core.di.InjectorFactory;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -31,6 +33,8 @@ public final class FxStarter implements BundleActivator {
     @Override
     public void start(final BundleContext context) throws Exception {
         InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
+        final ServiceReference<ThreadSynchronize> serviceReference = context.getServiceReference(ThreadSynchronize.class);
+        context.getService(serviceReference);
     }
 
     @Override
