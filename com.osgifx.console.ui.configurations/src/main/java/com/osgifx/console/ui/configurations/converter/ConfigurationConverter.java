@@ -15,10 +15,18 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations.converter;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.util.converter.Converter;
+import org.osgi.util.converter.ConverterBuilder;
 import org.osgi.util.converter.Converters;
+import org.osgi.util.converter.Rule;
+import org.osgi.util.converter.TypeReference;
+
+import com.google.common.primitives.Floats;
 
 @Component(service = ConfigurationConverter.class)
 public final class ConfigurationConverter {
@@ -27,12 +35,83 @@ public final class ConfigurationConverter {
 
     @Activate
     public ConfigurationConverter() {
-        converter = Converters.standardConverter();
+        final Converter        c  = Converters.standardConverter();
+        final ConverterBuilder cb = c.newConverterBuilder();
+        cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
+        });
+        cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
+        });
+        cb.rule(new Rule<String, int[]>(v -> Stream.of(v.split(",")).mapToInt(Integer::parseInt).toArray()) {
+        });
+        cb.rule(new Rule<String, List<Integer>>(v -> Stream.of(v.split(",")).map(Integer::parseInt).toList()) {
+        });
+        cb.rule(new Rule<String, boolean[]>(v -> {
+            final String[]  split = v.split(",");
+            final boolean[] array = new boolean[split.length];
+            for (int i = 0; i < split.length; i++) {
+                final boolean value = Boolean.parseBoolean(v);
+                array[i] = value;
+            }
+            return array;
+        }) {
+        });
+        cb.rule(new Rule<String, List<Boolean>>(v -> Stream.of(v.split(",")).map(Boolean::parseBoolean).toList()) {
+        });
+        cb.rule(new Rule<String, double[]>(v -> Stream.of(v.split(",")).mapToDouble(Double::parseDouble).toArray()) {
+        });
+        cb.rule(new Rule<String, List<Double>>(v -> Stream.of(v.split(",")).map(Double::parseDouble).toList()) {
+        });
+        cb.rule(new Rule<String, float[]>(v -> {
+            final List<Double> elements = Stream.of(v.split(",")).map(Double::parseDouble).toList();
+            return Floats.toArray(elements);
+        }) {
+        });
+        cb.rule(new Rule<String, List<Float>>(v -> Stream.of(v.split(",")).map(Float::parseFloat).toList()) {
+        });
+        cb.rule(new Rule<String, char[]>(v -> {
+            final String[] split = v.split(",");
+            final char[]   array = new char[split.length];
+            for (int i = 0; i < split.length; i++) {
+                final char value = v.charAt(0);
+                array[i] = value;
+            }
+            return array;
+        }) {
+        });
+        cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(",")).map(e -> e.charAt(0)).toList()) {
+        });
+        cb.rule(new Rule<String, long[]>(v -> Stream.of(v.split(",")).mapToLong(Long::parseLong).toArray()) {
+        });
+        cb.rule(new Rule<String, List<Long>>(v -> Stream.of(v.split(",")).map(Long::parseLong).toList()) {
+        });
+        converter = cb.build();
     }
 
     public Object convert(final String value, final ConfigurationType target) throws Exception {
-        final Class<?> targetClass = ConfigurationType.clazz(target);
-        return converter.convert(value).to(targetClass);
+        return switch (target) {
+            case STRING_ARRAY -> converter.convert(value).to(String[].class);
+            case STRING_LIST -> converter.convert(value).to(new TypeReference<List<String>>() {
+            });
+            case INTEGER_ARRAY -> converter.convert(value).to(int[].class);
+            case INTEGER_LIST -> converter.convert(value).to(new TypeReference<List<Integer>>() {
+            });
+            case BOOLEAN_ARRAY -> converter.convert(value).to(boolean[].class);
+            case BOOLEAN_LIST -> converter.convert(value).to(new TypeReference<List<Boolean>>() {
+            });
+            case DOUBLE_ARRAY -> converter.convert(value).to(double[].class);
+            case DOUBLE_LIST -> converter.convert(value).to(new TypeReference<List<Double>>() {
+            });
+            case FLOAT_ARRAY -> converter.convert(value).to(float[].class);
+            case FLOAT_LIST -> converter.convert(value).to(new TypeReference<List<Float>>() {
+            });
+            case CHAR_ARRAY -> converter.convert(value).to(char[].class);
+            case CHAR_LIST -> converter.convert(value).to(new TypeReference<List<Character>>() {
+            });
+            case LONG_ARRAY -> converter.convert(value).to(long[].class);
+            case LONG_LIST -> converter.convert(value).to(new TypeReference<List<Long>>() {
+            });
+            default -> converter.convert(value).to(ConfigurationType.clazz(target));
+        };
     }
 
 }

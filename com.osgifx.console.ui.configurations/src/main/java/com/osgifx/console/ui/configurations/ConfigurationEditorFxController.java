@@ -39,6 +39,7 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
+import com.dlsc.formsfx.view.controls.SimpleCheckBoxControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -261,8 +262,7 @@ public final class ConfigurationEditorFxController {
             final List<String> options) {
         Field<?> field = null;
         switch (adType) {
-            case LONG:
-            case INTEGER:
+            case LONG, INTEGER:
                 if (options != null && !options.isEmpty()) {
                     String effectiveValue = null;
                     if (currentValue != null) {
@@ -443,7 +443,7 @@ public final class ConfigurationEditorFxController {
                 if (currentValue != null) {
                     final List<Double> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Double>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case LONG_LIST:
@@ -458,13 +458,13 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Long>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<Long> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Long>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case INTEGER_ARRAY:
@@ -483,7 +483,7 @@ public final class ConfigurationEditorFxController {
                 if (currentValue != null) {
                     final List<Integer> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case INTEGER_LIST:
@@ -498,13 +498,13 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<Integer> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case FLOAT_ARRAY:
@@ -517,13 +517,13 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Float>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<Float> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Float>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case FLOAT_LIST:
@@ -538,13 +538,13 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Float>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<Float> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Float>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case CHAR_ARRAY:
@@ -557,13 +557,13 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Character>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<Character> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Character>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case CHAR_LIST:
@@ -578,13 +578,13 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Character>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<Character> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Character>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case STRING_ARRAY:
@@ -597,31 +597,34 @@ public final class ConfigurationEditorFxController {
                     }
                     final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
                     field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                    }), selections);
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
                     final List<String> convertedValue = converter.convert(currentValue).to(new TypeReference<List<String>>() {
                     });
-                    field = Field.ofMultiSelectionType(convertedValue);
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case STRING_LIST:
                 if (options != null && !options.isEmpty()) {
-                    String effectiveValue = null;
+                    List<String> effectiveValue = null;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String.class);
+                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<String>>() {
+                        });
                     } else {
-                        effectiveValue = converter.convert(defaultValue).to(String.class);
+                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<String>>() {
+                        });
                     }
-                    final int selection = options.indexOf(effectiveValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                    }), selection);
+                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
+                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    }), selections).render(new SimpleCheckBoxControl<>());
                     break;
                 }
                 if (currentValue != null) {
-                    final String convertedValue = converter.convert(currentValue).to(String.class);
-                    field = Field.ofStringType(convertedValue).multiline(convertedValue.length() > 100);
+                    final List<String> convertedValue = converter.convert(currentValue).to(new TypeReference<List<String>>() {
+                    });
+                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
                 }
                 break;
             case STRING:
@@ -656,9 +659,7 @@ public final class ConfigurationEditorFxController {
     private Map<String, Object> prepareConfigurationProperties() {
         final Map<String, Object> properties = Maps.newHashMap();
         for (final Field<?> field : form.getFields()) {
-            if (field instanceof DataField) {
-                @SuppressWarnings("rawtypes")
-                final DataField df = (DataField) field;
+            if (field instanceof final DataField<?, ?, ?> df) {
                 if (!df.isEditable()) {
                     continue;
                 }
@@ -672,45 +673,30 @@ public final class ConfigurationEditorFxController {
     private Object convertToRequestedType(final Field<?> field, final Object value) {
         // this controller cannot be loaded by FXMLLoader if the 'typeMappings' values are of type XAttributeDefType
         final XAttributeDefType type = XAttributeDefType.values()[typeMappings.get(field)];
-        switch (type) {
-            case STRING_ARRAY:
-                return converter.convert(value).to(String[].class);
-            case STRING_LIST:
-                return converter.convert(value).to(new TypeReference<List<String>>() {
-                });
-            case INTEGER_ARRAY:
-                return converter.convert(value).to(int[].class);
-            case INTEGER_LIST:
-                return converter.convert(value).to(new TypeReference<List<Integer>>() {
-                });
-            case BOOLEAN_ARRAY:
-                return converter.convert(value).to(boolean[].class);
-            case BOOLEAN_LIST:
-                return converter.convert(value).to(new TypeReference<List<Boolean>>() {
-                });
-            case DOUBLE_ARRAY:
-                return converter.convert(value).to(double[].class);
-            case DOUBLE_LIST:
-                return converter.convert(value).to(new TypeReference<List<Double>>() {
-                });
-            case FLOAT_ARRAY:
-                return converter.convert(value).to(float[].class);
-            case FLOAT_LIST:
-                return converter.convert(value).to(new TypeReference<List<Float>>() {
-                });
-            case CHAR_ARRAY:
-                return converter.convert(value).to(char[].class);
-            case CHAR_LIST:
-                return converter.convert(value).to(new TypeReference<List<Character>>() {
-                });
-            case LONG_ARRAY:
-                return converter.convert(value).to(long[].class);
-            case LONG_LIST:
-                return converter.convert(value).to(new TypeReference<List<Long>>() {
-                });
-            default:
-                return converter.convert(value).to(XAttributeDefType.clazz(type));
-        }
+        return switch (type) {
+            case STRING_ARRAY -> converter.convert(value).to(String[].class);
+            case STRING_LIST -> converter.convert(value).to(new TypeReference<List<String>>() {
+            });
+            case INTEGER_ARRAY -> converter.convert(value).to(int[].class);
+            case INTEGER_LIST -> converter.convert(value).to(new TypeReference<List<Integer>>() {
+            });
+            case BOOLEAN_ARRAY -> converter.convert(value).to(boolean[].class);
+            case BOOLEAN_LIST -> converter.convert(value).to(new TypeReference<List<Boolean>>() {
+            });
+            case DOUBLE_ARRAY -> converter.convert(value).to(double[].class);
+            case DOUBLE_LIST -> converter.convert(value).to(new TypeReference<List<Double>>() {
+            });
+            case FLOAT_ARRAY -> converter.convert(value).to(float[].class);
+            case FLOAT_LIST -> converter.convert(value).to(new TypeReference<List<Float>>() {
+            });
+            case CHAR_ARRAY -> converter.convert(value).to(char[].class);
+            case CHAR_LIST -> converter.convert(value).to(new TypeReference<List<Character>>() {
+            });
+            case LONG_ARRAY -> converter.convert(value).to(long[].class);
+            case LONG_LIST -> converter.convert(value).to(new TypeReference<List<Long>>() {
+            });
+            default -> converter.convert(value).to(XAttributeDefType.clazz(type));
+        };
     }
 
     private Object getValue(final XConfigurationDTO config, final String id) {
