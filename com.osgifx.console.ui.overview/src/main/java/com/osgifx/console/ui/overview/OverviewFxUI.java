@@ -46,7 +46,6 @@ import com.osgifx.console.ui.ConsoleStatusBar;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
-import eu.hansolo.tilesfx.addons.Indicator;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
@@ -221,15 +220,6 @@ public final class OverviewFxUI {
                                                    .decimals(0)
                                                    .build();
         noOfComponentsTile.setRoundedCorners(false);
-
-        final Indicator leftGraphics = new Indicator(Tile.RED);
-        leftGraphics.setOn(true);
-
-        final Indicator middleGraphics = new Indicator(Tile.YELLOW);
-        middleGraphics.setOn(true);
-
-        final Indicator rightGraphics = new Indicator(Tile.GREEN);
-        rightGraphics.setOn(true);
 
         final long freeMemoryInBytes = getMemory("Memory Free");
         final long totalMemoryInBytes = getMemory("Memory Total");

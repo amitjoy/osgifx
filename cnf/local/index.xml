@@ -1,5 +1,68 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1643283578431">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1643793670136">
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="license" value="http://www.eclipse.org/legal/epl-2.0, https://www.gnu.org/software/classpath/license.html"/>
+      <attribute name="osgi.identity" value="javax.annotation"/>
+      <attribute name="documentation" value="https://www.eclipse.org"/>
+      <attribute name="description" value="Jakarta Annotations API"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="1.3.5.v20200909-1856" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="javax.annotation"/>
+      <attribute name="bundle-version" value="1.3.5.v20200909-1856" type="Version"/>
+      <attribute name="version" value="1.3.5" type="Version"/>
+      <attribute name="osgi.wiring.package" value="javax.annotation"/>
+      <attribute name="bnd.hashes" value="-2004043409,1693669327,-783626505,424653815,-1100816956,-747788814,-276420562,20897285" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="javax.annotation"/>
+      <attribute name="bundle-version" value="1.3.5.v20200909-1856" type="Version"/>
+      <attribute name="version" value="1.3.5" type="Version"/>
+      <attribute name="osgi.wiring.package" value="javax.annotation.security"/>
+      <attribute name="bnd.hashes" value="1788444563,-1077456939,-1614978202,1796849739,79322109" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="javax.annotation"/>
+      <attribute name="bundle-version" value="1.3.5.v20200909-1856" type="Version"/>
+      <attribute name="version" value="1.3.5" type="Version"/>
+      <attribute name="osgi.wiring.package" value="javax.annotation.sql"/>
+      <attribute name="bnd.hashes" value="-1838143560,-1147875397" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="1.3.5.v20200909-1856" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="javax.annotation"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="1.3.5.v20200909-1856" type="Version"/>
+      <attribute name="osgi.wiring.host" value="javax.annotation"/>
+    </capability>
+    <capability namespace="osgi.content">
+      <attribute name="size" value="47385" type="Long"/>
+      <attribute name="url" value="javax.annotation/javax.annotation-1.3.5.jar"/>
+      <attribute name="mime" value="application/vnd.osgi.bundle"/>
+      <attribute name="osgi.content" value="3209816BB5AC598C1B4FD042FD8A68405AEADAD1244D0189734AB9EB3345327B"/>
+    </capability>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=javax.annotation)(version&gt;=1.3.5))"/>
+      <attribute name="osgi.wiring.package" value="javax.annotation"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=javax.annotation.security)(version&gt;=1.3.5))"/>
+      <attribute name="osgi.wiring.package" value="javax.annotation.security"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=javax.annotation.sql)(version&gt;=1.3.5))"/>
+      <attribute name="osgi.wiring.package" value="javax.annotation.sql"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.bundle">
+      <directive name="filter" value="(osgi.wiring.bundle=system.bundle)"/>
+    </requirement>
+    <requirement namespace="osgi.ee">
+      <directive name="filter" value="(&amp;(osgi.ee=JavaSE)(version=1.8))"/>
+    </requirement>
+  </resource>
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.runtime"/>
