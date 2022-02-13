@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -17,7 +17,6 @@ package com.osgifx.console.ui.packages;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.osgi.framework.BundleContext;
 
@@ -72,7 +71,7 @@ public final class PackageHelper {
     }
 
     private static List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
-        return exportedPackages.stream().map(PackageHelper::toPackageDTO).collect(Collectors.toList());
+        return exportedPackages.stream().map(PackageHelper::toPackageDTO).toList();
     }
 
     private static PackageDTO toPackageDTO(final XPackageDTO xpkg) {

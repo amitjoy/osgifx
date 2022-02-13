@@ -71,8 +71,8 @@ public final class FeatureInstallDialog extends Dialog<SelectedFeaturesDTO> {
     }
 
     public static class SelectedFeaturesDTO {
-        public String                        archiveURL;
-        public List<Entry<File, FeatureDTO>> features;
+        public String                                  archiveURL;
+        public List<? extends Entry<File, FeatureDTO>> features;
     }
 
 }

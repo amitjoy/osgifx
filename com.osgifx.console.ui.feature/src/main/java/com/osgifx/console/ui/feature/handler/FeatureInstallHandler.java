@@ -83,11 +83,11 @@ public final class FeatureInstallHandler {
         }
     }
 
-    private void udpateOrInstallFeatures(final List<Entry<File, FeatureDTO>> features, final String archiveURL) {
+    private void udpateOrInstallFeatures(final List<? extends Entry<File, FeatureDTO>> features, final String archiveURL) {
         if (features.isEmpty()) {
             return;
         }
-        final Task<Void> task = new Task<Void>() {
+        final Task<Void> task = new Task<>() {
             final List<FeatureDTO> successfullyInstalledFeatures = Lists.newArrayList();
             final List<FeatureDTO> notInstalledFeatures          = Lists.newArrayList();
 

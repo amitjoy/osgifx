@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.feature.dialog;
 
-import static java.util.stream.Collectors.toList;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
@@ -143,7 +142,7 @@ public final class InstallFeatureDialogController {
                 logger.atInfo().log("Web URL found - '%s'", url);
                 logger.atInfo().log("Reading features from - '%s'", url);
 
-                final Task<Void> task = new Task<Void>() {
+                final Task<Void> task = new Task<>() {
 
                     @Override
                     protected Void call() throws Exception {
@@ -204,7 +203,7 @@ public final class InstallFeatureDialogController {
         final SelectedFeaturesDTO dto = new SelectedFeaturesDTO();
 
         final ObservableList<XFeatureDTO> selectedItems = featuresList.getCheckModel().getCheckedItems();
-        dto.features   = selectedItems.stream().map(f -> new SimpleEntry<>(f.json, f.dto)).collect(toList());
+        dto.features   = selectedItems.stream().map(f -> new SimpleEntry<>(f.json, f.dto)).toList();
         dto.archiveURL = archiveUrlCombo.getEditor().getText();
 
         return dto;
@@ -246,7 +245,7 @@ public final class InstallFeatureDialogController {
         final Collection<XFeatureDTO> fs = features.entrySet()
                                                    .stream()
                                                    .map(e -> new XFeatureDTO(e.getKey(), e.getValue(), false))
-                                                   .collect(toList());
+                                                   .toList();
         // @formatter:on
         featuresList.setItems(FXCollections.observableArrayList(fs));
     }
