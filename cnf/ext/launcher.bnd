@@ -1,28 +1,91 @@
--runrepos                       =         Workspace, Runtime, e(fx)clipse
+-runrepos                       =         Workspace, Runtime, e(fx)clipse, Local
 -runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         true
 -runtrace                       =         true 
--runee                          =         JavaSE-1.8
+-runee                          =         JavaSE-17
 -runvm                          =         -ea
 -runsystemcapabilities          =         ${native_capability}
--runpath.efx                    =         org.eclipse.fx.osgi
 -runproperties.scr              =         ds.log.enabled=false
 -runblacklist                   =         bnd.identity;id='com.osgifx.console.api'
-
 current.directory               =         .
 storage.directory               =         ${current.directory}/.osgifx-ws
 -runproperties.storage          =         \
                                           launch.storage.dir=${storage.directory},\
                                           org.osgi.framework.storage=${storage.directory}
 
+-runvm                          =         --add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED,\
+                                          --add-exports=javafx.base/com.sun.javafx.runtime=ALL-UNNAMED,\
+                                          --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,\
+                                          --add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED,\
+                                          --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED,\
+                                          --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,\
+                                          --add-exports=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED,\
+                                          --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED,\
+                                          --add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED
+
 -runproperties.equinox          =         osgi.instance.area.default=${storage.directory}
 
--runproperties.efx              =         osgi.framework.extensions=org.eclipse.fx.osgi,\
-                                          eclipse.application.launchDefault=true,\
+-runproperties.efx              =         eclipse.application.launchDefault=true,\
                                           osgi.compatibility.eagerStart.LazyActivation=true,\
                                           osgi.compatibility.errorOnFailedStart=false
 
--runsystempackages              =         com.sun.javafx.collections,\
+-runproperties.bootdelegation   =         org.osgi.framework.bootdelegation="\
+                                            com.sun.glass.ui,\
+                                            com.sun.javafx.collections,\
+                                            com.sun.javafx.css,\
+                                            com.sun.javafx.css.converters,\
+                                            com.sun.javafx.event,\
+                                            com.sun.javafx.geom,\
+                                            com.sun.javafx.runtime,\
+                                            com.sun.javafx.scene.control,\
+                                            com.sun.javafx.scene.control.behavior,\
+                                            com.sun.javafx.scene.control.skin,\
+                                            com.sun.javafx.scene.text,\
+                                            com.sun.javafx.scene.traversal,\
+                                            com.sun.javafx.tk,\
+                                            com.sun.javafx.webkit,\
+                                            com.sun.webkit,\
+		                                    com.sun.management,\
+		                                    javafx.animation,\
+                                          	javafx.application,\
+                                          	javafx.beans,\
+                                          	javafx.beans.binding,\
+                                          	javafx.beans.property,\
+                                          	javafx.beans.property.adapter,\
+                                         	javafx.beans.value,\
+                                          	javafx.collections,\
+                                          	javafx.collections.transformation,\
+                                          	javafx.concurrent,\
+                                          	javafx.css,\
+                                          	javafx.css.converter,\
+                                          	javafx.embed.swing,\
+                                          	javafx.event,\
+                                          	javafx.fxml,\
+                                          	javafx.geometry,\
+                                          	javafx.print,\
+                                          	javafx.scene,\
+                                          	javafx.scene.canvas,\
+                                          	javafx.scene.chart,\
+                                          	javafx.scene.control,\
+                                          	javafx.scene.control.cell,\
+                                          	javafx.scene.control.skin,\
+                                          	javafx.scene.effect,\
+                                          	javafx.scene.image,\
+                                          	javafx.scene.input,\
+                                          	javafx.scene.layout,\
+                                          	javafx.scene.media,\
+                                          	javafx.scene.paint,\
+                                          	javafx.scene.shape,\
+                                          	javafx.scene.text,\
+                                          	javafx.scene.transform,\
+                                          	javafx.scene.web,\
+                                          	javafx.stage,\
+                                          	javafx.util,\
+                                          	javafx.util.converter,\
+		                                    sun.misc"
+
+-runsystempackages              =         com.sun.glass.ui,\
+                                          com.sun.javafx.collections,\
                                           com.sun.javafx.css,\
                                           com.sun.javafx.css.converters,\
                                           com.sun.javafx.event,\
@@ -47,6 +110,7 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                           javafx.collections.transformation,\
                                           javafx.concurrent,\
                                           javafx.css,\
+                                          javafx.css.converter,\
                                           javafx.embed.swing,\
                                           javafx.event,\
                                           javafx.fxml,\
@@ -57,6 +121,7 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                           javafx.scene.chart,\
                                           javafx.scene.control,\
                                           javafx.scene.control.cell,\
+                                          javafx.scene.control.skin,\
                                           javafx.scene.effect,\
                                           javafx.scene.image,\
                                           javafx.scene.input,\

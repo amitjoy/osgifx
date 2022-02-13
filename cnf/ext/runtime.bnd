@@ -12,14 +12,13 @@ bundles.console: \
                  org.eclipse.equinox.console
 
 bundles.deps: \
-                 com.ibm.icu.base,\
-                 javax.annotation,\
-                 javax.inject,\
-                 javax.xml.jre,\
-                 org.eclipse.osgi.services,\
-                 org.apache.commons.jxpath,\
-                 com.google.guava,\
-                 org.eclipse.jdt.annotation
+				 com.ibm.icu.base,\
+				 javax.annotation,\
+				 javax.inject,\
+				 javax.xml.jre,\
+				 org.apache.commons.jxpath,\
+				 com.google.guava,\
+				 org.eclipse.jdt.annotation
 
 bundles.eclipse.emf: \
                  org.eclipse.emf.common,\
@@ -73,17 +72,18 @@ bundles.e4.efxclipse: \
                  org.eclipse.fx.ui.workbench.services
 
 bundles.required: \
-                 ${bundles.e4.core},\
-                 ${bundles.e4.efxclipse},\
-                 ${bundles.eclipse.core},\
-                 com.google.guava,\
-                 org.apache.commons.lang,\
-                 org.eclipse.equinox.preferences,\
-                 controlsfx,\
-                 javax.inject,\
-                 com.osgifx.console.util,\
-                 com.osgifx.console.wrapper.tilesfx,\
-                 com.osgifx.console.wrapper.formsfx
+				${bundles.e4.core},\
+                ${bundles.e4.efxclipse},\
+				${bundles.deps},\
+				${bundles.eclipse.core},\
+				com.google.guava,\
+				org.apache.commons.lang,\
+				org.eclipse.equinox.preferences,\
+                controlsfx,\
+                javax.inject,\
+                com.osgifx.console.util,\
+                eu.hansolo.tilesfx,\
+                com.osgifx.console.wrapper.formsfx
                 
 bundles.configurations: \
                  org.apache.felix.configadmin,\

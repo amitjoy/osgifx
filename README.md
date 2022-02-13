@@ -51,10 +51,10 @@
 
 |                      	|                                             	|
 |----------------------	|---------------------------------------------	|
-| Java                 	| 1.8                                         	|
+| Java                 	| 17                                         	|
 | Rich Client Platform 	| JavaFX 8                                    	|
 | Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
-| UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
+| UI Libraries         	| ControlsFX, TilesFX, FormsFX                   |
 | Tools                	| Bndtools 6                                  	|
 
 ------------------------------------------------------------------------------------------------------------

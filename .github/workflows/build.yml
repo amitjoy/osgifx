@@ -19,19 +19,19 @@ jobs:
          uses: actions/checkout@v1
       -  name: Gradle Wrapper Validation
          uses: gradle/wrapper-validation-action@v1
-      -  name: Set up Java 1.8 with JavaFX
+      -  name: Set up Java 17 with JavaFX
          uses: actions/setup-java@v1
          with:
-            java-version: 1.8
+            java-version: 17
             java-package: jdk+fx
       -  name: Build Workspace
          run: ./gradlew build --max-workers=5 --parallel
       -  name: Build Executable JAR
          run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
-         run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/
+         run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
       -  name: Build Distribution Image for ${{ matrix.config.os }}
-         run: ./gradlew package_distro
+         run: ./gradlew jpackage --info
       -  name: Copy Distribution Artifacts to Current Directory
          run: ./gradlew copy_artifacts
       -  uses: actions/upload-artifact@master
@@ -39,8 +39,6 @@ jobs:
             name: dist-${{ matrix.config.os }}
             path: |-
                *.deb
-               *.rpm
                *.dmg
-               *.pkg
                *.exe
                com.osgifx.console.agent.jar

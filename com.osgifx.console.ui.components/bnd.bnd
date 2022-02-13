@@ -6,5 +6,6 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fxml = fxml,\
 					  graphic = graphic
 -buildpath          : ${bundles.required}
-Import-Package      : org.controlsfx.glyphfont, *
+Import-Package      : org.controlsfx.glyphfont,\
+                      *
 -privatepackage     : com.osgifx.console.ui.components.*
