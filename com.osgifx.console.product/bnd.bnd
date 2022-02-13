@@ -1,1 +1,2 @@
 Require-Capability  : compile
+-buildpath: org.eclipse.fx.osgi, org.eclipse.osgi
