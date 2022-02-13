@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -14,8 +14,6 @@
  * the License.
  ******************************************************************************/
 package com.osgifx.console.feature.agent;
-
-import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -89,7 +87,7 @@ public final class FeatureHelper {
         dto.kind      = extension.getKind();
         dto.json      = extension.getJSON();
         dto.text      = extension.getText();
-        dto.artifacts = extension.getArtifacts().stream().map(FeatureHelper::toFeatureArtifactDTO).collect(toList());
+        dto.artifacts = extension.getArtifacts().stream().map(FeatureHelper::toFeatureArtifactDTO).toList();
 
         return dto;
     }
@@ -106,7 +104,7 @@ public final class FeatureHelper {
         dto.license        = feature.getLicense().orElse(null);
         dto.scm            = feature.getSCM().orElse(null);
         dto.isComplete     = feature.isComplete();
-        dto.bundles        = feature.getBundles().stream().map(FeatureHelper::toFeatureBundleDTO).collect(toList());
+        dto.bundles        = feature.getBundles().stream().map(FeatureHelper::toFeatureBundleDTO).toList();
         dto.configurations = feature.getConfigurations().entrySet().stream()
                 .collect(Collectors.toMap(Entry::getKey, e -> toFeatureConfigDTO(e.getValue())));
         dto.extensions     = feature.getExtensions().entrySet().stream()

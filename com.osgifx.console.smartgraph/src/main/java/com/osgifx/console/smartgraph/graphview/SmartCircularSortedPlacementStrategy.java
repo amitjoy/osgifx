@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -17,7 +17,6 @@ package com.osgifx.console.smartgraph.graphview;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 import com.osgifx.console.smartgraph.graph.Graph;
 
@@ -58,8 +57,7 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
         }
     }
 
-    protected <V> Collection<SmartGraphVertex<V>> sort(final Collection<? extends SmartGraphVertex<V>> vertices) {
-        return vertices.stream().sorted(Comparator.comparing(v -> v.getUnderlyingVertex().element().toString().toLowerCase()))
-                .collect(Collectors.toList());
+    protected <V> Collection<? extends SmartGraphVertex<V>> sort(final Collection<? extends SmartGraphVertex<V>> vertices) {
+        return vertices.stream().sorted(Comparator.comparing(v -> v.getUnderlyingVertex().element().toString().toLowerCase())).toList();
     }
 }

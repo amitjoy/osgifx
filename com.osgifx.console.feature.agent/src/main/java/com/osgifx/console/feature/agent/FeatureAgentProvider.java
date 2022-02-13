@@ -55,7 +55,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -583,7 +582,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
     private List<File> extractFeatures(final File archive, final Path extractionDirectory) throws IOException {
         unzip(archive, extractionDirectory);
         final File[] files = extractionDirectory.toFile().listFiles((FilenameFilter) (dir, name) -> name.endsWith(".json"));
-        return Stream.of(files).collect(Collectors.toList());
+        return Stream.of(files).toList();
     }
 
     public void cleanDirectory(final Path path) throws IOException {
