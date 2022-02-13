@@ -18,32 +18,38 @@ package com.osgifx.console.ui.configurations.converter;
 public enum ConfigurationType {
 
     STRING,
+    STRING_ARRAY,
+    STRING_LIST,
     INTEGER,
+    INTEGER_ARRAY,
+    INTEGER_LIST,
     BOOLEAN,
+    BOOLEAN_ARRAY,
+    BOOLEAN_LIST,
     DOUBLE,
+    DOUBLE_ARRAY,
+    DOUBLE_LIST,
     FLOAT,
+    FLOAT_ARRAY,
+    FLOAT_LIST,
     CHAR,
-    LONG;
+    CHAR_ARRAY,
+    CHAR_LIST,
+    LONG,
+    LONG_ARRAY,
+    LONG_LIST;
 
     public static Class<?> clazz(final ConfigurationType type) {
-        switch (type) {
-            case STRING:
-                return String.class;
-            case INTEGER:
-                return Integer.class;
-            case BOOLEAN:
-                return Boolean.class;
-            case DOUBLE:
-                return Double.class;
-            case FLOAT:
-                return Float.class;
-            case CHAR:
-                return Character.class;
-            case LONG:
-                return Long.class;
-            default:
-                return String.class;
-        }
+        return switch (type) {
+            case STRING -> String.class;
+            case INTEGER -> Integer.class;
+            case BOOLEAN -> Boolean.class;
+            case DOUBLE -> Double.class;
+            case FLOAT -> Float.class;
+            case CHAR -> Character.class;
+            case LONG -> Long.class;
+            default -> null;
+        };
     }
 
 }

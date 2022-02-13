@@ -19,6 +19,7 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -27,6 +28,8 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.fx.core.Triple;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -58,6 +61,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
     @Log
     @Inject
     private FluentLogger           logger;
+    @Inject
+    private IEclipseContext        context;
     @Inject
     private ConfigurationConverter converter;
 
@@ -97,8 +102,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         final ButtonType createButtonType = new ButtonType("Create", ButtonData.OK_DONE);
         dialogPane.getButtonTypes().addAll(createButtonType);
 
-        final Button loginButton = (Button) dialogPane.lookupButton(createButtonType);
-        loginButton.setOnAction(actionEvent -> {
+        final Button createButton = (Button) dialogPane.lookupButton(createButtonType);
+        createButton.setOnAction(actionEvent -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -182,6 +187,26 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
             final ObservableList<ConfigurationType> options  = FXCollections.observableArrayList(ConfigurationType.values());
             final ComboBox<ConfigurationType>       comboBox = new ComboBox<>(options);
+
+            comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
+                final Class<?> clazz = ConfigurationType.clazz(newValue);
+                txtValue.setOnMouseClicked(e -> {
+                    // multiple cardinality
+                    txtValue.setText("");
+                    if (clazz == null) {
+                        final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
+                        ContextInjectionFactory.inject(dialog, context);
+                        final String key = txtKey.getText();
+                        if (!Strings.isNullOrEmpty(key.trim())) {
+                            dialog.init(key, newValue);
+                            final Optional<String> entries = dialog.showAndWait();
+                            if (entries.isPresent()) {
+                                txtValue.setText(entries.get());
+                            }
+                        }
+                    }
+                });
+            });
 
             comboBox.getSelectionModel().select(0); // default STRING type
 
