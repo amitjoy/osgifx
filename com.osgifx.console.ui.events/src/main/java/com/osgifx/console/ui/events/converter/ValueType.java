@@ -26,24 +26,16 @@ public enum ValueType {
     LONG;
 
     public static Class<?> clazz(final ValueType type) {
-        switch (type) {
-            case STRING:
-                return String.class;
-            case INTEGER:
-                return Integer.class;
-            case BOOLEAN:
-                return Boolean.class;
-            case DOUBLE:
-                return Double.class;
-            case FLOAT:
-                return Float.class;
-            case CHAR:
-                return Character.class;
-            case LONG:
-                return Long.class;
-            default:
-                return String.class;
-        }
+        return switch (type) {
+            case STRING -> String.class;
+            case INTEGER -> Integer.class;
+            case BOOLEAN -> Boolean.class;
+            case DOUBLE -> Double.class;
+            case FLOAT -> Float.class;
+            case CHAR -> Character.class;
+            case LONG -> Long.class;
+            default -> String.class;
+        };
     }
 
 }
