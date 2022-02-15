@@ -32,7 +32,7 @@ import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.osgifx.console.ui.configurations.converter.ConfigurationType;
+import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.geometry.Pos;
@@ -54,10 +54,10 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
     private FluentLogger               logger;
     @Inject
     private ThreadSynchronize          threadSync;
-    private ConfigurationType          targetType;
+    private XAttributeDefType          targetType;
     private final List<PropertiesForm> entries = Lists.newArrayList();
 
-    public void init(final String key, final ConfigurationType targetType) {
+    public void init(final String key, final XAttributeDefType targetType) {
         this.targetType = targetType;
         final DialogPane dialogPane = getDialogPane();
 
@@ -175,7 +175,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         entries.remove(form);
     }
 
-    private Object getParsed(final ConfigurationType type, final String value) {
+    private Object getParsed(final XAttributeDefType type, final String value) {
         return switch (type) {
             case STRING_ARRAY, STRING_LIST -> value;
             case INTEGER_ARRAY, INTEGER_LIST -> Integer.parseInt(value);
