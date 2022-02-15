@@ -449,13 +449,16 @@ public final class ConfigurationEditorFxController {
             }
         } else {
             final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-            });
-            field = Field.ofStringType(String.join(",", convertedValue));
+                                              });
+            final String       joinedValue    = String.join(",", convertedValue);
+            field = Field.ofStringType(joinedValue);
             final EventHandler<MouseEvent> handler = event -> {
                 final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
                 ContextInjectionFactory.inject(dialog, context);
                 if (!Strings.isNullOrEmpty(key.trim())) {
-                    dialog.init(key, adType);
+                    final DataField<?, ?, ?> dataField = (DataField<?, ?, ?>) field;
+                    dialog.init(key, adType, dataField.getValue().toString());
+
                     final Optional<String> entries = dialog.showAndWait();
                     if (entries.isPresent()) {
                         // set the value in the value field
@@ -506,7 +509,9 @@ public final class ConfigurationEditorFxController {
                 final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
                 ContextInjectionFactory.inject(dialog, context);
                 if (!Strings.isNullOrEmpty(key.trim())) {
-                    dialog.init(key, adType);
+                    final DataField<?, ?, ?> dataField = (DataField<?, ?, ?>) field;
+                    dialog.init(key, adType, dataField.getValue().toString());
+
                     final Optional<String> entries = dialog.showAndWait();
                     if (entries.isPresent()) {
                         // set the value in the value field

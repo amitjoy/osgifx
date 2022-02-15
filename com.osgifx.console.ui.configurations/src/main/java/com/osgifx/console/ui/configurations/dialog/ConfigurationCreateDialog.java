@@ -192,17 +192,14 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                 final Class<?> clazz = XAttributeDefType.clazz(newValue);
                 txtValue.setOnMouseClicked(e -> {
                     // multiple cardinality
-                    txtValue.setText("");
                     if (clazz == null) {
                         final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
                         ContextInjectionFactory.inject(dialog, context);
                         final String key = txtKey.getText();
-                        if (!Strings.isNullOrEmpty(key.trim())) {
-                            dialog.init(key, newValue);
-                            final Optional<String> entries = dialog.showAndWait();
-                            if (entries.isPresent()) {
-                                txtValue.setText(entries.get());
-                            }
+                        dialog.init(key, newValue, txtValue.getText());
+                        final Optional<String> entries = dialog.showAndWait();
+                        if (entries.isPresent()) {
+                            txtValue.setText(entries.get());
                         }
                     }
                 });
