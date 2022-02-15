@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -15,10 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.dto;
 
-import java.util.Collections;
 import java.util.List;
-
-import com.osgifx.console.agent.dto.XAttributeDefType;
 
 public enum XAttributeDefType {
 
@@ -165,48 +162,20 @@ public enum XAttributeDefType {
         switch (type) {
             case STRING:
                 return String.class;
-            case STRING_ARRAY:
-                return String[].class;
-            case STRING_LIST:
-                return Collections.<String> emptyList().getClass();
             case INTEGER:
                 return Integer.class;
-            case INTEGER_ARRAY:
-                return int[].class;
-            case INTEGER_LIST:
-                return Collections.<Integer> emptyList().getClass();
             case BOOLEAN:
                 return Boolean.class;
-            case BOOLEAN_ARRAY:
-                return boolean[].class;
-            case BOOLEAN_LIST:
-                return Collections.<Boolean> emptyList().getClass();
             case DOUBLE:
                 return Double.class;
-            case DOUBLE_ARRAY:
-                return double[].class;
-            case DOUBLE_LIST:
-                return Collections.<Double> emptyList().getClass();
             case FLOAT:
                 return Float.class;
-            case FLOAT_ARRAY:
-                return float[].class;
-            case FLOAT_LIST:
-                return Collections.<Float> emptyList().getClass();
             case CHAR:
                 return Character.class;
-            case CHAR_ARRAY:
-                return char[].class;
-            case CHAR_LIST:
-                return Collections.<Character> emptyList().getClass();
             case LONG:
                 return Long.class;
-            case LONG_ARRAY:
-                return long[].class;
-            case LONG_LIST:
-                return Collections.<Long> emptyList().getClass();
             default:
-                return String.class;
+                return null;
         }
     }
 

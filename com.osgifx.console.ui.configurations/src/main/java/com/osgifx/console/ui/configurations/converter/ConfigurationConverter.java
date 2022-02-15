@@ -27,6 +27,7 @@ import org.osgi.util.converter.Rule;
 import org.osgi.util.converter.TypeReference;
 
 import com.google.common.primitives.Floats;
+import com.osgifx.console.agent.dto.XAttributeDefType;
 
 @Component(service = ConfigurationConverter.class)
 public final class ConfigurationConverter {
@@ -37,6 +38,8 @@ public final class ConfigurationConverter {
     public ConfigurationConverter() {
         final Converter        c  = Converters.standardConverter();
         final ConverterBuilder cb = c.newConverterBuilder();
+
+        // TODO add rules to convert to string from other types
         cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
         });
         cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
@@ -87,7 +90,7 @@ public final class ConfigurationConverter {
         converter = cb.build();
     }
 
-    public Object convert(final String value, final ConfigurationType target) throws Exception {
+    public Object convert(final Object value, final XAttributeDefType target) {
         return switch (target) {
             case STRING_ARRAY -> converter.convert(value).to(String[].class);
             case STRING_LIST -> converter.convert(value).to(new TypeReference<List<String>>() {
@@ -110,8 +113,16 @@ public final class ConfigurationConverter {
             case LONG_ARRAY -> converter.convert(value).to(long[].class);
             case LONG_LIST -> converter.convert(value).to(new TypeReference<List<Long>>() {
             });
-            default -> converter.convert(value).to(ConfigurationType.clazz(target));
+            default -> converter.convert(value).to(XAttributeDefType.clazz(target));
         };
+    }
+
+    public <T> T convert(final Object value, final Class<T> clazz) {
+        return converter.convert(value).to(clazz);
+    }
+
+    public <T> T convert(final Object value, final TypeReference<T> ref) {
+        return converter.convert(value).to(ref);
     }
 
 }

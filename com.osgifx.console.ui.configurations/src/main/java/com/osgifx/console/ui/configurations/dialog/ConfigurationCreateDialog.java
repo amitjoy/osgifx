@@ -37,8 +37,8 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Maps;
+import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.ui.configurations.converter.ConfigurationConverter;
-import com.osgifx.console.ui.configurations.converter.ConfigurationType;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.collections.FXCollections;
@@ -66,7 +66,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
     @Inject
     private ConfigurationConverter converter;
 
-    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<ConfigurationType>>> configurationEntries = Maps
+    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> configurationEntries = Maps
             .newHashMap();
 
     public void init() {
@@ -139,17 +139,17 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         config.factoryPid = txtFactoryPid.getText();
 
         final Map<String, Object> properties = Maps.newHashMap();
-        for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<ConfigurationType>>> entry : configurationEntries
+        for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : configurationEntries
                 .entrySet()) {
-            final Triple<Supplier<String>, Supplier<String>, Supplier<ConfigurationType>> value       = entry.getValue();
+            final Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>> value       = entry.getValue();
             final String                                                                  configKey   = value.value1.get();
             final String                                                                  configValue = value.value2.get();
-            ConfigurationType                                                             configType  = value.value3.get();
+            XAttributeDefType                                                             configType  = value.value3.get();
             if (Strings.isNullOrEmpty(configKey) || Strings.isNullOrEmpty(configValue)) {
                 continue;
             }
             if (configType == null) {
-                configType = ConfigurationType.STRING;
+                configType = XAttributeDefType.STRING;
             }
             final Object convertedValue = converter.convert(configValue, configType);
             properties.put(configKey, convertedValue);
@@ -185,11 +185,11 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
             btnAddField    = new Button();
             btnRemoveField = new Button();
 
-            final ObservableList<ConfigurationType> options  = FXCollections.observableArrayList(ConfigurationType.values());
-            final ComboBox<ConfigurationType>       comboBox = new ComboBox<>(options);
+            final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
+            final ComboBox<XAttributeDefType>       comboBox = new ComboBox<>(options);
 
             comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
-                final Class<?> clazz = ConfigurationType.clazz(newValue);
+                final Class<?> clazz = XAttributeDefType.clazz(newValue);
                 txtValue.setOnMouseClicked(e -> {
                     // multiple cardinality
                     txtValue.setText("");
@@ -218,7 +218,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
             getChildren().addAll(txtKey, txtValue, comboBox, btnAddField, btnRemoveField);
 
-            final Triple<Supplier<String>, Supplier<String>, Supplier<ConfigurationType>> tuple = new Triple<>(txtKey::getText,
+            final Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>> tuple = new Triple<>(txtKey::getText,
                     txtValue::getText, comboBox::getValue);
             configurationEntries.put(this, tuple);
         }

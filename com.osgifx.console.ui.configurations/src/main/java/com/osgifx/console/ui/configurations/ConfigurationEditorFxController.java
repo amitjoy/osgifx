@@ -18,6 +18,7 @@ package com.osgifx.console.ui.configurations;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_DELETED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +28,11 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.util.converter.Converter;
-import org.osgi.util.converter.Converters;
 import org.osgi.util.converter.TypeReference;
 
 import com.dlsc.formsfx.model.structure.DataField;
@@ -39,8 +40,9 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
-import com.dlsc.formsfx.view.controls.SimpleCheckBoxControl;
+import com.dlsc.formsfx.view.controls.SimpleControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XAttributeDefDTO;
@@ -49,15 +51,19 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.configurations.converter.ConfigurationConverter;
+import com.osgifx.console.ui.configurations.dialog.MultipleCardinalityPropertiesDialog;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -66,6 +72,10 @@ public final class ConfigurationEditorFxController {
     @Log
     @Inject
     private FluentLogger           logger;
+    @Inject
+    private IEclipseContext        context;
+    @Inject
+    private ConfigurationConverter converter;
     @FXML
     private BorderPane             rootPanel;
     @Inject
@@ -79,7 +89,6 @@ public final class ConfigurationEditorFxController {
     @FXML
     private Button                 deleteConfigButton;
     private Form                   form;
-    private Converter              converter;
     private FormRenderer           formRenderer;
     private Map<Field<?>, Integer> typeMappings;
     private List<String>           uneditableProperties;
@@ -88,7 +97,6 @@ public final class ConfigurationEditorFxController {
     public void initialize() {
         typeMappings         = Maps.newHashMap();
         uneditableProperties = Arrays.asList("service.pid", "service.factoryPid");
-        converter            = Converters.standardConverter();
         logger.atDebug().log("FXML controller has been initialized");
     }
 
@@ -201,11 +209,11 @@ public final class ConfigurationEditorFxController {
         final List<Field<?>> fields = Lists.newArrayList();
 
         for (final Entry<String, Object> entry : config.properties.entrySet()) {
-            final String id    = entry.getKey();
+            final String key   = entry.getKey();
             final Object value = entry.getValue();
 
             final XAttributeDefType attrDefType = XAttributeDefType.getType(value);
-            final Field<?>          field       = initFieldFromType(value, null, attrDefType, null).label(id);
+            final Field<?>          field       = initFieldFromType(key, value, null, attrDefType, null, false).label(key);
 
             if (uneditableProperties.contains(field.getLabel())) {
                 continue;
@@ -255,403 +263,260 @@ public final class ConfigurationEditorFxController {
         final List<String>      defaultVal = ad.defaultValue;
         final String            id         = ad.id;
 
-        return initFieldFromType(currentValue, defaultVal, type, options).label(id).labelDescription(ad.description);
+        return initFieldFromType(id, currentValue, defaultVal, type, options, true).label(id).labelDescription(ad.description);
     }
 
-    private Field<?> initFieldFromType(final Object currentValue, final List<String> defaultValue, final XAttributeDefType adType,
-            final List<String> options) {
+    private Field<?> initFieldFromType(final String key, final Object currentValue, final List<String> defaultValue,
+            final XAttributeDefType adType, final List<String> options, final boolean hasOCD) {
         Field<?> field = null;
         switch (adType) {
             case LONG, INTEGER:
                 if (options != null && !options.isEmpty()) {
                     String effectiveValue = null;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String.class);
+                        effectiveValue = converter.convert(currentValue, String.class);
                     } else {
-                        effectiveValue = converter.convert(defaultValue).to(String.class);
+                        effectiveValue = converter.convert(defaultValue, String.class);
                     }
                     final int selection = options.indexOf(effectiveValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Double>>() {
                     }), selection);
                     break;
                 }
                 if (currentValue != null) {
-                    field = Field.ofIntegerType(converter.convert(currentValue).to(int.class));
+                    field = Field.ofIntegerType(converter.convert(currentValue, int.class));
                 } else {
-                    field = Field.ofIntegerType(converter.convert(defaultValue).to(int.class));
+                    field = Field.ofIntegerType(converter.convert(defaultValue, int.class));
                 }
                 break;
             case FLOAT, DOUBLE:
                 if (options != null && !options.isEmpty()) {
                     String effectiveValue = null;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String.class);
+                        effectiveValue = converter.convert(currentValue, String.class);
                     } else {
-                        effectiveValue = converter.convert(defaultValue).to(String.class);
+                        effectiveValue = converter.convert(defaultValue, String.class);
                     }
                     final int selection = options.indexOf(effectiveValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Double>>() {
                     }), selection);
                     break;
                 }
                 if (currentValue != null) {
-                    field = Field.ofDoubleType(converter.convert(currentValue).to(double.class));
+                    field = Field.ofDoubleType(converter.convert(currentValue, double.class));
                 } else {
-                    field = Field.ofDoubleType(converter.convert(defaultValue).to(double.class));
+                    field = Field.ofDoubleType(converter.convert(defaultValue, double.class));
                 }
                 break;
             case BOOLEAN:
                 if (options != null && !options.isEmpty()) {
                     String effectiveValue = null;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String.class);
+                        effectiveValue = converter.convert(currentValue, String.class);
                     } else {
-                        effectiveValue = converter.convert(defaultValue).to(String.class);
+                        effectiveValue = converter.convert(defaultValue, String.class);
                     }
                     final int selection = options.indexOf(effectiveValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Boolean>>() {
                     }), selection);
                     break;
                 }
                 if (currentValue != null) {
-                    field = Field.ofBooleanType(converter.convert(currentValue).to(boolean.class));
+                    field = Field.ofBooleanType(converter.convert(currentValue, boolean.class));
                 } else {
-                    field = Field.ofBooleanType(converter.convert(defaultValue).to(boolean.class));
+                    field = Field.ofBooleanType(converter.convert(defaultValue, boolean.class));
                 }
                 break;
             case PASSWORD:
                 if (currentValue != null) {
-                    field = Field.ofPasswordType(converter.convert(currentValue).to(String.class));
+                    field = Field.ofPasswordType(converter.convert(currentValue, String.class));
                 } else {
-                    field = Field.ofPasswordType(converter.convert(defaultValue).to(String.class));
+                    field = Field.ofPasswordType(converter.convert(defaultValue, String.class));
                 }
                 break;
             case CHAR:
                 if (options != null && !options.isEmpty()) {
                     String effectiveValue = null;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String.class);
+                        effectiveValue = converter.convert(currentValue, String.class);
                     } else {
-                        effectiveValue = converter.convert(defaultValue).to(String.class);
+                        effectiveValue = converter.convert(defaultValue, String.class);
                     }
                     final int selection = options.indexOf(effectiveValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
                     }), selection);
                     break;
                 }
                 if (currentValue != null) {
-                    field = Field.ofStringType(converter.convert(currentValue).to(String.class))
+                    field = Field.ofStringType(converter.convert(currentValue, String.class))
                             .validate(StringLengthValidator.exactly(1, "Length must be 1"));
                 } else {
-                    field = Field.ofStringType(converter.convert(defaultValue).to(String.class))
+                    field = Field.ofStringType(converter.convert(defaultValue, String.class))
                             .validate(StringLengthValidator.exactly(1, "Length must be 1"));
                 }
                 break;
             case BOOLEAN_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    boolean[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(boolean[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(boolean[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
-                    }), selections);
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Boolean> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Boolean>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue);
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, boolean.class, XAttributeDefType.BOOLEAN_ARRAY);
                 break;
             case BOOLEAN_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<Boolean> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<Boolean>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<Boolean>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Boolean>>() {
-                    }), selections);
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Boolean> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Boolean>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue);
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Boolean.class, XAttributeDefType.BOOLEAN_LIST);
                 break;
             case DOUBLE_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    double[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(double[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(double[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
-                    }), selections);
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Double> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Double>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue);
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, double.class, XAttributeDefType.DOUBLE_ARRAY);
                 break;
             case DOUBLE_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<Double> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<Double>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<Double>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
-                    }), selections);
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Double> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Double>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue);
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Double.class, XAttributeDefType.DOUBLE_LIST);
                 break;
             case LONG_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    long[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(long[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(long[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Double>>() {
-                    }), selections);
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Double> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Double>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, long.class, XAttributeDefType.LONG_ARRAY);
                 break;
             case LONG_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<Long> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<Long>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<Long>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Long>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Long> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Long>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Long.class, XAttributeDefType.LONG_LIST);
                 break;
             case INTEGER_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    int[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(int[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(int[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
-                    }), selections);
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Integer> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, int.class, XAttributeDefType.INTEGER_ARRAY);
                 break;
             case INTEGER_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<Integer> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<Integer>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Integer>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Integer> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Integer>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Integer.class, XAttributeDefType.INTEGER_LIST);
                 break;
             case FLOAT_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    float[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(float[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(float[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Float>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Float> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Float>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, float.class, XAttributeDefType.FLOAT_ARRAY);
                 break;
             case FLOAT_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<Float> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<Float>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<Float>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Float>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Float> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Float>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Float.class, XAttributeDefType.FLOAT_LIST);
                 break;
             case CHAR_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    char[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(char[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(char[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Character>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Character> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Character>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, XAttributeDefType.CHAR_ARRAY);
                 break;
             case CHAR_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<Character> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<Character>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<Character>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<Character>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<Character> convertedValue = converter.convert(currentValue).to(new TypeReference<List<Character>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Character.class, XAttributeDefType.CHAR_LIST);
                 break;
             case STRING_ARRAY:
-                if (options != null && !options.isEmpty()) {
-                    String[] effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String[].class);
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(String[].class);
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<String> convertedValue = converter.convert(currentValue).to(new TypeReference<List<String>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, String.class, XAttributeDefType.STRING_ARRAY);
                 break;
             case STRING_LIST:
-                if (options != null && !options.isEmpty()) {
-                    List<String> effectiveValue = null;
-                    if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(new TypeReference<List<String>>() {
-                        });
-                    } else {
-                        effectiveValue = converter.convert(defaultValue).to(new TypeReference<List<String>>() {
-                        });
-                    }
-                    final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                    field = Field.ofMultiSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
-                    }), selections).render(new SimpleCheckBoxControl<>());
-                    break;
-                }
-                if (currentValue != null) {
-                    final List<String> convertedValue = converter.convert(currentValue).to(new TypeReference<List<String>>() {
-                    });
-                    field = Field.ofMultiSelectionType(convertedValue).render(new SimpleCheckBoxControl<>());
-                }
+                field = processList(key, currentValue, defaultValue, options, hasOCD, String.class, XAttributeDefType.STRING_LIST);
                 break;
             case STRING:
             default:
                 if (options != null && !options.isEmpty()) {
                     String effectiveValue = null;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue).to(String.class);
+                        effectiveValue = converter.convert(currentValue, String.class);
                     } else {
-                        effectiveValue = converter.convert(defaultValue).to(String.class);
+                        effectiveValue = converter.convert(defaultValue, String.class);
                     }
                     final int selection = options.indexOf(effectiveValue);
-                    field = Field.ofSingleSelectionType(converter.convert(options).to(new TypeReference<List<String>>() {
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
                     }), selection);
                     break;
                 }
                 if (currentValue != null) {
-                    final String convertedValue = converter.convert(currentValue).to(String.class);
-                    field = Field.ofStringType(converter.convert(currentValue).to(String.class)).multiline(convertedValue.length() > 100);
+                    final String convertedValue = converter.convert(currentValue, String.class);
+                    field = Field.ofStringType(converter.convert(currentValue, String.class)).multiline(convertedValue.length() > 100);
                 } else {
-                    final String convertedValue = converter.convert(defaultValue).to(String.class);
-                    field = Field.ofStringType(converter.convert(defaultValue).to(String.class)).multiline(convertedValue.length() > 100);
+                    final String convertedValue = converter.convert(defaultValue, String.class);
+                    field = Field.ofStringType(converter.convert(defaultValue, String.class)).multiline(convertedValue.length() > 100);
                 }
                 break;
         }
         if (field == null) {
             field = Field.ofStringType("");
+        }
+        return field;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> Field<?> processArray(final String key, final Object currentValue, final List<String> defaultValue,
+            final List<String> options, final boolean hasOCD, final Class<T> clazz, final XAttributeDefType adType) {
+        Field<?> field;
+        if (hasOCD) {
+            T[] effectiveValue;
+            if (currentValue != null) {
+                effectiveValue = converter.convert(currentValue, getArrayClass(clazz));
+            } else if (defaultValue != null) {
+                effectiveValue = converter.convert(defaultValue, getArrayClass(clazz));
+            } else {
+                effectiveValue = (T[]) Array.newInstance(clazz, 0);
+            }
+            if (options != null && !options.isEmpty()) {
+                final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
+                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
+                }), selections);
+            } else {
+                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
+                }));
+            }
+        } else {
+            final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
+            });
+            field = Field.ofStringType(String.join(",", convertedValue));
+            final EventHandler<MouseEvent> handler = event -> {
+                final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
+                ContextInjectionFactory.inject(dialog, context);
+                if (!Strings.isNullOrEmpty(key.trim())) {
+                    dialog.init(key, adType);
+                    final Optional<String> entries = dialog.showAndWait();
+                    if (entries.isPresent()) {
+                        // set the value in the value field
+                        // TODO
+                    }
+                }
+            };
+
+            final SimpleControl<?> renderer = field.getRenderer();
+            renderer.addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
+        }
+        return field;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> Class<? extends T[]> getArrayClass(final Class<T> clazz) {
+        return (Class<? extends T[]>) Array.newInstance(clazz, 0).getClass();
+    }
+
+    private <T> Field<?> processList(final String key, final Object currentValue, final List<String> defaultValue,
+            final List<String> options, final boolean hasOCD, final Class<T> clazz, final XAttributeDefType adType) {
+        Field<?> field;
+        if (hasOCD) {
+            List<T> effectiveValue;
+            if (currentValue != null) {
+                effectiveValue = converter.convert(currentValue, new TypeReference<List<T>>() {
+                });
+            } else if (defaultValue != null) {
+                effectiveValue = converter.convert(defaultValue, new TypeReference<List<T>>() {
+                });
+            } else {
+                effectiveValue = List.of();
+            }
+            if (options != null && !options.isEmpty()) {
+                final List<Integer> selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
+                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
+                }), selections);
+            } else {
+                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
+                }));
+            }
+        } else {
+            final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
+            });
+            field = Field.ofStringType(String.join(",", convertedValue));
+
+            final EventHandler<MouseEvent> handler = event -> {
+                final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
+                ContextInjectionFactory.inject(dialog, context);
+                if (!Strings.isNullOrEmpty(key.trim())) {
+                    dialog.init(key, adType);
+                    final Optional<String> entries = dialog.showAndWait();
+                    if (entries.isPresent()) {
+                        // set the value in the value field
+                        // TODO
+                    }
+                }
+            };
+
+            final SimpleControl<?> renderer = field.getRenderer();
+            renderer.addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
         }
         return field;
     }
@@ -673,30 +538,7 @@ public final class ConfigurationEditorFxController {
     private Object convertToRequestedType(final Field<?> field, final Object value) {
         // this controller cannot be loaded by FXMLLoader if the 'typeMappings' values are of type XAttributeDefType
         final XAttributeDefType type = XAttributeDefType.values()[typeMappings.get(field)];
-        return switch (type) {
-            case STRING_ARRAY -> converter.convert(value).to(String[].class);
-            case STRING_LIST -> converter.convert(value).to(new TypeReference<List<String>>() {
-            });
-            case INTEGER_ARRAY -> converter.convert(value).to(int[].class);
-            case INTEGER_LIST -> converter.convert(value).to(new TypeReference<List<Integer>>() {
-            });
-            case BOOLEAN_ARRAY -> converter.convert(value).to(boolean[].class);
-            case BOOLEAN_LIST -> converter.convert(value).to(new TypeReference<List<Boolean>>() {
-            });
-            case DOUBLE_ARRAY -> converter.convert(value).to(double[].class);
-            case DOUBLE_LIST -> converter.convert(value).to(new TypeReference<List<Double>>() {
-            });
-            case FLOAT_ARRAY -> converter.convert(value).to(float[].class);
-            case FLOAT_LIST -> converter.convert(value).to(new TypeReference<List<Float>>() {
-            });
-            case CHAR_ARRAY -> converter.convert(value).to(char[].class);
-            case CHAR_LIST -> converter.convert(value).to(new TypeReference<List<Character>>() {
-            });
-            case LONG_ARRAY -> converter.convert(value).to(long[].class);
-            case LONG_LIST -> converter.convert(value).to(new TypeReference<List<Long>>() {
-            });
-            default -> converter.convert(value).to(XAttributeDefType.clazz(type));
-        };
+        return converter.convert(value, type);
     }
 
     private Object getValue(final XConfigurationDTO config, final String id) {
