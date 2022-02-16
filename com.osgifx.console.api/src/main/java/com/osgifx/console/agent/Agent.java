@@ -26,6 +26,7 @@ import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -374,7 +375,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded
      *         or failed
      */
-    XResultDTO createOrUpdateConfiguration(String pid, Map<String, Object> newProperties);
+    XResultDTO createOrUpdateConfiguration(String pid, List<ConfigValue> newProperties);
 
     /**
      * Deletes the associated {@code Configuration} object that corresponds to
@@ -401,7 +402,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded
      *         or failed
      */
-    XResultDTO createFactoryConfiguration(String factoryPid, Map<String, Object> newProperties);
+    XResultDTO createFactoryConfiguration(String factoryPid, List<ConfigValue> newProperties);
 
     /**
      * Publish event synchronously (the method does not return until the event is processed)

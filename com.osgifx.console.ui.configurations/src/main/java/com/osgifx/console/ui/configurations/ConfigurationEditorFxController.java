@@ -43,6 +43,7 @@ import com.dlsc.formsfx.model.validators.StringLengthValidator;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefDTO;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -114,8 +115,8 @@ public final class ConfigurationEditorFxController {
             deleteConfiguration(pid);
         });
         saveConfigButton.setOnAction(event -> {
-            final Map<String, Object> properties   = prepareConfigurationProperties();
-            String                    effectivePID = null;
+            final List<ConfigValue> properties   = prepareConfigurationProperties();
+            String                  effectivePID = null;
             if (pid == null && ocd != null) {
                 effectivePID = ocd.pid;
             } else {
@@ -151,7 +152,7 @@ public final class ConfigurationEditorFxController {
         }
     }
 
-    private void createFactoryConfiguration(final String factoryPID, final Map<String, Object> properties) {
+    private void createFactoryConfiguration(final String factoryPID, final List<ConfigValue> properties) {
         final XResultDTO result = supervisor.getAgent().createFactoryConfiguration(factoryPID, properties);
         if (result.result == XResultDTO.SUCCESS) {
             logger.atInfo().log(result.response);
@@ -164,7 +165,7 @@ public final class ConfigurationEditorFxController {
         }
     }
 
-    private void createOrUpdateConfiguration(final String pid, final Map<String, Object> properties) {
+    private void createOrUpdateConfiguration(final String pid, final List<ConfigValue> properties) {
         final XResultDTO result = supervisor.getAgent().createOrUpdateConfiguration(pid, properties);
         if (result.result == XResultDTO.SUCCESS) {
             logger.atInfo().log(result.response);
@@ -203,12 +204,13 @@ public final class ConfigurationEditorFxController {
     private List<Field<?>> initPropertiesFromConfiguration(final XConfigurationDTO config) {
         final List<Field<?>> fields = Lists.newArrayList();
 
-        for (final Entry<String, Object> entry : config.properties.entrySet()) {
-            final String key   = entry.getKey();
-            final Object value = entry.getValue();
+        for (final Entry<String, ConfigValue> entry : config.properties.entrySet()) {
+            final String            key           = entry.getKey();
+            final ConfigValue       value         = entry.getValue();
+            final Object            originalValue = value.value;
+            final XAttributeDefType attrDefType   = value.type;
 
-            final XAttributeDefType attrDefType = XAttributeDefType.getType(value);
-            final Field<?>          field       = initFieldFromType(key, value, null, attrDefType, null, false).label(key);
+            final Field<?> field = initFieldFromType(key, originalValue, null, attrDefType, null, false).label(key);
 
             if (uneditableProperties.contains(field.getLabel())) {
                 continue;
@@ -491,23 +493,24 @@ public final class ConfigurationEditorFxController {
         return field;
     }
 
-    private Map<String, Object> prepareConfigurationProperties() {
-        final Map<String, Object> properties = Maps.newHashMap();
+    private List<ConfigValue> prepareConfigurationProperties() {
+        final List<ConfigValue> properties = Lists.newArrayList();
         for (final Field<?> field : form.getFields()) {
             if (field instanceof final DataField<?, ?, ?> df) {
                 if (!df.isEditable()) {
                     continue;
                 }
-                final Object originalType = convertToRequestedType(field, df.getValue());
-                properties.put(field.getLabel(), originalType);
+                final XAttributeDefType type         = XAttributeDefType.values()[typeMappings.get(field)];
+                final Object            currentValue = df.getValue();
+                final Object            configValue  = convertToRequestedType(currentValue, type);
+                properties.add(ConfigValue.create(field.getLabel(), configValue, type));
             }
         }
         return properties;
     }
 
-    private Object convertToRequestedType(final Field<?> field, final Object value) {
+    private Object convertToRequestedType(final Object value, final XAttributeDefType type) {
         // this controller cannot be loaded by FXMLLoader if the 'typeMappings' values are of type XAttributeDefType
-        final XAttributeDefType type = XAttributeDefType.values()[typeMappings.get(field)];
         return converter.convert(value, type);
     }
 

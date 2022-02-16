@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations.converter;
 
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -40,17 +41,18 @@ public final class ConfigurationManager {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
-    public boolean createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
+    public boolean createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Remote agent cannot be connected");
             return false;
         }
+
         final XResultDTO result = agent.createOrUpdateConfiguration(pid, newProperties);
         return result.result == XResultDTO.SUCCESS;
     }
 
-    public boolean createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
+    public boolean createFactoryConfiguration(final String factoryPid, final List<ConfigValue> newProperties) {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Remote agent cannot be connected");

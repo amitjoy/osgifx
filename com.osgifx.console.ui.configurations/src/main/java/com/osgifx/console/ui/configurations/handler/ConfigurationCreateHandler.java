@@ -17,7 +17,7 @@ package com.osgifx.console.ui.configurations.handler;
 
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -32,6 +32,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.ui.configurations.converter.ConfigurationManager;
 import com.osgifx.console.ui.configurations.dialog.ConfigurationCreateDialog;
 import com.osgifx.console.ui.configurations.dialog.ConfigurationDTO;
@@ -63,10 +64,10 @@ public final class ConfigurationCreateHandler {
         final Optional<ConfigurationDTO> configuration = dialog.showAndWait();
         if (configuration.isPresent()) {
             try {
-                final ConfigurationDTO    dto        = configuration.get();
-                final String              pid        = dto.pid;
-                final String              factoryPid = dto.factoryPid;
-                final Map<String, Object> properties = dto.properties;
+                final ConfigurationDTO  dto        = configuration.get();
+                final String            pid        = dto.pid;
+                final String            factoryPid = dto.factoryPid;
+                final List<ConfigValue> properties = dto.properties;
 
                 if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
                     return;
