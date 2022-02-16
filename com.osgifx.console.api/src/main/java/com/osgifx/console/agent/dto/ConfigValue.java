@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- *
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- *
+ * 
  *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -15,18 +15,24 @@
  ******************************************************************************/
 package com.osgifx.console.agent.dto;
 
-import java.util.Map;
+public class ConfigValue {
 
-import org.osgi.dto.DTO;
+    public String            key;
+    public Object            value;
+    public XAttributeDefType type;
 
-public class XConfigurationDTO extends DTO {
+    public ConfigValue() {
+        // required for JSON serialization
+    }
 
-    public String                   pid;
-    public String                   factoryPid;
-    public String                   location;
-    public boolean                  isFactory;
-    public boolean                  isPersisted;
-    public XObjectClassDefDTO       ocd;
-    public Map<String, ConfigValue> properties;
+    public ConfigValue(final String key, final Object value, final XAttributeDefType type) {
+        this.key   = key;
+        this.value = value;
+        this.type  = type;
+    }
+
+    public static ConfigValue create(final String key, final Object value, final XAttributeDefType type) {
+        return new ConfigValue(key, value, type);
+    }
 
 }

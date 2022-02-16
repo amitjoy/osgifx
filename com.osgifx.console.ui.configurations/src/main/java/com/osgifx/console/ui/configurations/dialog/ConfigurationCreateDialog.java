@@ -17,6 +17,7 @@ package com.osgifx.console.ui.configurations.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -36,7 +37,9 @@ import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.ui.configurations.converter.ConfigurationConverter;
 import com.osgifx.console.util.fx.FxDialog;
@@ -138,7 +141,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         config.pid        = txtPid.getText();
         config.factoryPid = txtFactoryPid.getText();
 
-        final Map<String, Object> properties = Maps.newHashMap();
+        final List<ConfigValue> properties = Lists.newArrayList();
         for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : configurationEntries
                 .entrySet()) {
             final Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>> value       = entry.getValue();
@@ -152,7 +155,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                 configType = XAttributeDefType.STRING;
             }
             final Object convertedValue = converter.convert(configValue, configType);
-            properties.put(configKey, convertedValue);
+            properties.add(ConfigValue.create(configKey, convertedValue, configType));
         }
         config.properties = properties;
         return config;

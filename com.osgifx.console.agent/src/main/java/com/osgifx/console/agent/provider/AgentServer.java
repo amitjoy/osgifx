@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider;
 
+import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static java.util.Objects.requireNonNull;
 
@@ -84,6 +85,8 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.AgentExtension;
+import com.osgifx.console.agent.dto.ConfigValue;
+import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -1038,7 +1041,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
+    public XResultDTO createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
         requireNonNull(pid, "Configuration PID cannot be null");
         requireNonNull(newProperties, "Configuration properties cannot be null");
 
@@ -1046,7 +1049,12 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         if (isConfigAdminAvailable) {
             final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
                     metatypeTracker.getService());
-            return configAdmin.createOrUpdateConfiguration(pid, newProperties);
+            try {
+                final Map<String, Object> finalProperties = parseProperties(newProperties);
+                return configAdmin.createOrUpdateConfiguration(pid, finalProperties);
+            } catch (final Exception e) {
+                return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
+            }
         }
         return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
     }
@@ -1065,7 +1073,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
+    public XResultDTO createFactoryConfiguration(final String factoryPid, final List<ConfigValue> newProperties) {
         requireNonNull(factoryPid, "Configuration factory PID cannot be null");
         requireNonNull(newProperties, "Configuration properties cannot be null");
 
@@ -1074,7 +1082,12 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         if (isConfigAdminAvailable) {
             final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
                     metatypeTracker.getService());
-            return configAdmin.createFactoryConfiguration(factoryPid, newProperties);
+            try {
+                final Map<String, Object> finalProperties = parseProperties(newProperties);
+                return configAdmin.createFactoryConfiguration(factoryPid, finalProperties);
+            } catch (final Exception e) {
+                return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
+            }
         }
         return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
     }
@@ -1187,6 +1200,59 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         dto.response = response;
 
         return dto;
+    }
+
+    private Map<String, Object> parseProperties(final List<ConfigValue> newProperties) throws Exception {
+        final Map<String, Object> properties = new HashMap<>();
+        for (final ConfigValue entry : newProperties) {
+            final Object convertedValue = convert(entry);
+            properties.put(entry.key, convertedValue);
+        }
+        return properties;
+    }
+
+    public Object convert(final ConfigValue entry) throws Exception {
+        final Object            source = entry.value;
+        final XAttributeDefType type   = entry.type;
+        switch (type) {
+            case STRING_ARRAY:
+                return Converter.cnv(String[].class, source);
+            case STRING_LIST:
+                return Converter.cnv(new TypeReference<List<String>>() {
+                }, source);
+            case INTEGER_ARRAY:
+                return Converter.cnv(int[].class, source);
+            case INTEGER_LIST:
+                return Converter.cnv(new TypeReference<List<Integer>>() {
+                }, source);
+            case BOOLEAN_ARRAY:
+                return Converter.cnv(boolean[].class, source);
+            case BOOLEAN_LIST:
+                return Converter.cnv(new TypeReference<List<Boolean>>() {
+                }, source);
+            case DOUBLE_ARRAY:
+                return Converter.cnv(double[].class, source);
+            case DOUBLE_LIST:
+                return Converter.cnv(new TypeReference<List<Double>>() {
+                }, source);
+            case FLOAT_ARRAY:
+                return Converter.cnv(float[].class, source);
+            case FLOAT_LIST:
+                return Converter.cnv(new TypeReference<List<Float>>() {
+                }, source);
+            case CHAR_ARRAY:
+                return Converter.cnv(char[].class, source);
+            case CHAR_LIST:
+                return Converter.cnv(new TypeReference<List<Character>>() {
+                }, source);
+            case LONG_ARRAY:
+                return Converter.cnv(long[].class, source);
+            case LONG_LIST:
+                return Converter.cnv(new TypeReference<List<Long>>() {
+                }, source);
+            default:
+                return Converter.cnv(XAttributeDefType.clazz(type), source);
+        }
     }
 
 }

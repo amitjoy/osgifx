@@ -23,9 +23,12 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.osgi.framework.BundleContext;
@@ -33,6 +36,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.osgifx.console.agent.dto.ConfigValue;
+import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 
@@ -142,11 +147,22 @@ public class XConfigurationAdmin {
 
         dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
         dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties  = Optional.ofNullable(configuration).map(c -> AgentServer.valueOf(configuration.getProperties())).orElse(null);
+        dto.properties  = prepareConfiguration(configuration.getProperties());
         dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
         dto.isPersisted = true;
 
         return dto;
+    }
+
+    public static Map<String, ConfigValue> prepareConfiguration(final Dictionary<String, Object> properties) {
+        final Map<String, ConfigValue> props = new HashMap<>();
+        for (final Entry<String, Object> entry : AgentServer.valueOf(properties).entrySet()) {
+            final String      key         = entry.getKey();
+            final Object      value       = entry.getValue();
+            final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));
+            props.put(key, configValue);
+        }
+        return props;
     }
 
 }

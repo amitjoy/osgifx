@@ -15,12 +15,14 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations.dialog;
 
-import java.util.Map;
+import java.util.List;
+
+import com.osgifx.console.agent.dto.ConfigValue;
 
 public final class ConfigurationDTO {
 
-    public String              pid;
-    public String              factoryPid;
-    public Map<String, Object> properties;
+    public String            pid;
+    public String            factoryPid;
+    public List<ConfigValue> properties;
 
 }
