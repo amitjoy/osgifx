@@ -196,7 +196,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
                     case DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST:
                         final String valueCaptionAsDouble = "Decimal Number";
                         txtField.setPromptText(valueCaptionAsDouble);
-                        final Pattern pattern = Pattern.compile("\\d*|\\d+\\,\\d*");
+                        final Pattern pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
                         final TextFormatter<?> doubleFormatter = new TextFormatter<>(
                                 (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches()
                                         ? change

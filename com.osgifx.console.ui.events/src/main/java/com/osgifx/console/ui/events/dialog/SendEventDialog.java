@@ -15,12 +15,15 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.dialog;
 
+import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -44,9 +47,11 @@ import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -54,6 +59,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -157,7 +164,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
     private class PropertiesForm extends HBox {
 
         private final CustomTextField txtKey;
-        private final CustomTextField txtValue;
+        private Node                  node;
 
         private final Button btnAddField;
         private final Button btnRemoveField;
@@ -166,17 +173,12 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             setAlignment(Pos.CENTER_LEFT);
             setSpacing(5);
 
-            final String keyCaption   = "Key";
-            final String valueCaption = "Value";
+            final String keyCaption = "Key";
 
             txtKey = (CustomTextField) TextFields.createClearableTextField();
             txtKey.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
 
-            txtValue = (CustomTextField) TextFields.createClearableTextField();
-            txtValue.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
-
             txtKey.setPromptText(keyCaption);
-            txtValue.setPromptText(valueCaption);
 
             btnAddField    = new Button();
             btnRemoveField = new Button();
@@ -184,21 +186,32 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
             final ComboBox<XAttributeDefType>       comboBox = new ComboBox<>(options);
 
-            comboBox.getSelectionModel().select(0); // default STRING type
+            final XAttributeDefType type = comboBox.getValue();
+            node = getFieldByType(type == null ? XAttributeDefType.STRING : type);
 
             comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
-                final Class<?> clazz = XAttributeDefType.clazz(newValue);
-                txtValue.setOnMouseClicked(e -> {
+                final Class<?> clazz   = XAttributeDefType.clazz(newValue);
+                final Node     newNode = getFieldByType(newValue);
+                newNode.setOnMouseClicked(e -> {
                     // multiple cardinality
                     if (clazz == null) {
                         final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
                         final String                              key    = txtKey.getText();
-                        dialog.init(key, newValue, txtValue.getText(), getClass().getClassLoader());
+                        final TextField                           field  = (TextField) node;
+
+                        dialog.init(key, newValue, field.getText(), getClass().getClassLoader());
                         final Optional<String> entries = dialog.showAndWait();
-                        entries.ifPresent(txtValue::setText);
+                        entries.ifPresent(field::setText);
                     }
                 });
+                node = newNode;
+                final ObservableList<Node> children = getChildren();
+                if (!children.isEmpty()) {
+                    children.set(1, newNode);
+                }
             });
+
+            comboBox.getSelectionModel().select(0); // default STRING type
 
             btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
             btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
@@ -206,11 +219,63 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             btnAddField.setOnAction(e -> addFieldPair(parent));
             btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
 
-            getChildren().addAll(txtKey, txtValue, comboBox, btnAddField, btnRemoveField);
+            getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 
             final Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>> tuple = new Triple<>(txtKey::getText,
-                    txtValue::getText, comboBox::getValue);
+                    () -> getValue(node), comboBox::getValue);
             entries.put(this, tuple);
+        }
+
+        private Node getFieldByType(final XAttributeDefType type) {
+            final CustomTextField txtField;
+            if (type != BOOLEAN) {
+                txtField = (CustomTextField) TextFields.createClearableTextField();
+                txtField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+            } else {
+                txtField = null;
+            }
+            switch (type) {
+                case LONG, INTEGER:
+                    final String captionAsInt = switch (type) {
+                        case LONG -> "Long Number";
+                        case INTEGER -> "Integer Number";
+                        default -> null;
+                    };
+                    txtField.setPromptText(captionAsInt);
+                    txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                        if (!newValue.matches("\\d*")) {
+                            txtField.setText(newValue.replaceAll("[^\\d]", ""));
+                        }
+                    });
+                    break;
+                case BOOLEAN:
+                    return new ToggleSwitch();
+                case DOUBLE, FLOAT:
+                    final String captionAsDouble = "Decimal Number";
+                    txtField.setPromptText(captionAsDouble);
+                    final Pattern pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
+                    final TextFormatter<?> doubleFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches() ? change
+                                    : null));
+                    txtField.setTextFormatter(doubleFormatter);
+                    break;
+                case CHAR:
+                    final String valueCaptionAsChar = "Character Value";
+                    txtField.setPromptText(valueCaptionAsChar);
+                    final TextFormatter<?> charFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
+                    txtField.setTextFormatter(charFormatter);
+                    break;
+                case STRING, PASSWORD:
+                    final String valueCaptionAsStr = "String Value";
+                    txtField.setPromptText(valueCaptionAsStr);
+                    break;
+                case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
+                    final String valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
+                    txtField.setPromptText(valueCaptionAsMultipleCardinality);
+                    break;
+            }
+            return txtField;
         }
     }
 
@@ -225,6 +290,16 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             getDialogPane().getScene().getWindow().sizeToScene();
         }
         entries.remove(form);
+    }
+
+    private String getValue(final Node node) {
+        if (node instanceof final TextField tf) {
+            return tf.getText();
+        }
+        if (node instanceof final ToggleSwitch ts) {
+            return String.valueOf(ts.isSelected());
+        }
+        return null;
     }
 
 }
