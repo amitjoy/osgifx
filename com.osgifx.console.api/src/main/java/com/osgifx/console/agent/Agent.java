@@ -412,7 +412,7 @@ public interface Agent {
      * @param properties
      *            data to be published with the event
      */
-    void sendEvent(String topic, Map<String, Object> properties);
+    void sendEvent(String topic, List<ConfigValue> properties);
 
     /**
      * Publish event asynchronously ((this method returns immediately))
@@ -422,7 +422,7 @@ public interface Agent {
      * @param properties
      *            data to be published with the event
      */
-    void postEvent(String topic, Map<String, Object> properties);
+    void postEvent(String topic, List<ConfigValue> properties);
 
     /**
      * Returns the runtime information of the remote system

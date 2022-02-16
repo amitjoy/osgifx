@@ -13,13 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.configurations.converter;
+package com.osgifx.console.util.converter;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.ConverterBuilder;
 import org.osgi.util.converter.Converters;
@@ -29,17 +27,14 @@ import org.osgi.util.converter.TypeReference;
 import com.google.common.primitives.Floats;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 
-@Component(service = ConfigurationConverter.class)
-public final class ConfigurationConverter {
+public final class ValueConverter {
 
     private final Converter converter;
 
-    @Activate
-    public ConfigurationConverter() {
+    public ValueConverter() {
         final Converter        c  = Converters.standardConverter();
         final ConverterBuilder cb = c.newConverterBuilder();
 
-        // TODO add rules to convert to string from other types
         cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
         });
         cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {

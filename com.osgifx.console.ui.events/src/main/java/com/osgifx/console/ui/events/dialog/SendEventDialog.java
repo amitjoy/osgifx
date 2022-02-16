@@ -17,8 +17,10 @@ package com.osgifx.console.ui.events.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -34,10 +36,13 @@ import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.osgifx.console.ui.events.converter.ValueConverter;
-import com.osgifx.console.ui.events.converter.ValueType;
+import com.osgifx.console.agent.dto.ConfigValue;
+import com.osgifx.console.agent.dto.XAttributeDefType;
+import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
+import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,11 +63,10 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
     @Log
     @Inject
-    private FluentLogger   logger;
-    @Inject
-    private ValueConverter converter;
+    private FluentLogger         logger;
+    private final ValueConverter converter = new ValueConverter();
 
-    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<ValueType>>> entries = Maps.newHashMap();
+    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries = Maps.newHashMap();
 
     public void init() {
         final DialogPane dialogPane = getDialogPane();
@@ -130,20 +134,21 @@ public final class SendEventDialog extends Dialog<EventDTO> {
         config.topic  = txtTopic.getText();
         config.isSync = isSyncToggle.isSelected();
 
-        final Map<String, Object> properties = Maps.newHashMap();
-        for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<ValueType>>> entry : entries.entrySet()) {
-            final Triple<Supplier<String>, Supplier<String>, Supplier<ValueType>> value       = entry.getValue();
-            final String                                                          configKey   = value.value1.get();
-            final String                                                          configValue = value.value2.get();
-            ValueType                                                             configType  = value.value3.get();
+        final List<ConfigValue> properties = Lists.newArrayList();
+        for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : entries
+                .entrySet()) {
+            final Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>> value       = entry.getValue();
+            final String                                                                  configKey   = value.value1.get();
+            final String                                                                  configValue = value.value2.get();
+            XAttributeDefType                                                             configType  = value.value3.get();
             if (Strings.isNullOrEmpty(configKey) || Strings.isNullOrEmpty(configValue)) {
                 continue;
             }
             if (configType == null) {
-                configType = ValueType.STRING;
+                configType = XAttributeDefType.STRING;
             }
             final Object convertedValue = converter.convert(configValue, configType);
-            properties.put(configKey, convertedValue);
+            properties.add(ConfigValue.create(configKey, convertedValue, configType));
         }
         config.properties = properties;
         return config;
@@ -176,10 +181,24 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             btnAddField    = new Button();
             btnRemoveField = new Button();
 
-            final ObservableList<ValueType> options  = FXCollections.observableArrayList(ValueType.values());
-            final ComboBox<ValueType>       comboBox = new ComboBox<>(options);
+            final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
+            final ComboBox<XAttributeDefType>       comboBox = new ComboBox<>(options);
 
             comboBox.getSelectionModel().select(0); // default STRING type
+
+            comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
+                final Class<?> clazz = XAttributeDefType.clazz(newValue);
+                txtValue.setOnMouseClicked(e -> {
+                    // multiple cardinality
+                    if (clazz == null) {
+                        final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
+                        final String                              key    = txtKey.getText();
+                        dialog.init(key, newValue, txtValue.getText(), getClass().getClassLoader());
+                        final Optional<String> entries = dialog.showAndWait();
+                        entries.ifPresent(txtValue::setText);
+                    }
+                });
+            });
 
             btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
             btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
@@ -189,8 +208,8 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
             getChildren().addAll(txtKey, txtValue, comboBox, btnAddField, btnRemoveField);
 
-            final Triple<Supplier<String>, Supplier<String>, Supplier<ValueType>> tuple = new Triple<>(txtKey::getText, txtValue::getText,
-                    comboBox::getValue);
+            final Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>> tuple = new Triple<>(txtKey::getText,
+                    txtValue::getText, comboBox::getValue);
             entries.put(this, tuple);
         }
     }

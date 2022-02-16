@@ -29,8 +29,6 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.fx.core.Triple;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -41,8 +39,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
-import com.osgifx.console.ui.configurations.converter.ConfigurationConverter;
+import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
+import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,11 +62,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
     @Log
     @Inject
-    private FluentLogger           logger;
-    @Inject
-    private IEclipseContext        context;
-    @Inject
-    private ConfigurationConverter converter;
+    private FluentLogger         logger;
+    private final ValueConverter converter = new ValueConverter();
 
     private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> configurationEntries = Maps
             .newHashMap();
@@ -197,9 +193,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                     // multiple cardinality
                     if (clazz == null) {
                         final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
-                        ContextInjectionFactory.inject(dialog, context);
-                        final String key = txtKey.getText();
-                        dialog.init(key, newValue, txtValue.getText());
+                        final String                              key    = txtKey.getText();
+                        dialog.init(key, newValue, txtValue.getText(), getClass().getClassLoader());
                         final Optional<String> entries = dialog.showAndWait();
                         entries.ifPresent(txtValue::setText);
                     }

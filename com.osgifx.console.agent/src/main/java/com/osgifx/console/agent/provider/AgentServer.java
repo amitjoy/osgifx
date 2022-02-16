@@ -1093,26 +1093,36 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public void sendEvent(final String topic, final Map<String, Object> properties) {
+    public void sendEvent(final String topic, final List<ConfigValue> properties) {
         requireNonNull(topic, "Event topic cannot be null");
         requireNonNull(properties, "Event properties cannot be null");
 
         final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
         if (isEventAdminAvailable) {
             final XEventAdmin eventAdmin = new XEventAdmin(eventAdminTracker.getService());
-            eventAdmin.sendEvent(topic, properties);
+            try {
+                final Map<String, Object> finalProperties = parseProperties(properties);
+                eventAdmin.sendEvent(topic, finalProperties);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     @Override
-    public void postEvent(final String topic, final Map<String, Object> properties) {
+    public void postEvent(final String topic, final List<ConfigValue> properties) {
         requireNonNull(topic, "Event topic cannot be null");
         requireNonNull(properties, "Event properties cannot be null");
 
         final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
         if (isEventAdminAvailable) {
             final XEventAdmin eventAdmin = new XEventAdmin(eventAdminTracker.getService());
-            eventAdmin.postEvent(topic, properties);
+            try {
+                final Map<String, Object> finalProperties = parseProperties(properties);
+                eventAdmin.postEvent(topic, finalProperties);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -1211,7 +1221,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
         return properties;
     }
 
-    public Object convert(final ConfigValue entry) throws Exception {
+    public static Object convert(final ConfigValue entry) throws Exception {
         final Object            source = entry.value;
         final XAttributeDefType type   = entry.type;
         switch (type) {

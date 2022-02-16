@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.handler;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -29,6 +29,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.ui.events.converter.EventManager;
 import com.osgifx.console.ui.events.dialog.EventDTO;
 import com.osgifx.console.ui.events.dialog.SendEventDialog;
@@ -58,10 +59,10 @@ public final class SendEventHandler {
         final Optional<EventDTO> event = dialog.showAndWait();
         if (event.isPresent()) {
             try {
-                final EventDTO            dto        = event.get();
-                final String              topic      = dto.topic;
-                final boolean             isSync     = dto.isSync;
-                final Map<String, Object> properties = dto.properties;
+                final EventDTO          dto        = event.get();
+                final String            topic      = dto.topic;
+                final boolean           isSync     = dto.isSync;
+                final List<ConfigValue> properties = dto.properties;
 
                 if (Strings.isNullOrEmpty(topic) || properties == null) {
                     return;

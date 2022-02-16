@@ -17,17 +17,12 @@ package com.osgifx.console.ui.configurations;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
-
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-
 import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.dto.XAttributeDefType;
-import com.osgifx.console.ui.configurations.dialog.MultipleCardinalityPropertiesDialog;
+import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -61,13 +56,12 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 
     private final String            key;
     private final XAttributeDefType type;
-
-    @Inject
-    private IEclipseContext context;
+    private final ClassLoader       classLoader;
 
     public MultipleCardinalityTextControl(final String key, final XAttributeDefType type) {
-        this.key  = key;
-        this.type = type;
+        this.key    = key;
+        this.type   = type;
+        classLoader = getClass().getClassLoader();
     }
 
     @Override
@@ -87,10 +81,9 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 
         editableField.setOnMouseClicked(event -> {
             final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
-            ContextInjectionFactory.inject(dialog, context);
             if (!Strings.isNullOrEmpty(key.trim())) {
                 final DataField<?, ?, ?> dataField = field;
-                dialog.init(key, type, dataField.getValue().toString());
+                dialog.init(key, type, dataField.getValue().toString(), classLoader);
 
                 final Optional<String> entries = dialog.showAndWait();
                 entries.ifPresent(editableField::setText);

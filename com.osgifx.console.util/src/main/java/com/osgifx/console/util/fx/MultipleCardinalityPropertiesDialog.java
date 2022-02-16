@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.configurations.dialog;
+package com.osgifx.console.util.fx;
 
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN_ARRAY;
@@ -25,21 +25,15 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
-import org.eclipse.fx.core.log.FluentLogger;
-import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XAttributeDefType;
-import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
@@ -58,19 +52,17 @@ import javafx.stage.StageStyle;
 
 public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
 
-    @Log
-    @Inject
-    private FluentLogger               logger;
+    private ClassLoader                classLoader;
     private final List<PropertiesForm> entries = Lists.newArrayList();
 
-    public void init(final String key, final XAttributeDefType targetType, final String textInput) {
+    public void init(final String key, final XAttributeDefType targetType, final String textInput, final ClassLoader classLoader) {
+        this.classLoader = classLoader;
         final DialogPane dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setHeaderText("Multiple Cardinality [Key: " + key + "]");
-        dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
-        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/configuration.png").toString()));
+        dialogPane.getStylesheets().add(classLoader.getResource(STANDARD_CSS).toExternalForm());
+        dialogPane.setGraphic(new ImageView(classLoader.getResource("/graphic/images/configuration.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         final Label lbMessage = new Label("");
@@ -111,9 +103,8 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             try {
                 return data == ButtonData.OK_DONE ? getInput() : null;
             } catch (final Exception e) {
-                logger.atError().withException(e).log("Configuration values cannot be converted");
+                return null;
             }
-            return null;
         });
     }
 
@@ -178,7 +169,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             final CustomTextField txtField;
             if (type != BOOLEAN || type != BOOLEAN_ARRAY || type != BOOLEAN_LIST) {
                 txtField = (CustomTextField) TextFields.createClearableTextField();
-                txtField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+                txtField.setLeft(new ImageView(classLoader.getResource("/graphic/icons/kv.png").toExternalForm()));
                 if (initValue != null) {
                     txtField.setText(initValue);
                 }

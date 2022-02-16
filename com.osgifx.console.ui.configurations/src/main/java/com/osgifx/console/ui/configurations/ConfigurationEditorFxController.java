@@ -28,8 +28,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -50,7 +48,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.ui.configurations.converter.ConfigurationConverter;
+import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.beans.binding.BooleanBinding;
@@ -68,10 +66,6 @@ public final class ConfigurationEditorFxController {
     @Log
     @Inject
     private FluentLogger           logger;
-    @Inject
-    private IEclipseContext        context;
-    @Inject
-    private ConfigurationConverter converter;
     @FXML
     private BorderPane             rootPanel;
     @Inject
@@ -88,6 +82,7 @@ public final class ConfigurationEditorFxController {
     private FormRenderer           formRenderer;
     private Map<Field<?>, Integer> typeMappings;
     private List<String>           uneditableProperties;
+    private final ValueConverter   converter = new ValueConverter();
 
     @FXML
     public void initialize() {
@@ -426,7 +421,7 @@ public final class ConfigurationEditorFxController {
     @SuppressWarnings("unchecked")
     private <T> Field<?> processArray(final String key, final Object currentValue, final List<String> defaultValue,
             final List<String> options, final boolean hasOCD, final Class<T> clazz, final XAttributeDefType adType) {
-        Field<?> field;
+        final Field<?> field;
         if (hasOCD) {
             T[] effectiveValue;
             if (currentValue != null) {
@@ -445,11 +440,9 @@ public final class ConfigurationEditorFxController {
                 }));
             }
         } else {
-            final MultipleCardinalityTextControl control = new MultipleCardinalityTextControl(key, adType);
-            ContextInjectionFactory.inject(control, context);
-
-            final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-            });
+            final MultipleCardinalityTextControl control        = new MultipleCardinalityTextControl(key, adType);
+            final List<String>                   convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
+                                                                });
             field = Field.ofStringType(String.join(",", convertedValue)).render(control);
         }
         return field;
@@ -483,11 +476,9 @@ public final class ConfigurationEditorFxController {
                 }));
             }
         } else {
-            final MultipleCardinalityTextControl control = new MultipleCardinalityTextControl(key, adType);
-            ContextInjectionFactory.inject(control, context);
-
-            final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-            });
+            final MultipleCardinalityTextControl control        = new MultipleCardinalityTextControl(key, adType);
+            final List<String>                   convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
+                                                                });
             field = Field.ofStringType(String.join(",", convertedValue)).render(control);
         }
         return field;
