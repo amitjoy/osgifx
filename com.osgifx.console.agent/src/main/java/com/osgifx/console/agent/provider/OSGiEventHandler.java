@@ -15,8 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.service.event.Event;
@@ -24,6 +24,9 @@ import org.osgi.service.event.EventHandler;
 
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.supervisor.Supervisor;
+
+import aQute.lib.converter.Converter;
+import aQute.lib.converter.TypeReference;
 
 public class OSGiEventHandler implements EventHandler {
 
@@ -48,13 +51,53 @@ public class OSGiEventHandler implements EventHandler {
         final Map<String, String> properties = new HashMap<>();
 
         for (final String propertyName : event.getPropertyNames()) {
-            Object propertyValue = event.getProperty(propertyName);
-            if (propertyValue instanceof String[]) {
-                propertyValue = Arrays.asList((String[]) propertyValue);
+            final Object propertyValue = event.getProperty(propertyName);
+            try {
+                properties.put(propertyName, processElement(propertyValue));
+            } catch (final Exception e) {
+                // nothing to do
             }
-            properties.put(propertyName, String.valueOf(propertyValue));
         }
         return properties;
+    }
+
+    private String processElement(final Object propertyValue) throws Exception {
+        if (propertyValue instanceof boolean[]) {
+            final List<Boolean> arr = Converter.cnv(new TypeReference<List<Boolean>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        if (propertyValue instanceof int[]) {
+            final List<Integer> arr = Converter.cnv(new TypeReference<List<Integer>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        if (propertyValue instanceof float[]) {
+            final List<Float> arr = Converter.cnv(new TypeReference<List<Float>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        if (propertyValue instanceof double[]) {
+            final List<Double> arr = Converter.cnv(new TypeReference<List<Double>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        if (propertyValue instanceof long[]) {
+            final List<Long> arr = Converter.cnv(new TypeReference<List<Long>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        if (propertyValue instanceof String[]) {
+            final List<String> arr = Converter.cnv(new TypeReference<List<String>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        if (propertyValue instanceof char[]) {
+            final List<Character> arr = Converter.cnv(new TypeReference<List<Character>>() {
+            }, propertyValue);
+            return arr.toString();
+        }
+        return String.valueOf(propertyValue);
     }
 
 }
