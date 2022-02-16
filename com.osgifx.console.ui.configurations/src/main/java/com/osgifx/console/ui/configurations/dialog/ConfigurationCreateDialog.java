@@ -198,9 +198,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                         final String key = txtKey.getText();
                         dialog.init(key, newValue, txtValue.getText());
                         final Optional<String> entries = dialog.showAndWait();
-                        if (entries.isPresent()) {
-                            txtValue.setText(entries.get());
-                        }
+                        entries.ifPresent(txtValue::setText);
                     }
                 });
             });
