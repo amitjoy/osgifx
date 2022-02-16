@@ -40,9 +40,7 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
-import com.dlsc.formsfx.view.controls.SimpleControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XAttributeDefDTO;
@@ -52,18 +50,15 @@ import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.configurations.converter.ConfigurationConverter;
-import com.osgifx.console.ui.configurations.dialog.MultipleCardinalityPropertiesDialog;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -448,27 +443,12 @@ public final class ConfigurationEditorFxController {
                 }));
             }
         } else {
+            final MultipleCardinalityTextControl control = new MultipleCardinalityTextControl(key, adType);
+            ContextInjectionFactory.inject(control, context);
+
             final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-                                              });
-            final String       joinedValue    = String.join(",", convertedValue);
-            field = Field.ofStringType(joinedValue);
-            final EventHandler<MouseEvent> handler = event -> {
-                final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
-                ContextInjectionFactory.inject(dialog, context);
-                if (!Strings.isNullOrEmpty(key.trim())) {
-                    final DataField<?, ?, ?> dataField = (DataField<?, ?, ?>) field;
-                    dialog.init(key, adType, dataField.getValue().toString());
-
-                    final Optional<String> entries = dialog.showAndWait();
-                    if (entries.isPresent()) {
-                        // set the value in the value field
-                        // TODO
-                    }
-                }
-            };
-
-            final SimpleControl<?> renderer = field.getRenderer();
-            renderer.addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
+            });
+            field = Field.ofStringType(String.join(",", convertedValue)).render(control);
         }
         return field;
     }
@@ -501,27 +481,12 @@ public final class ConfigurationEditorFxController {
                 }));
             }
         } else {
+            final MultipleCardinalityTextControl control = new MultipleCardinalityTextControl(key, adType);
+            ContextInjectionFactory.inject(control, context);
+
             final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
             });
-            field = Field.ofStringType(String.join(",", convertedValue));
-
-            final EventHandler<MouseEvent> handler = event -> {
-                final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
-                ContextInjectionFactory.inject(dialog, context);
-                if (!Strings.isNullOrEmpty(key.trim())) {
-                    final DataField<?, ?, ?> dataField = (DataField<?, ?, ?>) field;
-                    dialog.init(key, adType, dataField.getValue().toString());
-
-                    final Optional<String> entries = dialog.showAndWait();
-                    if (entries.isPresent()) {
-                        // set the value in the value field
-                        // TODO
-                    }
-                }
-            };
-
-            final SimpleControl<?> renderer = field.getRenderer();
-            renderer.addEventHandler(MouseEvent.MOUSE_CLICKED, handler);
+            field = Field.ofStringType(String.join(",", convertedValue)).render(control);
         }
         return field;
     }
