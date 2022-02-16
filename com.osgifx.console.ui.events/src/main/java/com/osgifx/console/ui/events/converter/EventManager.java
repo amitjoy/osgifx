@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.converter;
 
-import java.util.Map;
+import java.util.List;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = EventManager.class)
@@ -39,7 +40,7 @@ public final class EventManager {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
-    public boolean sendEvent(final String topic, final Map<String, Object> properties) {
+    public boolean sendEvent(final String topic, final List<ConfigValue> properties) {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Remote agent cannot be connected");
@@ -49,7 +50,7 @@ public final class EventManager {
         return true;
     }
 
-    public boolean postEvent(final String topic, final Map<String, Object> properties) {
+    public boolean postEvent(final String topic, final List<ConfigValue> properties) {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Remote agent cannot be connected");
