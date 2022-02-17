@@ -90,7 +90,7 @@ public class OSGiLogListener implements LogListener {
     private XResultDTO executeR7method(final Object object, final String methodName) {
         final XResultDTO dto = new XResultDTO();
         try {
-            dto.response = Reflect.on(object).call(methodName).as(String.class);
+            dto.response = Reflect.on(object).call(methodName).get();
             dto.result   = XResultDTO.SUCCESS;
         } catch (final Exception e) {
             dto.result = XResultDTO.ERROR;
