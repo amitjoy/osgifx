@@ -192,7 +192,9 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
                         });
                         break;
                     case BOOLEAN_ARRAY, BOOLEAN_LIST:
-                        return new ToggleSwitch();
+                        final ToggleSwitch toggleSwitch = new ToggleSwitch();
+                        toggleSwitch.setSelected(Boolean.parseBoolean(initValue));
+                        return toggleSwitch;
                     case DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST:
                         final String valueCaptionAsDouble = "Decimal Number";
                         txtField.setPromptText(valueCaptionAsDouble);

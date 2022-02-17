@@ -47,7 +47,7 @@ public final class ValueConverter {
             final String[]  split = v.split(",");
             final boolean[] array = new boolean[split.length];
             for (int i = 0; i < split.length; i++) {
-                final boolean value = Boolean.parseBoolean(v);
+                final boolean value = Boolean.parseBoolean(split[i]);
                 array[i] = value;
             }
             return array;
