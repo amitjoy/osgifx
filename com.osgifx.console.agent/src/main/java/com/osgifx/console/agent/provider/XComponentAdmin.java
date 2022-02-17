@@ -198,7 +198,7 @@ public class XComponentAdmin {
                 .orElse(Collections.emptyMap());
         dto.references          = Stream.of(compDescDTO.references).map(this::toRef).collect(Collectors.toList());
 
-        final String failure = getR7field(compConfDTO, "failure", String.class);
+        final String failure = getR7field(compConfDTO, "failure");
         dto.failure = Optional.ofNullable(failure).orElse("");
 
         dto.activate              = compDescDTO.activate;
@@ -287,21 +287,21 @@ public class XComponentAdmin {
         ref.fieldOption   = reference.fieldOption;
         ref.scope         = reference.scope;
 
-        final Integer parameter = getR7field(reference, "parameter", Integer.class);
+        final Integer parameter = getR7field(reference, "parameter");
         ref.parameter = parameter;
 
-        final String collectionType = getR7field(reference, "collectionType", String.class);
+        final String collectionType = getR7field(reference, "collectionType");
         ref.collectionType = collectionType;
 
         return ref;
     }
 
-    private <T> T getR7field(final Object object, final String fieldName, final Class<T> wrapAs) {
+    private <T> T getR7field(final Object object, final String fieldName) {
         if (object == null) {
             return null;
         }
         try {
-            return Reflect.on(object).field(fieldName).as(wrapAs);
+            return Reflect.on(object).field(fieldName).get();
         } catch (final Exception e) {
             return null;
         }
