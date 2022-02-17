@@ -122,7 +122,7 @@ public class XMetaTypeAdmin {
         }
         XResultDTO result = null;
         try {
-            final Configuration configuration = configAdmin.getFactoryConfiguration(factoryPid, "?");
+            final Configuration configuration = configAdmin.createFactoryConfiguration(factoryPid, "?");
             configuration.update(new Hashtable<>(newProperties));
             result = createResult(SUCCESS, "Configuration with factory PID '" + factoryPid + " ' has been created");
         } catch (final Exception e) {

@@ -2,8 +2,11 @@ javac.source          : 1.8
 javac.target          : ${javac.source}
 javac.compliance      : ${javac.source}
 -noimportjava         : true
+-buildpath.osgi       : \
+                        osgi.annotation,\
+                        osgi.cmpn;version='6.0.0',\
+                        osgi.core;version='6.0.0'
 -buildpath            : \
-                        osgi.cmpn,\
                         com.osgifx.console.api,\
                         biz.aQute.bndlib;packages=*,\
                         biz.aQute.remote.agent;packages=*,\
