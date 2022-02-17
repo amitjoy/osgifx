@@ -161,6 +161,7 @@ public enum XAttributeDefType {
     public static Class<?> clazz(final XAttributeDefType type) {
         switch (type) {
             case STRING:
+            case PASSWORD:
                 return String.class;
             case INTEGER:
                 return Integer.class;

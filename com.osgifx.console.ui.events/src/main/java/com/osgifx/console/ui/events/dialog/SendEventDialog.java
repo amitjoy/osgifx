@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import org.controlsfx.control.ToggleSwitch;
+import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
@@ -266,10 +267,16 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                             (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
                     txtField.setTextFormatter(charFormatter);
                     break;
-                case STRING, PASSWORD:
+                case STRING:
                     final String valueCaptionAsStr = "String Value";
                     txtField.setPromptText(valueCaptionAsStr);
                     break;
+                case PASSWORD:
+                    final String valueCaptionAsPwd = "Password Value";
+                    final CustomPasswordField pwdField = (CustomPasswordField) TextFields.createClearablePasswordField();
+                    pwdField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+                    pwdField.setPromptText(valueCaptionAsPwd);
+                    return pwdField;
                 case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
                     final String valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
                     txtField.setPromptText(valueCaptionAsMultipleCardinality);
