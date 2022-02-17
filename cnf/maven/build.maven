@@ -12,7 +12,9 @@ de.jensd:fontawesomefx:8.9
 # OSGi
 
 org.osgi:osgi.annotation:8.1.0
+org.osgi:osgi.cmpn:6.0.0
 org.osgi:osgi.cmpn:7.0.0
+org.osgi:osgi.core:6.0.0
 org.osgi:osgi.core:8.0.0
 org.osgi:osgi.enroute.hamcrest.wrapper:1.3.0
 org.osgi:osgi.enroute.junit.wrapper:4.12.0

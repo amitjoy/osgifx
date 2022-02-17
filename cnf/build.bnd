@@ -36,7 +36,9 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -noextraheaders                       =         true
 
 -buildpath.base.api                   =         com.osgifx.console.api
--buildpath.osgi                       =         osgi.annotation, osgi.cmpn, osgi.core
+-buildpath.osgi                       =         osgi.annotation,\
+                                                osgi.cmpn;version='7.0.0',\
+                                                osgi.core;version='8.0.0'
 -testpath.all                         =         osgi.enroute.junit.wrapper, osgi.enroute.hamcrest.wrapper
 
 -pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
