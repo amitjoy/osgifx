@@ -70,7 +70,7 @@ public final class ValueConverter {
             final String[] split = v.split(",");
             final char[]   array = new char[split.length];
             for (int i = 0; i < split.length; i++) {
-                final char value = v.charAt(0);
+                final char value = split[i].charAt(0);
                 array[i] = value;
             }
             return array;

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations;
 
+import static com.osgifx.console.agent.dto.XAttributeDefType.CHAR_ARRAY;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_DELETED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 
@@ -264,7 +265,7 @@ public final class ConfigurationEditorFxController {
         switch (adType) {
             case LONG, INTEGER:
                 if (options != null && !options.isEmpty()) {
-                    String effectiveValue = null;
+                    String effectiveValue;
                     if (currentValue != null) {
                         effectiveValue = converter.convert(currentValue, String.class);
                     } else {
@@ -283,7 +284,7 @@ public final class ConfigurationEditorFxController {
                 break;
             case FLOAT, DOUBLE:
                 if (options != null && !options.isEmpty()) {
-                    String effectiveValue = null;
+                    String effectiveValue;
                     if (currentValue != null) {
                         effectiveValue = converter.convert(currentValue, String.class);
                     } else {
@@ -302,7 +303,7 @@ public final class ConfigurationEditorFxController {
                 break;
             case BOOLEAN:
                 if (options != null && !options.isEmpty()) {
-                    String effectiveValue = null;
+                    String effectiveValue;
                     if (currentValue != null) {
                         effectiveValue = converter.convert(currentValue, String.class);
                     } else {
@@ -328,11 +329,13 @@ public final class ConfigurationEditorFxController {
                 break;
             case CHAR:
                 if (options != null && !options.isEmpty()) {
-                    String effectiveValue = null;
+                    String effectiveValue;
                     if (currentValue != null) {
-                        effectiveValue = converter.convert(currentValue, String.class);
+                        final char c = converter.convert(currentValue, char.class);
+                        effectiveValue = Character.toString(c);
                     } else {
-                        effectiveValue = converter.convert(defaultValue, String.class);
+                        final char c = converter.convert(defaultValue, char.class);
+                        effectiveValue = Character.toString(c);
                     }
                     final int selection = options.indexOf(effectiveValue);
                     field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
@@ -340,11 +343,11 @@ public final class ConfigurationEditorFxController {
                     break;
                 }
                 if (currentValue != null) {
-                    field = Field.ofStringType(converter.convert(currentValue, String.class))
-                            .validate(StringLengthValidator.exactly(1, "Length must be 1"));
+                    final char c = converter.convert(currentValue, char.class);
+                    field = Field.ofStringType(Character.toString(c)).validate(StringLengthValidator.exactly(1, "Length must be 1"));
                 } else {
-                    field = Field.ofStringType(converter.convert(defaultValue, String.class))
-                            .validate(StringLengthValidator.exactly(1, "Length must be 1"));
+                    final char c = converter.convert(defaultValue, char.class);
+                    field = Field.ofStringType(Character.toString(c)).validate(StringLengthValidator.exactly(1, "Length must be 1"));
                 }
                 break;
             case BOOLEAN_ARRAY:
@@ -378,7 +381,7 @@ public final class ConfigurationEditorFxController {
                 field = processList(key, currentValue, defaultValue, options, hasOCD, Float.class, XAttributeDefType.FLOAT_LIST);
                 break;
             case CHAR_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, XAttributeDefType.CHAR_ARRAY);
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, CHAR_ARRAY);
                 break;
             case CHAR_LIST:
                 field = processList(key, currentValue, defaultValue, options, hasOCD, Character.class, XAttributeDefType.CHAR_LIST);
@@ -392,7 +395,7 @@ public final class ConfigurationEditorFxController {
             case STRING:
             default:
                 if (options != null && !options.isEmpty()) {
-                    String effectiveValue = null;
+                    String effectiveValue;
                     if (currentValue != null) {
                         effectiveValue = converter.convert(currentValue, String.class);
                     } else {
@@ -440,9 +443,17 @@ public final class ConfigurationEditorFxController {
                 }));
             }
         } else {
-            final MultipleCardinalityTextControl control        = new MultipleCardinalityTextControl(key, adType);
-            final List<String>                   convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-                                                                });
+            final MultipleCardinalityTextControl control = new MultipleCardinalityTextControl(key, adType);
+            List<String>                         convertedValue;
+            if (adType == CHAR_ARRAY) {
+                final List<Character> tempValue = converter.convert(currentValue, new TypeReference<List<Character>>() {
+                });
+                convertedValue = converter.convert(tempValue, new TypeReference<List<String>>() {
+                });
+            } else {
+                convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
+                });
+            }
             field = Field.ofStringType(String.join(",", convertedValue)).render(control);
         }
         return field;
