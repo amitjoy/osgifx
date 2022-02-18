@@ -66,8 +66,8 @@ public final class BundleInstallHandler {
         if (remoteInstall.isPresent()) {
             try {
                 final BundleInstallDTO dto        = remoteInstall.get();
-                final File             file       = dto.file;
-                final int              startLevel = dto.startLevel;
+                final File             file       = dto.file();
+                final int              startLevel = dto.startLevel();
                 if (file == null) {
                     return;
                 }
@@ -84,7 +84,7 @@ public final class BundleInstallHandler {
                     return;
                 }
                 logger.atInfo().log("Bundle has been installed or updated: %s", bundle);
-                if (dto.startBundle) {
+                if (dto.startBundle()) {
                     agent.start(bundle.id);
                     logger.atInfo().log("Bundle has been started: %s", bundle);
                 }

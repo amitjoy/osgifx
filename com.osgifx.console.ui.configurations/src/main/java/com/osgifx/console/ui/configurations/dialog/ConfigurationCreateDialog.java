@@ -141,11 +141,6 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
     }
 
     private ConfigurationDTO getInput(final CustomTextField txtPid, final CustomTextField txtFactoryPid) throws Exception {
-        final ConfigurationDTO config = new ConfigurationDTO();
-
-        config.pid        = txtPid.getText();
-        config.factoryPid = txtFactoryPid.getText();
-
         final List<ConfigValue> properties = Lists.newArrayList();
         for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : configurationEntries
                 .entrySet()) {
@@ -162,8 +157,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
             final Object convertedValue = converter.convert(configValue, configType);
             properties.add(ConfigValue.create(configKey, convertedValue, configType));
         }
-        config.properties = properties;
-        return config;
+        return new ConfigurationDTO(txtPid.getText(), txtFactoryPid.getText(), properties);
     }
 
     private class PropertiesForm extends HBox {

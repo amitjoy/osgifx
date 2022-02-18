@@ -60,9 +60,9 @@ public final class SendEventHandler {
         if (event.isPresent()) {
             try {
                 final EventDTO          dto        = event.get();
-                final String            topic      = dto.topic;
-                final boolean           isSync     = dto.isSync;
-                final List<ConfigValue> properties = dto.properties;
+                final String            topic      = dto.topic();
+                final boolean           isSync     = dto.isSync();
+                final List<ConfigValue> properties = dto.properties();
 
                 if (Strings.isNullOrEmpty(topic) || properties == null) {
                     return;

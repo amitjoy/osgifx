@@ -17,18 +17,5 @@ package com.osgifx.console.ui.bundles.dialog;
 
 import java.io.File;
 
-import org.osgi.dto.DTO;
-
-public final class BundleInstallDTO extends DTO {
-
-    public File    file;
-    public int     startLevel;
-    public boolean startBundle;
-
-    public BundleInstallDTO(final File file, final boolean startBundle, final int startLevel) {
-        this.file        = file;
-        this.startLevel  = startLevel;
-        this.startBundle = startBundle;
-    }
-
+public record BundleInstallDTO(File file, boolean startBundle, int startLevel) {
 }

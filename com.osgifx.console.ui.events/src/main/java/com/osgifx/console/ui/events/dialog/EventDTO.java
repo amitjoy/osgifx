@@ -19,10 +19,6 @@ import java.util.List;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 
-public final class EventDTO {
-
-    public String            topic;
-    public boolean           isSync;
-    public List<ConfigValue> properties;
+public record EventDTO(String topic, boolean isSync, List<ConfigValue> properties) {
 
 }
