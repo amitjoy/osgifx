@@ -184,7 +184,7 @@ public class XMetaTypeAdmin {
         dto.isPersisted = configuration != null;
         dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(metatypePID);
         dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties  = XConfigurationAdmin.prepareConfiguration(configuration.getProperties());
+        dto.properties  = XConfigurationAdmin.prepareConfiguration(configuration);
         dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
 
         return dto;
