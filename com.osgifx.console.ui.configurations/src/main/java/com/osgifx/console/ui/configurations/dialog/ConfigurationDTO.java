@@ -19,10 +19,6 @@ import java.util.List;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 
-public final class ConfigurationDTO {
-
-    public String            pid;
-    public String            factoryPid;
-    public List<ConfigValue> properties;
+public record ConfigurationDTO(String pid, String factoryPid, List<ConfigValue> properties) {
 
 }

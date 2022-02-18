@@ -65,9 +65,9 @@ public final class ConfigurationCreateHandler {
         if (configuration.isPresent()) {
             try {
                 final ConfigurationDTO  dto        = configuration.get();
-                final String            pid        = dto.pid;
-                final String            factoryPid = dto.factoryPid;
-                final List<ConfigValue> properties = dto.properties;
+                final String            pid        = dto.pid();
+                final String            factoryPid = dto.factoryPid();
+                final List<ConfigValue> properties = dto.properties();
 
                 if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
                     return;
@@ -85,7 +85,7 @@ public final class ConfigurationCreateHandler {
                     return;
                 }
                 if (result) {
-                    eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, dto.pid);
+                    eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
                     Fx.showSuccessNotification("New Configuration", "Configuration - '" + effectivePID + "' has been successfully created");
                     logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
                 } else {

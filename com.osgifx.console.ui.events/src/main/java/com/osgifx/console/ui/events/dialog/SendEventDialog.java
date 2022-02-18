@@ -137,11 +137,6 @@ public final class SendEventDialog extends Dialog<EventDTO> {
     }
 
     private EventDTO getInput(final CustomTextField txtTopic, final ToggleSwitch isSyncToggle) throws Exception {
-        final EventDTO config = new EventDTO();
-
-        config.topic  = txtTopic.getText();
-        config.isSync = isSyncToggle.isSelected();
-
         final List<ConfigValue> properties = Lists.newArrayList();
         for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : entries
                 .entrySet()) {
@@ -158,8 +153,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             final Object convertedValue = converter.convert(configValue, configType);
             properties.add(ConfigValue.create(configKey, convertedValue, configType));
         }
-        config.properties = properties;
-        return config;
+        return new EventDTO(txtTopic.getText(), isSyncToggle.isSelected(), properties);
     }
 
     private class PropertiesForm extends HBox {
