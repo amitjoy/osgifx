@@ -201,12 +201,11 @@ public final class ConfigurationEditorFxController {
         final List<Field<?>> fields = Lists.newArrayList();
 
         for (final Entry<String, ConfigValue> entry : config.properties.entrySet()) {
-            final String            key           = entry.getKey();
-            final ConfigValue       value         = entry.getValue();
-            final Object            originalValue = value.value;
-            final XAttributeDefType attrDefType   = value.type;
+            final String            key         = entry.getKey();
+            final ConfigValue       value       = entry.getValue();
+            final XAttributeDefType attrDefType = value.type;
 
-            final Field<?> field = initFieldFromType(key, originalValue, null, attrDefType, null, false).label(key);
+            final Field<?> field = initFieldFromType(key, value, null, attrDefType, null, false).label(key);
 
             if (uneditableProperties.contains(field.getLabel())) {
                 continue;
@@ -250,7 +249,7 @@ public final class ConfigurationEditorFxController {
         return fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(true);
     }
 
-    private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, final Object currentValue) {
+    private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, final ConfigValue currentValue) {
         final XAttributeDefType type       = XAttributeDefType.values()[ad.type];
         final List<String>      options    = ad.optionValues;
         final List<String>      defaultVal = ad.defaultValue;
@@ -259,9 +258,10 @@ public final class ConfigurationEditorFxController {
         return initFieldFromType(id, currentValue, defaultVal, type, options, true).label(id).labelDescription(ad.description);
     }
 
-    private Field<?> initFieldFromType(final String key, final Object currentValue, final List<String> defaultValue,
+    private Field<?> initFieldFromType(final String key, final ConfigValue configValue, final List<String> defaultValue,
             final XAttributeDefType adType, final List<String> options, final boolean hasOCD) {
-        Field<?> field = null;
+        final Object currentValue = configValue != null ? configValue.value : null;
+        Field<?>     field        = null;
         switch (adType) {
             case LONG, INTEGER:
                 if (options != null && !options.isEmpty()) {
@@ -516,7 +516,7 @@ public final class ConfigurationEditorFxController {
         return converter.convert(value, type);
     }
 
-    private Object getValue(final XConfigurationDTO config, final String id) {
+    private ConfigValue getValue(final XConfigurationDTO config, final String id) {
         if (config.properties == null) {
             return null;
         }
