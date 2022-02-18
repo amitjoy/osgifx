@@ -35,6 +35,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
 
+-buildpath.agent.api                  =         com.osgifx.console.agent.api
 -buildpath.base.api                   =         com.osgifx.console.api
 -buildpath.osgi                       =         osgi.annotation,\
                                                 osgi.cmpn;version='7.0.0',\
