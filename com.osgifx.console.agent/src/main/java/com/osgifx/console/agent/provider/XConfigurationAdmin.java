@@ -23,7 +23,6 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -147,16 +146,19 @@ public class XConfigurationAdmin {
 
         dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
         dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-        dto.properties  = prepareConfiguration(configuration.getProperties());
+        dto.properties  = prepareConfiguration(configuration);
         dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
         dto.isPersisted = true;
 
         return dto;
     }
 
-    public static Map<String, ConfigValue> prepareConfiguration(final Dictionary<String, Object> properties) {
+    public static Map<String, ConfigValue> prepareConfiguration(final Configuration config) {
+        if (config == null) {
+            return Collections.emptyMap();
+        }
         final Map<String, ConfigValue> props = new HashMap<>();
-        for (final Entry<String, Object> entry : AgentServer.valueOf(properties).entrySet()) {
+        for (final Entry<String, Object> entry : AgentServer.valueOf(config.getProperties()).entrySet()) {
             final String      key         = entry.getKey();
             final Object      value       = entry.getValue();
             final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));
