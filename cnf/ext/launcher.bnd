@@ -6,7 +6,9 @@
 -runvm                          =         -ea
 -runsystemcapabilities          =         ${native_capability}
 -runproperties.scr              =         ds.log.enabled=false
--runblacklist                   =         bnd.identity;id='com.osgifx.console.api'
+-runblacklist                   =         \
+                                          bnd.identity;id='com.osgifx.console.agent.api',\
+                                          bnd.identity;id='com.osgifx.console.api'
 current.directory               =         .
 storage.directory               =         ${current.directory}/.osgifx-ws
 -runproperties.storage          =         \

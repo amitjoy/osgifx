@@ -1,6 +1,3 @@
-javac.source        : 1.8
-javac.target        : ${javac.source}
-javac.compliance    : ${javac.source}
 -buildpath.base.api : 
 -buildpath          : biz.aQute.remote.agent;packages=*,\
                       org.osgi.service.feature
