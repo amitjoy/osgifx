@@ -25,6 +25,8 @@ Import-Package        : \
                         org.apache.felix.service.command;'resolution:'=optional,\
                         org.osgi.service.component.runtime;'resolution:'=optional,\
                         org.osgi.service.component.runtime.dto;'resolution:'=optional,\
+                        org.osgi.service.http.runtime;'resolution:'=optional,\
+                        org.osgi.service.http.runtime.dto;'resolution:'=optional,\
                         org.osgi.service.cm;'resolution:'=optional,\
                         org.osgi.service.event;'resolution:'=optional,\
                         org.osgi.service.log;'resolution:'=optional,\

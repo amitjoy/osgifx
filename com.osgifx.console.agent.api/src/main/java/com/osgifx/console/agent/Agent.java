@@ -25,6 +25,7 @@ import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
+import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -472,4 +473,11 @@ public interface Agent {
      * @return the set of bundles (can be empty)
      */
     Set<XBundleDTO> getClassloaderLeaks();
+
+    /**
+     * Returns the HTTP runtime information
+     *
+     * @return the HTTP runtime information
+     */
+    RuntimeDTO getHttpRuntimeInfo();
 }

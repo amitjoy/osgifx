@@ -16,6 +16,7 @@
 package com.osgifx.console.data.provider;
 
 import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -96,6 +97,14 @@ public interface DataProvider {
      *
      * @return the observable list of classloader leaks
      */
+
     ObservableList<XBundleDTO> leaks();
+
+    /**
+     * Returns the HTTP runtime information
+     *
+     * @return the HTTP runtime information
+     */
+    RuntimeDTO runtime();
 
 }
