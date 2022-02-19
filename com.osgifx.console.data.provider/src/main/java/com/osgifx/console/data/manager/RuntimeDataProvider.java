@@ -22,6 +22,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -159,6 +160,16 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
         final ObservableList<XBundleDTO> properties = FXCollections.observableArrayList();
         properties.addAll(makeNullSafe(agent.getClassloaderLeaks()));
         return properties;
+    }
+
+    @Override
+    public RuntimeDTO runtime() {
+        final Agent agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return null;
+        }
+        return agent.getHttpRuntimeInfo();
     }
 
 }

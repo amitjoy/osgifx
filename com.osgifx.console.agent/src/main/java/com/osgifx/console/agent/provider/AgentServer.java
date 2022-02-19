@@ -81,6 +81,7 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.dto.CapabilityDTO;
 import org.osgi.resource.dto.RequirementDTO;
+import org.osgi.service.http.runtime.dto.RuntimeDTO;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
@@ -155,6 +156,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     private final ServiceTracker<Object, Object>                 eventAdminTracker;
     private final ServiceTracker<Object, Object>                 configAdminTracker;
     private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
+    private final ServiceTracker<Object, Object>                 httpServiceRuntimeTracker;
     private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
 
     private final Set<String>                 gogoCommands    = new CopyOnWriteArraySet<>();
@@ -189,77 +191,79 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 
         final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
-        metatypeTracker       = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
-        eventAdminTracker     = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
-        configAdminTracker    = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
-        scrTracker            = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
-        agentExtensionTracker = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
+        metatypeTracker           = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
+        eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
+        configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
+        scrTracker                = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
+        httpServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime", null);
+        agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
 
-                                  @Override
-                                  public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
-                                      final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
-                                      if (name == null) {
-                                          return null;
+                                      @Override
+                                      public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
+                                          final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
+                                          if (name == null) {
+                                              return null;
+                                          }
+                                          final AgentExtension tracked = super.addingService(reference);
+                                          agentExtensions.put(name.toString(), tracked);
+                                          return tracked;
                                       }
-                                      final AgentExtension tracked = super.addingService(reference);
-                                      agentExtensions.put(name.toString(), tracked);
-                                      return tracked;
-                                  }
 
-                                  @Override
-                                  public void modifiedService(final ServiceReference<AgentExtension> reference,
-                                          final AgentExtension service) {
-                                      removedService(reference, service);
-                                      addingService(reference);
-                                  }
-
-                                  @Override
-                                  public void removedService(final ServiceReference<AgentExtension> reference,
-                                          final AgentExtension service) {
-                                      final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
-                                      if (name == null) {
-                                          return;
+                                      @Override
+                                      public void modifiedService(final ServiceReference<AgentExtension> reference,
+                                              final AgentExtension service) {
+                                          removedService(reference, service);
+                                          addingService(reference);
                                       }
-                                      agentExtensions.remove(name);
-                                  }
-                              };
-        gogoCommandsTracker   = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
-                                  @Override
-                                  public Object addingService(final ServiceReference<Object> reference) {
-                                      final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                      final String[] functions = adapt(reference.getProperty("osgi.command.function"));
-                                      addCommand(scope, functions);
-                                      return super.addingService(reference);
-                                  }
 
-                                  @Override
-                                  public void removedService(final ServiceReference<Object> reference, final Object service) {
-                                      final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                      final String[] functions = adapt(reference.getProperty("osgi.command.function"));
-                                      removeCommand(scope, functions);
-                                  }
-
-                                  private String[] adapt(final Object value) {
-                                      if (value instanceof String[]) {
-                                          return (String[]) value;
+                                      @Override
+                                      public void removedService(final ServiceReference<AgentExtension> reference,
+                                              final AgentExtension service) {
+                                          final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
+                                          if (name == null) {
+                                              return;
+                                          }
+                                          agentExtensions.remove(name);
                                       }
-                                      return new String[] { value.toString() };
-                                  }
+                                  };
+        gogoCommandsTracker       = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
+                                      @Override
+                                      public Object addingService(final ServiceReference<Object> reference) {
+                                          final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
+                                          final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                          addCommand(scope, functions);
+                                          return super.addingService(reference);
+                                      }
 
-                                  private void addCommand(final String scope, final String... commands) {
-                                      Stream.of(commands).forEach(cmd -> gogoCommands.add(scope + ":" + cmd));
-                                  }
+                                      @Override
+                                      public void removedService(final ServiceReference<Object> reference, final Object service) {
+                                          final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
+                                          final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                          removeCommand(scope, functions);
+                                      }
 
-                                  private void removeCommand(final String scope, final String... commands) {
-                                      Stream.of(commands).forEach(cmd -> gogoCommands.remove(scope + ":" + cmd));
-                                  }
-                              };
+                                      private String[] adapt(final Object value) {
+                                          if (value instanceof String[]) {
+                                              return (String[]) value;
+                                          }
+                                          return new String[] { value.toString() };
+                                      }
+
+                                      private void addCommand(final String scope, final String... commands) {
+                                          Stream.of(commands).forEach(cmd -> gogoCommands.add(scope + ":" + cmd));
+                                      }
+
+                                      private void removeCommand(final String scope, final String... commands) {
+                                          Stream.of(commands).forEach(cmd -> gogoCommands.remove(scope + ":" + cmd));
+                                      }
+                                  };
         scrTracker.open();
         metatypeTracker.open();
         eventAdminTracker.open();
         configAdminTracker.open();
         gogoCommandsTracker.open();
         agentExtensionTracker.open();
+        httpServiceRuntimeTracker.open();
     }
 
     /**
@@ -689,6 +693,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
             configAdminTracker.close();
             gogoCommandsTracker.close();
             agentExtensionTracker.close();
+            httpServiceRuntimeTracker.close();
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -1183,6 +1188,16 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     @Override
     public Set<XBundleDTO> getClassloaderLeaks() {
         return leakDetector.getSuspiciousBundles();
+    }
+
+    @Override
+    public RuntimeDTO getHttpRuntimeInfo() {
+        final boolean isHttpServiceRuntimeWired = PackageWirings.isHttpServiceRuntimeWired(context);
+        if (isHttpServiceRuntimeWired) {
+            final XHttpAdmin httpAdmin = new XHttpAdmin(httpServiceRuntimeTracker.getService());
+            return httpAdmin.runtime();
+        }
+        return null;
     }
 
     private static long getSystemUptime() {
