@@ -25,12 +25,12 @@ import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
-import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -475,9 +475,10 @@ public interface Agent {
     Set<XBundleDTO> getClassloaderLeaks();
 
     /**
-     * Returns the HTTP runtime information
+     * Returns the HTTP runtime information that includes list of all servlets, resources, listeners, filters and error
+     * pages
      *
      * @return the HTTP runtime information
      */
-    RuntimeDTO getHttpRuntimeInfo();
+    XHttpContextInfoDTO getHttpContextInfo();
 }

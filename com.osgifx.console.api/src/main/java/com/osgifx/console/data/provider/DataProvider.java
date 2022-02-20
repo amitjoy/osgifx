@@ -16,12 +16,12 @@
 package com.osgifx.console.data.provider;
 
 import org.osgi.annotation.versioning.ProviderType;
-import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -101,10 +101,11 @@ public interface DataProvider {
     ObservableList<XBundleDTO> leaks();
 
     /**
-     * Returns the HTTP runtime information
+     * Returns the HTTP runtime information that includes list of all servlets, resources, listeners, filters and error
+     * pages
      *
      * @return the HTTP runtime information
      */
-    RuntimeDTO runtime();
+    XHttpContextInfoDTO httpContext();
 
 }

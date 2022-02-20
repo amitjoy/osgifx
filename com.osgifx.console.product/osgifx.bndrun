@@ -38,13 +38,14 @@ startlevels                       :   org.apache.felix.scr;startlevel=1,\
                                       bnd.identity;id='com.osgifx.console.ui.logs',\
                                       bnd.identity;id='com.osgifx.console.ui.gogo',\
                                       bnd.identity;id='com.osgifx.console.ui.graph',\
+                                      bnd.identity;id='com.osgifx.console.ui.http',\
+                                      bnd.identity;id='com.osgifx.console.ui.leaks',\
                                       bnd.identity;id='com.osgifx.console.ui.overview',\
                                       bnd.identity;id='com.osgifx.console.ui.packages',\
                                       bnd.identity;id='com.osgifx.console.ui.properties',\
                                       bnd.identity;id='com.osgifx.console.ui.services',\
                                       bnd.identity;id='com.osgifx.console.ui.terminal',\
                                       bnd.identity;id='com.osgifx.console.ui.threads',\
-                                      bnd.identity;id='com.osgifx.console.ui.leaks',\
                                       \
                                       ${requirement.product}
 
@@ -65,7 +66,8 @@ install.order                     :   \
                                       com.osgifx.console.ui.graph,\
                                       com.osgifx.console.ui.gogo,\
                                       com.osgifx.console.ui.terminal,\
-                                      com.osgifx.console.ui.leaks                                      
+                                      com.osgifx.console.ui.leaks,\
+                                      com.osgifx.console.ui.http                                      
 
 -runbundles.X    	              :   ${install.order}
 
