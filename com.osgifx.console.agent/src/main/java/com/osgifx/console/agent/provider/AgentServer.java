@@ -81,7 +81,6 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.dto.CapabilityDTO;
 import org.osgi.resource.dto.RequirementDTO;
-import org.osgi.service.http.runtime.dto.RuntimeDTO;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
@@ -91,6 +90,7 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -1191,10 +1191,14 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
     }
 
     @Override
-    public RuntimeDTO getHttpRuntimeInfo() {
+    public XHttpContextInfoDTO getHttpContextInfo() {
         final boolean isHttpServiceRuntimeWired = PackageWirings.isHttpServiceRuntimeWired(context);
         if (isHttpServiceRuntimeWired) {
-            final XHttpAdmin httpAdmin = new XHttpAdmin(httpServiceRuntimeTracker.getService());
+            final Object service = httpServiceRuntimeTracker.getService();
+            if (service == null) {
+                return null;
+            }
+            final XHttpAdmin httpAdmin = new XHttpAdmin(service);
             return httpAdmin.runtime();
         }
         return null;

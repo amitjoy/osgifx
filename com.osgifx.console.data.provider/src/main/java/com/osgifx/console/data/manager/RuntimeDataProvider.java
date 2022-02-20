@@ -22,13 +22,13 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -163,13 +163,13 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
     }
 
     @Override
-    public RuntimeDTO runtime() {
+    public XHttpContextInfoDTO httpContext() {
         final Agent agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
             return null;
         }
-        return agent.getHttpRuntimeInfo();
+        return agent.getHttpContextInfo();
     }
 
 }
