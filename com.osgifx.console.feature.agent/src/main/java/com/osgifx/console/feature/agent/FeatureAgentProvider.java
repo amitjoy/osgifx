@@ -41,7 +41,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -240,13 +239,13 @@ public final class FeatureAgentProvider implements FeatureAgent {
             final Configuration              configuration = configAdmin.getConfiguration(FEATURE_STORAGE_PID, "?");
             final Dictionary<String, Object> properties    = configuration.getProperties();
             if (properties == null) {
-                return Collections.emptyList();
+                return List.of();
             }
             final Object features = properties.get(CONFIG_KEY);
 
             final Gson gson = new Gson();
             if (features == null) {
-                return Collections.emptyList();
+                return List.of();
             }
 
             final String       fs     = (String) features;
@@ -254,7 +253,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
             return ImmutableList.copyOf(result);
         } catch (final IOException e) {
             // should not happen as location check has been disabled
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -277,7 +276,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
         final Collection<FeatureDTO> installedFeatures       = getInstalledFeatures();
         if (installedFeatures.isEmpty()) {
             logger.atInfo().log("No features exist. Therefore, skipped checking for updates.");
-            return Collections.emptyList();
+            return List.of();
         }
         try {
             for (final FeatureDTO installedFeature : installedFeatures) {
