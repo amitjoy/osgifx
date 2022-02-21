@@ -16,7 +16,7 @@
 package com.osgifx.console.util.fx;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 public final class ConsoleFxHelper {
 
@@ -30,7 +30,7 @@ public final class ConsoleFxHelper {
      */
     public static <T> Collection<T> makeNullSafe(final Collection<T> source) {
         if (source == null) {
-            return Collections.emptyList();
+            return List.of();
         }
         return source;
     }
