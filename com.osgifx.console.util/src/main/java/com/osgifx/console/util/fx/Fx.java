@@ -58,7 +58,7 @@ public final class Fx {
         try {
             return loader.load();
         } catch (final Exception e) {
-            return null;
+            throw new RuntimeException(resourceName + " could not be loaded", e);
         }
     }
 
@@ -181,7 +181,7 @@ public final class Fx {
 
     public static <S, T> void addCellFactory(final TableColumn<S, T> column, final Predicate<S> predicate, final Color match,
             final Color noMatch) {
-        column.setCellFactory(c -> new TableCell<S, T>() {
+        column.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(final T item, final boolean empty) {
                 super.updateItem(item, empty);
