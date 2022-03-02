@@ -16,7 +16,7 @@ org.apache.felix:org.apache.felix.configurator:1.0.14
 org.apache.felix:org.apache.felix.converter:1.0.18
 org.apache.felix:org.apache.felix.eventadmin:1.6.2
 org.apache.felix:org.apache.felix.feature:0.9.4-RC3
-org.apache.felix:org.apache.felix.scr:2.2.0-RC1
+org.apache.felix:org.apache.felix.scr:2.2.0
 org.eclipse.platform:org.eclipse.osgi:3.17.100
 org.osgi:org.osgi.service.feature:1.0.0
 org.osgi:org.osgi.util.function:1.2.0
