@@ -1,6 +1,7 @@
 -sub       : *.bnd
 -buildpath : \
              eu.hansolo.tilesfx,\
+             eu.hansolo.toolbox,\
              eu.hansolo.toolboxfx,\
              eu.lestard:advanced-bindings,\
              jar/grid-0.3.0.jar;version=file,\
