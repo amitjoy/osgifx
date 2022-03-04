@@ -44,15 +44,15 @@ import aQute.remote.util.Link;
  */
 public class AgentSupervisor<S, A> {
 
-    private static final Map<File, Info>          fileInfo    = new ConcurrentHashMap<>();
-    private static final MultiMap<String, String> shaInfo     = new MultiMap<>();
-    private static final int                      connectWait = 200;
-    private static byte[]                         EMPTY       = {};
+    private static final Map<File, Info>          fileInfo     = new ConcurrentHashMap<>();
+    private static final MultiMap<String, String> shaInfo      = new MultiMap<>();
+    private static final int                      CONNECT_WAIT = 200;
+    private static final byte[]                   EMPTY        = {};
     private A                                     agent;
-    private final CountDownLatch                  latch       = new CountDownLatch(1);
+    private final CountDownLatch                  latch        = new CountDownLatch(1);
     protected volatile int                        exitCode;
     private Link<S, A>                            link;
-    private final AtomicBoolean                   quit        = new AtomicBoolean(false);
+    private final AtomicBoolean                   quit         = new AtomicBoolean(false);
     protected String                              host;
     protected int                                 port;
     protected int                                 timeout;
@@ -90,9 +90,9 @@ public class AgentSupervisor<S, A> {
                     throw e;
                 }
                 if (retryTimeout > 0) {
-                    retryTimeout = Math.max(retryTimeout - connectWait, 0);
+                    retryTimeout = Math.max(retryTimeout - CONNECT_WAIT, 0);
                 }
-                Thread.sleep(connectWait);
+                Thread.sleep(CONNECT_WAIT);
             }
         }
     }
