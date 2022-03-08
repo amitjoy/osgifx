@@ -8,29 +8,29 @@ plugins {
 def ws = Workspace.findWorkspace(IO.work)
 
 tasks.jpackage {
-	appName                   = ws.getProperty("appName")
-	appVersion                = ws.getProperty("appVersion")
-	appDescription            = ws.getProperty("appDescription")
-	copyright                 = ws.getProperty("copyright")
-	vendor                    = ws.getProperty("vendor")
-	input                     = ws.getProperty("input")
-	destination               = ws.getProperty("destination")
-	mainClass                 = ws.getProperty("mainClass")
-	mainJar                   = ws.getProperty("mainJar")
-	licenseFile               = ws.getProperty("licenseFile")
-	runtimeImage              = System.properties['java.home']
-	javaOptions               = ws.getProperty("javaOptions").split(",")
+	appName                     =     ws.getProperty("appName")
+	appVersion                  =     ws.getProperty("appVersion")
+	appDescription              =     ws.getProperty("appDescription")
+	copyright                   =     ws.getProperty("copyright")
+	vendor                      =     ws.getProperty("vendor")
+	input                       =     ws.getProperty("input")
+	destination                 =     ws.getProperty("destination")
+	mainClass                   =     ws.getProperty("mainClass")
+	mainJar                     =     ws.getProperty("mainJar")
+	licenseFile                 =     ws.getProperty("licenseFile")
+	runtimeImage                =     System.properties['java.home']
+	javaOptions                 =     ws.getProperty("javaOptions").split(",")
 	mac {
-		macPackageIdentifier  = ws.getProperty("macPackageIdentifier")
-		icon                  = ws.getProperty("macIcon")
+		macPackageIdentifier    =     ws.getProperty("macPackageIdentifier")
+		icon                    =     ws.getProperty("macIcon")
 	}
 	linux {
-		icon                  = ws.getProperty("linuxIcon")
-		linuxShortcut         = ws.getProperty("linuxShortcut")
-		linuxDebMaintainer    = ws.getProperty("linuxDebMaintainer")
+		icon                    =     ws.getProperty("linuxIcon")
+		linuxShortcut           =     ws.getProperty("linuxShortcut")
+		linuxDebMaintainer      =     ws.getProperty("linuxDebMaintainer")
 	}
 	windows {
-		icon                  = ws.getProperty("winIcon")
-		winShortcut           = ws.getProperty("winShortcut")
+		icon                    =     ws.getProperty("winIcon")
+		winShortcut             =     ws.getProperty("winShortcut")
 	}
 }
