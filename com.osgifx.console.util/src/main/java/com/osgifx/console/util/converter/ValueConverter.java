@@ -35,6 +35,11 @@ public final class ValueConverter {
         final Converter        c  = Converters.standardConverter();
         final ConverterBuilder cb = c.newConverterBuilder();
 
+        initRules(cb);
+        converter = cb.build();
+    }
+
+    private void initRules(final ConverterBuilder cb) {
         cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
         });
         cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
@@ -82,7 +87,6 @@ public final class ValueConverter {
         });
         cb.rule(new Rule<String, List<Long>>(v -> Stream.of(v.split(",")).map(Long::parseLong).toList()) {
         });
-        converter = cb.build();
     }
 
     public Object convert(final Object value, final XAttributeDefType target) {
