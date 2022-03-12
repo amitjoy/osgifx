@@ -26,6 +26,12 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public final class GameLogic {
 
+    public enum States {
+        EMPTY,
+        X,
+        O
+    }
+
     private States                       currentTurn;
     private final GridModel<States>      gridModel;
     private final ObjectProperty<States> winner = new SimpleObjectProperty<>();
