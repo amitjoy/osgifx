@@ -20,6 +20,8 @@ import javax.inject.Inject;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.feature.tictactoe.GameLogic.States;
+
 import eu.lestard.grid.GridModel;
 import eu.lestard.grid.GridView;
 import javafx.beans.binding.Bindings;
