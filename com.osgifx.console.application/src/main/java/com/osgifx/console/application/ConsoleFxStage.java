@@ -84,7 +84,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
                 updateMessage("Initializing Console . . .");
                 for (int i = 0; i < 5; i++) {
                     Thread.sleep(400);
-                    updateProgress(i + 1, 5);
+                    updateProgress(i + 1L, 5);
                 }
                 Thread.sleep(400);
                 updateMessage("Console Initialized.");
