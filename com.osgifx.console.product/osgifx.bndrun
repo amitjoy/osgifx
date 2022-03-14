@@ -21,7 +21,10 @@ startlevels                       :   org.apache.felix.scr;startlevel=1,\
 
 -runproperties.product            :   eclipse.product=com.osgifx.console.application.product
 -runproperties.name               :   launch.name=OSGi.fx
--runproperties.local.agent        :   osgi.fx.agent.port=0.0.0.0:1729
+
+# Ramanujan's Number
+port                              :   1729
+-runproperties.local.agent        :   osgi.fx.agent.port=0.0.0.0:${port}
 
 -runrequires                      :   \
                                       bnd.identity;id='com.osgifx.console.agent',\
