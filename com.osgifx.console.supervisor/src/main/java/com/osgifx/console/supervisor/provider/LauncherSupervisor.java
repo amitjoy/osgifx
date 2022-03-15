@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -29,23 +29,15 @@ import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 
-import aQute.bnd.util.dto.DTO;
-
 @Component
 public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
 
     private Appendable stdout;
     private Appendable stderr;
-    private Thread     stdin;
     private int        shell = -100; // always invalid so we update it
 
     private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
     private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
-
-    static class Info extends DTO {
-        public String sha;
-        public long   lastModified;
-    }
 
     @Override
     public boolean stdout(final String out) throws Exception {
@@ -74,33 +66,34 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     }
 
     public void setStdin(final InputStream in) throws Exception {
-        final InputStreamReader isr = new InputStreamReader(in);
-        stdin = new Thread("stdin") {
-            @Override
-            public void run() {
-                final StringBuilder sb = new StringBuilder();
+        final InputStreamReader isr   = new InputStreamReader(in);
+        final Thread            stdin = new Thread("stdin") {
+                                          @Override
+                                          public void run() {
+                                              final StringBuilder sb = new StringBuilder();
 
-                while (!isInterrupted()) {
-                    try {
-                        if (isr.ready()) {
-                            final int read = isr.read();
-                            if (read < 0) {
-                                return;
-                            }
-                            sb.append((char) read);
+                                              while (!isInterrupted()) {
+                                                  try {
+                                                      if (isr.ready()) {
+                                                          final int read = isr.read();
+                                                          if (read < 0) {
+                                                              return;
+                                                          }
+                                                          sb.append((char) read);
 
-                        } else if (sb.length() == 0) {
-                            sleep(100);
-                        } else {
-                            getAgent().stdin(sb.toString());
-                            sb.setLength(0);
-                        }
-                    } catch (final Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
+                                                      } else if (sb.length() == 0) {
+                                                          sleep(100);
+                                                      } else {
+                                                          getAgent().stdin(sb.toString());
+                                                          sb.setLength(0);
+                                                      }
+                                                  } catch (final Exception e) {
+                                                      Thread.currentThread().interrupt();
+                                                      e.printStackTrace();
+                                                  }
+                                              }
+                                          }
+                                      };
         stdin.start();
     }
 
