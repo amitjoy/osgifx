@@ -58,7 +58,7 @@ public final class Fx {
         try {
             return loader.load();
         } catch (final Exception e) {
-            throw new RuntimeException(resourceName + " could not be loaded", e);
+            return null;
         }
     }
 
