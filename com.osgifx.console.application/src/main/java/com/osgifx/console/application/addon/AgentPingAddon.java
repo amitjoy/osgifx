@@ -52,6 +52,9 @@ public final class AgentPingAddon {
     @Inject
     private IEventBroker                eventBroker;
     @Inject
+    @ContextValue("is_connected")
+    private ContextBoundValue<Boolean>  isConnected;
+    @Inject
     @ContextValue("connected.agent")
     private ContextBoundValue<String>   connectedAgent;
     private ScheduledExecutorService    executor;
@@ -84,6 +87,7 @@ public final class AgentPingAddon {
         logger.atInfo().log("Agent disconnected event has been received");
         future.cancel(true);
         future = null;
+        isConnected.publish(false);
         connectedAgent.publish(null);
     }
 
