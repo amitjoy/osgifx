@@ -99,7 +99,7 @@ public final class Fx {
                              .title(title)
                              .graphic(new ImageView(success))
                              .text(text)
-                             .hideAfter(Duration.seconds(7))
+                             .hideAfter(Duration.seconds(3))
                              .position(Pos.CENTER);
         // @formatter:on
         notification.show();
@@ -113,7 +113,7 @@ public final class Fx {
                              .title(title)
                              .graphic(new ImageView(success))
                              .text(text)
-                             .hideAfter(Duration.seconds(7))
+                             .hideAfter(Duration.seconds(3))
                              .position(Pos.CENTER);
         // @formatter:on
         notification.show();
