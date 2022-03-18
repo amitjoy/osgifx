@@ -112,12 +112,12 @@ install.order                     :   \
 	org.apache.sling.commons.johnzon;version='[1.2.14,1.2.15)';startlevel=10,\
 	org.eclipse.core.commands;version='[3.10.100,3.10.101)';startlevel=10,\
 	org.eclipse.core.contenttype;version='[3.8.100,3.8.101)';startlevel=10,\
-	org.eclipse.core.databinding.observable;version='[1.11.0,1.11.1)';startlevel=10,\
+	org.eclipse.core.databinding.observable;version='[1.12.0,1.12.1)';startlevel=10,\
 	org.eclipse.core.databinding.property;version='[1.9.0,1.9.1)';startlevel=10,\
 	org.eclipse.core.expressions;version='[3.6.600,3.6.601)';startlevel=10,\
-	org.eclipse.core.jobs;version='[3.12.0,3.12.1)';startlevel=10,\
-	org.eclipse.core.runtime;version='[3.24.0,3.24.1)';startlevel=10,\
-	org.eclipse.e4.core.commands;version='[1.0.0,1.0.1)';startlevel=10,\
+	org.eclipse.core.jobs;version='[3.12.100,3.12.101)';startlevel=10,\
+	org.eclipse.core.runtime;version='[3.24.100,3.24.101)';startlevel=10,\
+	org.eclipse.e4.core.commands;version='[1.0.100,1.0.101)';startlevel=10,\
 	org.eclipse.e4.core.contexts;version='[1.9.100,1.9.101)';startlevel=10,\
 	org.eclipse.e4.core.di;version='[1.8.100,1.8.101)';startlevel=10,\
 	org.eclipse.e4.core.di.annotations;version='[1.7.100,1.7.101)';startlevel=10,\
@@ -134,7 +134,7 @@ install.order                     :   \
 	org.eclipse.emf.ecore.change;version='[2.14.0,2.14.1)';startlevel=10,\
 	org.eclipse.emf.ecore.xmi;version='[2.16.0,2.16.1)';startlevel=10,\
 	org.eclipse.equinox.app;version='[1.6.100,1.6.101)';startlevel=10,\
-	org.eclipse.equinox.common;version='[3.15.100,3.15.101)';startlevel=10,\
+	org.eclipse.equinox.common;version='[3.16.0,3.16.1)';startlevel=10,\
 	org.eclipse.equinox.console;version='[1.4.0,1.4.1)';startlevel=10,\
 	org.eclipse.equinox.event;version='[1.6.100,1.6.101)';startlevel=10,\
 	org.eclipse.equinox.preferences;version='[3.9.100,3.9.101)';startlevel=10,\
