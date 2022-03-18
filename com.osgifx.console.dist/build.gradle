@@ -18,7 +18,6 @@ tasks.jpackage {
 	mainClass                   =     ws.getProperty("mainClass")
 	mainJar                     =     ws.getProperty("mainJar")
 	licenseFile                 =     ws.getProperty("licenseFile")
-	runtimeImage                =     System.properties['java.home']
 	javaOptions                 =     ws.getProperty("javaOptions").split(",")
 	mac {
 		macPackageIdentifier    =     ws.getProperty("macPackageIdentifier")
