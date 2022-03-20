@@ -39,38 +39,39 @@ import javafx.scene.layout.CornerRadii;
 
 public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
 
-    @Inject
-    @Optional
-    @Named("connected.agent")
-    private String          connectedAgent;
-    private final StatusBar statusBar = new StatusBar();
+	@Inject
+	@Optional
+	@Named("connected.agent")
+	private String          connectedAgent;
+	private final StatusBar statusBar = new StatusBar();
 
-    @Override
-    public void addTo(final BorderPane pane) {
-        final Glyph glyph = new Glyph("FontAwesome", "DESKTOP");
-        glyph.useGradientEffect();
-        glyph.useHoverEffect();
+	@Override
+	public void addTo(final BorderPane pane) {
+		final var glyph = new Glyph("FontAwesome", "DESKTOP");
+		glyph.useGradientEffect();
+		glyph.useHoverEffect();
 
-        final Button button = new Button("", glyph);
-        button.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
-        statusBar.getLeftItems().clear();
-        statusBar.getLeftItems().add(button);
-        statusBar.getLeftItems().add(new Separator(VERTICAL));
+		final var button = new Button("", glyph);
+		button.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
 
-        final String statusBarText;
-        if (connectedAgent != null) {
-            glyph.color(GREEN);
-            statusBarText = "Connected to " + connectedAgent;
-        } else {
-            statusBarText = "Disconnected";
-        }
-        statusBar.setText(statusBarText);
-        pane.setBottom(statusBar);
-    }
+		statusBar.getLeftItems().clear();
+		statusBar.getLeftItems().add(button);
+		statusBar.getLeftItems().add(new Separator(VERTICAL));
 
-    @Override
-    public DoubleProperty progressProperty() {
-        return statusBar.progressProperty();
-    }
+		final String statusBarText;
+		if (connectedAgent != null) {
+			glyph.color(GREEN);
+			statusBarText = "Connected to " + connectedAgent;
+		} else {
+			statusBarText = "Disconnected";
+		}
+		statusBar.setText(statusBarText);
+		pane.setBottom(statusBar);
+	}
+
+	@Override
+	public DoubleProperty progressProperty() {
+		return statusBar.progressProperty();
+	}
 
 }
