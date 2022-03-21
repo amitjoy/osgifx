@@ -31,33 +31,33 @@ import javafx.scene.text.Text;
 
 public final class AboutApplicationDialogController {
 
-    @Log
-    @Inject
-    private FluentLogger   logger;
-    @FXML
-    private HyperlinkLabel appLink;
-    @FXML
-    private HyperlinkLabel eclipseLink;
-    @FXML
-    private Text           appVersion;
-    @Inject
-    private Application    jfxApplication;
-    @Inject
-    @OSGiBundle
-    private BundleContext  bundleContext;
+	@Log
+	@Inject
+	private FluentLogger   logger;
+	@FXML
+	private HyperlinkLabel appLink;
+	@FXML
+	private HyperlinkLabel eclipseLink;
+	@FXML
+	private Text           appVersion;
+	@Inject
+	private Application    jfxApplication;
+	@Inject
+	@OSGiBundle
+	private BundleContext  bundleContext;
 
-    @FXML
-    public void initialize() {
-        appVersion.setText(bundleContext.getBundle().getVersion().toString());
-        appLink.setOnAction(this::handleLinkOnClick);
-        eclipseLink.setOnAction(this::handleLinkOnClick);
-        logger.atInfo().log("FXML controller (%s) has been initialized", getClass());
-    }
+	@FXML
+	public void initialize() {
+		appVersion.setText(bundleContext.getBundle().getVersion().toString());
+		appLink.setOnAction(this::handleLinkOnClick);
+		eclipseLink.setOnAction(this::handleLinkOnClick);
+		logger.atInfo().log("FXML controller (%s) has been initialized", getClass());
+	}
 
-    private void handleLinkOnClick(final ActionEvent event) {
-        final Hyperlink link           = (Hyperlink) event.getSource();
-        final String    eclipseWebLink = link.getText();
-        jfxApplication.getHostServices().showDocument(eclipseWebLink);
-    }
+	private void handleLinkOnClick(final ActionEvent event) {
+		final var link           = (Hyperlink) event.getSource();
+		final var eclipseWebLink = link.getText();
+		jfxApplication.getHostServices().showDocument(eclipseWebLink);
+	}
 
 }

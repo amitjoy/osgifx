@@ -15,7 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
+import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.ADD_CONNECTION;
+import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.CONNECT;
+import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.REMOVE_CONNECTION;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static javafx.scene.control.ButtonType.OK;
 
 import java.util.Map;
 
@@ -29,59 +33,55 @@ import com.google.common.collect.Maps;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
 public final class ConnectToAgentDialog extends Dialog<ButtonType> {
 
-    public enum ActionType {
-        CONNECT,
-        ADD_CONNECTION,
-        REMOVE_CONNECTION
-    }
+	public enum ActionType {
+		CONNECT, ADD_CONNECTION, REMOVE_CONNECTION
+	}
 
-    @Inject
-    @LocalInstance
-    private FXMLLoader    loader;
-    @Inject
-    @OSGiBundle
-    private BundleContext context;
+	@Inject
+	@LocalInstance
+	private FXMLLoader    loader;
+	@Inject
+	@OSGiBundle
+	private BundleContext context;
 
-    private final Map<ActionType, ButtonType> buttonTypes = Maps.newHashMap();
+	private final Map<ActionType, ButtonType> buttonTypes = Maps.newHashMap();
 
-    public void init() {
-        final DialogPane dialogPane = getDialogPane();
-        initStyle(StageStyle.UNDECORATED);
-        dialogPane.setPrefHeight(170);
-        dialogPane.setPrefWidth(400);
-        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+	public void init() {
+		final var dialogPane = getDialogPane();
+		initStyle(StageStyle.UNDECORATED);
+		dialogPane.setPrefHeight(170);
+		dialogPane.setPrefWidth(400);
+		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-        dialogPane.setHeaderText("Connect to Remote Agent");
-        dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
+		dialogPane.setHeaderText("Connect to Remote Agent");
+		dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
 
-        final ButtonType addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
-        final ButtonType removeConnectionButton = new ButtonType("Remove", ButtonBar.ButtonData.LEFT);
+		final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
+		final var removeConnectionButton = new ButtonType("Remove", ButtonBar.ButtonData.LEFT);
 
-        dialogPane.getButtonTypes().addAll(ButtonType.OK);
-        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
-        dialogPane.getButtonTypes().addAll(addConnectionButton);
-        dialogPane.getButtonTypes().addAll(removeConnectionButton);
+		dialogPane.getButtonTypes().addAll(ButtonType.OK);
+		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+		dialogPane.getButtonTypes().addAll(addConnectionButton);
+		dialogPane.getButtonTypes().addAll(removeConnectionButton);
 
-        buttonTypes.put(ActionType.ADD_CONNECTION, addConnectionButton);
-        buttonTypes.put(ActionType.REMOVE_CONNECTION, removeConnectionButton);
-        buttonTypes.put(ActionType.CONNECT, ButtonType.OK);
+		buttonTypes.put(ADD_CONNECTION, addConnectionButton);
+		buttonTypes.put(REMOVE_CONNECTION, removeConnectionButton);
+		buttonTypes.put(CONNECT, OK);
 
-        final Node content = Fx.loadFXML(loader, context, "/fxml/connection-chooser-window.fxml");
-        dialogPane.setContent(content);
-    }
+		final var content = Fx.loadFXML(loader, context, "/fxml/connection-chooser-window.fxml");
+		dialogPane.setContent(content);
+	}
 
-    public ButtonType getButtonType(final ActionType type) {
-        return buttonTypes.get(type);
-    }
+	public ButtonType getButtonType(final ActionType type) {
+		return buttonTypes.get(type);
+	}
 
 }

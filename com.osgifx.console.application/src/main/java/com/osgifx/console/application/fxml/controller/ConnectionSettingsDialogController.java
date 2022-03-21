@@ -33,35 +33,35 @@ import javafx.scene.control.TableView;
 
 public final class ConnectionSettingsDialogController {
 
-    @FXML
-    private TableView<ConnectionSettingDTO>            connectionTable;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, String>  hostColumn;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, Integer> portColumn;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
-    @Log
-    @Inject
-    private FluentLogger                               logger;
-    @Inject
-    private ConnectionsProvider                        connectionsProvider;
-    @Inject
-    @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO>    selectedSettings;
+	@FXML
+	private TableView<ConnectionSettingDTO>            connectionTable;
+	@FXML
+	private TableColumn<ConnectionSettingDTO, String>  hostColumn;
+	@FXML
+	private TableColumn<ConnectionSettingDTO, Integer> portColumn;
+	@FXML
+	private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
+	@Log
+	@Inject
+	private FluentLogger                               logger;
+	@Inject
+	private ConnectionsProvider                        connectionsProvider;
+	@Inject
+	@ContextValue("selected.settings")
+	private ContextBoundValue<ConnectionSettingDTO>    selectedSettings;
 
-    @FXML
-    public void initialize() {
-        hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
-        portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
-        timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
+	@FXML
+	public void initialize() {
+		hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
+		portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
+		timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
 
-        connectionTable.setItems(connectionsProvider.getConnections());
-        connectionTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldSettings, newSettings) -> selectedSettings.publish(newSettings));
+		connectionTable.setItems(connectionsProvider.getConnections());
+		connectionTable.getSelectionModel().selectedItemProperty()
+		        .addListener((obs, oldSettings, newSettings) -> selectedSettings.publish(newSettings));
 
-        TableFilter.forTableView(connectionTable).apply();
-        logger.atInfo().log("FXML controller has been initialized");
-    }
+		TableFilter.forTableView(connectionTable).apply();
+		logger.atInfo().log("FXML controller has been initialized");
+	}
 
 }

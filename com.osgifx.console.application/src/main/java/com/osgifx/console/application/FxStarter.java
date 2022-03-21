@@ -30,16 +30,16 @@ import com.osgifx.console.ui.ConsoleStatusBar;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class FxStarter implements BundleActivator {
 
-    @Override
-    public void start(final BundleContext context) throws Exception {
-        InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
-        final ServiceReference<ThreadSynchronize> serviceReference = context.getServiceReference(ThreadSynchronize.class);
-        context.getService(serviceReference);
-    }
+	@Override
+	public void start(final BundleContext context) throws Exception {
+		InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
+		final ServiceReference<ThreadSynchronize> serviceReference = context.getServiceReference(ThreadSynchronize.class);
+		context.getService(serviceReference);
+	}
 
-    @Override
-    public void stop(final BundleContext context) throws Exception {
-        // nothing to implement
-    }
+	@Override
+	public void stop(final BundleContext context) throws Exception {
+		// nothing to implement
+	}
 
 }

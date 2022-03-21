@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -29,20 +29,20 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = Theme.class)
 public final class DefaultTheme extends AbstractTheme {
 
-    @Activate
-    public DefaultTheme(final BundleContext context) {
-        super("theme.default", "Default Theme", context.getBundle().getResource("css/default.css"));
-    }
+	@Activate
+	public DefaultTheme(final BundleContext context) {
+		super("theme.default", "Default Theme", context.getBundle().getResource("css/default.css"));
+	}
 
-    @Override
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    public synchronized void registerStylesheet(final Stylesheet stylesheet) {
-        super.registerStylesheet(stylesheet);
-    }
+	@Override
+	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+	public synchronized void registerStylesheet(final Stylesheet stylesheet) {
+		super.registerStylesheet(stylesheet);
+	}
 
-    @Override
-    public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
-        super.unregisterStylesheet(stylesheet);
-    }
+	@Override
+	public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
+		super.unregisterStylesheet(stylesheet);
+	}
 
 }

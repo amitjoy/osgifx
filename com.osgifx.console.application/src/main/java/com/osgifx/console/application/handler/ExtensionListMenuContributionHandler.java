@@ -37,52 +37,52 @@ import org.eclipse.fx.core.log.Log;
 
 public final class ExtensionListMenuContributionHandler {
 
-    @Log
-    @Inject
-    private FluentLogger  logger;
-    @Inject
-    private EPartService  partService;
-    @Inject
-    private EModelService modelService;
+	@Log
+	@Inject
+	private FluentLogger  logger;
+	@Inject
+	private EPartService  partService;
+	@Inject
+	private EModelService modelService;
 
-    @AboutToShow
-    public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        for (final MStackElement tab : getRegisteredTabs(window)) {
-            final MDirectMenuItem tabMenu = createViewMenu(tab);
-            items.add(tabMenu);
-        }
-    }
+	@AboutToShow
+	public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
+		for (final MStackElement tab : getRegisteredTabs(window)) {
+			final var tabMenu = createViewMenu(tab);
+			items.add(tabMenu);
+		}
+	}
 
-    @Execute
-    public void execute(final MDirectMenuItem menuItem) {
-        final String partId = menuItem.getAccessibilityPhrase();
-        logger.atInfo().log("Activating part '%s'", partId);
-        partService.showPart(partId, ACTIVATE);
-    }
+	@Execute
+	public void execute(final MDirectMenuItem menuItem) {
+		final var partId = menuItem.getAccessibilityPhrase();
+		logger.atInfo().log("Activating part '%s'", partId);
+		partService.showPart(partId, ACTIVATE);
+	}
 
-    private List<MStackElement> getRegisteredTabs(final MWindow window) {
-        for (final MWindowElement element : window.getChildren()) {
-            final String elementId = element.getElementId();
-            if ("com.osgifx.console.ui.extensions.partstack".equals(elementId)) {
-                final MPartStack partStack = (MPartStack) element;
-                return partStack.getChildren();
-            }
-        }
-        return List.of();
-    }
+	private List<MStackElement> getRegisteredTabs(final MWindow window) {
+		for (final MWindowElement element : window.getChildren()) {
+			final var elementId = element.getElementId();
+			if ("com.osgifx.console.ui.extensions.partstack".equals(elementId)) {
+				final var partStack = (MPartStack) element;
+				return partStack.getChildren();
+			}
+		}
+		return List.of();
+	}
 
-    private MDirectMenuItem createViewMenu(final MStackElement element) {
-        final MPart           part        = (MPart) element;
-        final MDirectMenuItem dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+	private MDirectMenuItem createViewMenu(final MStackElement element) {
+		final var part        = (MPart) element;
+		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
 
-        dynamicItem.setLabel(part.getLabel());
-        dynamicItem.setIconURI(part.getIconURI());
-        dynamicItem.setAccessibilityPhrase(part.getElementId());
-        dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.application");
-        dynamicItem.setContributionURI(
-                "bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler");
+		dynamicItem.setLabel(part.getLabel());
+		dynamicItem.setIconURI(part.getIconURI());
+		dynamicItem.setAccessibilityPhrase(part.getElementId());
+		dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.application");
+		dynamicItem.setContributionURI(
+		        "bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler");
 
-        return dynamicItem;
-    }
+		return dynamicItem;
+	}
 
 }

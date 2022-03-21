@@ -18,7 +18,6 @@ package com.osgifx.console.application.handler;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,156 +46,155 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
-import javafx.scene.control.ButtonType;
 
 public final class ConnectToAgentHandler {
 
-    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.preference";
+	private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.preference";
 
-    @Log
-    @Inject
-    private FluentLogger               logger;
-    @Inject
-    private ThreadSynchronize          threadSync;
-    @Inject
-    private IEclipseContext            context;
-    @Inject
-    private IEventBroker               eventBroker;
-    @Inject
-    private Supervisor                 supervisor;
-    @Inject
-    private CommandService             commandService;
-    @Inject
-    @ContextValue("is_connected")
-    private ContextBoundValue<Boolean> isConnected;
-    @Inject
-    @ContextValue("connected.agent")
-    private ContextBoundValue<String>  connectedAgent;
-    @Inject
-    @Named("selected.settings")
-    private ConnectionSettingDTO       selectedSettings;
-    private ProgressDialog             progressDialog;
+	@Log
+	@Inject
+	private FluentLogger               logger;
+	@Inject
+	private ThreadSynchronize          threadSync;
+	@Inject
+	private IEclipseContext            context;
+	@Inject
+	private IEventBroker               eventBroker;
+	@Inject
+	private Supervisor                 supervisor;
+	@Inject
+	private CommandService             commandService;
+	@Inject
+	@ContextValue("is_connected")
+	private ContextBoundValue<Boolean> isConnected;
+	@Inject
+	@ContextValue("connected.agent")
+	private ContextBoundValue<String>  connectedAgent;
+	@Inject
+	@Named("selected.settings")
+	private ConnectionSettingDTO       selectedSettings;
+	private ProgressDialog             progressDialog;
 
-    @Execute
-    public void execute() {
-        final ConnectToAgentDialog connectToAgentDialog = new ConnectToAgentDialog();
-        ContextInjectionFactory.inject(connectToAgentDialog, context);
-        logger.atInfo().log("Injected connect to agent dialog to eclipse context");
-        connectToAgentDialog.init();
-        final Optional<ButtonType> result = connectToAgentDialog.showAndWait();
-        if (!result.isPresent()) {
-            logger.atInfo().log("No button has been selected");
-            return;
-        }
-        final ButtonType selectedButton = result.get();
-        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
-            addConnection();
-            return;
-        }
-        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
-            removeConnection();
-            return;
-        }
-        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.CONNECT)) {
-            connectAgent();
-        }
-    }
+	@Execute
+	public void execute() {
+		final var connectToAgentDialog = new ConnectToAgentDialog();
+		ContextInjectionFactory.inject(connectToAgentDialog, context);
+		logger.atInfo().log("Injected connect to agent dialog to eclipse context");
+		connectToAgentDialog.init();
+		final var result = connectToAgentDialog.showAndWait();
+		if (!result.isPresent()) {
+			logger.atInfo().log("No button has been selected");
+			return;
+		}
+		final var selectedButton = result.get();
+		if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
+			addConnection();
+			return;
+		}
+		if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
+			removeConnection();
+			return;
+		}
+		if (selectedButton == connectToAgentDialog.getButtonType(ActionType.CONNECT)) {
+			connectAgent();
+		}
+	}
 
-    @CanExecute
-    public boolean canExecute() {
-        return !isConnected.getValue();
-    }
+	@CanExecute
+	public boolean canExecute() {
+		return !isConnected.getValue();
+	}
 
-    private void addConnection() {
-        logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
+	private void addConnection() {
+		logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
-        final ConnectionDialog connectionDialog = new ConnectionDialog();
-        ContextInjectionFactory.inject(connectionDialog, context);
-        logger.atInfo().log("Injected connection dialog to eclipse context");
-        connectionDialog.init();
+		final var connectionDialog = new ConnectionDialog();
+		ContextInjectionFactory.inject(connectionDialog, context);
+		logger.atInfo().log("Injected connection dialog to eclipse context");
+		connectionDialog.init();
 
-        final Optional<ConnectionSettingDTO> value = connectionDialog.showAndWait();
+		final var value = connectionDialog.showAndWait();
 
-        if (value.isPresent()) {
-            final ConnectionSettingDTO dto = value.get();
-            triggerCommand(dto, "ADD");
-            logger.atInfo().log("ADD command has been invoked for %s", dto);
-            Fx.showSuccessNotification("Connection Settings", "New connection settings has been added successfully");
-        }
-    }
+		if (value.isPresent()) {
+			final var dto = value.get();
+			triggerCommand(dto, "ADD");
+			logger.atInfo().log("ADD command has been invoked for %s", dto);
+			Fx.showSuccessNotification("Connection Settings", "New connection settings has been added successfully");
+		}
+	}
 
-    private void removeConnection() {
-        logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
-        if (selectedSettings == null) {
-            logger.atInfo().log("No connection setting has been selected");
-            return;
-        }
-        triggerCommand(selectedSettings, "REMOVE");
-        logger.atInfo().log("REMOVE command has been invoked for %s", selectedSettings);
-        Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
-    }
+	private void removeConnection() {
+		logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
+		if (selectedSettings == null) {
+			logger.atInfo().log("No connection setting has been selected");
+			return;
+		}
+		triggerCommand(selectedSettings, "REMOVE");
+		logger.atInfo().log("REMOVE command has been invoked for %s", selectedSettings);
+		Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
+	}
 
-    private void connectAgent() {
-        logger.atInfo().log("'%s'-'connectAgent(..)' event has been invoked", getClass().getSimpleName());
-        if (selectedSettings == null) {
-            logger.atInfo().log("No connection setting has been selected");
-            return;
-        }
-        logger.atInfo().log("Selected connection: %s", selectedSettings);
-        final Task<Void> connectTask = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    updateMessage("Connecting to " + selectedSettings.host + ":" + selectedSettings.port);
-                    supervisor.connect(selectedSettings.host, selectedSettings.port, selectedSettings.timeout);
-                    logger.atInfo().log("Successfully connected to %s", selectedSettings);
-                } catch (final Exception e) {
-                    logger.atError().withException(e).log("Cannot connect to %s", selectedSettings);
-                    threadSync.asyncExec(() -> {
-                        progressDialog.close();
-                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-                    });
-                    throw e;
-                }
-                return null;
-            }
+	private void connectAgent() {
+		logger.atInfo().log("'%s'-'connectAgent(..)' event has been invoked", getClass().getSimpleName());
+		if (selectedSettings == null) {
+			logger.atInfo().log("No connection setting has been selected");
+			return;
+		}
+		logger.atInfo().log("Selected connection: %s", selectedSettings);
+		final Task<Void> connectTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					updateMessage("Connecting to " + selectedSettings.host + ":" + selectedSettings.port);
+					supervisor.connect(selectedSettings.host, selectedSettings.port, selectedSettings.timeout);
+					logger.atInfo().log("Successfully connected to %s", selectedSettings);
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Cannot connect to %s", selectedSettings);
+					threadSync.asyncExec(() -> {
+						progressDialog.close();
+						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+					});
+					throw e;
+				}
+				return null;
+			}
 
-            @Override
-            protected void succeeded() {
-                logger.atInfo().log("Agent connected event has been sent for %s", selectedSettings);
-                final String connection = selectedSettings.host + ":" + selectedSettings.port;
+			@Override
+			protected void succeeded() {
+				logger.atInfo().log("Agent connected event has been sent for %s", selectedSettings);
+				final var connection = selectedSettings.host + ":" + selectedSettings.port;
 
-                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
-                connectedAgent.publish(connection);
-                isConnected.publish(true);
-            }
-        };
+				eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
+				connectedAgent.publish(connection);
+				isConnected.publish(true);
+			}
+		};
 
-        final Thread th = new Thread(connectTask);
-        th.setDaemon(true);
-        th.start();
+		final var th = new Thread(connectTask);
+		th.setDaemon(true);
+		th.start();
 
-        progressDialog = FxDialog.showProgressDialog("Remote Connection", connectTask, getClass().getClassLoader());
-    }
+		progressDialog = FxDialog.showProgressDialog("Remote Connection", connectTask, getClass().getClassLoader());
+	}
 
-    private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
-        final Map<String, Object> properties = Maps.newHashMap();
+	private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
+		final Map<String, Object> properties = Maps.newHashMap();
 
-        properties.put("host", dto.host);
-        properties.put("port", dto.port);
-        properties.put("timeout", dto.timeout);
-        properties.put("type", type);
+		properties.put("host", dto.host);
+		properties.put("port", dto.port);
+		properties.put("timeout", dto.timeout);
+		properties.put("type", type);
 
-        commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
-    }
+		commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
+	}
 
-    @Inject
-    @org.eclipse.e4.core.di.annotations.Optional
-    private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-        logger.atInfo().log("Agent connected event received");
-        if (progressDialog != null) {
-            progressDialog.close();
-        }
-    }
+	@Inject
+	@org.eclipse.e4.core.di.annotations.Optional
+	private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+		logger.atInfo().log("Agent connected event received");
+		if (progressDialog != null) {
+			progressDialog.close();
+		}
+	}
 
 }
