@@ -41,75 +41,75 @@ import javafx.scene.layout.BorderPane;
 
 public final class GameFxUI {
 
-    @Log
-    @Inject
-    private FluentLogger     logger;
-    @Inject
-    @OSGiBundle
-    private BundleContext    context;
-    @Inject
-    private ConsoleStatusBar statusBar;
-    private final MaskerPane progressPane = new MaskerPane();
+	@Log
+	@Inject
+	private FluentLogger     logger;
+	@Inject
+	@OSGiBundle
+	private BundleContext    context;
+	@Inject
+	private ConsoleStatusBar statusBar;
+	private final MaskerPane progressPane = new MaskerPane();
 
-    @PostConstruct
-    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-        createControls(parent, loader);
-        logger.atDebug().log("Tic-Tac-Toe game play part has been initialized");
-    }
+	@PostConstruct
+	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+		createControls(parent, loader);
+		logger.atDebug().log("Tic-Tac-Toe game play part has been initialized");
+	}
 
-    @Focus
-    public void focus(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-        createControls(parent, loader);
-    }
+	@Focus
+	public void focus(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+		createControls(parent, loader);
+	}
 
-    @Inject
-    @Optional
-    private void updateOnAgentConnectedEvent( //
-            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
-        logger.atInfo().log("Agent connected event received");
-        createControls(parent, loader);
-    }
+	@Inject
+	@Optional
+	private void updateOnAgentConnectedEvent( //
+	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+	        final BorderPane parent, //
+	        @LocalInstance final FXMLLoader loader) {
+		logger.atInfo().log("Agent connected event received");
+		createControls(parent, loader);
+	}
 
-    @Inject
-    @Optional
-    private void updateOnAgentDisconnectedEvent( //
-            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
-        logger.atInfo().log("Agent disconnected event received");
-        createControls(parent, loader);
-    }
+	@Inject
+	@Optional
+	private void updateOnAgentDisconnectedEvent( //
+	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+	        final BorderPane parent, //
+	        @LocalInstance final FXMLLoader loader) {
+		logger.atInfo().log("Agent disconnected event received");
+		createControls(parent, loader);
+	}
 
-    private void createControls(final BorderPane parent, final FXMLLoader loader) {
-        final Task<?> task = new Task<Void>() {
+	private void createControls(final BorderPane parent, final FXMLLoader loader) {
+		final Task<?> task = new Task<Void>() {
 
-            Node tabContent = null;
+			Node tabContent = null;
 
-            @Override
-            protected Void call() throws Exception {
-                progressPane.setVisible(true);
-                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
-                return null;
-            }
+			@Override
+			protected Void call() throws Exception {
+				progressPane.setVisible(true);
+				tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+				return null;
+			}
 
-            @Override
-            protected void succeeded() {
-                super.succeeded();
-                parent.getChildren().clear();
-                parent.setCenter(tabContent);
-                statusBar.addTo(parent);
-                progressPane.setVisible(false);
-            }
-        };
-        parent.getChildren().clear();
-        parent.setCenter(progressPane);
-        statusBar.addTo(parent);
+			@Override
+			protected void succeeded() {
+				super.succeeded();
+				parent.getChildren().clear();
+				parent.setCenter(tabContent);
+				statusBar.addTo(parent);
+				progressPane.setVisible(false);
+			}
+		};
+		parent.getChildren().clear();
+		parent.setCenter(progressPane);
+		statusBar.addTo(parent);
 
-        final Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
-    }
+		final var thread = new Thread(task);
+		thread.setDaemon(true);
+		thread.start();
+	}
 
 }

@@ -32,50 +32,50 @@ import javafx.scene.layout.StackPane;
 
 public final class GameFxController {
 
-    @Log
-    @Inject
-    private FluentLogger logger;
-    @FXML
-    private AnchorPane   rootPane;
+	@Log
+	@Inject
+	private FluentLogger logger;
+	@FXML
+	private AnchorPane   rootPane;
 
-    @FXML
-    public void initialize() {
-        createControls();
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		createControls();
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void createControls() {
-        final GridModel<States> gridModel = new GridModel<>();
+	private void createControls() {
+		final var gridModel = new GridModel<States>();
 
-        gridModel.setDefaultState(States.EMPTY);
-        gridModel.setNumberOfColumns(3);
-        gridModel.setNumberOfRows(3);
+		gridModel.setDefaultState(States.EMPTY);
+		gridModel.setNumberOfColumns(3);
+		gridModel.setNumberOfRows(3);
 
-        final GridView<States> gridView = new GridView<>();
-        gridView.setGridModel(gridModel);
-        gridView.setNodeFactory(cell -> States.EMPTY == cell.getState() ? null : new Label(cell.getState().name()));
+		final var gridView = new GridView<States>();
+		gridView.setGridModel(gridModel);
+		gridView.setNodeFactory(cell -> States.EMPTY == cell.getState() ? null : new Label(cell.getState().name()));
 
-        final GameLogic gameLogic = new GameLogic(gridModel);
-        gameLogic.start();
+		final var gameLogic = new GameLogic(gridModel);
+		gameLogic.start();
 
-        final StackPane stackPane = new StackPane();
+		final var stackPane = new StackPane();
 
-        final Label winLabel = new Label("test");
-        winLabel.setId("winLabel");
+		final var winLabel = new Label("test");
+		winLabel.setId("winLabel");
 
-        winLabel.visibleProperty().bind(gameLogic.winnerProperty().isNotNull());
-        winLabel.textProperty()
-                .bind(Bindings.when(gameLogic.winnerProperty().isEqualTo(States.EMPTY).or(gameLogic.winnerProperty().isNull())).then("Tie")
-                        .otherwise(Bindings.concat("Winner: ", gameLogic.winnerProperty())));
+		winLabel.visibleProperty().bind(gameLogic.winnerProperty().isNotNull());
+		winLabel.textProperty()
+		        .bind(Bindings.when(gameLogic.winnerProperty().isEqualTo(States.EMPTY).or(gameLogic.winnerProperty().isNull())).then("Tie")
+		                .otherwise(Bindings.concat("Winner: ", gameLogic.winnerProperty())));
 
-        stackPane.getChildren().add(gridView);
-        stackPane.getChildren().add(winLabel);
+		stackPane.getChildren().add(gridView);
+		stackPane.getChildren().add(winLabel);
 
-        rootPane.getChildren().add(stackPane);
-        AnchorPane.setBottomAnchor(stackPane, 0.0);
-        AnchorPane.setTopAnchor(stackPane, 0.0);
-        AnchorPane.setLeftAnchor(stackPane, 0.0);
-        AnchorPane.setRightAnchor(stackPane, 0.0);
-    }
+		rootPane.getChildren().add(stackPane);
+		AnchorPane.setBottomAnchor(stackPane, 0.0);
+		AnchorPane.setTopAnchor(stackPane, 0.0);
+		AnchorPane.setLeftAnchor(stackPane, 0.0);
+		AnchorPane.setRightAnchor(stackPane, 0.0);
+	}
 
 }
