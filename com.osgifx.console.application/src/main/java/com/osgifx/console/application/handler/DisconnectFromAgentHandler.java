@@ -33,41 +33,41 @@ import com.osgifx.console.util.fx.Fx;
 
 public final class DisconnectFromAgentHandler {
 
-    @Log
-    @Inject
-    private FluentLogger                            logger;
-    @Inject
-    private Supervisor                              supervisor;
-    @Inject
-    private IEventBroker                            eventBroker;
-    @Inject
-    @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>              isConnected;
-    @Inject
-    @ContextValue("connected.agent")
-    private ContextBoundValue<String>               connectedAgent;
-    @Inject
-    @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+	@Log
+	@Inject
+	private FluentLogger                            logger;
+	@Inject
+	private Supervisor                              supervisor;
+	@Inject
+	private IEventBroker                            eventBroker;
+	@Inject
+	@ContextValue("is_connected")
+	private ContextBoundValue<Boolean>              isConnected;
+	@Inject
+	@ContextValue("connected.agent")
+	private ContextBoundValue<String>               connectedAgent;
+	@Inject
+	@ContextValue("selected.settings")
+	private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
 
-    @Execute
-    public void execute() {
-        try {
-            supervisor.getAgent().abort();
-            eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-            isConnected.publish(false);
-            selectedSettings.publish(null);
-            connectedAgent.publish(null);
-            Fx.showSuccessNotification("Agent Connection", "Agent connection has been successfully aborted");
-        } catch (final Exception e) {
-            logger.atError().withException(e).log("Agent connection cannot be aborted");
-            Fx.showErrorNotification("Agent Connection", "Agent connection cannot be aborted");
-        }
-    }
+	@Execute
+	public void execute() {
+		try {
+			supervisor.getAgent().abort();
+			eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+			isConnected.publish(false);
+			selectedSettings.publish(null);
+			connectedAgent.publish(null);
+			Fx.showSuccessNotification("Agent Connection", "Agent connection has been successfully aborted");
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("Agent connection cannot be aborted");
+			Fx.showErrorNotification("Agent Connection", "Agent connection cannot be aborted");
+		}
+	}
 
-    @CanExecute
-    public boolean canExecute() {
-        return isConnected.getValue();
-    }
+	@CanExecute
+	public boolean canExecute() {
+		return isConnected.getValue();
+	}
 
 }

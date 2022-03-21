@@ -35,53 +35,53 @@ import com.osgifx.console.application.preference.ConnectionsProvider;
 
 public final class ConnectionPreferenceHandler {
 
-    @Log
-    @Inject
-    private FluentLogger        logger;
-    @Inject
-    @Preference(nodePath = "osgi.fx.connections", key = "settings", defaultValue = "")
-    private Value<String>       settings;
-    @Inject
-    private ConnectionsProvider connectionsProvider;
+	@Log
+	@Inject
+	private FluentLogger        logger;
+	@Inject
+	@Preference(nodePath = "osgi.fx.connections", key = "settings", defaultValue = "")
+	private Value<String>       settings;
+	@Inject
+	private ConnectionsProvider connectionsProvider;
 
-    @PostConstruct
-    public void init() {
-        connectionsProvider.addConnections(getStoredValues());
-    }
+	@PostConstruct
+	public void init() {
+		connectionsProvider.addConnections(getStoredValues());
+	}
 
-    @Execute
-    public void execute( //
-            @Named("host") final String host, //
-            @Named("port") final String port, //
-            @Named("timeout") final String timeout, //
-            @Named("type") final String type) {
+	@Execute
+	public void execute( //
+	        @Named("host") final String host, //
+	        @Named("port") final String port, //
+	        @Named("timeout") final String timeout, //
+	        @Named("type") final String type) {
 
-        final Gson                       gson        = new Gson();
-        final List<ConnectionSettingDTO> connections = getStoredValues();
-        final ConnectionSettingDTO       dto         = new ConnectionSettingDTO(host, Integer.parseInt(port), Integer.parseInt(timeout));
+		final var gson        = new Gson();
+		final var connections = getStoredValues();
+		final var dto         = new ConnectionSettingDTO(host, Integer.parseInt(port), Integer.parseInt(timeout));
 
-        if ("ADD".equals(type)) {
-            connections.add(dto);
-            connectionsProvider.addConnection(dto);
-            logger.atInfo().log("New connection has been added: %s", dto);
-        } else if ("REMOVE".equals(type)) {
-            connections.remove(dto);
-            connectionsProvider.removeConnection(dto);
-            logger.atInfo().log("Existing connection has been deleted: %s", dto);
-        } else {
-            logger.atWarning().log("Cannot execute command with type '%s'", type);
-        }
-        settings.publish(gson.toJson(connections));
-    }
+		if ("ADD".equals(type)) {
+			connections.add(dto);
+			connectionsProvider.addConnection(dto);
+			logger.atInfo().log("New connection has been added: %s", dto);
+		} else if ("REMOVE".equals(type)) {
+			connections.remove(dto);
+			connectionsProvider.removeConnection(dto);
+			logger.atInfo().log("Existing connection has been deleted: %s", dto);
+		} else {
+			logger.atWarning().log("Cannot execute command with type '%s'", type);
+		}
+		settings.publish(gson.toJson(connections));
+	}
 
-    private List<ConnectionSettingDTO> getStoredValues() {
-        final Gson                 gson        = new Gson();
-        List<ConnectionSettingDTO> connections = gson.fromJson(settings.getValue(), new TypeToken<List<ConnectionSettingDTO>>() {
-                                               }.getType());
-        if (connections == null) {
-            connections = Lists.newArrayList();
-        }
-        return connections;
-    }
+	private List<ConnectionSettingDTO> getStoredValues() {
+		final var                  gson        = new Gson();
+		List<ConnectionSettingDTO> connections = gson.fromJson(settings.getValue(), new TypeToken<List<ConnectionSettingDTO>>() {
+												}.getType());
+		if (connections == null) {
+			connections = Lists.newArrayList();
+		}
+		return connections;
+	}
 
 }

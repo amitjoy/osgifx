@@ -28,27 +28,27 @@ import com.google.common.collect.Maps;
 
 public final class ModifiablePropertyAddon {
 
-    private final Map<String, Object> modifiableProperties = Maps.newHashMap();
+	private final Map<String, Object> modifiableProperties = Maps.newHashMap();
 
-    @Log
-    @Inject
-    private FluentLogger logger;
+	@Log
+	@Inject
+	private FluentLogger logger;
 
-    public ModifiablePropertyAddon() {
-        modifiableProperties.put("is_connected", false);
-        modifiableProperties.put("connected.agent", null);
-        modifiableProperties.put("selected.settings", null);
-    }
+	public ModifiablePropertyAddon() {
+		modifiableProperties.put("is_connected", false);
+		modifiableProperties.put("connected.agent", null);
+		modifiableProperties.put("selected.settings", null);
+	}
 
-    @PostConstruct
-    public void init(final IEclipseContext eclipseContext) {
-        modifiableProperties.forEach((k, v) -> {
-            eclipseContext.declareModifiable(k);
-            if (v != null) {
-                eclipseContext.set(k, v);
-            }
-            logger.atInfo().log("'%s' property has been declared as modifiable", k);
-        });
-    }
+	@PostConstruct
+	public void init(final IEclipseContext eclipseContext) {
+		modifiableProperties.forEach((k, v) -> {
+			eclipseContext.declareModifiable(k);
+			if (v != null) {
+				eclipseContext.set(k, v);
+			}
+			logger.atInfo().log("'%s' property has been declared as modifiable", k);
+		});
+	}
 
 }
