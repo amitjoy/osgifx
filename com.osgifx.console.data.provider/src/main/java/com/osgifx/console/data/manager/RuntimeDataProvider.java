@@ -23,7 +23,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -44,132 +43,132 @@ import javafx.collections.ObservableList;
 @Component
 public final class RuntimeDataProvider implements DataProvider, EventListener, LogEntryListener {
 
-    @Reference
-    private LoggerFactory factory;
-    @Reference
-    private Supervisor    supervisor;
-    private FluentLogger  logger;
+	@Reference
+	private LoggerFactory factory;
+	@Reference
+	private Supervisor    supervisor;
+	private FluentLogger  logger;
 
-    private final ObservableList<XLogEntryDTO> logs   = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
-    private final ObservableList<XEventDTO>    events = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+	private final ObservableList<XLogEntryDTO> logs   = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
+	private final ObservableList<XEventDTO>    events = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
 
-    @Activate
-    void activate() {
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-    }
+	@Activate
+	void activate() {
+		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+	}
 
-    @Override
-    public synchronized ObservableList<XBundleDTO> bundles() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XBundleDTO> bundles = FXCollections.observableArrayList();
-        bundles.addAll(makeNullSafe(agent.getAllBundles()));
-        return bundles;
-    }
+	@Override
+	public synchronized ObservableList<XBundleDTO> bundles() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XBundleDTO> bundles = FXCollections.observableArrayList();
+		bundles.addAll(makeNullSafe(agent.getAllBundles()));
+		return bundles;
+	}
 
-    @Override
-    public synchronized ObservableList<XServiceDTO> services() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XServiceDTO> services = FXCollections.observableArrayList();
-        services.addAll(makeNullSafe(agent.getAllServices()));
-        return services;
-    }
+	@Override
+	public synchronized ObservableList<XServiceDTO> services() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XServiceDTO> services = FXCollections.observableArrayList();
+		services.addAll(makeNullSafe(agent.getAllServices()));
+		return services;
+	}
 
-    @Override
-    public synchronized ObservableList<XComponentDTO> components() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XComponentDTO> components = FXCollections.observableArrayList();
-        components.addAll(makeNullSafe(agent.getAllComponents()));
-        return components;
-    }
+	@Override
+	public synchronized ObservableList<XComponentDTO> components() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XComponentDTO> components = FXCollections.observableArrayList();
+		components.addAll(makeNullSafe(agent.getAllComponents()));
+		return components;
+	}
 
-    @Override
-    public synchronized ObservableList<XConfigurationDTO> configurations() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
-        configurations.addAll(makeNullSafe(agent.getAllConfigurations()));
-        return configurations;
-    }
+	@Override
+	public synchronized ObservableList<XConfigurationDTO> configurations() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XConfigurationDTO> configurations = FXCollections.observableArrayList();
+		configurations.addAll(makeNullSafe(agent.getAllConfigurations()));
+		return configurations;
+	}
 
-    @Override
-    public synchronized ObservableList<XEventDTO> events() {
-        return events;
-    }
+	@Override
+	public synchronized ObservableList<XEventDTO> events() {
+		return events;
+	}
 
-    @Override
-    public synchronized ObservableList<XLogEntryDTO> logs() {
-        return logs;
-    }
+	@Override
+	public synchronized ObservableList<XLogEntryDTO> logs() {
+		return logs;
+	}
 
-    @Override
-    public synchronized void onEvent(final XEventDTO event) {
-        events.add(event);
-    }
+	@Override
+	public synchronized void onEvent(final XEventDTO event) {
+		events.add(event);
+	}
 
-    @Override
-    public synchronized void logged(final XLogEntryDTO logEntry) {
-        logs.add(logEntry);
-    }
+	@Override
+	public synchronized void logged(final XLogEntryDTO logEntry) {
+		logs.add(logEntry);
+	}
 
-    @Override
-    public synchronized ObservableList<XPropertyDTO> properties() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XPropertyDTO> properties = FXCollections.observableArrayList();
-        properties.addAll(makeNullSafe(agent.getAllProperties()));
-        return properties;
-    }
+	@Override
+	public synchronized ObservableList<XPropertyDTO> properties() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XPropertyDTO> properties = FXCollections.observableArrayList();
+		properties.addAll(makeNullSafe(agent.getAllProperties()));
+		return properties;
+	}
 
-    @Override
-    public synchronized ObservableList<XThreadDTO> threads() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XThreadDTO> threads = FXCollections.observableArrayList();
-        threads.addAll(makeNullSafe(agent.getAllThreads()));
-        return threads;
-    }
+	@Override
+	public synchronized ObservableList<XThreadDTO> threads() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XThreadDTO> threads = FXCollections.observableArrayList();
+		threads.addAll(makeNullSafe(agent.getAllThreads()));
+		return threads;
+	}
 
-    @Override
-    public ObservableList<XBundleDTO> leaks() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return FXCollections.emptyObservableList();
-        }
-        final ObservableList<XBundleDTO> properties = FXCollections.observableArrayList();
-        properties.addAll(makeNullSafe(agent.getClassloaderLeaks()));
-        return properties;
-    }
+	@Override
+	public ObservableList<XBundleDTO> leaks() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return FXCollections.emptyObservableList();
+		}
+		final ObservableList<XBundleDTO> properties = FXCollections.observableArrayList();
+		properties.addAll(makeNullSafe(agent.getClassloaderLeaks()));
+		return properties;
+	}
 
-    @Override
-    public XHttpContextInfoDTO httpContext() {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
-            return null;
-        }
-        return agent.getHttpContextInfo();
-    }
+	@Override
+	public XHttpContextInfoDTO httpContext() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return null;
+		}
+		return agent.getHttpContextInfo();
+	}
 
 }
