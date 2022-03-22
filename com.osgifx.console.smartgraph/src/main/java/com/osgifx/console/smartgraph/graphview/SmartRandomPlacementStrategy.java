@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -27,20 +27,20 @@ import com.osgifx.console.smartgraph.graph.Graph;
  */
 public class SmartRandomPlacementStrategy implements SmartPlacementStrategy {
 
-    @Override
-    public <V, E> void place(final double width, final double height, final Graph<V, E> theGraph,
-            final Collection<? extends SmartGraphVertex<V>> vertices) {
+	@Override
+	public <V, E> void place(final double width, final double height, final Graph<V, E> theGraph,
+	        final Collection<? extends SmartGraphVertex<V>> vertices) {
 
-        final Random rand = new Random();
+		final var rand = new Random();
 
-        for (final SmartGraphVertex<V> vertex : vertices) {
+		for (final SmartGraphVertex<V> vertex : vertices) {
 
-            final double x = rand.nextDouble() * width;
-            final double y = rand.nextDouble() * height;
+			final var x = rand.nextDouble() * width;
+			final var y = rand.nextDouble() * height;
 
-            vertex.setPosition(x, y);
+			vertex.setPosition(x, y);
 
-        }
-    }
+		}
+	}
 
 }
