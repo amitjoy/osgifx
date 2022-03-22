@@ -31,7 +31,6 @@ import com.google.common.collect.Maps;
 import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.ui.feature.dialog.CheckForUpdatesDialog.SelectedFeaturesForUpdateDTO;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.TreeItem;
@@ -39,66 +38,66 @@ import javafx.scene.layout.BorderPane;
 
 public final class CheckForUpdatesDialogController {
 
-    private static final String               PLACEHOLDER_ROOT = "<Updated Features>";
-    @Log
-    @Inject
-    private FluentLogger                      logger;
-    @FXML
-    private BorderPane                        featuresPane;
-    private CheckBoxTreeItem<String>          root;
-    private CheckTreeView<String>             featuresView;
-    private Map<TreeItem<String>, FeatureDTO> features;
+	private static final String               PLACEHOLDER_ROOT = "<Updated Features>";
+	@Log
+	@Inject
+	private FluentLogger                      logger;
+	@FXML
+	private BorderPane                        featuresPane;
+	private CheckBoxTreeItem<String>          root;
+	private CheckTreeView<String>             featuresView;
+	private Map<TreeItem<String>, FeatureDTO> features;
 
-    @FXML
-    public void initialize() {
-        root = new CheckBoxTreeItem<>(PLACEHOLDER_ROOT);
-        root.setExpanded(true);
+	@FXML
+	public void initialize() {
+		root = new CheckBoxTreeItem<>(PLACEHOLDER_ROOT);
+		root.setExpanded(true);
 
-        featuresView = new CheckTreeView<>(root);
-        featuresView.getSelectionModel().setSelectionMode(MULTIPLE);
+		featuresView = new CheckTreeView<>(root);
+		featuresView.getSelectionModel().setSelectionMode(MULTIPLE);
 
-        features = Maps.newHashMap();
+		features = Maps.newHashMap();
 
-        logger.atInfo().log("FXML controller has been initialized");
-    }
+		logger.atInfo().log("FXML controller has been initialized");
+	}
 
-    public SelectedFeaturesForUpdateDTO getSelectedFeatures() {
-        final SelectedFeaturesForUpdateDTO dto = new SelectedFeaturesForUpdateDTO();
-        dto.features = Lists.newArrayList();
-        final ObservableList<TreeItem<String>> selectedItems = featuresView.getCheckModel().getCheckedItems();
-        for (final TreeItem<String> treeItem : selectedItems) {
-            final TreeItem<String> parent = treeItem.getParent();
-            if (parent == null || PLACEHOLDER_ROOT.equals(parent.getValue())) {
-                continue;
-            }
-            final FeatureDTO feature = features.get(treeItem);
-            dto.features.add(feature);
-        }
-        return dto;
-    }
+	public SelectedFeaturesForUpdateDTO getSelectedFeatures() {
+		final var dto = new SelectedFeaturesForUpdateDTO();
+		dto.features = Lists.newArrayList();
+		final var selectedItems = featuresView.getCheckModel().getCheckedItems();
+		for (final TreeItem<String> treeItem : selectedItems) {
+			final var parent = treeItem.getParent();
+			if (parent == null || PLACEHOLDER_ROOT.equals(parent.getValue())) {
+				continue;
+			}
+			final var feature = features.get(treeItem);
+			dto.features.add(feature);
+		}
+		return dto;
+	}
 
-    public void setFeaturesToBeUpdated(final Collection<FeatureDTO> tobeUpdatedFeatures) {
-        final Map<String, CheckBoxTreeItem<String>> featureRoots = Maps.newHashMap();
-        for (final FeatureDTO feature : tobeUpdatedFeatures) {
-            final String archiveURL = feature.archiveURL;
-            if (featureRoots.containsKey(archiveURL)) {
-                continue;
-            }
-            final CheckBoxTreeItem<String> featureRoot = new CheckBoxTreeItem<>(archiveURL);
-            featureRoot.setExpanded(true);
-            root.getChildren().add(featureRoot);
-            featureRoots.put(archiveURL, featureRoot);
-        }
-        for (final FeatureDTO feature : tobeUpdatedFeatures) {
-            final CheckBoxTreeItem<String> item = new CheckBoxTreeItem<>(featureAsString(feature));
-            features.put(item, feature);
-            final CheckBoxTreeItem<String> featureRoot = featureRoots.get(feature.archiveURL);
-            featureRoot.getChildren().add(item);
-        }
-        featuresPane.setCenter(featuresView);
-    }
+	public void setFeaturesToBeUpdated(final Collection<FeatureDTO> tobeUpdatedFeatures) {
+		final Map<String, CheckBoxTreeItem<String>> featureRoots = Maps.newHashMap();
+		for (final FeatureDTO feature : tobeUpdatedFeatures) {
+			final var archiveURL = feature.archiveURL;
+			if (featureRoots.containsKey(archiveURL)) {
+				continue;
+			}
+			final var featureRoot = new CheckBoxTreeItem<>(archiveURL);
+			featureRoot.setExpanded(true);
+			root.getChildren().add(featureRoot);
+			featureRoots.put(archiveURL, featureRoot);
+		}
+		for (final FeatureDTO feature : tobeUpdatedFeatures) {
+			final var item = new CheckBoxTreeItem<>(featureAsString(feature));
+			features.put(item, feature);
+			final var featureRoot = featureRoots.get(feature.archiveURL);
+			featureRoot.getChildren().add(item);
+		}
+		featuresPane.setCenter(featuresView);
+	}
 
-    private String featureAsString(final FeatureDTO feature) {
-        return feature.id.groupId + ":" + feature.id.artifactId + ":" + feature.id.version;
-    }
+	private String featureAsString(final FeatureDTO feature) {
+		return feature.id.groupId + ":" + feature.id.artifactId + ":" + feature.id.version;
+	}
 }

@@ -27,19 +27,19 @@ import com.osgifx.console.ui.feature.dialog.FeaturesViewDialog;
 
 public final class ViewFeaturesHandler {
 
-    @Log
-    @Inject
-    private FluentLogger    logger;
-    @Inject
-    private IEclipseContext context;
+	@Log
+	@Inject
+	private FluentLogger    logger;
+	@Inject
+	private IEclipseContext context;
 
-    @Execute
-    public void execute() {
-        final FeaturesViewDialog dialog = new FeaturesViewDialog();
-        ContextInjectionFactory.inject(dialog, context);
-        logger.atInfo().log("Injected features view dialog to eclipse context");
-        dialog.init();
-        dialog.show();
-    }
+	@Execute
+	public void execute() {
+		final var dialog = new FeaturesViewDialog();
+		ContextInjectionFactory.inject(dialog, context);
+		logger.atInfo().log("Injected features view dialog to eclipse context");
+		dialog.init();
+		dialog.show();
+	}
 
 }
