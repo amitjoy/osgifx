@@ -44,107 +44,106 @@ import com.osgifx.console.util.fx.Fx;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class EventReceiveMenuContributionHandler {
 
-    private static final String PROPERTY_KEY_EVENT_DISPLAY = "osgi.fx.event";
+	private static final String PROPERTY_KEY_EVENT_DISPLAY = "osgi.fx.event";
 
-    @Log
-    @Inject
-    private FluentLogger  logger;
-    @Inject
-    private Supervisor    supervisor;
-    @Inject
-    private IEventBroker  eventBroker;
-    @Inject
-    private EventListener eventListener;
-    @Inject
-    private EModelService modelService;
-    @Inject
-    @Named("is_connected")
-    private boolean       isConnected;
+	@Log
+	@Inject
+	private FluentLogger  logger;
+	@Inject
+	private Supervisor    supervisor;
+	@Inject
+	private IEventBroker  eventBroker;
+	@Inject
+	private EventListener eventListener;
+	@Inject
+	private EModelService modelService;
+	@Inject
+	@Named("is_connected")
+	private boolean       isConnected;
 
-    @PostConstruct
-    public void init() {
-        final boolean currentState = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
-        if (currentState) {
-            supervisor.addOSGiEventListener(eventListener);
-            logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
-        } else {
-            supervisor.removeOSGiEventListener(eventListener);
-            logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
-        }
-    }
+	@PostConstruct
+	public void init() {
+		final var currentState = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
+		if (currentState) {
+			supervisor.addOSGiEventListener(eventListener);
+			logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
+		} else {
+			supervisor.removeOSGiEventListener(eventListener);
+			logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
+		}
+	}
 
-    @AboutToShow
-    public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        final boolean value = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
-        prepareMenu(items, value);
-    }
+	@AboutToShow
+	public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
+		final var value = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
+		prepareMenu(items, value);
+	}
 
-    @Execute
-    public void execute(final MDirectMenuItem menuItem) {
-        final boolean accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
+	@Execute
+	public void execute(final MDirectMenuItem menuItem) {
+		final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
 
-        if (accessibilityPhrase) {
-            eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-        } else {
-            eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-        }
+		if (accessibilityPhrase) {
+			eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+		} else {
+			eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+		}
 
-        System.setProperty(PROPERTY_KEY_EVENT_DISPLAY, String.valueOf(accessibilityPhrase));
+		System.setProperty(PROPERTY_KEY_EVENT_DISPLAY, String.valueOf(accessibilityPhrase));
 
-        if (accessibilityPhrase) {
-            supervisor.addOSGiEventListener(eventListener);
-            Fx.showSuccessNotification("Event Notification", "Events will now be received");
-            logger.atInfo().log("OSGi events will now be received");
-        } else {
-            supervisor.removeOSGiEventListener(eventListener);
-            Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
-            logger.atInfo().log("OSGi events will not be received anymore");
-        }
-    }
+		if (accessibilityPhrase) {
+			supervisor.addOSGiEventListener(eventListener);
+			Fx.showSuccessNotification("Event Notification", "Events will now be received");
+			logger.atInfo().log("OSGi events will now be received");
+		} else {
+			supervisor.removeOSGiEventListener(eventListener);
+			Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
+			logger.atInfo().log("OSGi events will not be received anymore");
+		}
+	}
 
-    @CanExecute
-    public boolean canExecute() {
-        return isConnected;
-    }
+	@CanExecute
+	public boolean canExecute() {
+		return isConnected;
+	}
 
-    private void prepareMenu(final List<MMenuElement> items, final boolean value) {
-        final MDirectMenuItem eventActionMenu;
-        if (value) {
-            eventActionMenu = createEventActionMenu(Type.STOP);
-        } else {
-            eventActionMenu = createEventActionMenu(Type.START);
-        }
-        items.add(eventActionMenu);
-    }
+	private void prepareMenu(final List<MMenuElement> items, final boolean value) {
+		final MDirectMenuItem eventActionMenu;
+		if (value) {
+			eventActionMenu = createEventActionMenu(Type.STOP);
+		} else {
+			eventActionMenu = createEventActionMenu(Type.START);
+		}
+		items.add(eventActionMenu);
+	}
 
-    private MDirectMenuItem createEventActionMenu(final Type type) {
-        String label;
-        String icon;
-        String accessibilityPhrase;
-        if (type == Type.STOP) {
-            label               = "Stop Receiving Events";
-            icon                = "stop.png";
-            accessibilityPhrase = "false";
-        } else {
-            label               = "Start Receiving Events";
-            icon                = "start.png";
-            accessibilityPhrase = "true";
-        }
-        final MDirectMenuItem dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+	private MDirectMenuItem createEventActionMenu(final Type type) {
+		String label;
+		String icon;
+		String accessibilityPhrase;
+		if (type == Type.STOP) {
+			label               = "Stop Receiving Events";
+			icon                = "stop.png";
+			accessibilityPhrase = "false";
+		} else {
+			label               = "Start Receiving Events";
+			icon                = "start.png";
+			accessibilityPhrase = "true";
+		}
+		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
 
-        dynamicItem.setLabel(label);
-        dynamicItem.setIconURI("platform:/plugin/com.osgifx.console.ui.events/graphic/icons/" + icon);
-        dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
-        dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.ui.events");
-        dynamicItem.setContributionURI(
-                "bundleclass://com.osgifx.console.ui.events/com.osgifx.console.ui.events.handler.EventReceiveMenuContributionHandler");
+		dynamicItem.setLabel(label);
+		dynamicItem.setIconURI("platform:/plugin/com.osgifx.console.ui.events/graphic/icons/" + icon);
+		dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
+		dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.ui.events");
+		dynamicItem.setContributionURI(
+		        "bundleclass://com.osgifx.console.ui.events/com.osgifx.console.ui.events.handler.EventReceiveMenuContributionHandler");
 
-        return dynamicItem;
-    }
+		return dynamicItem;
+	}
 
-    private enum Type {
-        START,
-        STOP
-    }
+	private enum Type {
+		START, STOP
+	}
 
 }
