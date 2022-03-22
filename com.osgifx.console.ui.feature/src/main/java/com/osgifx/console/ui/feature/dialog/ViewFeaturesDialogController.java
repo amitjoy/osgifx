@@ -17,8 +17,6 @@ package com.osgifx.console.ui.feature.dialog;
 
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
-import java.util.Collection;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.ui.workbench.IWorkbench;
@@ -44,74 +42,74 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.FeatureAgent)")
 public final class ViewFeaturesDialogController {
 
-    @Log
-    @Inject
-    private FluentLogger                    logger;
-    @FXML
-    private TableView<FeatureDTO>           featuresList;
-    @FXML
-    private TableColumn<FeatureDTO, String> idColumn;
-    @FXML
-    private TableColumn<FeatureDTO, String> nameColumn;
-    @FXML
-    private TableColumn<FeatureDTO, String> descriptionColumn;
-    @FXML
-    private TableColumn<FeatureDTO, String> vendorColumn;
-    @FXML
-    private TableColumn<FeatureDTO, String> licenseColumn;
-    @Inject
-    private FeatureAgent                    featureAgent;
-    @Inject
-    private IWorkbench                      workbench;
-    @Inject
-    private ThreadSynchronize               threadSync;
-    private ObservableList<FeatureDTO>      features;
+	@Log
+	@Inject
+	private FluentLogger                    logger;
+	@FXML
+	private TableView<FeatureDTO>           featuresList;
+	@FXML
+	private TableColumn<FeatureDTO, String> idColumn;
+	@FXML
+	private TableColumn<FeatureDTO, String> nameColumn;
+	@FXML
+	private TableColumn<FeatureDTO, String> descriptionColumn;
+	@FXML
+	private TableColumn<FeatureDTO, String> vendorColumn;
+	@FXML
+	private TableColumn<FeatureDTO, String> licenseColumn;
+	@Inject
+	private FeatureAgent                    featureAgent;
+	@Inject
+	private IWorkbench                      workbench;
+	@Inject
+	private ThreadSynchronize               threadSync;
+	private ObservableList<FeatureDTO>      features;
 
-    @FXML
-    public void initialize() {
-        final Collection<FeatureDTO> installedFeatures = featureAgent.getInstalledFeatures();
-        features = FXCollections.observableArrayList(installedFeatures);
-        featuresList.setItems(features);
-        logger.atInfo().log("FXML controller has been initialized");
+	@FXML
+	public void initialize() {
+		final var installedFeatures = featureAgent.getInstalledFeatures();
+		features = FXCollections.observableArrayList(installedFeatures);
+		featuresList.setItems(features);
+		logger.atInfo().log("FXML controller has been initialized");
 
-        idColumn.setCellValueFactory(
-                p -> new SimpleStringProperty(p.getValue().id.groupId + ":" + p.getValue().id.artifactId + ":" + p.getValue().id.version));
-        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-        descriptionColumn.setCellValueFactory(new DTOCellValueFactory<>("description", String.class));
-        vendorColumn.setCellValueFactory(new DTOCellValueFactory<>("vendor", String.class));
-        licenseColumn.setCellValueFactory(new DTOCellValueFactory<>("license", String.class));
+		idColumn.setCellValueFactory(
+		        p -> new SimpleStringProperty(p.getValue().id.groupId + ":" + p.getValue().id.artifactId + ":" + p.getValue().id.version));
+		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+		descriptionColumn.setCellValueFactory(new DTOCellValueFactory<>("description", String.class));
+		vendorColumn.setCellValueFactory(new DTOCellValueFactory<>("vendor", String.class));
+		licenseColumn.setCellValueFactory(new DTOCellValueFactory<>("license", String.class));
 
-        initContextMenu();
-    }
+		initContextMenu();
+	}
 
-    private void initContextMenu() {
-        final MenuItem item = new MenuItem("Uninstall");
-        item.setOnAction(event -> {
-            final FeatureDTO f = featuresList.getSelectionModel().getSelectedItem();
-            try {
-                final FeatureDTO removedfeature = featureAgent.remove(featureIdAsString(f));
-                if (removedfeature != null) {
-                    threadSync.asyncExec(() -> {
-                        final String header = "Feature Uninstallation";
-                        FxDialog.showInfoDialog(header, featureIdAsString(removedfeature) + " has been uninstalled",
-                                getClass().getClassLoader());
-                        features.clear();
-                        features.addAll(featureAgent.getInstalledFeatures());
-                        // show information about the restart of the application
-                        FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
-                                getClass().getClassLoader(), btn -> workbench.restart());
-                    });
-                }
-            } catch (final Exception e) {
-                threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-            }
-        });
-        final ContextMenu menu = new ContextMenu();
-        menu.getItems().add(item);
-        featuresList.setContextMenu(menu);
-    }
+	private void initContextMenu() {
+		final var item = new MenuItem("Uninstall");
+		item.setOnAction(event -> {
+			final var f = featuresList.getSelectionModel().getSelectedItem();
+			try {
+				final var removedfeature = featureAgent.remove(featureIdAsString(f));
+				if (removedfeature != null) {
+					threadSync.asyncExec(() -> {
+						final var header = "Feature Uninstallation";
+						FxDialog.showInfoDialog(header, featureIdAsString(removedfeature) + " has been uninstalled",
+						        getClass().getClassLoader());
+						features.clear();
+						features.addAll(featureAgent.getInstalledFeatures());
+						// show information about the restart of the application
+						FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
+						        getClass().getClassLoader(), btn -> workbench.restart());
+					});
+				}
+			} catch (final Exception e) {
+				threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+			}
+		});
+		final var menu = new ContextMenu();
+		menu.getItems().add(item);
+		featuresList.setContextMenu(menu);
+	}
 
-    private String featureIdAsString(final FeatureDTO f) {
-        return f.id.groupId + ":" + f.id.artifactId + ":" + f.id.version;
-    }
+	private String featureIdAsString(final FeatureDTO f) {
+		return f.id.groupId + ":" + f.id.artifactId + ":" + f.id.version;
+	}
 }
