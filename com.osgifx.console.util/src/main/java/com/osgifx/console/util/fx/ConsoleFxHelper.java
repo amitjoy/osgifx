@@ -20,19 +20,19 @@ import java.util.List;
 
 public final class ConsoleFxHelper {
 
-    private ConsoleFxHelper() {
-        throw new IllegalAccessError("Cannot be instantiated");
-    }
+	private ConsoleFxHelper() {
+		throw new IllegalAccessError("Cannot be instantiated");
+	}
 
-    /**
-     * This is required as the agent can be disconnected and all invoked method
-     * executions will return null thereafter
-     */
-    public static <T> Collection<T> makeNullSafe(final Collection<T> source) {
-        if (source == null) {
-            return List.of();
-        }
-        return source;
-    }
+	/**
+	 * This is required as the agent can be disconnected and all invoked method
+	 * executions will return null thereafter
+	 */
+	public static <T> Collection<T> makeNullSafe(final Collection<T> source) {
+		if (source == null) {
+			return List.of();
+		}
+		return source;
+	}
 
 }
