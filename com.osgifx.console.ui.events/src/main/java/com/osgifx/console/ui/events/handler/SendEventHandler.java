@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.handler;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,67 +26,65 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
-import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.ui.events.converter.EventManager;
-import com.osgifx.console.ui.events.dialog.EventDTO;
 import com.osgifx.console.ui.events.dialog.SendEventDialog;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 public final class SendEventHandler {
 
-    @Log
-    @Inject
-    private FluentLogger    logger;
-    @Inject
-    private IEclipseContext context;
-    @Inject
-    @Named("is_connected")
-    private boolean         isConnected;
-    @Inject
-    private EventManager    eventManager;
+	@Log
+	@Inject
+	private FluentLogger    logger;
+	@Inject
+	private IEclipseContext context;
+	@Inject
+	@Named("is_connected")
+	private boolean         isConnected;
+	@Inject
+	private EventManager    eventManager;
 
-    @Execute
-    public void execute() {
-        final SendEventDialog dialog = new SendEventDialog();
-        ContextInjectionFactory.inject(dialog, context);
-        logger.atInfo().log("Injected send event dialog to eclipse context");
-        dialog.init();
+	@Execute
+	public void execute() {
+		final var dialog = new SendEventDialog();
+		ContextInjectionFactory.inject(dialog, context);
+		logger.atInfo().log("Injected send event dialog to eclipse context");
+		dialog.init();
 
-        final Optional<EventDTO> event = dialog.showAndWait();
-        if (event.isPresent()) {
-            try {
-                final EventDTO          dto        = event.get();
-                final String            topic      = dto.topic();
-                final boolean           isSync     = dto.isSync();
-                final List<ConfigValue> properties = dto.properties();
+		final var event = dialog.showAndWait();
+		if (event.isPresent()) {
+			try {
+				final var dto        = event.get();
+				final var topic      = dto.topic();
+				final var isSync     = dto.isSync();
+				final var properties = dto.properties();
 
-                if (Strings.isNullOrEmpty(topic) || properties == null) {
-                    return;
-                }
+				if (Strings.isNullOrEmpty(topic) || properties == null) {
+					return;
+				}
 
-                boolean result;
-                if (isSync) {
-                    result = eventManager.sendEvent(topic, properties);
-                } else {
-                    result = eventManager.postEvent(topic, properties);
-                }
-                if (result) {
-                    Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic);
-                    logger.atInfo().log("Event successfully sent successfully to %s", topic);
-                } else {
-                    Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic);
-                }
-            } catch (final Exception e) {
-                logger.atError().withException(e).log("Event cannot be sent");
-                FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-            }
-        }
-    }
+				boolean result;
+				if (isSync) {
+					result = eventManager.sendEvent(topic, properties);
+				} else {
+					result = eventManager.postEvent(topic, properties);
+				}
+				if (result) {
+					Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic);
+					logger.atInfo().log("Event successfully sent successfully to %s", topic);
+				} else {
+					Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic);
+				}
+			} catch (final Exception e) {
+				logger.atError().withException(e).log("Event cannot be sent");
+				FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+			}
+		}
+	}
 
-    @CanExecute
-    public boolean canExecute() {
-        return isConnected;
-    }
+	@CanExecute
+	public boolean canExecute() {
+		return isConnected;
+	}
 
 }

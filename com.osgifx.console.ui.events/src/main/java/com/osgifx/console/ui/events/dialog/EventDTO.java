@@ -20,5 +20,4 @@ import java.util.List;
 import com.osgifx.console.agent.dto.ConfigValue;
 
 public record EventDTO(String topic, boolean isSync, List<ConfigValue> properties) {
-
 }

@@ -39,7 +39,6 @@ import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -49,80 +48,79 @@ import javafx.scene.layout.GridPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class EventsFxController {
 
-    @Log
-    @Inject
-    private FluentLogger         logger;
-    @Inject
-    @LocalInstance
-    private FXMLLoader           loader;
-    @FXML
-    private TableView<XEventDTO> table;
-    @Inject
-    @OSGiBundle
-    private BundleContext        context;
-    @Inject
-    @Named("is_connected")
-    private boolean              isConnected;
-    @Inject
-    private DataProvider         dataProvider;
+	@Log
+	@Inject
+	private FluentLogger         logger;
+	@Inject
+	@LocalInstance
+	private FXMLLoader           loader;
+	@FXML
+	private TableView<XEventDTO> table;
+	@Inject
+	@OSGiBundle
+	private BundleContext        context;
+	@Inject
+	@Named("is_connected")
+	private boolean              isConnected;
+	@Inject
+	private DataProvider         dataProvider;
 
-    private static final String EVENT_TOPIC = "com/osgifx/clear/events";
+	private static final String EVENT_TOPIC = "com/osgifx/clear/events";
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(table);
-            return;
-        }
-        createControls();
-        Fx.disableSelectionModel(table);
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(table);
+			return;
+		}
+		createControls();
+		Fx.disableSelectionModel(table);
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void createControls() {
-        final GridPane                          expandedNode   = (GridPane) Fx.loadFXML(loader, context,
-                "/fxml/expander-column-content.fxml");
-        final EventDetailsFxController          controller     = loader.getController();
-        final TableRowExpanderColumn<XEventDTO> expanderColumn = new TableRowExpanderColumn<>(expandedEvent -> {
-                                                                   controller.initControls(expandedEvent.getValue());
-                                                                   return expandedNode;
-                                                               });
+	private void createControls() {
+		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+		final var controller     = (EventDetailsFxController) loader.getController();
+		final var expanderColumn = new TableRowExpanderColumn<XEventDTO>(expandedEvent -> {
+										controller.initControls(expandedEvent.getValue());
+										return expandedNode;
+									});
 
-        final TableColumn<XEventDTO, Date> receivedAtColumn = new TableColumn<>("Received At");
+		final var receivedAtColumn = new TableColumn<XEventDTO, Date>("Received At");
 
-        receivedAtColumn.setPrefWidth(290);
-        receivedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("received", Date.class));
+		receivedAtColumn.setPrefWidth(290);
+		receivedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("received", Date.class));
 
-        final TableColumn<XEventDTO, String> topicColumn = new TableColumn<>("Topic");
+		final var topicColumn = new TableColumn<XEventDTO, String>("Topic");
 
-        topicColumn.setPrefWidth(650);
-        topicColumn.setCellValueFactory(new DTOCellValueFactory<>("topic", String.class));
+		topicColumn.setPrefWidth(650);
+		topicColumn.setCellValueFactory(new DTOCellValueFactory<>("topic", String.class));
 
-        table.getColumns().add(expanderColumn);
-        table.getColumns().add(receivedAtColumn);
-        table.getColumns().add(topicColumn);
+		table.getColumns().add(expanderColumn);
+		table.getColumns().add(receivedAtColumn);
+		table.getColumns().add(topicColumn);
 
-        final ObservableList<XEventDTO> events = dataProvider.events();
-        table.setItems(events);
+		final var events = dataProvider.events();
+		table.setItems(events);
 
-        TableFilter.forTableView(table).apply();
-        sortByReceivedAt(receivedAtColumn);
-    }
+		TableFilter.forTableView(table).apply();
+		sortByReceivedAt(receivedAtColumn);
+	}
 
-    @Inject
-    @Optional
-    private synchronized void clearTableEvent(@UIEventTopic(EVENT_TOPIC) final String data) {
-        table.setItems(FXCollections.emptyObservableList());
-        final ObservableList<XEventDTO> events = dataProvider.events();
-        events.clear();
-        table.setItems(events);
-        logger.atInfo().log("Cleared events table successfully");
-    }
+	@Inject
+	@Optional
+	private synchronized void clearTableEvent(@UIEventTopic(EVENT_TOPIC) final String data) {
+		table.setItems(FXCollections.emptyObservableList());
+		final var events = dataProvider.events();
+		events.clear();
+		table.setItems(events);
+		logger.atInfo().log("Cleared events table successfully");
+	}
 
-    private void sortByReceivedAt(final TableColumn<XEventDTO, Date> column) {
-        column.setSortType(TableColumn.SortType.DESCENDING);
-        table.getSortOrder().add(column);
-        table.sort();
-    }
+	private void sortByReceivedAt(final TableColumn<XEventDTO, Date> column) {
+		column.setSortType(TableColumn.SortType.DESCENDING);
+		table.getSortOrder().add(column);
+		table.sort();
+	}
 
 }

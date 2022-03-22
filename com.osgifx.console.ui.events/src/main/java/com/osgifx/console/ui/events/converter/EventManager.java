@@ -22,42 +22,41 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = EventManager.class)
 public final class EventManager {
 
-    @Reference
-    private Supervisor supervisor;
+	@Reference
+	private Supervisor supervisor;
 
-    @Reference
-    private LoggerFactory factory;
-    private FluentLogger  logger;
+	@Reference
+	private LoggerFactory factory;
+	private FluentLogger  logger;
 
-    void activate() {
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-    }
+	void activate() {
+		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+	}
 
-    public boolean sendEvent(final String topic, final List<ConfigValue> properties) {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Remote agent cannot be connected");
-            return false;
-        }
-        agent.sendEvent(topic, properties);
-        return true;
-    }
+	public boolean sendEvent(final String topic, final List<ConfigValue> properties) {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Remote agent cannot be connected");
+			return false;
+		}
+		agent.sendEvent(topic, properties);
+		return true;
+	}
 
-    public boolean postEvent(final String topic, final List<ConfigValue> properties) {
-        final Agent agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Remote agent cannot be connected");
-            return false;
-        }
-        agent.postEvent(topic, properties);
-        return true;
-    }
+	public boolean postEvent(final String topic, final List<ConfigValue> properties) {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Remote agent cannot be connected");
+			return false;
+		}
+		agent.postEvent(topic, properties);
+		return true;
+	}
 
 }
