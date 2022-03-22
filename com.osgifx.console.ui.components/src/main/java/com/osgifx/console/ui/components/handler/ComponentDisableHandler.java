@@ -26,7 +26,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
@@ -34,36 +33,36 @@ import com.osgifx.console.util.fx.FxDialog;
 @Creatable
 public final class ComponentDisableHandler {
 
-    @Log
-    @Inject
-    private FluentLogger logger;
-    @Inject
-    private IEventBroker eventBroker;
-    @Inject
-    private Supervisor   supervisor;
+	@Log
+	@Inject
+	private FluentLogger logger;
+	@Inject
+	private IEventBroker eventBroker;
+	@Inject
+	private Supervisor   supervisor;
 
-    @Execute
-    public void execute(@Named("id") final String id) {
-        final Agent agent = supervisor.getAgent();
-        if (supervisor.getAgent() == null) {
-            logger.atWarning().log("Remote agent cannot be connected");
-            return;
-        }
-        try {
-            final XResultDTO result = agent.disableComponentById(Long.parseLong(id));
-            if (result.result == XResultDTO.SUCCESS) {
-                logger.atInfo().log(result.response);
-                eventBroker.post(COMPONENT_DISABLED_EVENT_TOPIC, id);
-            } else if (result.result == XResultDTO.SKIPPED) {
-                logger.atWarning().log(result.response);
-            } else {
-                logger.atError().log(result.response);
-                FxDialog.showErrorDialog("Component Disable Error", result.response, getClass().getClassLoader());
-            }
-        } catch (final Exception e) {
-            logger.atError().withException(e).log("Service component with ID '%s' cannot be disabled", id);
-            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-        }
-    }
+	@Execute
+	public void execute(@Named("id") final String id) {
+		final var agent = supervisor.getAgent();
+		if (supervisor.getAgent() == null) {
+			logger.atWarning().log("Remote agent cannot be connected");
+			return;
+		}
+		try {
+			final var result = agent.disableComponentById(Long.parseLong(id));
+			if (result.result == XResultDTO.SUCCESS) {
+				logger.atInfo().log(result.response);
+				eventBroker.post(COMPONENT_DISABLED_EVENT_TOPIC, id);
+			} else if (result.result == XResultDTO.SKIPPED) {
+				logger.atWarning().log(result.response);
+			} else {
+				logger.atError().log(result.response);
+				FxDialog.showErrorDialog("Component Disable Error", result.response, getClass().getClassLoader());
+			}
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("Service component with ID '%s' cannot be disabled", id);
+			FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+		}
+	}
 
 }

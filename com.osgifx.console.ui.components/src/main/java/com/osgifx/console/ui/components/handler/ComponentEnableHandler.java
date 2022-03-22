@@ -25,43 +25,42 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
 
 public final class ComponentEnableHandler {
 
-    @Log
-    @Inject
-    private FluentLogger logger;
-    @Inject
-    private IEventBroker eventBroker;
-    @Inject
-    private Supervisor   supervisor;
+	@Log
+	@Inject
+	private FluentLogger logger;
+	@Inject
+	private IEventBroker eventBroker;
+	@Inject
+	private Supervisor   supervisor;
 
-    @Execute
-    public void execute(@Named("name") final String name) {
-        final Agent agent = supervisor.getAgent();
-        if (supervisor.getAgent() == null) {
-            logger.atWarning().log("Remote agent cannot be connected");
-            return;
-        }
-        try {
-            final XResultDTO result = agent.enableComponentByName(name);
-            if (result.result == XResultDTO.SUCCESS) {
-                logger.atInfo().log(result.response);
-                eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
-            } else if (result.result == XResultDTO.SKIPPED) {
-                logger.atWarning().log(result.response);
-            } else {
-                logger.atError().log(result.response);
-                FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
-            }
-        } catch (final Exception e) {
-            logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
-            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-        }
-    }
+	@Execute
+	public void execute(@Named("name") final String name) {
+		final var agent = supervisor.getAgent();
+		if (supervisor.getAgent() == null) {
+			logger.atWarning().log("Remote agent cannot be connected");
+			return;
+		}
+		try {
+			final var result = agent.enableComponentByName(name);
+			if (result.result == XResultDTO.SUCCESS) {
+				logger.atInfo().log(result.response);
+				eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
+			} else if (result.result == XResultDTO.SKIPPED) {
+				logger.atWarning().log(result.response);
+			} else {
+				logger.atError().log(result.response);
+				FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
+			}
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
+			FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+		}
+	}
 
 }
