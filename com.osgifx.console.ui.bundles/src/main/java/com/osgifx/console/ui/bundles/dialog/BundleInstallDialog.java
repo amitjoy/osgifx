@@ -26,42 +26,40 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
 public final class BundleInstallDialog extends Dialog<BundleInstallDTO> {
 
-    @Inject
-    @LocalInstance
-    private FXMLLoader    loader;
-    @Inject
-    @OSGiBundle
-    private BundleContext context;
+	@Inject
+	@LocalInstance
+	private FXMLLoader    loader;
+	@Inject
+	@OSGiBundle
+	private BundleContext context;
 
-    public void init() {
-        final DialogPane dialogPane = getDialogPane();
-        initStyle(StageStyle.UNDECORATED);
-        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+	public void init() {
+		final var dialogPane = getDialogPane();
+		initStyle(StageStyle.UNDECORATED);
+		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-        dialogPane.setHeaderText("Remote Bundle Install");
-        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));
+		dialogPane.setHeaderText("Remote Bundle Install");
+		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));
 
-        final ButtonType loginButtonType = new ButtonType("Install", ButtonData.OK_DONE);
-        dialogPane.getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+		final var loginButtonType = new ButtonType("Install", ButtonData.OK_DONE);
+		dialogPane.getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
 
-        final Node dialogContent = Fx.loadFXML(loader, context, "/fxml/install-bundle-dialog.fxml");
-        dialogPane.setContent(dialogContent);
+		final var dialogContent = Fx.loadFXML(loader, context, "/fxml/install-bundle-dialog.fxml");
+		dialogPane.setContent(dialogContent);
 
-        final BundleInstallDialogController controller = (BundleInstallDialogController) loader.getController();
-        setResultConverter(dialogButton -> {
-            final ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
-            return data == ButtonData.OK_DONE ? controller.getInstallDTO() : null;
-        });
-    }
+		final var controller = (BundleInstallDialogController) loader.getController();
+		setResultConverter(dialogButton -> {
+			final var data = dialogButton == null ? null : dialogButton.getButtonData();
+			return data == ButtonData.OK_DONE ? controller.getInstallDTO() : null;
+		});
+	}
 
 }
