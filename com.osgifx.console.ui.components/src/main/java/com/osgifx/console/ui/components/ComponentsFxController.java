@@ -34,7 +34,6 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -44,68 +43,67 @@ import javafx.scene.layout.GridPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ComponentsFxController {
 
-    @Log
-    @Inject
-    private FluentLogger             logger;
-    @Inject
-    @LocalInstance
-    private FXMLLoader               loader;
-    @FXML
-    private TableView<XComponentDTO> table;
-    @Inject
-    @OSGiBundle
-    private BundleContext            context;
-    @Inject
-    @Named("is_connected")
-    private boolean                  isConnected;
-    @Inject
-    private DataProvider             dataProvider;
+	@Log
+	@Inject
+	private FluentLogger             logger;
+	@Inject
+	@LocalInstance
+	private FXMLLoader               loader;
+	@FXML
+	private TableView<XComponentDTO> table;
+	@Inject
+	@OSGiBundle
+	private BundleContext            context;
+	@Inject
+	@Named("is_connected")
+	private boolean                  isConnected;
+	@Inject
+	private DataProvider             dataProvider;
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(table);
-            return;
-        }
-        createControls();
-        Fx.disableSelectionModel(table);
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(table);
+			return;
+		}
+		createControls();
+		Fx.disableSelectionModel(table);
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void createControls() {
-        final GridPane                              expandedNode   = (GridPane) Fx.loadFXML(loader, context,
-                "/fxml/expander-column-content.fxml");
-        final ComponentDetailsFxController          controller     = loader.getController();
-        final TableRowExpanderColumn<XComponentDTO> expanderColumn = new TableRowExpanderColumn<>(expandedComponent -> {
-                                                                       controller.initControls(expandedComponent.getValue());
-                                                                       return expandedNode;
-                                                                   });
+	private void createControls() {
+		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+		final var controller     = (ComponentDetailsFxController) loader.getController();
+		final var expanderColumn = new TableRowExpanderColumn<XComponentDTO>(expandedComponent -> {
+										controller.initControls(expandedComponent.getValue());
+										return expandedNode;
+									});
 
-        final TableColumn<XComponentDTO, Integer> idColumn = new TableColumn<>("ID");
+		final var idColumn = new TableColumn<XComponentDTO, Integer>("ID");
 
-        idColumn.setPrefWidth(90);
-        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+		idColumn.setPrefWidth(90);
+		idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
-        final TableColumn<XComponentDTO, String> componentNameColumn = new TableColumn<>("Name");
+		final var componentNameColumn = new TableColumn<XComponentDTO, String>("Name");
 
-        componentNameColumn.setPrefWidth(900);
-        componentNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+		componentNameColumn.setPrefWidth(900);
+		componentNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-        final TableColumn<XComponentDTO, String> stateColumn = new TableColumn<>("State");
+		final var stateColumn = new TableColumn<XComponentDTO, String>("State");
 
-        stateColumn.setPrefWidth(200);
-        stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
+		stateColumn.setPrefWidth(200);
+		stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
-        table.getColumns().add(expanderColumn);
-        table.getColumns().add(idColumn);
-        table.getColumns().add(componentNameColumn);
-        table.getColumns().add(stateColumn);
+		table.getColumns().add(expanderColumn);
+		table.getColumns().add(idColumn);
+		table.getColumns().add(componentNameColumn);
+		table.getColumns().add(stateColumn);
 
-        final ObservableList<XComponentDTO> bundles = dataProvider.components();
-        table.setItems(bundles);
-        Fx.sortBy(table, idColumn);
+		final var bundles = dataProvider.components();
+		table.setItems(bundles);
+		Fx.sortBy(table, idColumn);
 
-        TableFilter.forTableView(table).apply();
-    }
+		TableFilter.forTableView(table).apply();
+	}
 
 }
