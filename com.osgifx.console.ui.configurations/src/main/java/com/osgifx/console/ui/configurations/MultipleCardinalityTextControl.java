@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations;
 
-import java.util.Optional;
-
 import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
@@ -27,7 +25,6 @@ import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -36,150 +33,148 @@ import javafx.scene.layout.StackPane;
 
 public final class MultipleCardinalityTextControl extends SimpleControl<StringField> {
 
-    /**
-     * This StackPane is needed for achieving the readonly effect by putting
-     * the readOnlyLabel over the editableField on the change of the
-     * visibleProperty.
-     */
-    protected StackPane stack;
+	/**
+	 * This StackPane is needed for achieving the readonly effect by putting the
+	 * readOnlyLabel over the editableField on the change of the visibleProperty.
+	 */
+	protected StackPane stack;
 
-    /**
-     * - The fieldLabel is the container that displays the label property of
-     * the field.
-     * - The editableField allows users to modify the field's value.
-     * - The readOnlyLabel displays the field's value if it is not editable.
-     */
-    protected TextField editableField;
-    protected TextArea  editableArea;
-    protected Label     readOnlyLabel;
-    protected Label     fieldLabel;
+	/**
+	 * - The fieldLabel is the container that displays the label property of the
+	 * field. - The editableField allows users to modify the field's value. - The
+	 * readOnlyLabel displays the field's value if it is not editable.
+	 */
+	protected TextField editableField;
+	protected TextArea  editableArea;
+	protected Label     readOnlyLabel;
+	protected Label     fieldLabel;
 
-    private final String            key;
-    private final XAttributeDefType type;
-    private final ClassLoader       classLoader;
+	private final String            key;
+	private final XAttributeDefType type;
+	private final ClassLoader       classLoader;
 
-    public MultipleCardinalityTextControl(final String key, final XAttributeDefType type) {
-        this.key    = key;
-        this.type   = type;
-        classLoader = getClass().getClassLoader();
-    }
+	public MultipleCardinalityTextControl(final String key, final XAttributeDefType type) {
+		this.key    = key;
+		this.type   = type;
+		classLoader = getClass().getClassLoader();
+	}
 
-    @Override
-    public void initializeParts() {
-        super.initializeParts();
+	@Override
+	public void initializeParts() {
+		super.initializeParts();
 
-        getStyleClass().add("simple-text-control");
+		getStyleClass().add("simple-text-control");
 
-        stack = new StackPane();
+		stack = new StackPane();
 
-        editableField = new TextField(field.getValue());
-        editableArea  = new TextArea(field.getValue());
+		editableField = new TextField(field.getValue());
+		editableArea  = new TextArea(field.getValue());
 
-        readOnlyLabel = new Label(field.getValue());
-        fieldLabel    = new Label(field.labelProperty().getValue());
-        editableField.setPromptText(field.placeholderProperty().getValue());
+		readOnlyLabel = new Label(field.getValue());
+		fieldLabel    = new Label(field.labelProperty().getValue());
+		editableField.setPromptText(field.placeholderProperty().getValue());
 
-        editableField.setOnMouseClicked(event -> {
-            final MultipleCardinalityPropertiesDialog dialog = new MultipleCardinalityPropertiesDialog();
-            if (!Strings.isNullOrEmpty(key.trim())) {
-                final DataField<?, ?, ?> dataField = field;
-                dialog.init(key, type, dataField.getValue().toString(), classLoader);
+		editableField.setOnMouseClicked(event -> {
+			final var dialog = new MultipleCardinalityPropertiesDialog();
+			if (!Strings.isNullOrEmpty(key.trim())) {
+				final DataField<?, ?, ?> dataField = field;
+				dialog.init(key, type, dataField.getValue().toString(), classLoader);
 
-                final Optional<String> entries = dialog.showAndWait();
-                entries.ifPresent(editableField::setText);
-            }
-        });
-    }
+				final var entries = dialog.showAndWait();
+				entries.ifPresent(editableField::setText);
+			}
+		});
+	}
 
-    @Override
-    public void layoutParts() {
-        super.layoutParts();
+	@Override
+	public void layoutParts() {
+		super.layoutParts();
 
-        readOnlyLabel.getStyleClass().add("read-only-label");
+		readOnlyLabel.getStyleClass().add("read-only-label");
 
-        readOnlyLabel.setPrefHeight(26);
+		readOnlyLabel.setPrefHeight(26);
 
-        editableArea.getStyleClass().add("simple-textarea");
-        editableArea.setPrefRowCount(5);
-        editableArea.setPrefHeight(80);
-        editableArea.setWrapText(true);
+		editableArea.getStyleClass().add("simple-textarea");
+		editableArea.setPrefRowCount(5);
+		editableArea.setPrefHeight(80);
+		editableArea.setWrapText(true);
 
-        if (field.isMultiline()) {
-            stack.setPrefHeight(80);
-            readOnlyLabel.setPrefHeight(80);
-        }
+		if (field.isMultiline()) {
+			stack.setPrefHeight(80);
+			readOnlyLabel.setPrefHeight(80);
+		}
 
-        stack.getChildren().addAll(editableField, editableArea, readOnlyLabel);
+		stack.getChildren().addAll(editableField, editableArea, readOnlyLabel);
 
-        stack.setAlignment(Pos.CENTER_LEFT);
+		stack.setAlignment(Pos.CENTER_LEFT);
 
-        final Node labelDescription = field.getLabelDescription();
-        final Node valueDescription = field.getValueDescription();
+		final var labelDescription = field.getLabelDescription();
+		final var valueDescription = field.getValueDescription();
 
-        final int columns = field.getSpan();
+		final var columns = field.getSpan();
 
-        if (columns < 3) {
-            int rowIndex = 0;
-            add(fieldLabel, 0, rowIndex, columns, 1);
-            rowIndex++;
-            if (labelDescription != null) {
-                GridPane.setValignment(labelDescription, VPos.TOP);
-                add(labelDescription, 0, rowIndex, columns, 1);
-                rowIndex++;
-            }
-            add(stack, 0, rowIndex, columns, 1);
-            rowIndex++;
-            if (valueDescription != null) {
-                GridPane.setValignment(valueDescription, VPos.TOP);
-                add(valueDescription, 0, rowIndex, columns, 1);
-            }
-        } else {
-            add(fieldLabel, 0, 0, 2, 1);
-            if (labelDescription != null) {
-                GridPane.setValignment(labelDescription, VPos.TOP);
-                add(labelDescription, 0, 1, 2, 1);
-            }
-            add(stack, 2, 0, columns - 2, 1);
-            if (valueDescription != null) {
-                GridPane.setValignment(valueDescription, VPos.TOP);
-                add(valueDescription, 2, 1, columns - 2, 1);
-            }
-        }
-    }
+		if (columns < 3) {
+			var rowIndex = 0;
+			add(fieldLabel, 0, rowIndex, columns, 1);
+			rowIndex++;
+			if (labelDescription != null) {
+				GridPane.setValignment(labelDescription, VPos.TOP);
+				add(labelDescription, 0, rowIndex, columns, 1);
+				rowIndex++;
+			}
+			add(stack, 0, rowIndex, columns, 1);
+			rowIndex++;
+			if (valueDescription != null) {
+				GridPane.setValignment(valueDescription, VPos.TOP);
+				add(valueDescription, 0, rowIndex, columns, 1);
+			}
+		} else {
+			add(fieldLabel, 0, 0, 2, 1);
+			if (labelDescription != null) {
+				GridPane.setValignment(labelDescription, VPos.TOP);
+				add(labelDescription, 0, 1, 2, 1);
+			}
+			add(stack, 2, 0, columns - 2, 1);
+			if (valueDescription != null) {
+				GridPane.setValignment(valueDescription, VPos.TOP);
+				add(valueDescription, 2, 1, columns - 2, 1);
+			}
+		}
+	}
 
-    @Override
-    public void setupBindings() {
-        super.setupBindings();
+	@Override
+	public void setupBindings() {
+		super.setupBindings();
 
-        editableArea.visibleProperty().bind(Bindings.and(field.editableProperty(), field.multilineProperty()));
-        editableField.visibleProperty().bind(Bindings.and(field.editableProperty(), field.multilineProperty().not()));
-        readOnlyLabel.visibleProperty().bind(field.editableProperty().not());
+		editableArea.visibleProperty().bind(Bindings.and(field.editableProperty(), field.multilineProperty()));
+		editableField.visibleProperty().bind(Bindings.and(field.editableProperty(), field.multilineProperty().not()));
+		readOnlyLabel.visibleProperty().bind(field.editableProperty().not());
 
-        editableField.textProperty().bindBidirectional(field.userInputProperty());
-        editableArea.textProperty().bindBidirectional(field.userInputProperty());
-        readOnlyLabel.textProperty().bind(field.userInputProperty());
-        fieldLabel.textProperty().bind(field.labelProperty());
-        editableField.promptTextProperty().bind(field.placeholderProperty());
-        editableArea.promptTextProperty().bind(field.placeholderProperty());
+		editableField.textProperty().bindBidirectional(field.userInputProperty());
+		editableArea.textProperty().bindBidirectional(field.userInputProperty());
+		readOnlyLabel.textProperty().bind(field.userInputProperty());
+		fieldLabel.textProperty().bind(field.labelProperty());
+		editableField.promptTextProperty().bind(field.placeholderProperty());
+		editableArea.promptTextProperty().bind(field.placeholderProperty());
 
-        editableArea.managedProperty().bind(editableArea.visibleProperty());
-        editableField.managedProperty().bind(editableField.visibleProperty());
-    }
+		editableArea.managedProperty().bind(editableArea.visibleProperty());
+		editableField.managedProperty().bind(editableField.visibleProperty());
+	}
 
-    @Override
-    public void setupValueChangedListeners() {
-        super.setupValueChangedListeners();
+	@Override
+	public void setupValueChangedListeners() {
+		super.setupValueChangedListeners();
 
-        field.multilineProperty().addListener((observable, oldValue, newValue) -> {
-            stack.setPrefHeight(newValue ? 80 : 0);
-            readOnlyLabel.setPrefHeight(newValue ? 80 : 26);
-        });
+		field.multilineProperty().addListener((observable, oldValue, newValue) -> {
+			stack.setPrefHeight(newValue ? 80 : 0);
+			readOnlyLabel.setPrefHeight(newValue ? 80 : 26);
+		});
 
-        field.errorMessagesProperty()
-                .addListener((observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
+		field.errorMessagesProperty()
+		        .addListener((observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
 
-        editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-        editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
-    }
+		editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
+		editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
+	}
 
 }
