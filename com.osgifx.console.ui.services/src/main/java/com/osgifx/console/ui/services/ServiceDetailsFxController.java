@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -36,45 +36,45 @@ import javafx.scene.control.TableView;
 
 public final class ServiceDetailsFxController {
 
-    @Log
-    @Inject
-    private FluentLogger                               logger;
-    @FXML
-    private Label                                      idLabel;
-    @FXML
-    private Label                                      bundleIdLabel;
-    @FXML
-    private Label                                      bundleBsnLabel;
-    @FXML
-    private ListView<String>                           objectClassesList;
-    @FXML
-    private TableView<Entry<String, String>>           propertiesTable;
-    @FXML
-    private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
-    @FXML
-    private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
+	@Log
+	@Inject
+	private FluentLogger                               logger;
+	@FXML
+	private Label                                      idLabel;
+	@FXML
+	private Label                                      bundleIdLabel;
+	@FXML
+	private Label                                      bundleBsnLabel;
+	@FXML
+	private ListView<String>                           objectClassesList;
+	@FXML
+	private TableView<Entry<String, String>>           propertiesTable;
+	@FXML
+	private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
+	@FXML
+	private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
 
-    @FXML
-    public void initialize() {
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    void initControls(final XServiceDTO service) {
-        idLabel.setText(String.valueOf(service.id));
-        bundleBsnLabel.setText(service.registeringBundle);
-        bundleIdLabel.setText(String.valueOf(service.bundleId));
+	void initControls(final XServiceDTO service) {
+		idLabel.setText(String.valueOf(service.id));
+		bundleBsnLabel.setText(service.registeringBundle);
+		bundleIdLabel.setText(String.valueOf(service.bundleId));
 
-        propertiesTableColumn1.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
-        propertiesTableColumn2.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
-        propertiesTable.setItems(FXCollections.observableArrayList(service.properties.entrySet()));
+		propertiesTableColumn1.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
+		propertiesTableColumn2.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
+		propertiesTable.setItems(FXCollections.observableArrayList(service.properties.entrySet()));
 
-        objectClassesList.getItems().clear();
-        objectClassesList.getItems().addAll(service.types);
+		objectClassesList.getItems().clear();
+		objectClassesList.getItems().addAll(service.types);
 
-        TableFilter.forTableView(propertiesTable).apply();
+		TableFilter.forTableView(propertiesTable).apply();
 
-        Fx.addContextMenuToCopyContent(propertiesTable);
-        Fx.addContextMenuToCopyContent(objectClassesList);
-    }
+		Fx.addContextMenuToCopyContent(propertiesTable);
+		Fx.addContextMenuToCopyContent(objectClassesList);
+	}
 
 }

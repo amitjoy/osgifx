@@ -34,7 +34,6 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -44,68 +43,67 @@ import javafx.scene.layout.GridPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ServicesFxController {
 
-    @Log
-    @Inject
-    private FluentLogger           logger;
-    @Inject
-    @LocalInstance
-    private FXMLLoader             loader;
-    @FXML
-    private TableView<XServiceDTO> table;
-    @Inject
-    @OSGiBundle
-    private BundleContext          context;
-    @Inject
-    @Named("is_connected")
-    private boolean                isConnected;
-    @Inject
-    private DataProvider           dataProvider;
+	@Log
+	@Inject
+	private FluentLogger           logger;
+	@Inject
+	@LocalInstance
+	private FXMLLoader             loader;
+	@FXML
+	private TableView<XServiceDTO> table;
+	@Inject
+	@OSGiBundle
+	private BundleContext          context;
+	@Inject
+	@Named("is_connected")
+	private boolean                isConnected;
+	@Inject
+	private DataProvider           dataProvider;
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(table);
-            return;
-        }
-        createControls();
-        Fx.disableSelectionModel(table);
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(table);
+			return;
+		}
+		createControls();
+		Fx.disableSelectionModel(table);
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void createControls() {
-        final GridPane                            expandedNode   = (GridPane) Fx.loadFXML(loader, context,
-                "/fxml/expander-column-content.fxml");
-        final ServiceDetailsFxController          controller     = loader.getController();
-        final TableRowExpanderColumn<XServiceDTO> expanderColumn = new TableRowExpanderColumn<>(expandedService -> {
-                                                                     controller.initControls(expandedService.getValue());
-                                                                     return expandedNode;
-                                                                 });
+	private void createControls() {
+		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+		final var controller     = (ServiceDetailsFxController) loader.getController();
+		final var expanderColumn = new TableRowExpanderColumn<XServiceDTO>(expandedService -> {
+										controller.initControls(expandedService.getValue());
+										return expandedNode;
+									});
 
-        final TableColumn<XServiceDTO, Integer> idColumn = new TableColumn<>("ID");
+		final var idColumn = new TableColumn<XServiceDTO, Integer>("ID");
 
-        idColumn.setPrefWidth(100);
-        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+		idColumn.setPrefWidth(100);
+		idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
-        final TableColumn<XServiceDTO, String> objectClassColumn = new TableColumn<>("Object Class");
+		final var objectClassColumn = new TableColumn<XServiceDTO, String>("Object Class");
 
-        objectClassColumn.setPrefWidth(600);
-        objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
+		objectClassColumn.setPrefWidth(600);
+		objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
 
-        final TableColumn<XServiceDTO, String> registeringBundleColumn = new TableColumn<>("Registering Bundle");
+		final var registeringBundleColumn = new TableColumn<XServiceDTO, String>("Registering Bundle");
 
-        registeringBundleColumn.setPrefWidth(400);
-        registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
+		registeringBundleColumn.setPrefWidth(400);
+		registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
 
-        table.getColumns().add(expanderColumn);
-        table.getColumns().add(idColumn);
-        table.getColumns().add(objectClassColumn);
-        table.getColumns().add(registeringBundleColumn);
+		table.getColumns().add(expanderColumn);
+		table.getColumns().add(idColumn);
+		table.getColumns().add(objectClassColumn);
+		table.getColumns().add(registeringBundleColumn);
 
-        final ObservableList<XServiceDTO> services = dataProvider.services();
-        table.setItems(services);
-        Fx.sortBy(table, idColumn);
+		final var services = dataProvider.services();
+		table.setItems(services);
+		Fx.sortBy(table, idColumn);
 
-        TableFilter.forTableView(table).apply();
-    }
+		TableFilter.forTableView(table).apply();
+	}
 
 }
