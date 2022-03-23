@@ -68,7 +68,7 @@ public final class CustomLogFormatter extends Formatter {
 
 	public CustomLogFormatter() {
 		final var logManager = LogManager.getLogManager();
-		final var     classname  = getClass().getName();
+		final var classname  = getClass().getName();
 
 		// load the format from logging.properties
 		final var dateFormatKey = classname + ".date.format";
@@ -139,7 +139,7 @@ public final class CustomLogFormatter extends Formatter {
 			// %t
 			sb.delete(0, sb.length()); // re-use
 
-			final var          date     = new Date(logRecord.getMillis());
+			final var date     = new Date(logRecord.getMillis());
 			final var fieldPos = new FieldPosition(0);
 			synchronized (dateFormat) {
 				sb = dateFormat.format(date, sb, fieldPos);
@@ -223,7 +223,7 @@ public final class CustomLogFormatter extends Formatter {
 		// java.util.logging.Formatter except that it has been
 		// modified to operate on the passed in StringBuffer.
 
-		var                         format  = record.getMessage();
+		var       format  = record.getMessage();
 		final var catalog = record.getResourceBundle();
 		if (catalog != null) {
 			try {
