@@ -37,40 +37,40 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class PropertiesFxController {
 
-    @Log
-    @Inject
-    private FluentLogger                      logger;
-    @FXML
-    private TableView<XPropertyDTO>           propertyTable;
-    @FXML
-    private TableColumn<XPropertyDTO, String> propertyName;
-    @FXML
-    private TableColumn<XPropertyDTO, String> propertyValue;
-    @FXML
-    private TableColumn<XPropertyDTO, String> propertyType;
-    @Inject
-    @Named("is_connected")
-    private boolean                           isConnected;
-    @Inject
-    private DataProvider                      dataProvider;
+	@Log
+	@Inject
+	private FluentLogger                      logger;
+	@FXML
+	private TableView<XPropertyDTO>           propertyTable;
+	@FXML
+	private TableColumn<XPropertyDTO, String> propertyName;
+	@FXML
+	private TableColumn<XPropertyDTO, String> propertyValue;
+	@FXML
+	private TableColumn<XPropertyDTO, String> propertyType;
+	@Inject
+	@Named("is_connected")
+	private boolean                           isConnected;
+	@Inject
+	private DataProvider                      dataProvider;
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(propertyTable);
-            return;
-        }
-        propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-        propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
-        propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(propertyTable);
+			return;
+		}
+		propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+		propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
+		propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
-        propertyTable.setItems(dataProvider.properties());
-        Fx.sortBy(propertyTable, propertyName);
+		propertyTable.setItems(dataProvider.properties());
+		Fx.sortBy(propertyTable, propertyName);
 
-        TableFilter.forTableView(propertyTable).apply();
-        Fx.addContextMenuToCopyContent(propertyTable);
+		TableFilter.forTableView(propertyTable).apply();
+		Fx.addContextMenuToCopyContent(propertyTable);
 
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
 }
