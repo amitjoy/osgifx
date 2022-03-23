@@ -17,9 +17,9 @@ package com.osgifx.console.ui.graph;
 
 public record BundleVertex(String symbolicName, long id) {
 
-    @Override
-    public String toString() {
-        return symbolicName + ":" + id;
-    }
+	@Override
+	public String toString() {
+		return symbolicName + ":" + id;
+	}
 
 }

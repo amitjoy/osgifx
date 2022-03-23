@@ -17,9 +17,9 @@ package com.osgifx.console.ui.graph;
 
 public record ComponentVertex(String name) {
 
-    @Override
-    public String toString() {
-        return name;
-    }
+	@Override
+	public String toString() {
+		return name;
+	}
 
 }
