@@ -38,185 +38,185 @@ import com.osgifx.console.agent.dto.XServletDTO;
 
 public class XHttpAdmin {
 
-    private final HttpServiceRuntime httpServiceRuntime;
+	private final HttpServiceRuntime httpServiceRuntime;
 
-    public XHttpAdmin(final Object httpServiceRuntime) {
-        this.httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntime;
-    }
+	public XHttpAdmin(final Object httpServiceRuntime) {
+		this.httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntime;
+	}
 
-    public XHttpContextInfoDTO runtime() {
-        final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
-        return initHttpRuntime(runtime);
-    }
+	public XHttpContextInfoDTO runtime() {
+		final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
+		return initHttpRuntime(runtime);
+	}
 
-    private XHttpContextInfoDTO initHttpRuntime(final RuntimeDTO runtime) {
-        final XHttpContextInfoDTO httpInfo = new XHttpContextInfoDTO();
+	private XHttpContextInfoDTO initHttpRuntime(final RuntimeDTO runtime) {
+		final XHttpContextInfoDTO httpInfo = new XHttpContextInfoDTO();
 
-        httpInfo.servlets   = initServlets(runtime);
-        httpInfo.filters    = initFilters(runtime);
-        httpInfo.resources  = initResources(runtime);
-        httpInfo.listeners  = initListeners(runtime);
-        httpInfo.errorPages = initErrorPages(runtime);
+		httpInfo.servlets   = initServlets(runtime);
+		httpInfo.filters    = initFilters(runtime);
+		httpInfo.resources  = initResources(runtime);
+		httpInfo.listeners  = initListeners(runtime);
+		httpInfo.errorPages = initErrorPages(runtime);
 
-        return httpInfo;
-    }
+		return httpInfo;
+	}
 
-    private List<XServletDTO> initServlets(final RuntimeDTO runtime) {
-        final List<XServletDTO>   servlets           = new ArrayList<>();
-        final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XServletDTO> initServlets(final RuntimeDTO runtime) {
+		final List<XServletDTO>   servlets           = new ArrayList<>();
+		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
 
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XServletDTO> servletDTOs = initServletsByContext(servletContextDTO);
-            servlets.addAll(servletDTOs);
-        }
-        return servlets;
-    }
+		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
+			final List<XServletDTO> servletDTOs = initServletsByContext(servletContextDTO);
+			servlets.addAll(servletDTOs);
+		}
+		return servlets;
+	}
 
-    private List<XServletDTO> initServletsByContext(final ServletContextDTO servletContextDTO) {
-        final List<XServletDTO> servletDTO = new ArrayList<>();
+	private List<XServletDTO> initServletsByContext(final ServletContextDTO servletContextDTO) {
+		final List<XServletDTO> servletDTO = new ArrayList<>();
 
-        for (final ServletDTO sDTO : servletContextDTO.servletDTOs) {
-            final XServletDTO dto = new XServletDTO();
+		for (final ServletDTO sDTO : servletContextDTO.servletDTOs) {
+			final XServletDTO dto = new XServletDTO();
 
-            dto.contextName      = servletContextDTO.name;
-            dto.contextPath      = servletContextDTO.contextPath;
-            dto.contextServiceId = servletContextDTO.serviceId;
-            dto.patterns         = Arrays.asList(sDTO.patterns);
-            dto.name             = sDTO.name;
-            dto.asyncSupported   = sDTO.asyncSupported;
-            dto.serviceId        = sDTO.serviceId;
-            dto.servletInfo      = sDTO.servletInfo;
-            dto.type             = "Servlet";
+			dto.contextName      = servletContextDTO.name;
+			dto.contextPath      = servletContextDTO.contextPath;
+			dto.contextServiceId = servletContextDTO.serviceId;
+			dto.patterns         = Arrays.asList(sDTO.patterns);
+			dto.name             = sDTO.name;
+			dto.asyncSupported   = sDTO.asyncSupported;
+			dto.serviceId        = sDTO.serviceId;
+			dto.servletInfo      = sDTO.servletInfo;
+			dto.type             = "Servlet";
 
-            servletDTO.add(dto);
-        }
-        return servletDTO;
-    }
+			servletDTO.add(dto);
+		}
+		return servletDTO;
+	}
 
-    private List<XFilterDTO> initFilters(final RuntimeDTO runtime) {
-        final List<XFilterDTO>    filters            = new ArrayList<>();
-        final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XFilterDTO> initFilters(final RuntimeDTO runtime) {
+		final List<XFilterDTO>    filters            = new ArrayList<>();
+		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
 
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XFilterDTO> filterDTOs = initFiltersByContext(servletContextDTO);
-            filters.addAll(filterDTOs);
-        }
-        return filters;
-    }
+		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
+			final List<XFilterDTO> filterDTOs = initFiltersByContext(servletContextDTO);
+			filters.addAll(filterDTOs);
+		}
+		return filters;
+	}
 
-    private List<XFilterDTO> initFiltersByContext(final ServletContextDTO servletContextDTO) {
-        final List<XFilterDTO> filterDTO = new ArrayList<>();
+	private List<XFilterDTO> initFiltersByContext(final ServletContextDTO servletContextDTO) {
+		final List<XFilterDTO> filterDTO = new ArrayList<>();
 
-        for (final FilterDTO fDTO : servletContextDTO.filterDTOs) {
-            final XFilterDTO dto = new XFilterDTO();
+		for (final FilterDTO fDTO : servletContextDTO.filterDTOs) {
+			final XFilterDTO dto = new XFilterDTO();
 
-            dto.contextName      = servletContextDTO.name;
-            dto.contextPath      = servletContextDTO.contextPath;
-            dto.contextServiceId = servletContextDTO.serviceId;
-            dto.patterns         = Arrays.asList(fDTO.patterns);
-            dto.name             = fDTO.name;
-            dto.asyncSupported   = fDTO.asyncSupported;
-            dto.serviceId        = fDTO.serviceId;
-            dto.dispatcher       = Arrays.asList(fDTO.dispatcher);
-            dto.regexs           = Arrays.asList(fDTO.regexs);
-            dto.servletNames     = Arrays.asList(fDTO.servletNames);
-            dto.type             = "Filter";
+			dto.contextName      = servletContextDTO.name;
+			dto.contextPath      = servletContextDTO.contextPath;
+			dto.contextServiceId = servletContextDTO.serviceId;
+			dto.patterns         = Arrays.asList(fDTO.patterns);
+			dto.name             = fDTO.name;
+			dto.asyncSupported   = fDTO.asyncSupported;
+			dto.serviceId        = fDTO.serviceId;
+			dto.dispatcher       = Arrays.asList(fDTO.dispatcher);
+			dto.regexs           = Arrays.asList(fDTO.regexs);
+			dto.servletNames     = Arrays.asList(fDTO.servletNames);
+			dto.type             = "Filter";
 
-            filterDTO.add(dto);
-        }
-        return filterDTO;
-    }
+			filterDTO.add(dto);
+		}
+		return filterDTO;
+	}
 
-    private List<XResourceDTO> initResources(final RuntimeDTO runtime) {
-        final List<XResourceDTO>  resources          = new ArrayList<>();
-        final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XResourceDTO> initResources(final RuntimeDTO runtime) {
+		final List<XResourceDTO>  resources          = new ArrayList<>();
+		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
 
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XResourceDTO> resourceDTOs = initResourcesByContext(servletContextDTO);
-            resources.addAll(resourceDTOs);
-        }
-        return resources;
-    }
+		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
+			final List<XResourceDTO> resourceDTOs = initResourcesByContext(servletContextDTO);
+			resources.addAll(resourceDTOs);
+		}
+		return resources;
+	}
 
-    private List<XResourceDTO> initResourcesByContext(final ServletContextDTO servletContextDTO) {
-        final List<XResourceDTO> resourceDTO = new ArrayList<>();
+	private List<XResourceDTO> initResourcesByContext(final ServletContextDTO servletContextDTO) {
+		final List<XResourceDTO> resourceDTO = new ArrayList<>();
 
-        for (final ResourceDTO rDTO : servletContextDTO.resourceDTOs) {
-            final XResourceDTO dto = new XResourceDTO();
+		for (final ResourceDTO rDTO : servletContextDTO.resourceDTOs) {
+			final XResourceDTO dto = new XResourceDTO();
 
-            dto.contextName      = servletContextDTO.name;
-            dto.contextPath      = servletContextDTO.contextPath;
-            dto.contextServiceId = servletContextDTO.serviceId;
-            dto.patterns         = Arrays.asList(rDTO.patterns);
-            dto.prefix           = rDTO.prefix;
-            dto.serviceId        = rDTO.serviceId;
-            dto.type             = "Resource";
+			dto.contextName      = servletContextDTO.name;
+			dto.contextPath      = servletContextDTO.contextPath;
+			dto.contextServiceId = servletContextDTO.serviceId;
+			dto.patterns         = Arrays.asList(rDTO.patterns);
+			dto.prefix           = rDTO.prefix;
+			dto.serviceId        = rDTO.serviceId;
+			dto.type             = "Resource";
 
-            resourceDTO.add(dto);
-        }
-        return resourceDTO;
-    }
+			resourceDTO.add(dto);
+		}
+		return resourceDTO;
+	}
 
-    private List<XListenerDTO> initListeners(final RuntimeDTO runtime) {
-        final List<XListenerDTO>  listeners          = new ArrayList<>();
-        final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XListenerDTO> initListeners(final RuntimeDTO runtime) {
+		final List<XListenerDTO>  listeners          = new ArrayList<>();
+		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
 
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XListenerDTO> listenerDTOs = initListenersByContext(servletContextDTO);
-            listeners.addAll(listenerDTOs);
-        }
-        return listeners;
-    }
+		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
+			final List<XListenerDTO> listenerDTOs = initListenersByContext(servletContextDTO);
+			listeners.addAll(listenerDTOs);
+		}
+		return listeners;
+	}
 
-    private List<XListenerDTO> initListenersByContext(final ServletContextDTO servletContextDTO) {
-        final List<XListenerDTO> listenerDTO = new ArrayList<>();
+	private List<XListenerDTO> initListenersByContext(final ServletContextDTO servletContextDTO) {
+		final List<XListenerDTO> listenerDTO = new ArrayList<>();
 
-        for (final ListenerDTO lDTO : servletContextDTO.listenerDTOs) {
-            final XListenerDTO dto = new XListenerDTO();
+		for (final ListenerDTO lDTO : servletContextDTO.listenerDTOs) {
+			final XListenerDTO dto = new XListenerDTO();
 
-            dto.contextName      = servletContextDTO.name;
-            dto.contextPath      = servletContextDTO.contextPath;
-            dto.contextServiceId = servletContextDTO.serviceId;
-            dto.types            = Arrays.asList(lDTO.types);
-            dto.serviceId        = lDTO.serviceId;
-            dto.type             = "Listener";
+			dto.contextName      = servletContextDTO.name;
+			dto.contextPath      = servletContextDTO.contextPath;
+			dto.contextServiceId = servletContextDTO.serviceId;
+			dto.types            = Arrays.asList(lDTO.types);
+			dto.serviceId        = lDTO.serviceId;
+			dto.type             = "Listener";
 
-            listenerDTO.add(dto);
-        }
-        return listenerDTO;
-    }
+			listenerDTO.add(dto);
+		}
+		return listenerDTO;
+	}
 
-    private List<XErrorPageDTO> initErrorPages(final RuntimeDTO runtime) {
-        final List<XErrorPageDTO> errorPages         = new ArrayList<>();
-        final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XErrorPageDTO> initErrorPages(final RuntimeDTO runtime) {
+		final List<XErrorPageDTO> errorPages         = new ArrayList<>();
+		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
 
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XErrorPageDTO> errorPageDTOs = initErrorPagesByContext(servletContextDTO);
-            errorPages.addAll(errorPageDTOs);
-        }
-        return errorPages;
-    }
+		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
+			final List<XErrorPageDTO> errorPageDTOs = initErrorPagesByContext(servletContextDTO);
+			errorPages.addAll(errorPageDTOs);
+		}
+		return errorPages;
+	}
 
-    private List<XErrorPageDTO> initErrorPagesByContext(final ServletContextDTO servletContextDTO) {
-        final List<XErrorPageDTO> errorPageDTO = new ArrayList<>();
+	private List<XErrorPageDTO> initErrorPagesByContext(final ServletContextDTO servletContextDTO) {
+		final List<XErrorPageDTO> errorPageDTO = new ArrayList<>();
 
-        for (final ErrorPageDTO eDTO : servletContextDTO.errorPageDTOs) {
-            final XErrorPageDTO dto = new XErrorPageDTO();
+		for (final ErrorPageDTO eDTO : servletContextDTO.errorPageDTOs) {
+			final XErrorPageDTO dto = new XErrorPageDTO();
 
-            dto.contextName      = servletContextDTO.name;
-            dto.contextPath      = servletContextDTO.contextPath;
-            dto.contextServiceId = servletContextDTO.serviceId;
-            dto.name             = eDTO.name;
-            dto.asyncSupported   = eDTO.asyncSupported;
-            dto.serviceId        = eDTO.serviceId;
-            dto.servletInfo      = eDTO.servletInfo;
-            dto.exceptions       = Arrays.asList(eDTO.exceptions);
-            dto.errorCodes       = Arrays.stream(eDTO.errorCodes).boxed().collect(Collectors.toList());
-            dto.type             = "Error Page";
+			dto.contextName      = servletContextDTO.name;
+			dto.contextPath      = servletContextDTO.contextPath;
+			dto.contextServiceId = servletContextDTO.serviceId;
+			dto.name             = eDTO.name;
+			dto.asyncSupported   = eDTO.asyncSupported;
+			dto.serviceId        = eDTO.serviceId;
+			dto.servletInfo      = eDTO.servletInfo;
+			dto.exceptions       = Arrays.asList(eDTO.exceptions);
+			dto.errorCodes       = Arrays.stream(eDTO.errorCodes).boxed().collect(Collectors.toList());
+			dto.type             = "Error Page";
 
-            errorPageDTO.add(dto);
-        }
-        return errorPageDTO;
-    }
+			errorPageDTO.add(dto);
+		}
+		return errorPageDTO;
+	}
 
 }

@@ -17,22 +17,22 @@ package com.osgifx.console.agent.dto;
 
 public class ConfigValue {
 
-    public String            key;
-    public Object            value;
-    public XAttributeDefType type;
+	public String            key;
+	public Object            value;
+	public XAttributeDefType type;
 
-    public ConfigValue() {
-        // required for JSON serialization
-    }
+	public ConfigValue() {
+		// required for JSON serialization
+	}
 
-    public ConfigValue(final String key, final Object value, final XAttributeDefType type) {
-        this.key   = key;
-        this.value = value;
-        this.type  = type;
-    }
+	public ConfigValue(final String key, final Object value, final XAttributeDefType type) {
+		this.key   = key;
+		this.value = value;
+		this.type  = type;
+	}
 
-    public static ConfigValue create(final String key, final Object value, final XAttributeDefType type) {
-        return new ConfigValue(key, value, type);
-    }
+	public static ConfigValue create(final String key, final Object value, final XAttributeDefType type) {
+		return new ConfigValue(key, value, type);
+	}
 
 }

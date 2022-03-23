@@ -30,35 +30,35 @@ import org.osgi.framework.BundleContext;
 
 public final class ConsoleAgentHelper {
 
-    private ConsoleAgentHelper() {
-        throw new IllegalAccessError("Cannot be instantiated");
-    }
+	private ConsoleAgentHelper() {
+		throw new IllegalAccessError("Cannot be instantiated");
+	}
 
-    public static String bsn(final long id, final BundleContext context) {
-        for (final Bundle b : context.getBundles()) {
-            if (b.getBundleId() == id) {
-                return b.getSymbolicName();
-            }
-        }
-        return null;
-    }
+	public static String bsn(final long id, final BundleContext context) {
+		for (final Bundle b : context.getBundles()) {
+			if (b.getBundleId() == id) {
+				return b.getSymbolicName();
+			}
+		}
+		return null;
+	}
 
-    public static Map<String, String> toStringMap(final Dictionary<String, Object> dictionary) {
-        final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream().collect(Collectors.toMap(identity(), v -> dictionary.get(v).toString()));
-    }
+	public static Map<String, String> toStringMap(final Dictionary<String, Object> dictionary) {
+		final List<String> keys = Collections.list(dictionary.keys());
+		return keys.stream().collect(Collectors.toMap(identity(), v -> dictionary.get(v).toString()));
+	}
 
-    public static <K, V> Map<K, V> valueOf(final Dictionary<K, V> dictionary) {
-        if (dictionary == null) {
-            return null;
-        }
-        final Map<K, V>      map  = new HashMap<>(dictionary.size());
-        final Enumeration<K> keys = dictionary.keys();
-        while (keys.hasMoreElements()) {
-            final K key = keys.nextElement();
-            map.put(key, dictionary.get(key));
-        }
-        return map;
-    }
+	public static <K, V> Map<K, V> valueOf(final Dictionary<K, V> dictionary) {
+		if (dictionary == null) {
+			return null;
+		}
+		final Map<K, V>      map  = new HashMap<>(dictionary.size());
+		final Enumeration<K> keys = dictionary.keys();
+		while (keys.hasMoreElements()) {
+			final K key = keys.nextElement();
+			map.put(key, dictionary.get(key));
+		}
+		return map;
+	}
 
 }

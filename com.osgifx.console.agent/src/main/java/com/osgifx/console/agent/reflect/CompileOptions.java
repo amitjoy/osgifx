@@ -23,31 +23,31 @@ import javax.annotation.processing.Processor;
 
 public final class CompileOptions {
 
-    final List<? extends Processor> processors;
-    final List<String>              options;
+	final List<? extends Processor> processors;
+	final List<String>              options;
 
-    public CompileOptions() {
-        this(Collections.emptyList(), Collections.emptyList());
-    }
+	public CompileOptions() {
+		this(Collections.emptyList(), Collections.emptyList());
+	}
 
-    private CompileOptions(final List<? extends Processor> processors, final List<String> options) {
-        this.processors = processors;
-        this.options    = options;
-    }
+	private CompileOptions(final List<? extends Processor> processors, final List<String> options) {
+		this.processors = processors;
+		this.options    = options;
+	}
 
-    public final CompileOptions processors(final Processor... newProcessors) {
-        return processors(Arrays.asList(newProcessors));
-    }
+	public final CompileOptions processors(final Processor... newProcessors) {
+		return processors(Arrays.asList(newProcessors));
+	}
 
-    public CompileOptions processors(final List<? extends Processor> newProcessors) {
-        return new CompileOptions(newProcessors, options);
-    }
+	public CompileOptions processors(final List<? extends Processor> newProcessors) {
+		return new CompileOptions(newProcessors, options);
+	}
 
-    public final CompileOptions options(final String... newOptions) {
-        return options(Arrays.asList(newOptions));
-    }
+	public final CompileOptions options(final String... newOptions) {
+		return options(Arrays.asList(newOptions));
+	}
 
-    public CompileOptions options(final List<String> newOptions) {
-        return new CompileOptions(processors, newOptions);
-    }
+	public CompileOptions options(final List<String> newOptions) {
+		return new CompileOptions(processors, newOptions);
+	}
 }

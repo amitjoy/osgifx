@@ -19,11 +19,11 @@ import java.util.List;
 
 public class XErrorPageDTO extends XHttpInfoDTO {
 
-    public String       name;
-    public boolean      asyncSupported;
-    public long         serviceId;
-    public String       servletInfo;
-    public List<String> exceptions;
-    public List<Long>   errorCodes;
+	public String       name;
+	public boolean      asyncSupported;
+	public long         serviceId;
+	public String       servletInfo;
+	public List<String> exceptions;
+	public List<Long>   errorCodes;
 
 }

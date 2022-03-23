@@ -19,5 +19,5 @@ import com.osgifx.console.agent.dto.XEventDTO;
 
 @FunctionalInterface
 public interface EventListener {
-    void onEvent(XEventDTO event);
+	void onEvent(XEventDTO event);
 }

@@ -17,20 +17,20 @@ package com.osgifx.console.agent.reflect;
 
 public class ReflectException extends RuntimeException {
 
-    private static final long serialVersionUID = -6213149635297151442L;
+	private static final long serialVersionUID = -6213149635297151442L;
 
-    public ReflectException(final String message) {
-        super(message);
-    }
+	public ReflectException(final String message) {
+		super(message);
+	}
 
-    public ReflectException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
+	public ReflectException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 
-    public ReflectException() {
-    }
+	public ReflectException() {
+	}
 
-    public ReflectException(final Throwable cause) {
-        super(cause);
-    }
+	public ReflectException(final Throwable cause) {
+		super(cause);
+	}
 }

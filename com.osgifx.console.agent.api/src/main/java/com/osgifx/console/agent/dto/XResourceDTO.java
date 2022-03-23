@@ -19,8 +19,8 @@ import java.util.List;
 
 public class XResourceDTO extends XHttpInfoDTO {
 
-    public List<String> patterns;
-    public String       prefix;
-    public long         serviceId;
+	public List<String> patterns;
+	public String       prefix;
+	public long         serviceId;
 
 }

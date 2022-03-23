@@ -19,7 +19,7 @@ import java.util.List;
 
 public class XListenerDTO extends XHttpInfoDTO {
 
-    public List<String> types;
-    public long         serviceId;
+	public List<String> types;
+	public long         serviceId;
 
 }

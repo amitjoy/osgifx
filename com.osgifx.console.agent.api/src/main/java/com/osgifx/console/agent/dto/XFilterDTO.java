@@ -19,12 +19,12 @@ import java.util.List;
 
 public class XFilterDTO extends XHttpInfoDTO {
 
-    public List<String> patterns;
-    public String       name;
-    public List<String> servletNames;
-    public List<String> regexs;
-    public List<String> dispatcher;
-    public boolean      asyncSupported;
-    public long         serviceId;
+	public List<String> patterns;
+	public String       name;
+	public List<String> servletNames;
+	public List<String> regexs;
+	public List<String> dispatcher;
+	public boolean      asyncSupported;
+	public long         serviceId;
 
 }

@@ -26,14 +26,14 @@ import java.util.Map;
 @FunctionalInterface
 public interface AgentExtension {
 
-    /** The service property key to be set */
-    String PROPERTY_KEY = "agent.extension.name";
+	/** The service property key to be set */
+	String PROPERTY_KEY = "agent.extension.name";
 
-    /**
-     * Returns the results as a type supported by the bnd converter
-     *
-     * @param context the context for the extension
-     * @return the result as a bnd converter supported type
-     */
-    Object execute(Map<String, Object> context);
+	/**
+	 * Returns the results as a type supported by the bnd converter
+	 *
+	 * @param context the context for the extension
+	 * @return the result as a bnd converter supported type
+	 */
+	Object execute(Map<String, Object> context);
 }
