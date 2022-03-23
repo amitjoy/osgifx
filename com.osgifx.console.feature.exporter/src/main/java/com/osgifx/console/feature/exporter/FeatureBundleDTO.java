@@ -17,8 +17,8 @@ package com.osgifx.console.feature.exporter;
 
 public class FeatureBundleDTO {
 
-    public String  id;
-    public String  file;
-    public Integer startlevel; // intentional as it can be null as well
+	public String  id;
+	public String  file;
+	public Integer startlevel; // intentional as it can be null as well
 
 }
