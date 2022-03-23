@@ -29,8 +29,8 @@ org.awaitility:awaitility:4.2.0
 # TilesFx
 
 eu.hansolo:tilesfx:17.1.8
-eu.hansolo:toolbox:17.0.21
-eu.hansolo:toolboxfx:17.0.27
+eu.hansolo:toolbox:17.0.22
+eu.hansolo:toolboxfx:17.0.28
 
 # FormsFx
 
