@@ -19,10 +19,10 @@ import java.util.List;
 
 public class XServletDTO extends XHttpInfoDTO {
 
-    public List<String> patterns;
-    public String       name;
-    public boolean      asyncSupported;
-    public long         serviceId;
-    public String       servletInfo;
+	public List<String> patterns;
+	public String       name;
+	public boolean      asyncSupported;
+	public long         serviceId;
+	public String       servletInfo;
 
 }

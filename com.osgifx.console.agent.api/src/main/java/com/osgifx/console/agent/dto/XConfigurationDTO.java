@@ -21,12 +21,12 @@ import org.osgi.dto.DTO;
 
 public class XConfigurationDTO extends DTO {
 
-    public String                   pid;
-    public String                   factoryPid;
-    public String                   location;
-    public boolean                  isFactory;
-    public boolean                  isPersisted;
-    public XObjectClassDefDTO       ocd;
-    public Map<String, ConfigValue> properties;
+	public String                   pid;
+	public String                   factoryPid;
+	public String                   location;
+	public boolean                  isFactory;
+	public boolean                  isPersisted;
+	public XObjectClassDefDTO       ocd;
+	public Map<String, ConfigValue> properties;
 
 }

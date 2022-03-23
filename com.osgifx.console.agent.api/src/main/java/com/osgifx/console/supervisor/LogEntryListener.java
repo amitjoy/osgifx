@@ -19,5 +19,5 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 
 @FunctionalInterface
 public interface LogEntryListener {
-    void logged(XLogEntryDTO logEntry);
+	void logged(XLogEntryDTO logEntry);
 }
