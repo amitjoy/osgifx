@@ -37,55 +37,55 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ThreadsFxController {
 
-    @Log
-    @Inject
-    private FluentLogger                    logger;
-    @FXML
-    private TableView<XThreadDTO>           table;
-    @FXML
-    private TableColumn<XThreadDTO, String> nameColumn;
-    @FXML
-    private TableColumn<XThreadDTO, String> idColumn;
-    @FXML
-    private TableColumn<XThreadDTO, String> priorityColumn;
-    @FXML
-    private TableColumn<XThreadDTO, String> stateColumn;
-    @FXML
-    private TableColumn<XThreadDTO, String> isInterruptedColumn;
-    @FXML
-    private TableColumn<XThreadDTO, String> isAliveColumn;
-    @FXML
-    private TableColumn<XThreadDTO, String> isDaemonColumn;
-    @Inject
-    @Named("is_connected")
-    private boolean                         isConnected;
-    @Inject
-    private DataProvider                    dataProvider;
+	@Log
+	@Inject
+	private FluentLogger                    logger;
+	@FXML
+	private TableView<XThreadDTO>           table;
+	@FXML
+	private TableColumn<XThreadDTO, String> nameColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> idColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> priorityColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> stateColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> isInterruptedColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> isAliveColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> isDaemonColumn;
+	@Inject
+	@Named("is_connected")
+	private boolean                         isConnected;
+	@Inject
+	private DataProvider                    dataProvider;
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(table);
-            return;
-        }
-        initCells();
-        Fx.addContextMenuToCopyContent(table);
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(table);
+			return;
+		}
+		initCells();
+		Fx.addContextMenuToCopyContent(table);
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void initCells() {
-        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
-        priorityColumn.setCellValueFactory(new DTOCellValueFactory<>("priority", String.class));
-        stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
-        isInterruptedColumn.setCellValueFactory(new DTOCellValueFactory<>("isInterrupted", String.class));
-        isAliveColumn.setCellValueFactory(new DTOCellValueFactory<>("isAlive", String.class));
-        isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
+	private void initCells() {
+		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+		idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+		priorityColumn.setCellValueFactory(new DTOCellValueFactory<>("priority", String.class));
+		stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
+		isInterruptedColumn.setCellValueFactory(new DTOCellValueFactory<>("isInterrupted", String.class));
+		isAliveColumn.setCellValueFactory(new DTOCellValueFactory<>("isAlive", String.class));
+		isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
 
-        table.setItems(dataProvider.threads());
-        Fx.sortBy(table, nameColumn);
+		table.setItems(dataProvider.threads());
+		Fx.sortBy(table, nameColumn);
 
-        TableFilter.forTableView(table).apply();
-    }
+		TableFilter.forTableView(table).apply();
+	}
 
 }
