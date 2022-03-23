@@ -39,7 +39,6 @@ import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -50,87 +49,86 @@ import javafx.scene.paint.Color;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogsFxController {
 
-    private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
+	private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
 
-    @Log
-    @Inject
-    private FluentLogger            logger;
-    @Inject
-    @LocalInstance
-    private FXMLLoader              loader;
-    @FXML
-    private TableView<XLogEntryDTO> table;
-    @Inject
-    @OSGiBundle
-    private BundleContext           context;
-    @Inject
-    @Named("is_connected")
-    private boolean                 isConnected;
-    @Inject
-    private DataProvider            dataProvider;
+	@Log
+	@Inject
+	private FluentLogger            logger;
+	@Inject
+	@LocalInstance
+	private FXMLLoader              loader;
+	@FXML
+	private TableView<XLogEntryDTO> table;
+	@Inject
+	@OSGiBundle
+	private BundleContext           context;
+	@Inject
+	@Named("is_connected")
+	private boolean                 isConnected;
+	@Inject
+	private DataProvider            dataProvider;
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(table);
-            return;
-        }
-        createControls();
-        Fx.disableSelectionModel(table);
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(table);
+			return;
+		}
+		createControls();
+		Fx.disableSelectionModel(table);
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void createControls() {
-        final GridPane                             expandedNode   = (GridPane) Fx.loadFXML(loader, context,
-                "/fxml/expander-column-content.fxml");
-        final LogDetailsFxController               controller     = loader.getController();
-        final TableRowExpanderColumn<XLogEntryDTO> expanderColumn = new TableRowExpanderColumn<>(expandedLog -> {
-                                                                      controller.initControls(expandedLog.getValue());
-                                                                      return expandedNode;
-                                                                  });
+	private void createControls() {
+		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+		final var controller     = (LogDetailsFxController) loader.getController();
+		final var expanderColumn = new TableRowExpanderColumn<XLogEntryDTO>(expandedLog -> {
+										controller.initControls(expandedLog.getValue());
+										return expandedNode;
+									});
 
-        final TableColumn<XLogEntryDTO, Date> loggedAtColumn = new TableColumn<>("Logged At");
+		final var loggedAtColumn = new TableColumn<XLogEntryDTO, Date>("Logged At");
 
-        loggedAtColumn.setPrefWidth(270);
-        loggedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("loggedAt", Date.class));
+		loggedAtColumn.setPrefWidth(270);
+		loggedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("loggedAt", Date.class));
 
-        final TableColumn<XLogEntryDTO, String> logLevelColumn = new TableColumn<>("Level");
+		final var logLevelColumn = new TableColumn<XLogEntryDTO, String>("Level");
 
-        logLevelColumn.setPrefWidth(110);
-        logLevelColumn.setCellValueFactory(new DTOCellValueFactory<>("level", String.class));
+		logLevelColumn.setPrefWidth(110);
+		logLevelColumn.setCellValueFactory(new DTOCellValueFactory<>("level", String.class));
 
-        final TableColumn<XLogEntryDTO, String> messageColumn = new TableColumn<>("Message");
+		final var messageColumn = new TableColumn<XLogEntryDTO, String>("Message");
 
-        messageColumn.setPrefWidth(750);
-        messageColumn.setCellValueFactory(new DTOCellValueFactory<>("message", String.class));
-        Fx.addCellFactory(messageColumn, c -> "ERROR".equalsIgnoreCase(c.level), Color.MEDIUMVIOLETRED, Color.BLACK);
+		messageColumn.setPrefWidth(750);
+		messageColumn.setCellValueFactory(new DTOCellValueFactory<>("message", String.class));
+		Fx.addCellFactory(messageColumn, c -> "ERROR".equalsIgnoreCase(c.level), Color.MEDIUMVIOLETRED, Color.BLACK);
 
-        table.getColumns().add(expanderColumn);
-        table.getColumns().add(loggedAtColumn);
-        table.getColumns().add(logLevelColumn);
-        table.getColumns().add(messageColumn);
+		table.getColumns().add(expanderColumn);
+		table.getColumns().add(loggedAtColumn);
+		table.getColumns().add(logLevelColumn);
+		table.getColumns().add(messageColumn);
 
-        final ObservableList<XLogEntryDTO> logs = dataProvider.logs();
-        table.setItems(logs);
+		final var logs = dataProvider.logs();
+		table.setItems(logs);
 
-        TableFilter.forTableView(table).apply();
-        sortByLoggedAt(loggedAtColumn);
-    }
+		TableFilter.forTableView(table).apply();
+		sortByLoggedAt(loggedAtColumn);
+	}
 
-    @Inject
-    @Optional
-    private void clearTableEvent(@UIEventTopic(EVENT_TOPIC) final String data) {
-        table.setItems(FXCollections.emptyObservableList());
-        final ObservableList<XLogEntryDTO> logs = dataProvider.logs();
-        logs.clear();
-        table.setItems(logs);
-        logger.atInfo().log("Cleared logs table successfully");
-    }
+	@Inject
+	@Optional
+	private void clearTableEvent(@UIEventTopic(EVENT_TOPIC) final String data) {
+		table.setItems(FXCollections.emptyObservableList());
+		final var logs = dataProvider.logs();
+		logs.clear();
+		table.setItems(logs);
+		logger.atInfo().log("Cleared logs table successfully");
+	}
 
-    private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {
-        column.setSortType(TableColumn.SortType.DESCENDING);
-        table.getSortOrder().add(column);
-        table.sort();
-    }
+	private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {
+		column.setSortType(TableColumn.SortType.DESCENDING);
+		table.getSortOrder().add(column);
+		table.sort();
+	}
 
 }
