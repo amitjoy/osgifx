@@ -68,89 +68,89 @@ import javafx.scene.paint.Stop;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class OverviewFxUI {
 
-    private static final double TILE_WIDTH  = 420;
-    private static final double TILE_HEIGHT = 220;
+	private static final double TILE_WIDTH  = 420;
+	private static final double TILE_HEIGHT = 220;
 
-    @Log
-    @Inject
-    private FluentLogger     logger;
-    @Inject
-    private ConsoleStatusBar statusBar;
-    @Inject
-    private Supervisor       supervisor;
+	@Log
+	@Inject
+	private FluentLogger     logger;
+	@Inject
+	private ConsoleStatusBar statusBar;
+	@Inject
+	private Supervisor       supervisor;
 
-    private volatile double noOfThreads;
-    private volatile double noOfServices;
-    private volatile double noOfComponents;
-    private volatile double noOfInstalledBundles;
+	private volatile double noOfThreads;
+	private volatile double noOfServices;
+	private volatile double noOfComponents;
+	private volatile double noOfInstalledBundles;
 
-    private UptimeDTO           uptime;
-    private Map<String, String> runtimeInfo;
+	private UptimeDTO           uptime;
+	private Map<String, String> runtimeInfo;
 
-    @PostConstruct
-    public void postConstruct(final BorderPane parent) {
-        createControls(parent);
-        logger.atDebug().log("Overview part has been initialized");
-    }
+	@PostConstruct
+	public void postConstruct(final BorderPane parent) {
+		createControls(parent);
+		logger.atDebug().log("Overview part has been initialized");
+	}
 
-    @Focus
-    void focus(final BorderPane parent) {
-        createControls(parent);
-    }
+	@Focus
+	void focus(final BorderPane parent) {
+		createControls(parent);
+	}
 
-    private void createControls(final BorderPane parent) {
-        runtimeInfo = Maps.newConcurrentMap();
-        uptime      = new UptimeDTO(0, 0, 0, 0);
+	private void createControls(final BorderPane parent) {
+		runtimeInfo = Maps.newConcurrentMap();
+		uptime      = new UptimeDTO(0, 0, 0, 0);
 
-        statusBar.addTo(parent);
-        retrieveRuntimeInfo(parent);
-        createWidgets(parent);
-    }
+		statusBar.addTo(parent);
+		retrieveRuntimeInfo(parent);
+		createWidgets(parent);
+	}
 
-    private void retrieveRuntimeInfo(final BorderPane parent) {
-        final Task<?> task = new Task<Void>() {
+	private void retrieveRuntimeInfo(final BorderPane parent) {
+		final Task<?> task = new Task<Void>() {
 
-            @Override
-            protected Void call() throws Exception {
-                final Agent agent = supervisor.getAgent();
-                if (agent == null) {
-                    return null;
-                }
-                noOfThreads          = Optional.ofNullable(agent.getAllThreads()).map(List::size).orElse(0);
-                noOfInstalledBundles = Optional.ofNullable(agent.getAllBundles()).map(List::size).orElse(0);
-                noOfServices         = Optional.ofNullable(agent.getAllServices()).map(List::size).orElse(0);
-                noOfComponents       = Optional.ofNullable(agent.getAllComponents()).map(List::size).orElse(0);
+			@Override
+			protected Void call() throws Exception {
+				final var agent = supervisor.getAgent();
+				if (agent == null) {
+					return null;
+				}
+				noOfThreads          = Optional.ofNullable(agent.getAllThreads()).map(List::size).orElse(0);
+				noOfInstalledBundles = Optional.ofNullable(agent.getAllBundles()).map(List::size).orElse(0);
+				noOfServices         = Optional.ofNullable(agent.getAllServices()).map(List::size).orElse(0);
+				noOfComponents       = Optional.ofNullable(agent.getAllComponents()).map(List::size).orElse(0);
 
-                final Map<String, String> info = Optional.ofNullable(agent.getRuntimeInfo()).map(Maps::newHashMap)
-                        .orElse(Maps.newHashMap());
-                runtimeInfo.putAll(info);
+				final Map<String, String> info = Optional.ofNullable(agent.getRuntimeInfo()).map(Maps::newHashMap)
+				        .orElse(Maps.newHashMap());
+				runtimeInfo.putAll(info);
 
-                final String up = info.get("Uptime");
-                if (up != null) {
-                    uptime = toUptimeEntry(Long.parseLong(up));
-                } else {
-                    uptime = new UptimeDTO(0, 0, 0, 0);
-                }
-                return null;
-            }
+				final var up = info.get("Uptime");
+				if (up != null) {
+					uptime = toUptimeEntry(Long.parseLong(up));
+				} else {
+					uptime = new UptimeDTO(0, 0, 0, 0);
+				}
+				return null;
+			}
 
-            @Override
-            protected void succeeded() {
-                createWidgets(parent);
-                updateProgress(0, 0);
-            }
-        };
+			@Override
+			protected void succeeded() {
+				createWidgets(parent);
+				updateProgress(0, 0);
+			}
+		};
 
-        statusBar.progressProperty().bind(task.progressProperty());
+		statusBar.progressProperty().bind(task.progressProperty());
 
-        final Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
-    }
+		final var thread = new Thread(task);
+		thread.setDaemon(true);
+		thread.start();
+	}
 
-    private void createWidgets(final BorderPane parent) {
-        // @formatter:off
-        final Tile clockTile = TileBuilder.create()
+	private void createWidgets(final BorderPane parent) {
+		// @formatter:off
+        final var clockTile = TileBuilder.create()
                                           .skinType(SkinType.CLOCK)
                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                           .title("Today")
@@ -161,7 +161,7 @@ public final class OverviewFxUI {
                                           .build();
         clockTile.setRoundedCorners(false);
 
-        final Tile noOfThreadsTile = TileBuilder.create()
+        final var noOfThreadsTile = TileBuilder.create()
                                                 .skinType(SkinType.NUMBER)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                 .title("Threads")
@@ -173,7 +173,7 @@ public final class OverviewFxUI {
                                                 .build();
         noOfThreadsTile.setRoundedCorners(false);
 
-        final Tile runtimeInfoTile = TileBuilder.create()
+        final var runtimeInfoTile = TileBuilder.create()
                                                 .skinType(SkinType.CUSTOM)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                 .title("Runtime Information")
@@ -183,7 +183,7 @@ public final class OverviewFxUI {
                                                 .build();
         runtimeInfoTile.setRoundedCorners(false);
 
-        final Tile noOfBundlesTile = TileBuilder.create()
+        final var noOfBundlesTile = TileBuilder.create()
                                                 .skinType(SkinType.NUMBER)
                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                 .title("Bundles")
@@ -195,7 +195,7 @@ public final class OverviewFxUI {
                                                 .build();
         noOfBundlesTile.setRoundedCorners(false);
 
-        final Tile noOfServicesTile = TileBuilder.create()
+        final var noOfServicesTile = TileBuilder.create()
                                                  .skinType(SkinType.NUMBER)
                                                  .numberFormat(new DecimalFormat("#"))
                                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -208,7 +208,7 @@ public final class OverviewFxUI {
                                                  .build();
         noOfServicesTile.setRoundedCorners(false);
 
-        final Tile noOfComponentsTile = TileBuilder.create()
+        final var noOfComponentsTile = TileBuilder.create()
                                                    .skinType(SkinType.NUMBER)
                                                    .numberFormat(new DecimalFormat("#"))
                                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
@@ -221,24 +221,24 @@ public final class OverviewFxUI {
                                                    .build();
         noOfComponentsTile.setRoundedCorners(false);
 
-        final long freeMemoryInBytes = getMemory("Memory Free");
-        final long totalMemoryInBytes = getMemory("Memory Total");
+        final var freeMemoryInBytes = getMemory("Memory Free");
+        final var totalMemoryInBytes = getMemory("Memory Total");
 
-        final int freeMemoryInMB = toMB(freeMemoryInBytes);
-        final int totalMemoryInMB = toMB(totalMemoryInBytes);
+        final var freeMemoryInMB = toMB(freeMemoryInBytes);
+        final var totalMemoryInMB = toMB(totalMemoryInBytes);
 
-        final Tile memoryConsumptionTile = TileBuilder.create()
+        final var memoryConsumptionTile = TileBuilder.create()
                                                         .skinType(SkinType.PERCENTAGE)
                                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                         .title("JVM Memory Consumption Percentage")
                                                         .build();
         memoryConsumptionTile.setRoundedCorners(false);
         final double usedMemory = totalMemoryInBytes - freeMemoryInBytes;
-        final double memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
-        final double memoryConsumptionInfoInPercentage = memoryConsumptionInfo * 100;
+        final var memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
+        final var memoryConsumptionInfoInPercentage = memoryConsumptionInfo * 100;
         memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
-        final Tile availableMemoryTile = TileBuilder.create()
+        final var availableMemoryTile = TileBuilder.create()
                                                     .skinType(SkinType.BAR_GAUGE)
                                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                     .minValue(0)
@@ -266,7 +266,7 @@ public final class OverviewFxUI {
         availableMemoryTile.setRoundedCorners(false);
         availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
 
-        final Tile uptimeTile = TileBuilder.create()
+        final var uptimeTile = TileBuilder.create()
                                            .skinType(SkinType.TIME)
                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                            .title("Uptime")
@@ -276,7 +276,7 @@ public final class OverviewFxUI {
                                            .build();
         uptimeTile.setRoundedCorners(false);
 
-        final FlowGridPane pane = new FlowGridPane(3, 3,
+        final var pane = new FlowGridPane(3, 3,
                                                    clockTile,
                                                    runtimeInfoTile,
                                                    noOfThreadsTile,
@@ -295,95 +295,95 @@ public final class OverviewFxUI {
 
         parent.setCenter(pane);
         // @formatter:on
-    }
+	}
 
-    private synchronized Node createRuntimeTable(final Map<String, String> info) {
-        final Label name = new Label("");
-        name.setTextFill(Tile.FOREGROUND);
-        name.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(name, Priority.NEVER);
+	private synchronized Node createRuntimeTable(final Map<String, String> info) {
+		final var name = new Label("");
+		name.setTextFill(Tile.FOREGROUND);
+		name.setAlignment(Pos.CENTER_LEFT);
+		HBox.setHgrow(name, Priority.NEVER);
 
-        final Region spacer = new Region();
-        spacer.setPrefSize(5, 5);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+		final var spacer = new Region();
+		spacer.setPrefSize(5, 5);
+		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        final Label views = new Label("");
-        views.setTextFill(Tile.FOREGROUND);
-        views.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setHgrow(views, Priority.NEVER);
+		final var views = new Label("");
+		views.setTextFill(Tile.FOREGROUND);
+		views.setAlignment(Pos.CENTER_RIGHT);
+		HBox.setHgrow(views, Priority.NEVER);
 
-        final HBox header = new HBox(5, name, spacer, views);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setFillHeight(true);
+		final var header = new HBox(5, name, spacer, views);
+		header.setAlignment(Pos.CENTER_LEFT);
+		header.setFillHeight(true);
 
-        final VBox dataTable = new VBox(0, header);
-        dataTable.setFillWidth(true);
+		final var dataTable = new VBox(0, header);
+		dataTable.setFillWidth(true);
 
-        final Map<String, String> sorted = new TreeMap<>(info);
-        for (final Entry<String, String> entry : sorted.entrySet()) {
-            final String key   = entry.getKey();
-            final String value = entry.getValue();
-            if ("Uptime".equals(key)) {
-                continue;
-            }
-            final HBox node = getTileTableInfo(key, value);
-            dataTable.getChildren().add(node);
-        }
-        return dataTable;
-    }
+		final Map<String, String> sorted = new TreeMap<>(info);
+		for (final Entry<String, String> entry : sorted.entrySet()) {
+			final var key   = entry.getKey();
+			final var value = entry.getValue();
+			if ("Uptime".equals(key)) {
+				continue;
+			}
+			final var node = getTileTableInfo(key, value);
+			dataTable.getChildren().add(node);
+		}
+		return dataTable;
+	}
 
-    private HBox getTileTableInfo(final String property, final String value) {
-        final Label propertyLabel = new Label(property);
-        propertyLabel.setTextFill(Tile.FOREGROUND);
-        propertyLabel.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(propertyLabel, Priority.NEVER);
+	private HBox getTileTableInfo(final String property, final String value) {
+		final var propertyLabel = new Label(property);
+		propertyLabel.setTextFill(Tile.FOREGROUND);
+		propertyLabel.setAlignment(Pos.CENTER_LEFT);
+		HBox.setHgrow(propertyLabel, Priority.NEVER);
 
-        final Region spacer = new Region();
-        spacer.setPrefSize(5, 5);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+		final var spacer = new Region();
+		spacer.setPrefSize(5, 5);
+		HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        final Label valueLabel = new Label(value);
-        valueLabel.setTextFill(Tile.FOREGROUND);
-        valueLabel.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setHgrow(valueLabel, Priority.NEVER);
+		final var valueLabel = new Label(value);
+		valueLabel.setTextFill(Tile.FOREGROUND);
+		valueLabel.setAlignment(Pos.CENTER_RIGHT);
+		HBox.setHgrow(valueLabel, Priority.NEVER);
 
-        final HBox hBox = new HBox(5, propertyLabel, spacer, valueLabel);
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setFillHeight(true);
+		final var hBox = new HBox(5, propertyLabel, spacer, valueLabel);
+		hBox.setAlignment(Pos.CENTER_LEFT);
+		hBox.setFillHeight(true);
 
-        return hBox;
-    }
+		return hBox;
+	}
 
-    private int toMB(final long sizeInBytes) {
-        return (int) (sizeInBytes / 1024 / 1024);
-    }
+	private int toMB(final long sizeInBytes) {
+		return (int) (sizeInBytes / 1024 / 1024);
+	}
 
-    private UptimeDTO toUptimeEntry(final long uptime) {
-        final int days    = (int) TimeUnit.MILLISECONDS.toDays(uptime);
-        final int hours   = (int) TimeUnit.MILLISECONDS.toHours(uptime) - days * 24;
-        final int minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(uptime) - TimeUnit.MILLISECONDS.toHours(uptime) * 60);
-        final int seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(uptime) - TimeUnit.MILLISECONDS.toMinutes(uptime) * 60);
+	private UptimeDTO toUptimeEntry(final long uptime) {
+		final var days    = (int) TimeUnit.MILLISECONDS.toDays(uptime);
+		final var hours   = (int) TimeUnit.MILLISECONDS.toHours(uptime) - days * 24;
+		final var minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(uptime) - TimeUnit.MILLISECONDS.toHours(uptime) * 60);
+		final var seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(uptime) - TimeUnit.MILLISECONDS.toMinutes(uptime) * 60);
 
-        return new UptimeDTO(days, hours, minutes, seconds);
-    }
+		return new UptimeDTO(days, hours, minutes, seconds);
+	}
 
-    @SuppressWarnings("unused")
-    private static class UptimeDTO {
-        int days;
-        int hours;
-        int minutes;
-        int seconds;
+	@SuppressWarnings("unused")
+	private static class UptimeDTO {
+		int days;
+		int hours;
+		int minutes;
+		int seconds;
 
-        public UptimeDTO(final int days, final int hours, final int minutes, final int seconds) {
-            this.days    = days;
-            this.hours   = hours;
-            this.minutes = minutes;
-            this.seconds = seconds;
-        }
-    }
+		public UptimeDTO(final int days, final int hours, final int minutes, final int seconds) {
+			this.days    = days;
+			this.hours   = hours;
+			this.minutes = minutes;
+			this.seconds = seconds;
+		}
+	}
 
-    private long getMemory(final String key) {
-        // @formatter:off
+	private long getMemory(final String key) {
+		// @formatter:off
         return java.util.Optional.ofNullable(supervisor.getAgent())
                                  .map(Agent::getRuntimeInfo)
                                  .map(Maps::newHashMap)
@@ -392,20 +392,20 @@ public final class OverviewFxUI {
                                  .map(Long::valueOf)
                                  .orElse(0L);
         // @formatter:on
-    }
+	}
 
-    @Inject
-    @org.eclipse.e4.core.di.annotations.Optional
-    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
-        logger.atInfo().log("Agent connected event received");
-        createControls(parent);
-    }
+	@Inject
+	@org.eclipse.e4.core.di.annotations.Optional
+	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+		logger.atInfo().log("Agent connected event received");
+		createControls(parent);
+	}
 
-    @Inject
-    @org.eclipse.e4.core.di.annotations.Optional
-    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
-        logger.atInfo().log("Agent disconnected event received");
-        createControls(parent);
-    }
+	@Inject
+	@org.eclipse.e4.core.di.annotations.Optional
+	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+		logger.atInfo().log("Agent disconnected event received");
+		createControls(parent);
+	}
 
 }
