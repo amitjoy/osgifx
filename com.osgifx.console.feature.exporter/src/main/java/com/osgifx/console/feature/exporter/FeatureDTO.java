@@ -20,17 +20,17 @@ import java.util.Map;
 
 public class FeatureDTO {
 
-    public String                           id;
-    public String                           name;
-    public List<String>                     categories;
-    public String                           description;
-    public String                           docURL;
-    public String                           vendor;
-    public String                           license;
-    public String                           scm;
-    public boolean                          complete = true;
-    public List<FeatureBundleDTO>           bundles;
-    public Map<String, String>              variables;
-    public Map<String, Map<String, String>> configurations;
+	public String                           id;
+	public String                           name;
+	public List<String>                     categories;
+	public String                           description;
+	public String                           docURL;
+	public String                           vendor;
+	public String                           license;
+	public String                           scm;
+	public boolean                          complete = true;
+	public List<FeatureBundleDTO>           bundles;
+	public Map<String, String>              variables;
+	public Map<String, Map<String, String>> configurations;
 
 }
