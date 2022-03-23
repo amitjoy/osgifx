@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.services;
 
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+import static org.osgi.service.component.ComponentConstants.COMPONENT_ID;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,6 +40,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ServicesFxController {
@@ -88,6 +90,7 @@ public final class ServicesFxController {
 
 		objectClassColumn.setPrefWidth(600);
 		objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
+		Fx.addCellFactory(objectClassColumn, s -> s.properties.containsKey(COMPONENT_ID), Color.SLATEBLUE, Color.BLACK);
 
 		final var registeringBundleColumn = new TableColumn<XServiceDTO, String>("Registering Bundle");
 
