@@ -29,12 +29,10 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -44,68 +42,67 @@ import javafx.scene.layout.GridPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class PackagesFxController {
 
-    @Log
-    @Inject
-    private FluentLogger          logger;
-    @Inject
-    @LocalInstance
-    private FXMLLoader            loader;
-    @FXML
-    private TableView<PackageDTO> table;
-    @Inject
-    @OSGiBundle
-    private BundleContext         context;
-    @Inject
-    @Named("is_connected")
-    private boolean               isConnected;
-    @Inject
-    private DataProvider          dataProvider;
+	@Log
+	@Inject
+	private FluentLogger          logger;
+	@Inject
+	@LocalInstance
+	private FXMLLoader            loader;
+	@FXML
+	private TableView<PackageDTO> table;
+	@Inject
+	@OSGiBundle
+	private BundleContext         context;
+	@Inject
+	@Named("is_connected")
+	private boolean               isConnected;
+	@Inject
+	private DataProvider          dataProvider;
 
-    @FXML
-    public void initialize() {
-        if (!isConnected) {
-            Fx.addTablePlaceholderWhenDisconnected(table);
-            return;
-        }
-        createControls();
-        Fx.disableSelectionModel(table);
-        logger.atDebug().log("FXML controller has been initialized");
-    }
+	@FXML
+	public void initialize() {
+		if (!isConnected) {
+			Fx.addTablePlaceholderWhenDisconnected(table);
+			return;
+		}
+		createControls();
+		Fx.disableSelectionModel(table);
+		logger.atDebug().log("FXML controller has been initialized");
+	}
 
-    private void createControls() {
-        final GridPane                           expandedNode   = (GridPane) Fx.loadFXML(loader, context,
-                "/fxml/expander-column-content.fxml");
-        final PackageDetailsFxController         controller     = loader.getController();
-        final TableRowExpanderColumn<PackageDTO> expanderColumn = new TableRowExpanderColumn<>(expandedPackage -> {
-                                                                    controller.initControls(expandedPackage.getValue());
-                                                                    return expandedNode;
-                                                                });
+	private void createControls() {
+		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+		final var controller     = (PackageDetailsFxController) loader.getController();
+		final var expanderColumn = new TableRowExpanderColumn<PackageDTO>(expandedPackage -> {
+										controller.initControls(expandedPackage.getValue());
+										return expandedNode;
+									});
 
-        final TableColumn<PackageDTO, String> nameColumn = new TableColumn<>("Name");
+		final var nameColumn = new TableColumn<PackageDTO, String>("Name");
 
-        nameColumn.setPrefWidth(450);
-        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+		nameColumn.setPrefWidth(450);
+		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-        final TableColumn<PackageDTO, String> versionColumn = new TableColumn<>("Version");
+		final var versionColumn = new TableColumn<PackageDTO, String>("Version");
 
-        versionColumn.setPrefWidth(450);
-        versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
+		versionColumn.setPrefWidth(450);
+		versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
-        final TableColumn<PackageDTO, String> hasDuplicatesColumn = new TableColumn<>("Is Duplicate Export?");
+		final var hasDuplicatesColumn = new TableColumn<PackageDTO, String>("Is Duplicate Export?");
 
-        hasDuplicatesColumn.setPrefWidth(200);
-        hasDuplicatesColumn.setCellValueFactory(new DTOCellValueFactory<>("isDuplicateExport", String.class));
+		hasDuplicatesColumn.setPrefWidth(200);
+		hasDuplicatesColumn.setCellValueFactory(new DTOCellValueFactory<>("isDuplicateExport", String.class));
 
-        table.getColumns().add(expanderColumn);
-        table.getColumns().add(nameColumn);
-        table.getColumns().add(versionColumn);
-        table.getColumns().add(hasDuplicatesColumn);
+		table.getColumns().add(expanderColumn);
+		table.getColumns().add(nameColumn);
+		table.getColumns().add(versionColumn);
+		table.getColumns().add(hasDuplicatesColumn);
 
-        final ObservableList<XBundleDTO> bundles = dataProvider.bundles();
-        table.setItems(PackageHelper.prepareList(bundles, context));
-        Fx.sortBy(table, nameColumn);
+		final var bundles = dataProvider.bundles();
+		table.setItems(PackageHelper.prepareList(bundles, context));
+		Fx.sortBy(table, nameColumn);
 
-        TableFilter.forTableView(table).apply();
-    }
+		TableFilter.forTableView(table).apply();
+	}
 
 }

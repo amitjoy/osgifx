@@ -30,57 +30,57 @@ import javafx.collections.ObservableList;
 
 public final class PackageHelper {
 
-    private PackageHelper() {
-        throw new IllegalAccessError("Cannot be instantiated");
-    }
+	private PackageHelper() {
+		throw new IllegalAccessError("Cannot be instantiated");
+	}
 
-    public static ObservableList<PackageDTO> prepareList(final ObservableList<XBundleDTO> bundles, final BundleContext context) {
-        final List<PackageDTO>        packages      = Lists.newArrayList();
-        final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
+	public static ObservableList<PackageDTO> prepareList(final ObservableList<XBundleDTO> bundles, final BundleContext context) {
+		final List<PackageDTO>        packages      = Lists.newArrayList();
+		final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
 
-        for (final XBundleDTO bundle : bundles) {
-            final List<PackageDTO> exportedPackages = toPackageDTOs(bundle.exportedPackages);
-            final List<PackageDTO> importedPackages = toPackageDTOs(bundle.importedPackages);
+		for (final XBundleDTO bundle : bundles) {
+			final var exportedPackages = toPackageDTOs(bundle.exportedPackages);
+			final var importedPackages = toPackageDTOs(bundle.importedPackages);
 
-            exportedPackages.forEach(p -> p.exporters.add(bundle));
-            importedPackages.forEach(p -> p.importers.add(bundle));
+			exportedPackages.forEach(p -> p.exporters.add(bundle));
+			importedPackages.forEach(p -> p.importers.add(bundle));
 
-            packages.addAll(exportedPackages);
-            packages.addAll(importedPackages);
-        }
+			packages.addAll(exportedPackages);
+			packages.addAll(importedPackages);
+		}
 
-        for (final PackageDTO pkg : packages) {
-            final String key = pkg.name + ":" + pkg.version;
-            if (!finalPackages.containsKey(key)) {
-                finalPackages.put(key, pkg);
-            } else {
-                final PackageDTO packageDTO = finalPackages.get(key);
+		for (final PackageDTO pkg : packages) {
+			final var key = pkg.name + ":" + pkg.version;
+			if (!finalPackages.containsKey(key)) {
+				finalPackages.put(key, pkg);
+			} else {
+				final var packageDTO = finalPackages.get(key);
 
-                packageDTO.exporters.addAll(pkg.exporters);
-                packageDTO.importers.addAll(pkg.importers);
-            }
-        }
+				packageDTO.exporters.addAll(pkg.exporters);
+				packageDTO.importers.addAll(pkg.importers);
+			}
+		}
 
-        for (final PackageDTO pkg : finalPackages.values()) {
-            if (pkg.exporters.size() > 1) {
-                pkg.isDuplicateExport = true;
-            }
-        }
+		for (final PackageDTO pkg : finalPackages.values()) {
+			if (pkg.exporters.size() > 1) {
+				pkg.isDuplicateExport = true;
+			}
+		}
 
-        return FXCollections.observableArrayList(finalPackages.values());
-    }
+		return FXCollections.observableArrayList(finalPackages.values());
+	}
 
-    private static List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
-        return exportedPackages.stream().map(PackageHelper::toPackageDTO).toList();
-    }
+	private static List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
+		return exportedPackages.stream().map(PackageHelper::toPackageDTO).toList();
+	}
 
-    private static PackageDTO toPackageDTO(final XPackageDTO xpkg) {
-        final PackageDTO pkg = new PackageDTO();
+	private static PackageDTO toPackageDTO(final XPackageDTO xpkg) {
+		final var pkg = new PackageDTO();
 
-        pkg.name    = xpkg.name;
-        pkg.version = xpkg.version;
+		pkg.name    = xpkg.name;
+		pkg.version = xpkg.version;
 
-        return pkg;
-    }
+		return pkg;
+	}
 
 }
