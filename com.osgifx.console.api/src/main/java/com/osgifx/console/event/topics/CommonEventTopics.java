@@ -17,16 +17,16 @@ package com.osgifx.console.event.topics;
 
 public final class CommonEventTopics {
 
-    private CommonEventTopics() {
-        throw new IllegalAccessError("Cannot be instantiated");
-    }
+	private CommonEventTopics() {
+		throw new IllegalAccessError("Cannot be instantiated");
+	}
 
-    public static final String EVENT_RECEIVE_EVENT_TOPICS        = "osgi/fx/event/receive/*";
-    public static final String EVENT_RECEIVE_STARTED_EVENT_TOPIC = "osgi/fx/event/receive/started";
-    public static final String EVENT_RECEIVE_STOPPED_EVENT_TOPIC = "osgi/fx/event/receive/stopped";
+	public static final String EVENT_RECEIVE_EVENT_TOPICS        = "osgi/fx/event/receive/*";
+	public static final String EVENT_RECEIVE_STARTED_EVENT_TOPIC = "osgi/fx/event/receive/started";
+	public static final String EVENT_RECEIVE_STOPPED_EVENT_TOPIC = "osgi/fx/event/receive/stopped";
 
-    public static final String LOG_RECEIVE_EVENT_TOPICS        = "osgi/fx/log/receive/*";
-    public static final String LOG_RECEIVE_STARTED_EVENT_TOPIC = "osgi/fx/log/receive/started";
-    public static final String LOG_RECEIVE_STOPPED_EVENT_TOPIC = "osgi/fx/log/receive/stopped";
+	public static final String LOG_RECEIVE_EVENT_TOPICS        = "osgi/fx/log/receive/*";
+	public static final String LOG_RECEIVE_STARTED_EVENT_TOPIC = "osgi/fx/log/receive/started";
+	public static final String LOG_RECEIVE_STOPPED_EVENT_TOPIC = "osgi/fx/log/receive/stopped";
 
 }
