@@ -271,7 +271,7 @@ public final class OverviewFxUI {
                                            .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                            .title("Uptime")
                                            .text("Uptime of the remote runtime")
-                                           .duration(LocalTime.of(uptime.hours, uptime.minutes))
+                                           .duration(LocalTime.of(uptime.hours(), uptime.minutes()))
                                            .textVisible(true)
                                            .build();
         uptimeTile.setRoundedCorners(false);
@@ -367,19 +367,7 @@ public final class OverviewFxUI {
 		return new UptimeDTO(days, hours, minutes, seconds);
 	}
 
-	@SuppressWarnings("unused")
-	private static class UptimeDTO {
-		int days;
-		int hours;
-		int minutes;
-		int seconds;
-
-		public UptimeDTO(final int days, final int hours, final int minutes, final int seconds) {
-			this.days    = days;
-			this.hours   = hours;
-			this.minutes = minutes;
-			this.seconds = seconds;
-		}
+	private record UptimeDTO(int days, int hours, int minutes, int seconds) {
 	}
 
 	private long getMemory(final String key) {
