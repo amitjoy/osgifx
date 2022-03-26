@@ -19,6 +19,7 @@ tasks.jpackage {
 	mainJar                     =     ws.getProperty("mainJar")
 	licenseFile                 =     ws.getProperty("licenseFile")
 	javaOptions                 =     ws.getProperty("javaOptions").split(",")
+	verbose                     =     ws.getProperty("verbose")
 	mac {
 		macPackageIdentifier    =     ws.getProperty("macPackageIdentifier")
 		icon                    =     ws.getProperty("macIcon")
