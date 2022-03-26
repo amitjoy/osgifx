@@ -9,6 +9,7 @@ mainClass               =        aQute.launcher.pre.EmbeddedLauncher
 mainJar                 =        osgifx.jar
 licenseFile             =        ../LICENSE
 javaOptions             =        ${-runvm}
+verbose                 =        true
 
 macPackageIdentifier    =        com.osgifx
 macIcon                 =        icons/macosx/OSGi.fx.icns
