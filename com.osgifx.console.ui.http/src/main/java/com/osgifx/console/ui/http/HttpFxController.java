@@ -21,6 +21,7 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
@@ -129,6 +130,8 @@ public final class HttpFxController {
 
 		final var httpRuntime = httpComponents;
 		table.setItems(httpRuntime);
+
+		TableFilter.forTableView(table).apply();
 		Fx.sortBy(table, componentColumn);
 	}
 
