@@ -47,7 +47,7 @@ eu.lestard:advanced-bindings:0.4.0
 
 # Zip4j
 
-net.lingala.zip4j:zip4j:2.9.1
+net.lingala.zip4j:zip4j:2.10.0
 
 # Apache
 
