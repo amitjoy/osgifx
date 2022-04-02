@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2021-2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -81,56 +81,6 @@ public class Reflect {
 	 */
 	public static Reflect compile(final String name, final String content, final CompileOptions options) throws ReflectException {
 		return onClass(Compile.compile(name, content, options));
-	}
-
-	/**
-	 * Wrap a class name.
-	 * <p>
-	 * This is the same as calling <code>on(Class.forName(name))</code>
-	 *
-	 * @param name A fully qualified class name
-	 * @return A wrapped class object, to be used for further reflection.
-	 * @throws ReflectException If any reflection exception occurred.
-	 * @see #onClass(Class)
-	 * @deprecated [#78] 0.9.11, use {@link #onClass(String)} instead.
-	 */
-	@Deprecated
-	public static Reflect on(final String name) throws ReflectException {
-		return onClass(name);
-	}
-
-	/**
-	 * Wrap a class name, loading it via a given class loader.
-	 * <p>
-	 * This is the same as calling <code>on(Class.forName(name, classLoader))</code>
-	 *
-	 * @param name        A fully qualified class name.
-	 * @param classLoader The class loader in whose context the class should be
-	 *                    loaded.
-	 * @return A wrapped class object, to be used for further reflection.
-	 * @throws ReflectException If any reflection exception occurred.
-	 * @see #onClass(Class)
-	 * @deprecated [#78] 0.9.11, use {@link #onClass(String, ClassLoader)} instead.
-	 */
-	@Deprecated
-	public static Reflect on(final String name, final ClassLoader classLoader) throws ReflectException {
-		return onClass(name, classLoader);
-	}
-
-	/**
-	 * Wrap a class.
-	 * <p>
-	 * Use this when you want to access static fields and methods on a {@link Class}
-	 * object, or as a basis for constructing objects of that class using
-	 * {@link #create(Object...)}
-	 *
-	 * @param clazz The class to be wrapped
-	 * @return A wrapped class object, to be used for further reflection.
-	 * @deprecated [#78] 0.9.11, use {@link #onClass(Class)} instead.
-	 */
-	@Deprecated
-	public static Reflect on(final Class<?> clazz) {
-		return onClass(clazz);
 	}
 
 	/**
@@ -931,7 +881,8 @@ public class Reflect {
 			}
 			if (long.class == type) {
 				return (Class<T>) Long.class;
-			} else if (short.class == type) {
+			}
+			if (short.class == type) {
 				return (Class<T>) Short.class;
 			} else if (byte.class == type) {
 				return (Class<T>) Byte.class;
