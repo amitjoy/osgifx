@@ -884,7 +884,8 @@ public class Reflect {
 			}
 			if (short.class == type) {
 				return (Class<T>) Short.class;
-			} else if (byte.class == type) {
+			}
+			if (byte.class == type) {
 				return (Class<T>) Byte.class;
 			} else if (double.class == type) {
 				return (Class<T>) Double.class;
