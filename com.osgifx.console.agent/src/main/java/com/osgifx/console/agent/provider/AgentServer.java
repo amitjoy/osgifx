@@ -111,6 +111,7 @@ import aQute.remote.util.Link;
  * interfaces and communicates with a Supervisor interfaces.
  */
 public class AgentServer implements Agent, Closeable, FrameworkListener {
+
 	private static final Pattern       BSN_P    = Pattern.compile("\\s*([^;\\s]+).*");
 	private static final AtomicInteger sequence = new AtomicInteger(1000);
 

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2021-2022 Amit Kumar Mondal
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -28,6 +28,7 @@ import com.osgifx.console.agent.Agent;
  * that if we have multiple agents we need to share the redirecting.
  */
 public class ConsoleRedirector implements Redirector {
+
 	private static RedirectOutput                    stdout;
 	private static RedirectOutput                    stderr;
 	private static RedirectInput                     stdin;
