@@ -25,7 +25,6 @@ javapackager {
 	organizationName    =    ws.getProperty("organizationName")
 	organizationUrl     =    ws.getProperty("organizationUrl")
 	organizationEmail   =    ws.getProperty("organizationEmail")
-	jrePath             =    file(System.properties['java.home'])
 	url                 =    ws.getProperty("organizationUrl")
 	macConfig {
 		appId           =    ws.getProperty("macPackageIdentifier")
