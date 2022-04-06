@@ -4,3 +4,5 @@ description: An easy-to-use desktop application to manage OSGi frameworks remote
 show_downloads: true
 google_analytics:
 theme: jekyll-theme-minimal
+jdeploy:
+  url: https://www.jdeploy.com/~osgifx

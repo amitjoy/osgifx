@@ -75,23 +75,26 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 		<img src="https://user-images.githubusercontent.com/13380182/154861104-56f11a38-8adb-4fa6-b3a4-6621f2ca12fc.png" />
 	</details>
 </p>
+
 --------------------------------------------------------------------------------------------------------------
 
 #### Tools and Technologies
 
 |                      	|                                             	|
 |----------------------	|---------------------------------------------	|
-| Java (Application)    | 17                                         	  |
+| Java (Application)    | 17                                         	|
 | Java (Agent)          | 1.8                                         	|
 | Rich Client Platform 	| JavaFX 17                                    	|
 | Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
 | Tools                	| Bndtools 6                                  	|
 
-#### Important Notes
+--------------------------------------------------------------------------------------------------------------
 
-* The distribution packages include JRE for respective platforms
-* After application is installed, you will need to change the permission of the application to **777** or change the ownership, otherwise, the OSGi framework will not be able to create the required directories inside it
+#### Important Notes for Download
+
+* The application is distributed through [jdeploy](https://www.jdeploy.com) enabling developers to distribute native applications much easily
+* Note that, the required VM will directly be downloaded while installing the application using `jdeploy`
 
 --------------------------------------------------------------------------------------------------------------
 
