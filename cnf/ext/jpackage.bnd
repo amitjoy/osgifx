@@ -16,7 +16,7 @@ macIcon                 =        icons/macosx/OSGi.fx.icns
 
 linuxShortcut           =        true
 linuxIcon               =        icons/linux/OSGi.fx.png
-linuxDebMaintainer      =        admin@amitinside.com
+linuxDebMaintainer      =        ${Bundle-ContactAddress}
 
 winShortcut             =        true
 winIcon                 =        icons/windows/OSGi.fx.ico
