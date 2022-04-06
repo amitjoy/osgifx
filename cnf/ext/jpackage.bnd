@@ -1,0 +1,22 @@
+appName                 =        ${Bundle-Vendor}
+appVersion              =        1.0.0
+appDescription          =        An easy-to-use application to manage OSGi frameworks remotely
+copyright               =        ${Bundle-Copyright}
+vendor                  =        ${Bundle-Vendor}
+input                   =        uberjar
+destination             =        target
+mainClass               =        aQute.launcher.pre.EmbeddedLauncher
+mainJar                 =        osgifx.jar
+licenseFile             =        ../LICENSE
+javaOptions             =        ${-runvm}
+verbose                 =        true
+
+macPackageIdentifier    =        com.osgifx
+macIcon                 =        icons/macosx/OSGi.fx.icns
+
+linuxShortcut           =        true
+linuxIcon               =        icons/linux/OSGi.fx.png
+linuxDebMaintainer      =        admin@amitinside.com
+
+winShortcut             =        true
+winIcon                 =        icons/windows/OSGi.fx.ico

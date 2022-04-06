@@ -1,46 +1,36 @@
-buildscript {
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath 'io.github.fvarrui:javapackager:1.6.5'
-	}
-}
-
-apply plugin: 'io.github.fvarrui.javapackager.plugin'
-
 import aQute.bnd.build.Workspace
 import aQute.lib.io.IO
 
-def ws = Workspace.findWorkspace(IO.work)
-
-javapackager {
-	name                =    ws.getProperty("name")
-	version             =    ws.getProperty("version")
-	description         =    ws.getProperty("description")
-	mainClass           =    ws.getProperty("mainClass")
-	bundleJre           =    ws.getProperty("bundleJre")
-	runnableJar         =    file(ws.getProperty("runnableJar"))
-	copyDependencies    =    ws.getProperty("copyDependencies")
-	organizationName    =    ws.getProperty("organizationName")
-	organizationUrl     =    ws.getProperty("organizationUrl")
-	organizationEmail   =    ws.getProperty("organizationEmail")
-	url                 =    ws.getProperty("organizationUrl")
-	macConfig {
-		appId           =    ws.getProperty("macPackageIdentifier")
-		icnsFile        =    file(ws.getProperty("macIcon"))
-		createTarball   =    ws.getProperty("macCreateTarball")
-	}
-	linuxConfig {
-		pngFile         =    file(ws.getProperty("linuxIcon"))
-		createTarball   =    ws.getProperty("linuxCreateTarball")
-	}
-	winConfig {
-		icoFile         =    file(ws.getProperty("winIcon"))
-		generateMsi     =    ws.getProperty("createTarball")
-	}
+plugins {
+  id "org.panteleyev.jpackageplugin" version "1.3.1"
 }
 
-task('package_distro', type: io.github.fvarrui.javapackager.gradle.PackageTask) {
-	platform        'auto'
+def ws = Workspace.findWorkspace(IO.work)
+
+tasks.jpackage {
+	appName                     =     ws.getProperty("appName")
+	appVersion                  =     ws.getProperty("appVersion")
+	appDescription              =     ws.getProperty("appDescription")
+	copyright                   =     ws.getProperty("copyright")
+	vendor                      =     ws.getProperty("vendor")
+	input                       =     ws.getProperty("input")
+	destination                 =     ws.getProperty("destination")
+	mainClass                   =     ws.getProperty("mainClass")
+	mainJar                     =     ws.getProperty("mainJar")
+	licenseFile                 =     ws.getProperty("licenseFile")
+	javaOptions                 =     ws.getProperty("javaOptions").split(",")
+	verbose                     =     ws.getProperty("verbose")
+	mac {
+		macPackageIdentifier    =     ws.getProperty("macPackageIdentifier")
+		icon                    =     ws.getProperty("macIcon")
+	}
+	linux {
+		icon                    =     ws.getProperty("linuxIcon")
+		linuxShortcut           =     ws.getProperty("linuxShortcut")
+		linuxDebMaintainer      =     ws.getProperty("linuxDebMaintainer")
+	}
+	windows {
+		icon                    =     ws.getProperty("winIcon")
+		winShortcut             =     ws.getProperty("winShortcut")
+	}
 }
