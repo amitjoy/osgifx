@@ -30,8 +30,8 @@ jobs:
          run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
-      -  name: Build Distribution Image for ${{ matrix.config.os }}
-         run: ./gradlew jpackage --info
+      # -  name: Build Distribution Image for ${{ matrix.config.os }}
+      #    run: ./gradlew jpackage --info
       -  name: Copy Distribution Artifacts to Current Directory
          run: ./gradlew copy_artifacts
       -  uses: actions/upload-artifact@master
