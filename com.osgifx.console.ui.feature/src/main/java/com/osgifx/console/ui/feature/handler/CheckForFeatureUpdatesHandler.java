@@ -35,14 +35,14 @@ import org.osgi.annotation.bundle.Requirement;
 import com.google.common.collect.Lists;
 import com.osgifx.console.feature.FeatureDTO;
 import com.osgifx.console.feature.IdDTO;
-import com.osgifx.console.ui.feature.dialog.CheckForUpdatesDialog;
+import com.osgifx.console.ui.feature.dialog.CheckForFeatureUpdatesDialog;
 import com.osgifx.console.update.FeatureAgent;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.update.FeatureAgent)")
-public final class CheckForUpdatesHandler {
+public final class CheckForFeatureUpdatesHandler {
 
 	@Log
 	@Inject
@@ -62,7 +62,7 @@ public final class CheckForUpdatesHandler {
 		final Task<Collection<FeatureDTO>> updateCheckTask = new Task<>() {
 			@Override
 			protected Collection<FeatureDTO> call() throws Exception {
-				final var tobeUpdatedFeatures = featureAgent.checkForUpdates();
+				final var tobeUpdatedFeatures = featureAgent.checkForFeatureUpdates();
 				if (tobeUpdatedFeatures.isEmpty()) {
 					threadSync.asyncExec(() -> {
 						updateCheckProgressDialog.close();
@@ -83,7 +83,7 @@ public final class CheckForUpdatesHandler {
 		thread.start();
 
 		updateCheckTask.setOnSucceeded(t -> {
-			final var dialog = new CheckForUpdatesDialog();
+			final var dialog = new CheckForFeatureUpdatesDialog();
 			ContextInjectionFactory.inject(dialog, context);
 			dialog.init();
 			logger.atDebug().log("Injected check for updates dialog to eclipse context");

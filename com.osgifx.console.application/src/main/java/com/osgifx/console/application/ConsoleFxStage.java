@@ -23,6 +23,7 @@ import org.eclipse.fx.ui.workbench.fx.DefaultJFXApp;
 import org.osgi.framework.FrameworkUtil;
 
 import javafx.animation.FadeTransition;
+import javafx.application.HostServices;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -91,6 +92,14 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 		};
 		showSplash(initStage, friendTask, this::showFxConsoleStage);
 		new Thread(friendTask).start();
+
+		registerHostServices();
+	}
+
+	private void registerHostServices() {
+		final var hostServices = getHostServices();
+		final var context      = FrameworkUtil.getBundle(getClass()).getBundleContext();
+		context.registerService(HostServices.class, hostServices, null);
 	}
 
 	private void showFxConsoleStage() {

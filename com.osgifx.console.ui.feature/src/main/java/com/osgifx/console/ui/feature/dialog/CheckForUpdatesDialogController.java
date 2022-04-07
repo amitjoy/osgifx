@@ -29,7 +29,7 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.feature.FeatureDTO;
-import com.osgifx.console.ui.feature.dialog.CheckForUpdatesDialog.SelectedFeaturesForUpdateDTO;
+import com.osgifx.console.ui.feature.dialog.CheckForFeatureUpdatesDialog.SelectedFeaturesForUpdateDTO;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBoxTreeItem;
