@@ -66,8 +66,8 @@ public final class CheckForAppUpdatesHandler {
 		final Task<String> updateCheckTask = new Task<>() {
 			@Override
 			protected String call() throws Exception {
-				final var latestUpdates = featureAgent.checkForAppUpdates();
-				if (latestUpdates.isEmpty() || updatesNotAvailable(latestUpdates.get())) {
+				final var latestAppVersion = featureAgent.checkForAppUpdates();
+				if (latestAppVersion.isEmpty() || updatesNotAvailable(latestAppVersion.get())) {
 					logger.atInfo().log("No updates available");
 					threadSync.asyncExec(() -> {
 						updateCheckProgressDialog.close();
@@ -75,7 +75,7 @@ public final class CheckForAppUpdatesHandler {
 					});
 					return null;
 				}
-				return latestUpdates.get();
+				return latestAppVersion.get();
 			}
 
 			private boolean updatesNotAvailable(final String latest) {
@@ -84,7 +84,7 @@ public final class CheckForAppUpdatesHandler {
 
 				logger.atDebug().log("Current Version: %s | Latest Version: %s", currentVersion, latestVersion);
 
-				return latestVersion.compareTo(currentVersion) == 0;
+				return latestVersion.compareTo(currentVersion) <= 0;
 			}
 
 			@Override
@@ -107,7 +107,7 @@ public final class CheckForAppUpdatesHandler {
 		final List<CommandLinksButtonType> links = new ArrayList<>();
 
 		final var downloadNowBtn  = new CommandLinksButtonType("Download Now", "Open download page", true);
-		final var downloadSkipBtn = new CommandLinksButtonType("Skip", "Skip updating the application", false);
+		final var downloadSkipBtn = new CommandLinksButtonType("Skip Download", "Skip updating the application", false);
 
 		links.add(downloadNowBtn);
 		links.add(downloadSkipBtn);
@@ -116,7 +116,9 @@ public final class CheckForAppUpdatesHandler {
 
 		dialog.initStyle(StageStyle.UNDECORATED);
 		dialog.getDialogPane().getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-		dialog.getDialogPane().setHeaderText("Updates are available. Latest version is " + latestVersion + ".");
+		dialog.getDialogPane().setHeaderText("Updates are available");
+		dialog.getDialogPane().setContentText("Latest version is " + latestVersion);
+
 		final var buttonType = dialog.showAndWait();
 
 		if (buttonType.isPresent()) {
