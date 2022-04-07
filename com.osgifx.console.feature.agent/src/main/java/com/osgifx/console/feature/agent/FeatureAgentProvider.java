@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.feature.agent;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
 
@@ -76,7 +77,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.Resources;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.osgifx.console.feature.FeatureBundleDTO;
 import com.osgifx.console.feature.FeatureConfigurationDTO;
 import com.osgifx.console.feature.FeatureDTO;
@@ -90,6 +93,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
 	private static final int          MAX_REDIRECTS                       = 50;
 	private static final long         CONNECTION_TIMEOUT_IN_MILLISECONDS  = Duration.ofSeconds(15).toMillis();
 	private static final long         READ_TIMEOUT_IN_MILLISECONDS        = Duration.ofSeconds(20).toMillis();
+	private static final String       NPM_REGISTRY_URL                    = "https://registry.npmjs.org/osgifx";
 	private static final String       USER_AGENT                          = "osgi.fx";
 	private static final String       LOCATION_PREFIX                     = "osgifx-feature:";
 	private static final String       TEMP_DIRECTORY_PREFIX               = "osgifx.console_";
@@ -266,7 +270,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
 	}
 
 	@Override
-	public Collection<FeatureDTO> checkForUpdates() throws Exception {
+	public Collection<FeatureDTO> checkForFeatureUpdates() throws Exception {
 		logger.atInfo().log("Checking for updates");
 		final Map<File, FeatureDTO> updateAvailableFeatures = Maps.newHashMap();
 		final var                   installedFeatures       = getInstalledFeatures();
@@ -294,6 +298,27 @@ public final class FeatureAgentProvider implements FeatureAgent {
 			}
 		}
 		return updateAvailableFeatures.values();
+	}
+
+	@Override
+	public Optional<String> checkForAppUpdates() throws Exception {
+		final var metadata      = Resources.toString(new URL(NPM_REGISTRY_URL), UTF_8);
+		final var gson          = new Gson();
+		final var json          = gson.fromJson(metadata, AppVersion.class);
+		final var latestVersion = json.latestVersion;
+		if (latestVersion == null) {
+			return Optional.empty();
+		}
+		return Optional.ofNullable(latestVersion.latest);
+	}
+
+	private static class AppVersion {
+		@SerializedName("dist-tags")
+		LatestVersion latestVersion;
+	}
+
+	private static class LatestVersion {
+		String latest;
 	}
 
 	public void remove(final FeatureDTO feature) throws Exception {

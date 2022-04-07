@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -110,6 +111,14 @@ public interface FeatureAgent {
 	 *         empty)
 	 * @throws Exception if the updates cannot be checked
 	 */
-	Collection<FeatureDTO> checkForUpdates() throws Exception;
+	Collection<FeatureDTO> checkForFeatureUpdates() throws Exception;
+
+	/**
+	 * Checks for latest version of the application if available
+	 *
+	 * @return the latest version wrapped in {@link Optional}
+	 * @throws Exception if the latest version cannot be retrieved
+	 */
+	Optional<String> checkForAppUpdates() throws Exception;
 
 }

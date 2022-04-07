@@ -27,7 +27,7 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.feature.FeatureDTO;
-import com.osgifx.console.ui.feature.dialog.CheckForUpdatesDialog.SelectedFeaturesForUpdateDTO;
+import com.osgifx.console.ui.feature.dialog.CheckForFeatureUpdatesDialog.SelectedFeaturesForUpdateDTO;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
@@ -37,7 +37,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
-public final class CheckForUpdatesDialog extends Dialog<SelectedFeaturesForUpdateDTO> {
+public final class CheckForFeatureUpdatesDialog extends Dialog<SelectedFeaturesForUpdateDTO> {
 
 	@Inject
 	@LocalInstance
