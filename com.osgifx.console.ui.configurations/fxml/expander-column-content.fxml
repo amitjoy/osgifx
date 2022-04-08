@@ -30,7 +30,7 @@
                   <Insets left="20.0" />
                </HBox.margin>
                <graphic>
-        		  <Glyph fontFamily="FontAwesome" icon="ENVELOPE" />
+        		  <Glyph fontFamily="FontAwesome" icon="FLOPPY_ALT" />
     		   </graphic>
     		   <tooltip><Tooltip text="Save Configuration" /></tooltip>
             </Button>
