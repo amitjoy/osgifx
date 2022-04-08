@@ -69,7 +69,6 @@ public final class ConnectToLocalAgentHandler {
 
 	@Execute
 	public void execute() {
-		logger.atInfo().log("'%s'-'connectLocalAgent(..)' event has been invoked", getClass().getSimpleName());
 		final Task<Void> connectTask = new Task<>() {
 			@Override
 			protected Void call() throws Exception {

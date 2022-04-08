@@ -62,13 +62,13 @@ public final class CheckForAppUpdatesHandler {
 
 	@Execute
 	public void execute() {
-		logger.atInfo().log("Checking for updates");
+		logger.atInfo().log("Checking for application updates");
 		final Task<String> updateCheckTask = new Task<>() {
 			@Override
 			protected String call() throws Exception {
 				final var latestAppVersion = featureAgent.checkForAppUpdates();
 				if (latestAppVersion.isEmpty() || updatesNotAvailable(latestAppVersion.get())) {
-					logger.atInfo().log("No updates available");
+					logger.atInfo().log("No application updates available");
 					threadSync.asyncExec(() -> {
 						updateCheckProgressDialog.close();
 						FxDialog.showInfoDialog("Check for Updates", "No update found", getClass().getClassLoader());

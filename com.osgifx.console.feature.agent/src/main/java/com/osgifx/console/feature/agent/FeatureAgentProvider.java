@@ -271,7 +271,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
 
 	@Override
 	public Collection<FeatureDTO> checkForFeatureUpdates() throws Exception {
-		logger.atInfo().log("Checking for updates");
+		logger.atInfo().log("Checking for feature updates");
 		final Map<File, FeatureDTO> updateAvailableFeatures = Maps.newHashMap();
 		final var                   installedFeatures       = getInstalledFeatures();
 		if (installedFeatures.isEmpty()) {
@@ -302,10 +302,12 @@ public final class FeatureAgentProvider implements FeatureAgent {
 
 	@Override
 	public Optional<String> checkForAppUpdates() throws Exception {
+		logger.atInfo().log("Checking for application updates");
 		final var metadata      = Resources.toString(new URL(NPM_REGISTRY_URL), UTF_8);
 		final var gson          = new Gson();
 		final var json          = gson.fromJson(metadata, AppVersion.class);
 		final var latestVersion = json.latestVersion;
+		logger.atDebug().log("Latest version available - %s", latestVersion);
 		if (latestVersion == null) {
 			return Optional.empty();
 		}
