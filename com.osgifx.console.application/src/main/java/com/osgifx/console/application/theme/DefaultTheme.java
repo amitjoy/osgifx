@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.application.theme;
 
+import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -31,7 +32,7 @@ public final class DefaultTheme extends AbstractTheme {
 
 	@Activate
 	public DefaultTheme(final BundleContext context) {
-		super("theme.default", "Default Theme", context.getBundle().getResource("css/default.css"));
+		super("theme.default", "Default Theme", context.getBundle().getResource(STANDARD_CSS));
 	}
 
 	@Override
