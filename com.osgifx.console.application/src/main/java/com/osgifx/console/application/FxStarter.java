@@ -24,7 +24,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.osgifx.console.application.ui.ConsoleMaskerPaneProvider;
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
+import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
@@ -33,6 +35,8 @@ public final class FxStarter implements BundleActivator {
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
+		InjectorFactory.getDefault().addBinding(ConsoleMaskerPane.class).implementedBy(ConsoleMaskerPaneProvider.class);
+
 		final ServiceReference<ThreadSynchronize> serviceReference = context.getServiceReference(ThreadSynchronize.class);
 		context.getService(serviceReference);
 	}

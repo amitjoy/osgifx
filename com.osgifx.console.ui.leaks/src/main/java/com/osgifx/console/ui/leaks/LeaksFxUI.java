@@ -21,7 +21,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.controlsfx.control.MaskerPane;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.Focus;
@@ -31,6 +30,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 
@@ -43,13 +43,14 @@ public final class LeaksFxUI {
 
 	@Log
 	@Inject
-	private FluentLogger     logger;
+	private FluentLogger      logger;
 	@Inject
 	@OSGiBundle
-	private BundleContext    context;
+	private BundleContext     context;
 	@Inject
-	private ConsoleStatusBar statusBar;
-	private final MaskerPane progressPane = new MaskerPane();
+	private ConsoleStatusBar  statusBar;
+	@Inject
+	private ConsoleMaskerPane progressPane;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -104,7 +105,7 @@ public final class LeaksFxUI {
 			}
 		};
 		parent.getChildren().clear();
-		parent.setCenter(progressPane);
+		progressPane.addTo(parent);
 		statusBar.addTo(parent);
 
 		final var thread = new Thread(task);

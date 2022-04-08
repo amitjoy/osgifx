@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.controlsfx.control.MaskerPane;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -35,6 +34,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
@@ -57,11 +57,12 @@ public final class GraphFxUI {
 	@Inject
 	private ConsoleStatusBar              statusBar;
 	@Inject
+	private ThreadSynchronize             threadSync;
+	@Inject
 	private EPartService                  partService;
 	@Inject
-	private ThreadSynchronize             threadSync;
-	private final MaskerPane              progressPane = new MaskerPane();
-	private final AtomicReference<String> loadedType   = new AtomicReference<>();
+	private ConsoleMaskerPane             progressPane;
+	private final AtomicReference<String> loadedType = new AtomicReference<>();
 
 	private static final String BUNDLES_GRAPH_TYPE    = "Bundles";
 	private static final String COMPONENTS_GRAPH_TYPE = "Components";
@@ -115,7 +116,7 @@ public final class GraphFxUI {
 
 	private void loadContent(final BorderPane parent, final FXMLLoader loader, final String type) {
 		Node tabContent = null;
-		threadSync.asyncExec(() -> parent.setCenter(progressPane));
+		threadSync.asyncExec(() -> progressPane.addTo(parent));
 		if (BUNDLES_GRAPH_TYPE.equalsIgnoreCase(type)) {
 			tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-bundles.fxml");
 			loadedType.set(BUNDLES_GRAPH_TYPE);
