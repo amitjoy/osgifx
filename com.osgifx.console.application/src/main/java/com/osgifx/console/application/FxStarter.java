@@ -18,11 +18,9 @@ package com.osgifx.console.application;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import org.eclipse.e4.core.di.InjectorFactory;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import com.osgifx.console.application.ui.ConsoleMaskerPaneProvider;
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
@@ -36,9 +34,6 @@ public final class FxStarter implements BundleActivator {
 	public void start(final BundleContext context) throws Exception {
 		InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
 		InjectorFactory.getDefault().addBinding(ConsoleMaskerPane.class).implementedBy(ConsoleMaskerPaneProvider.class);
-
-		final ServiceReference<ThreadSynchronize> serviceReference = context.getServiceReference(ThreadSynchronize.class);
-		context.getService(serviceReference);
 	}
 
 	@Override
