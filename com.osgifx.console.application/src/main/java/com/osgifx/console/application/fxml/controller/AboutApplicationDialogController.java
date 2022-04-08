@@ -15,10 +15,15 @@
  ******************************************************************************/
 package com.osgifx.console.application.fxml.controller;
 
+import static org.osgi.framework.Constants.BUNDLE_DOCURL;
+
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import org.controlsfx.control.HyperlinkLabel;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.fx.core.SystemUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
@@ -35,29 +40,45 @@ public final class AboutApplicationDialogController {
 	@Inject
 	private FluentLogger   logger;
 	@FXML
-	private HyperlinkLabel appLink;
+	private HyperlinkLabel appDetails;
 	@FXML
 	private HyperlinkLabel eclipseLink;
-	@FXML
-	private Text           appVersion;
 	@Inject
 	private Application    jfxApplication;
+	@FXML
+	private Text           javaVersionTxt;
 	@Inject
 	@OSGiBundle
 	private BundleContext  bundleContext;
 
 	@FXML
 	public void initialize() {
-		appVersion.setText(bundleContext.getBundle().getVersion().toString());
-		appLink.setOnAction(this::handleLinkOnClick);
+		appDetails.setText(replace(appDetails.getText()));
+		javaVersionTxt.setText(replace(javaVersionTxt.getText()));
+		appDetails.setOnAction(this::handleLinkOnClick);
 		eclipseLink.setOnAction(this::handleLinkOnClick);
 		logger.atInfo().log("FXML controller (%s) has been initialized", getClass());
 	}
 
 	private void handleLinkOnClick(final ActionEvent event) {
-		final var link           = (Hyperlink) event.getSource();
+		final var source = event.getSource();
+		if (!(source instanceof final Hyperlink link)) {
+			return;
+		}
 		final var eclipseWebLink = link.getText();
 		jfxApplication.getHostServices().showDocument(eclipseWebLink);
+	}
+
+	public String replace(final String input) {
+		final var appVersion    = bundleContext.getBundle().getVersion().toString();
+		final var appLink       = bundleContext.getBundle().getHeaders().get(BUNDLE_DOCURL);
+		final var javaVersion   = Runtime.version().toString();
+		final var javafxVersion = String.valueOf(SystemUtils.getMajorFXVersion());
+
+		final Map<String, String> substitutors = Map.of("appVersion", appVersion, "appLink", appLink, "javaVersion", javaVersion,
+		        "javafxVersion", javafxVersion);
+
+		return substitutors.entrySet().stream().reduce(input, (s, e) -> s.replace("(" + e.getKey() + ")", e.getValue()), (s, s2) -> s);
 	}
 
 }
