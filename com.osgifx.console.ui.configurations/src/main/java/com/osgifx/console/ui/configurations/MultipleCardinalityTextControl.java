@@ -40,7 +40,7 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 	protected StackPane stack;
 
 	/**
-	 * - The fieldLabel is the container that displays the label property of the
+	 * The fieldLabel is the container that displays the label property of the
 	 * field. - The editableField allows users to modify the field's value. - The
 	 * readOnlyLabel displays the field's value if it is not editable.
 	 */
