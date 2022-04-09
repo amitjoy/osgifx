@@ -22,6 +22,7 @@ import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -45,20 +46,21 @@ public final class ComponentsFxController {
 
 	@Log
 	@Inject
-	private FluentLogger             logger;
+	private FluentLogger                        logger;
 	@Inject
 	@LocalInstance
-	private FXMLLoader               loader;
+	private FXMLLoader                          loader;
 	@FXML
-	private TableView<XComponentDTO> table;
+	private TableView<XComponentDTO>            table;
 	@Inject
 	@OSGiBundle
-	private BundleContext            context;
+	private BundleContext                       context;
 	@Inject
 	@Named("is_connected")
-	private boolean                  isConnected;
+	private boolean                             isConnected;
 	@Inject
-	private DataProvider             dataProvider;
+	private DataProvider                        dataProvider;
+	private TableRowDataFeatures<XComponentDTO> previouslyExpanded;
 
 	@FXML
 	public void initialize() {
@@ -74,8 +76,15 @@ public final class ComponentsFxController {
 	private void createControls() {
 		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
 		final var controller     = (ComponentDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XComponentDTO>(expandedComponent -> {
-										controller.initControls(expandedComponent.getValue());
+		final var expanderColumn = new TableRowExpanderColumn<XComponentDTO>(current -> {
+										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+											return expandedNode;
+										}
+										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+											previouslyExpanded.toggleExpanded();
+										}
+										controller.initControls(current.getValue());
+										previouslyExpanded = current;
 										return expandedNode;
 									});
 
