@@ -24,6 +24,7 @@ import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -50,20 +51,21 @@ public final class EventsFxController {
 
 	@Log
 	@Inject
-	private FluentLogger         logger;
+	private FluentLogger                    logger;
 	@Inject
 	@LocalInstance
-	private FXMLLoader           loader;
+	private FXMLLoader                      loader;
 	@FXML
-	private TableView<XEventDTO> table;
+	private TableView<XEventDTO>            table;
 	@Inject
 	@OSGiBundle
-	private BundleContext        context;
+	private BundleContext                   context;
 	@Inject
 	@Named("is_connected")
-	private boolean              isConnected;
+	private boolean                         isConnected;
 	@Inject
-	private DataProvider         dataProvider;
+	private DataProvider                    dataProvider;
+	private TableRowDataFeatures<XEventDTO> previouslyExpanded;
 
 	private static final String EVENT_TOPIC = "com/osgifx/clear/events";
 
@@ -81,8 +83,15 @@ public final class EventsFxController {
 	private void createControls() {
 		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
 		final var controller     = (EventDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XEventDTO>(expandedEvent -> {
-										controller.initControls(expandedEvent.getValue());
+		final var expanderColumn = new TableRowExpanderColumn<XEventDTO>(current -> {
+										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+											return expandedNode;
+										}
+										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+											previouslyExpanded.toggleExpanded();
+										}
+										controller.initControls(current.getValue());
+										previouslyExpanded = current;
 										return expandedNode;
 									});
 

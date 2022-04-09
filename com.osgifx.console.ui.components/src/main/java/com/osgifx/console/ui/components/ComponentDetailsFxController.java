@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.di.LocalInstance;
@@ -123,6 +124,7 @@ public final class ComponentDetailsFxController {
 	private BundleContext                                 context;
 	@Inject
 	private CommandService                                commandService;
+	private TableRowDataFeatures<XReferenceDTO>           previouslyExpanded;
 	private AtomicBoolean                                 areReferenceTableNodesLoader;
 
 	@FXML
@@ -191,8 +193,15 @@ public final class ComponentDetailsFxController {
 	private void createReferenceExpandedTable(final XComponentDTO component) {
 		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/sub-expander-column-content.fxml");
 		final var controller     = (ReferenceDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XReferenceDTO>(expandedReference -> {
-										controller.initControls(expandedReference.getValue());
+		final var expanderColumn = new TableRowExpanderColumn<XReferenceDTO>(current -> {
+										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+											return expandedNode;
+										}
+										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+											previouslyExpanded.toggleExpanded();
+										}
+										controller.initControls(current.getValue());
+										previouslyExpanded = current;
 										return expandedNode;
 									});
 
