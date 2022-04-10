@@ -27,6 +27,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -36,6 +37,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
+import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
@@ -49,6 +51,9 @@ public final class LogReceiveMenuContributionHandler {
 	@Log
 	@Inject
 	private FluentLogger     logger;
+	@Inject
+	@OSGiBundle
+	private BundleContext    context;
 	@Inject
 	private Supervisor       supervisor;
 	@Inject
@@ -131,13 +136,13 @@ public final class LogReceiveMenuContributionHandler {
 			accessibilityPhrase = "true";
 		}
 		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+		final var bsn         = context.getBundle().getSymbolicName();
 
 		dynamicItem.setLabel(label);
-		dynamicItem.setIconURI("platform:/plugin/com.osgifx.console.ui.logs/graphic/icons/" + icon);
+		dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
 		dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
-		dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.ui.logs");
-		dynamicItem.setContributionURI(
-		        "bundleclass://com.osgifx.console.ui.logs/com.osgifx.console.ui.logs.handler.LogReceiveMenuContributionHandler");
+		dynamicItem.setContributorURI("platform:/plugin/" + bsn);
+		dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
 		return dynamicItem;
 	}
