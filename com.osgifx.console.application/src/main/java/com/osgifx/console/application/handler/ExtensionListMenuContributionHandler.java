@@ -22,18 +22,17 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.framework.BundleContext;
 
 public final class ExtensionListMenuContributionHandler {
 
@@ -41,16 +40,17 @@ public final class ExtensionListMenuContributionHandler {
 	@Inject
 	private FluentLogger  logger;
 	@Inject
+	@OSGiBundle
+	private BundleContext context;
+	@Inject
 	private EPartService  partService;
 	@Inject
 	private EModelService modelService;
 
 	@AboutToShow
 	public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-		for (final MStackElement tab : getRegisteredTabs(window)) {
-			final var tabMenu = createViewMenu(tab);
-			items.add(tabMenu);
-		}
+		final var parts = partService.getParts();
+		parts.stream().map(this::createViewMenu).forEach(items::add);
 	}
 
 	@Execute
@@ -60,27 +60,15 @@ public final class ExtensionListMenuContributionHandler {
 		partService.showPart(partId, ACTIVATE);
 	}
 
-	private List<MStackElement> getRegisteredTabs(final MWindow window) {
-		for (final MWindowElement element : window.getChildren()) {
-			final var elementId = element.getElementId();
-			if ("com.osgifx.console.ui.extensions.partstack".equals(elementId)) {
-				final var partStack = (MPartStack) element;
-				return partStack.getChildren();
-			}
-		}
-		return List.of();
-	}
-
-	private MDirectMenuItem createViewMenu(final MStackElement element) {
-		final var part        = (MPart) element;
+	private MDirectMenuItem createViewMenu(final MPart part) {
 		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+		final var bsn         = context.getBundle().getSymbolicName();
 
 		dynamicItem.setLabel(part.getLabel());
 		dynamicItem.setIconURI(part.getIconURI());
 		dynamicItem.setAccessibilityPhrase(part.getElementId());
-		dynamicItem.setContributorURI("platform:/plugin/com.osgifx.console.application");
-		dynamicItem.setContributionURI(
-		        "bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler");
+		dynamicItem.setContributorURI("platform:/plugin/" + bsn);
+		dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
 		return dynamicItem;
 	}
