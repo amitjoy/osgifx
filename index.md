@@ -2,7 +2,7 @@
 layout: default
 ---
 
-OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Similar to Felix web console, this is an endeavour for desktop application users with all the necessary functionalities required to remotely manage OSGi runtimes.
+OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Similar to Felix web console, this is an endeavour for desktop application users to provide all the necessary functionalities to remotely manage OSGi runtimes.
 
 |                                                                                                                                                                           |     |
 |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |:-:  |
@@ -37,6 +37,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Open Diagnostics (Show application log file)  |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Show suspicious classloader leaks 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Show HTTP runtime components (Servlets, Listeners, Filters, Resources and Error Pages) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 
 
 #### Application Screenshots
@@ -48,7 +49,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 <img src="https://user-images.githubusercontent.com/13380182/152663960-5539ada8-d9ab-4ce8-807d-8857a81360c3.png" />
 <p align="center">
 	<details>
-		<summary>Click here for more application screenshots</summary>
+		<summary><h2>Click here for more screenshots</h2></summary>
 		<img src="https://user-images.githubusercontent.com/13380182/152663676-f29732d5-a18f-4c1d-a88c-06aa938a101b.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663677-17ff2ba7-95cf-4113-91b2-12f40f97bb92.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663678-f18513b8-736f-4091-b942-fc4fa1f61bc6.png" />
@@ -66,11 +67,12 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 		<img src="https://user-images.githubusercontent.com/13380182/152663695-5f9a53e5-a18b-46f4-8c0d-6b1ecee677a0.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663697-55c966a9-94a2-4eaf-a270-05610bbf4371.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663698-fd148901-e492-4436-986e-d958e13996ad.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/154861118-3e742ada-8eaa-42a8-b388-b926e44501ce.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/162635128-38d26996-aa8b-4b48-ba7d-b30a2685077d.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663700-ca3cc38c-74fd-4ebb-b736-66af21757123.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663701-80a05b53-a8ad-42c2-a1e1-a20073ea28b5.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663702-3a709ee4-9aee-4b2b-b861-8dc169df5d83.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663703-983aaba6-44fe-42b2-b1d0-1c10a60c8a41.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/162635203-d6f990af-5ca9-49ec-96ca-0b99689a1633.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/153309982-c2445505-2667-483c-9f1c-cb97679295cf.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/154861104-56f11a38-8adb-4fa6-b3a4-6621f2ca12fc.png" />
 	</details>
@@ -93,8 +95,9 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 
 #### Important Notes for Download
 
-* The application is distributed through [jdeploy](https://www.jdeploy.com) enabling developers to distribute native applications much easily
+* The application is distributed through [jdeploy](https://www.jdeploy.com) enabling developers to distribute native applications effortlessly
 * Note that, the required VM will directly be downloaded while installing the application using `jdeploy`
+* Also note that, if the auto-update feature is enabled, every new version will be automatically downloaded while starting the application
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -122,7 +125,7 @@ Run `./gradlew clean build` in the project root directory
 
 #### External Feature Development
 
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. As a starting point, please have a look at the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.feature.tictactoe). Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily use their modular functionalities to build your own features.
+External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. As a starting point, please have a look at the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.ext.feature.tictactoe). Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily leverage their modular functionalities to build your own features (extensions).
 
 Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option.
 
