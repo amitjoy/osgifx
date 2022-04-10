@@ -30,6 +30,8 @@ import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
+import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -57,6 +59,13 @@ public interface Agent {
 	 * The property key to set the agent's port.
 	 */
 	String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
+
+	/**
+	 * The property key to set the heapdump location. If not set, the default
+	 * location will be set to the {@code heapdumps} directory inside the current
+	 * working directory of the remote OSGi runtime.
+	 */
+	String HEAPDUMP_LOCATION_KEY = "osgi.fx.agent.heapdump.location";
 
 	/**
 	 * The pattern for a server port specification: {@code [<interface>:]<port>} .
@@ -476,4 +485,23 @@ public interface Agent {
 	 * @return the HTTP runtime information
 	 */
 	XHttpContextInfoDTO getHttpContextInfo();
+
+	/**
+	 * Returns the heap usage information
+	 *
+	 * @return the heap usage information
+	 */
+	XHeapUsageDTO getHeapUsage();
+
+	/**
+	 * Performs a heap dump in the remote machine
+	 *
+	 * @return the heap dump information
+	 */
+	XHeapdumpDTO heapdump() throws Exception;
+
+	/**
+	 * Performs a garbage collection
+	 */
+	void gc();
 }

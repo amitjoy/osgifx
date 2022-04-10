@@ -19,6 +19,7 @@ javac.compliance      : ${javac.source}
                         aQute.*,\
                         org.apache.commons.exec.*
 Import-Package        : \
+                        com.sun.management;'resolution:'=optional,\
                         org.osgi.framework;version='[1.5,2)',\
                         org.osgi.framework.launch;version='[1.0,2)',\
                         org.apache.felix.gogo.runtime;'resolution:'=optional,\
