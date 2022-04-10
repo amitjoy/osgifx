@@ -36,11 +36,12 @@
 		<img src="https://user-images.githubusercontent.com/13380182/152663695-5f9a53e5-a18b-46f4-8c0d-6b1ecee677a0.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663697-55c966a9-94a2-4eaf-a270-05610bbf4371.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663698-fd148901-e492-4436-986e-d958e13996ad.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/154861118-3e742ada-8eaa-42a8-b388-b926e44501ce.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/162635128-38d26996-aa8b-4b48-ba7d-b30a2685077d.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663700-ca3cc38c-74fd-4ebb-b736-66af21757123.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663701-80a05b53-a8ad-42c2-a1e1-a20073ea28b5.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663702-3a709ee4-9aee-4b2b-b861-8dc169df5d83.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/152663703-983aaba6-44fe-42b2-b1d0-1c10a60c8a41.png" />
+		<img src="https://user-images.githubusercontent.com/13380182/162635203-d6f990af-5ca9-49ec-96ca-0b99689a1633.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/153309982-c2445505-2667-483c-9f1c-cb97679295cf.png" />
 		<img src="https://user-images.githubusercontent.com/13380182/154861104-56f11a38-8adb-4fa6-b3a4-6621f2ca12fc.png" />
 	</details>
@@ -96,6 +97,7 @@
 | Open Diagnostics (Show application log file) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Show suspicious classloader leaks 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Show HTTP runtime components (Servlets, Listeners, Filters, Resources and Error Pages) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 
 --------------------------------------------------------------------------------------------------------------
 

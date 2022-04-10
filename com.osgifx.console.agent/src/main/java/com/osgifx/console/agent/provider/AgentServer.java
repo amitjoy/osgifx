@@ -90,6 +90,8 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
+import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -1202,6 +1204,21 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 			return httpAdmin.runtime();
 		}
 		return null;
+	}
+
+	@Override
+	public XHeapUsageDTO getHeapUsage() {
+		return XHeapAdmin.init();
+	}
+
+	@Override
+	public void gc() {
+		System.gc();
+	}
+
+	@Override
+	public XHeapdumpDTO heapdump() throws Exception {
+		return XHeapAdmin.heapdump();
 	}
 
 	private static long getSystemUptime() {

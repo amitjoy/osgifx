@@ -41,6 +41,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.logs',\
                                       bnd.identity;id='com.osgifx.console.ui.gogo',\
                                       bnd.identity;id='com.osgifx.console.ui.graph',\
+                                      bnd.identity;id='com.osgifx.console.ui.heap',\
                                       bnd.identity;id='com.osgifx.console.ui.http',\
                                       bnd.identity;id='com.osgifx.console.ui.leaks',\
                                       bnd.identity;id='com.osgifx.console.ui.overview',\
@@ -69,6 +70,7 @@ install.order                     :   \
                                       com.osgifx.console.ui.graph,\
                                       com.osgifx.console.ui.gogo,\
                                       com.osgifx.console.ui.terminal,\
+                                      com.osgifx.console.ui.heap,\
                                       com.osgifx.console.ui.leaks,\
                                       com.osgifx.console.ui.http                                      
 
