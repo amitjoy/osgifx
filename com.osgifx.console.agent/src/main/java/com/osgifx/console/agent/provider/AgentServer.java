@@ -775,32 +775,17 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 		return context;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void refresh(final boolean async) throws InterruptedException {
-		try {
-			final FrameworkWiring f = context.getBundle(0).adapt(FrameworkWiring.class);
-			if (f != null) {
-				refresh = new CountDownLatch(1);
-				f.refreshBundles(null, event -> refresh.countDown());
+		final FrameworkWiring f = context.getBundle(0).adapt(FrameworkWiring.class);
+		if (f != null) {
+			refresh = new CountDownLatch(1);
+			f.refreshBundles(null, event -> refresh.countDown());
 
-				if (async) {
-					return;
-				}
-
-				refresh.await();
+			if (async) {
 				return;
 			}
-		} catch (Exception | NoSuchMethodError e) {
-			@SuppressWarnings("unchecked")
-			final ServiceReference<org.osgi.service.packageadmin.PackageAdmin> ref = (ServiceReference<org.osgi.service.packageadmin.PackageAdmin>) context
-			        .getServiceReference(org.osgi.service.packageadmin.PackageAdmin.class.getName());
-			if (ref != null) {
-				final org.osgi.service.packageadmin.PackageAdmin padmin = context.getService(ref);
-				padmin.refreshPackages(null);
-				return;
-			}
+			refresh.await();
 		}
-		throw new IllegalStateException("Cannot refresh");
 	}
 
 	@Override
@@ -1208,7 +1193,8 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 
 	@Override
 	public XHeapUsageDTO getHeapUsage() {
-		return XHeapAdmin.init();
+		final boolean isJMXWired = PackageWirings.isJMXWired(context);
+		return isJMXWired ? XHeapAdmin.init() : null;
 	}
 
 	@Override
