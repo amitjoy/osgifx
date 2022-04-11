@@ -9,7 +9,7 @@ def ws = Workspace.findWorkspace(IO.work)
 
 tasks.jpackage {
 	appName                     =     ws.getProperty("appName")
-	appVersion                  =     ws.getProperty("appVersion")
+	appVersion                  =     ws.getProperty("OSGifx-Version")
 	appDescription              =     ws.getProperty("appDescription")
 	copyright                   =     ws.getProperty("copyright")
 	vendor                      =     ws.getProperty("vendor")
