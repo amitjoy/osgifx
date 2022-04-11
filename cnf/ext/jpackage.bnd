@@ -1,5 +1,4 @@
 appName                 =        ${Bundle-Vendor}
-appVersion              =        1.0.0
 appDescription          =        An easy-to-use application to manage OSGi frameworks remotely
 copyright               =        ${Bundle-Copyright}
 vendor                  =        ${Bundle-Vendor}

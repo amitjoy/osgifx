@@ -70,8 +70,9 @@ public final class AboutApplicationDialogController {
 	}
 
 	public String replace(final String input) {
-		final var appVersion    = bundleContext.getBundle().getVersion().toString();
-		final var appLink       = bundleContext.getBundle().getHeaders().get(BUNDLE_DOCURL);
+		final var headers       = bundleContext.getBundle().getHeaders();
+		final var appVersion    = headers.get("OSGifx-Version");
+		final var appLink       = headers.get(BUNDLE_DOCURL);
 		final var javaVersion   = Runtime.version().toString();
 		final var javafxVersion = String.valueOf(SystemUtils.getMajorFXVersion());
 
