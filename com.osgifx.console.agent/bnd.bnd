@@ -20,9 +20,9 @@ javac.compliance      : ${javac.source}
                         org.apache.commons.exec.*
 Import-Package        : \
                         com.sun.management;'resolution:'=optional,\
-                        org.osgi.framework;version='[1.5,2)',\
-                        org.osgi.framework.launch;version='[1.0,2)',\
-                        org.apache.felix.gogo.runtime;'resolution:'=optional,\
+                        javax.management;'resolution:'=optional,\
+                        javax.management.openmbean;'resolution:'=optional,\
+                        javax.management.remote;'resolution:'=optional,\
                         org.apache.felix.service.command;'resolution:'=optional,\
                         org.osgi.service.component.runtime;'resolution:'=optional,\
                         org.osgi.service.component.runtime.dto;'resolution:'=optional,\
@@ -32,7 +32,5 @@ Import-Package        : \
                         org.osgi.service.event;'resolution:'=optional,\
                         org.osgi.service.log;'resolution:'=optional,\
                         org.osgi.service.metatype;'resolution:'=optional,\
-                        org.osgi.util.function;'resolution:'=optional,\
                         org.osgi.util.promise;'resolution:'=optional,\
                         *
--fixupmessages        : 'private reference'

@@ -37,53 +37,6 @@ public class Reflect {
 	// ---------------------------------------------------------------------
 
 	/**
-	 * Compile a class at runtime and reflect on it.
-	 * <p>
-	 * For example: <code><pre>
-	 * Supplier&lt;String&gt; supplier = Reflect.compile(
-	 *   "org.joor.Test",
-	 *   "package org.joor;\n" +
-	 *   "class Test implements java.util.function.Supplier&lt;String&gt; {\n" +
-	 *   "  public String get() {\n" +
-	 *   "    return \"Hello World!\";\n" +
-	 *   "  }\n" +
-	 *   "}\n").create().get();
-	 * </pre></code>
-	 *
-	 * @param name    The qualified class name
-	 * @param content The source code for the class
-	 * @return A wrapped {@link Class}
-	 * @throws ReflectException if anything went wrong compiling the class.
-	 */
-	public static Reflect compile(final String name, final String content) throws ReflectException {
-		return compile(name, content, new CompileOptions());
-	}
-
-	/**
-	 * Compile a class at runtime and reflect on it.
-	 * <p>
-	 * For example: <code><pre>
-	 * Supplier&lt;String&gt; supplier = Reflect.compile(
-	 *   "org.joor.Test",
-	 *   "package org.joor;\n" +
-	 *   "class Test implements java.util.function.Supplier&lt;String&gt; {\n" +
-	 *   "  public String get() {\n" +
-	 *   "    return \"Hello World!\";\n" +
-	 *   "  }\n" +
-	 *   "}\n").create().get();
-	 * </pre></code>
-	 *
-	 * @param name    The qualified class name
-	 * @param content The source code for the class
-	 * @param options compiler options
-	 * @return A wrapped {@link Class}
-	 * @throws ReflectException if anything went wrong compiling the class.
-	 */
-	public static Reflect compile(final String name, final String content, final CompileOptions options) throws ReflectException {
-		return onClass(Compile.compile(name, content, options));
-	}
-
-	/**
 	 * Wrap a class name.
 	 * <p>
 	 * This is the same as calling <code>onClass(Class.forName(name))</code>
@@ -887,7 +840,8 @@ public class Reflect {
 			}
 			if (byte.class == type) {
 				return (Class<T>) Byte.class;
-			} else if (double.class == type) {
+			}
+			if (double.class == type) {
 				return (Class<T>) Double.class;
 			} else if (float.class == type) {
 				return (Class<T>) Float.class;
