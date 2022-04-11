@@ -151,74 +151,74 @@ public final class OverviewFxUI {
 	private void createWidgets(final BorderPane parent) {
 		// @formatter:off
         final var clockTile = TileBuilder.create()
-                                          .skinType(SkinType.CLOCK)
-                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                          .title("Today")
-                                          .dateVisible(true)
-                                          .locale(Locale.UK)
-                                          .running(true)
-                                          .styleClass("overview")
-                                          .build();
+                                         .skinType(SkinType.CLOCK)
+                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                         .title("Today")
+                                         .dateVisible(true)
+                                         .locale(Locale.UK)
+                                         .running(true)
+                                         .styleClass("overview")
+                                         .build();
         clockTile.setRoundedCorners(false);
 
         final var noOfThreadsTile = TileBuilder.create()
-                                                .skinType(SkinType.NUMBER)
-                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                .title("Threads")
-                                                .text("Number of threads")
-                                                .value(noOfThreads)
-                                                .valueVisible(noOfThreads != 0.0d)
-                                                .textVisible(true)
-                                                .decimals(0)
-                                                .build();
+                                               .skinType(SkinType.NUMBER)
+                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                               .title("Threads")
+                                               .text("Number of threads")
+                                               .value(noOfThreads)
+                                               .valueVisible(noOfThreads != 0.0d)
+                                               .textVisible(true)
+                                               .decimals(0)
+                                               .build();
         noOfThreadsTile.setRoundedCorners(false);
 
         final var runtimeInfoTile = TileBuilder.create()
-                                                .skinType(SkinType.CUSTOM)
-                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                .title("Runtime Information")
-                                                .graphic(createRuntimeTable(runtimeInfo))
-                                                .valueVisible(!runtimeInfo.isEmpty())
-                                                .text("")
-                                                .build();
+                                               .skinType(SkinType.CUSTOM)
+                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                               .title("Runtime Information")
+                                               .graphic(createRuntimeTable(runtimeInfo))
+                                               .valueVisible(!runtimeInfo.isEmpty())
+                                               .text("")
+                                               .build();
         runtimeInfoTile.setRoundedCorners(false);
 
         final var noOfBundlesTile = TileBuilder.create()
-                                                .skinType(SkinType.NUMBER)
-                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                .title("Bundles")
-                                                .text("Number of installed bundles")
-                                                .value(noOfInstalledBundles)
-                                                .valueVisible(noOfInstalledBundles != 0.0d)
-                                                .textVisible(true)
-                                                .decimals(0)
-                                                .build();
+                                               .skinType(SkinType.NUMBER)
+                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                               .title("Bundles")
+                                               .text("Number of installed bundles")
+                                               .value(noOfInstalledBundles)
+                                               .valueVisible(noOfInstalledBundles != 0.0d)
+                                               .textVisible(true)
+                                               .decimals(0)
+                                               .build();
         noOfBundlesTile.setRoundedCorners(false);
 
         final var noOfServicesTile = TileBuilder.create()
-                                                 .skinType(SkinType.NUMBER)
-                                                 .numberFormat(new DecimalFormat("#"))
-                                                 .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                 .title("Services")
-                                                 .text("Number of registered services")
-                                                 .value(noOfServices)
-                                                 .valueVisible(noOfServices != 0.0d)
-                                                 .textVisible(true)
-                                                 .decimals(0)
-                                                 .build();
+                                                .skinType(SkinType.NUMBER)
+                                                .numberFormat(new DecimalFormat("#"))
+                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                .title("Services")
+                                                .text("Number of registered services")
+                                                .value(noOfServices)
+                                                .valueVisible(noOfServices != 0.0d)
+                                                .textVisible(true)
+                                                .decimals(0)
+                                                .build();
         noOfServicesTile.setRoundedCorners(false);
 
         final var noOfComponentsTile = TileBuilder.create()
-                                                   .skinType(SkinType.NUMBER)
-                                                   .numberFormat(new DecimalFormat("#"))
-                                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                   .title("Components")
-                                                   .text("Number of registered components")
-                                                   .value(noOfComponents)
-                                                   .valueVisible(noOfComponents != 0.0d)
-                                                   .textVisible(true)
-                                                   .decimals(0)
-                                                   .build();
+                                                  .skinType(SkinType.NUMBER)
+                                                  .numberFormat(new DecimalFormat("#"))
+                                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                  .title("Components")
+                                                  .text("Number of registered components")
+                                                  .value(noOfComponents)
+                                                  .valueVisible(noOfComponents != 0.0d)
+                                                  .textVisible(true)
+                                                  .decimals(0)
+                                                  .build();
         noOfComponentsTile.setRoundedCorners(false);
 
         final var freeMemoryInBytes = getMemory("Memory Free");
@@ -228,10 +228,10 @@ public final class OverviewFxUI {
         final var totalMemoryInMB = toMB(totalMemoryInBytes);
 
         final var memoryConsumptionTile = TileBuilder.create()
-                                                        .skinType(SkinType.PERCENTAGE)
-                                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                        .title("JVM Memory Consumption Percentage")
-                                                        .build();
+                                                     .skinType(SkinType.PERCENTAGE)
+                                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                     .title("JVM Memory Consumption Percentage")
+                                                     .build();
         memoryConsumptionTile.setRoundedCorners(false);
         final double usedMemory = totalMemoryInBytes - freeMemoryInBytes;
         final var memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
@@ -239,17 +239,17 @@ public final class OverviewFxUI {
         memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
         final var availableMemoryTile = TileBuilder.create()
-                                                    .skinType(SkinType.BAR_GAUGE)
-                                                    .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                    .minValue(0)
-                                                    .maxValue(totalMemoryInMB)
-                                                    .startFromZero(true)
-                                                    .threshold(totalMemoryInMB * .8)
-                                                    .thresholdVisible(true)
-                                                    .title("JVM Allocated Memory")
-                                                    .unit("MB")
-                                                    .text("Allocated memory of the remote runtime")
-                                                    .gradientStops(
+                                                   .skinType(SkinType.BAR_GAUGE)
+                                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                                   .minValue(0)
+                                                   .maxValue(totalMemoryInMB)
+                                                   .startFromZero(true)
+                                                   .threshold(totalMemoryInMB * .8)
+                                                   .thresholdVisible(true)
+                                                   .title("JVM Allocated Memory")
+                                                   .unit("MB")
+                                                   .text("Allocated memory of the remote runtime")
+                                                   .gradientStops(
                                                            new Stop(0, Bright.BLUE),
                                                            new Stop(0.1, Bright.BLUE_GREEN),
                                                            new Stop(0.2, Bright.GREEN),
@@ -260,32 +260,32 @@ public final class OverviewFxUI {
                                                            new Stop(0.7, Bright.ORANGE_RED),
                                                            new Stop(0.8, Bright.RED),
                                                            new Stop(1.0, Dark.RED))
-                                                    .strokeWithGradient(true)
-                                                    .animated(true)
-                                                    .build();
+                                                   .strokeWithGradient(true)
+                                                   .animated(true)
+                                                   .build();
         availableMemoryTile.setRoundedCorners(false);
         availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
 
         final var uptimeTile = TileBuilder.create()
-                                           .skinType(SkinType.TIME)
-                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                           .title("Uptime")
-                                           .text("Uptime of the remote runtime")
-                                           .duration(LocalTime.of(uptime.hours(), uptime.minutes()))
-                                           .textVisible(true)
-                                           .build();
+                                          .skinType(SkinType.TIME)
+                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                          .title("Uptime")
+                                          .text("Uptime of the remote runtime")
+                                          .duration(LocalTime.of(uptime.hours(), uptime.minutes()))
+                                          .textVisible(true)
+                                          .build();
         uptimeTile.setRoundedCorners(false);
 
         final var pane = new FlowGridPane(3, 3,
-                                                   clockTile,
-                                                   runtimeInfoTile,
-                                                   noOfThreadsTile,
-                                                   noOfBundlesTile,
-                                                   noOfServicesTile,
-                                                   noOfComponentsTile,
-                                                   memoryConsumptionTile,
-                                                   availableMemoryTile,
-                                                   uptimeTile);
+                                           clockTile,
+                                           runtimeInfoTile,
+                                           noOfThreadsTile,
+                                           noOfBundlesTile,
+                                           noOfServicesTile,
+                                           noOfComponentsTile,
+                                           memoryConsumptionTile,
+                                           availableMemoryTile,
+                                           uptimeTile);
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setAlignment(Pos.CENTER);
@@ -372,13 +372,13 @@ public final class OverviewFxUI {
 
 	private long getMemory(final String key) {
 		// @formatter:off
-        return java.util.Optional.ofNullable(supervisor.getAgent())
-                                 .map(Agent::getRuntimeInfo)
-                                 .map(Maps::newHashMap)
-                                 .filter(info -> !info.isEmpty())
-                                 .map(info -> info.get(key))
-                                 .map(Long::valueOf)
-                                 .orElse(0L);
+        return Optional.ofNullable(supervisor.getAgent())
+                       .map(Agent::getRuntimeInfo)
+                       .map(Maps::newHashMap)
+                       .filter(info -> !info.isEmpty())
+                       .map(info -> info.get(key))
+                       .map(Long::valueOf)
+                       .orElse(0L);
         // @formatter:on
 	}
 
