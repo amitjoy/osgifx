@@ -275,7 +275,7 @@ public final class HeapMonitorPane extends BorderPane {
 		label.textProperty().bind(totalUsedHeap);
 		GridPane.setHalignment(label, HPos.LEFT);
 		label.setTextAlignment(TextAlignment.LEFT);
-		label.setPrefWidth(300);
+		label.setPrefWidth(800);
 		return label;
 	}
 
