@@ -121,8 +121,7 @@ public final class OverviewFxUI {
 				noOfServices         = Optional.ofNullable(agent.getAllServices()).map(List::size).orElse(0);
 				noOfComponents       = Optional.ofNullable(agent.getAllComponents()).map(List::size).orElse(0);
 
-				final Map<String, String> info = Optional.ofNullable(agent.getRuntimeInfo()).map(Maps::newHashMap)
-				        .orElse(Maps.newHashMap());
+				final Map<String, String> info = Map.copyOf(agent.getRuntimeInfo());
 				runtimeInfo.putAll(info);
 
 				final var up = info.get("Uptime");
