@@ -383,14 +383,18 @@ public final class OverviewFxUI {
 
 	@Inject
 	@org.eclipse.e4.core.di.annotations.Optional
-	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+	private void updateOnAgentConnectedEvent( //
+	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+	        final BorderPane parent) {
 		logger.atInfo().log("Agent connected event received");
 		createControls(parent);
 	}
 
 	@Inject
 	@org.eclipse.e4.core.di.annotations.Optional
-	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+	private void updateOnAgentDisconnectedEvent(//
+	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+	        final BorderPane parent) {
 		logger.atInfo().log("Agent disconnected event received");
 		createControls(parent);
 	}
