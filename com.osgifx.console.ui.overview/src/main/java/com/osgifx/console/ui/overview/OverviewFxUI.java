@@ -17,6 +17,7 @@ package com.osgifx.console.ui.overview;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static java.util.Objects.requireNonNullElse;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.text.DecimalFormat;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -78,6 +80,9 @@ public final class OverviewFxUI {
 	private ConsoleStatusBar statusBar;
 	@Inject
 	private Supervisor       supervisor;
+	@Inject
+	@Named("is_connected")
+	private boolean          isConnected;
 
 	private volatile double noOfThreads;
 	private volatile double noOfServices;
@@ -121,10 +126,11 @@ public final class OverviewFxUI {
 				noOfServices         = Optional.ofNullable(agent.getAllServices()).map(List::size).orElse(0);
 				noOfComponents       = Optional.ofNullable(agent.getAllComponents()).map(List::size).orElse(0);
 
-				final Map<String, String> info = Map.copyOf(agent.getRuntimeInfo());
-				runtimeInfo.putAll(info);
+				final var                 remoteRuntimeInfo = agent.getRuntimeInfo();
+				final Map<String, String> outputInfo        = Map.copyOf(requireNonNullElse(remoteRuntimeInfo, Map.of()));
+				runtimeInfo.putAll(outputInfo);
 
-				final var up = info.get("Uptime");
+				final var up = outputInfo.get("Uptime");
 				if (up != null) {
 					uptime = toUptimeEntry(Long.parseLong(up));
 				} else {
