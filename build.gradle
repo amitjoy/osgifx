@@ -7,9 +7,7 @@ task copy_artifacts(type: Copy) {
     from 'com.osgifx.console.agent/target/'
     into '.'
     include '*.deb'
-    include '*.rpm'
     include '*.dmg'
-    include '*.pkg'
     include '*.exe'
     include 'com.osgifx.console.agent.jar'
 }
