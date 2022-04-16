@@ -16,7 +16,7 @@ jobs:
             -  os: windows-latest
       steps:
       -  name: Git Checkout
-         uses: actions/checkout@v1
+         uses: actions/checkout@v3
       -  name: Gradle Wrapper Validation
          uses: gradle/wrapper-validation-action@v1
       -  name: Set up Java 17 with JavaFX
@@ -24,21 +24,21 @@ jobs:
          with:
             java-version: 17
             java-package: jdk+fx
-      -  name: Build Workspace
+      -  name: Build Workspace using Gradle
          run: ./gradlew build --max-workers=5 --parallel
       -  name: Build Executable JAR
          run: ./gradlew :com.osgifx.console.product:export.osgifx
-      -  name: Copy Executable JAR to Distribution Project
-         run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
+      # -  name: Copy Executable JAR to Distribution Project
+      #    run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
       # -  name: Build Distribution Image for ${{ matrix.config.os }}
       #    run: ./gradlew jpackage --info
-      -  name: Copy Distribution Artifacts to Current Directory
-         run: ./gradlew copy_artifacts
-      -  uses: actions/upload-artifact@master
-         with:
-            name: dist-${{ matrix.config.os }}
-            path: |-
-               *.deb
-               *.dmg
-               *.exe
-               com.osgifx.console.agent.jar
+      # -  name: Copy Distribution Artifacts to Current Directory
+      #    run: ./gradlew copy_artifacts
+      # -  uses: actions/upload-artifact@master
+      #    with:
+      #       name: dist-${{ matrix.config.os }}
+      #       path: |-
+      #          *.deb
+      #          *.dmg
+      #          *.exe
+      #          com.osgifx.console.agent.jar
