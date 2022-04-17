@@ -1,0 +1,38 @@
+name: Publish with jDeploy
+
+on:
+   push:
+      tags: '*'
+
+jobs:
+   build:
+      runs-on: ubuntu-latest
+      steps:
+      -  name: Git Checkout
+         uses: actions/checkout@v3
+      -  name: Gradle Wrapper Validation
+         uses: gradle/wrapper-validation-action@v1
+      -  name: Set up Java 17 with JavaFX
+         uses: actions/setup-java@v1
+         with:
+            java-version: '17'
+            java-package: jdk+fx
+      -  name: Set up Node
+         uses: actions/setup-node@v2
+         with:
+            node-version: 16.x
+            registry-url: https://registry.npmjs.org
+         env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      -  name: Build Workspace using Gradle
+         run: ./gradlew build --max-workers=5 --parallel
+      -  name: Build Executable JAR
+         run: ./gradlew :com.osgifx.console.product:export.osgifx
+      -  name: Copy Executable JAR to Distribution Project
+         run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
+      -  name: Publish with jDeploy
+         run: |
+            npm version "$GITHUB_REF_NAME"
+            npm jdeploy publish
+         env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
