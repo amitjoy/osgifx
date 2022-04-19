@@ -22,7 +22,7 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -48,13 +48,8 @@ public final class HeapMonitorFxUI {
 	@PostConstruct
 	public void postConstruct(final BorderPane parent) {
 		createControls(parent);
-		logger.atDebug().log("Heap monitor part has been initialized");
-	}
-
-	@Focus
-	void focus(final BorderPane parent) {
-		createControls(parent);
 		memoryViewPane.startUpdates();
+		logger.atDebug().log("Heap monitor part has been initialized");
 	}
 
 	private void createControls(final BorderPane parent) {
@@ -63,7 +58,7 @@ public final class HeapMonitorFxUI {
 	}
 
 	@Inject
-	@org.eclipse.e4.core.di.annotations.Optional
+	@Optional
 	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
 		logger.atInfo().log("Agent connected event received");
 		createControls(parent);
@@ -71,7 +66,7 @@ public final class HeapMonitorFxUI {
 	}
 
 	@Inject
-	@org.eclipse.e4.core.di.annotations.Optional
+	@Optional
 	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
 		logger.atInfo().log("Agent disconnected event received");
 		memoryViewPane.stopUpdates();
