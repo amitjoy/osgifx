@@ -70,7 +70,7 @@ public final class ViewFeaturesDialogController {
 		final var installedFeatures = featureAgent.getInstalledFeatures();
 		features = FXCollections.observableArrayList(installedFeatures);
 		featuresList.setItems(features);
-		logger.atInfo().log("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 
 		idColumn.setCellValueFactory(
 		        p -> new SimpleStringProperty(p.getValue().id.groupId + ":" + p.getValue().id.artifactId + ":" + p.getValue().id.version));

@@ -57,7 +57,7 @@ public final class BundleInstallDialogController {
 	public void initialize() {
 		registerDragAndDropSupport();
 		registerNumberValidationListener();
-		logger.atInfo().log("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 	@FXML

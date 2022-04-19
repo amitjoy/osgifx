@@ -58,7 +58,7 @@ public final class CheckForUpdatesDialogController {
 
 		features = Maps.newHashMap();
 
-		logger.atInfo().log("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 	public SelectedFeaturesForUpdateDTO getSelectedFeatures() {

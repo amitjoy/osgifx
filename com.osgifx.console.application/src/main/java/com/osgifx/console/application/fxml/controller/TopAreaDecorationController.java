@@ -36,7 +36,7 @@ public final class TopAreaDecorationController {
 
 	@FXML
 	public void initialize() {
-		logger.atInfo().log("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 	@FXML
