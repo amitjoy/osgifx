@@ -57,7 +57,7 @@ public final class AboutApplicationDialogController {
 		javaVersionTxt.setText(replace(javaVersionTxt.getText()));
 		appDetails.setOnAction(this::handleLinkOnClick);
 		eclipseLink.setOnAction(this::handleLinkOnClick);
-		logger.atInfo().log("FXML controller (%s) has been initialized", getClass());
+		logger.atDebug().log("FXML controller (%s) has been initialized", getClass());
 	}
 
 	private void handleLinkOnClick(final ActionEvent event) {

@@ -61,7 +61,7 @@ public final class ConnectionSettingsDialogController {
 		        .addListener((obs, oldSettings, newSettings) -> selectedSettings.publish(newSettings));
 
 		TableFilter.forTableView(connectionTable).apply();
-		logger.atInfo().log("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 }

@@ -114,7 +114,7 @@ public final class InstallFeatureDialogController {
 		});
 		analyzeButton.disableProperty().bind(Bindings.createBooleanBinding(() -> archiveUrlCombo.getEditor().getText().trim().isEmpty(),
 		        archiveUrlCombo.getEditor().textProperty()));
-		logger.atInfo().log("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 	private void initCombo() {
