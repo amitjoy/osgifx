@@ -17,8 +17,8 @@ package com.osgifx.console.ui.components;
 
 import javax.inject.Inject;
 
+import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.log.Logger;
 
 import com.osgifx.console.agent.dto.XReferenceDTO;
 
@@ -29,39 +29,39 @@ public final class ReferenceDetailsFxController {
 
 	@Log
 	@Inject
-	private Logger logger;
+	private FluentLogger logger;
 	@FXML
-	private Label  nameLabel;
+	private Label        nameLabel;
 	@FXML
-	private Label  interfaceLabel;
+	private Label        interfaceLabel;
 	@FXML
-	private Label  cardinalityLabel;
+	private Label        cardinalityLabel;
 	@FXML
-	private Label  policyLabel;
+	private Label        policyLabel;
 	@FXML
-	private Label  policyOptionLabel;
+	private Label        policyOptionLabel;
 	@FXML
-	private Label  targetLabel;
+	private Label        targetLabel;
 	@FXML
-	private Label  unbindLabel;
+	private Label        unbindLabel;
 	@FXML
-	private Label  updatedLabel;
+	private Label        updatedLabel;
 	@FXML
-	private Label  fieldLabel;
+	private Label        fieldLabel;
 	@FXML
-	private Label  fieldOptionLabel;
+	private Label        fieldOptionLabel;
 	@FXML
-	private Label  scopeLabel;
+	private Label        scopeLabel;
 	@FXML
-	private Label  bindLabel;
+	private Label        bindLabel;
 	@FXML
-	private Label  parameterLabel;
+	private Label        parameterLabel;
 	@FXML
-	private Label  collectionTypeLabel;
+	private Label        collectionTypeLabel;
 
 	@FXML
 	public void initialize() {
-		logger.info("FXML controller has been initialized");
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 	void initControls(final XReferenceDTO reference) {
