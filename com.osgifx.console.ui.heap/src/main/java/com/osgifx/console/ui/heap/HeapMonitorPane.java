@@ -71,12 +71,17 @@ public final class HeapMonitorPane extends BorderPane {
 	public HeapMonitorPane(final Supervisor supervisor, final ThreadSynchronize threadSync) {
 		this.supervisor = supervisor;
 		this.threadSync = threadSync;
+
 		setTop(createControlPanel());
+
 		final var box        = createMainContent();
 		final var scrollPane = new ScrollPane(box);
+
 		scrollPane.setFitToWidth(true);
 		setCenter(scrollPane);
+
 		final var frame = new KeyFrame(Duration.millis(1_000), (final var actionEvent) -> updateHeapInformation());
+
 		animation = new Timeline();
 		animation.getKeyFrames().add(frame);
 		animation.setCycleCount(Animation.INDEFINITE);
@@ -97,9 +102,11 @@ public final class HeapMonitorPane extends BorderPane {
 
 		final var memoryUsageChartGlobal = new HeapMonitorChart("Heap", supplier, now);
 		addToList(memoryUsageChartGlobal, vBoxChildren);
+
 		final var separator = new Separator();
 		separator.setPrefHeight(2);
 		vBoxChildren.add(separator);
+
 		final var agent = supervisor.getAgent();
 		if (agent != null && agent.getHeapUsage() != null) {
 			for (final XMemoryPoolMXBean mpBean : agent.getHeapUsage().memoryPoolBeans) {
@@ -190,9 +197,11 @@ public final class HeapMonitorPane extends BorderPane {
 
 	private Pane createControlPanel() {
 		final var borderPane = new BorderPane();
+
 		borderPane.setLeft(createLeftPane());
 		borderPane.setRight(createRightPane());
 		borderPane.setPadding(new Insets(5, 5, 5, 5));
+
 		final var border = new Border(
 		        new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT, new Insets(5)));
 		borderPane.setBorder(border);
@@ -273,9 +282,12 @@ public final class HeapMonitorPane extends BorderPane {
 	private Label createRightSideLabel(final StringProperty totalUsedHeap) {
 		final var label = new Label();
 		label.textProperty().bind(totalUsedHeap);
+
 		GridPane.setHalignment(label, HPos.LEFT);
+
 		label.setTextAlignment(TextAlignment.LEFT);
 		label.setPrefWidth(800);
+
 		return label;
 	}
 
