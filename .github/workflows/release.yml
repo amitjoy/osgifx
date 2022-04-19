@@ -1,9 +1,7 @@
-name: Publish with jDeploy
-
+name: Release
 on:
    push:
-      tags: '*'
-
+      tags: v*.*.*
 jobs:
    build:
       runs-on: ubuntu-latest
@@ -34,6 +32,16 @@ jobs:
          run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
+      -  name: Copy Agent JAR to Current Directory
+         run: cp com.osgifx.console.agent/target/com.osgifx.console.agent.jar .
+      -  name: Prepare Release
+         uses: softprops/action-gh-release@v1
+         with:
+            tag_name: ${{ github.ref.name }}
+            body_path: changelogs/${{ github.ref.name }}.md
+            token: ${{ secrets.GITHUB_TOKEN }}
+            fail_on_unmatched_files: true
+            files: com.osgifx.console.agent.jar
       -  name: Publish with jDeploy
          run: |
             npm version "$GITHUB_REF_NAME"
