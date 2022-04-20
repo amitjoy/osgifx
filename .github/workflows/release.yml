@@ -37,8 +37,8 @@ jobs:
       -  name: Prepare Release
          uses: softprops/action-gh-release@v1
          with:
-            tag_name: ${{ github.ref.name }}
-            body_path: changelogs/${{ github.ref.name }}.md
+            tag_name: ${{ github.ref_name }}
+            body_path: changelogs/${{ github.ref_name }}.md
             token: ${{ secrets.GITHUB_TOKEN }}
             fail_on_unmatched_files: true
             files: com.osgifx.console.agent.jar
