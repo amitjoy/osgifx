@@ -43,8 +43,6 @@ jobs:
             fail_on_unmatched_files: true
             files: com.osgifx.console.agent.jar
       -  name: Publish with jDeploy
-         run: |
-            npm version "$GITHUB_REF_NAME"
-            npx jdeploy publish
+         run: npx jdeploy publish
          env:
             NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
