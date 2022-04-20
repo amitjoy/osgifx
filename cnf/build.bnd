@@ -38,7 +38,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
 -groupid                              =         com.osgifx
 
-OSGifx-Version                        =         0.0.4
+OSGifx-Version                        =         ${cat;${.}/app.version}
 Bundle-Version                        =         ${OSGifx-Version}.${tstamp}
 
 Git-Descriptor                        =         ${system-allow-fail;git describe --dirty --always --abbrev=9}
