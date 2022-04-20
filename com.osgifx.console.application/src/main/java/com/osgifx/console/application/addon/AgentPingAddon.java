@@ -92,7 +92,7 @@ public final class AgentPingAddon {
 	}
 
 	@PreDestroy
-	private void destory() {
+	private void destroy() {
 		executor.shutdownNow();
 		logger.atInfo().log("Agent ping addon has been destroyed");
 	}
