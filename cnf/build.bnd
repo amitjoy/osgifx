@@ -25,7 +25,7 @@ sonatype.url                          =         https://oss.sonatype.org
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
 sonatype.url.staging                  =         ${sonatype.url}/service/local/staging/deploy/maven2/
 
-efxclipse.version                     =         3.7.0
+efxclipse.version                     =         3.8.0
 efxclipse.url                         =         http://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
 
 bin.directory                         =         ${if;${is;${driver};gradle};target/gradle/classes;target/classes}

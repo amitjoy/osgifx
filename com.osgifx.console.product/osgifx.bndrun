@@ -141,27 +141,27 @@ install.order                     :   \
 	org.eclipse.equinox.event;version='[1.6.100,1.6.101)';startlevel=10,\
 	org.eclipse.equinox.preferences;version='[3.9.100,3.9.101)';startlevel=10,\
 	org.eclipse.equinox.registry;version='[3.11.100,3.11.101)';startlevel=10,\
-	org.eclipse.fx.core;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.core.databinding;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.core.di;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.core.di.context;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.core.fxml;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.osgi.util;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.animation;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.controls;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.di;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.dialogs;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.keybindings;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.keybindings.e4;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.keybindings.generic;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.panes;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.services;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.theme;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.workbench.base;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.workbench.fx;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.workbench.renderers.base;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.workbench.renderers.fx;version='[3.7.0,3.7.1)';startlevel=10,\
-	org.eclipse.fx.ui.workbench.services;version='[3.7.0,3.7.1)';startlevel=10,\
+	org.eclipse.fx.core;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.core.databinding;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.core.di;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.core.di.context;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.core.fxml;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.osgi.util;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.animation;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.controls;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.di;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.dialogs;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.keybindings;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.keybindings.e4;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.keybindings.generic;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.panes;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.services;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.theme;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.workbench.base;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.workbench.fx;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.workbench.renderers.base;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.workbench.renderers.fx;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.ui.workbench.services;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.jdt.annotation;version='[2.2.400,2.2.401)';startlevel=10,\
 	org.eclipse.osgi.services;version='[3.10.200,3.10.201)';startlevel=10,\
 	org.osgi.service.feature;version='[1.0.0,1.0.1)';startlevel=10,\
