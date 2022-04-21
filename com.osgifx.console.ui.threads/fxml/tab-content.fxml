@@ -27,7 +27,7 @@
     	</placeholder>
       	<columns>
           <TableColumn prefWidth="30.0" text="" />
-          <TableColumn fx:id="nameColumn" prefWidth="500.0" text="Name" />
+          <TableColumn fx:id="nameColumn" prefWidth="550.0" text="Name" />
           <TableColumn fx:id="idColumn" prefWidth="90.0" text="ID" />
           <TableColumn fx:id="priorityColumn" prefWidth="90.0" text="Priority" />
           <TableColumn fx:id="stateColumn" prefWidth="140.0" text="State" />

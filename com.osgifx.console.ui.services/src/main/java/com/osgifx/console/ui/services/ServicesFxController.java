@@ -97,7 +97,7 @@ public final class ServicesFxController {
 
 		final var objectClassColumn = new TableColumn<XServiceDTO, String>("Object Class");
 
-		objectClassColumn.setPrefWidth(600);
+		objectClassColumn.setPrefWidth(700);
 		objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
 		Fx.addCellFactory(objectClassColumn, s -> s.properties.containsKey(COMPONENT_ID), Color.SLATEBLUE, Color.BLACK);
 

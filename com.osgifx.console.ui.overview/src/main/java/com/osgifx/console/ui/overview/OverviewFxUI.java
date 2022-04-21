@@ -70,7 +70,7 @@ import javafx.scene.paint.Stop;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class OverviewFxUI {
 
-	private static final double TILE_WIDTH  = 420;
+	private static final double TILE_WIDTH  = 500;
 	private static final double TILE_HEIGHT = 220;
 
 	@Log
