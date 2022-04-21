@@ -128,7 +128,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 				} catch (final Exception e) {
 					return false;
 				}
-			}, String.format(requiredNumberFormat, portCaption)));
+			}, String.format(requiredNumberFormat, timeoutCaption)));
 		});
 		setResultConverter(dialogButton -> {
 			try {
