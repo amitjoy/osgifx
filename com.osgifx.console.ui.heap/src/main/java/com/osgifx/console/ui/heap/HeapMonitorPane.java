@@ -213,15 +213,44 @@ public final class HeapMonitorPane extends BorderPane {
 		vBox.setSpacing(5);
 		final var children = vBox.getChildren();
 
-		final var garbageCollect = new Button("Garbage Collect");
-		garbageCollect.setMaxWidth(Double.MAX_VALUE);
-		garbageCollect.setOnAction(e -> performGC());
-		children.add(garbageCollect);
+		final var garbageCollectBtn = new Button("Garbage Collect");
+		garbageCollectBtn.setDisable(true);
+		garbageCollectBtn.setMaxWidth(Double.MAX_VALUE);
+		garbageCollectBtn.setOnAction(e -> performGC());
 
-		final var heapDump = new Button("Heap Dump");
-		heapDump.setMaxWidth(Double.MAX_VALUE);
-		heapDump.setOnAction(e -> heapDump());
-		children.add(heapDump);
+		final var heapDumpBtn = new Button("Heap Dump");
+		heapDumpBtn.setDisable(true);
+		heapDumpBtn.setMaxWidth(Double.MAX_VALUE);
+		heapDumpBtn.setOnAction(e -> heapDump());
+
+		final var startStopBtn = new Button("Start");
+		startStopBtn.setDisable(supervisor.getAgent() == null || supervisor.getAgent().getHeapUsage() == null);
+		startStopBtn.setMaxWidth(Double.MAX_VALUE);
+		startStopBtn.setOnAction(e -> {
+			switch (animation.getStatus()) {
+			case RUNNING:
+				animation.pause();
+
+				garbageCollectBtn.setDisable(true);
+				heapDumpBtn.setDisable(true);
+				startStopBtn.setText("Start");
+
+				break;
+			case PAUSED, STOPPED:
+			default:
+				animation.play();
+
+				garbageCollectBtn.setDisable(false);
+				heapDumpBtn.setDisable(false);
+				startStopBtn.setText("Stop");
+
+				break;
+			}
+		});
+
+		children.add(startStopBtn);
+		children.add(garbageCollectBtn);
+		children.add(heapDumpBtn);
 
 		return vBox;
 	}
