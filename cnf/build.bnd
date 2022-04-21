@@ -21,9 +21,16 @@ testbin                               =         ${testbin.directory}
 target-dir                            =         target
 
 maven.central.url                     =         https://repo.maven.apache.org/maven2/
+github.packages.url                   =         https://maven.pkg.github.com/
+github.osgifx.packages.url            =         ${github.packages.url}/amitjoy/osgifx
 sonatype.url                          =         https://oss.sonatype.org
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
 sonatype.url.staging                  =         ${sonatype.url}/service/local/staging/deploy/maven2/
+
+pwd                                   =         ${env;GH_PKG_TOKEN;}
+usr                                   =         ${env;GITHUB_ACTOR;}
+-connection-settings                  =         ${if;${pwd};server;-dummy};id=${github.packages.url};username=${usr};password=${pwd}, -bnd
+-releaserepo                          =         Release
 
 efxclipse.version                     =         3.8.0
 efxclipse.url                         =         http://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
@@ -35,7 +42,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
 
--pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
+-pom                                  =         true
 -groupid                              =         com.osgifx
 
 OSGifx-Version                        =         ${cat;${.}/app.version}
@@ -60,16 +67,23 @@ Git-SHA                               =         ${system-allow-fail;git rev-list
 		          name                =         Runtime;\
 		          index               =         ${.}/maven/runtime.maven
 
--plugin.3.efxclipse                   =         \
+-plugin.3.Release                     =         \
+		    aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		          snapshotUrl         =         ${github.osgifx.packages.url};\
+		          releaseUrl          =         ${github.osgifx.packages.url};\
+		          name                =         Release;\
+		          index               =         ${.}/maven/release.maven
+
+-plugin.4.efxclipse                   =         \
 		    aQute.bnd.repository.osgi.OSGiRepository;\
 		          locations           =         ${efxclipse.url};\
 		          name                =         e(fx)clipse
 
--plugin.4.Local                       =         \
+-plugin.5.Local                       =         \
             aQute.bnd.deployer.repository.LocalIndexedRepo; \
                   name                =         Local; \
                   pretty              =         true; \
                   local               =         ${build}/local
 
--plugin.5.Exporter                    =         com.osgifx.console.feature.exporter.FeatureExporter
+-plugin.6.Exporter                    =         com.osgifx.console.feature.exporter.FeatureExporter
 -pluginpath                           =         ${build}/plugin/com.osgifx.console.feature.exporter.jar

@@ -32,9 +32,15 @@ jobs:
          run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
+      -  name: Publish Agent JAR to GitHub Packages Registry
+         run: ./gradlew :com.osgifx.console.agent:release --info
+      -  name: Publish OSGi.fx to npmjs Registry using jDeploy
+         run: npx jdeploy publish
+         env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       -  name: Copy Agent JAR to Current Directory
          run: cp com.osgifx.console.agent/target/com.osgifx.console.agent.jar .
-      -  name: Prepare Release
+      -  name: Draft GitHub Release
          uses: softprops/action-gh-release@v1
          with:
             tag_name: ${{ github.ref_name }}
@@ -42,7 +48,3 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
             fail_on_unmatched_files: true
             files: com.osgifx.console.agent.jar
-      -  name: Publish with jDeploy
-         run: npx jdeploy publish
-         env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
