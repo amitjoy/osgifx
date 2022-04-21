@@ -30,6 +30,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.ConsoleStatusBar;
 
 import javafx.scene.layout.BorderPane;
 
@@ -43,18 +44,20 @@ public final class HeapMonitorFxUI {
 	private Supervisor        supervisor;
 	@Inject
 	private ThreadSynchronize threadSync;
+	@Inject
+	private ConsoleStatusBar  statusBar;
 	private HeapMonitorPane   memoryViewPane;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent) {
 		createControls(parent);
-		memoryViewPane.startUpdates();
 		logger.atDebug().log("Heap monitor part has been initialized");
 	}
 
 	private void createControls(final BorderPane parent) {
 		memoryViewPane = new HeapMonitorPane(supervisor, threadSync);
 		parent.setCenter(memoryViewPane);
+		statusBar.addTo(parent);
 	}
 
 	@Inject
@@ -62,7 +65,6 @@ public final class HeapMonitorFxUI {
 	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
 		logger.atInfo().log("Agent connected event received");
 		createControls(parent);
-		memoryViewPane.startUpdates();
 	}
 
 	@Inject
