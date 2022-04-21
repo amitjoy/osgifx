@@ -6,3 +6,5 @@ google_analytics:
 theme: jekyll-theme-minimal
 jdeploy:
   url: https://www.jdeploy.com/~osgifx
+agent:
+  url: https://github.com/amitjoy/osgifx/packages/
