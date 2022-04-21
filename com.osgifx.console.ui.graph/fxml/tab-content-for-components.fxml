@@ -45,7 +45,7 @@
                    </SegmentedButton>
                </left>
                <right>
-                  <Button mnemonicParsing="false" onAction="#generateGraph" BorderPane.alignment="CENTER">
+                  <Button mnemonicParsing="false" onAction="#generateGraph" prefHeight="40.0" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets right="5.0" top="5.0" />
                      </BorderPane.margin>
@@ -55,14 +55,14 @@
                   </Button>
                </right>
                <center>
-                  <Button mnemonicParsing="false" onAction="#deselectAll" prefHeight="27.0" prefWidth="118.0" text="Deselect All" BorderPane.alignment="CENTER">
+                  <Button mnemonicParsing="false" onAction="#deselectAll" prefHeight="40.0" prefWidth="140.0" text="Deselect All" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets left="5.0" right="5.0" top="5.0" />
                      </BorderPane.margin>
                   </Button>
                </center>
                <bottom>
-                  <ChoiceBox fx:id="wiringSelection" prefWidth="329.0" BorderPane.alignment="CENTER">
+                  <ChoiceBox fx:id="wiringSelection" prefHeight="30.0" prefWidth="360.0" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets bottom="5.0" top="5.0" />
                      </BorderPane.margin>
@@ -76,7 +76,7 @@
                   <CheckListView fx:id="componentsList" prefHeight="498.0" prefWidth="245.0" BorderPane.alignment="CENTER" />
                </center>
                <top>
-                  <TextField fx:id="searchText" prefHeight="30.0" prefWidth="329.0" promptText="Search Filter" BorderPane.alignment="CENTER">
+                   <TextField fx:id="searchText" prefHeight="30.0" prefWidth="360.0" promptText="Search Filter" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" />
                      </BorderPane.margin></TextField>

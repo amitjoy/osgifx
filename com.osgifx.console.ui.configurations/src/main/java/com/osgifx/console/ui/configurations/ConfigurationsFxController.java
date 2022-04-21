@@ -92,7 +92,7 @@ public final class ConfigurationsFxController {
 									});
 
 		final var pidColumn = new TableColumn<XConfigurationDTO, String>("PID/Factory PID");
-		pidColumn.setPrefWidth(480);
+		pidColumn.setPrefWidth(580);
 		pidColumn.setCellValueFactory(
 		        new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
 		Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);

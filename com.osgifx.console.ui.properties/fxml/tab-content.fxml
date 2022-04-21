@@ -28,7 +28,7 @@
         <columns>
           <TableColumn prefWidth="30.0" text="" />
           <TableColumn fx:id="propertyName" prefWidth="515.0" text="Name" />
-          <TableColumn fx:id="propertyValue" prefWidth="400.0" text="Value" />
+          <TableColumn fx:id="propertyValue" prefWidth="450.0" text="Value" />
           <TableColumn fx:id="propertyType" prefWidth="200.0" text="Type" />
         </columns>
       </TableView>

@@ -89,7 +89,7 @@ public final class PackagesFxController {
 
 		final var nameColumn = new TableColumn<PackageDTO, String>("Name");
 
-		nameColumn.setPrefWidth(450);
+		nameColumn.setPrefWidth(550);
 		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
 		final var versionColumn = new TableColumn<PackageDTO, String>("Version");

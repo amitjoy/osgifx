@@ -92,7 +92,7 @@ public final class HttpFxController {
 									});
 
 		final var componentColumn = new TableColumn<XHttpInfoDTO, String>("Component Name");
-		componentColumn.setPrefWidth(550);
+		componentColumn.setPrefWidth(600);
 		componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> {
 			// resource doesn't have associated name field
 			try {
