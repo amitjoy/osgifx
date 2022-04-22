@@ -33,6 +33,8 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.concurrent.Task;
+
 public final class BundleInstallHandler {
 
 	@Log
@@ -58,36 +60,46 @@ public final class BundleInstallHandler {
 
 		final var remoteInstall = dialog.showAndWait();
 		if (remoteInstall.isPresent()) {
-			try {
-				final var dto        = remoteInstall.get();
-				final var file       = dto.file();
-				final var startLevel = dto.startLevel();
-				if (file == null) {
-					return;
-				}
-				logger.atInfo().log("Selected file to install or update as bundle: %s", file);
+			final Task<Void> installTask = new Task<>() {
+				@Override
+				protected Void call() throws Exception {
+					try {
+						final var dto        = remoteInstall.get();
+						final var file       = dto.file();
+						final var startLevel = dto.startLevel();
+						if (file == null) {
+							return null;
+						}
+						logger.atInfo().log("Selected file to install or update as bundle: %s", file);
 
-				final var agent = supervisor.getAgent();
-				if (agent == null) {
-					logger.atWarning().log("Remote agent cannot be connected");
-					return;
+						final var agent = supervisor.getAgent();
+						if (agent == null) {
+							logger.atWarning().log("Remote agent cannot be connected");
+							return null;
+						}
+						final var bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
+						if (bundle == null) {
+							logger.atError().log("Bundle cannot be installed or updated");
+							return null;
+						}
+						logger.atInfo().log("Bundle has been installed or updated: %s", bundle);
+						if (dto.startBundle()) {
+							agent.start(bundle.id);
+							logger.atInfo().log("Bundle has been started: %s", bundle);
+						}
+						eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
+						Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated");
+					} catch (final Exception e) {
+						logger.atError().withException(e).log("Bundle cannot be installed or updated");
+						Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated");
+					}
+					return null;
 				}
-				final var bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
-				if (bundle == null) {
-					logger.atError().log("Bundle cannot be installed or updated");
-					return;
-				}
-				logger.atInfo().log("Bundle has been installed or updated: %s", bundle);
-				if (dto.startBundle()) {
-					agent.start(bundle.id);
-					logger.atInfo().log("Bundle has been started: %s", bundle);
-				}
-				eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
-				Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated");
-			} catch (final Exception e) {
-				logger.atError().withException(e).log("Bundle cannot be installed or updated");
-				Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated");
-			}
+			};
+
+			final var thread = new Thread(installTask);
+			thread.setDaemon(true);
+			thread.start();
 		}
 	}
 

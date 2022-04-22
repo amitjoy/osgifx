@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2021-2022 Amit Kumar Mondal
+ * Copyright 2022 Amit Kumar Mondal
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -13,19 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.packages;
+package com.osgifx.console.agent.dto;
 
-import java.util.List;
+import org.osgi.dto.DTO;
 
-import com.google.common.collect.Lists;
-import com.osgifx.console.agent.dto.XBundleDTO;
+public class XFrameworkEventDTO extends DTO {
 
-public final class PackageDTO {
-
-	public String           name;
-	public String           version;
-	public boolean          isDuplicateExport;
-	public List<XBundleDTO> exporters = Lists.newArrayList();
-	public List<XBundleDTO> importers = Lists.newArrayList();
+	public int    eventType;
+	public long   received;
+	public String sourceBundleBsn;
+	public String throwable;
 
 }

@@ -28,6 +28,8 @@ import org.eclipse.fx.core.log.Log;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.concurrent.Task;
+
 public final class BundleStartHandler {
 
 	@Log
@@ -45,19 +47,29 @@ public final class BundleStartHandler {
 			logger.atWarning().log("Remote agent cannot be connected");
 			return;
 		}
-		try {
-			final var error = agent.start(Long.parseLong(id));
-			if (error == null) {
-				logger.atInfo().log("Bundle with ID '%s' has been started", id);
-				eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
-			} else {
-				logger.atError().log(error);
-				FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader());
+		final Task<Void> startTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					final var error = agent.start(Long.parseLong(id));
+					if (error == null) {
+						logger.atInfo().log("Bundle with ID '%s' has been started", id);
+						eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
+					} else {
+						logger.atError().log(error);
+						FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader());
+					}
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
+					FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+				}
+				return null;
 			}
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
-			FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-		}
+		};
+
+		final var thread = new Thread(startTask);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 }

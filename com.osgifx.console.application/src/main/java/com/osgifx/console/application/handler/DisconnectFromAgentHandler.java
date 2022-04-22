@@ -29,7 +29,8 @@ import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.util.fx.Fx;
+
+import javafx.concurrent.Task;
 
 public final class DisconnectFromAgentHandler {
 
@@ -52,17 +53,29 @@ public final class DisconnectFromAgentHandler {
 
 	@Execute
 	public void execute() {
-		try {
-			supervisor.getAgent().abort();
-			eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-			isConnected.publish(false);
-			selectedSettings.publish(null);
-			connectedAgent.publish(null);
-			Fx.showSuccessNotification("Agent Connection", "Agent connection has been successfully aborted");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("Agent connection cannot be aborted");
-			Fx.showErrorNotification("Agent Connection", "Agent connection cannot be aborted");
-		}
+		final Task<Void> disconnectTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					supervisor.getAgent().abort();
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Agent connection cannot be aborted");
+				}
+				return null;
+			}
+
+			@Override
+			protected void succeeded() {
+				eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+				isConnected.publish(false);
+				selectedSettings.publish(null);
+				connectedAgent.publish(null);
+			}
+		};
+
+		final var thread = new Thread(disconnectTask);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	@CanExecute

@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.components;
 
-import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
@@ -24,7 +23,6 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -57,21 +55,6 @@ public final class ComponentsFxUI {
 	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
 		createControls(parent, loader);
 		logger.atDebug().log("Components part has been initialized");
-	}
-
-	@Focus
-	public void focus(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-		createControls(parent, loader);
-	}
-
-	@Inject
-	@Optional
-	private void updateControlsOnEvent( //
-	        @UIEventTopic(COMPONENT_ACTION_EVENT_TOPICS) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		logger.atDebug().log("Component action event received");
-		createControls(parent, loader);
 	}
 
 	@Inject

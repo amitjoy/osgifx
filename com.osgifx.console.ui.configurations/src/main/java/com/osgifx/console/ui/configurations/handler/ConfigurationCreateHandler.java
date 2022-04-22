@@ -34,6 +34,8 @@ import com.osgifx.console.ui.configurations.dialog.ConfigurationCreateDialog;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.concurrent.Task;
+
 public final class ConfigurationCreateHandler {
 
 	@Log
@@ -58,38 +60,49 @@ public final class ConfigurationCreateHandler {
 
 		final var configuration = dialog.showAndWait();
 		if (configuration.isPresent()) {
-			try {
-				final var dto        = configuration.get();
-				final var pid        = dto.pid();
-				final var factoryPid = dto.factoryPid();
-				final var properties = dto.properties();
+			final Task<Void> createTask = new Task<>() {
+				@Override
+				protected Void call() throws Exception {
+					try {
+						final var dto        = configuration.get();
+						final var pid        = dto.pid();
+						final var factoryPid = dto.factoryPid();
+						final var properties = dto.properties();
 
-				if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
-					return;
-				}
+						if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
+							return null;
+						}
 
-				boolean result;
-				String  effectivePID;
-				if (!Strings.isNullOrEmpty(pid)) {
-					result       = configManager.createOrUpdateConfiguration(pid, properties);
-					effectivePID = pid;
-				} else if (!Strings.isNullOrEmpty(factoryPid)) {
-					result       = configManager.createFactoryConfiguration(factoryPid, properties);
-					effectivePID = factoryPid;
-				} else {
-					return;
+						boolean result;
+						String  effectivePID;
+						if (!Strings.isNullOrEmpty(pid)) {
+							result       = configManager.createOrUpdateConfiguration(pid, properties);
+							effectivePID = pid;
+						} else if (!Strings.isNullOrEmpty(factoryPid)) {
+							result       = configManager.createFactoryConfiguration(factoryPid, properties);
+							effectivePID = factoryPid;
+						} else {
+							return null;
+						}
+						if (result) {
+							eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+							Fx.showSuccessNotification("New Configuration",
+							        "Configuration - '" + effectivePID + "' has been successfully created");
+							logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
+						} else {
+							Fx.showErrorNotification("New Configuration", "Configuration - '" + effectivePID + "' cannot be created");
+						}
+					} catch (final Exception e) {
+						logger.atError().withException(e).log("Configuration cannot be created");
+						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+					}
+					return null;
 				}
-				if (result) {
-					eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
-					Fx.showSuccessNotification("New Configuration", "Configuration - '" + effectivePID + "' has been successfully created");
-					logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
-				} else {
-					Fx.showErrorNotification("New Configuration", "Configuration - '" + effectivePID + "' cannot be created");
-				}
-			} catch (final Exception e) {
-				logger.atError().withException(e).log("Configuration cannot be created");
-				FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-			}
+			};
+
+			final var thread = new Thread(createTask);
+			thread.setDaemon(true);
+			thread.start();
 		}
 	}
 

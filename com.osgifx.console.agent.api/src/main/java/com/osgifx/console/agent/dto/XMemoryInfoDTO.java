@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2021-2022 Amit Kumar Mondal
+ * Copyright 2022 Amit Kumar Mondal
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
@@ -13,17 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.event.topics;
+package com.osgifx.console.agent.dto;
 
-public final class ComponentActionEventTopics {
+public class XMemoryInfoDTO {
 
-	private ComponentActionEventTopics() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
-
-	public static final String COMPONENT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/component/";
-	public static final String COMPONENT_ACTION_EVENT_TOPICS       = COMPONENT_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String COMPONENT_ENABLED_EVENT_TOPIC       = "osgi/fx/console/component/enabled";
-	public static final String COMPONENT_DISABLED_EVENT_TOPIC      = "osgi/fx/console/component/disabled";
+	public long uptime;
+	public long totalMemory;
+	public long freeMemory;
 
 }
