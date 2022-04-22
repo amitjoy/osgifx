@@ -33,6 +33,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
+import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -430,11 +431,11 @@ public interface Agent {
 	void postEvent(String topic, List<ConfigValue> properties);
 
 	/**
-	 * Returns the runtime information of the remote system
+	 * Returns the memory information of the remote system
 	 *
-	 * @return the runtime information
+	 * @return the memory information
 	 */
-	Map<String, String> getRuntimeInfo();
+	XMemoryInfoDTO getMemoryInfo();
 
 	/**
 	 * Returns the set of registered Gogo commands

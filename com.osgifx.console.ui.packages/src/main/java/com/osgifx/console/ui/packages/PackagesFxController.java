@@ -31,6 +31,7 @@ import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
@@ -107,8 +108,7 @@ public final class PackagesFxController {
 		table.getColumns().add(versionColumn);
 		table.getColumns().add(hasDuplicatesColumn);
 
-		final var bundles = dataProvider.bundles();
-		table.setItems(PackageHelper.prepareList(bundles, context));
+		table.setItems(dataProvider.packages());
 		Fx.sortBy(table, nameColumn);
 
 		TableFilter.forTableView(table).apply();

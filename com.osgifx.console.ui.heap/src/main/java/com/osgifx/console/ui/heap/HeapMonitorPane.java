@@ -224,7 +224,7 @@ public final class HeapMonitorPane extends BorderPane {
 		heapDumpBtn.setOnAction(e -> heapDump());
 
 		final var startStopBtn = new Button("Start");
-		startStopBtn.setDisable(supervisor.getAgent() == null || supervisor.getAgent().getHeapUsage() == null);
+		startStopBtn.setDisable(supervisor.getAgent() == null);
 		startStopBtn.setMaxWidth(Double.MAX_VALUE);
 		startStopBtn.setOnAction(e -> {
 			switch (animation.getStatus()) {

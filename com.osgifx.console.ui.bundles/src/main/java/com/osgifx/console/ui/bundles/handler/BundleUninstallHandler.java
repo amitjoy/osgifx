@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.handler;
+package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_UNINSTALLED_EVENT_TOPIC;
 
@@ -27,6 +27,8 @@ import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
+
+import javafx.concurrent.Task;
 
 public final class BundleUninstallHandler {
 
@@ -45,19 +47,29 @@ public final class BundleUninstallHandler {
 			logger.atWarning().log("Remote agent cannot be connected");
 			return;
 		}
-		try {
-			final var error = agent.uninstall(Long.parseLong(id));
-			if (error == null) {
-				logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
-				eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
-			} else {
-				logger.atError().log(error);
-				FxDialog.showErrorDialog("Bundle Uninstall Error", error, getClass().getClassLoader());
+		final Task<Void> uninstallTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					final var error = agent.uninstall(Long.parseLong(id));
+					if (error == null) {
+						logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
+						eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
+					} else {
+						logger.atError().log(error);
+						FxDialog.showErrorDialog("Bundle Uninstall Error", error, getClass().getClassLoader());
+					}
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);
+					FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+				}
+				return null;
 			}
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);
-			FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-		}
+		};
+
+		final var thread = new Thread(uninstallTask);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 }

@@ -29,6 +29,8 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.concurrent.Task;
+
 public final class ComponentEnableHandler {
 
 	@Log
@@ -46,21 +48,31 @@ public final class ComponentEnableHandler {
 			logger.atWarning().log("Remote agent cannot be connected");
 			return;
 		}
-		try {
-			final var result = agent.enableComponentByName(name);
-			if (result.result == XResultDTO.SUCCESS) {
-				logger.atInfo().log(result.response);
-				eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
-			} else if (result.result == XResultDTO.SKIPPED) {
-				logger.atWarning().log(result.response);
-			} else {
-				logger.atError().log(result.response);
-				FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
+		final Task<Void> enableTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					final var result = agent.enableComponentByName(name);
+					if (result.result == XResultDTO.SUCCESS) {
+						logger.atInfo().log(result.response);
+						eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
+					} else if (result.result == XResultDTO.SKIPPED) {
+						logger.atWarning().log(result.response);
+					} else {
+						logger.atError().log(result.response);
+						FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
+					}
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
+					FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+				}
+				return null;
 			}
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
-			FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-		}
+		};
+
+		final var thread = new Thread(enableTask);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 }

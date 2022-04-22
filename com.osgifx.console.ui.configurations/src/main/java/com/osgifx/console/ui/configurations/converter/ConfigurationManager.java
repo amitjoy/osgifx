@@ -46,7 +46,6 @@ public final class ConfigurationManager {
 			logger.atWarning().log("Remote agent cannot be connected");
 			return false;
 		}
-
 		final var result = agent.createOrUpdateConfiguration(pid, newProperties);
 		return result.result == XResultDTO.SUCCESS;
 	}

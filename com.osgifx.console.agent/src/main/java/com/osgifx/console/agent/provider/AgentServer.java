@@ -93,6 +93,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
+import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -1119,20 +1120,14 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 	}
 
 	@Override
-	public Map<String, String> getRuntimeInfo() {
-		final Map<String, String> runtime      = new HashMap<>();
-		final Bundle              systemBundle = getContext().getBundle(0);
+	public XMemoryInfoDTO getMemoryInfo() {
+		final XMemoryInfoDTO dto = new XMemoryInfoDTO();
 
-		runtime.put("Framework", systemBundle.getSymbolicName());
-		runtime.put("Framework Version", systemBundle.getVersion().toString());
-		runtime.put("Memory Total", String.valueOf(Runtime.getRuntime().totalMemory()));
-		runtime.put("Memory Free", String.valueOf(Runtime.getRuntime().freeMemory()));
-		runtime.put("OS Name", System.getProperty("os.name"));
-		runtime.put("OS Version", System.getProperty("os.version"));
-		runtime.put("OS Architecture", System.getProperty("os.arch"));
-		runtime.put("Uptime", String.valueOf(getSystemUptime()));
+		dto.uptime      = getSystemUptime();
+		dto.totalMemory = Runtime.getRuntime().totalMemory();
+		dto.freeMemory  = Runtime.getRuntime().freeMemory();
 
-		return runtime;
+		return dto;
 	}
 
 	@Override

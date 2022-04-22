@@ -13,17 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.event.topics;
+package com.osgifx.console.data.provider;
 
-public final class ComponentActionEventTopics {
+import java.util.ArrayList;
+import java.util.List;
 
-	private ComponentActionEventTopics() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+import com.osgifx.console.agent.dto.XBundleDTO;
 
-	public static final String COMPONENT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/component/";
-	public static final String COMPONENT_ACTION_EVENT_TOPICS       = COMPONENT_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String COMPONENT_ENABLED_EVENT_TOPIC       = "osgi/fx/console/component/enabled";
-	public static final String COMPONENT_DISABLED_EVENT_TOPIC      = "osgi/fx/console/component/disabled";
+public final class PackageDTO {
+
+	public String           name;
+	public String           version;
+	public boolean          isDuplicateExport;
+	public List<XBundleDTO> exporters = new ArrayList<>();
+	public List<XBundleDTO> importers = new ArrayList<>();
 
 }

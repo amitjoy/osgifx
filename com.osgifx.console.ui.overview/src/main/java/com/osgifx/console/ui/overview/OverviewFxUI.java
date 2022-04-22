@@ -17,23 +17,20 @@ package com.osgifx.console.ui.overview;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static java.util.Objects.requireNonNullElse;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -41,7 +38,8 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.dto.XMemoryInfoDTO;
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
@@ -81,16 +79,25 @@ public final class OverviewFxUI {
 	@Inject
 	private Supervisor       supervisor;
 	@Inject
+	private DataProvider     dataProvider;
+	@Inject
 	@Named("is_connected")
 	private boolean          isConnected;
+
+	private volatile String frameworkBsn;
+	private volatile String frameworkVersion;
+
+	private volatile String osName;
+	private volatile String osVersion;
+	private volatile String osArchitecture;
 
 	private volatile double noOfThreads;
 	private volatile double noOfServices;
 	private volatile double noOfComponents;
 	private volatile double noOfInstalledBundles;
 
-	private UptimeDTO           uptime;
-	private Map<String, String> runtimeInfo;
+	private UptimeDTO      uptime;
+	private XMemoryInfoDTO memoryInfo;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent) {
@@ -104,8 +111,7 @@ public final class OverviewFxUI {
 	}
 
 	private void createControls(final BorderPane parent) {
-		runtimeInfo = Maps.newConcurrentMap();
-		uptime      = new UptimeDTO(0, 0, 0, 0);
+		uptime = new UptimeDTO(0, 0, 0, 0);
 
 		statusBar.addTo(parent);
 		retrieveRuntimeInfo(parent);
@@ -113,29 +119,34 @@ public final class OverviewFxUI {
 	}
 
 	private void retrieveRuntimeInfo(final BorderPane parent) {
-		final Task<?> task = new Task<Void>() {
+		final Task<Void> task = new Task<>() {
 
 			@Override
 			protected Void call() throws Exception {
-				final var agent = supervisor.getAgent();
-				if (agent == null) {
-					return null;
+				if (isConnected) {
+					// wait a bit for the remote runtime information to be retrieved
+					TimeUnit.SECONDS.sleep(3);
 				}
-				noOfThreads          = Optional.ofNullable(agent.getAllThreads()).map(List::size).orElse(0);
-				noOfInstalledBundles = Optional.ofNullable(agent.getAllBundles()).map(List::size).orElse(0);
-				noOfServices         = Optional.ofNullable(agent.getAllServices()).map(List::size).orElse(0);
-				noOfComponents       = Optional.ofNullable(agent.getAllComponents()).map(List::size).orElse(0);
-
-				final var                 remoteRuntimeInfo = agent.getRuntimeInfo();
-				final Map<String, String> outputInfo        = Map.copyOf(requireNonNullElse(remoteRuntimeInfo, Map.of()));
-				runtimeInfo.putAll(outputInfo);
-
-				final var up = outputInfo.get("Uptime");
-				if (up != null) {
-					uptime = toUptimeEntry(Long.parseLong(up));
-				} else {
-					uptime = new UptimeDTO(0, 0, 0, 0);
-				}
+				frameworkBsn         = isConnected ? dataProvider.bundles().get(0).symbolicName : "";
+				frameworkVersion     = isConnected ? dataProvider.bundles().get(0).version : "";
+				osName               = isConnected
+				        ? dataProvider.properties().stream().filter(p -> "os.name".equals(p.name)).map(p -> p.value).map(Object::toString)
+				                .findAny().orElse("")
+				        : "";
+				osVersion            = isConnected
+				        ? dataProvider.properties().stream().filter(p -> "os.version".equals(p.name)).map(p -> p.value)
+				                .map(Object::toString).findAny().orElse("")
+				        : "";
+				osArchitecture       = isConnected
+				        ? dataProvider.properties().stream().filter(p -> "os.arch".equals(p.name)).map(p -> p.value).map(Object::toString)
+				                .findAny().orElse("")
+				        : "";
+				noOfThreads          = isConnected ? dataProvider.threads().size() : 0d;
+				noOfInstalledBundles = isConnected ? dataProvider.bundles().size() : 0d;
+				noOfServices         = isConnected ? dataProvider.services().size() : 0d;
+				noOfComponents       = isConnected ? dataProvider.components().size() : 0d;
+				memoryInfo           = isConnected ? supervisor.getAgent().getMemoryInfo() : new XMemoryInfoDTO();
+				uptime               = toUptimeEntry(memoryInfo.uptime);
 				return null;
 			}
 
@@ -182,8 +193,8 @@ public final class OverviewFxUI {
                                                .skinType(SkinType.CUSTOM)
                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                .title("Runtime Information")
-                                               .graphic(createRuntimeTable(runtimeInfo))
-                                               .valueVisible(!runtimeInfo.isEmpty())
+                                               .graphic(createRuntimeTable())
+                                               .valueVisible(memoryInfo != null)
                                                .text("")
                                                .build();
         runtimeInfoTile.setRoundedCorners(false);
@@ -226,21 +237,23 @@ public final class OverviewFxUI {
                                                   .build();
         noOfComponentsTile.setRoundedCorners(false);
 
-        final var freeMemoryInBytes = getMemory("Memory Free");
-        final var totalMemoryInBytes = getMemory("Memory Total");
+        final var freeMemoryInBytes = memoryInfo.freeMemory;
+        final var totalMemoryInBytes = memoryInfo.totalMemory;
 
         final var freeMemoryInMB = toMB(freeMemoryInBytes);
         final var totalMemoryInMB = toMB(totalMemoryInBytes);
+
+        final double usedMemory = totalMemoryInBytes - freeMemoryInBytes;
+        final var memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
+        final var memoryConsumptionInfoInPercentage = memoryConsumptionInfo * 100;
 
         final var memoryConsumptionTile = TileBuilder.create()
                                                      .skinType(SkinType.PERCENTAGE)
                                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                                      .title("JVM Memory Consumption Percentage")
+                                                     .textVisible(memoryConsumptionInfoInPercentage != 0D)
+                                                     .roundedCorners(false)
                                                      .build();
-        memoryConsumptionTile.setRoundedCorners(false);
-        final double usedMemory = totalMemoryInBytes - freeMemoryInBytes;
-        final var memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
-        final var memoryConsumptionInfoInPercentage = memoryConsumptionInfo * 100;
         memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
         final var availableMemoryTile = TileBuilder.create()
@@ -302,7 +315,7 @@ public final class OverviewFxUI {
         // @formatter:on
 	}
 
-	private synchronized Node createRuntimeTable(final Map<String, String> info) {
+	private synchronized Node createRuntimeTable() {
 		final var name = new Label("");
 		name.setTextFill(Tile.FOREGROUND);
 		name.setAlignment(Pos.CENTER_LEFT);
@@ -324,14 +337,17 @@ public final class OverviewFxUI {
 		final var dataTable = new VBox(0, header);
 		dataTable.setFillWidth(true);
 
-		final Map<String, String> sorted = new TreeMap<>(info);
-		for (final Entry<String, String> entry : sorted.entrySet()) {
+		final Map<String, String> runtimeInfo = Map.of("Framework", frameworkBsn, "Framework Version", frameworkVersion, "Memory Total",
+		        String.valueOf(memoryInfo.totalMemory), "Memory Free", String.valueOf(memoryInfo.freeMemory), "OS Name", osName,
+		        "OS Version", osVersion, "OS Architecture", osArchitecture);
+
+		final Map<String, String> filteredMap = Maps.newTreeMap();
+		filteredMap.putAll(runtimeInfo);
+
+		for (final Entry<String, String> entry : filteredMap.entrySet()) {
 			final var key   = entry.getKey();
 			final var value = entry.getValue();
-			if ("Uptime".equals(key)) {
-				continue;
-			}
-			final var node = getTileTableInfo(key, value);
+			final var node  = getTileTableInfo(key, value);
 			dataTable.getChildren().add(node);
 		}
 		return dataTable;
@@ -375,20 +391,8 @@ public final class OverviewFxUI {
 	private record UptimeDTO(int days, int hours, int minutes, int seconds) {
 	}
 
-	private long getMemory(final String key) {
-		// @formatter:off
-        return Optional.ofNullable(supervisor.getAgent())
-                       .map(Agent::getRuntimeInfo)
-                       .map(Maps::newHashMap)
-                       .filter(info -> !info.isEmpty())
-                       .map(info -> info.get(key))
-                       .map(Long::valueOf)
-                       .orElse(0L);
-        // @formatter:on
-	}
-
 	@Inject
-	@org.eclipse.e4.core.di.annotations.Optional
+	@Optional
 	private void updateOnAgentConnectedEvent( //
 	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
 	        final BorderPane parent) {
@@ -397,7 +401,7 @@ public final class OverviewFxUI {
 	}
 
 	@Inject
-	@org.eclipse.e4.core.di.annotations.Optional
+	@Optional
 	private void updateOnAgentDisconnectedEvent(//
 	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
 	        final BorderPane parent) {

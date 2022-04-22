@@ -57,7 +57,6 @@ public final class GogoFxController {
 	public void initialize() {
 		historyPointer = 0;
 		agent          = supervisor.getAgent();
-		final var   agent = supervisor.getAgent();
 		Set<String> gogoCommands;
 		if (agent == null || (gogoCommands = agent.getGogoCommands()) == null) {
 			logger.atWarning().log("Agent is not connected");

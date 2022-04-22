@@ -37,11 +37,26 @@ import javafx.collections.ObservableList;
 public interface DataProvider {
 
 	/**
+	 * Retrieve information from the remote runtime
+	 *
+	 * @param isAsync set to {@code true} if the information needs to be retrieved
+	 *                asynchronously
+	 */
+	void retrieveInfo(boolean isAsync);
+
+	/**
 	 * Returns the observable list of bundles
 	 *
 	 * @return the observable list of bundles
 	 */
 	ObservableList<XBundleDTO> bundles();
+
+	/**
+	 * Returns the observable list of packages
+	 *
+	 * @return the observable list of packages
+	 */
+	ObservableList<PackageDTO> packages();
 
 	/**
 	 * Returns the observable list of services

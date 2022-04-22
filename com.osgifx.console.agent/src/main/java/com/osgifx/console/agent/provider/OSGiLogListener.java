@@ -98,7 +98,7 @@ public class OSGiLogListener implements LogListener {
 		return dto;
 	}
 
-	private String toExceptionString(final Throwable exception) {
+	public static String toExceptionString(final Throwable exception) {
 		if (exception == null) {
 			return null;
 		}

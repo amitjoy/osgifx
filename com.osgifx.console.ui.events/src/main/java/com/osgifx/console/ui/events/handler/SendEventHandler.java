@@ -31,6 +31,8 @@ import com.osgifx.console.ui.events.dialog.SendEventDialog;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.concurrent.Task;
+
 public final class SendEventHandler {
 
 	@Log
@@ -53,32 +55,42 @@ public final class SendEventHandler {
 
 		final var event = dialog.showAndWait();
 		if (event.isPresent()) {
-			try {
-				final var dto        = event.get();
-				final var topic      = dto.topic();
-				final var isSync     = dto.isSync();
-				final var properties = dto.properties();
+			final Task<Void> sendEventTask = new Task<>() {
+				@Override
+				protected Void call() throws Exception {
+					try {
+						final var dto        = event.get();
+						final var topic      = dto.topic();
+						final var isSync     = dto.isSync();
+						final var properties = dto.properties();
 
-				if (Strings.isNullOrEmpty(topic) || properties == null) {
-					return;
-				}
+						if (Strings.isNullOrEmpty(topic) || properties == null) {
+							return null;
+						}
 
-				boolean result;
-				if (isSync) {
-					result = eventManager.sendEvent(topic, properties);
-				} else {
-					result = eventManager.postEvent(topic, properties);
+						boolean result;
+						if (isSync) {
+							result = eventManager.sendEvent(topic, properties);
+						} else {
+							result = eventManager.postEvent(topic, properties);
+						}
+						if (result) {
+							Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic);
+							logger.atInfo().log("Event successfully sent successfully to %s", topic);
+						} else {
+							Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic);
+						}
+					} catch (final Exception e) {
+						logger.atError().withException(e).log("Event cannot be sent");
+						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+					}
+					return null;
 				}
-				if (result) {
-					Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic);
-					logger.atInfo().log("Event successfully sent successfully to %s", topic);
-				} else {
-					Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic);
-				}
-			} catch (final Exception e) {
-				logger.atError().withException(e).log("Event cannot be sent");
-				FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-			}
+			};
+
+			final var thread = new Thread(sendEventTask);
+			thread.setDaemon(true);
+			thread.start();
 		}
 	}
 
