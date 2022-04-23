@@ -22,6 +22,7 @@ import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONE
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 
 import java.util.List;
@@ -60,7 +61,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
-@EventTopics({ AGENT_CONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS, COMPONENT_ACTION_EVENT_TOPICS, CONFIGURATION_ACTION_EVENT_TOPICS })
+// @formatter:off
+@EventTopics({
+	AGENT_CONNECTED_EVENT_TOPIC,
+	AGENT_DISCONNECTED_EVENT_TOPIC,
+	BUNDLE_ACTION_EVENT_TOPICS,
+	COMPONENT_ACTION_EVENT_TOPICS,
+	CONFIGURATION_ACTION_EVENT_TOPICS })
+// @formatter:on
 public final class RuntimeDataProvider implements DataProvider, EventListener, LogEntryListener, EventHandler {
 
 	@Reference
@@ -141,6 +149,17 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
 		if (AGENT_CONNECTED_EVENT_TOPIC.equals(topic)) {
 			// on connection, we don't need to use UI thread
 			retrieveInfo(true);
+		} else if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic)) {
+			threadSync.asyncExec(() -> {
+				bundles.clear();
+				packages.clear();
+				services.clear();
+				components.clear();
+				configurations.clear();
+				properties.clear();
+				threads.clear();
+				leaks.clear();
+			});
 		} else if (topic.startsWith(BUNDLE_ACTION_EVENT_TOPIC_PREFIX)) {
 			// synchronously update the bundles UI and the rest can be done asynchronously
 			threadSync.syncExec(this::retrieveBundles);
