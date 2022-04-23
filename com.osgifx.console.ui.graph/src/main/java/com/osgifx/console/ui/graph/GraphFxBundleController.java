@@ -151,9 +151,9 @@ public final class GraphFxBundleController {
 			public void updateItem(final XBundleDTO bundle, final boolean empty) {
 				super.updateItem(bundle, empty);
 				if (empty || bundle == null) {
-					setText(null);
+					threadSync.syncExec(() -> setText(null));
 				} else {
-					setText(bundle.symbolicName);
+					threadSync.syncExec(() -> setText(bundle.symbolicName));
 				}
 			}
 		});

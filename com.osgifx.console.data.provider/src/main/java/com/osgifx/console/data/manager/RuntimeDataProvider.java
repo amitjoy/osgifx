@@ -15,6 +15,17 @@
  ******************************************************************************/
 package com.osgifx.console.data.manager;
 
+import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
+import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
+import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
+import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
+import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
+import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
+import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
+import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
+import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
+import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
+import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPIC_PREFIX;
 import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
@@ -22,16 +33,18 @@ import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONE
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
+import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
+import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,7 +52,6 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -47,58 +59,30 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
-import com.osgifx.console.agent.dto.XPackageDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.data.provider.PackageDTO;
-import com.osgifx.console.supervisor.EventListener;
-import com.osgifx.console.supervisor.LogEntryListener;
+import com.osgifx.console.data.supplier.RuntimeInfoSupplier;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
-// @formatter:off
-@EventTopics({
-	AGENT_CONNECTED_EVENT_TOPIC,
-	AGENT_DISCONNECTED_EVENT_TOPIC,
-	BUNDLE_ACTION_EVENT_TOPICS,
-	COMPONENT_ACTION_EVENT_TOPICS,
-	CONFIGURATION_ACTION_EVENT_TOPICS })
-// @formatter:on
-public final class RuntimeDataProvider implements DataProvider, EventListener, LogEntryListener, EventHandler {
+@EventTopics({ AGENT_CONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS, COMPONENT_ACTION_EVENT_TOPICS, CONFIGURATION_ACTION_EVENT_TOPICS })
+@SuppressWarnings("unchecked")
+public final class RuntimeDataProvider implements DataProvider, EventHandler {
 
 	@Reference
-	private LoggerFactory     factory;
+	private LoggerFactory                          factory;
 	@Reference
-	private Supervisor        supervisor;
+	private Supervisor                             supervisor;
 	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
-
-	private final ObservableList<XBundleDTO>        bundles        = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<PackageDTO>        packages       = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XServiceDTO>       services       = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XComponentDTO>     components     = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XConfigurationDTO> configurations = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XPropertyDTO>      properties     = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XThreadDTO>        threads        = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XBundleDTO>        leaks          = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XLogEntryDTO>      logs           = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
-	private final ObservableList<XEventDTO>         events         = FXCollections
-	        .synchronizedObservableList(FXCollections.observableArrayList());
+	private ThreadSynchronize                      threadSync;
+	private FluentLogger                           logger;
+	private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newHashMap();
 
 	@Activate
 	void activate() {
@@ -106,40 +90,28 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
 	}
 
 	@Override
-	public void retrieveInfo(final boolean isAsync) {
-		if (isAsync) {
-			final var bundlesFuture        = CompletableFuture.runAsync(this::retrieveBundles);
-			final var packagesFuture       = CompletableFuture.runAsync(this::retrievePackages);
-			final var servicesFuture       = CompletableFuture.runAsync(this::retrieveServices);
-			final var componentsFuture     = CompletableFuture.runAsync(this::retrieveComponents);
-			final var configurationsFuture = CompletableFuture.runAsync(this::retrieveConfigurations);
-			final var propertiesFuture     = CompletableFuture.runAsync(this::retrieveProperties);
-			final var threadsFuture        = CompletableFuture.runAsync(this::retrieveThreads);
-			final var leaksFuture          = CompletableFuture.runAsync(this::retrieveLeaks);
-
-			// @formatter:off
-			CompletableFuture.allOf(
-									bundlesFuture,
-									packagesFuture,
-									servicesFuture,
-									componentsFuture,
-									configurationsFuture,
-									propertiesFuture,
-									threadsFuture,
-									leaksFuture)
-							.thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
-			// @formatter:on
+	public void retrieveInfo(final String id, final boolean isAsync) {
+		if (id == null) {
+			if (isAsync) {
+				// @formatter:off
+				final Collection<CompletableFuture<Void>> futures =
+						infoSuppliers.values()
+						             .stream()
+						             .map(s -> CompletableFuture.runAsync(s::retrieve))
+						             .toList();
+				// @formatter:on
+				CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+				        .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
+			} else {
+				infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
+				logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
+			}
+		} else if (isAsync) {
+			CompletableFuture.runAsync(() -> retrieve(id));
+			logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id);
 		} else {
-			retrieveBundles();
-			retrievePackages();
-			retrieveServices();
-			retrieveComponents();
-			retrieveConfigurations();
-			retrieveProperties();
-			retrieveThreads();
-			retrieveLeaks();
-
-			logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
+			retrieve(id);
+			logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
 		}
 	}
 
@@ -148,107 +120,86 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
 		final var topic = event.getTopic();
 		if (AGENT_CONNECTED_EVENT_TOPIC.equals(topic)) {
 			// on connection, we don't need to use UI thread
-			retrieveInfo(true);
-		} else if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic)) {
-			threadSync.asyncExec(() -> {
-				bundles.clear();
-				packages.clear();
-				services.clear();
-				components.clear();
-				configurations.clear();
-				properties.clear();
-				threads.clear();
-				leaks.clear();
-			});
+			retrieveInfo(null, true);
 		} else if (topic.startsWith(BUNDLE_ACTION_EVENT_TOPIC_PREFIX)) {
 			// synchronously update the bundles UI and the rest can be done asynchronously
-			threadSync.syncExec(this::retrieveBundles);
-			threadSync.asyncExec(this::retrievePackages);
-			threadSync.asyncExec(this::retrieveServices);
-			threadSync.asyncExec(this::retrieveComponents);
-			threadSync.asyncExec(this::retrieveConfigurations);
-			threadSync.asyncExec(this::retrieveProperties);
-			threadSync.asyncExec(this::retrieveThreads);
-			threadSync.asyncExec(this::retrieveLeaks);
+			threadSync.syncExec(() -> retrieve(BUNDLES_ID));
+			threadSync.asyncExec(() -> retrieve(PACKAGES_ID));
+			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
+			threadSync.asyncExec(() -> retrieve(COMPONENTS_ID));
+			threadSync.asyncExec(() -> retrieve(CONFIGURATIONS_ID));
+			threadSync.asyncExec(() -> retrieve(PROPERTIES_ID));
+			threadSync.asyncExec(() -> retrieve(THREADS_ID));
+			threadSync.asyncExec(() -> retrieve(LEAKS_ID));
 		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX)) {
 			// synchronously update the component UI and the rest can be done asynchronously
-			threadSync.asyncExec(this::retrieveServices);
-			threadSync.syncExec(this::retrieveComponents);
-			threadSync.asyncExec(this::retrieveConfigurations);
-			threadSync.asyncExec(this::retrieveProperties);
-			threadSync.asyncExec(this::retrieveThreads);
+			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
+			threadSync.syncExec(() -> retrieve(COMPONENTS_ID));
+			threadSync.asyncExec(() -> retrieve(CONFIGURATIONS_ID));
+			threadSync.asyncExec(() -> retrieve(PROPERTIES_ID));
+			threadSync.asyncExec(() -> retrieve(THREADS_ID));
 		} else if (topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
 			// synchronously update the configurations UI and the rest asynchronously
-			threadSync.asyncExec(this::retrieveServices);
-			threadSync.asyncExec(this::retrieveComponents);
-			threadSync.syncExec(this::retrieveConfigurations);
-			threadSync.asyncExec(this::retrieveProperties);
-			threadSync.asyncExec(this::retrieveThreads);
+			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
+			threadSync.asyncExec(() -> retrieve(COMPONENTS_ID));
+			threadSync.syncExec(() -> retrieve(CONFIGURATIONS_ID));
+			threadSync.asyncExec(() -> retrieve(PROPERTIES_ID));
+			threadSync.asyncExec(() -> retrieve(THREADS_ID));
 		}
 	}
 
 	@Override
 	public synchronized ObservableList<XBundleDTO> bundles() {
-		return bundles;
+		return (ObservableList<XBundleDTO>) getData(BUNDLES_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<PackageDTO> packages() {
-		return packages;
+		return (ObservableList<PackageDTO>) getData(PACKAGES_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XServiceDTO> services() {
-		return services;
+		return (ObservableList<XServiceDTO>) getData(SERVICES_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XComponentDTO> components() {
-		return components;
+		return (ObservableList<XComponentDTO>) getData(COMPONENTS_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XConfigurationDTO> configurations() {
-		return configurations;
+		return (ObservableList<XConfigurationDTO>) getData(CONFIGURATIONS_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XEventDTO> events() {
-		return events;
+		return (ObservableList<XEventDTO>) getData(EVENTS_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XLogEntryDTO> logs() {
-		return logs;
-	}
-
-	@Override
-	public synchronized void onEvent(final XEventDTO event) {
-		events.add(event);
-	}
-
-	@Override
-	public synchronized void logged(final XLogEntryDTO logEntry) {
-		logs.add(logEntry);
+		return (ObservableList<XLogEntryDTO>) getData(LOGS_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XPropertyDTO> properties() {
-		return properties;
+		return (ObservableList<XPropertyDTO>) getData(PROPERTIES_ID);
 	}
 
 	@Override
 	public synchronized ObservableList<XThreadDTO> threads() {
-		return threads;
+		return (ObservableList<XThreadDTO>) getData(THREADS_ID);
 	}
 
 	@Override
-	public ObservableList<XBundleDTO> leaks() {
-		return leaks;
+	public synchronized ObservableList<XBundleDTO> leaks() {
+		return (ObservableList<XBundleDTO>) getData(LEAKS_ID);
 	}
 
 	@Override
-	public XHttpContextInfoDTO httpContext() {
+	public synchronized XHttpContextInfoDTO httpContext() {
 		final var agent = supervisor.getAgent();
 		if (agent == null) {
 			logger.atWarning().log("Agent is not connected");
@@ -257,130 +208,39 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
 		return agent.getHttpContextInfo();
 	}
 
-	private synchronized void retrieveBundles() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		bundles.clear();
-		bundles.addAll(makeNullSafe(agent.getAllBundles()));
+	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+	void bindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
+		final var name = (String) reference.getProperty(PROPERTY_ID);
+		infoSuppliers.put(name, supplier);
 	}
 
-	private synchronized void retrievePackages() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		packages.clear();
-		packages.addAll(preparePackages(agent.getAllBundles()));
+	void unbindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
+		final var name = (String) reference.getProperty(PROPERTY_ID);
+		infoSuppliers.remove(name);
 	}
 
-	private synchronized void retrieveServices() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		services.clear();
-		services.addAll(makeNullSafe(agent.getAllServices()));
-	}
+	private ObservableList<?> getData(final String id) {
+		for (final Entry<String, RuntimeInfoSupplier> supplierEntry : infoSuppliers.entrySet()) {
+			final var key      = supplierEntry.getKey();
+			final var supplier = supplierEntry.getValue();
 
-	private synchronized void retrieveComponents() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		components.clear();
-		components.addAll(makeNullSafe(agent.getAllComponents()));
-	}
-
-	private synchronized void retrieveConfigurations() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		configurations.clear();
-		configurations.addAll(makeNullSafe(agent.getAllConfigurations()));
-	}
-
-	private synchronized void retrieveProperties() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		properties.clear();
-		properties.addAll(makeNullSafe(agent.getAllProperties()));
-	}
-
-	private synchronized void retrieveThreads() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		threads.clear();
-		threads.addAll(makeNullSafe(agent.getAllThreads()));
-	}
-
-	private synchronized void retrieveLeaks() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		leaks.clear();
-		leaks.addAll(makeNullSafe(agent.getClassloaderLeaks()));
-	}
-
-	private synchronized ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {
-		final List<PackageDTO>        packages      = Lists.newArrayList();
-		final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
-
-		for (final XBundleDTO bundle : bundles) {
-			final var exportedPackages = toPackageDTOs(bundle.exportedPackages);
-			final var importedPackages = toPackageDTOs(bundle.importedPackages);
-
-			exportedPackages.forEach(p -> p.exporters.add(bundle));
-			importedPackages.forEach(p -> p.importers.add(bundle));
-
-			packages.addAll(exportedPackages);
-			packages.addAll(importedPackages);
-		}
-		for (final PackageDTO pkg : packages) {
-			final var key = pkg.name + ":" + pkg.version;
-			if (!finalPackages.containsKey(key)) {
-				finalPackages.put(key, pkg);
-			} else {
-				final var packageDTO = finalPackages.get(key);
-
-				packageDTO.exporters.addAll(pkg.exporters);
-				packageDTO.importers.addAll(pkg.importers);
+			if (key.equals(id)) {
+				return supplier.supply();
 			}
 		}
-		for (final PackageDTO pkg : finalPackages.values()) {
-			if (pkg.exporters.size() > 1) {
-				pkg.isDuplicateExport = true;
+		return FXCollections.observableArrayList();
+	}
+
+	private void retrieve(final String id) {
+		for (final Entry<String, RuntimeInfoSupplier> supplierEntry : infoSuppliers.entrySet()) {
+			final var key      = supplierEntry.getKey();
+			final var supplier = supplierEntry.getValue();
+
+			if (key.equals(id)) {
+				supplier.retrieve();
+				return;
 			}
 		}
-		return FXCollections.observableArrayList(finalPackages.values());
-	}
-
-	private List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
-		return exportedPackages.stream().map(this::toPackageDTO).toList();
-	}
-
-	private PackageDTO toPackageDTO(final XPackageDTO xpkg) {
-		final var pkg = new PackageDTO();
-
-		pkg.name    = xpkg.name;
-		pkg.version = xpkg.version;
-
-		return pkg;
 	}
 
 }

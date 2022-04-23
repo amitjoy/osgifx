@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -53,6 +54,8 @@ public final class PropertiesFxController {
 	private boolean                           isConnected;
 	@Inject
 	private DataProvider                      dataProvider;
+	@Inject
+	private ThreadSynchronize                 threadSync;
 
 	@FXML
 	public void initialize() {
@@ -65,7 +68,7 @@ public final class PropertiesFxController {
 		propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
 		propertyTable.setItems(dataProvider.properties());
-		Fx.sortBy(propertyTable, propertyName);
+		threadSync.syncExec(() -> Fx.sortBy(propertyTable, propertyName));
 
 		TableFilter.forTableView(propertyTable).apply();
 		Fx.addContextMenuToCopyContent(propertyTable);
