@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.fx.core.ThreadSynchronize;
 
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
@@ -59,6 +60,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
+@Creatable
 public final class HeapMonitorPane extends BorderPane {
 
 	private final List<HeapMonitorChart> memoryUsageCharts = new ArrayList<>();
