@@ -37,12 +37,14 @@ import javafx.collections.ObservableList;
 public interface DataProvider {
 
 	/**
-	 * Retrieve information from the remote runtime
+	 * Retrieves information from the remote runtime
 	 *
+	 * @param id      the identifier to execute a specific information, otherwise,
+	 *                set to {@code null} to retrieve all informations
 	 * @param isAsync set to {@code true} if the information needs to be retrieved
 	 *                asynchronously
 	 */
-	void retrieveInfo(boolean isAsync);
+	void retrieveInfo(String id, boolean isAsync);
 
 	/**
 	 * Returns the observable list of bundles
