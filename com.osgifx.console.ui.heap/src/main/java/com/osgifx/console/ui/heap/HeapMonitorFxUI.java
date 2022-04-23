@@ -24,12 +24,10 @@ import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 
-import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
 import javafx.scene.layout.BorderPane;
@@ -39,14 +37,11 @@ public final class HeapMonitorFxUI {
 
 	@Log
 	@Inject
-	private FluentLogger      logger;
+	private FluentLogger     logger;
 	@Inject
-	private Supervisor        supervisor;
+	private ConsoleStatusBar statusBar;
 	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	private ConsoleStatusBar  statusBar;
-	private HeapMonitorPane   memoryViewPane;
+	private HeapMonitorPane  memoryViewPane;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent) {
@@ -55,7 +50,6 @@ public final class HeapMonitorFxUI {
 	}
 
 	private void createControls(final BorderPane parent) {
-		memoryViewPane = new HeapMonitorPane(supervisor, threadSync);
 		parent.setCenter(memoryViewPane);
 		statusBar.addTo(parent);
 	}
@@ -65,6 +59,7 @@ public final class HeapMonitorFxUI {
 	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
 		logger.atInfo().log("Agent connected event received");
 		createControls(parent);
+		memoryViewPane.init();
 	}
 
 	@Inject
@@ -73,6 +68,7 @@ public final class HeapMonitorFxUI {
 		logger.atInfo().log("Agent disconnected event received");
 		memoryViewPane.stopUpdates();
 		createControls(parent);
+		memoryViewPane.init();
 	}
 
 }

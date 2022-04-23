@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
@@ -64,14 +68,18 @@ public final class HeapMonitorPane extends BorderPane {
 	private final StringProperty         maxHeap           = new SimpleStringProperty();
 	private final StringProperty         uptTime           = new SimpleStringProperty();
 
-	private final Timeline          animation;
-	private final Supervisor        supervisor;
-	private final ThreadSynchronize threadSync;
+	private Timeline animation;
 
-	public HeapMonitorPane(final Supervisor supervisor, final ThreadSynchronize threadSync) {
-		this.supervisor = supervisor;
-		this.threadSync = threadSync;
+	@Inject
+	@Named("is_connected")
+	private boolean           isConnected;
+	@Inject
+	private Supervisor        supervisor;
+	@Inject
+	private ThreadSynchronize threadSync;
 
+	@PostConstruct
+	public void init() {
 		setTop(createControlPanel());
 
 		final var box        = createMainContent();
@@ -127,11 +135,11 @@ public final class HeapMonitorPane extends BorderPane {
 	}
 
 	private void updateHeapInformation() {
-		final var agent = supervisor.getAgent();
-		if (agent == null || agent.getHeapUsage() == null) {
+		if (!isConnected) {
 			return;
 		}
-		final var used = agent.getHeapUsage().memoryUsage.used;
+		final var agent = supervisor.getAgent();
+		final var used  = agent.getHeapUsage().memoryUsage.used;
 		totalUsedHeap.setValue(formatByteSize(used));
 
 		final var max = agent.getHeapUsage().memoryUsage.max;
@@ -144,10 +152,10 @@ public final class HeapMonitorPane extends BorderPane {
 	}
 
 	private void updateGCStats() {
-		final var agent = supervisor.getAgent();
-		if (agent == null || agent.getHeapUsage() == null) {
+		if (!isConnected) {
 			return;
 		}
+		final var agent           = supervisor.getAgent();
 		final var mbeanUptime     = agent.getHeapUsage().uptime;
 		final var formattedUptime = formatTimeDifference(mbeanUptime);
 		uptTime.setValue(formattedUptime);
@@ -224,7 +232,7 @@ public final class HeapMonitorPane extends BorderPane {
 		heapDumpBtn.setOnAction(e -> heapDump());
 
 		final var startStopBtn = new Button("Start");
-		startStopBtn.setDisable(supervisor.getAgent() == null);
+		startStopBtn.setDisable(!isConnected);
 		startStopBtn.setMaxWidth(Double.MAX_VALUE);
 		startStopBtn.setOnAction(e -> {
 			switch (animation.getStatus()) {
@@ -264,11 +272,11 @@ public final class HeapMonitorPane extends BorderPane {
 	}
 
 	private void heapDump() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
+		if (!isConnected) {
 			return;
 		}
 		try {
+			final var agent    = supervisor.getAgent();
 			final var heapdump = agent.heapdump();
 			if (heapdump == null) {
 				return;
@@ -337,10 +345,10 @@ public final class HeapMonitorPane extends BorderPane {
 
 	public Supplier<XMemoryUsage> getMemoryUsagedByMemoryPoolBean(final XMemoryPoolMXBean bean) {
 		return () -> {
-			final var agent = supervisor.getAgent();
-			if (agent == null || agent.getHeapUsage() == null) {
+			if (!isConnected) {
 				return new XMemoryUsage();
 			}
+			final var agent     = supervisor.getAgent();
 			final var heapUsage = agent.getHeapUsage();
 			for (final XMemoryPoolMXBean mpbean : heapUsage.memoryPoolBeans) {
 				if (bean.name.equals(mpbean.name)) {
