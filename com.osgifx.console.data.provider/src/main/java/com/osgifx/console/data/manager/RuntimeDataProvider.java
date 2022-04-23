@@ -172,6 +172,7 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
 			threadSync.asyncExec(this::retrieveLeaks);
 		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX)) {
 			// synchronously update the component UI and the rest can be done asynchronously
+			threadSync.asyncExec(this::retrieveServices);
 			threadSync.syncExec(this::retrieveComponents);
 			threadSync.asyncExec(this::retrieveConfigurations);
 			threadSync.asyncExec(this::retrieveProperties);
