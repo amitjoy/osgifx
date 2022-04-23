@@ -20,8 +20,11 @@ import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_STA
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -34,16 +37,21 @@ public final class BundleStartHandler {
 
 	@Log
 	@Inject
-	private FluentLogger logger;
+	private FluentLogger      logger;
 	@Inject
-	private IEventBroker eventBroker;
+	private IEventBroker      eventBroker;
 	@Inject
-	private Supervisor   supervisor;
+	private Supervisor        supervisor;
+	@Inject
+	@Optional
+	@Named("is_connected")
+	private boolean           isConnected;
+	@Inject
+	private ThreadSynchronize threadSync;
 
 	@Execute
 	public void execute(@Named("id") final String id) {
-		final var agent = supervisor.getAgent();
-		if (supervisor.getAgent() == null) {
+		if (!isConnected) {
 			logger.atWarning().log("Remote agent cannot be connected");
 			return;
 		}
@@ -51,17 +59,18 @@ public final class BundleStartHandler {
 			@Override
 			protected Void call() throws Exception {
 				try {
+					final var agent = supervisor.getAgent();
 					final var error = agent.start(Long.parseLong(id));
 					if (error == null) {
 						logger.atInfo().log("Bundle with ID '%s' has been started", id);
 						eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
 					} else {
 						logger.atError().log(error);
-						FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader());
+						threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader()));
 					}
 				} catch (final Exception e) {
 					logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
-					FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
 				}
 				return null;
 			}
@@ -70,6 +79,11 @@ public final class BundleStartHandler {
 		final var thread = new Thread(startTask);
 		thread.setDaemon(true);
 		thread.start();
+	}
+
+	@CanExecute
+	public boolean canExecute() {
+		return isConnected;
 	}
 
 }

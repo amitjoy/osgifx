@@ -20,8 +20,11 @@ import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONE
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -35,16 +38,21 @@ public final class ComponentEnableHandler {
 
 	@Log
 	@Inject
-	private FluentLogger logger;
+	private FluentLogger      logger;
 	@Inject
-	private IEventBroker eventBroker;
+	private IEventBroker      eventBroker;
 	@Inject
-	private Supervisor   supervisor;
+	private Supervisor        supervisor;
+	@Inject
+	private ThreadSynchronize threadSync;
+	@Inject
+	@Optional
+	@Named("is_connected")
+	private boolean           isConnected;
 
 	@Execute
 	public void execute(@Named("name") final String name) {
-		final var agent = supervisor.getAgent();
-		if (supervisor.getAgent() == null) {
+		if (!isConnected) {
 			logger.atWarning().log("Remote agent cannot be connected");
 			return;
 		}
@@ -52,6 +60,7 @@ public final class ComponentEnableHandler {
 			@Override
 			protected Void call() throws Exception {
 				try {
+					final var agent  = supervisor.getAgent();
 					final var result = agent.enableComponentByName(name);
 					if (result.result == XResultDTO.SUCCESS) {
 						logger.atInfo().log(result.response);
@@ -60,11 +69,12 @@ public final class ComponentEnableHandler {
 						logger.atWarning().log(result.response);
 					} else {
 						logger.atError().log(result.response);
-						FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader());
+						threadSync.asyncExec(
+						        () -> FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader()));
 					}
 				} catch (final Exception e) {
 					logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
-					FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
 				}
 				return null;
 			}
@@ -73,6 +83,11 @@ public final class ComponentEnableHandler {
 		final var thread = new Thread(enableTask);
 		thread.setDaemon(true);
 		thread.start();
+	}
+
+	@CanExecute
+	public boolean canExecute() {
+		return isConnected;
 	}
 
 }

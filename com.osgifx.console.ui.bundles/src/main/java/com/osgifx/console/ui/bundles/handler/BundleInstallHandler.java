@@ -25,6 +25,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -39,16 +40,18 @@ public final class BundleInstallHandler {
 
 	@Log
 	@Inject
-	private FluentLogger    logger;
+	private FluentLogger      logger;
 	@Inject
-	private IEclipseContext context;
+	private IEclipseContext   context;
 	@Inject
-	private IEventBroker    eventBroker;
+	private IEventBroker      eventBroker;
 	@Inject
-	private Supervisor      supervisor;
+	private Supervisor        supervisor;
 	@Inject
 	@Named("is_connected")
-	private boolean         isConnected;
+	private boolean           isConnected;
+	@Inject
+	private ThreadSynchronize threadSync;
 
 	@Execute
 	public void execute() {
@@ -88,10 +91,11 @@ public final class BundleInstallHandler {
 							logger.atInfo().log("Bundle has been started: %s", bundle);
 						}
 						eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
-						Fx.showSuccessNotification("Remote Bundle Install", bundle.symbolicName + " successfully installed/updated");
+						threadSync.asyncExec(() -> Fx.showSuccessNotification("Remote Bundle Install",
+						        bundle.symbolicName + " successfully installed/updated"));
 					} catch (final Exception e) {
 						logger.atError().withException(e).log("Bundle cannot be installed or updated");
-						Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated");
+						threadSync.asyncExec(() -> Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated"));
 					}
 					return null;
 				}

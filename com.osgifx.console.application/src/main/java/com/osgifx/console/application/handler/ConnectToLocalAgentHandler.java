@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -112,7 +113,7 @@ public final class ConnectToLocalAgentHandler {
 	}
 
 	@Inject
-	@org.eclipse.e4.core.di.annotations.Optional
+	@Optional
 	private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
 		logger.atInfo().log("Agent connected event received");
 		if (progressDialog != null) {
