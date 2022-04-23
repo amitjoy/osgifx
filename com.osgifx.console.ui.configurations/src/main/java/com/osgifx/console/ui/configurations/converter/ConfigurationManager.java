@@ -30,10 +30,9 @@ import com.osgifx.console.supervisor.Supervisor;
 public final class ConfigurationManager {
 
 	@Reference
-	private Supervisor supervisor;
-
-	@Reference
 	private LoggerFactory factory;
+	@Reference
+	private Supervisor    supervisor;
 	private FluentLogger  logger;
 
 	void activate() {

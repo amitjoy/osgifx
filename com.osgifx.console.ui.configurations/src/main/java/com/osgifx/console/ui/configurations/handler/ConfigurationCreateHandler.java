@@ -25,6 +25,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -43,6 +44,8 @@ public final class ConfigurationCreateHandler {
 	private FluentLogger         logger;
 	@Inject
 	private IEclipseContext      context;
+	@Inject
+	private ThreadSynchronize    threadSync;
 	@Inject
 	private IEventBroker         eventBroker;
 	@Inject
@@ -86,15 +89,16 @@ public final class ConfigurationCreateHandler {
 						}
 						if (result) {
 							eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
-							Fx.showSuccessNotification("New Configuration",
-							        "Configuration - '" + effectivePID + "' has been successfully created");
+							threadSync.asyncExec(() -> Fx.showSuccessNotification("New Configuration",
+							        "Configuration - '" + effectivePID + "' has been successfully created"));
 							logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
 						} else {
-							Fx.showErrorNotification("New Configuration", "Configuration - '" + effectivePID + "' cannot be created");
+							threadSync.asyncExec(() -> Fx.showErrorNotification("New Configuration",
+							        "Configuration - '" + effectivePID + "' cannot be created"));
 						}
 					} catch (final Exception e) {
 						logger.atError().withException(e).log("Configuration cannot be created");
-						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+						threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
 					}
 					return null;
 				}
