@@ -184,7 +184,6 @@ public final class RuntimeDataProvider implements DataProvider, EventListener, L
 			threadSync.syncExec(this::retrieveConfigurations);
 			threadSync.asyncExec(this::retrieveProperties);
 			threadSync.asyncExec(this::retrieveThreads);
-			threadSync.asyncExec(this::retrieveLeaks);
 		}
 	}
 
