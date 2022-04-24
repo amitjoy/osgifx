@@ -16,7 +16,9 @@
       <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="com.osgifx.console.application.menu.extensions.list" label="View">
         <children xsi:type="menu:DynamicMenuContribution" xmi:id="__cOGkCEsEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.extensions.list" label="" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler"/>
       </children>
-      <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.actions" label="Actions"/>
+      <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.actions" label="Actions">
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_sk720MNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.handledmenuitem.refresh" label="Refresh Views" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/refresh.png" tooltip="Refreshes the views by retrieving the current state of the remote runtime" command="_IPypwMNnEeynHblGyo61Iw"/>
+      </children>
       <children xsi:type="menu:Menu" xmi:id="_zHSQ0CCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.help" label="Help">
         <children xsi:type="menu:DirectMenuItem" xmi:id="_8qOKEHxzEey0g_aPFrhMQA" elementId="com.osgifx.console.application.directmenuitem.connect" label="Connect to Local Agent" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/connected.png" tooltip="Establishes connection with the local agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToLocalAgentHandler"/>
         <children xsi:type="menu:DirectMenuItem" xmi:id="_a8tgcFg-EeyAM-B7DnvdyA" elementId="com.osgifx.console.application.directmenuitem.diagnostics" label="Open Diagnostics" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/diagnostic.png" tooltip="Opens the log file" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.OpenDiagnosticsHandler"/>
@@ -25,18 +27,24 @@
     </mainMenu>
   </children>
   <handlers xmi:id="_Y0EEwCWwEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.handler.preference" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
+  <handlers xmi:id="_Whi4IMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.handler.refresh" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.RefreshHandler" command="_IPypwMNnEeynHblGyo61Iw"/>
+  <bindingTables xmi:id="_9_QOEMNmEeynHblGyo61Iw" elementId="com.osgifx.console.application.bindingtable.refresh" bindingContext="_1NNJoMNmEeynHblGyo61Iw">
+    <bindings xmi:id="_CjmjAMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.refresh" keySequence="M1+R" command="_IPypwMNnEeynHblGyo61Iw"/>
+  </bindingTables>
+  <rootContext xmi:id="_1NNJoMNmEeynHblGyo61Iw" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="Windows and Dialogs" description="Windows and Dialogs"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.preference" commandName="Connection Preference Command">
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
     <parameters xmi:id="_ciGqICVrEeyVo_nfbAX0Bg" elementId="timeout" name="Timeout" optional="false"/>
     <parameters xmi:id="_bwGcQCWpEeyVo_nfbAX0Bg" elementId="type" name="Type" optional="false"/>
   </commands>
+  <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View Command" description="Refreshes the views by retrieving the current state of the remote runtime"/>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
-  <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.bindings.service" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
+  <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.fx.ui.keybindings.e4.service" contributionURI="bundleclass://org.eclipse.fx.ui.keybindings.e4/org.eclipse.fx.ui.keybindings.e4.BindingServiceAddon"/>
   <addons xmi:id="_c376xBuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.commands.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.CommandProcessingAddon"/>
   <addons xmi:id="_c376xRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
-  <addons xmi:id="_c376xhuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
+  <addons xmi:id="_c376xhuoEeyWL5Ll6OkKhA" elementId="org.eclipse.fx.ui.keybindings.e4.model" contributionURI="bundleclass://org.eclipse.fx.ui.keybindings.e4/org.eclipse.fx.ui.keybindings.e4.BindingProcessingAddon"/>
   <addons xmi:id="_c376xxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.workbench.handler.model" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
   <addons xmi:id="_602qgC28EeychK3tSwmSyw" elementId="com.osgifx.console.application.addon.ping" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.addon.AgentPingAddon"/>
   <addons xmi:id="_BR24sDSYEey04sZvAWfugg" elementId="org.eclipse.fx.ui.workbench.renderers.base.addons.DnDAddon" contributionURI="bundleclass://org.eclipse.fx.ui.workbench.renderers.base/org.eclipse.fx.ui.workbench.renderers.base.addons.DnDAddon"/>
