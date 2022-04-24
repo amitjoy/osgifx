@@ -38,10 +38,9 @@ import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.ServiceReference;
@@ -75,18 +74,16 @@ import javafx.collections.ObservableList;
 @SuppressWarnings("unchecked")
 public final class RuntimeDataProvider implements DataProvider, EventHandler {
 
-	@Reference
-	private LoggerFactory                          factory;
-	@Reference
-	private Supervisor                             supervisor;
-	@Reference
-	private ThreadSynchronize                      threadSync;
-	private FluentLogger                           logger;
-	private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newHashMap();
+	private final FluentLogger                     logger;
+	private final Supervisor                       supervisor;
+	private final Map<String, RuntimeInfoSupplier> infoSuppliers;
 
 	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+	public RuntimeDataProvider(@Reference final LoggerFactory factory, @Reference final Supervisor supervisor) {
+		this.supervisor = supervisor;
+		infoSuppliers   = Maps.newHashMap();
+		logger          = FluentLogger.of(factory.createLogger(getClass().getName()));
+
 	}
 
 	@Override
@@ -99,9 +96,9 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 						             .stream()
 						             .map(s -> CompletableFuture.runAsync(s::retrieve))
 						             .toList();
-				// @formatter:on
 				CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-				        .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
+				                 .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
+				// @formatter:on
 			} else {
 				infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
 				logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
@@ -122,29 +119,20 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			// on connection, we don't need to use UI thread
 			retrieveInfo(null, true);
 		} else if (topic.startsWith(BUNDLE_ACTION_EVENT_TOPIC_PREFIX)) {
-			// synchronously update the bundles UI and the rest asynchronously
-			threadSync.syncExec(() -> retrieve(BUNDLES_ID));
-			threadSync.asyncExec(() -> retrieve(PACKAGES_ID));
-			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
-			threadSync.asyncExec(() -> retrieve(COMPONENTS_ID));
-			threadSync.asyncExec(() -> retrieve(CONFIGURATIONS_ID));
-			threadSync.asyncExec(() -> retrieve(PROPERTIES_ID));
-			threadSync.asyncExec(() -> retrieve(THREADS_ID));
-			threadSync.asyncExec(() -> retrieve(LEAKS_ID));
-		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX)) {
-			// synchronously update the components UI and the rest asynchronously
-			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
-			threadSync.syncExec(() -> retrieve(COMPONENTS_ID));
-			threadSync.asyncExec(() -> retrieve(CONFIGURATIONS_ID));
-			threadSync.asyncExec(() -> retrieve(PROPERTIES_ID));
-			threadSync.asyncExec(() -> retrieve(THREADS_ID));
-		} else if (topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
-			// synchronously update the configurations UI and the rest asynchronously
-			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
-			threadSync.asyncExec(() -> retrieve(COMPONENTS_ID));
-			threadSync.syncExec(() -> retrieve(CONFIGURATIONS_ID));
-			threadSync.asyncExec(() -> retrieve(PROPERTIES_ID));
-			threadSync.asyncExec(() -> retrieve(THREADS_ID));
+			retrieveInfo(BUNDLES_ID, true);
+			retrieveInfo(PACKAGES_ID, true);
+			retrieveInfo(SERVICES_ID, true);
+			retrieveInfo(COMPONENTS_ID, true);
+			retrieveInfo(CONFIGURATIONS_ID, true);
+			retrieveInfo(PROPERTIES_ID, true);
+			retrieveInfo(THREADS_ID, true);
+			retrieveInfo(LEAKS_ID, true);
+		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX) || topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
+			retrieveInfo(SERVICES_ID, true);
+			retrieveInfo(COMPONENTS_ID, true);
+			retrieveInfo(CONFIGURATIONS_ID, true);
+			retrieveInfo(PROPERTIES_ID, true);
+			retrieveInfo(THREADS_ID, true);
 		}
 	}
 
@@ -220,27 +208,11 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 	}
 
 	private ObservableList<?> getData(final String id) {
-		for (final Entry<String, RuntimeInfoSupplier> supplierEntry : infoSuppliers.entrySet()) {
-			final var key      = supplierEntry.getKey();
-			final var supplier = supplierEntry.getValue();
-
-			if (key.equals(id)) {
-				return supplier.supply();
-			}
-		}
-		return FXCollections.observableArrayList();
+		return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply).orElse(FXCollections.observableArrayList());
 	}
 
 	private void retrieve(final String id) {
-		for (final Entry<String, RuntimeInfoSupplier> supplierEntry : infoSuppliers.entrySet()) {
-			final var key      = supplierEntry.getKey();
-			final var supplier = supplierEntry.getValue();
-
-			if (key.equals(id)) {
-				supplier.retrieve();
-				return;
-			}
-		}
+		Optional.ofNullable(infoSuppliers.get(id)).ifPresent(RuntimeInfoSupplier::retrieve);
 	}
 
 }
