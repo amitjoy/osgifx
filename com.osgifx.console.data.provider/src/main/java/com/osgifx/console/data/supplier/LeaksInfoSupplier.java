@@ -66,8 +66,7 @@ public final class LeaksInfoSupplier implements RuntimeInfoSupplier, EventHandle
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		leaks.clear();
-		leaks.addAll(makeNullSafe(agent.getClassloaderLeaks()));
+		leaks.setAll(makeNullSafe(agent.getClassloaderLeaks()));
 		logger.atInfo().log("Classloader leaks info retrieved successfully");
 	}
 

@@ -66,8 +66,7 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		properties.clear();
-		properties.addAll(makeNullSafe(agent.getAllProperties()));
+		properties.setAll(makeNullSafe(agent.getAllProperties()));
 		logger.atInfo().log("Properties info retrieved successfully");
 	}
 

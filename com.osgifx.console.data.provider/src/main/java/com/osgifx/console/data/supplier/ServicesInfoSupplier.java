@@ -66,8 +66,7 @@ public final class ServicesInfoSupplier implements RuntimeInfoSupplier, EventHan
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		services.clear();
-		services.addAll(makeNullSafe(agent.getAllServices()));
+		services.setAll(makeNullSafe(agent.getAllServices()));
 		logger.atInfo().log("Services info retrieved successfully");
 	}
 

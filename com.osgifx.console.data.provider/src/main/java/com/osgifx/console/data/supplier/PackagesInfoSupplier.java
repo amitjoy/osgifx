@@ -73,8 +73,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		packages.clear();
-		packages.addAll(preparePackages(agent.getAllBundles()));
+		packages.setAll(preparePackages(agent.getAllBundles()));
 		logger.atInfo().log("Packages info retrieved successfully");
 	}
 

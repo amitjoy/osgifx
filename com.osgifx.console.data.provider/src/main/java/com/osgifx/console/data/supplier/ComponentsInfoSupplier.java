@@ -66,8 +66,7 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		components.clear();
-		components.addAll(makeNullSafe(agent.getAllComponents()));
+		components.setAll(makeNullSafe(agent.getAllComponents()));
 		logger.atInfo().log("Components info retrieved successfully");
 	}
 
