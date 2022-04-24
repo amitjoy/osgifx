@@ -122,7 +122,7 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			// on connection, we don't need to use UI thread
 			retrieveInfo(null, true);
 		} else if (topic.startsWith(BUNDLE_ACTION_EVENT_TOPIC_PREFIX)) {
-			// synchronously update the bundles UI and the rest can be done asynchronously
+			// synchronously update the bundles UI and the rest asynchronously
 			threadSync.syncExec(() -> retrieve(BUNDLES_ID));
 			threadSync.asyncExec(() -> retrieve(PACKAGES_ID));
 			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
@@ -132,7 +132,7 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			threadSync.asyncExec(() -> retrieve(THREADS_ID));
 			threadSync.asyncExec(() -> retrieve(LEAKS_ID));
 		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX)) {
-			// synchronously update the component UI and the rest can be done asynchronously
+			// synchronously update the components UI and the rest asynchronously
 			threadSync.asyncExec(() -> retrieve(SERVICES_ID));
 			threadSync.syncExec(() -> retrieve(COMPONENTS_ID));
 			threadSync.asyncExec(() -> retrieve(CONFIGURATIONS_ID));
@@ -210,13 +210,13 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 
 	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)
 	void bindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
-		final var name = (String) reference.getProperty(PROPERTY_ID);
-		infoSuppliers.put(name, supplier);
+		final var id = (String) reference.getProperty(PROPERTY_ID);
+		infoSuppliers.put(id, supplier);
 	}
 
 	void unbindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
-		final var name = (String) reference.getProperty(PROPERTY_ID);
-		infoSuppliers.remove(name);
+		final var id = (String) reference.getProperty(PROPERTY_ID);
+		infoSuppliers.remove(id);
 	}
 
 	private ObservableList<?> getData(final String id) {
