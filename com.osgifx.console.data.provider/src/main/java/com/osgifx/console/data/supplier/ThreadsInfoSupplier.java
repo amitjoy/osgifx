@@ -66,8 +66,7 @@ public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHand
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		threads.clear();
-		threads.addAll(makeNullSafe(agent.getAllThreads()));
+		threads.setAll(makeNullSafe(agent.getAllThreads()));
 		logger.atInfo().log("Threads info retrieved successfully");
 	}
 

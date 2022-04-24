@@ -66,8 +66,7 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		bundles.clear();
-		bundles.addAll(makeNullSafe(agent.getAllBundles()));
+		bundles.setAll(makeNullSafe(agent.getAllBundles()));
 		logger.atInfo().log("Bundles info retrieved successfully");
 	}
 

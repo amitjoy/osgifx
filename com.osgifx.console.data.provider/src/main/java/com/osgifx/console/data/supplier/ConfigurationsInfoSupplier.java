@@ -66,8 +66,7 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
 			logger.atWarning().log("Agent is not connected");
 			return;
 		}
-		configurations.clear();
-		configurations.addAll(makeNullSafe(agent.getAllConfigurations()));
+		configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
 		logger.atInfo().log("Configurations info retrieved successfully");
 	}
 
