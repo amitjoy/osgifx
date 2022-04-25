@@ -149,7 +149,7 @@ public final class GraphFxBundleController {
 		bundlesList.setCellFactory(param -> new CheckBoxListCell<>(bundlesList::getItemBooleanProperty) {
 			@Override
 			public void updateItem(final XBundleDTO bundle, final boolean empty) {
-				super.updateItem(bundle, empty);
+				threadSync.syncExec(() -> super.updateItem(bundle, empty));
 				if (empty || bundle == null) {
 					threadSync.syncExec(() -> setText(null));
 				} else {
