@@ -127,12 +127,21 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			retrieveInfo(THREADS_ID, true);
 			retrieveInfo(LEAKS_ID, true);
 			retrieveInfo(HTTP_ID, true);
-		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX) || topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
+		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX)) {
 			// only retrieve those informations from the remote runtime that can be impacted
-			// by component and configuration actions
-			retrieveInfo(SERVICES_ID, true);
+			// by component actions
 			retrieveInfo(COMPONENTS_ID, true);
 			retrieveInfo(CONFIGURATIONS_ID, true);
+			retrieveInfo(SERVICES_ID, true);
+			retrieveInfo(PROPERTIES_ID, true);
+			retrieveInfo(THREADS_ID, true);
+			retrieveInfo(HTTP_ID, true);
+		} else if (topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
+			// only retrieve those informations from the remote runtime that can be impacted
+			// by configuration actions
+			retrieveInfo(CONFIGURATIONS_ID, true);
+			retrieveInfo(COMPONENTS_ID, true);
+			retrieveInfo(SERVICES_ID, true);
 			retrieveInfo(PROPERTIES_ID, true);
 			retrieveInfo(THREADS_ID, true);
 			retrieveInfo(HTTP_ID, true);
