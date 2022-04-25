@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider;
 
+import static com.osgifx.console.agent.Agent.CONSOLE;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.osgifx.console.agent.Agent;
 
 /**
  * The Console Redirector redirects System.in, System.out, and System.err to the
@@ -72,7 +72,7 @@ public class ConsoleRedirector implements Redirector {
 
 	@Override
 	public int getPort() {
-		return Agent.CONSOLE;
+		return CONSOLE;
 	}
 
 	@Override

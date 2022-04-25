@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider;
 
+import static com.osgifx.console.agent.Agent.AGENT_SERVER_PORT_KEY;
+import static com.osgifx.console.agent.Agent.DEFAULT_PORT;
+import static com.osgifx.console.agent.Agent.PORT_P;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import java.io.File;
@@ -60,30 +63,20 @@ public class Activator extends Thread implements BundleActivator {
 		classloaderLeakDetector = new ClassloaderLeakDetector();
 		classloaderLeakDetector.start(context);
 
-		//
 		// Get the specified port in the framework properties
-		//
-
-		String port = context.getProperty(Agent.AGENT_SERVER_PORT_KEY);
+		String port = context.getProperty(AGENT_SERVER_PORT_KEY);
 		if (port == null) {
-			port = Agent.DEFAULT_PORT + "";
+			port = DEFAULT_PORT + "";
 		}
 
-		//
 		// Check if it matches the specification of host:port
-		//
-
-		final Matcher m = Agent.PORT_P.matcher(port);
+		final Matcher m = PORT_P.matcher(port);
 		if (!m.matches()) {
 			throw new IllegalArgumentException(
-			        "Invalid port specification in property 'osgi.fx.agent.port', expects [<host>:]<port> : " + port);
+			        "Invalid port specification in property '" + AGENT_SERVER_PORT_KEY + "', expects [<host>:]<port> : " + port);
 		}
 
-		//
-		// See if the host was set, otherwise use localhost
-		// for security reasons
-		//
-
+		// if the host is not set, use localhost
 		String host = m.group(1);
 		if (host == null) {
 			host = "localhost";
@@ -93,11 +86,7 @@ public class Activator extends Thread implements BundleActivator {
 
 		System.err.println("OSGi.fx Agent Host: " + host + " " + port);
 
-		//
-		// Get the SHA cache root file, which will be shared by all agents for
-		// this process.
-		//
-
+		// Get the SHA cache root file to be shared by all agents for this process
 		cache = context.getDataFile("shacache");
 
 		final int p = Integer.parseInt(port);
@@ -117,18 +106,11 @@ public class Activator extends Thread implements BundleActivator {
 				try {
 					final Socket socket = server.accept();
 
-					//
-					// Use a time out so we get interrupts
-					// and can do some checks
-					//
-
+					// timeout to get interrupts
 					socket.setSoTimeout(1000);
 
-					//
-					// Create a new agent, and link it up.
-					//
-
-					final AgentServer sa = new AgentServer("<>", context, cache, classloaderLeakDetector);
+					// create a new agent, and link it up.
+					final AgentServer sa = new AgentServer(context, cache, classloaderLeakDetector);
 					agents.add(sa);
 					final Link<Agent, Supervisor> link = new Link<Agent, Supervisor>(Supervisor.class, sa, socket) {
 						@Override
@@ -166,17 +148,11 @@ public class Activator extends Thread implements BundleActivator {
 		}
 	}
 
-	/**
-	 * Shutdown any agents & the server socket.
-	 */
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 		interrupt();
 		IO.close(server);
-
-		for (final AgentServer sa : agents) {
-			IO.close(sa);
-		}
+		agents.forEach(IO::close);
 		classloaderLeakDetector.stop();
 	}
 

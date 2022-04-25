@@ -71,7 +71,7 @@ public class GogoRedirector implements Redirector {
 								        final CommandProcessor service) {
 									super.removedService(reference, service);
 									if (service == processor) {
-										closeSession(service);
+										closeSession();
 										final CommandProcessor replacement = getService();
 										if (replacement != null) {
 											openSession(replacement);
@@ -83,7 +83,7 @@ public class GogoRedirector implements Redirector {
 		tracker.open();
 	}
 
-	void closeSession(final CommandProcessor service) {
+	void closeSession() {
 		if (session != null) {
 			session.close();
 			processor = null;
@@ -133,7 +133,7 @@ public class GogoRedirector implements Redirector {
 
 	@Override
 	public void close() throws IOException {
-		closeSession(processor);
+		closeSession();
 	}
 
 	@Override

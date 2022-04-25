@@ -843,7 +843,8 @@ public class Reflect {
 			}
 			if (double.class == type) {
 				return (Class<T>) Double.class;
-			} else if (float.class == type) {
+			}
+			if (float.class == type) {
 				return (Class<T>) Float.class;
 			} else if (char.class == type) {
 				return (Class<T>) Character.class;
@@ -856,5 +857,25 @@ public class Reflect {
 	}
 
 	private static class NULL {
+	}
+
+	public static class ReflectException extends RuntimeException {
+
+		private static final long serialVersionUID = -6213149635297151442L;
+
+		public ReflectException(final String message) {
+			super(message);
+		}
+
+		public ReflectException(final String message, final Throwable cause) {
+			super(message, cause);
+		}
+
+		public ReflectException() {
+		}
+
+		public ReflectException(final Throwable cause) {
+			super(cause);
+		}
 	}
 }
