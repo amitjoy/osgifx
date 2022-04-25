@@ -502,6 +502,22 @@ public interface Agent {
 	XHeapdumpDTO heapdump() throws Exception;
 
 	/**
+	 * Checks if {@code ConfigAdmin} is available in the remote runtime
+	 *
+	 * @return {@code true} if {@code ConfigAdmin} is available, otherwise
+	 *         {@code false}
+	 */
+	boolean isConfigAdminAvailable();
+
+	/**
+	 * Checks if {@code EventAdmin} is available in the remote runtime
+	 *
+	 * @return {@code true} if {@code EventAdmin} is available, otherwise
+	 *         {@code false}
+	 */
+	boolean isEventAdminAvailable();
+
+	/**
 	 * Performs a garbage collection
 	 */
 	void gc();

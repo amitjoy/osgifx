@@ -27,13 +27,6 @@ import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES
 import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
-import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
-import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPIC_PREFIX;
-import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
-import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPIC_PREFIX;
-import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
-import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -48,9 +41,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
-import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -70,9 +60,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
-@EventTopics({ AGENT_CONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS, COMPONENT_ACTION_EVENT_TOPICS, CONFIGURATION_ACTION_EVENT_TOPICS })
 @SuppressWarnings("unchecked")
-public final class RuntimeDataProvider implements DataProvider, EventHandler {
+public final class RuntimeDataProvider implements DataProvider {
 
 	private final FluentLogger                     logger;
 	private final Map<String, RuntimeInfoSupplier> infoSuppliers;
@@ -106,45 +95,6 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 		} else {
 			retrieve(id);
 			logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
-		}
-	}
-
-	@Override
-	public void handleEvent(final Event event) {
-		final var topic = event.getTopic();
-		if (AGENT_CONNECTED_EVENT_TOPIC.equals(topic)) {
-			// on connection, retrieve all informations just for the purpose of caching
-			retrieveInfo(null, true);
-		} else if (topic.startsWith(BUNDLE_ACTION_EVENT_TOPIC_PREFIX)) {
-			// only retrieve those informations from the remote runtime that can be impacted
-			// by bundle actions
-			retrieveInfo(BUNDLES_ID, true);
-			retrieveInfo(PACKAGES_ID, true);
-			retrieveInfo(SERVICES_ID, true);
-			retrieveInfo(COMPONENTS_ID, true);
-			retrieveInfo(CONFIGURATIONS_ID, true);
-			retrieveInfo(PROPERTIES_ID, true);
-			retrieveInfo(THREADS_ID, true);
-			retrieveInfo(LEAKS_ID, true);
-			retrieveInfo(HTTP_ID, true);
-		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX)) {
-			// only retrieve those informations from the remote runtime that can be impacted
-			// by component actions
-			retrieveInfo(COMPONENTS_ID, true);
-			retrieveInfo(CONFIGURATIONS_ID, true);
-			retrieveInfo(SERVICES_ID, true);
-			retrieveInfo(PROPERTIES_ID, true);
-			retrieveInfo(THREADS_ID, true);
-			retrieveInfo(HTTP_ID, true);
-		} else if (topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
-			// only retrieve those informations from the remote runtime that can be impacted
-			// by configuration actions
-			retrieveInfo(CONFIGURATIONS_ID, true);
-			retrieveInfo(COMPONENTS_ID, true);
-			retrieveInfo(SERVICES_ID, true);
-			retrieveInfo(PROPERTIES_ID, true);
-			retrieveInfo(THREADS_ID, true);
-			retrieveInfo(HTTP_ID, true);
 		}
 	}
 
