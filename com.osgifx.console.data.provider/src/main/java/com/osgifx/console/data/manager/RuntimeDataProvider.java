@@ -116,9 +116,11 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 	public void handleEvent(final Event event) {
 		final var topic = event.getTopic();
 		if (AGENT_CONNECTED_EVENT_TOPIC.equals(topic)) {
-			// on connection, we don't need to use UI thread
+			// on connection, retrieve all informations just for the purpose of caching
 			retrieveInfo(null, true);
 		} else if (topic.startsWith(BUNDLE_ACTION_EVENT_TOPIC_PREFIX)) {
+			// only retrieve those informations from the remote runtime that can be impacted
+			// by bundle actions
 			retrieveInfo(BUNDLES_ID, true);
 			retrieveInfo(PACKAGES_ID, true);
 			retrieveInfo(SERVICES_ID, true);
@@ -128,6 +130,8 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			retrieveInfo(THREADS_ID, true);
 			retrieveInfo(LEAKS_ID, true);
 		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX) || topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
+			// only retrieve those informations from the remote runtime that can be impacted
+			// by component and configuration actions
 			retrieveInfo(SERVICES_ID, true);
 			retrieveInfo(COMPONENTS_ID, true);
 			retrieveInfo(CONFIGURATIONS_ID, true);
