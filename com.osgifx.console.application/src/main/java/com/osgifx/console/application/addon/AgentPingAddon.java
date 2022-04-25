@@ -87,7 +87,11 @@ public final class AgentPingAddon {
 		logger.atInfo().log("Agent disconnected event has been received");
 		future.cancel(true);
 		future = null;
-		isConnected.publish(false);
+		// there can be a race condition when this addon is just destroyed and the
+		// disconnected event is received simultaneously
+		if (!executor.isShutdown()) {
+			isConnected.publish(false);
+		}
 		connectedAgent.publish(null);
 	}
 
