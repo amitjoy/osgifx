@@ -168,7 +168,7 @@ public class XComponentAdmin {
 					builder.append(e.getMessage()).append(System.lineSeparator());
 				}
 				final String response = builder.toString();
-				return response.isEmpty() ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully disable")
+				return response.isEmpty() ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully disabled")
 				        : createResult(ERROR, response);
 			}
 		}

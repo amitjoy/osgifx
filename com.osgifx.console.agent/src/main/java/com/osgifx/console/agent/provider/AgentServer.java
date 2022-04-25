@@ -15,9 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider;
 
+import static aQute.bnd.osgi.Constants.LAUNCH_ACTIVATION_EAGER;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static java.util.Objects.requireNonNull;
+import static org.osgi.framework.Bundle.START_ACTIVATION_POLICY;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -66,8 +68,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
@@ -113,7 +113,7 @@ import aQute.remote.util.Link;
  * Implementation of the Agent. This implementation implements the Agent
  * interfaces and communicates with a Supervisor interfaces.
  */
-public class AgentServer implements Agent, Closeable, FrameworkListener {
+public class AgentServer implements Agent, Closeable {
 
 	private static final Pattern       BSN_P    = Pattern.compile("\\s*([^;\\s]+).*");
 	private static final AtomicInteger sequence = new AtomicInteger(1000);
@@ -169,28 +169,24 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 	/**
 	 * An agent server is based on a context and takes a name and cache directory
 	 *
-	 * @param name    the name of the agent's framework
 	 * @param context a bundle context of the framework
 	 * @param cache   the directory for caching
 	 */
-
-	public AgentServer(final String name, final BundleContext context, final File cache, final ClassloaderLeakDetector leakDetector)
-	        throws Exception {
-		this(name, context, cache, StartLevelRuntimeHandler.absent(), leakDetector);
+	public AgentServer(final BundleContext context, final File cache, final ClassloaderLeakDetector leakDetector) throws Exception {
+		this(context, cache, StartLevelRuntimeHandler.absent(), leakDetector);
 	}
 
-	public AgentServer(final String name, final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels,
+	public AgentServer(final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels,
 	        final ClassloaderLeakDetector leakDetector) throws Exception {
 		requireNonNull(context, "Bundle context cannot be null");
 		this.context      = context;
 		this.leakDetector = leakDetector;
 
-		final boolean eager = context.getProperty(aQute.bnd.osgi.Constants.LAUNCH_ACTIVATION_EAGER) != null;
-		startOptions = eager ? 0 : Bundle.START_ACTIVATION_POLICY;
+		final boolean eager = context.getProperty(LAUNCH_ACTIVATION_EAGER) != null;
+		startOptions = eager ? 0 : START_ACTIVATION_POLICY;
 
 		this.cache       = new ShaCache(cache);
 		this.startlevels = startlevels;
-		this.context.addFrameworkListener(this);
 
 		final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
@@ -523,9 +519,7 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 	@Override
 	public String updateFromURL(final long id, final String url) throws Exception {
 		final StringBuilder sb = new StringBuilder();
-		final InputStream   is = new URL(url).openStream();
-
-		try {
+		try (final InputStream is = new URL(url).openStream()) {
 			final Bundle bundle = context.getBundle(id);
 			bundle.update(is);
 			refresh(true);
@@ -705,11 +699,6 @@ public class AgentServer implements Agent, Closeable, FrameworkListener {
 	@Override
 	public void abort() throws Exception {
 		cleanup(-3);
-	}
-
-	@Override
-	public void frameworkEvent(final FrameworkEvent event) {
-
 	}
 
 	private void printStack(final Exception e1) {
