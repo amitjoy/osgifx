@@ -32,7 +32,7 @@ import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
-import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -483,9 +483,9 @@ public interface Agent {
 	 * Returns the HTTP runtime information that includes list of all servlets,
 	 * resources, listeners, filters and error pages
 	 *
-	 * @return the HTTP runtime information
+	 * @return the list of all HTTP components
 	 */
-	XHttpContextInfoDTO getHttpContextInfo();
+	List<XHttpComponentDTO> getHttpComponents();
 
 	/**
 	 * Returns the heap usage information

@@ -21,7 +21,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
-import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -121,8 +121,8 @@ public interface DataProvider {
 	 * Returns the HTTP runtime information that includes list of all servlets,
 	 * resources, listeners, filters and error pages
 	 *
-	 * @return the HTTP runtime information
+	 * @return the observable list of all HTTP components
 	 */
-	XHttpContextInfoDTO httpContext();
+	ObservableList<XHttpComponentDTO> httpComponents();
 
 }

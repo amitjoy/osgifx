@@ -19,6 +19,7 @@ import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
+import static com.osgifx.console.data.supplier.HttpComponentsInfoSupplier.HTTP_ID;
 import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
 import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
@@ -56,7 +57,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
-import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -64,7 +65,6 @@ import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.data.supplier.RuntimeInfoSupplier;
-import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -75,15 +75,12 @@ import javafx.collections.ObservableList;
 public final class RuntimeDataProvider implements DataProvider, EventHandler {
 
 	private final FluentLogger                     logger;
-	private final Supervisor                       supervisor;
 	private final Map<String, RuntimeInfoSupplier> infoSuppliers;
 
 	@Activate
-	public RuntimeDataProvider(@Reference final LoggerFactory factory, @Reference final Supervisor supervisor) {
-		this.supervisor = supervisor;
-		infoSuppliers   = Maps.newHashMap();
-		logger          = FluentLogger.of(factory.createLogger(getClass().getName()));
-
+	public RuntimeDataProvider(@Reference final LoggerFactory factory) {
+		infoSuppliers = Maps.newHashMap();
+		logger        = FluentLogger.of(factory.createLogger(getClass().getName()));
 	}
 
 	@Override
@@ -129,6 +126,7 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			retrieveInfo(PROPERTIES_ID, true);
 			retrieveInfo(THREADS_ID, true);
 			retrieveInfo(LEAKS_ID, true);
+			retrieveInfo(HTTP_ID, true);
 		} else if (topic.startsWith(COMPONENT_ACTION_EVENT_TOPIC_PREFIX) || topic.startsWith(CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX)) {
 			// only retrieve those informations from the remote runtime that can be impacted
 			// by component and configuration actions
@@ -137,6 +135,7 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 			retrieveInfo(CONFIGURATIONS_ID, true);
 			retrieveInfo(PROPERTIES_ID, true);
 			retrieveInfo(THREADS_ID, true);
+			retrieveInfo(HTTP_ID, true);
 		}
 	}
 
@@ -191,13 +190,8 @@ public final class RuntimeDataProvider implements DataProvider, EventHandler {
 	}
 
 	@Override
-	public synchronized XHttpContextInfoDTO httpContext() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return null;
-		}
-		return agent.getHttpContextInfo();
+	public synchronized ObservableList<XHttpComponentDTO> httpComponents() {
+		return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
 	}
 
 	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)

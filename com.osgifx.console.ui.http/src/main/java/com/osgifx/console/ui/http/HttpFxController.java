@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.http;
 
-import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import javax.inject.Inject;
@@ -32,13 +31,11 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.agent.dto.XHttpInfoDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -50,23 +47,23 @@ public final class HttpFxController {
 
 	@Log
 	@Inject
-	private FluentLogger                       logger;
+	private FluentLogger                            logger;
 	@Inject
 	@LocalInstance
-	private FXMLLoader                         loader;
+	private FXMLLoader                              loader;
 	@FXML
-	private TableView<XHttpInfoDTO>            table;
+	private TableView<XHttpComponentDTO>            table;
 	@Inject
 	@OSGiBundle
-	private BundleContext                      context;
+	private BundleContext                           context;
 	@Inject
 	@Named("is_connected")
-	private boolean                            isConnected;
+	private boolean                                 isConnected;
 	@Inject
-	private DataProvider                       dataProvider;
+	private DataProvider                            dataProvider;
 	@Inject
-	private ThreadSynchronize                  threadSync;
-	private TableRowDataFeatures<XHttpInfoDTO> previouslyExpanded;
+	private ThreadSynchronize                       threadSync;
+	private TableRowDataFeatures<XHttpComponentDTO> previouslyExpanded;
 
 	@FXML
 	public void initialize() {
@@ -82,7 +79,7 @@ public final class HttpFxController {
 	private void createControls() {
 		final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
 		final var controller     = (HttpDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XHttpInfoDTO>(current -> {
+		final var expanderColumn = new TableRowExpanderColumn<XHttpComponentDTO>(current -> {
 										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
 											return expandedNode;
 										}
@@ -94,7 +91,7 @@ public final class HttpFxController {
 										return expandedNode;
 									});
 
-		final var componentColumn = new TableColumn<XHttpInfoDTO, String>("Component Name");
+		final var componentColumn = new TableColumn<XHttpComponentDTO, String>("Component Name");
 		componentColumn.setPrefWidth(600);
 		componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> {
 			// resource doesn't have associated name field
@@ -106,19 +103,19 @@ public final class HttpFxController {
 			return null; // not gonna happen
 		}));
 
-		final var contextNameColumn = new TableColumn<XHttpInfoDTO, String>("Context Name");
+		final var contextNameColumn = new TableColumn<XHttpComponentDTO, String>("Context Name");
 		contextNameColumn.setPrefWidth(150);
 		contextNameColumn.setCellValueFactory(new DTOCellValueFactory<>("contextName", String.class));
 
-		final var contextPathColumn = new TableColumn<XHttpInfoDTO, String>("Context Path");
+		final var contextPathColumn = new TableColumn<XHttpComponentDTO, String>("Context Path");
 		contextPathColumn.setPrefWidth(200);
 		contextPathColumn.setCellValueFactory(new DTOCellValueFactory<>("contextPath", String.class));
 
-		final var contextServiceIdColumn = new TableColumn<XHttpInfoDTO, String>("Context Service ID");
+		final var contextServiceIdColumn = new TableColumn<XHttpComponentDTO, String>("Context Service ID");
 		contextServiceIdColumn.setPrefWidth(140);
 		contextServiceIdColumn.setCellValueFactory(new DTOCellValueFactory<>("contextServiceId", String.class));
 
-		final var componentTypeColumn = new TableColumn<XHttpInfoDTO, String>("Type");
+		final var componentTypeColumn = new TableColumn<XHttpComponentDTO, String>("Type");
 		componentTypeColumn.setPrefWidth(100);
 		componentTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
@@ -129,19 +126,8 @@ public final class HttpFxController {
 		table.getColumns().add(contextServiceIdColumn);
 		table.getColumns().add(componentTypeColumn);
 
-		final ObservableList<XHttpInfoDTO> httpComponents = FXCollections.observableArrayList();
-		final var                          httpContext    = dataProvider.httpContext();
-
-		if (httpContext != null) {
-			httpComponents.addAll(makeNullSafe(httpContext.servlets));
-			httpComponents.addAll(makeNullSafe(httpContext.filters));
-			httpComponents.addAll(makeNullSafe(httpContext.listeners));
-			httpComponents.addAll(makeNullSafe(httpContext.resources));
-			httpComponents.addAll(makeNullSafe(httpContext.errorPages));
-		}
-
-		final var httpRuntime = httpComponents;
-		table.setItems(httpRuntime);
+		final var httpComponents = dataProvider.httpComponents();
+		table.setItems(httpComponents);
 
 		TableFilter.forTableView(table).apply();
 		threadSync.syncExec(() -> Fx.sortBy(table, componentColumn));

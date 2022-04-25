@@ -29,12 +29,7 @@ import org.osgi.service.http.runtime.dto.RuntimeDTO;
 import org.osgi.service.http.runtime.dto.ServletContextDTO;
 import org.osgi.service.http.runtime.dto.ServletDTO;
 
-import com.osgifx.console.agent.dto.XErrorPageDTO;
-import com.osgifx.console.agent.dto.XFilterDTO;
-import com.osgifx.console.agent.dto.XHttpContextInfoDTO;
-import com.osgifx.console.agent.dto.XListenerDTO;
-import com.osgifx.console.agent.dto.XResourceDTO;
-import com.osgifx.console.agent.dto.XServletDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
 
 public class XHttpAdmin {
 
@@ -44,39 +39,38 @@ public class XHttpAdmin {
 		this.httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntime;
 	}
 
-	public XHttpContextInfoDTO runtime() {
+	public List<XHttpComponentDTO> runtime() {
 		final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
-		return initHttpRuntime(runtime);
+		return initHttpComponents(runtime);
 	}
 
-	private XHttpContextInfoDTO initHttpRuntime(final RuntimeDTO runtime) {
-		final XHttpContextInfoDTO httpInfo = new XHttpContextInfoDTO();
+	private List<XHttpComponentDTO> initHttpComponents(final RuntimeDTO runtime) {
+		final List<XHttpComponentDTO> dtos = new ArrayList<>(initServlets(runtime));
 
-		httpInfo.servlets   = initServlets(runtime);
-		httpInfo.filters    = initFilters(runtime);
-		httpInfo.resources  = initResources(runtime);
-		httpInfo.listeners  = initListeners(runtime);
-		httpInfo.errorPages = initErrorPages(runtime);
+		dtos.addAll(initFilters(runtime));
+		dtos.addAll(initResources(runtime));
+		dtos.addAll(initListeners(runtime));
+		dtos.addAll(initErrorPages(runtime));
 
-		return httpInfo;
+		return dtos;
 	}
 
-	private List<XServletDTO> initServlets(final RuntimeDTO runtime) {
-		final List<XServletDTO>   servlets           = new ArrayList<>();
-		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XHttpComponentDTO> initServlets(final RuntimeDTO runtime) {
+		final List<XHttpComponentDTO> servlets           = new ArrayList<>();
+		final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
 
 		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-			final List<XServletDTO> servletDTOs = initServletsByContext(servletContextDTO);
+			final List<XHttpComponentDTO> servletDTOs = initServletsByContext(servletContextDTO);
 			servlets.addAll(servletDTOs);
 		}
 		return servlets;
 	}
 
-	private List<XServletDTO> initServletsByContext(final ServletContextDTO servletContextDTO) {
-		final List<XServletDTO> servletDTO = new ArrayList<>();
+	private List<XHttpComponentDTO> initServletsByContext(final ServletContextDTO servletContextDTO) {
+		final List<XHttpComponentDTO> servletDTO = new ArrayList<>();
 
 		for (final ServletDTO sDTO : servletContextDTO.servletDTOs) {
-			final XServletDTO dto = new XServletDTO();
+			final XHttpComponentDTO dto = new XHttpComponentDTO();
 
 			dto.contextName      = servletContextDTO.name;
 			dto.contextPath      = servletContextDTO.contextPath;
@@ -93,22 +87,22 @@ public class XHttpAdmin {
 		return servletDTO;
 	}
 
-	private List<XFilterDTO> initFilters(final RuntimeDTO runtime) {
-		final List<XFilterDTO>    filters            = new ArrayList<>();
-		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XHttpComponentDTO> initFilters(final RuntimeDTO runtime) {
+		final List<XHttpComponentDTO> filters            = new ArrayList<>();
+		final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
 
 		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-			final List<XFilterDTO> filterDTOs = initFiltersByContext(servletContextDTO);
+			final List<XHttpComponentDTO> filterDTOs = initFiltersByContext(servletContextDTO);
 			filters.addAll(filterDTOs);
 		}
 		return filters;
 	}
 
-	private List<XFilterDTO> initFiltersByContext(final ServletContextDTO servletContextDTO) {
-		final List<XFilterDTO> filterDTO = new ArrayList<>();
+	private List<XHttpComponentDTO> initFiltersByContext(final ServletContextDTO servletContextDTO) {
+		final List<XHttpComponentDTO> filterDTOs = new ArrayList<>();
 
 		for (final FilterDTO fDTO : servletContextDTO.filterDTOs) {
-			final XFilterDTO dto = new XFilterDTO();
+			final XHttpComponentDTO dto = new XHttpComponentDTO();
 
 			dto.contextName      = servletContextDTO.name;
 			dto.contextPath      = servletContextDTO.contextPath;
@@ -122,27 +116,27 @@ public class XHttpAdmin {
 			dto.servletNames     = Arrays.asList(fDTO.servletNames);
 			dto.type             = "Filter";
 
-			filterDTO.add(dto);
+			filterDTOs.add(dto);
 		}
-		return filterDTO;
+		return filterDTOs;
 	}
 
-	private List<XResourceDTO> initResources(final RuntimeDTO runtime) {
-		final List<XResourceDTO>  resources          = new ArrayList<>();
-		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XHttpComponentDTO> initResources(final RuntimeDTO runtime) {
+		final List<XHttpComponentDTO> resources          = new ArrayList<>();
+		final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
 
 		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-			final List<XResourceDTO> resourceDTOs = initResourcesByContext(servletContextDTO);
+			final List<XHttpComponentDTO> resourceDTOs = initResourcesByContext(servletContextDTO);
 			resources.addAll(resourceDTOs);
 		}
 		return resources;
 	}
 
-	private List<XResourceDTO> initResourcesByContext(final ServletContextDTO servletContextDTO) {
-		final List<XResourceDTO> resourceDTO = new ArrayList<>();
+	private List<XHttpComponentDTO> initResourcesByContext(final ServletContextDTO servletContextDTO) {
+		final List<XHttpComponentDTO> resourceDTO = new ArrayList<>();
 
 		for (final ResourceDTO rDTO : servletContextDTO.resourceDTOs) {
-			final XResourceDTO dto = new XResourceDTO();
+			final XHttpComponentDTO dto = new XHttpComponentDTO();
 
 			dto.contextName      = servletContextDTO.name;
 			dto.contextPath      = servletContextDTO.contextPath;
@@ -157,22 +151,22 @@ public class XHttpAdmin {
 		return resourceDTO;
 	}
 
-	private List<XListenerDTO> initListeners(final RuntimeDTO runtime) {
-		final List<XListenerDTO>  listeners          = new ArrayList<>();
-		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XHttpComponentDTO> initListeners(final RuntimeDTO runtime) {
+		final List<XHttpComponentDTO> listeners          = new ArrayList<>();
+		final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
 
 		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-			final List<XListenerDTO> listenerDTOs = initListenersByContext(servletContextDTO);
+			final List<XHttpComponentDTO> listenerDTOs = initListenersByContext(servletContextDTO);
 			listeners.addAll(listenerDTOs);
 		}
 		return listeners;
 	}
 
-	private List<XListenerDTO> initListenersByContext(final ServletContextDTO servletContextDTO) {
-		final List<XListenerDTO> listenerDTO = new ArrayList<>();
+	private List<XHttpComponentDTO> initListenersByContext(final ServletContextDTO servletContextDTO) {
+		final List<XHttpComponentDTO> listenerDTO = new ArrayList<>();
 
 		for (final ListenerDTO lDTO : servletContextDTO.listenerDTOs) {
-			final XListenerDTO dto = new XListenerDTO();
+			final XHttpComponentDTO dto = new XHttpComponentDTO();
 
 			dto.contextName      = servletContextDTO.name;
 			dto.contextPath      = servletContextDTO.contextPath;
@@ -186,22 +180,22 @@ public class XHttpAdmin {
 		return listenerDTO;
 	}
 
-	private List<XErrorPageDTO> initErrorPages(final RuntimeDTO runtime) {
-		final List<XErrorPageDTO> errorPages         = new ArrayList<>();
-		final ServletContextDTO[] servletContextDTOs = runtime.servletContextDTOs;
+	private List<XHttpComponentDTO> initErrorPages(final RuntimeDTO runtime) {
+		final List<XHttpComponentDTO> errorPages         = new ArrayList<>();
+		final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
 
 		for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-			final List<XErrorPageDTO> errorPageDTOs = initErrorPagesByContext(servletContextDTO);
+			final List<XHttpComponentDTO> errorPageDTOs = initErrorPagesByContext(servletContextDTO);
 			errorPages.addAll(errorPageDTOs);
 		}
 		return errorPages;
 	}
 
-	private List<XErrorPageDTO> initErrorPagesByContext(final ServletContextDTO servletContextDTO) {
-		final List<XErrorPageDTO> errorPageDTO = new ArrayList<>();
+	private List<XHttpComponentDTO> initErrorPagesByContext(final ServletContextDTO servletContextDTO) {
+		final List<XHttpComponentDTO> errorPageDTO = new ArrayList<>();
 
 		for (final ErrorPageDTO eDTO : servletContextDTO.errorPageDTOs) {
-			final XErrorPageDTO dto = new XErrorPageDTO();
+			final XHttpComponentDTO dto = new XHttpComponentDTO();
 
 			dto.contextName      = servletContextDTO.name;
 			dto.contextPath      = servletContextDTO.contextPath;
