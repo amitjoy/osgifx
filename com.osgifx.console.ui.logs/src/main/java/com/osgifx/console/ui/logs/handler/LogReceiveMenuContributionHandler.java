@@ -46,7 +46,7 @@ import com.osgifx.console.util.fx.Fx;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class LogReceiveMenuContributionHandler {
 
-	private static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
+	public static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
 
 	@Log
 	@Inject
