@@ -27,12 +27,7 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.osgifx.console.agent.dto.XErrorPageDTO;
-import com.osgifx.console.agent.dto.XFilterDTO;
-import com.osgifx.console.agent.dto.XHttpInfoDTO;
-import com.osgifx.console.agent.dto.XListenerDTO;
-import com.osgifx.console.agent.dto.XResourceDTO;
-import com.osgifx.console.agent.dto.XServletDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -53,19 +48,19 @@ public final class HttpDetailsFxController {
 		logger.atDebug().log("FXML controller has been initialized");
 	}
 
-	void initControls(final XHttpInfoDTO httpContext) {
+	void initControls(final XHttpComponentDTO httpComponent) {
 		if (formRenderer != null) {
 			rootPanel.getChildren().remove(formRenderer);
 		}
-		formRenderer = createForm(httpContext);
+		formRenderer = createForm(httpComponent);
 		rootPanel.setCenter(formRenderer);
 	}
 
-	private FormRenderer createForm(final XHttpInfoDTO httpContext) {
-		final var type = httpContext.type;
+	private FormRenderer createForm(final XHttpComponentDTO httpComponent) {
+		final var type = httpComponent.type;
 		final var form = Form
-		        .of(Section.of(initContextProperties(httpContext).toArray(new Field[0])).title("Servlet Context Properties"),
-		                Section.of(initSpecificProperties(httpContext).toArray(new Field[0])).title(type + " Properties"))
+		        .of(Section.of(initContextProperties(httpComponent).toArray(new Field[0])).title("Servlet Context Properties"),
+		                Section.of(initSpecificProperties(httpComponent).toArray(new Field[0])).title(type + " Properties"))
 		        .title("Configuration Properties");
 
 		final var renderer = new FormRenderer(form);
@@ -78,31 +73,29 @@ public final class HttpDetailsFxController {
 		return renderer;
 	}
 
-	private List<Field<?>> initContextProperties(final XHttpInfoDTO httpContext) {
+	private List<Field<?>> initContextProperties(final XHttpComponentDTO httpComponent) {
 
-		final Field<?> contextNameField      = Field.ofStringType(httpContext.contextName).editable(false).label("Name");
-		final Field<?> contextPathField      = Field.ofStringType(httpContext.contextPath).editable(false).label("Path");
-		final Field<?> contextServiceIdField = Field.ofIntegerType(Math.toIntExact(httpContext.contextServiceId)).editable(false)
+		final Field<?> contextNameField      = Field.ofStringType(httpComponent.contextName).editable(false).label("Name");
+		final Field<?> contextPathField      = Field.ofStringType(httpComponent.contextPath).editable(false).label("Path");
+		final Field<?> contextServiceIdField = Field.ofIntegerType(Math.toIntExact(httpComponent.contextServiceId)).editable(false)
 		        .label("Service ID");
 
 		return Arrays.asList(contextNameField, contextPathField, contextServiceIdField);
 	}
 
-	private List<Field<?>> initSpecificProperties(final XHttpInfoDTO httpContext) {
-		final var type = httpContext.type;
+	private List<Field<?>> initSpecificProperties(final XHttpComponentDTO httpComponent) {
+		final var type = httpComponent.type;
 		return switch (type) {
-		case "Servlet" -> initServletProperties(httpContext);
-		case "Filter" -> initFilterProperties(httpContext);
-		case "Resource" -> initResourceProperties(httpContext);
-		case "Listener" -> initListenerProperties(httpContext);
-		case "Error Page" -> initErrorPageProperties(httpContext);
+		case "Servlet" -> initServletProperties(httpComponent);
+		case "Filter" -> initFilterProperties(httpComponent);
+		case "Resource" -> initResourceProperties(httpComponent);
+		case "Listener" -> initListenerProperties(httpComponent);
+		case "Error Page" -> initErrorPageProperties(httpComponent);
 		default -> List.of();
 		};
 	}
 
-	private List<Field<?>> initErrorPageProperties(final XHttpInfoDTO httpContext) {
-		final var errrorPage = (XErrorPageDTO) httpContext;
-
+	private List<Field<?>> initErrorPageProperties(final XHttpComponentDTO errrorPage) {
 		final Field<?> nameField           = Field.ofStringType(errrorPage.name).editable(false).label("Name");
 		final Field<?> asyncSupportedField = Field.ofBooleanType(errrorPage.asyncSupported).editable(false).label("Async Supported");
 		final Field<?> serviceIdField      = Field.ofIntegerType(Math.toIntExact(errrorPage.serviceId)).editable(false).label("Service ID");
@@ -113,18 +106,14 @@ public final class HttpDetailsFxController {
 		return Arrays.asList(nameField, asyncSupportedField, serviceIdField, infoField, exceptionsField, errorCodesField);
 	}
 
-	private List<Field<?>> initListenerProperties(final XHttpInfoDTO httpContext) {
-		final var listener = (XListenerDTO) httpContext;
-
+	private List<Field<?>> initListenerProperties(final XHttpComponentDTO listener) {
 		final Field<?> serviceIdField = Field.ofIntegerType(Math.toIntExact(listener.serviceId)).editable(false).label("Service ID");
 		final Field<?> typesField     = Field.ofMultiSelectionType(listener.types).label("Types");
 
 		return Arrays.asList(serviceIdField, typesField);
 	}
 
-	private List<Field<?>> initResourceProperties(final XHttpInfoDTO httpContext) {
-		final var resource = (XResourceDTO) httpContext;
-
+	private List<Field<?>> initResourceProperties(final XHttpComponentDTO resource) {
 		final Field<?> prefixField    = Field.ofStringType(resource.prefix).editable(false).label("Prefix");
 		final Field<?> serviceIdField = Field.ofIntegerType(Math.toIntExact(resource.serviceId)).editable(false).label("Service ID");
 		final Field<?> patternsField  = Field.ofMultiSelectionType(resource.patterns).label("Patterns");
@@ -132,9 +121,7 @@ public final class HttpDetailsFxController {
 		return Arrays.asList(prefixField, serviceIdField, patternsField);
 	}
 
-	private List<Field<?>> initFilterProperties(final XHttpInfoDTO httpContext) {
-		final var filter = (XFilterDTO) httpContext;
-
+	private List<Field<?>> initFilterProperties(final XHttpComponentDTO filter) {
 		final Field<?> nameField           = Field.ofStringType(filter.name).editable(false).label("Name");
 		final Field<?> asyncSupportedField = Field.ofBooleanType(filter.asyncSupported).editable(false).label("Async Supported");
 		final Field<?> serviceIdField      = Field.ofIntegerType(Math.toIntExact(filter.serviceId)).editable(false).label("Service ID");
@@ -147,9 +134,7 @@ public final class HttpDetailsFxController {
 		        dispatcherField);
 	}
 
-	private List<Field<?>> initServletProperties(final XHttpInfoDTO httpContext) {
-		final var servlet = (XServletDTO) httpContext;
-
+	private List<Field<?>> initServletProperties(final XHttpComponentDTO servlet) {
 		final Field<?> nameField           = Field.ofStringType(servlet.name).editable(false).label("Name");
 		final Field<?> asyncSupportedField = Field.ofBooleanType(servlet.asyncSupported).editable(false).label("Async Supported");
 		final Field<?> serviceIdField      = Field.ofIntegerType(Math.toIntExact(servlet.serviceId)).editable(false).label("Service ID");
