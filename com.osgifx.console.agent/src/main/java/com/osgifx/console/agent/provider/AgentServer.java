@@ -1191,6 +1191,16 @@ public class AgentServer implements Agent, Closeable {
 		return XHeapAdmin.heapdump();
 	}
 
+	@Override
+	public boolean isConfigAdminAvailable() {
+		return PackageWirings.isConfigAdminWired(context);
+	}
+
+	@Override
+	public boolean isEventAdminAvailable() {
+		return PackageWirings.isEventAdminWired(context);
+	}
+
 	private static long getSystemUptime() {
 		final RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
 		return rb.getUptime();

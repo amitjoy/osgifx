@@ -17,6 +17,7 @@ package com.osgifx.console.supervisor.provider;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -143,7 +144,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
 	@Override
 	public synchronized void onOSGiEvent(final XEventDTO event) {
-		eventListeners.forEach(listener -> listener.onEvent(event));
+		eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics())).forEach(listener -> listener.onEvent(event));
 	}
 
 	@Override
@@ -198,5 +199,21 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 	@Override
 	public void connect(final String host, final int port, final int timeout) throws Exception {
 		super.connect(Agent.class, this, host, port, timeout);
+	}
+
+	private static boolean matchTopic(final String receivedEventTopic, final Collection<String> listenerTopics) {
+		if (listenerTopics.contains("*")) {
+			return true;
+		}
+		for (final String topic : listenerTopics) {
+			if (!topic.contains("*")) {
+				return receivedEventTopic.equals(topic);
+			}
+			final var prefix = topic.substring(0, topic.lastIndexOf('/'));
+			if (receivedEventTopic.startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

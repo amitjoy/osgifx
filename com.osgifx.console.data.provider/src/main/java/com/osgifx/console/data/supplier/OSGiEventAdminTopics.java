@@ -13,19 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.supervisor;
+package com.osgifx.console.data.supplier;
 
-import java.util.Collection;
-import java.util.Collections;
+public final class OSGiEventAdminTopics {
 
-import com.osgifx.console.agent.dto.XEventDTO;
-
-@FunctionalInterface
-public interface EventListener {
-
-	default Collection<String> topics() {
-		return Collections.singleton("*");
+	private OSGiEventAdminTopics() {
+		throw new IllegalAccessError("Cannot be instantiated");
 	}
 
-	void onEvent(XEventDTO event);
+	public static final String BUNDLE_EVENTS_TOPIC        = "org/osgi/framework/BundleEvent/*";
+	public static final String SERVICE_EVENTS_TOPIC       = "org/osgi/framework/ServiceEvent/*";
+	public static final String CONFIGURATION_EVENTS_TOPIC = "org/osgi/service/cm/ConfigurationEvent/*";
+
 }

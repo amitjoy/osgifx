@@ -34,6 +34,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -59,6 +60,7 @@ public final class EventReceiveMenuContributionHandler {
 	@Inject
 	private IEventBroker  eventBroker;
 	@Inject
+	@Service(filterExpression = "(supplier.id=events)")
 	private EventListener eventListener;
 	@Inject
 	private EModelService modelService;

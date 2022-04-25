@@ -16,22 +16,31 @@
 package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
+import static com.osgifx.console.data.supplier.OSGiEventAdminTopics.BUNDLE_EVENTS_TOPIC;
+import static com.osgifx.console.data.supplier.OSGiEventAdminTopics.SERVICE_EVENTS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.collections.FXCollections.synchronizedObservableList;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.ObservableList;
@@ -39,7 +48,7 @@ import javafx.collections.ObservableList;
 @Component
 @SupplierID(COMPONENTS_ID)
 @EventTopics(AGENT_DISCONNECTED_EVENT_TOPIC)
-public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
+public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventHandler, EventListener {
 
 	public static final String COMPONENTS_ID = "components";
 
@@ -55,7 +64,13 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
 
 	@Activate
 	void activate() {
+		supervisor.addOSGiEventListener(this);
 		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+	}
+
+	@Deactivate
+	void deactivate() {
+		supervisor.removeOSGiEventListener(this);
 	}
 
 	@Override
@@ -78,6 +93,16 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
 	@Override
 	public void handleEvent(final Event event) {
 		threadSync.asyncExec(components::clear);
+	}
+
+	@Override
+	public void onEvent(final XEventDTO event) {
+		CompletableFuture.runAsync(this::retrieve);
+	}
+
+	@Override
+	public Collection<String> topics() {
+		return List.of(BUNDLE_EVENTS_TOPIC, SERVICE_EVENTS_TOPIC);
 	}
 
 }

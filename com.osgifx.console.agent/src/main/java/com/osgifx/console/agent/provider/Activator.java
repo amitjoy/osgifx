@@ -127,6 +127,10 @@ public class Activator extends Thread implements BundleActivator {
 						properties.put("event.topics", "*");
 						context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(link.getRemote()), properties);
 					}
+					final boolean isConfigAdminvailable = PackageWirings.isConfigAdminWired(context);
+					if (isConfigAdminvailable && isEventAdminAvailable) {
+						context.registerService("org.osgi.service.cm.ConfigurationListener", new EventAdminCmListener(context), null);
+					}
 					context.addFrameworkListener(new OSGiFrameworkEventHandler(link.getRemote()));
 					// initialize OSGi logging if available
 					final boolean isLogAvailable = PackageWirings.isLogWired(context);
