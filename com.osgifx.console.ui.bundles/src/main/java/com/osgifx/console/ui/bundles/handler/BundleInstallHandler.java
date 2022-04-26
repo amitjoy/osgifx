@@ -17,6 +17,8 @@ package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -100,10 +102,7 @@ public final class BundleInstallHandler {
 					return null;
 				}
 			};
-
-			final var thread = new Thread(installTask);
-			thread.setDaemon(true);
-			thread.start();
+			CompletableFuture.runAsync(installTask);
 		}
 	}
 

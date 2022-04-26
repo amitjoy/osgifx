@@ -96,7 +96,7 @@ public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, Ev
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return httpComponents;
 	}
 

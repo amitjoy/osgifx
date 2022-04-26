@@ -97,7 +97,7 @@ public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHand
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return threads;
 	}
 

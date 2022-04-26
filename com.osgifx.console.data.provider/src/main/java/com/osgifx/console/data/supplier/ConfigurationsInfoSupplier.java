@@ -94,7 +94,7 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return configurations;
 	}
 

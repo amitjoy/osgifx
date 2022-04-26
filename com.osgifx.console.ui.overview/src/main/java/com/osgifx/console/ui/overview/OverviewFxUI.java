@@ -24,6 +24,7 @@ import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -156,12 +157,8 @@ public final class OverviewFxUI {
 				updateProgress(0, 0);
 			}
 		};
-
 		statusBar.progressProperty().bind(task.progressProperty());
-
-		final var thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(task);
 	}
 
 	private void createWidgets(final BorderPane parent) {

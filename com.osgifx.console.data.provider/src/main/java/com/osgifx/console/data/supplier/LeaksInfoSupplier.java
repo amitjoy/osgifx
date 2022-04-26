@@ -87,7 +87,7 @@ public final class LeaksInfoSupplier implements RuntimeInfoSupplier, EventHandle
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return leaks;
 	}
 

@@ -17,6 +17,8 @@ package com.osgifx.console.ui.terminal;
 
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -127,10 +129,7 @@ public final class TerminalFxController {
 			input.clear();
 			logger.atDebug().log("Task for command '%s' has been succeeded", command);
 		});
-
-		final var thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(task);
 	}
 
 }

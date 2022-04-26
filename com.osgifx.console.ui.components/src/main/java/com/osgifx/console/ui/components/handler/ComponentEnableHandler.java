@@ -17,6 +17,8 @@ package com.osgifx.console.ui.components.handler;
 
 import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ENABLED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -79,10 +81,7 @@ public final class ComponentEnableHandler {
 				return null;
 			}
 		};
-
-		final var thread = new Thread(enableTask);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(enableTask);
 	}
 
 	@CanExecute

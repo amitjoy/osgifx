@@ -20,6 +20,7 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -93,10 +94,7 @@ public final class CheckForAppUpdatesHandler {
 			}
 		};
 		updateCheckProgressDialog = FxDialog.showProgressDialog("Checking for Updates", updateCheckTask, getClass().getClassLoader());
-		final var thread = new Thread(updateCheckTask);
-		thread.setDaemon(true);
-		thread.start();
-
+		CompletableFuture.runAsync(updateCheckTask);
 		updateCheckTask.setOnSucceeded(t -> openDialog(updateCheckTask.getValue()));
 	}
 

@@ -20,6 +20,7 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -78,9 +79,7 @@ public final class CheckForFeatureUpdatesHandler {
 			}
 		};
 		updateCheckProgressDialog = FxDialog.showProgressDialog("Checking for updates", updateCheckTask, getClass().getClassLoader());
-		final var thread = new Thread(updateCheckTask);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(updateCheckTask);
 
 		updateCheckTask.setOnSucceeded(t -> {
 			final var dialog = new CheckForFeatureUpdatesDialog();
@@ -156,9 +155,7 @@ public final class CheckForFeatureUpdatesHandler {
 			}
 			if (updateTask != null) {
 				updateProgressDialog = FxDialog.showProgressDialog("Updating Features", updateTask, getClass().getClassLoader());
-				final var th = new Thread(updateTask);
-				th.setDaemon(true);
-				th.start();
+				CompletableFuture.runAsync(updateTask);
 			}
 		});
 	}

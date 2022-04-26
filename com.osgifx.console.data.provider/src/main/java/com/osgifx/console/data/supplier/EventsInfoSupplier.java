@@ -53,7 +53,7 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return events;
 	}
 

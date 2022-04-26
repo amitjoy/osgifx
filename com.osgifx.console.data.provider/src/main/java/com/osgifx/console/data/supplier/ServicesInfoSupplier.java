@@ -96,7 +96,7 @@ public final class ServicesInfoSupplier implements RuntimeInfoSupplier, EventHan
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return services;
 	}
 
