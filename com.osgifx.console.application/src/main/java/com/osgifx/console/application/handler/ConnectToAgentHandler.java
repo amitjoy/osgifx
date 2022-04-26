@@ -27,6 +27,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -65,12 +66,15 @@ public final class ConnectToAgentHandler {
 	@Inject
 	private CommandService             commandService;
 	@Inject
+	@Optional
 	@ContextValue("is_connected")
 	private ContextBoundValue<Boolean> isConnected;
 	@Inject
+	@Optional
 	@ContextValue("connected.agent")
 	private ContextBoundValue<String>  connectedAgent;
 	@Inject
+	@Optional
 	@Named("selected.settings")
 	private ConnectionSettingDTO       selectedSettings;
 	private ProgressDialog             progressDialog;

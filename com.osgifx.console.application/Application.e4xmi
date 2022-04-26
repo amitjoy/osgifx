@@ -10,8 +10,8 @@
     <properties key="local.agent.timeout" value="200"/>
     <mainMenu xmi:id="_IB5tkCBqEey33dbookdebQ" elementId="com.osgifx.console.application.menu.extensions" mnemonics="">
       <children xsi:type="menu:Menu" xmi:id="_so66kHoLEeyQKID2zKUvKQ" elementId="com.osgifx.console.application.menu.connection" label="Connection">
-        <children xsi:type="menu:DirectMenuItem" xmi:id="_ywFGEHoLEeyQKID2zKUvKQ" elementId="com.osgifx.console.application.directmenuitem.connect" label="Connect to Remote Agent" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/connected.png" tooltip="Establishes connection with the remote agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToAgentHandler"/>
-        <children xsi:type="menu:DirectMenuItem" xmi:id="_5jukIHoLEeyQKID2zKUvKQ" elementId="com.osgifx.console.application.directmenuitem.disconnect" label="Disconnect" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/disconnected.png" tooltip="Disconnects already established connection with the agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.DisconnectFromAgentHandler"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_-_3cwMT2EeynHblGyo61Iw" elementId="com.osgifx.console.application.handledmenuitem.connect.agent" label="Connect to Remote Agent" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/connected.png" tooltip="Establishes connection with the remote agent" command="_skZnAMT2EeynHblGyo61Iw"/>
+        <children xsi:type="menu:HandledMenuItem" xmi:id="_sBq38MT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.handledmenuitem.disconnect.agent" label="Disconnect" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/connected.png" tooltip="Disconnects already established connection with the agent" command="_fg9JYMT3EeynHblGyo61Iw"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="com.osgifx.console.application.menu.extensions.list" label="View">
         <children xsi:type="menu:DynamicMenuContribution" xmi:id="__cOGkCEsEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.extensions.list" label="" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler"/>
@@ -28,8 +28,12 @@
   </children>
   <handlers xmi:id="_Y0EEwCWwEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.handler.preference" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
   <handlers xmi:id="_Whi4IMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.handler.refresh" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.RefreshHandler" command="_IPypwMNnEeynHblGyo61Iw"/>
+  <handlers xmi:id="_1jdMsMT2EeynHblGyo61Iw" elementId="com.osgifx.console.application.handler.connect.agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToAgentHandler" command="_skZnAMT2EeynHblGyo61Iw"/>
+  <handlers xmi:id="_mYnkwMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.handler.disconnect.agent" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.DisconnectFromAgentHandler" command="_fg9JYMT3EeynHblGyo61Iw"/>
   <bindingTables xmi:id="_9_QOEMNmEeynHblGyo61Iw" elementId="com.osgifx.console.application.bindingtable.refresh" bindingContext="_1NNJoMNmEeynHblGyo61Iw">
     <bindings xmi:id="_CjmjAMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.refresh" keySequence="M1+R" command="_IPypwMNnEeynHblGyo61Iw"/>
+    <bindings xmi:id="_Ku86EMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.connect.agent" keySequence="M1+N" command="_skZnAMT2EeynHblGyo61Iw"/>
+    <bindings xmi:id="_zPCdkMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.disconnect.agent" keySequence="M1+D" command="_fg9JYMT3EeynHblGyo61Iw"/>
   </bindingTables>
   <rootContext xmi:id="_1NNJoMNmEeynHblGyo61Iw" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="Windows and Dialogs" description="Windows and Dialogs"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.preference" commandName="Connection Preference Command">
@@ -39,6 +43,8 @@
     <parameters xmi:id="_bwGcQCWpEeyVo_nfbAX0Bg" elementId="type" name="Type" optional="false"/>
   </commands>
   <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View Command" description="Refreshes the views by retrieving the current state of the remote runtime"/>
+  <commands xmi:id="_skZnAMT2EeynHblGyo61Iw" elementId="com.osgifx.console.application.command.connect.agent" commandName="Connect to Remote Agent" description="Establishes connection to the remote agent"/>
+  <commands xmi:id="_fg9JYMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.command.disconnect.agent" commandName="Disconnect from Remote Agent" description="Disconnects from the remote agent"/>
   <addons xmi:id="_c376wRuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.core.commands.service" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_c376whuoEeyWL5Ll6OkKhA" elementId="org.eclipse.e4.ui.contexts.service" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_c376wxuoEeyWL5Ll6OkKhA" elementId="org.eclipse.fx.ui.keybindings.e4.service" contributionURI="bundleclass://org.eclipse.fx.ui.keybindings.e4/org.eclipse.fx.ui.keybindings.e4.BindingServiceAddon"/>
