@@ -17,6 +17,8 @@ package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_STOPPED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -75,10 +77,7 @@ public final class BundleStopHandler {
 				return null;
 			}
 		};
-
-		final var thread = new Thread(stopTask);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(stopTask);
 	}
 
 	@CanExecute

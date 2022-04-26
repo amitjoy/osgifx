@@ -17,6 +17,8 @@ package com.osgifx.console.ui.configurations.handler;
 
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -103,10 +105,7 @@ public final class ConfigurationCreateHandler {
 					return null;
 				}
 			};
-
-			final var thread = new Thread(createTask);
-			thread.setDaemon(true);
-			thread.start();
+			CompletableFuture.runAsync(createTask);
 		}
 	}
 

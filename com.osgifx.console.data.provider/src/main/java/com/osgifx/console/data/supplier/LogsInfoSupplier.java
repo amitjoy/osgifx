@@ -53,7 +53,7 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return logs;
 	}
 

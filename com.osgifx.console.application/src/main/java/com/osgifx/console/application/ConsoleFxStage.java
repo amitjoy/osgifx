@@ -19,6 +19,8 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.eclipse.fx.ui.workbench.fx.DefaultJFXApp;
 import org.osgi.framework.FrameworkUtil;
 
@@ -91,8 +93,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 			}
 		};
 		showSplash(initStage, friendTask, this::showFxConsoleStage);
-		new Thread(friendTask).start();
-
+		CompletableFuture.runAsync(friendTask);
 		registerHostServices();
 	}
 

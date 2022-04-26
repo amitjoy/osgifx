@@ -17,6 +17,8 @@ package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -99,11 +101,7 @@ public final class ConnectToLocalAgentHandler {
 				isConnected.publish(true);
 			}
 		};
-
-		final var th = new Thread(connectTask);
-		th.setDaemon(true);
-		th.start();
-
+		CompletableFuture.runAsync(connectTask);
 		progressDialog = FxDialog.showProgressDialog("Local Agent Connection", connectTask, getClass().getClassLoader());
 	}
 

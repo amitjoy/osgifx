@@ -86,7 +86,7 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return components;
 	}
 

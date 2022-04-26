@@ -97,7 +97,7 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return properties;
 	}
 

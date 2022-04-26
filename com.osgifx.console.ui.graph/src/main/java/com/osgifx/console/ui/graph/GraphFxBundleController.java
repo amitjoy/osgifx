@@ -185,7 +185,7 @@ public final class GraphFxBundleController {
 			logger.atInfo().log("No bundles has been selected. Skipped graph generation.");
 			return;
 		}
-		final Task<?> task = new Task<Void>() {
+		final Task<Void> task = new Task<>() {
 
 			@Override
 			protected Void call() throws Exception {

@@ -17,6 +17,8 @@ package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -76,10 +78,7 @@ public final class DisconnectFromAgentHandler {
 				connectedAgent.publish(null);
 			}
 		};
-
-		final var thread = new Thread(disconnectTask);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(disconnectTask);
 	}
 
 	@CanExecute

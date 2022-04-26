@@ -18,6 +18,7 @@ package com.osgifx.console.ui.gogo;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -132,10 +133,7 @@ public final class GogoFxController {
 			input.clear();
 			logger.atDebug().log("Task for command '%s' has been succeeded", command);
 		});
-
-		final var thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(task);
 	}
 
 }

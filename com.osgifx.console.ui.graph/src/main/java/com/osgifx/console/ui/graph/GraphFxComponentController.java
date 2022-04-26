@@ -194,7 +194,7 @@ public final class GraphFxComponentController {
 			logger.atInfo().log("No components has been selected. Skipped graph generation.");
 			return;
 		}
-		final Task<?> task = new Task<Void>() {
+		final Task<Void> task = new Task<>() {
 
 			@Override
 			protected Void call() throws Exception {

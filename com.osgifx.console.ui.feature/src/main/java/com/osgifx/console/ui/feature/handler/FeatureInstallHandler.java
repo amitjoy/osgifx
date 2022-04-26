@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -161,11 +162,7 @@ public final class FeatureInstallHandler {
 				repos.publish(json);
 			}
 		};
-
-		final var th = new Thread(task);
-		th.setDaemon(true);
-		th.start();
-
+		CompletableFuture.runAsync(task);
 		progressDialog = FxDialog.showProgressDialog("External Feature Installation", task, getClass().getClassLoader());
 	}
 

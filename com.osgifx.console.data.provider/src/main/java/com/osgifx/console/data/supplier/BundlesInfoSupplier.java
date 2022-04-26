@@ -87,7 +87,7 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return bundles;
 	}
 

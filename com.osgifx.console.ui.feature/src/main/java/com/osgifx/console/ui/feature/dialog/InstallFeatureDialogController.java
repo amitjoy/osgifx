@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -159,11 +160,7 @@ public final class InstallFeatureDialogController {
 						threadSync.asyncExec(() -> progressDialog.close());
 					}
 				};
-
-				final var th = new Thread(task);
-				th.setDaemon(true);
-				th.start();
-
+				CompletableFuture.runAsync(task);
 				progressDialog = FxDialog.showProgressDialog("External Feature Download", task, getClass().getClassLoader());
 			} else {
 				logger.atInfo().log("Local archive found - '%s'", url);

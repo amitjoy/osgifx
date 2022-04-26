@@ -18,6 +18,7 @@ package com.osgifx.console.ui.graph;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
@@ -98,16 +99,14 @@ public final class GraphFxUI {
 		if (loadedType.get() == null) {
 			threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
 			        "/graphic/images/graph.png", type -> {
-				        final Task<?> task = new Task<Void>() {
-											        @Override
-											        protected Void call() throws Exception {
-												        loadContent(parent, loader, type);
-												        return null;
-											        }
-										        };
-				        final var thread = new Thread(task);
-				        thread.setDaemon(true);
-				        thread.start();
+				        final Task<Void> task = new Task<>() {
+					        @Override
+					        protected Void call() throws Exception {
+						        loadContent(parent, loader, type);
+						        return null;
+					        }
+				        };
+				        CompletableFuture.runAsync(task);
 			        }, () -> partService.hidePart(part), BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE));
 		} else {
 			loadContent(parent, loader, loadedType.get());

@@ -92,7 +92,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 	}
 
 	@Override
-	public synchronized ObservableList<?> supply() {
+	public ObservableList<?> supply() {
 		return packages;
 	}
 

@@ -18,6 +18,8 @@ package com.osgifx.console.ui.terminal;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -78,20 +80,19 @@ public final class TerminalFxUI {
 	}
 
 	private void createControls(final BorderPane parent, final FXMLLoader loader) {
-		final Task<?> task = new Task<Void>() {
+		progressPane.setVisible(true);
+		final Task<Void> task = new Task<>() {
 
-			Node tabContent = null;
+			Node tabContent;
 
 			@Override
 			protected Void call() throws Exception {
-				progressPane.setVisible(true);
 				tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
 				return null;
 			}
 
 			@Override
 			protected void succeeded() {
-				super.succeeded();
 				parent.getChildren().clear();
 				parent.setCenter(tabContent);
 				statusBar.addTo(parent);
@@ -101,10 +102,7 @@ public final class TerminalFxUI {
 		parent.getChildren().clear();
 		progressPane.addTo(parent);
 		statusBar.addTo(parent);
-
-		final var thread = new Thread(task);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(task);
 	}
 
 }

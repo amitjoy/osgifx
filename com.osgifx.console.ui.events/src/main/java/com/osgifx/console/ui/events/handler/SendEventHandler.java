@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.handler;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -87,10 +89,7 @@ public final class SendEventHandler {
 					return null;
 				}
 			};
-
-			final var thread = new Thread(sendEventTask);
-			thread.setDaemon(true);
-			thread.start();
+			CompletableFuture.runAsync(sendEventTask);
 		}
 	}
 

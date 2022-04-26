@@ -17,6 +17,8 @@ package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_UNINSTALLED_EVENT_TOPIC;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -73,10 +75,7 @@ public final class BundleUninstallHandler {
 				return null;
 			}
 		};
-
-		final var thread = new Thread(uninstallTask);
-		thread.setDaemon(true);
-		thread.start();
+		CompletableFuture.runAsync(uninstallTask);
 	}
 
 	@CanExecute
