@@ -21,7 +21,7 @@ testbin                               =         ${testbin.directory}
 target-dir                            =         target
 
 maven.central.url                     =         https://repo.maven.apache.org/maven2/
-github.packages.url                   =         https://maven.pkg.github.com/
+github.packages.url                   =         https://maven.pkg.github.com
 github.osgifx.packages.url            =         ${github.packages.url}/amitjoy/osgifx
 sonatype.url                          =         https://oss.sonatype.org
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
