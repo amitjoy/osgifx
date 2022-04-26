@@ -27,8 +27,8 @@ sonatype.url                          =         https://oss.sonatype.org
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
 sonatype.url.staging                  =         ${sonatype.url}/service/local/staging/deploy/maven2/
 
-pwd                                   =         ${env;GH_PKG_TOKEN;}
 usr                                   =         ${env;GITHUB_ACTOR;}
+pwd                                   =         ${env;GITHUB_TOKEN;}
 -connection-settings                  =         ${if;${pwd};server;-dummy};id=${github.packages.url};username=${usr};password=${pwd}, -bnd
 -releaserepo                          =         Release
 
