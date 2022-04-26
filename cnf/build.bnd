@@ -42,7 +42,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
 
--pom                                  =         true
+-pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
 -groupid                              =         com.osgifx
 
 OSGifx-Version                        =         ${cat;${.}/app.version}
