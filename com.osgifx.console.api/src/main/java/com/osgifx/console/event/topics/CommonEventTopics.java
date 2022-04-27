@@ -29,4 +29,7 @@ public final class CommonEventTopics {
 	public static final String LOG_RECEIVE_STARTED_EVENT_TOPIC = "osgi/fx/log/receive/started";
 	public static final String LOG_RECEIVE_STOPPED_EVENT_TOPIC = "osgi/fx/log/receive/stopped";
 
+	public static final String CLEAR_EVENTS_TOPIC = "com/osgifx/clear/events";
+	public static final String CLEAR_LOGS_TOPIC   = "com/osgifx/clear/logs";
+
 }

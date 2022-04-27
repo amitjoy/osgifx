@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs.handler;
 
+import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_LOGS_TOPIC;
 import static com.osgifx.console.ui.logs.handler.LogReceiveMenuContributionHandler.PROPERTY_KEY_LOG_DISPLAY;
 
 import javax.inject.Inject;
@@ -28,8 +29,6 @@ import org.eclipse.fx.core.log.Log;
 
 public final class ClearLogsTableHandler {
 
-	private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
-
 	@Log
 	@Inject
 	private FluentLogger logger;
@@ -41,7 +40,7 @@ public final class ClearLogsTableHandler {
 
 	@Execute
 	public void execute() {
-		eventBroker.post(EVENT_TOPIC, "");
+		eventBroker.post(CLEAR_LOGS_TOPIC, "");
 		logger.atInfo().log("Clear logs table command sent");
 	}
 
