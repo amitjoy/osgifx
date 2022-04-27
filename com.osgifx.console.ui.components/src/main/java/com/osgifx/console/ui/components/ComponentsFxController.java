@@ -113,7 +113,7 @@ public final class ComponentsFxController {
 
 		final var bundles = dataProvider.components();
 		table.setItems(bundles);
-		threadSync.syncExec(() -> Fx.sortBy(table, idColumn));
+		threadSync.syncExec(() -> Fx.sortBy(table, componentNameColumn));
 
 		TableFilter.forTableView(table).apply();
 	}
