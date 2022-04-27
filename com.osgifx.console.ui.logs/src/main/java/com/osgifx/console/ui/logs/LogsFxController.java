@@ -25,9 +25,7 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -39,7 +37,6 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -49,8 +46,6 @@ import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogsFxController {
-
-	private static final String EVENT_TOPIC = "com/osgifx/clear/logs";
 
 	@Log
 	@Inject
@@ -122,16 +117,6 @@ public final class LogsFxController {
 
 		TableFilter.forTableView(table).apply();
 		sortByLoggedAt(loggedAtColumn);
-	}
-
-	@Inject
-	@Optional
-	private void clearTableEvent(@UIEventTopic(EVENT_TOPIC) final String data) {
-		table.setItems(FXCollections.emptyObservableList());
-		final var logs = dataProvider.logs();
-		logs.clear();
-		table.setItems(logs);
-		logger.atInfo().log("Cleared logs table successfully");
 	}
 
 	private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {

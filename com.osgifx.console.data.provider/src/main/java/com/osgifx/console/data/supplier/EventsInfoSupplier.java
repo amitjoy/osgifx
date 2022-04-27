@@ -16,6 +16,7 @@
 package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
+import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_EVENTS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.collections.FXCollections.synchronizedObservableList;
@@ -35,7 +36,7 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(EVENTS_ID)
-@EventTopics(AGENT_DISCONNECTED_EVENT_TOPIC)
+@EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, CLEAR_EVENTS_TOPIC })
 public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListener, EventHandler {
 
 	public static final String EVENTS_ID = "events";
