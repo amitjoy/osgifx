@@ -19,7 +19,6 @@ import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_LOGS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.synchronizedObservableList;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.osgi.service.component.annotations.Component;
@@ -46,7 +45,7 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
 	@Reference
 	private ThreadSynchronize threadSync;
 
-	private final ObservableList<XLogEntryDTO> logs = synchronizedObservableList(observableArrayList());
+	private final ObservableList<XLogEntryDTO> logs = observableArrayList();
 
 	@Override
 	public void retrieve() {

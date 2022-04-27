@@ -25,7 +25,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.synchronizedObservableList;
 
 import java.util.Collection;
 import java.util.List;
@@ -71,7 +70,7 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
 	private ThreadSynchronize threadSync;
 	private FluentLogger      logger;
 
-	private final ObservableList<XPropertyDTO> properties = synchronizedObservableList(observableArrayList());
+	private final ObservableList<XPropertyDTO> properties = observableArrayList();
 
 	@Activate
 	void activate() {
