@@ -49,12 +49,14 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
+import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.data.supplier.RuntimeInfoSupplier;
+import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -64,12 +66,14 @@ import javafx.collections.ObservableList;
 public final class RuntimeDataProvider implements DataProvider {
 
 	private final FluentLogger                     logger;
+	private final Supervisor                       supervisor;
 	private final Map<String, RuntimeInfoSupplier> infoSuppliers;
 
 	@Activate
-	public RuntimeDataProvider(@Reference final LoggerFactory factory) {
-		infoSuppliers = Maps.newHashMap();
-		logger        = FluentLogger.of(factory.createLogger(getClass().getName()));
+	public RuntimeDataProvider(@Reference final LoggerFactory factory, @Reference final Supervisor supervisor) {
+		this.supervisor = supervisor;
+		infoSuppliers   = Maps.newHashMap();
+		logger          = FluentLogger.of(factory.createLogger(getClass().getName()));
 	}
 
 	@Override
@@ -99,58 +103,68 @@ public final class RuntimeDataProvider implements DataProvider {
 	}
 
 	@Override
-	public synchronized ObservableList<XBundleDTO> bundles() {
+	public ObservableList<XBundleDTO> bundles() {
 		return (ObservableList<XBundleDTO>) getData(BUNDLES_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<PackageDTO> packages() {
+	public ObservableList<PackageDTO> packages() {
 		return (ObservableList<PackageDTO>) getData(PACKAGES_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XServiceDTO> services() {
+	public ObservableList<XServiceDTO> services() {
 		return (ObservableList<XServiceDTO>) getData(SERVICES_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XComponentDTO> components() {
+	public ObservableList<XComponentDTO> components() {
 		return (ObservableList<XComponentDTO>) getData(COMPONENTS_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XConfigurationDTO> configurations() {
+	public ObservableList<XConfigurationDTO> configurations() {
 		return (ObservableList<XConfigurationDTO>) getData(CONFIGURATIONS_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XEventDTO> events() {
+	public ObservableList<XEventDTO> events() {
 		return (ObservableList<XEventDTO>) getData(EVENTS_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XLogEntryDTO> logs() {
+	public ObservableList<XLogEntryDTO> logs() {
 		return (ObservableList<XLogEntryDTO>) getData(LOGS_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XPropertyDTO> properties() {
+	public ObservableList<XPropertyDTO> properties() {
 		return (ObservableList<XPropertyDTO>) getData(PROPERTIES_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XThreadDTO> threads() {
+	public ObservableList<XThreadDTO> threads() {
 		return (ObservableList<XThreadDTO>) getData(THREADS_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XBundleDTO> leaks() {
+	public ObservableList<XBundleDTO> leaks() {
 		return (ObservableList<XBundleDTO>) getData(LEAKS_ID);
 	}
 
 	@Override
-	public synchronized ObservableList<XHttpComponentDTO> httpComponents() {
+	public ObservableList<XHttpComponentDTO> httpComponents() {
 		return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
+	}
+
+	@Override
+	public XMemoryInfoDTO memory() {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return null;
+		}
+		return agent.getMemoryInfo();
 	}
 
 	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)
