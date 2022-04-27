@@ -63,7 +63,7 @@ public final class PackageWirings {
 		return PackageWirings.isWired("org.osgi.service.http.runtime", context);
 	}
 
-	public static boolean isJMXWired(final BundleContext context) {
+	public static boolean isJmxWired(final BundleContext context) {
 		return PackageWirings.isWired("javax.management", context);
 	}
 

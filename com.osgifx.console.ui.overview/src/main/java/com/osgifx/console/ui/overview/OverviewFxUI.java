@@ -17,6 +17,8 @@ package com.osgifx.console.ui.overview;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static java.util.Objects.requireNonNullElse;
+import static javafx.animation.Animation.INDEFINITE;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.text.DecimalFormat;
@@ -24,7 +26,6 @@ import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -41,7 +42,6 @@ import org.osgi.annotation.bundle.Requirement;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.data.provider.DataProvider;
-import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
 import eu.hansolo.tilesfx.Tile;
@@ -50,7 +50,8 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
-import javafx.concurrent.Task;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -65,6 +66,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.util.Duration;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class OverviewFxUI {
@@ -78,90 +80,100 @@ public final class OverviewFxUI {
 	@Inject
 	private ConsoleStatusBar statusBar;
 	@Inject
-	private Supervisor       supervisor;
-	@Inject
 	private DataProvider     dataProvider;
 	@Inject
 	@Named("is_connected")
 	private boolean          isConnected;
 
-	private volatile String frameworkBsn;
-	private volatile String frameworkVersion;
+	private Tile noOfThreadsTile;
+	private Tile runtimeInfoTile;
+	private Tile noOfBundlesTile;
+	private Tile noOfServicesTile;
+	private Tile noOfComponentsTile;
+	private Tile memoryConsumptionTile;
+	private Tile availableMemoryTile;
+	private Tile uptimeTile;
 
-	private volatile String osName;
-	private volatile String osVersion;
-	private volatile String osArchitecture;
-
-	private volatile double noOfThreads;
-	private volatile double noOfServices;
-	private volatile double noOfComponents;
-	private volatile double noOfInstalledBundles;
-
-	private UptimeDTO      uptime;
-	private XMemoryInfoDTO memoryInfo;
+	private Timeline dataRetrieverTimeline;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent) {
-		createControls(parent);
+		retrieveRuntimeInfo();
+		createTiles(parent);
+		createPeriodicTaskToSetRuntimeInfo();
 		logger.atDebug().log("Overview part has been initialized");
 	}
 
 	@Focus
-	void focus(final BorderPane parent) {
-		createControls(parent);
+	public void onFocus(final BorderPane parent) {
+		createTiles(parent);
 	}
 
-	private void createControls(final BorderPane parent) {
-		uptime = new UptimeDTO(0, 0, 0, 0);
+	private void createPeriodicTaskToSetRuntimeInfo() {
+		dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(1), a -> {
 
-		statusBar.addTo(parent);
-		retrieveRuntimeInfo(parent);
-		createWidgets(parent);
+			final var runtimeInfo = retrieveRuntimeInfo();
+
+			noOfBundlesTile.setValue(runtimeInfo.noOfInstalledBundles());
+			noOfServicesTile.setValue(runtimeInfo.noOfServices());
+			noOfComponentsTile.setValue(runtimeInfo.noOfComponents());
+			noOfThreadsTile.setValue(runtimeInfo.noOfThreads());
+
+			final var memoryInfo = runtimeInfo.memoryInfo();
+
+			final var freeMemoryInBytes = memoryInfo.freeMemory;
+			final var maxMemoryInBytes  = memoryInfo.maxMemory;
+			final var freeMemoryInMB    = toMB(freeMemoryInBytes);
+			final var maxMemoryInMB     = toMB(maxMemoryInBytes);
+
+			availableMemoryTile.setValue(freeMemoryInMB);
+			availableMemoryTile.setMaxValue(maxMemoryInMB);
+			availableMemoryTile.setThreshold(maxMemoryInMB * .8);
+
+			final var memoryConsumptionInfoInPercentage = (double) freeMemoryInBytes / (double) maxMemoryInBytes * 100;
+
+			memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
+
+			final var uptime = runtimeInfo.uptime();
+			uptimeTile.setDuration(LocalTime.of(uptime.hours(), uptime.minutes(), uptime.seconds()));
+
+			// @formatter:off
+			runtimeInfoTile.setGraphic(createRuntimeTable(
+					runtimeInfo.frameworkBsn(),
+					runtimeInfo.frameworkVersion(),
+			        runtimeInfo.memoryInfo(),
+			        runtimeInfo.osName(),
+			        runtimeInfo.osVersion(),
+			        runtimeInfo.osArchitecture()));
+			// @formatter:on
+		}));
+		dataRetrieverTimeline.setCycleCount(INDEFINITE);
 	}
 
-	private void retrieveRuntimeInfo(final BorderPane parent) {
-		final Task<Void> task = new Task<>() {
+	private OverviewInfo retrieveRuntimeInfo() {
+		if (!isConnected) {
+			return new OverviewInfo();
+		}
+		final var frameworkBsn         = dataProvider.bundles().stream().findFirst().map(b -> b.symbolicName).orElse("");
+		final var frameworkVersion     = dataProvider.bundles().stream().findFirst().map(b -> b.version).orElse("");
+		final var osName               = dataProvider.properties().stream().filter(p -> "os.name".equals(p.name)).map(p -> p.value)
+		        .map(Object::toString).findAny().orElse("");
+		final var osVersion            = dataProvider.properties().stream().filter(p -> "os.version".equals(p.name)).map(p -> p.value)
+		        .map(Object::toString).findAny().orElse("");
+		final var osArchitecture       = dataProvider.properties().stream().filter(p -> "os.arch".equals(p.name)).map(p -> p.value)
+		        .map(Object::toString).findAny().orElse("");
+		final var noOfThreads          = dataProvider.threads().size();
+		final var noOfInstalledBundles = dataProvider.bundles().size();
+		final var noOfServices         = dataProvider.services().size();
+		final var noOfComponents       = dataProvider.components().size();
+		final var memoryInfo           = requireNonNullElse(dataProvider.memory(), new XMemoryInfoDTO());
+		final var uptime               = toUptimeEntry(memoryInfo.uptime);
 
-			@Override
-			protected Void call() throws Exception {
-				if (isConnected) {
-					// wait a bit for the remote runtime information to be retrieved
-					TimeUnit.SECONDS.sleep(3);
-				}
-				frameworkBsn         = isConnected ? dataProvider.bundles().get(0).symbolicName : "";
-				frameworkVersion     = isConnected ? dataProvider.bundles().get(0).version : "";
-				osName               = isConnected
-				        ? dataProvider.properties().stream().filter(p -> "os.name".equals(p.name)).map(p -> p.value).map(Object::toString)
-				                .findAny().orElse("")
-				        : "";
-				osVersion            = isConnected
-				        ? dataProvider.properties().stream().filter(p -> "os.version".equals(p.name)).map(p -> p.value)
-				                .map(Object::toString).findAny().orElse("")
-				        : "";
-				osArchitecture       = isConnected
-				        ? dataProvider.properties().stream().filter(p -> "os.arch".equals(p.name)).map(p -> p.value).map(Object::toString)
-				                .findAny().orElse("")
-				        : "";
-				noOfThreads          = isConnected ? dataProvider.threads().size() : 0d;
-				noOfInstalledBundles = isConnected ? dataProvider.bundles().size() : 0d;
-				noOfServices         = isConnected ? dataProvider.services().size() : 0d;
-				noOfComponents       = isConnected ? dataProvider.components().size() : 0d;
-				memoryInfo           = isConnected ? supervisor.getAgent().getMemoryInfo() : new XMemoryInfoDTO();
-				uptime               = toUptimeEntry(memoryInfo.uptime);
-				return null;
-			}
-
-			@Override
-			protected void succeeded() {
-				createWidgets(parent);
-				updateProgress(0, 0);
-			}
-		};
-		statusBar.progressProperty().bind(task.progressProperty());
-		CompletableFuture.runAsync(task);
+		return new OverviewInfo(frameworkBsn, frameworkVersion, osName, osVersion, osArchitecture, noOfThreads, noOfInstalledBundles,
+		        noOfServices, noOfComponents, memoryInfo, uptime);
 	}
 
-	private void createWidgets(final BorderPane parent) {
+	private void createTiles(final BorderPane parent) {
 		// @formatter:off
         final var clockTile = TileBuilder.create()
                                          .skinType(SkinType.CLOCK)
@@ -171,125 +183,100 @@ public final class OverviewFxUI {
                                          .locale(Locale.UK)
                                          .running(true)
                                          .styleClass("overview")
+                                         .roundedCorners(false)
                                          .build();
-        clockTile.setRoundedCorners(false);
 
-        final var noOfThreadsTile = TileBuilder.create()
-                                               .skinType(SkinType.NUMBER)
-                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                               .title("Threads")
-                                               .text("Number of threads")
-                                               .value(noOfThreads)
-                                               .valueVisible(noOfThreads != 0.0d)
-                                               .textVisible(true)
-                                               .decimals(0)
-                                               .build();
-        noOfThreadsTile.setRoundedCorners(false);
+        noOfThreadsTile = TileBuilder.create()
+                                     .skinType(SkinType.NUMBER)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("Threads")
+                                     .text("Number of threads")
+                                     .textVisible(true)
+                                     .decimals(0)
+                                     .roundedCorners(false)
+                                     .build();
 
-        final var runtimeInfoTile = TileBuilder.create()
-                                               .skinType(SkinType.CUSTOM)
-                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                               .title("Runtime Information")
-                                               .graphic(createRuntimeTable())
-                                               .valueVisible(memoryInfo != null)
-                                               .text("")
-                                               .build();
-        runtimeInfoTile.setRoundedCorners(false);
+        runtimeInfoTile = TileBuilder.create()
+                                     .skinType(SkinType.CUSTOM)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("Runtime Information")
+                                     .text("")
+                                     .roundedCorners(false)
+                                     .build();
 
-        final var noOfBundlesTile = TileBuilder.create()
-                                               .skinType(SkinType.NUMBER)
-                                               .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                               .title("Bundles")
-                                               .text("Number of installed bundles")
-                                               .value(noOfInstalledBundles)
-                                               .valueVisible(noOfInstalledBundles != 0.0d)
-                                               .textVisible(true)
-                                               .decimals(0)
-                                               .build();
-        noOfBundlesTile.setRoundedCorners(false);
+        noOfBundlesTile = TileBuilder.create()
+                                     .skinType(SkinType.NUMBER)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("Bundles")
+                                     .text("Number of installed bundles")
+                                     .textVisible(true)
+                                     .roundedCorners(false)
+                                     .decimals(0)
+                                     .build();
 
-        final var noOfServicesTile = TileBuilder.create()
-                                                .skinType(SkinType.NUMBER)
-                                                .numberFormat(new DecimalFormat("#"))
-                                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                .title("Services")
-                                                .text("Number of registered services")
-                                                .value(noOfServices)
-                                                .valueVisible(noOfServices != 0.0d)
-                                                .textVisible(true)
-                                                .decimals(0)
-                                                .build();
-        noOfServicesTile.setRoundedCorners(false);
+        noOfServicesTile = TileBuilder.create()
+                                      .skinType(SkinType.NUMBER)
+                                      .numberFormat(new DecimalFormat("#"))
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                      .title("Services")
+                                      .text("Number of registered services")
+                                      .textVisible(true)
+                                      .roundedCorners(false)
+                                      .decimals(0)
+                                      .build();
 
-        final var noOfComponentsTile = TileBuilder.create()
-                                                  .skinType(SkinType.NUMBER)
-                                                  .numberFormat(new DecimalFormat("#"))
-                                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                  .title("Components")
-                                                  .text("Number of registered components")
-                                                  .value(noOfComponents)
-                                                  .valueVisible(noOfComponents != 0.0d)
-                                                  .textVisible(true)
-                                                  .decimals(0)
-                                                  .build();
-        noOfComponentsTile.setRoundedCorners(false);
+        noOfComponentsTile = TileBuilder.create()
+                                        .skinType(SkinType.NUMBER)
+                                        .numberFormat(new DecimalFormat("#"))
+                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                        .title("Components")
+                                        .text("Number of registered components")
+                                        .textVisible(true)
+                                        .roundedCorners(false)
+                                        .decimals(0)
+                                        .build();
 
-        final var freeMemoryInBytes = memoryInfo.freeMemory;
-        final var totalMemoryInBytes = memoryInfo.totalMemory;
+        memoryConsumptionTile = TileBuilder.create()
+                                           .skinType(SkinType.PERCENTAGE)
+                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                           .title("JVM Memory Consumption Percentage")
+                                           .roundedCorners(false)
+                                           .build();
 
-        final var freeMemoryInMB = toMB(freeMemoryInBytes);
-        final var totalMemoryInMB = toMB(totalMemoryInBytes);
+        availableMemoryTile = TileBuilder.create()
+                                         .skinType(SkinType.BAR_GAUGE)
+                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                         .minValue(0)
+                                         .startFromZero(true)
+                                         .thresholdVisible(true)
+                                         .title("JVM Allocated Memory")
+                                         .unit("MB")
+                                         .text("Allocated memory of the remote runtime")
+                                         .gradientStops(
+                                        		 new Stop(0, Bright.BLUE),
+                                        		 new Stop(0.1, Bright.BLUE_GREEN),
+                                        		 new Stop(0.2, Bright.GREEN),
+                                        		 new Stop(0.3, Bright.GREEN_YELLOW),
+                                        		 new Stop(0.4, Bright.YELLOW),
+                                        		 new Stop(0.5, Bright.YELLOW_ORANGE),
+                                        		 new Stop(0.6, Bright.ORANGE),
+                                        		 new Stop(0.7, Bright.ORANGE_RED),
+                                        		 new Stop(0.8, Bright.RED),
+                                        		 new Stop(1.0, Dark.RED))
+                                         .strokeWithGradient(true)
+                                         .animated(true)
+                                         .roundedCorners(false)
+                                         .build();
 
-        final double usedMemory = totalMemoryInBytes - freeMemoryInBytes;
-        final var memoryConsumptionInfo = totalMemoryInBytes == 0 ? 0D : usedMemory/totalMemoryInBytes;
-        final var memoryConsumptionInfoInPercentage = memoryConsumptionInfo * 100;
-
-        final var memoryConsumptionTile = TileBuilder.create()
-                                                     .skinType(SkinType.PERCENTAGE)
-                                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                     .title("JVM Memory Consumption Percentage")
-                                                     .textVisible(memoryConsumptionInfoInPercentage != 0D)
-                                                     .roundedCorners(false)
-                                                     .build();
-        memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
-
-        final var availableMemoryTile = TileBuilder.create()
-                                                   .skinType(SkinType.BAR_GAUGE)
-                                                   .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                                   .minValue(0)
-                                                   .maxValue(totalMemoryInMB)
-                                                   .startFromZero(true)
-                                                   .threshold(totalMemoryInMB * .8)
-                                                   .thresholdVisible(true)
-                                                   .title("JVM Allocated Memory")
-                                                   .unit("MB")
-                                                   .text("Allocated memory of the remote runtime")
-                                                   .gradientStops(
-                                                           new Stop(0, Bright.BLUE),
-                                                           new Stop(0.1, Bright.BLUE_GREEN),
-                                                           new Stop(0.2, Bright.GREEN),
-                                                           new Stop(0.3, Bright.GREEN_YELLOW),
-                                                           new Stop(0.4, Bright.YELLOW),
-                                                           new Stop(0.5, Bright.YELLOW_ORANGE),
-                                                           new Stop(0.6, Bright.ORANGE),
-                                                           new Stop(0.7, Bright.ORANGE_RED),
-                                                           new Stop(0.8, Bright.RED),
-                                                           new Stop(1.0, Dark.RED))
-                                                   .strokeWithGradient(true)
-                                                   .animated(true)
-                                                   .build();
-        availableMemoryTile.setRoundedCorners(false);
-        availableMemoryTile.setValue(totalMemoryInMB - freeMemoryInMB);
-
-        final var uptimeTile = TileBuilder.create()
-                                          .skinType(SkinType.TIME)
-                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                          .title("Uptime")
-                                          .text("Uptime of the remote runtime")
-                                          .duration(LocalTime.of(uptime.hours(), uptime.minutes()))
-                                          .textVisible(true)
-                                          .build();
-        uptimeTile.setRoundedCorners(false);
+        uptimeTile = TileBuilder.create()
+                                .skinType(SkinType.TIME)
+                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                .title("Uptime")
+                                .text("Uptime of the remote runtime")
+                                .textVisible(true)
+                                .roundedCorners(false)
+                                .duration(LocalTime.of(0, 0, 0))
+                                .build();
 
         final var pane = new FlowGridPane(3, 3,
                                            clockTile,
@@ -301,18 +288,20 @@ public final class OverviewFxUI {
                                            memoryConsumptionTile,
                                            availableMemoryTile,
                                            uptimeTile);
-        pane.setHgap(5);
-        pane.setVgap(5);
-        pane.setAlignment(Pos.CENTER);
-        pane.setCenterShape(true);
-        pane.setPadding(new Insets(5));
-        pane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
-
-        parent.setCenter(pane);
         // @formatter:on
+		pane.setHgap(5);
+		pane.setVgap(5);
+		pane.setAlignment(Pos.CENTER);
+		pane.setCenterShape(true);
+		pane.setPadding(new Insets(5));
+		pane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
+
+		parent.setCenter(pane);
+		statusBar.addTo(parent);
 	}
 
-	private synchronized Node createRuntimeTable() {
+	private Node createRuntimeTable(final String frameworkBsn, final String frameworkVersion, final XMemoryInfoDTO memoryInfo,
+	        final String osName, final String osVersion, final String osArchitecture) {
 		final var name = new Label("");
 		name.setTextFill(Tile.FOREGROUND);
 		name.setAlignment(Pos.CENTER_LEFT);
@@ -334,9 +323,16 @@ public final class OverviewFxUI {
 		final var dataTable = new VBox(0, header);
 		dataTable.setFillWidth(true);
 
-		final Map<String, String> runtimeInfo = Map.of("Framework", frameworkBsn, "Framework Version", frameworkVersion, "Memory Total",
-		        String.valueOf(memoryInfo.totalMemory), "Memory Free", String.valueOf(memoryInfo.freeMemory), "OS Name", osName,
-		        "OS Version", osVersion, "OS Architecture", osArchitecture);
+		// @formatter:off
+		final Map<String, String> runtimeInfo = Map.of(
+				"Framework", frameworkBsn,
+				"Framework Version", frameworkVersion,
+				"Memory Total", String.valueOf(memoryInfo.totalMemory),
+				"Memory Free", String.valueOf(memoryInfo.freeMemory),
+				"OS Name", osName,
+		        "OS Version", osVersion,
+		        "OS Architecture", osArchitecture);
+		// @formatter:on
 
 		final Map<String, String> filteredMap = Maps.newTreeMap();
 		filteredMap.putAll(runtimeInfo);
@@ -372,8 +368,8 @@ public final class OverviewFxUI {
 		return hBox;
 	}
 
-	private int toMB(final long sizeInBytes) {
-		return (int) (sizeInBytes / 1024 / 1024);
+	private long toMB(final long sizeInBytes) {
+		return sizeInBytes / 1024 / 1024;
 	}
 
 	private UptimeDTO toUptimeEntry(final long uptime) {
@@ -388,13 +384,22 @@ public final class OverviewFxUI {
 	private record UptimeDTO(int days, int hours, int minutes, int seconds) {
 	}
 
+	private record OverviewInfo(String frameworkBsn, String frameworkVersion, String osName, String osVersion, String osArchitecture,
+	        int noOfThreads, int noOfInstalledBundles, int noOfServices, int noOfComponents, XMemoryInfoDTO memoryInfo, UptimeDTO uptime) {
+		public OverviewInfo() {
+			this("", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
+		}
+	}
+
 	@Inject
 	@Optional
 	private void updateOnAgentConnectedEvent( //
 	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
 	        final BorderPane parent) {
 		logger.atInfo().log("Agent connected event received");
-		createControls(parent);
+		dataRetrieverTimeline.play();
+		parent.setBottom(null);
+		statusBar.addTo(parent);
 	}
 
 	@Inject
@@ -403,7 +408,8 @@ public final class OverviewFxUI {
 	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
 	        final BorderPane parent) {
 		logger.atInfo().log("Agent disconnected event received");
-		createControls(parent);
+		dataRetrieverTimeline.stop();
+		createTiles(parent);
 	}
 
 }

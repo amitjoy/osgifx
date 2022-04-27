@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -1113,8 +1112,9 @@ public class AgentServer implements Agent, Closeable {
 		final XMemoryInfoDTO dto = new XMemoryInfoDTO();
 
 		dto.uptime      = getSystemUptime();
-		dto.totalMemory = Runtime.getRuntime().totalMemory();
+		dto.maxMemory   = Runtime.getRuntime().maxMemory();
 		dto.freeMemory  = Runtime.getRuntime().freeMemory();
+		dto.totalMemory = Runtime.getRuntime().totalMemory();
 
 		return dto;
 	}
@@ -1177,7 +1177,7 @@ public class AgentServer implements Agent, Closeable {
 
 	@Override
 	public XHeapUsageDTO getHeapUsage() {
-		final boolean isJMXWired = PackageWirings.isJMXWired(context);
+		final boolean isJMXWired = PackageWirings.isJmxWired(context);
 		return isJMXWired ? XHeapAdmin.init() : null;
 	}
 
@@ -1201,9 +1201,9 @@ public class AgentServer implements Agent, Closeable {
 		return PackageWirings.isEventAdminWired(context);
 	}
 
-	private static long getSystemUptime() {
-		final RuntimeMXBean rb = ManagementFactory.getRuntimeMXBean();
-		return rb.getUptime();
+	private long getSystemUptime() {
+		final boolean isJMXWired = PackageWirings.isJmxWired(context);
+		return isJMXWired ? ManagementFactory.getRuntimeMXBean().getUptime() : 0;
 	}
 
 	public static <K, V> Map<K, V> valueOf(final Dictionary<K, V> dictionary) {
