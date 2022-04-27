@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.events.handler;
 
 import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_EVENTS_TOPIC;
-import static com.osgifx.console.ui.events.handler.EventReceiveMenuContributionHandler.PROPERTY_KEY_EVENT_DISPLAY;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,8 +45,7 @@ public final class ClearEventsTableHandler {
 
 	@CanExecute
 	public boolean canExecute() {
-		final var isEventReceiveEnabled = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
-		return isConnected && isEventReceiveEnabled;
+		return isConnected;
 	}
 
 }

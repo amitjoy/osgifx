@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.logs.handler;
 
 import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_LOGS_TOPIC;
-import static com.osgifx.console.ui.logs.handler.LogReceiveMenuContributionHandler.PROPERTY_KEY_LOG_DISPLAY;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,8 +45,7 @@ public final class ClearLogsTableHandler {
 
 	@CanExecute
 	public boolean canExecute() {
-		final var isLogReceiveEnabled = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
-		return isConnected && isLogReceiveEnabled;
+		return isConnected;
 	}
 
 }
