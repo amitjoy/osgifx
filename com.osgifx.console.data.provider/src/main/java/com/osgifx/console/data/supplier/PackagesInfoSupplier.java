@@ -21,7 +21,6 @@ import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACT
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.synchronizedObservableList;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,7 +65,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 	private ThreadSynchronize threadSync;
 	private FluentLogger      logger;
 
-	private final ObservableList<PackageDTO> packages = synchronizedObservableList(observableArrayList());
+	private final ObservableList<PackageDTO> packages = observableArrayList();
 
 	@Activate
 	void activate() {

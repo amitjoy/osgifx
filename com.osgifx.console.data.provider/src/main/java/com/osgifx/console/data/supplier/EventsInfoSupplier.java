@@ -19,7 +19,6 @@ import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_EVENTS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.synchronizedObservableList;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.osgi.service.component.annotations.Component;
@@ -46,7 +45,7 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 	@Reference
 	private ThreadSynchronize threadSync;
 
-	private final ObservableList<XEventDTO> events = synchronizedObservableList(observableArrayList());
+	private final ObservableList<XEventDTO> events = observableArrayList();
 
 	@Override
 	public void retrieve() {
