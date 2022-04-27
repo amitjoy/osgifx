@@ -1188,7 +1188,8 @@ public class AgentServer implements Agent, Closeable {
 
 	@Override
 	public XHeapdumpDTO heapdump() throws Exception {
-		return XHeapAdmin.heapdump();
+		final boolean isJMXWired = PackageWirings.isJmxWired(context);
+		return isJMXWired ? XHeapAdmin.heapdump() : null;
 	}
 
 	@Override
