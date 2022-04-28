@@ -102,7 +102,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
 	private static final String       BUNDLES_DIRECTORY                   = "bundles";
 	private static final String       FEATURE_STORAGE_PID                 = "osgifx.features";
 	private static final String       BND_LAUNCHER_BUNDLE_LOCATION_PREFIX = "reference:file:";
-	private static final List<String> ACCEPTABLE_MIME_TYPES               = ImmutableList.of("application/zip", "application/octet-stream");
+	private static final List<String> ACCEPTABLE_MIME_TYPES               = List.of("application/zip", "application/octet-stream");
 
 	@Reference
 	private LoggerFactory         factory;

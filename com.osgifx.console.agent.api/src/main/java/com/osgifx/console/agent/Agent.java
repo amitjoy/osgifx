@@ -124,7 +124,8 @@ public interface Agent {
 	 * the specified byte array instance. Otherwise, a new bundle gets installed
 	 * with the specified byte array instance.
 	 *
-	 * @param location   The bundle location (cannot be {@code null})
+	 * @param location   The bundle location (if set to {@code null}, the existing
+	 *                   bundle location is used)
 	 * @param data       The byte array instance from which this bundle will be read
 	 *                   (cannot be {@code null})
 	 * @param startLevel the start level of the bundle
@@ -371,6 +372,20 @@ public interface Agent {
 	 *         failed
 	 */
 	XResultDTO disableComponentById(long id);
+
+	/**
+	 * Creates or updates the associated {@code Configuration} object with the
+	 * specified properties.
+	 * <p>
+	 * Note that, this is only possible if the remote runtime has ConfigAdmin (CM)
+	 * bundle installed.
+	 *
+	 * @param pid           the configuration PID to update
+	 * @param newProperties the new properties to associate
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
+	 */
+	XResultDTO createOrUpdateConfiguration(String pid, Map<String, Object> newProperties);
 
 	/**
 	 * Creates or updates the associated {@code Configuration} object with the

@@ -1023,6 +1023,17 @@ public class AgentServer implements Agent, Closeable {
 
 	@Override
 	public XResultDTO createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
+		requireNonNull(newProperties, "Configuration properties cannot be null");
+		try {
+			final Map<String, Object> finalProperties = parseProperties(newProperties);
+			return createOrUpdateConfiguration(pid, finalProperties);
+		} catch (final Exception e) {
+			return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
+		}
+	}
+
+	@Override
+	public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
 		requireNonNull(pid, "Configuration PID cannot be null");
 		requireNonNull(newProperties, "Configuration properties cannot be null");
 
@@ -1031,10 +1042,9 @@ public class AgentServer implements Agent, Closeable {
 			final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
 			        metatypeTracker.getService());
 			try {
-				final Map<String, Object> finalProperties = parseProperties(newProperties);
-				return configAdmin.createOrUpdateConfiguration(pid, finalProperties);
+				return configAdmin.createOrUpdateConfiguration(pid, newProperties);
 			} catch (final Exception e) {
-				return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
+				return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
 			}
 		}
 		return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
