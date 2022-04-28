@@ -1,6 +1,6 @@
 -runrepos                       =         Workspace, Runtime, e(fx)clipse, Local
 -runfw                          =         org.eclipse.osgi;version=latest
--runkeep                        =         true
+-runkeep                        =         ${if;${is;${driver};gradle};true;false}
 -runtrace                       =         true 
 -runee                          =         JavaSE-17
 -runvm                          =         -ea

@@ -24,6 +24,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -46,6 +47,7 @@ public final class BundleUninstallHandler {
 	@Inject
 	private ThreadSynchronize threadSync;
 	@Inject
+	@Optional
 	@Named("is_connected")
 	private boolean           isConnected;
 
