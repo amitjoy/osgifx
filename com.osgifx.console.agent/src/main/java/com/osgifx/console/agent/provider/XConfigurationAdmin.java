@@ -23,6 +23,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -39,6 +40,7 @@ import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.reflect.Reflect;
 
 public class XConfigurationAdmin {
 
@@ -78,12 +80,21 @@ public class XConfigurationAdmin {
 			} else {
 				action = "updated";
 			}
-			configuration.update(new Hashtable<>(newProperties));
+			executeUpdate(configuration, newProperties);
 			result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been " + action);
 		} catch (final Exception e) {
 			result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
 		}
 		return result;
+	}
+
+	private void executeUpdate(final Configuration configuration, final Map<String, Object> newProperties) {
+		final Dictionary<String, Object> properties = new Hashtable<>(newProperties);
+		try {
+			Reflect.on(configuration).call("updateIfDifferent", properties).get();
+		} catch (final Exception e) {
+			Reflect.on(configuration).call("update", properties).get();
+		}
 	}
 
 	public XResultDTO deleteConfiguration(final String pid) {
