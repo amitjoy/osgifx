@@ -258,8 +258,10 @@ public class XComponentAdmin {
 		}
 		final Set<String> finalList = new HashSet<>();
 		for (final ServiceReferenceDTO dto : services) {
-			final String[] objectClass = (String[]) dto.properties.get(Constants.OBJECTCLASS);
-			finalList.addAll(Arrays.asList(objectClass));
+			if (dto != null) {
+				final String[] objectClass = (String[]) dto.properties.get(Constants.OBJECTCLASS);
+				finalList.addAll(Arrays.asList(objectClass));
+			}
 		}
 		return String.join(", ", finalList);
 	}
