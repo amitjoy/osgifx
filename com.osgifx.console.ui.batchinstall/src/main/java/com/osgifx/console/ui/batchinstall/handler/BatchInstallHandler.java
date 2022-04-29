@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.batchinstall.handler;
 
+import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -25,6 +27,8 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -90,6 +94,14 @@ public final class BatchInstallHandler {
 	@CanExecute
 	public boolean canExecute() {
 		return isConnected;
+	}
+
+	@Inject
+	@Optional
+	private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+		if (progressDialog != null) {
+			progressDialog.close();
+		}
 	}
 
 }
