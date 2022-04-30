@@ -28,7 +28,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.EventTopic;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -86,7 +86,15 @@ public final class BatchInstallHandler {
 					threadSync.asyncExec(() -> FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader()));
 				}
 			});
-			CompletableFuture.runAsync(batchTask);
+			CompletableFuture.runAsync(batchTask).exceptionally(e -> {
+				if (progressDialog != null) {
+					threadSync.asyncExec(() -> {
+						progressDialog.close();
+						FxDialog.showExceptionDialog(e, BatchInstallHandler.class.getClassLoader());
+					});
+				}
+				return null;
+			});
 			progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader());
 		}
 	}
@@ -98,7 +106,8 @@ public final class BatchInstallHandler {
 
 	@Inject
 	@Optional
-	private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+		logger.atInfo().log("Agent disconnected event received");
 		if (progressDialog != null) {
 			progressDialog.close();
 		}
