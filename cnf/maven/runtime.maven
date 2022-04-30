@@ -8,7 +8,7 @@ com.google.code.gson:gson:2.9.0
 org.apache.sling:org.apache.sling.commons.johnzon:1.2.14
 commons-io:commons-io:2.11.0
 
-# OSGi
+# Felix
 
 org.apache.felix:org.apache.felix.cm.json:1.0.6
 org.apache.felix:org.apache.felix.configadmin:1.9.24
@@ -17,7 +17,9 @@ org.apache.felix:org.apache.felix.converter:1.0.18
 org.apache.felix:org.apache.felix.eventadmin:1.6.2
 org.apache.felix:org.apache.felix.feature:0.9.4-RC3
 org.apache.felix:org.apache.felix.scr:2.2.0
-org.eclipse.platform:org.eclipse.osgi:3.17.200
+
+# OSGi
+
 org.osgi:org.osgi.service.feature:1.0.0
 org.osgi:org.osgi.util.function:1.2.0
 org.osgi:org.osgi.util.promise:1.2.0
@@ -39,6 +41,7 @@ org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.400
 org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.400
 org.eclipse.platform:org.eclipse.equinox.preferences:3.9.100
 org.eclipse.platform:org.eclipse.equinox.registry:3.11.100
+org.eclipse.platform:org.eclipse.osgi:3.17.200
 org.eclipse.platform:org.eclipse.osgi.services:3.10.200
 
 # Eclipse e4
