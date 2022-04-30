@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +42,12 @@ public class XServiceAdmin {
 
 	public static List<XServiceDTO> get(final BundleContext context) {
 		requireNonNull(context);
-		final FrameworkDTO dto = context.getBundle(Constants.SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
-		return dto.services.stream().map(s -> toDTO(s, context)).collect(toList());
+		try {
+			final FrameworkDTO dto = context.getBundle(Constants.SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
+			return dto.services.stream().map(s -> toDTO(s, context)).collect(toList());
+		} catch (final Exception e) {
+			return Collections.emptyList();
+		}
 	}
 
 	private static XServiceDTO toDTO(final ServiceReferenceDTO refDTO, final BundleContext context) {
