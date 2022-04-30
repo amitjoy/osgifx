@@ -37,7 +37,7 @@ efxclipse.url                         =         http://download.eclipse.org/efxc
 
 bin.directory                         =         ${if;${is;${driver};gradle};target/gradle/classes;target/classes}
 testbin.directory                     =         ${if;${is;${driver};gradle};target/gradle/test-classes;target/test-classes}
-bin.testbin.directory                 =         ${if;${is;${driver};gradle};target/gradle/classes,target/gradle/test-classes;target/classes,target/test-classes}
+bin.testbin.directory                 =         ${if;${is;${driver};gradle};target/classes,target/test-classes;target/gradle/classes,target/gradle/test-classes}
 
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
