@@ -63,14 +63,19 @@ public class XComponentAdmin {
 			return Collections.emptyList();
 		}
 		final List<XComponentDTO> dtos = new ArrayList<>();
-		for (final ComponentDescriptionDTO compDescDTO : scr.getComponentDescriptionDTOs()) {
-			final Collection<ComponentConfigurationDTO> compConfDTOs = scr.getComponentConfigurationDTOs(compDescDTO);
-			if (compConfDTOs.isEmpty()) {
-				// this is for use cases when a component doesn't have any
-				// configuration yet as it is probably disabled
-				dtos.add(toDTO(null, compDescDTO));
+		try {
+			for (final ComponentDescriptionDTO compDescDTO : scr.getComponentDescriptionDTOs()) {
+				final Collection<ComponentConfigurationDTO> compConfDTOs = scr.getComponentConfigurationDTOs(compDescDTO);
+				if (compConfDTOs.isEmpty()) {
+					// this is for use cases when a component doesn't have any
+					// configuration yet as it is probably disabled
+					dtos.add(toDTO(null, compDescDTO));
+				}
+				dtos.addAll(compConfDTOs.stream().map(dto -> toDTO(dto, compDescDTO)).collect(Collectors.toList()));
 			}
-			dtos.addAll(compConfDTOs.stream().map(dto -> toDTO(dto, compDescDTO)).collect(Collectors.toList()));
+		} catch (final Exception e) {
+			// for any exception occurs in Felix
+			return Collections.emptyList();
 		}
 		return dtos;
 	}
