@@ -17,6 +17,7 @@ package com.osgifx.console.agent.provider;
 
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +38,12 @@ public class XPropertyAdmin {
 	}
 
 	public static List<XPropertyDTO> get(final BundleContext context) {
-		final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
-		return prepareProperties(dto.properties);
+		try {
+			final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
+			return prepareProperties(dto.properties);
+		} catch (final Exception e) {
+			return Collections.emptyList();
+		}
 	}
 
 	private static List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {
