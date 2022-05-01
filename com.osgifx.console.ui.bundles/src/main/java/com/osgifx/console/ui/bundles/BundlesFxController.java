@@ -69,9 +69,13 @@ public final class BundlesFxController {
 			Fx.addTablePlaceholderWhenDisconnected(table);
 			return;
 		}
-		createControls();
-		Fx.disableSelectionModel(table);
-		logger.atDebug().log("FXML controller has been initialized");
+		try {
+			createControls();
+			Fx.disableSelectionModel(table);
+			logger.atDebug().log("FXML controller has been initialized");
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("FXML controller could not be initialized");
+		}
 	}
 
 	private void createControls() {

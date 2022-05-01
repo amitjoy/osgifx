@@ -99,22 +99,26 @@ public final class GraphFxComponentController {
 
 	@FXML
 	public void initialize() {
-		addExportToDotContextMenu();
-		initComponentsList();
-		executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen"));
-		progressPane = new MaskerPane();
-		strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-		wiringSelection.getItems().addAll("Find all components that are required by", "Find all component cycles");
-		wiringSelection.getSelectionModel().select(0);
-		wiringSelection.getSelectionModel().selectedIndexProperty()
-		        .addListener((ChangeListener<Number>) (observable, oldValue, newValue) -> {
-			        final var condition = newValue.intValue() == 1;
+		try {
+			addExportToDotContextMenu();
+			initComponentsList();
+			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen"));
+			progressPane = new MaskerPane();
+			strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
+			wiringSelection.getItems().addAll("Find all components that are required by", "Find all component cycles");
+			wiringSelection.getSelectionModel().select(0);
+			wiringSelection.getSelectionModel().selectedIndexProperty()
+			        .addListener((ChangeListener<Number>) (observable, oldValue, newValue) -> {
+				        final var condition = newValue.intValue() == 1;
 
-			        searchText.setDisable(condition);
-			        componentsList.setDisable(condition);
-			        componentsList.getCheckModel().clearChecks();
-		        });
-		logger.atDebug().log("FXML controller has been initialized");
+				        searchText.setDisable(condition);
+				        componentsList.setDisable(condition);
+				        componentsList.getCheckModel().clearChecks();
+			        });
+			logger.atDebug().log("FXML controller has been initialized");
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("FXML controller could not be initialized");
+		}
 	}
 
 	@PreDestroy

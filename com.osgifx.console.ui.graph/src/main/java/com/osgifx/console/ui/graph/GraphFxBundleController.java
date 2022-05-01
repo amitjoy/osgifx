@@ -98,15 +98,19 @@ public final class GraphFxBundleController {
 
 	@FXML
 	public void initialize() {
-		addExportToDotContextMenu();
-		initBundlesList();
-		executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen"));
-		progressPane = new MaskerPane();
-		logger.atDebug().log("FXML controller has been initialized");
-		strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-		wiringSelection.getItems().addAll("Find all bundles that are required by", "Find all bundles that require");
-		wiringSelection.getSelectionModel().select(0);
-		logger.atDebug().log("FXML controller has been initialized");
+		try {
+			addExportToDotContextMenu();
+			initBundlesList();
+			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen"));
+			progressPane = new MaskerPane();
+			logger.atDebug().log("FXML controller has been initialized");
+			strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
+			wiringSelection.getItems().addAll("Find all bundles that are required by", "Find all bundles that require");
+			wiringSelection.getSelectionModel().select(0);
+			logger.atDebug().log("FXML controller has been initialized");
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("FXML controller could not be initialized");
+		}
 	}
 
 	@PreDestroy
