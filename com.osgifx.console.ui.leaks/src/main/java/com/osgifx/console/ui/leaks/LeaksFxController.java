@@ -62,9 +62,13 @@ public final class LeaksFxController {
 			Fx.addTablePlaceholderWhenDisconnected(table);
 			return;
 		}
-		initCells();
-		Fx.addContextMenuToCopyContent(table);
-		logger.atDebug().log("FXML controller has been initialized");
+		try {
+			initCells();
+			Fx.addContextMenuToCopyContent(table);
+			logger.atDebug().log("FXML controller has been initialized");
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("FXML controller could not be initialized");
+		}
 	}
 
 	private void initCells() {
