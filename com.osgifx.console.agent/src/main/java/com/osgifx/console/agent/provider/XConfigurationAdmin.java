@@ -61,7 +61,7 @@ public class XConfigurationAdmin {
 		List<XConfigurationDTO> configsWithoutMetatype = null;
 		try {
 			configsWithoutMetatype = findConfigsWithoutMetatype();
-		} catch (IOException | InvalidSyntaxException e) {
+		} catch (final Exception e) {
 			return Collections.emptyList();
 		}
 		return configsWithoutMetatype;

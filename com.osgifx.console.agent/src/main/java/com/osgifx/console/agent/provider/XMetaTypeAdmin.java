@@ -71,7 +71,7 @@ public class XMetaTypeAdmin {
 		try {
 			configsWithMetatype    = findConfigsWithMetatype();
 			metatypeWithoutConfigs = findMetatypeWithoutConfigs();
-		} catch (IOException | InvalidSyntaxException e) {
+		} catch (final Exception e) {
 			return Collections.emptyList();
 		}
 		return joinLists(configsWithMetatype, metatypeWithoutConfigs);
