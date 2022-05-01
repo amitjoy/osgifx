@@ -17,6 +17,7 @@ package com.osgifx.console.agent.provider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,8 +41,12 @@ public class XHttpAdmin {
 	}
 
 	public List<XHttpComponentDTO> runtime() {
-		final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
-		return initHttpComponents(runtime);
+		try {
+			final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
+			return initHttpComponents(runtime);
+		} catch (final Exception e) {
+			return Collections.emptyList();
+		}
 	}
 
 	private List<XHttpComponentDTO> initHttpComponents(final RuntimeDTO runtime) {

@@ -43,17 +43,19 @@ public final class XHeapAdmin {
 
 	public static XHeapUsageDTO init() {
 		final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
+		try {
+			final MemoryMXBean                 memoryMBean      = ManagementFactory.getMemoryMXBean();
+			final RuntimeMXBean                runtimeMBean     = ManagementFactory.getRuntimeMXBean();
+			final List<GarbageCollectorMXBean> gcMBeans         = ManagementFactory.getGarbageCollectorMXBeans();
+			final List<MemoryPoolMXBean>       memoryPoolMBeans = ManagementFactory.getMemoryPoolMXBeans();
 
-		final MemoryMXBean                 memoryMBean      = ManagementFactory.getMemoryMXBean();
-		final RuntimeMXBean                runtimeMBean     = ManagementFactory.getRuntimeMXBean();
-		final List<GarbageCollectorMXBean> gcMBeans         = ManagementFactory.getGarbageCollectorMXBeans();
-		final List<MemoryPoolMXBean>       memoryPoolMBeans = ManagementFactory.getMemoryPoolMXBeans();
-
-		heapUsage.memoryUsage     = initMemoryUsageMBean(memoryMBean.getHeapMemoryUsage());
-		heapUsage.uptime          = runtimeMBean.getUptime();
-		heapUsage.gcBeans         = initGcMBeans(gcMBeans);
-		heapUsage.memoryPoolBeans = initMemoryPoolMBeans(memoryPoolMBeans);
-
+			heapUsage.memoryUsage     = initMemoryUsageMBean(memoryMBean.getHeapMemoryUsage());
+			heapUsage.uptime          = runtimeMBean.getUptime();
+			heapUsage.gcBeans         = initGcMBeans(gcMBeans);
+			heapUsage.memoryPoolBeans = initMemoryPoolMBeans(memoryPoolMBeans);
+		} catch (final Exception e) {
+			// nothing to do
+		}
 		return heapUsage;
 	}
 

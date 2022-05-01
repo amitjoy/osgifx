@@ -57,7 +57,11 @@ public class XBundleAdmin {
 
 	public static List<XBundleDTO> get(final BundleContext context) {
 		requireNonNull(context);
-		return Stream.of(context.getBundles()).map(XBundleAdmin::toDTO).collect(toList());
+		try {
+			return Stream.of(context.getBundles()).map(XBundleAdmin::toDTO).collect(toList());
+		} catch (final Exception e) {
+			return Collections.emptyList();
+		}
 	}
 
 	public static XBundleDTO toDTO(final Bundle bundle) {

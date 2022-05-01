@@ -19,7 +19,6 @@ import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.provider.AgentServer.createResult;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -94,7 +93,7 @@ public class XComponentAdmin {
 					try {
 						final Promise<Void> promise = scr.enableComponent(dto);
 						promise.getValue();
-					} catch (InvocationTargetException | InterruptedException e) {
+					} catch (final Exception e) {
 						builder.append(e.getMessage()).append(System.lineSeparator());
 					}
 					final String response = builder.toString();
@@ -120,7 +119,7 @@ public class XComponentAdmin {
 				try {
 					final Promise<Void> promise = scr.enableComponent(dto);
 					promise.getValue();
-				} catch (InvocationTargetException | InterruptedException e) {
+				} catch (final Exception e) {
 					builder.append(e.getMessage()).append(System.lineSeparator());
 				}
 				final String response = builder.toString();
@@ -145,7 +144,7 @@ public class XComponentAdmin {
 					try {
 						final Promise<Void> promise = scr.disableComponent(dto);
 						promise.getValue();
-					} catch (InvocationTargetException | InterruptedException e) {
+					} catch (final Exception e) {
 						builder.append(e.getMessage()).append(System.lineSeparator());
 					}
 					final String response = builder.toString();
@@ -169,7 +168,7 @@ public class XComponentAdmin {
 				try {
 					final Promise<Void> promise = scr.disableComponent(dto);
 					promise.getValue();
-				} catch (InvocationTargetException | InterruptedException e) {
+				} catch (final Exception e) {
 					builder.append(e.getMessage()).append(System.lineSeparator());
 				}
 				final String response = builder.toString();

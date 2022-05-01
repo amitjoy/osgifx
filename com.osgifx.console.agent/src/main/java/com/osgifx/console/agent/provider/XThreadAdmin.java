@@ -16,6 +16,7 @@
 package com.osgifx.console.agent.provider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,9 +30,13 @@ public class XThreadAdmin {
 	}
 
 	public static List<XThreadDTO> get() {
-		final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
-		final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
-		return threadList.stream().map(XThreadAdmin::toDTO).collect(Collectors.toList());
+		try {
+			final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
+			final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
+			return threadList.stream().map(XThreadAdmin::toDTO).collect(Collectors.toList());
+		} catch (final Exception e) {
+			return Collections.emptyList();
+		}
 	}
 
 	private static XThreadDTO toDTO(final Thread thread) {
