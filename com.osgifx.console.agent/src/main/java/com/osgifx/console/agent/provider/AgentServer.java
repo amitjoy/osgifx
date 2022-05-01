@@ -277,26 +277,39 @@ public class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
-	public BundleDTO installWithData(String location, final byte[] data, final int startLevel) throws Exception {
+	public BundleDTO installWithData(final String location, final byte[] data, final int startLevel) throws Exception {
+		return installBundleWithData(location, data, startLevel, true);
+	}
+
+	@Override
+	public XResultDTO installWithMultipleData(final Collection<byte[]> data, final int startLevel) {
 		requireNonNull(data);
-
-		Bundle installedBundle;
-
-		if (location == null) {
-			location = getLocation(data);
-		}
-
-		try (InputStream stream = new ByteBufferInputStream(data)) {
-			installedBundle = context.getBundle(location);
-			if (installedBundle == null) {
-				installedBundle = context.installBundle(location, stream);
-				installedBundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
-			} else {
-				installedBundle.update(stream);
-				refresh(true);
+		final XResultDTO    result = new XResultDTO();
+		final StringBuilder b      = new StringBuilder();
+		try {
+			for (final byte[] d : data) {
+				try {
+					installBundleWithData(null, d, startLevel, false);
+				} catch (final Exception e) {
+					b.append(e.getMessage()).append(System.lineSeparator());
+				}
+			}
+		} catch (final Exception e) {
+			result.result = XResultDTO.ERROR;
+		} finally {
+			result.response = b.toString();
+			// if there are no errors at all, perform the refresh operation
+			if (result.response.isEmpty()) {
+				try {
+					// this causes https://issues.apache.org/jira/browse/FELIX-3414
+					// refresh(true);
+				} catch (final Exception e) {
+					// nothing to do
+				}
 			}
 		}
-		return toDTO(installedBundle);
+		result.result = XResultDTO.SUCCESS;
+		return result;
 	}
 
 	@Override
@@ -1051,6 +1064,13 @@ public class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
+	public Map<String, XResultDTO> createOrUpdateConfigurations(final Map<String, Map<String, Object>> configurations) {
+		final Map<String, XResultDTO> results = new HashMap<>();
+		configurations.forEach((k, v) -> results.put(k, createOrUpdateConfiguration(k, v)));
+		return results;
+	}
+
+	@Override
 	public XResultDTO deleteConfiguration(final String pid) {
 		requireNonNull(pid, "Configuration PID cannot be null");
 
@@ -1139,7 +1159,11 @@ public class AgentServer implements Agent, Closeable {
 		if (!agentExtensions.containsKey(name)) {
 			return "Agent extension with name '" + name + "' doesn't exist";
 		}
-		return agentExtensions.get(name).execute(context);
+		try {
+			return agentExtensions.get(name).execute(context);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -1160,7 +1184,7 @@ public class AgentServer implements Agent, Closeable {
 
 			resultHandler.waitFor();
 			return outputStream.toString();
-		} catch (IOException | InterruptedException e) {
+		} catch (final Exception e) {
 			Thread.currentThread().interrupt();
 			return Exceptions.toString(e);
 		}
@@ -1177,12 +1201,12 @@ public class AgentServer implements Agent, Closeable {
 		if (isHttpServiceRuntimeWired) {
 			final Object service = httpServiceRuntimeTracker.getService();
 			if (service == null) {
-				return null;
+				return Collections.emptyList();
 			}
 			final XHttpAdmin httpAdmin = new XHttpAdmin(service);
 			return httpAdmin.runtime();
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
@@ -1237,6 +1261,31 @@ public class AgentServer implements Agent, Closeable {
 		dto.response = response;
 
 		return dto;
+	}
+
+	private BundleDTO installBundleWithData(String location, final byte[] data, final int startLevel, final boolean shouldRefresh)
+	        throws IOException, BundleException, InterruptedException {
+		requireNonNull(data);
+
+		Bundle installedBundle;
+
+		if (location == null) {
+			location = getLocation(data);
+		}
+
+		try (InputStream stream = new ByteBufferInputStream(data)) {
+			installedBundle = context.getBundle(location);
+			if (installedBundle == null) {
+				installedBundle = context.installBundle(location, stream);
+				installedBundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
+			} else {
+				installedBundle.update(stream);
+				if (shouldRefresh) {
+					refresh(true);
+				}
+			}
+		}
+		return toDTO(installedBundle);
 	}
 
 	private Map<String, Object> parseProperties(final List<ConfigValue> newProperties) throws Exception {

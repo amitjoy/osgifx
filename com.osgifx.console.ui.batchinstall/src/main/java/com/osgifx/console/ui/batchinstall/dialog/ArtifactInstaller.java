@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog.ArtifactDTO;
@@ -64,19 +65,15 @@ public class ArtifactInstaller {
 			logger.atWarning().log("Agent is not connected");
 			return null;
 		}
-		final var result = new StringBuilder();
+		final var                              result  = new StringBuilder();
+		final Map<String, byte[]>              data    = Maps.newHashMap();
+		final Map<String, Map<String, Object>> configs = Maps.newHashMap();
 		for (final ArtifactDTO artifact : artifacts) {
 			if (artifact.isConfiguration()) {
 				try {
 					final var pids = readConfigFile(artifact.file());
 					for (final ConfigDTO config : pids) {
-						final var r = agent.createOrUpdateConfiguration(config.pid(), config.properties());
-						if (r.result == ERROR) {
-							result.append(config.pid);
-							result.append(": ");
-							result.append(r.response);
-							result.append(System.lineSeparator());
-						}
+						configs.put(config.pid, config.properties);
 					}
 				} catch (final Exception e) {
 					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
@@ -88,14 +85,28 @@ public class ArtifactInstaller {
 					continue;
 				}
 				try {
-					agent.installWithData(null, Files.toByteArray(artifact.file()), DEFAULT_START_LEVEL);
+					data.put(jar.bsn, Files.toByteArray(artifact.file()));
 				} catch (final Exception e) {
-					result.append(jar.bsn);
-					result.append(": ");
-					result.append(e.getMessage());
-					result.append(System.lineSeparator());
+					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
 				}
 			}
+		}
+		if (!data.isEmpty()) {
+			final var r = agent.installWithMultipleData(data.values(), DEFAULT_START_LEVEL);
+			if (!r.response.isEmpty()) {
+				result.append(r.response);
+			}
+		}
+		if (!configs.isEmpty()) {
+			final var results = agent.createOrUpdateConfigurations(configs);
+			results.forEach((k, v) -> {
+				if (v.result == ERROR) {
+					result.append(k);
+					result.append(": ");
+					result.append(v.response);
+					result.append(System.lineSeparator());
+				}
+			});
 		}
 		return result.toString();
 	}
