@@ -135,6 +135,21 @@ public interface Agent {
 	BundleDTO installWithData(String location, byte[] data, int startLevel) throws Exception;
 
 	/**
+	 * Install or update multiple bundles from the specified byte array instance.
+	 * <p>
+	 * This method does check if there is any existing bundle with the bsn. If
+	 * found, the existing bundles get updated with the specified byte array
+	 * instances. Otherwise, new bundles get installed with the specified byte array
+	 * instances.
+	 *
+	 * @param data       The byte array instances from which the bundle will be read
+	 *                   (cannot be {@code null})
+	 * @param startLevel the start level of the bundle
+	 * @return A Bundle DTO (cannot be {@code null})
+	 */
+	XResultDTO installWithMultipleData(Collection<byte[]> data, int startLevel);
+
+	/**
 	 * Install a new bundle at the given bundle location. The SHA identifies the
 	 * file and should be retrievable through {@link Supervisor#getFile(String)} .
 	 *
@@ -386,6 +401,19 @@ public interface Agent {
 	 *         failed
 	 */
 	XResultDTO createOrUpdateConfiguration(String pid, Map<String, Object> newProperties);
+
+	/**
+	 * Creates or updates the associated {@code Configuration} objects with the
+	 * specified properties.
+	 * <p>
+	 * Note that, this is only possible if the remote runtime has ConfigAdmin (CM)
+	 * bundle installed.
+	 *
+	 * @param configurations the configurations (key=PID, value=properties)
+	 * @return the detailed information about the operations whether it succeeded or
+	 *         failed
+	 */
+	Map<String, XResultDTO> createOrUpdateConfigurations(Map<String, Map<String, Object>> configurations);
 
 	/**
 	 * Creates or updates the associated {@code Configuration} object with the

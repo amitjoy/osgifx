@@ -69,21 +69,22 @@ public final class BatchInstallHandler {
 		final var selectedFeatures = dialog.showAndWait();
 		if (selectedFeatures.isPresent()) {
 			final Task<String> batchTask = new Task<>() {
-
 				@Override
 				protected String call() throws Exception {
 					return installer.installArtifacts(selectedFeatures.get());
 				}
-
-				@Override
-				protected void succeeded() {
-					progressDialog.close();
-				}
 			};
 			batchTask.setOnSucceeded(t -> {
 				final var result = batchTask.getValue();
-				if (result != null && !result.isEmpty()) {
-					threadSync.asyncExec(() -> FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader()));
+				if (result != null) {
+					if (!result.isEmpty()) {
+						threadSync.asyncExec(() -> {
+							progressDialog.close();
+							FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
+						});
+					} else {
+						threadSync.asyncExec(() -> progressDialog.close());
+					}
 				}
 			});
 			CompletableFuture.runAsync(batchTask).exceptionally(e -> {
