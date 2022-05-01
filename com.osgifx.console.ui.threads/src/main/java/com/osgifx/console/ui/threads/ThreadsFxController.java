@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -62,8 +61,6 @@ public final class ThreadsFxController {
 	private boolean                         isConnected;
 	@Inject
 	private DataProvider                    dataProvider;
-	@Inject
-	private ThreadSynchronize               threadSync;
 
 	@FXML
 	public void initialize() {
@@ -71,9 +68,13 @@ public final class ThreadsFxController {
 			Fx.addTablePlaceholderWhenDisconnected(table);
 			return;
 		}
-		initCells();
-		Fx.addContextMenuToCopyContent(table);
-		logger.atDebug().log("FXML controller has been initialized");
+		try {
+			initCells();
+			Fx.addContextMenuToCopyContent(table);
+			logger.atDebug().log("FXML controller has been initialized");
+		} catch (final Exception e) {
+			logger.atError().withException(e).log("FXML controller could not be initialized");
+		}
 	}
 
 	private void initCells() {
@@ -86,8 +87,6 @@ public final class ThreadsFxController {
 		isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
 
 		table.setItems(dataProvider.threads());
-		threadSync.syncExec(() -> Fx.sortBy(table, nameColumn));
-
 		TableFilter.forTableView(table).apply();
 	}
 

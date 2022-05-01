@@ -61,12 +61,6 @@ public final class Fx {
 		}
 	}
 
-	public static <S, T> void sortBy(final TableView<S> table, final TableColumn<S, T> column) {
-		column.setSortType(TableColumn.SortType.ASCENDING);
-		table.getSortOrder().add(column);
-		table.sort();
-	}
-
 	public static void autoResizeColumns(final TableView<?> table) {
 		// Set the right policy
 		table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
