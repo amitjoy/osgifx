@@ -24,7 +24,6 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -61,8 +60,6 @@ public final class HttpFxController {
 	private boolean                                 isConnected;
 	@Inject
 	private DataProvider                            dataProvider;
-	@Inject
-	private ThreadSynchronize                       threadSync;
 	private TableRowDataFeatures<XHttpComponentDTO> previouslyExpanded;
 
 	@FXML
@@ -126,11 +123,8 @@ public final class HttpFxController {
 		table.getColumns().add(contextServiceIdColumn);
 		table.getColumns().add(componentTypeColumn);
 
-		final var httpComponents = dataProvider.httpComponents();
-		table.setItems(httpComponents);
-
+		table.setItems(dataProvider.httpComponents());
 		TableFilter.forTableView(table).apply();
-		threadSync.syncExec(() -> Fx.sortBy(table, componentColumn));
 	}
 
 }

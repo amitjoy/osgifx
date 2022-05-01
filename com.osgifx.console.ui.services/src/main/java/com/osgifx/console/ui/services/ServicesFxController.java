@@ -25,7 +25,6 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -63,8 +62,6 @@ public final class ServicesFxController {
 	private boolean                           isConnected;
 	@Inject
 	private DataProvider                      dataProvider;
-	@Inject
-	private ThreadSynchronize                 threadSync;
 	private TableRowDataFeatures<XServiceDTO> previouslyExpanded;
 
 	@FXML
@@ -114,10 +111,7 @@ public final class ServicesFxController {
 		table.getColumns().add(objectClassColumn);
 		table.getColumns().add(registeringBundleColumn);
 
-		final var services = dataProvider.services();
-		table.setItems(services);
-		threadSync.syncExec(() -> Fx.sortBy(table, idColumn));
-
+		table.setItems(dataProvider.services());
 		TableFilter.forTableView(table).apply();
 	}
 

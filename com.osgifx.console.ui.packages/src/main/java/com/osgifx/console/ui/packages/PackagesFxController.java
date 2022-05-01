@@ -24,7 +24,6 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -61,8 +60,6 @@ public final class PackagesFxController {
 	private boolean                          isConnected;
 	@Inject
 	private DataProvider                     dataProvider;
-	@Inject
-	private ThreadSynchronize                threadSync;
 	private TableRowDataFeatures<PackageDTO> previouslyExpanded;
 
 	@FXML
@@ -112,8 +109,6 @@ public final class PackagesFxController {
 		table.getColumns().add(hasDuplicatesColumn);
 
 		table.setItems(dataProvider.packages());
-		threadSync.syncExec(() -> Fx.sortBy(table, nameColumn));
-
 		TableFilter.forTableView(table).apply();
 	}
 

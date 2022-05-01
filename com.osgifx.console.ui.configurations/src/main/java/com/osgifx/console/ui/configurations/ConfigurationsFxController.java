@@ -26,7 +26,6 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
-import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -64,8 +63,6 @@ public final class ConfigurationsFxController {
 	private boolean                                 isConnected;
 	@Inject
 	private DataProvider                            dataProvider;
-	@Inject
-	private ThreadSynchronize                       threadSync;
 	private TableRowDataFeatures<XConfigurationDTO> previouslyExpanded;
 
 	@FXML
@@ -119,10 +116,7 @@ public final class ConfigurationsFxController {
 		table.getColumns().add(locationColumn);
 		table.getColumns().add(isFactoryColumn);
 
-		final var configurations = dataProvider.configurations();
-		table.setItems(configurations);
-		threadSync.syncExec(() -> Fx.sortBy(table, pidColumn));
-
+		table.setItems(dataProvider.configurations());
 		TableFilter.forTableView(table).apply();
 	}
 
