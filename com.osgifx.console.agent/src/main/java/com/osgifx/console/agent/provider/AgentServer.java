@@ -24,7 +24,6 @@ import static org.osgi.framework.Bundle.START_ACTIVATION_POLICY;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -36,10 +35,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,7 +44,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -70,16 +66,8 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
-import org.osgi.framework.dto.FrameworkDTO;
-import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.framework.startlevel.BundleStartLevel;
-import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.FrameworkWiring;
-import org.osgi.framework.wiring.dto.BundleRevisionDTO;
-import org.osgi.resource.Capability;
-import org.osgi.resource.Requirement;
-import org.osgi.resource.dto.CapabilityDTO;
-import org.osgi.resource.dto.RequirementDTO;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
@@ -103,9 +91,6 @@ import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 import aQute.lib.io.ByteBufferInputStream;
-import aQute.lib.startlevel.StartLevelRuntimeHandler;
-import aQute.libg.shacache.ShaCache;
-import aQute.libg.shacache.ShaSource;
 import aQute.remote.util.Link;
 
 /**
@@ -114,45 +99,17 @@ import aQute.remote.util.Link;
  */
 public class AgentServer implements Agent, Closeable {
 
-	private static final Pattern       BSN_P    = Pattern.compile("\\s*([^;\\s]+).*");
-	private static final AtomicInteger sequence = new AtomicInteger(1000);
+	private static final Pattern BSN_P = Pattern.compile("\\s*([^;\\s]+).*");
 
-	//
-	// Constant so we do not have to repeat it
-	//
-
-	private static final TypeReference<Map<String, String>> MAP_STRING_STRING_T = new TypeReference<Map<String, String>>() {
-	};
-
-	private static final long[] EMPTY = {};
-
-	//
-	// Known keys in the framework properties since we cannot
-	// iterate over framework properties
-	//
-
-	@SuppressWarnings("deprecation")
-	static final String keys[] = { Constants.FRAMEWORK_BEGINNING_STARTLEVEL, Constants.FRAMEWORK_BOOTDELEGATION,
-	        Constants.FRAMEWORK_BSNVERSION, Constants.FRAMEWORK_BUNDLE_PARENT, Constants.FRAMEWORK_TRUST_REPOSITORIES,
-	        Constants.FRAMEWORK_COMMAND_ABSPATH, Constants.FRAMEWORK_EXECPERMISSION, Constants.FRAMEWORK_EXECUTIONENVIRONMENT,
-	        Constants.FRAMEWORK_LANGUAGE, Constants.FRAMEWORK_LIBRARY_EXTENSIONS, Constants.FRAMEWORK_OS_NAME,
-	        Constants.FRAMEWORK_OS_VERSION, Constants.FRAMEWORK_PROCESSOR, Constants.FRAMEWORK_SECURITY, Constants.FRAMEWORK_STORAGE,
-	        Constants.FRAMEWORK_SYSTEMCAPABILITIES, Constants.FRAMEWORK_SYSTEMCAPABILITIES_EXTRA, Constants.FRAMEWORK_SYSTEMPACKAGES,
-	        Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, Constants.FRAMEWORK_UUID, Constants.FRAMEWORK_VENDOR, Constants.FRAMEWORK_VERSION,
-	        Constants.FRAMEWORK_WINDOWSYSTEM, };
-
-	private Supervisor                     remote;
-	private BundleContext                  context;
-	private final ShaCache                 cache;
-	private ShaSource                      source;
-	private final Map<String, String>      installed  = new HashMap<>();
-	volatile boolean                       quit;
-	private Redirector                     redirector = new NullRedirector();
-	private Link<Agent, Supervisor>        link;
-	private CountDownLatch                 refresh    = new CountDownLatch(0);
-	private final StartLevelRuntimeHandler startlevels;
-	private final int                      startOptions;
-	private ClassloaderLeakDetector        leakDetector;
+	private Supervisor                remote;
+	private BundleContext             context;
+	private final Map<String, String> installed  = new HashMap<>();
+	volatile boolean                  quit;
+	private Redirector                redirector = new NullRedirector();
+	private Link<Agent, Supervisor>   link;
+	private CountDownLatch            refresh    = new CountDownLatch(0);
+	private final int                 startOptions;
+	private ClassloaderLeakDetector   leakDetector;
 
 	private final ServiceTracker<Object, Object>                 scrTracker;
 	private final ServiceTracker<Object, Object>                 metatypeTracker;
@@ -165,27 +122,13 @@ public class AgentServer implements Agent, Closeable {
 	private final Set<String>                 gogoCommands    = new CopyOnWriteArraySet<>();
 	private final Map<String, AgentExtension> agentExtensions = new ConcurrentHashMap<>();
 
-	/**
-	 * An agent server is based on a context and takes a name and cache directory
-	 *
-	 * @param context a bundle context of the framework
-	 * @param cache   the directory for caching
-	 */
-	public AgentServer(final BundleContext context, final File cache, final ClassloaderLeakDetector leakDetector) throws Exception {
-		this(context, cache, StartLevelRuntimeHandler.absent(), leakDetector);
-	}
-
-	public AgentServer(final BundleContext context, final File cache, final StartLevelRuntimeHandler startlevels,
-	        final ClassloaderLeakDetector leakDetector) throws Exception {
+	public AgentServer(final BundleContext context, final ClassloaderLeakDetector leakDetector) throws Exception {
 		requireNonNull(context, "Bundle context cannot be null");
 		this.context      = context;
 		this.leakDetector = leakDetector;
 
 		final boolean eager = context.getProperty(LAUNCH_ACTIVATION_EAGER) != null;
 		startOptions = eager ? 0 : START_ACTIVATION_POLICY;
-
-		this.cache       = new ShaCache(cache);
-		this.startlevels = startlevels;
 
 		final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
@@ -264,18 +207,6 @@ public class AgentServer implements Agent, Closeable {
 		httpServiceRuntimeTracker.open();
 	}
 
-	/**
-	 * Get the framework's DTO
-	 */
-	@Override
-	public FrameworkDTO getFramework() throws Exception {
-		final FrameworkDTO fw = new FrameworkDTO();
-		fw.bundles    = getBundles();
-		fw.properties = getProperties();
-		fw.services   = getServiceReferences();
-		return fw;
-	}
-
 	@Override
 	public BundleDTO installWithData(final String location, final byte[] data, final int startLevel) throws Exception {
 		return installBundleWithData(location, data, startLevel, true);
@@ -310,18 +241,6 @@ public class AgentServer implements Agent, Closeable {
 		}
 		result.result = XResultDTO.SUCCESS;
 		return result;
-	}
-
-	@Override
-	public BundleDTO install(final String location, final String sha) throws Exception {
-		final InputStream in = cache.getStream(sha, source);
-		if (in == null) {
-			return null;
-		}
-
-		final Bundle b = context.installBundle(location, in);
-		installed.put(b.getLocation(), sha);
-		return toDTO(b);
 	}
 
 	@Override
@@ -379,156 +298,6 @@ public class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
-	public String update(Map<String, String> bundles) throws InterruptedException {
-
-		refresh.await();
-
-		final Formatter out = new Formatter();
-		if (bundles == null) {
-			bundles = Collections.emptyMap();
-		}
-
-		final Set<String> toBeDeleted = new HashSet<>(installed.keySet());
-		toBeDeleted.removeAll(bundles.keySet());
-
-		final LinkedHashSet<String> toBeInstalled = new LinkedHashSet<>(bundles.keySet());
-		toBeInstalled.removeAll(installed.keySet());
-
-		final Map<String, String> changed = new HashMap<>(bundles);
-		changed.values().removeAll(installed.values());
-		changed.keySet().removeAll(toBeInstalled);
-
-		final Set<String> affected = new HashSet<>(toBeDeleted);
-		affected.addAll(changed.keySet());
-
-		final LinkedHashSet<Bundle> toBeStarted = new LinkedHashSet<>();
-
-		for (final String location : affected) {
-			final Bundle b = getBundle(location);
-			if (b == null) {
-				out.format("Could not location bundle %s to stop it", location);
-				continue;
-			}
-
-			try {
-				if (isActive(b)) {
-					toBeStarted.add(b);
-				}
-
-				b.stop();
-			} catch (final Exception e) {
-				printStack(e);
-				out.format("Trying to stop bundle %s : %s", b, e);
-			}
-
-		}
-
-		for (final String location : toBeDeleted) {
-			final Bundle b = getBundle(location);
-			if (b == null) {
-				out.format("Could not find bundle %s to uninstall it", location);
-				continue;
-			}
-
-			try {
-				b.uninstall();
-				installed.remove(location);
-				toBeStarted.remove(b);
-			} catch (final Exception e) {
-				printStack(e);
-				out.format("Trying to uninstall %s: %s", location, e);
-			}
-		}
-
-		for (final String location : toBeInstalled) {
-			final String sha = bundles.get(location);
-
-			try {
-				final InputStream in = cache.getStream(sha, source);
-				if (in == null) {
-					out.format("Could not find file with sha %s for bundle %s", sha, location);
-					continue;
-				}
-
-				final Bundle b = context.installBundle(location, in);
-				installed.put(location, sha);
-				toBeStarted.add(b);
-
-			} catch (final Exception e) {
-				printStack(e);
-				out.format("Trying to install %s: %s", location, e);
-			}
-		}
-
-		for (final Entry<String, String> e : changed.entrySet()) {
-			final String location = e.getKey();
-			final String sha      = e.getValue();
-
-			try {
-				final InputStream in = cache.getStream(sha, source);
-				if (in == null) {
-					out.format("Cannot find file for sha %s to update %s", sha, location);
-					continue;
-				}
-
-				final Bundle bundle = getBundle(location);
-				if (bundle == null) {
-					out.format("No such bundle for location %s while trying to update it", location);
-					continue;
-				}
-
-				if (bundle.getState() == Bundle.UNINSTALLED) {
-					context.installBundle(location, in);
-				} else {
-					bundle.update(in);
-				}
-
-			} catch (final Exception e1) {
-				printStack(e1);
-				out.format("Trying to update %s: %s", location, e);
-			}
-		}
-
-		for (final Bundle b : toBeStarted) {
-			try {
-				b.start(startOptions);
-			} catch (final Exception e1) {
-				printStack(e1);
-				out.format("Trying to start %s: %s", b, e1);
-			}
-		}
-
-		final String result = out.toString();
-		out.close();
-		startlevels.afterStart();
-		if (result.length() == 0) {
-			refresh(true);
-			return null;
-		}
-		return result;
-	}
-
-	@Override
-	public String update(final long id, final String sha) throws Exception {
-		final InputStream in = cache.getStream(sha, source);
-		if (in == null) {
-			return null;
-		}
-
-		final StringBuilder sb = new StringBuilder();
-
-		try {
-			final Bundle bundle = context.getBundle(id);
-			bundle.update(in);
-			refresh(true);
-		} catch (final Exception e) {
-			sb.append(e.getMessage()).append("\n");
-		}
-
-		return sb.length() == 0 ? null : sb.toString();
-	}
-
-	@Override
 	public String updateFromURL(final long id, final String url) throws Exception {
 		final StringBuilder sb = new StringBuilder();
 		try (final InputStream is = new URL(url).openStream()) {
@@ -542,26 +311,12 @@ public class AgentServer implements Agent, Closeable {
 		return sb.length() == 0 ? null : sb.toString();
 	}
 
-	private Bundle getBundle(final String location) {
-		try {
-			return context.getBundle(location);
-		} catch (final Exception e) {
-			printStack(e);
-		}
-		return null;
-	}
-
-	private boolean isActive(final Bundle b) {
-		return b.getState() == Bundle.ACTIVE || b.getState() == Bundle.STARTING;
-	}
-
 	@Override
 	public boolean redirect(final int port) throws Exception {
 		if (redirector != null) {
 			if (redirector.getPort() == port) {
 				return false;
 			}
-
 			redirector.close();
 			redirector = new NullRedirector();
 		}
@@ -583,7 +338,6 @@ public class AgentServer implements Agent, Closeable {
 			redirector = new ConsoleRedirector(this);
 			return true;
 		}
-
 		redirector = new SocketRedirector(this, port);
 		return true;
 	}
@@ -606,68 +360,11 @@ public class AgentServer implements Agent, Closeable {
 			final RedirectOutput rout = (RedirectOutput) ps;
 			return rout.getLastOutput();
 		}
-
 		return null;
 	}
 
 	public void setSupervisor(final Supervisor remote) {
 		setRemote(remote);
-	}
-
-	private List<ServiceReferenceDTO> getServiceReferences() throws Exception {
-		final ServiceReference<?>[] refs = context.getAllServiceReferences(null, null);
-		if (refs == null) {
-			return Collections.emptyList();
-		}
-
-		final ArrayList<ServiceReferenceDTO> list = new ArrayList<>(refs.length);
-		for (final ServiceReference<?> r : refs) {
-			final ServiceReferenceDTO ref = new ServiceReferenceDTO();
-			ref.bundle     = r.getBundle().getBundleId();
-			ref.id         = (Long) r.getProperty(Constants.SERVICE_ID);
-			ref.properties = getProperties(r);
-			final Bundle[] usingBundles = r.getUsingBundles();
-			if (usingBundles == null) {
-				ref.usingBundles = EMPTY;
-			} else {
-				ref.usingBundles = new long[usingBundles.length];
-				for (int i = 0; i < usingBundles.length; i++) {
-					ref.usingBundles[i] = usingBundles[i].getBundleId();
-				}
-			}
-			list.add(ref);
-		}
-		return list;
-	}
-
-	private Map<String, Object> getProperties(final ServiceReference<?> ref) {
-		final Map<String, Object> map = new HashMap<>();
-		for (final String key : ref.getPropertyKeys()) {
-			map.put(key, ref.getProperty(key));
-		}
-		return map;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Map<String, Object> getProperties() {
-		final Map map = new HashMap(System.getenv());
-		map.putAll(System.getProperties());
-		for (final String key : keys) {
-			final Object value = context.getProperty(key);
-			if (value != null) {
-				map.put(key, value);
-			}
-		}
-		return map;
-	}
-
-	private List<BundleDTO> getBundles() {
-		final Bundle[]             bundles = context.getBundles();
-		final ArrayList<BundleDTO> list    = new ArrayList<>(bundles.length);
-		for (final Bundle b : bundles) {
-			list.add(toDTO(b));
-		}
-		return list;
 	}
 
 	private BundleDTO toDTO(final Bundle b) {
@@ -686,7 +383,6 @@ public class AgentServer implements Agent, Closeable {
 		}
 
 		quit = true;
-		update(null);
 		redirect(0);
 		link.close();
 	}
@@ -695,7 +391,6 @@ public class AgentServer implements Agent, Closeable {
 	public void close() throws IOException {
 		try {
 			cleanup(-2);
-			startlevels.close();
 
 			scrTracker.close();
 			metatypeTracker.close();
@@ -713,50 +408,8 @@ public class AgentServer implements Agent, Closeable {
 		cleanup(-3);
 	}
 
-	private void printStack(final Exception e1) {
-		try {
-			e1.printStackTrace(redirector.getOut());
-		} catch (final Exception e) {
-			//
-		}
-	}
-
 	public void setRemote(final Supervisor supervisor) {
 		remote = supervisor;
-		source = new ShaSource() {
-
-					@Override
-					public boolean isFast() {
-						return false;
-					}
-
-					@Override
-					public InputStream get(final String sha) throws Exception {
-						final byte[] data = remote.getFile(sha);
-						if (data == null) {
-							return null;
-						}
-
-						return new ByteArrayInputStream(data);
-					}
-				};
-
-	}
-
-	@Override
-	public boolean isEnvoy() {
-		return false;
-	}
-
-	@Override
-	public Map<String, String> getSystemProperties() throws Exception {
-		return Converter.cnv(MAP_STRING_STRING_T, System.getProperties());
-	}
-
-	@Override
-	public boolean createFramework(final String name, final Collection<String> runpath, final Map<String, Object> properties)
-	        throws Exception {
-		throw new UnsupportedOperationException("This is an agent, we can't create new frameworks (for now)");
 	}
 
 	public Supervisor getSupervisor() {
@@ -788,109 +441,6 @@ public class AgentServer implements Agent, Closeable {
 			}
 			refresh.await();
 		}
-	}
-
-	@Override
-	public List<BundleDTO> getBundles(final long... bundleId) throws Exception {
-
-		Bundle[] bundles;
-		if (bundleId.length == 0) {
-			bundles = context.getBundles();
-		} else {
-			bundles = new Bundle[bundleId.length];
-			for (int i = 0; i < bundleId.length; i++) {
-				bundles[i] = context.getBundle(bundleId[i]);
-				if (bundles[i] == null) {
-					throw new IllegalArgumentException("Bundle " + bundleId[i] + " not installed");
-				}
-			}
-		}
-
-		final List<BundleDTO> bundleDTOs = new ArrayList<>(bundles.length);
-
-		for (final Bundle b : bundles) {
-			final BundleDTO dto = toDTO(b);
-			bundleDTOs.add(dto);
-		}
-
-		return bundleDTOs;
-	}
-
-	/**
-	 * Return the bundle revisions
-	 */
-	@Override
-	public List<BundleRevisionDTO> getBundleRevisons(final long... bundleId) throws Exception {
-
-		Bundle[] bundles;
-		if (bundleId.length == 0) {
-			bundles = context.getBundles();
-		} else {
-			bundles = new Bundle[bundleId.length];
-			for (int i = 0; i < bundleId.length; i++) {
-				bundles[i] = context.getBundle(bundleId[i]);
-				if (bundles[i] == null) {
-					throw new IllegalArgumentException("Bundle " + bundleId[i] + " does not exist");
-				}
-			}
-		}
-
-		final List<BundleRevisionDTO> revisions = new ArrayList<>(bundles.length);
-
-		for (final Bundle b : bundles) {
-			final BundleRevision    resource = b.adapt(BundleRevision.class);
-			final BundleRevisionDTO bwd      = toDTO(resource);
-			revisions.add(bwd);
-		}
-
-		return revisions;
-	}
-
-	/*
-	 * Turn a bundle in a Bundle Revision dto. On a r6 framework we could do this
-	 * with adapt but on earlier frameworks we're on our own
-	 */
-
-	private BundleRevisionDTO toDTO(final BundleRevision resource) {
-		final BundleRevisionDTO brd = new BundleRevisionDTO();
-		brd.bundle       = resource.getBundle().getBundleId();
-		brd.id           = sequence.getAndIncrement();
-		brd.symbolicName = resource.getSymbolicName();
-		brd.type         = resource.getTypes();
-		brd.version      = resource.getVersion().toString();
-
-		brd.requirements = new ArrayList<>();
-
-		for (final Requirement r : resource.getRequirements(null)) {
-			brd.requirements.add(toDTO(brd.id, r));
-		}
-
-		brd.capabilities = new ArrayList<>();
-		for (final Capability c : resource.getCapabilities(null)) {
-			brd.capabilities.add(toDTO(brd.id, c));
-		}
-
-		return brd;
-	}
-
-	private RequirementDTO toDTO(final int resource, final Requirement r) {
-		final RequirementDTO rd = new RequirementDTO();
-		rd.id         = sequence.getAndIncrement();
-		rd.resource   = resource;
-		rd.namespace  = r.getNamespace();
-		rd.directives = r.getDirectives();
-		rd.attributes = r.getAttributes();
-		return rd;
-	}
-
-	private CapabilityDTO toDTO(final int resource, final Capability r) {
-		final CapabilityDTO rd = new CapabilityDTO();
-		rd.id         = sequence.getAndIncrement();
-		rd.resource   = resource;
-		rd.namespace  = r.getNamespace();
-		rd.directives = r.getDirectives();
-		rd.attributes = r.getAttributes();
-		return rd;
 	}
 
 	private Entry<String, Version> getIdentity(final byte[] data) throws IOException {
@@ -1229,11 +779,6 @@ public class AgentServer implements Agent, Closeable {
 	@Override
 	public boolean isConfigAdminAvailable() {
 		return PackageWirings.isConfigAdminWired(context);
-	}
-
-	@Override
-	public boolean isEventAdminAvailable() {
-		return PackageWirings.isEventAdminWired(context);
 	}
 
 	private long getSystemUptime() {
