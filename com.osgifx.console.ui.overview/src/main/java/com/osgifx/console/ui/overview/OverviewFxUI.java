@@ -19,7 +19,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static java.util.Objects.requireNonNullElse;
 import static javafx.animation.Animation.INDEFINITE;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
@@ -37,7 +36,6 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -68,7 +66,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
 import javafx.util.Duration;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class OverviewFxUI {
 
 	private static final double TILE_WIDTH  = 500;
