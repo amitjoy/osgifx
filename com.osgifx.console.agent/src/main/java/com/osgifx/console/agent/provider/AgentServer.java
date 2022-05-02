@@ -705,7 +705,7 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public Object executeExtension(final String name, final Map<String, Object> context) {
 		if (!agentExtensions.containsKey(name)) {
-			return "Agent extension with name '" + name + "' doesn't exist";
+			throw new RuntimeException("Agent extension with name '" + name + "' doesn't exist");
 		}
 		try {
 			return agentExtensions.get(name).execute(context);
