@@ -23,8 +23,6 @@ import java.util.regex.Pattern;
 
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
-import org.osgi.framework.dto.FrameworkDTO;
-import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -38,7 +36,6 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
-import com.osgifx.console.supervisor.Supervisor;
 
 /**
  * An agent runs on remote OSGi framework and provides the means to control this
@@ -88,35 +85,6 @@ public interface Agent {
 	int CONSOLE = 1;
 
 	/**
-	 * An Envoy is an agent that can install a framework (well, -runpath) and launch
-	 * it with an Agent. An envoy can only handle this method and
-	 * {@link #createFramework(String, Collection, Map)} so other methods should not
-	 * be called. This rather awkward model is necessary so that we do not have to
-	 * reconnect to the actual agent.
-	 *
-	 * @return true if this is a limited envoy, otherwise true for a true Agent.
-	 */
-	boolean isEnvoy();
-
-	/**
-	 * Get the Bundles for the given ids. If no ids are given, all bundles are
-	 * returned.
-	 */
-	List<BundleDTO> getBundles(long... bundleId) throws Exception;
-
-	/**
-	 * Get the Bundle Revisions for the given ids. If no ids are given, the
-	 * revisions for all bundles must be returned.
-	 */
-
-	List<BundleRevisionDTO> getBundleRevisons(long... bundleId) throws Exception;
-
-	/**
-	 * Get the framework DTO
-	 */
-	FrameworkDTO getFramework() throws Exception;
-
-	/**
 	 * Install or update a bundle from the specified byte array instance.
 	 * <p>
 	 * This method does check if there is any existing bundle with the specified
@@ -144,20 +112,10 @@ public interface Agent {
 	 *
 	 * @param data       The byte array instances from which the bundle will be read
 	 *                   (cannot be {@code null})
-	 * @param startLevel the start level of the bundle
+	 * @param startLevel the start level of the bundles
 	 * @return A Bundle DTO (cannot be {@code null})
 	 */
 	XResultDTO installWithMultipleData(Collection<byte[]> data, int startLevel);
-
-	/**
-	 * Install a new bundle at the given bundle location. The SHA identifies the
-	 * file and should be retrievable through {@link Supervisor#getFile(String)} .
-	 *
-	 * @param location the bundle location
-	 * @param sha      the sha of the bundle's JAR
-	 * @return A Bundle DTO
-	 */
-	BundleDTO install(String location, String sha) throws Exception;
 
 	/**
 	 * Install a new bundle at the given location using a url to get the stream.
@@ -197,28 +155,6 @@ public interface Agent {
 	 */
 
 	String uninstall(long... id) throws Exception;
-
-	/**
-	 * Update the bundles in the framework. Each agent compares this map against a
-	 * map of installed bundles. The map maps a bundle location to SHA. Any
-	 * differences are reflected in the installed bundles. That is, a change in the
-	 * SHA will update, a new entry will install, and a removed entry will
-	 * uninstall. This is the preferred way to keep the remote framework
-	 * synchronized since it is idempotent.
-	 *
-	 * @param bundles the bundles to update
-	 */
-	String update(Map<String, String> bundles) throws Exception;
-
-	/**
-	 * Updates a single bundle by id in the framework. The SHA identifies the file
-	 * and should be retrievable through {@link Supervisor#getFile(String)}
-	 *
-	 * @param id  the bundle id
-	 * @param sha the sha of the bundle
-	 * @return any errors that occurred
-	 */
-	String update(long id, String sha) throws Exception;
 
 	/**
 	 * Updates a single bundle from a url
@@ -261,28 +197,6 @@ public interface Agent {
 	String shell(String cmd) throws Exception;
 
 	/**
-	 * Get the remote's system's System properties
-	 *
-	 * @return the remote systems properties
-	 */
-	Map<String, String> getSystemProperties() throws Exception;
-
-	/**
-	 * This method is only implemented in the Envoy (the pre-Agent). It is meant to
-	 * install a -runpath before the framework runs. An Envoy can actally created
-	 * multiple independent frameworks. If this framework already existed, and the
-	 * given parameters are identical, that framework will be used for the aget that
-	 * will take over. Otherwise the current framework is stopped and a new
-	 * framework is started.
-	 *
-	 * @param name       the name of the framework
-	 * @param runpath    the runpath the install
-	 * @param properties the framework properties
-	 * @return if this created a new framework
-	 */
-	boolean createFramework(String name, Collection<String> runpath, Map<String, Object> properties) throws Exception;
-
-	/**
 	 * Abort the remote agent. The agent should send an event back and die. This is
 	 * an async method.
 	 */
@@ -292,10 +206,6 @@ public interface Agent {
 	 * Ping the remote agent to see if it is still alive.
 	 */
 	boolean ping();
-
-	/*******************************************************************
-	 * Extended usages to manage runtime in all respects
-	 *******************************************************************/
 
 	/**
 	 * Returns the detailed information of all the installed bundles
@@ -551,14 +461,6 @@ public interface Agent {
 	 *         {@code false}
 	 */
 	boolean isConfigAdminAvailable();
-
-	/**
-	 * Checks if {@code EventAdmin} is available in the remote runtime
-	 *
-	 * @return {@code true} if {@code EventAdmin} is available, otherwise
-	 *         {@code false}
-	 */
-	boolean isEventAdminAvailable();
 
 	/**
 	 * Performs a garbage collection

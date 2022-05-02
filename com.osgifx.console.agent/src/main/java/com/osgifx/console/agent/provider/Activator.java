@@ -20,7 +20,6 @@ import static com.osgifx.console.agent.Agent.DEFAULT_PORT;
 import static com.osgifx.console.agent.Agent.PORT_P;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -49,7 +48,6 @@ import aQute.remote.util.Link;
  */
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public class Activator extends Thread implements BundleActivator {
-	private File          cache;
 	private ServerSocket  server;
 	private BundleContext context;
 
@@ -84,15 +82,11 @@ public class Activator extends Thread implements BundleActivator {
 			port = m.group(2);
 		}
 
-		System.err.println("OSGi.fx Agent Host: " + host + " " + port);
-
-		// Get the SHA cache root file to be shared by all agents for this process
-		cache = context.getDataFile("shacache");
+		System.err.println("OSGi.fx Agent Host: " + host + ":" + port);
 
 		final int p = Integer.parseInt(port);
 		server = "*".equals(host) ? new ServerSocket(p) : new ServerSocket(p, 3, InetAddress.getByName(host));
 		start();
-
 	}
 
 	/**
@@ -110,7 +104,7 @@ public class Activator extends Thread implements BundleActivator {
 					socket.setSoTimeout(1000);
 
 					// create a new agent, and link it up.
-					final AgentServer sa = new AgentServer(context, cache, classloaderLeakDetector);
+					final AgentServer sa = new AgentServer(context, classloaderLeakDetector);
 					agents.add(sa);
 					final Link<Agent, Supervisor> link = new Link<Agent, Supervisor>(Supervisor.class, sa, socket) {
 						@Override
@@ -127,11 +121,6 @@ public class Activator extends Thread implements BundleActivator {
 						properties.put("event.topics", "*");
 						context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(link.getRemote()), properties);
 					}
-					final boolean isConfigAdminvailable = PackageWirings.isConfigAdminWired(context);
-					if (isConfigAdminvailable && isEventAdminAvailable) {
-						context.registerService("org.osgi.service.cm.ConfigurationListener", new EventAdminCmListener(context), null);
-					}
-					context.addFrameworkListener(new OSGiFrameworkEventHandler(link.getRemote()));
 					// initialize OSGi logging if available
 					final boolean isLogAvailable = PackageWirings.isLogWired(context);
 					if (isLogAvailable) {
