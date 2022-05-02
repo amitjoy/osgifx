@@ -94,8 +94,8 @@ public final class RuntimeDataProvider implements DataProvider {
 				logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
 			}
 		} else if (isAsync) {
-			CompletableFuture.runAsync(() -> retrieve(id));
-			logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id);
+			CompletableFuture.runAsync(() -> retrieve(id))
+			        .thenRunAsync(() -> logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id));
 		} else {
 			retrieve(id);
 			logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);

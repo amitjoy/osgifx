@@ -15,14 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.data.supplier;
 
-import static com.osgifx.console.data.supplier.OSGiEventAdminTopics.BUNDLE_EVENTS_TOPIC;
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -32,7 +30,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -41,10 +38,8 @@ import org.osgi.service.event.propertytypes.EventTopics;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
-import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
 import com.osgifx.console.data.provider.PackageDTO;
-import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.FXCollections;
@@ -53,7 +48,7 @@ import javafx.collections.ObservableList;
 @Component
 @SupplierID(PACKAGES_ID)
 @EventTopics({ AGENT_CONNECTED_EVENT_TOPIC, AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
-public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHandler, EventListener {
+public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
 	public static final String PACKAGES_ID = "packages";
 
@@ -69,13 +64,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 
 	@Activate
 	void activate() {
-		supervisor.addOSGiEventListener(this);
 		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
-
-	@Deactivate
-	void deactivate() {
-		supervisor.removeOSGiEventListener(this);
 	}
 
 	@Override
@@ -97,35 +86,11 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 
 	@Override
 	public void handleEvent(final Event event) {
-		final var topic = event.getTopic();
-		if (AGENT_CONNECTED_EVENT_TOPIC.equals(topic)) {
-			CompletableFuture.runAsync(this::retrieve);
-			return;
-		}
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic)) {
+		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
 			threadSync.asyncExec(packages::clear);
 			return;
 		}
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atInfo().log("Agent is not connected");
-			return;
-		}
-		// if the remote runtime has EventAdmin installed, we retrieve the values on
-		// EventAdmin events, otherwise, retrieve the values on e4 events
-		if (!agent.isEventAdminAvailable()) {
-			CompletableFuture.runAsync(this::retrieve);
-		}
-	}
-
-	@Override
-	public void onEvent(final XEventDTO event) {
 		CompletableFuture.runAsync(this::retrieve);
-	}
-
-	@Override
-	public Collection<String> topics() {
-		return List.of(BUNDLE_EVENTS_TOPIC);
 	}
 
 	private synchronized ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {
