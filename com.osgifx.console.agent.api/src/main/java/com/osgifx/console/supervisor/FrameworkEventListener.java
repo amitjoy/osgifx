@@ -17,7 +17,19 @@ package com.osgifx.console.supervisor;
 
 import com.osgifx.console.agent.dto.XFrameworkEventDTO;
 
+/**
+ * This is used to receive remote OSGi framework events
+ *
+ * @see Supervisor#addOSGiFrameworkEventListener(FrameworkEventListener)
+ * @see Supervisor#removeOSGiFrameworkEventListener(FrameworkEventListener)
+ */
 @FunctionalInterface
 public interface FrameworkEventListener {
+
+	/**
+	 * The callback to be executed when the framework event will be received
+	 *
+	 * @param event the remote event
+	 */
 	void onEvent(XFrameworkEventDTO event);
 }
