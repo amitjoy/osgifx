@@ -20,12 +20,30 @@ import java.util.Collections;
 
 import com.osgifx.console.agent.dto.XEventDTO;
 
+/**
+ * This is used to receive remote OSGi event admin events
+ *
+ * @see Supervisor#addOSGiEventListener(EventListener)
+ * @see Supervisor#removeOSGiEventListener(EventListener)
+ */
 @FunctionalInterface
 public interface EventListener {
 
+	/**
+	 * By default, all events from all the topics will be intercepted by this
+	 * listener. However, you can also specify which event you are interested to
+	 * intercept.
+	 *
+	 * @return the collection of event topics
+	 */
 	default Collection<String> topics() {
 		return Collections.singleton("*");
 	}
 
+	/**
+	 * The callback to be executed when the event will be received
+	 *
+	 * @param event the remote event
+	 */
 	void onEvent(XEventDTO event);
 }
