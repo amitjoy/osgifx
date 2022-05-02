@@ -15,23 +15,13 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.provider;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.google.common.collect.Lists;
-
-import aQute.bnd.util.dto.DTO;
-import aQute.lib.collections.MultiMap;
-import aQute.lib.io.IO;
-import aQute.libg.cryptography.SHA1;
 import aQute.remote.util.Link;
 
 /**
@@ -44,23 +34,15 @@ import aQute.remote.util.Link;
  */
 public class AgentSupervisor<S, A> {
 
-	private static final Map<File, Info>          fileInfo     = new ConcurrentHashMap<>();
-	private static final MultiMap<String, String> shaInfo      = new MultiMap<>();
-	private static final int                      CONNECT_WAIT = 200;
-	private static final byte[]                   EMPTY        = {};
-	private A                                     agent;
-	private final CountDownLatch                  latch        = new CountDownLatch(1);
-	protected volatile int                        exitCode;
-	private Link<S, A>                            link;
-	private final AtomicBoolean                   quit         = new AtomicBoolean(false);
-	protected String                              host;
-	protected int                                 port;
-	protected int                                 timeout;
-
-	static class Info extends DTO {
-		public String sha;
-		public long   lastModified;
-	}
+	private static final int     CONNECT_WAIT = 200;
+	private A                    agent;
+	private final CountDownLatch latch        = new CountDownLatch(1);
+	protected volatile int       exitCode;
+	private Link<S, A>           link;
+	private final AtomicBoolean  quit         = new AtomicBoolean(false);
+	protected String             host;
+	protected int                port;
+	protected int                timeout;
 
 	protected void connect(final Class<A> agent, final S supervisor, final String host, final int port) throws Exception {
 		connect(agent, supervisor, host, port, -1);
@@ -71,12 +53,10 @@ public class AgentSupervisor<S, A> {
 		if (timeout < -1) {
 			throw new IllegalArgumentException("timeout cannot be less than -1");
 		}
-
 		var retryTimeout = timeout;
 		this.host    = host;
 		this.port    = port;
 		this.timeout = timeout;
-
 		while (true) {
 			try {
 				final var socket = new Socket();
@@ -97,25 +77,6 @@ public class AgentSupervisor<S, A> {
 		}
 	}
 
-	public byte[] getFile(final String sha) throws Exception {
-		List<String> copy;
-		synchronized (shaInfo) {
-			final var list = shaInfo.get(sha);
-			if (list == null) {
-				return EMPTY;
-			}
-
-			copy = Lists.newArrayList(list);
-		}
-		for (final String path : copy) {
-			final var f = new File(path);
-			if (f.isFile()) {
-				return IO.read(f);
-			}
-		}
-		return EMPTY;
-	}
-
 	public void setAgent(final Link<S, A> link) {
 		this.agent = link.getRemote();
 		this.link  = link;
@@ -125,11 +86,9 @@ public class AgentSupervisor<S, A> {
 		if (quit.getAndSet(true)) {
 			return;
 		}
-
 		if (link.isOpen()) {
 			link.close();
 		}
-
 		latch.countDown();
 	}
 
@@ -149,27 +108,6 @@ public class AgentSupervisor<S, A> {
 
 	public A getAgent() {
 		return agent;
-	}
-
-	public String addFile(File file) throws Exception {
-		file = file.getAbsoluteFile();
-		final var info = fileInfo.computeIfAbsent(file, f -> {
-			final var i = new Info();
-			i.lastModified = -1;
-			return i;
-		});
-		synchronized (shaInfo) {
-			if (info.lastModified != file.lastModified()) {
-				final var sha = SHA1.digest(file).asHex();
-				if (info.sha != null && !sha.equals(info.sha)) {
-					shaInfo.removeValue(info.sha, file.getAbsolutePath());
-				}
-				info.sha          = sha;
-				info.lastModified = file.lastModified();
-				shaInfo.add(sha, file.getAbsolutePath());
-			}
-			return info.sha;
-		}
 	}
 
 	public boolean isOpen() {
