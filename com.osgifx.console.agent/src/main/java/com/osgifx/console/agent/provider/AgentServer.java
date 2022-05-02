@@ -97,7 +97,7 @@ import aQute.remote.util.Link;
  * Implementation of the Agent. This implementation implements the Agent
  * interfaces and communicates with a Supervisor interfaces.
  */
-public class AgentServer implements Agent, Closeable {
+public final class AgentServer implements Agent, Closeable {
 
 	private static final Pattern BSN_P = Pattern.compile("\\s*([^;\\s]+).*");
 
@@ -107,7 +107,6 @@ public class AgentServer implements Agent, Closeable {
 	volatile boolean                  quit;
 	private Redirector                redirector = new NullRedirector();
 	private Link<Agent, Supervisor>   link;
-	private CountDownLatch            refresh    = new CountDownLatch(0);
 	private final int                 startOptions;
 	private ClassloaderLeakDetector   leakDetector;
 
@@ -232,10 +231,10 @@ public class AgentServer implements Agent, Closeable {
 			// if there are no errors at all, perform the refresh operation
 			if (result.response.isEmpty()) {
 				try {
-					// this causes https://issues.apache.org/jira/browse/FELIX-3414
-					// refresh(true);
+					// this sometimes causes https://issues.apache.org/jira/browse/FELIX-3414
+					refresh(true);
 				} catch (final Exception e) {
-					// nothing to do
+					Thread.currentThread().interrupt();
 				}
 			}
 		}
@@ -433,9 +432,8 @@ public class AgentServer implements Agent, Closeable {
 	public void refresh(final boolean async) throws InterruptedException {
 		final FrameworkWiring f = context.getBundle(0).adapt(FrameworkWiring.class);
 		if (f != null) {
-			refresh = new CountDownLatch(1);
+			final CountDownLatch refresh = new CountDownLatch(1);
 			f.refreshBundles(null, event -> refresh.countDown());
-
 			if (async) {
 				return;
 			}
