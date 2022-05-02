@@ -51,17 +51,6 @@ public interface Supervisor {
 	boolean stderr(String out) throws Exception;
 
 	/**
-	 * Return the contents of the file that has the given SHA-1. The initiator of
-	 * the connection should in general register the files it refers to in the
-	 * communication to the agent. The agent then calls this method to retrieve the
-	 * contents if it does not have it in its local cache.
-	 *
-	 * @param sha the SHA-1
-	 * @return the contents of that file or null if no such file exists.
-	 */
-	byte[] getFile(String sha) throws Exception;
-
-	/**
 	 * Connects to the specific host and port using the provided timeout in
 	 * connection
 	 *
