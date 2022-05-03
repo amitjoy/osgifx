@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.batchinstall.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialogController.ARTIFACTS_DIRECTORY;
 
 import java.io.File;
 import java.util.List;
@@ -50,7 +51,8 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
 		initStyle(StageStyle.UNDECORATED);
 		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-		dialogPane.setHeaderText("Install Artifacts from Directory");
+		dialogPane
+		        .setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '" + ARTIFACTS_DIRECTORY + "' directory");
 		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
 
 		final var loginButtonType = new ButtonType("Install", ButtonData.OK_DONE);
