@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.overview;
 
+import static com.osgifx.console.event.topics.CommonEventTopics.ALL_DATA_RETRIVED;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static java.util.Objects.requireNonNullElse;
@@ -103,6 +104,9 @@ public final class OverviewFxUI {
 
 	@Focus
 	public void onFocus(final BorderPane parent) {
+		// This is required as a workaround to ensure that after the tab gets focussed,
+		// the CSS overridden problem gets overridden once again with the TileFX
+		// embedded CSS and the number tiles are shown properly
 		createTiles(parent);
 	}
 
@@ -401,11 +405,25 @@ public final class OverviewFxUI {
 
 	@Inject
 	@Optional
-	private void updateOnAgentDisconnectedEvent(//
+	private void updateOnAgentDisconnectedEvent( //
 	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
 	        final BorderPane parent) {
 		logger.atInfo().log("Agent disconnected event received");
 		dataRetrieverTimeline.stop();
+		createTiles(parent);
+	}
+
+	/*
+	 * This is only required as a workaround to ensure that after the progress
+	 * dialog is closed, the CSS overridden problem gets overridden once again with
+	 * the TileFX embedded CSS and the number tiles are shown properly
+	 */
+	@Inject
+	@Optional
+	private void updateOnDataRetrivedEvent( //
+	        @UIEventTopic(ALL_DATA_RETRIVED) final String data, //
+	        final BorderPane parent) {
+		logger.atInfo().log("All data retrieved event received");
 		createTiles(parent);
 	}
 

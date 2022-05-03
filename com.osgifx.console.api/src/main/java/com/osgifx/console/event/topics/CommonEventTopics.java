@@ -32,4 +32,6 @@ public final class CommonEventTopics {
 	public static final String CLEAR_EVENTS_TOPIC = "com/osgifx/clear/events";
 	public static final String CLEAR_LOGS_TOPIC   = "com/osgifx/clear/logs";
 
+	public static final String ALL_DATA_RETRIVED = "com/osgifx/data/retrieved";
+
 }
