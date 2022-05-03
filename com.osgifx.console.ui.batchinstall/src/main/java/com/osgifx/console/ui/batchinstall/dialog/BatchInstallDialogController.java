@@ -33,7 +33,7 @@ import javafx.scene.image.ImageView;
 
 public final class BatchInstallDialogController {
 
-	private static final String ARTIFACTS_DIRECTORY = "./fxartifacts";
+	public static final String ARTIFACTS_DIRECTORY = "./fxartifacts";
 
 	@Log
 	@Inject
