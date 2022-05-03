@@ -16,12 +16,9 @@
 package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
-
-import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -40,7 +37,7 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(PROPERTIES_ID)
-@EventTopics({ AGENT_CONNECTED_EVENT_TOPIC, AGENT_DISCONNECTED_EVENT_TOPIC })
+@EventTopics(AGENT_DISCONNECTED_EVENT_TOPIC)
 public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
 	public static final String PROPERTIES_ID = "properties";
@@ -79,14 +76,7 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
 
 	@Override
 	public void handleEvent(final Event event) {
-		final var topic = event.getTopic();
-		if (AGENT_CONNECTED_EVENT_TOPIC.equals(topic)) {
-			CompletableFuture.runAsync(this::retrieve);
-			return;
-		}
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic)) {
-			threadSync.asyncExec(properties::clear);
-		}
+		threadSync.asyncExec(properties::clear);
 	}
 
 }

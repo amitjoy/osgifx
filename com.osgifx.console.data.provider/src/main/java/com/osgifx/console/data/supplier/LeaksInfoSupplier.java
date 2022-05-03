@@ -17,7 +17,6 @@ package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -41,7 +40,7 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(LEAKS_ID)
-@EventTopics({ AGENT_CONNECTED_EVENT_TOPIC, AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
+@EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
 public final class LeaksInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
 	public static final String LEAKS_ID = "leaks";

@@ -18,7 +18,6 @@ package com.osgifx.console.data.supplier;
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
 import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -42,13 +41,7 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(CONFIGURATIONS_ID)
-// @formatter:off
-@EventTopics({
-	AGENT_CONNECTED_EVENT_TOPIC,
-	AGENT_DISCONNECTED_EVENT_TOPIC,
-	COMPONENT_ACTION_EVENT_TOPICS,
-	CONFIGURATION_ACTION_EVENT_TOPICS })
-// @formatter:on
+@EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, COMPONENT_ACTION_EVENT_TOPICS, CONFIGURATION_ACTION_EVENT_TOPICS })
 public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
 	public static final String CONFIGURATIONS_ID = "configurations";
