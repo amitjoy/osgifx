@@ -145,6 +145,7 @@ public final class InstallFeatureDialogController {
 					protected Void call() throws Exception {
 						try {
 							features.putAll(featureAgent.readFeatures(parsedURL));
+							return null;
 						} catch (final InterruptedException e) {
 							logger.atInfo().log("Feature retrieval task interrupted");
 							threadSync.asyncExec(progressDialog::close);
@@ -155,8 +156,8 @@ public final class InstallFeatureDialogController {
 								progressDialog.close();
 								FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 							});
+							throw e;
 						}
-						return null;
 					}
 
 					@Override

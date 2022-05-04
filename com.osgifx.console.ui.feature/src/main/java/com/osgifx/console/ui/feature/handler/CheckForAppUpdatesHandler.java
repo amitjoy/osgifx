@@ -88,8 +88,8 @@ public final class CheckForAppUpdatesHandler {
 						updateCheckProgressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
+					throw e;
 				}
-				return null;
 			}
 
 			private boolean updatesNotAvailable(final String latest) {

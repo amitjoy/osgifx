@@ -79,6 +79,7 @@ public final class ConnectToLocalAgentHandler {
 					updateMessage("Connecting to Local Agent on " + localAgentPort);
 					supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
 					logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost, localAgentPort);
+					return null;
 				} catch (final InterruptedException e) {
 					logger.atInfo().log("Connection task interrupted");
 					threadSync.asyncExec(progressDialog::close);
@@ -89,8 +90,8 @@ public final class ConnectToLocalAgentHandler {
 						progressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
+					throw e;
 				}
-				return null;
 			}
 
 			@Override
