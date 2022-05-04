@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -48,6 +47,7 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
+import javafx.scene.control.ButtonType;
 
 public final class ConnectToAgentHandler {
 
@@ -55,37 +55,38 @@ public final class ConnectToAgentHandler {
 
 	@Log
 	@Inject
-	private FluentLogger               logger;
+	private FluentLogger                            logger;
 	@Inject
-	private ThreadSynchronize          threadSync;
+	private ThreadSynchronize                       threadSync;
 	@Inject
-	private IEclipseContext            context;
+	private IEclipseContext                         context;
 	@Inject
-	private IEventBroker               eventBroker;
+	private IEventBroker                            eventBroker;
 	@Inject
-	private Supervisor                 supervisor;
+	private Supervisor                              supervisor;
 	@Inject
-	private CommandService             commandService;
+	private CommandService                          commandService;
 	@Inject
 	@Optional
 	@ContextValue("is_connected")
-	private ContextBoundValue<Boolean> isConnected;
+	private ContextBoundValue<Boolean>              isConnected;
 	@Inject
 	@Optional
 	@ContextValue("connected.agent")
-	private ContextBoundValue<String>  connectedAgent;
+	private ContextBoundValue<String>               connectedAgent;
 	@Inject
-	@Optional
-	@Named("selected.settings")
-	private ConnectionSettingDTO       selectedSettings;
-	private ProgressDialog             progressDialog;
+	@ContextValue("selected.settings")
+	private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+	private ProgressDialog                          progressDialog;
 
 	@Execute
 	public void execute() {
 		final var connectToAgentDialog = new ConnectToAgentDialog();
 		ContextInjectionFactory.inject(connectToAgentDialog, context);
 		logger.atInfo().log("Injected connect to agent dialog to eclipse context");
+
 		connectToAgentDialog.init();
+
 		final var result = connectToAgentDialog.showAndWait();
 		if (!result.isPresent()) {
 			logger.atInfo().log("No button has been selected");
@@ -94,14 +95,21 @@ public final class ConnectToAgentHandler {
 		final var selectedButton = result.get();
 		if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
 			addConnection();
+			removeCurrentSelection();
 			return;
 		}
 		if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
 			removeConnection();
+			removeCurrentSelection();
 			return;
 		}
 		if (selectedButton == connectToAgentDialog.getButtonType(ActionType.CONNECT)) {
 			connectAgent();
+			removeCurrentSelection();
+			return;
+		}
+		if (selectedButton == ButtonType.CANCEL) {
+			removeCurrentSelection();
 		}
 	}
 
@@ -130,18 +138,20 @@ public final class ConnectToAgentHandler {
 
 	private void removeConnection() {
 		logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
-		if (selectedSettings == null) {
+		final ConnectionSettingDTO settings = selectedSettings.getValue();
+		if (settings == null) {
 			logger.atInfo().log("No connection setting has been selected");
 			return;
 		}
-		triggerCommand(selectedSettings, "REMOVE");
-		logger.atInfo().log("REMOVE command has been invoked for %s", selectedSettings);
+		triggerCommand(settings, "REMOVE");
+		logger.atInfo().log("REMOVE command has been invoked for %s", settings);
 		Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
 	}
 
 	private void connectAgent() {
 		logger.atInfo().log("'%s'-'connectAgent(..)' event has been invoked", getClass().getSimpleName());
-		if (selectedSettings == null) {
+		final var settings = selectedSettings.getValue();
+		if (settings == null) {
 			logger.atInfo().log("No connection setting has been selected");
 			return;
 		}
@@ -150,15 +160,15 @@ public final class ConnectToAgentHandler {
 			@Override
 			protected Void call() throws Exception {
 				try {
-					updateMessage("Connecting to " + selectedSettings.host + ":" + selectedSettings.port);
-					supervisor.connect(selectedSettings.host, selectedSettings.port, selectedSettings.timeout);
-					logger.atInfo().log("Successfully connected to %s", selectedSettings);
+					updateMessage("Connecting to " + settings.host + ":" + settings.port);
+					supervisor.connect(settings.host, settings.port, settings.timeout);
+					logger.atInfo().log("Successfully connected to %s", settings);
 				} catch (final InterruptedException e) {
 					logger.atInfo().log("Connection task interrupted");
 					threadSync.asyncExec(progressDialog::close);
 					throw e;
 				} catch (final Exception e) {
-					logger.atError().withException(e).log("Cannot connect to %s", selectedSettings);
+					logger.atError().withException(e).log("Cannot connect to %s", settings);
 					threadSync.asyncExec(() -> {
 						progressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
@@ -169,8 +179,8 @@ public final class ConnectToAgentHandler {
 
 			@Override
 			protected void succeeded() {
-				logger.atInfo().log("Agent connected event has been sent for %s", selectedSettings);
-				final var connection = selectedSettings.host + ":" + selectedSettings.port;
+				logger.atInfo().log("Agent connected event has been sent for %s", settings);
+				final var connection = settings.host + ":" + settings.port;
 
 				eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
 				connectedAgent.publish(connection);
@@ -192,6 +202,10 @@ public final class ConnectToAgentHandler {
 		properties.put("type", type);
 
 		commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
+	}
+
+	private void removeCurrentSelection() {
+		selectedSettings.publish(null);
 	}
 
 	@Inject
