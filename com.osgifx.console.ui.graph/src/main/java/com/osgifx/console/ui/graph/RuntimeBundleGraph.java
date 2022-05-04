@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
+import static com.osgifx.console.ui.graph.BundleVertex.VERTEX_ID_FUNCTION;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
@@ -77,7 +78,7 @@ public final class RuntimeBundleGraph {
 	}
 
 	private Map<String, XBundleDTO> processBundles(final List<XBundleDTO> bundles) {
-		return bundles.stream().collect(toMap(b -> b.symbolicName + ":" + b.id, Functions.identity()));
+		return bundles.stream().collect(toMap(b -> VERTEX_ID_FUNCTION.apply(b.symbolicName, b.id), Functions.identity()));
 	}
 
 	private Graph<BundleVertex, DefaultEdge> buildGraph(final List<XBundleDTO> bundles, final Strategy strategy) {
