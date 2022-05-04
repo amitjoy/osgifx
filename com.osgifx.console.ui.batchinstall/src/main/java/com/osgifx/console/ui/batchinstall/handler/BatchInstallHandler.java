@@ -83,11 +83,11 @@ public final class BatchInstallHandler {
 							FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
 						});
 					} else {
-						threadSync.asyncExec(() -> progressDialog.close());
+						threadSync.asyncExec(progressDialog::close);
 					}
 				}
 			});
-			CompletableFuture.runAsync(batchTask).exceptionally(e -> {
+			final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(batchTask).exceptionally(e -> {
 				if (progressDialog != null) {
 					threadSync.asyncExec(() -> {
 						progressDialog.close();
@@ -96,7 +96,7 @@ public final class BatchInstallHandler {
 				}
 				return null;
 			});
-			progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader());
+			progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
 		}
 	}
 

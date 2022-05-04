@@ -67,16 +67,29 @@ public final class CheckForAppUpdatesHandler {
 		final Task<String> updateCheckTask = new Task<>() {
 			@Override
 			protected String call() throws Exception {
-				final var latestAppVersion = featureAgent.checkForAppUpdates();
-				if (latestAppVersion.isEmpty() || updatesNotAvailable(latestAppVersion.get())) {
-					logger.atInfo().log("No application updates available");
+				try {
+					final var latestAppVersion = featureAgent.checkForAppUpdates();
+					if (latestAppVersion.isEmpty() || updatesNotAvailable(latestAppVersion.get())) {
+						logger.atInfo().log("No application updates available");
+						threadSync.asyncExec(() -> {
+							updateCheckProgressDialog.close();
+							FxDialog.showInfoDialog("Check for Updates", "No update found", getClass().getClassLoader());
+						});
+						return null;
+					}
+					return latestAppVersion.get();
+				} catch (final InterruptedException e) {
+					logger.atInfo().log("Check for application updates task interrupted");
+					threadSync.asyncExec(updateCheckProgressDialog::close);
+					throw e;
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Cannot check for application updates");
 					threadSync.asyncExec(() -> {
 						updateCheckProgressDialog.close();
-						FxDialog.showInfoDialog("Check for Updates", "No update found", getClass().getClassLoader());
+						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
-					return null;
 				}
-				return latestAppVersion.get();
+				return null;
 			}
 
 			private boolean updatesNotAvailable(final String latest) {
@@ -90,11 +103,13 @@ public final class CheckForAppUpdatesHandler {
 
 			@Override
 			protected void succeeded() {
-				threadSync.asyncExec(() -> updateCheckProgressDialog.close());
+				threadSync.asyncExec(updateCheckProgressDialog::close);
 			}
 		};
-		updateCheckProgressDialog = FxDialog.showProgressDialog("Checking for Updates", updateCheckTask, getClass().getClassLoader());
-		CompletableFuture.runAsync(updateCheckTask);
+
+		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(updateCheckTask);
+		updateCheckProgressDialog = FxDialog.showProgressDialog("Checking for Updates", updateCheckTask, getClass().getClassLoader(),
+		        () -> taskFuture.cancel(true));
 		updateCheckTask.setOnSucceeded(t -> openDialog(updateCheckTask.getValue()));
 	}
 

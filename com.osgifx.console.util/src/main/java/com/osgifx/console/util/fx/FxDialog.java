@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
 
-import javafx.concurrent.Worker;
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -66,14 +66,28 @@ public final class FxDialog {
 		return dialog;
 	}
 
-	public static ProgressDialog showProgressDialog(final String header, final Worker<?> worker, final ClassLoader cssResLoader) {
-		final var progressDialog = new ProgressDialog(worker);
+	public static ProgressDialog showProgressDialog(final String header, final Task<?> task, final ClassLoader cssResLoader,
+	        final Runnable cancellationRunnable) {
+		final var progressDialog = new ProgressDialog(task);
 
 		progressDialog.setHeaderText(header);
 		progressDialog.initStyle(StageStyle.UNDECORATED);
-		progressDialog.getDialogPane().getStylesheets().add(cssResLoader.getResource(STANDARD_CSS).toExternalForm());
-		progressDialog.show();
 
+		final var dialogPane = progressDialog.getDialogPane();
+		dialogPane.getStylesheets().add(cssResLoader.getResource(STANDARD_CSS).toExternalForm());
+		dialogPane.getButtonTypes().setAll(ButtonType.CANCEL);
+
+		task.setOnCancelled(succeeded -> progressDialog.close());
+		progressDialog.setOnCloseRequest(closeRequest -> {
+			if (task.isRunning()) {
+				closeRequest.consume();
+			}
+			if (cancellationRunnable != null) {
+				cancellationRunnable.run();
+				task.cancel(true);
+			}
+		});
+		progressDialog.show();
 		return progressDialog;
 	}
 

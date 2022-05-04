@@ -63,13 +63,14 @@ public final class AgentConnectedAddon {
 
 			@Override
 			protected void succeeded() {
-				threadSync.asyncExec(() -> progressDialog.close());
+				threadSync.asyncExec(progressDialog::close);
 				eventBroker.post(ALL_DATA_RETRIVED, null);
 			}
 		};
+
+		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(dataRetrievalTask);
 		progressDialog = FxDialog.showProgressDialog("Retrieving information from remote agent", dataRetrievalTask,
-		        getClass().getClassLoader());
-		CompletableFuture.runAsync(dataRetrievalTask);
+		        getClass().getClassLoader(), () -> taskFuture.cancel(true));
 	}
 
 }
