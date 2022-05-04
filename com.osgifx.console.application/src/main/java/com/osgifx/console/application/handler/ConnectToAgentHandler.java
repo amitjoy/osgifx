@@ -163,6 +163,7 @@ public final class ConnectToAgentHandler {
 					updateMessage("Connecting to " + settings.host + ":" + settings.port);
 					supervisor.connect(settings.host, settings.port, settings.timeout);
 					logger.atInfo().log("Successfully connected to %s", settings);
+					return null;
 				} catch (final InterruptedException e) {
 					logger.atInfo().log("Connection task interrupted");
 					threadSync.asyncExec(progressDialog::close);
@@ -173,8 +174,8 @@ public final class ConnectToAgentHandler {
 						progressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
+					throw e;
 				}
-				return null;
 			}
 
 			@Override

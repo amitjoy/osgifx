@@ -79,9 +79,6 @@ public final class FxDialog {
 
 		task.setOnCancelled(succeeded -> progressDialog.close());
 		progressDialog.setOnCloseRequest(closeRequest -> {
-			if (task.isRunning()) {
-				closeRequest.consume();
-			}
 			if (cancellationRunnable != null) {
 				cancellationRunnable.run();
 				task.cancel(true);

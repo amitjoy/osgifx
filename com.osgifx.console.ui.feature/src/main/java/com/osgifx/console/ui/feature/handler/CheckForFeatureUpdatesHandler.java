@@ -77,13 +77,13 @@ public final class CheckForFeatureUpdatesHandler {
 					threadSync.asyncExec(updateCheckProgressDialog::close);
 					throw e;
 				} catch (final Exception e) {
-					logger.atError().withException(e).log("Could not check for updated");
+					logger.atError().withException(e).log("Could not check for updates");
 					threadSync.asyncExec(() -> {
 						updateCheckProgressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
+					throw e;
 				}
-				return null;
 			}
 
 			@Override
@@ -131,6 +131,7 @@ public final class CheckForFeatureUpdatesHandler {
 							} catch (final Exception e) {
 								logger.atError().withException(e).log("Cannot check for updates");
 								notUpdatedFeatures.add(entry);
+								throw e;
 							}
 						}
 						threadSync.asyncExec(() -> {

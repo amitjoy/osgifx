@@ -109,6 +109,7 @@ public final class FeatureInstallHandler {
 					} catch (final Exception e) {
 						notInstalledFeatures.add(f);
 						logger.atError().withException(e).log("Cannot update or install feature '%s'", id);
+						throw e;
 					}
 				}
 				return null;
