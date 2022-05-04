@@ -63,14 +63,27 @@ public final class CheckForFeatureUpdatesHandler {
 		final Task<Collection<FeatureDTO>> updateCheckTask = new Task<>() {
 			@Override
 			protected Collection<FeatureDTO> call() throws Exception {
-				final var tobeUpdatedFeatures = featureAgent.checkForFeatureUpdates();
-				if (tobeUpdatedFeatures.isEmpty()) {
+				try {
+					final var tobeUpdatedFeatures = featureAgent.checkForFeatureUpdates();
+					if (tobeUpdatedFeatures.isEmpty()) {
+						threadSync.asyncExec(() -> {
+							updateCheckProgressDialog.close();
+							FxDialog.showInfoDialog("Check for Updates", "No update found", getClass().getClassLoader());
+						});
+					}
+					return tobeUpdatedFeatures;
+				} catch (final InterruptedException e) {
+					logger.atInfo().log("Update check task interrupted");
+					threadSync.asyncExec(updateCheckProgressDialog::close);
+					throw e;
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Could not check for updated");
 					threadSync.asyncExec(() -> {
 						updateCheckProgressDialog.close();
-						FxDialog.showInfoDialog("Check for Updates", "No update found", getClass().getClassLoader());
+						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
 				}
-				return tobeUpdatedFeatures;
+				return null;
 			}
 
 			@Override
@@ -78,8 +91,10 @@ public final class CheckForFeatureUpdatesHandler {
 				threadSync.asyncExec(() -> updateCheckProgressDialog.close());
 			}
 		};
-		updateCheckProgressDialog = FxDialog.showProgressDialog("Checking for updates", updateCheckTask, getClass().getClassLoader());
-		CompletableFuture.runAsync(updateCheckTask);
+
+		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(updateCheckTask);
+		updateCheckProgressDialog = FxDialog.showProgressDialog("Checking for updates", updateCheckTask, getClass().getClassLoader(),
+		        () -> taskFuture.cancel(true));
 
 		updateCheckTask.setOnSucceeded(t -> {
 			final var dialog = new CheckForFeatureUpdatesDialog();
@@ -109,6 +124,10 @@ public final class CheckForFeatureUpdatesHandler {
 								logger.atInfo().log("Processing update: '%s'", feature.getValue());
 								featureAgent.updateOrInstall(feature.getKey(), repoURL);
 								successfullyUpdatedFeatures.add(entry);
+							} catch (final InterruptedException e) {
+								logger.atInfo().log("Update processing task interrupted");
+								threadSync.asyncExec(updateProgressDialog::close);
+								throw e;
 							} catch (final Exception e) {
 								logger.atError().withException(e).log("Cannot check for updates");
 								notUpdatedFeatures.add(entry);
@@ -154,8 +173,9 @@ public final class CheckForFeatureUpdatesHandler {
 				};
 			}
 			if (updateTask != null) {
-				updateProgressDialog = FxDialog.showProgressDialog("Updating Features", updateTask, getClass().getClassLoader());
-				CompletableFuture.runAsync(updateTask);
+				final var future = CompletableFuture.runAsync(updateTask);
+				updateProgressDialog = FxDialog.showProgressDialog("Updating Features", updateTask, getClass().getClassLoader(),
+				        () -> future.cancel(true));
 			}
 		});
 	}

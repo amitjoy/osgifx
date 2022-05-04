@@ -79,13 +79,16 @@ public final class ConnectToLocalAgentHandler {
 					updateMessage("Connecting to Local Agent on " + localAgentPort);
 					supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
 					logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost, localAgentPort);
+				} catch (final InterruptedException e) {
+					logger.atInfo().log("Connection task interrupted");
+					threadSync.asyncExec(progressDialog::close);
+					throw e;
 				} catch (final Exception e) {
 					logger.atError().withException(e).log("Cannot connect to Local Agent on %s:%s", localAgentHost, localAgentPort);
 					threadSync.asyncExec(() -> {
 						progressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
-					throw e;
 				}
 				return null;
 			}
@@ -101,8 +104,10 @@ public final class ConnectToLocalAgentHandler {
 				isConnected.publish(true);
 			}
 		};
-		CompletableFuture.runAsync(connectTask);
-		progressDialog = FxDialog.showProgressDialog("Local Agent Connection", connectTask, getClass().getClassLoader());
+
+		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(connectTask);
+		progressDialog = FxDialog.showProgressDialog("Local Agent Connection", connectTask, getClass().getClassLoader(),
+		        () -> taskFuture.cancel(true));
 	}
 
 	@CanExecute

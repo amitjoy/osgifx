@@ -32,6 +32,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.preferences.Preference;
@@ -55,17 +56,19 @@ public final class FeatureInstallHandler {
 
 	@Log
 	@Inject
-	private FluentLogger    logger;
+	private FluentLogger      logger;
 	@Inject
-	private IEclipseContext context;
+	private IEclipseContext   context;
 	@Inject
-	private FeatureAgent    featureAgent;
+	private FeatureAgent      featureAgent;
 	@Inject
-	private IWorkbench      workbench;
+	private IWorkbench        workbench;
+	@Inject
+	private ThreadSynchronize threadSync;
 	@Inject
 	@Preference(nodePath = "osgi.fx.feature", key = "repos", defaultValue = "")
-	private Value<String>   repos;
-	private ProgressDialog  progressDialog;
+	private Value<String>     repos;
+	private ProgressDialog    progressDialog;
 
 	@Execute
 	public void execute() {
@@ -99,6 +102,10 @@ public final class FeatureInstallHandler {
 						featureAgent.updateOrInstall(feature.getKey(), archiveURL);
 						successfullyInstalledFeatures.add(f);
 						logger.atInfo().log("Feature '%s' has been successfuly installed/updated", id);
+					} catch (final InterruptedException e) {
+						logger.atInfo().log("Feature install/update task interrupted");
+						threadSync.asyncExec(progressDialog::close);
+						throw e;
 					} catch (final Exception e) {
 						notInstalledFeatures.add(f);
 						logger.atError().withException(e).log("Cannot update or install feature '%s'", id);
@@ -162,8 +169,10 @@ public final class FeatureInstallHandler {
 				repos.publish(json);
 			}
 		};
-		CompletableFuture.runAsync(task);
-		progressDialog = FxDialog.showProgressDialog("External Feature Installation", task, getClass().getClassLoader());
+
+		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
+		progressDialog = FxDialog.showProgressDialog("External Feature Installation", task, getClass().getClassLoader(),
+		        () -> taskFuture.cancel(true));
 	}
 
 	private static boolean isWebURL(final String url) {

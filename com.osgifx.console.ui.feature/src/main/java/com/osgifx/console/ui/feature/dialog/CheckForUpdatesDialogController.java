@@ -57,7 +57,6 @@ public final class CheckForUpdatesDialogController {
 		featuresView.getSelectionModel().setSelectionMode(MULTIPLE);
 
 		features = Maps.newHashMap();
-
 		logger.atDebug().log("FXML controller has been initialized");
 	}
 

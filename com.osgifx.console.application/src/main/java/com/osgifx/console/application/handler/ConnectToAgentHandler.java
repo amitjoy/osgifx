@@ -153,13 +153,16 @@ public final class ConnectToAgentHandler {
 					updateMessage("Connecting to " + selectedSettings.host + ":" + selectedSettings.port);
 					supervisor.connect(selectedSettings.host, selectedSettings.port, selectedSettings.timeout);
 					logger.atInfo().log("Successfully connected to %s", selectedSettings);
+				} catch (final InterruptedException e) {
+					logger.atInfo().log("Connection task interrupted");
+					threadSync.asyncExec(progressDialog::close);
+					throw e;
 				} catch (final Exception e) {
 					logger.atError().withException(e).log("Cannot connect to %s", selectedSettings);
 					threadSync.asyncExec(() -> {
 						progressDialog.close();
 						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
 					});
-					throw e;
 				}
 				return null;
 			}
@@ -174,8 +177,10 @@ public final class ConnectToAgentHandler {
 				isConnected.publish(true);
 			}
 		};
-		CompletableFuture.runAsync(connectTask);
-		progressDialog = FxDialog.showProgressDialog("Remote Connection", connectTask, getClass().getClassLoader());
+
+		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(connectTask);
+		progressDialog = FxDialog.showProgressDialog("Remote Connection", connectTask, getClass().getClassLoader(),
+		        () -> taskFuture.cancel(true));
 	}
 
 	private void triggerCommand(final ConnectionSettingDTO dto, final String type) {

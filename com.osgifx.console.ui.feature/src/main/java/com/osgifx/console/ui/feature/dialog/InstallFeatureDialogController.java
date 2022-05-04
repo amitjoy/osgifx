@@ -145,6 +145,10 @@ public final class InstallFeatureDialogController {
 					protected Void call() throws Exception {
 						try {
 							features.putAll(featureAgent.readFeatures(parsedURL));
+						} catch (final InterruptedException e) {
+							logger.atInfo().log("Feature retrieval task interrupted");
+							threadSync.asyncExec(progressDialog::close);
+							throw e;
 						} catch (final Exception e) {
 							logger.atError().withException(e).log("Cannot read features from archive - '%s'", parsedURL);
 							threadSync.asyncExec(() -> {
@@ -157,11 +161,13 @@ public final class InstallFeatureDialogController {
 
 					@Override
 					protected void succeeded() {
-						threadSync.asyncExec(() -> progressDialog.close());
+						threadSync.asyncExec(progressDialog::close);
 					}
 				};
-				CompletableFuture.runAsync(task);
-				progressDialog = FxDialog.showProgressDialog("External Feature Download", task, getClass().getClassLoader());
+
+				final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
+				progressDialog = FxDialog.showProgressDialog("External Feature Download", task, getClass().getClassLoader(),
+				        () -> taskFuture.cancel(true));
 			} else {
 				logger.atInfo().log("Local archive found - '%s'", url);
 				logger.atInfo().log("Reading features from - '%s'", url);
