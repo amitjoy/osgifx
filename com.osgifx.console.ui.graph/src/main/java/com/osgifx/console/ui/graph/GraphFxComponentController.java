@@ -145,7 +145,7 @@ public final class GraphFxComponentController {
 	}
 
 	private void exportToDOT(final File location) {
-		final var exporter = new DOTExporter<ComponentVertex, DefaultEdge>();
+		final var exporter = new DOTExporter<ComponentVertex, DefaultEdge>(ComponentVertex::toDotID);
 		try {
 			final Graph<ComponentVertex, DefaultEdge> jGraph  = GraphHelper.toJGraphT(fxGraph.graph);
 			final var                                 dotFile = new File(location, generateDotFileName("Components"));

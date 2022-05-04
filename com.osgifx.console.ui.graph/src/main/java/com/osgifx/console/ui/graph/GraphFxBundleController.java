@@ -137,7 +137,7 @@ public final class GraphFxBundleController {
 	}
 
 	private void exportToDOT(final File location) {
-		final var exporter = new DOTExporter<BundleVertex, DefaultEdge>();
+		final var exporter = new DOTExporter<BundleVertex, DefaultEdge>(BundleVertex::toDotID);
 		try {
 			final Graph<BundleVertex, DefaultEdge> jGraph  = GraphHelper.toJGraphT(fxGraph.graph);
 			final var                              dotFile = new File(location, generateDotFileName("Bundles"));
