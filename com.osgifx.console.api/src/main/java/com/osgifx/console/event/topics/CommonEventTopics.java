@@ -32,6 +32,15 @@ public final class CommonEventTopics {
 	public static final String CLEAR_EVENTS_TOPIC = "com/osgifx/clear/events";
 	public static final String CLEAR_LOGS_TOPIC   = "com/osgifx/clear/logs";
 
-	public static final String ALL_DATA_RETRIVED = "com/osgifx/data/retrieved";
+	public static final String DATA_RETRIEVED_ALL_TOPIC            = "com/osgifx/data/retrieved/all";
+	public static final String DATA_RETRIEVED_BUNDLES_TOPIC        = "com/osgifx/data/retrieved/bundles";
+	public static final String DATA_RETRIEVED_COMPONENTS_TOPIC     = "com/osgifx/data/retrieved/components";
+	public static final String DATA_RETRIEVED_CONFIGURATIONS_TOPIC = "com/osgifx/data/retrieved/configurations";
+	public static final String DATA_RETRIEVED_HTTP_TOPIC           = "com/osgifx/data/retrieved/http";
+	public static final String DATA_RETRIEVED_LEAKS_TOPIC          = "com/osgifx/data/retrieved/leaks";
+	public static final String DATA_RETRIEVED_PACKAGES_TOPIC       = "com/osgifx/data/retrieved/packages";
+	public static final String DATA_RETRIEVED_PROPERTIES_TOPIC     = "com/osgifx/data/retrieved/properties";
+	public static final String DATA_RETRIEVED_SERVICES_TOPIC       = "com/osgifx/data/retrieved/services";
+	public static final String DATA_RETRIEVED_THREADS_TOPIC        = "com/osgifx/data/retrieved/threads";
 
 }

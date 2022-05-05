@@ -17,6 +17,7 @@ package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
 import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
@@ -32,6 +33,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
@@ -56,6 +58,8 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
 	@Reference
 	private LoggerFactory     factory;
 	@Reference
+	private EventAdmin        eventAdmin;
+	@Reference
 	private Supervisor        supervisor;
 	@Reference
 	private ThreadSynchronize threadSync;
@@ -77,6 +81,7 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
 			return;
 		}
 		components.setAll(makeNullSafe(agent.getAllComponents()));
+		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_COMPONENTS_TOPIC);
 		logger.atInfo().log("Components info retrieved successfully");
 	}
 

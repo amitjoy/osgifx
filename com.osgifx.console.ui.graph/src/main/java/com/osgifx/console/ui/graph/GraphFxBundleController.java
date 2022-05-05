@@ -90,6 +90,7 @@ public final class GraphFxBundleController {
 	private DataProvider              dataProvider;
 	@Inject
 	private ThreadSynchronize         threadSync;
+	@Inject
 	private RuntimeBundleGraph        runtimeGraph;
 	private MaskerPane                progressPane;
 	private FxBundleGraph             fxGraph;
@@ -127,9 +128,7 @@ public final class GraphFxBundleController {
 				return;
 			}
 			exportToDOT(location);
-			threadSync.asyncExec(() -> {
-				Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported");
-			});
+			threadSync.asyncExec(() -> Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported"));
 		});
 		final var menu = new ContextMenu();
 		menu.getItems().add(item);
@@ -163,7 +162,6 @@ public final class GraphFxBundleController {
 		});
 		final var bundles             = dataProvider.bundles();
 		final var filteredBundlesList = initSearchFilter(bundles);
-		runtimeGraph = new RuntimeBundleGraph(bundles);
 		bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.symbolicName)));
 		logger.atInfo().log("Bundles list has been initialized");
 	}

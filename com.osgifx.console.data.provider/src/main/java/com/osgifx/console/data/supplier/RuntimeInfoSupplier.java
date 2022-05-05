@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.data.supplier;
 
+import java.util.Map;
+
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+
 import javafx.collections.ObservableList;
 
 public interface RuntimeInfoSupplier {
@@ -30,5 +35,10 @@ public interface RuntimeInfoSupplier {
 	 * Returns the observable list
 	 */
 	ObservableList<?> supply();
+
+	static void sendEvent(final EventAdmin eventAdmin, final String topic) {
+		final var event = new Event(topic, Map.of());
+		eventAdmin.postEvent(event);
+	}
 
 }

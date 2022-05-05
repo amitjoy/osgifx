@@ -17,6 +17,7 @@ package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -30,6 +31,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
@@ -47,6 +49,8 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
 
 	@Reference
 	private LoggerFactory     factory;
+	@Reference
+	private EventAdmin        eventAdmin;
 	@Reference
 	private Supervisor        supervisor;
 	@Reference
@@ -69,6 +73,7 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
 			return;
 		}
 		bundles.setAll(makeNullSafe(agent.getAllBundles()));
+		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
 		logger.atInfo().log("Bundles info retrieved successfully");
 	}
 

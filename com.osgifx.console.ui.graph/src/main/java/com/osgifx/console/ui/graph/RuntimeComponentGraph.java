@@ -15,12 +15,20 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.annotations.Creatable;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.cycle.TarjanSimpleCycles;
@@ -33,14 +41,25 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.graph.RuntimeComponentGraph.CircularLinkedList.Node;
 
+@Creatable
 public final class RuntimeComponentGraph {
 
-	private final Graph<ComponentVertex, DefaultEdge> requirerGraph;
+	@Inject
+	private DataProvider                        dataProvider;
+	private Graph<ComponentVertex, DefaultEdge> requirerGraph;
 
-	public RuntimeComponentGraph(final List<XComponentDTO> components) {
-		requirerGraph = buildGraph(components);
+	@PostConstruct
+	public void init() {
+		requirerGraph = buildGraph(dataProvider.components());
+	}
+
+	@Inject
+	@Optional
+	private void onUnderlyingDataUpdate(@EventTopic(DATA_RETRIEVED_COMPONENTS_TOPIC) final String data) {
+		init();
 	}
 
 	public List<GraphPath<ComponentVertex, DefaultEdge>> getAllServiceComponentsThatAreRequiredBy(

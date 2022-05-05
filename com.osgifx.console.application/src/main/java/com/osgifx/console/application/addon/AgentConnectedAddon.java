@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.application.addon;
 
-import static com.osgifx.console.event.topics.CommonEventTopics.ALL_DATA_RETRIVED;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +23,6 @@ import javax.inject.Inject;
 
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -42,8 +40,6 @@ public final class AgentConnectedAddon {
 	private FluentLogger      logger;
 	@Inject
 	private ThreadSynchronize threadSync;
-	@Inject
-	private IEventBroker      eventBroker;
 	@Inject
 	private DataProvider      dataProvider;
 	private ProgressDialog    progressDialog;
@@ -64,7 +60,6 @@ public final class AgentConnectedAddon {
 			@Override
 			protected void succeeded() {
 				threadSync.asyncExec(progressDialog::close);
-				eventBroker.post(ALL_DATA_RETRIVED, null);
 			}
 		};
 
