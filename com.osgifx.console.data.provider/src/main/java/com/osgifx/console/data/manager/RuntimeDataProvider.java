@@ -27,6 +27,7 @@ import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES
 import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_ALL_TOPIC;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -41,6 +42,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.event.EventAdmin;
 
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -65,15 +67,19 @@ import javafx.collections.ObservableList;
 @SuppressWarnings("unchecked")
 public final class RuntimeDataProvider implements DataProvider {
 
-	private final FluentLogger                     logger;
-	private final Supervisor                       supervisor;
-	private final Map<String, RuntimeInfoSupplier> infoSuppliers;
+	@Reference
+	private LoggerFactory factory;
+	@Reference
+	private EventAdmin    eventAdmin;
+	@Reference
+	private Supervisor    supervisor;
+
+	private FluentLogger                           logger;
+	private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newHashMap();
 
 	@Activate
-	public RuntimeDataProvider(@Reference final LoggerFactory factory, @Reference final Supervisor supervisor) {
-		this.supervisor = supervisor;
-		infoSuppliers   = Maps.newHashMap();
-		logger          = FluentLogger.of(factory.createLogger(getClass().getName()));
+	public void activate() {
+		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 	}
 
 	@Override
@@ -86,11 +92,13 @@ public final class RuntimeDataProvider implements DataProvider {
 						             .stream()
 						             .map(s -> CompletableFuture.runAsync(s::retrieve))
 						             .toList();
-				CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-				                 .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
 				// @formatter:on
+				CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+				        .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
+				        .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
 			} else {
 				infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
+				RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
 				logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
 			}
 		} else if (isAsync) {

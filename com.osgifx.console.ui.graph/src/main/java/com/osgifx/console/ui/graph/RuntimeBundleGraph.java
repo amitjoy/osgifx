@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
 import static com.osgifx.console.ui.graph.BundleVertex.VERTEX_ID_FUNCTION;
 import static java.util.stream.Collectors.toMap;
 
@@ -23,6 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.eclipse.e4.core.di.annotations.Creatable;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.AllDirectedPaths;
@@ -33,17 +40,30 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
+import com.osgifx.console.data.provider.DataProvider;
 
+@Creatable
 public final class RuntimeBundleGraph {
 
-	private final Map<String, XBundleDTO>          bundles;
-	private final Graph<BundleVertex, DefaultEdge> providerGraph;
-	private final Graph<BundleVertex, DefaultEdge> requirerGraph;
+	@Inject
+	private DataProvider dataProvider;
 
-	public RuntimeBundleGraph(final List<XBundleDTO> bundles) {
-		this.bundles  = processBundles(bundles);
+	private Map<String, XBundleDTO>          bundleMap;
+	private Graph<BundleVertex, DefaultEdge> providerGraph;
+	private Graph<BundleVertex, DefaultEdge> requirerGraph;
+
+	@PostConstruct
+	public void init() {
+		final var bundles = dataProvider.bundles();
+		bundleMap     = processBundles(bundles);
 		providerGraph = buildGraph(bundles, Strategy.PROVIDER);
 		requirerGraph = buildGraph(bundles, Strategy.REQUIRER);
+	}
+
+	@Inject
+	@Optional
+	private void onUnderlyingDataUpdate(@EventTopic(DATA_RETRIEVED_BUNDLES_TOPIC) final String data) {
+		init();
 	}
 
 	public Collection<GraphPath<BundleVertex, DefaultEdge>> getAllBundlesThatRequire(final Collection<XBundleDTO> bundles) {
@@ -114,7 +134,7 @@ public final class RuntimeBundleGraph {
 				processedBundles.add(source.toString());
 			}
 			graph.addEdge(source, target);
-			final var dto = bundles.get(target.toString());
+			final var dto = bundleMap.get(target.toString());
 			prepareGraph(dto, graph, strategy, processedBundles);
 		}
 	}

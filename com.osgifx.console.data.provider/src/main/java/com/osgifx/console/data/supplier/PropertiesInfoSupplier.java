@@ -16,6 +16,7 @@
 package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_PROPERTIES_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
@@ -27,6 +28,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
@@ -44,6 +46,8 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
 
 	@Reference
 	private LoggerFactory     factory;
+	@Reference
+	private EventAdmin        eventAdmin;
 	@Reference
 	private Supervisor        supervisor;
 	@Reference
@@ -66,6 +70,7 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
 			return;
 		}
 		properties.setAll(makeNullSafe(agent.getAllProperties()));
+		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
 		logger.atInfo().log("Properties info retrieved successfully");
 	}
 

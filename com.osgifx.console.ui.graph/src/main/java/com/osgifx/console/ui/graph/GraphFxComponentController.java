@@ -91,6 +91,7 @@ public final class GraphFxComponentController {
 	private DataProvider                 dataProvider;
 	@Inject
 	private ThreadSynchronize            threadSync;
+	@Inject
 	private RuntimeComponentGraph        runtimeGraph;
 	private MaskerPane                   progressPane;
 	private ExecutorService              executor;
@@ -171,7 +172,6 @@ public final class GraphFxComponentController {
 		});
 		final var components             = dataProvider.components();
 		final var filteredComponentsList = initSearchFilter(components);
-		runtimeGraph = new RuntimeComponentGraph(components);
 		componentsList.setItems(filteredComponentsList.sorted(Comparator.comparing(b -> b.name)));
 		logger.atInfo().log("Components list has been initialized");
 	}

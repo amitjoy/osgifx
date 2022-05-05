@@ -17,6 +17,7 @@ package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_PACKAGES_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 
@@ -31,6 +32,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
@@ -54,6 +56,8 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 	@Reference
 	private LoggerFactory     factory;
 	@Reference
+	private EventAdmin        eventAdmin;
+	@Reference
 	private Supervisor        supervisor;
 	@Reference
 	private ThreadSynchronize threadSync;
@@ -75,6 +79,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 			return;
 		}
 		packages.setAll(preparePackages(agent.getAllBundles()));
+		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
 		logger.atInfo().log("Packages info retrieved successfully");
 	}
 

@@ -16,6 +16,7 @@
 package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
+import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_CONFIGURATIONS_TOPIC;
 import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
@@ -31,6 +32,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
@@ -48,6 +50,8 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
 
 	@Reference
 	private LoggerFactory     factory;
+	@Reference
+	private EventAdmin        eventAdmin;
 	@Reference
 	private Supervisor        supervisor;
 	@Reference
@@ -70,6 +74,7 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
 			return;
 		}
 		configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
+		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
 		logger.atInfo().log("Configurations info retrieved successfully");
 	}
 
