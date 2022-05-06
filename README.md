@@ -53,52 +53,50 @@
 
 |                      	|                                             	|
 |----------------------	|---------------------------------------------	|
-| Java (Application)    | 17                                         	  |
+| Java (Application)    | 17                                         	|
 | Java (Agent)          | 1.8                                         	|
 | Rich Client Platform 	| JavaFX 17                                    	|
 | Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
-| Tools                	| Bndtools 6                                  	|
+| Tools                	| Bndtools 6.2                                  |
 
 ------------------------------------------------------------------------------------------------------------
 
 ### Features
 
-|                                                                                                                                                                         	|   	|
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	|:-:	|
-| List all installed bundles and fragments                                                                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all exported and imported packages                                                                                                                                       	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all registered services                                                                                                                                                    	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all registered DS components                                                                                                                                               	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all available system and framework properties                                                                                                                              	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List all daemon and non-daemon threads                                                                                                                                          	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Send synchronous or asynchronous events on demand                                                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Receive events on demand (option to start and stop receiving events)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Receive logs on demand (option to start and stop receiving logs)                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Execute Gogo command                                                                                                                                                            	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Execute Terminal (CLI) command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install or update bundle                                                                                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                        	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+|                                                                                                                                                                           |     |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |:-:  |
+| List all installed bundles and fragments                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List all exported and imported packages                                                                                                                                         |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List all registered services                                                                                                                                                      |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List all registered DS components                                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List all available system and framework properties                                                                                                                                |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List all daemon and non-daemon threads                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Send synchronous or asynchronous events on demand                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Receive events on demand (option to start and stop receiving events)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Receive logs on demand (option to start and stop receiving logs)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Execute Gogo command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Execute CLI command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Install or update bundles                                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | List available configurations from `ConfigurationAdmin`                                                                                                                             |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List property descriptors (`Metatype`)                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Start/stop/uninstall bundle or fragment                                                                                                                                         	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Enable/disable DS component                                                                                                                                                     	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Update/delete existing configuration                                                                                                                                            	 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	 |
-| Create new configuration using metatype descriptor                                                                                                                              	 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	 |
-| Overview of the remote OSGi framework (memory consumption, uptime, framework information, number of bundles, number of threads, number of services and number of DS components) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Generate dependency graph for bundles 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Generate dependency graph for DS components 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Find all cycles between available DS components 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Export generated dependency graph to DOT (GraphViz) format (Right click on generated graph)	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install external feature (plugin) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Check and install if updates are available for installed feature(s) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| List and uninstall already installed feature(s) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Open Diagnostics (Show application log file) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| List `Metatype` property descriptors                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Start/stop/uninstall bundle or fragment                                                                                                                                           |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Enable/disable DS component                                                                                                                                                       |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Update/delete existing configuration                                                                                                                                               |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Create new configuration using metatype descriptor                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Overview of the remote OSGi framework (memory consumption, uptime, framework information, number of bundles, number of threads, number of services and number of DS components)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Generate dependency graph for bundles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Generate dependency graph for DS components   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Find all cycles between available DS components   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Export generated dependency graph to DOT (GraphViz) format (Right click on generated graph) |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Open Diagnostics (Show application log file)  |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Show suspicious classloader leaks 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Show HTTP runtime components (Servlets, Listeners, Filters, Resources and Error Pages) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Loads bundles and configurations from a specific directory to install in one go 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
+| Install external feature (plugin)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| List and uninstall already installed feature(s)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -122,4 +120,4 @@ This project is licensed under Apache License Version 2.0 [![License](http://img
 
 ### User Guide
 
-For instructions on how to download and install latest snapshot version, please refer to the [Project Website](https://osgifx.com).
+For instructions on how to download and install latest version, please refer to the [Project Website](https://osgifx.com).
