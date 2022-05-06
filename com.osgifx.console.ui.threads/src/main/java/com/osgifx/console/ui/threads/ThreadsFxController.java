@@ -87,7 +87,7 @@ public final class ThreadsFxController {
 		isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
 
 		table.setItems(dataProvider.threads());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

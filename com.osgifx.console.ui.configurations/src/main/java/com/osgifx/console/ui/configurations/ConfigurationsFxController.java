@@ -121,7 +121,7 @@ public final class ConfigurationsFxController {
 		table.getColumns().add(isFactoryColumn);
 
 		table.setItems(dataProvider.configurations());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

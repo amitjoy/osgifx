@@ -111,7 +111,7 @@ public final class EventsFxController {
 		final var events = dataProvider.events();
 		table.setItems(events);
 
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 		sortByReceivedAt(receivedAtColumn);
 	}
 

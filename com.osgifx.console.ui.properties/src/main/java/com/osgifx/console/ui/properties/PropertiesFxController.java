@@ -75,7 +75,7 @@ public final class PropertiesFxController {
 		propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
 		propertyTable.setItems(dataProvider.properties());
-		TableFilter.forTableView(propertyTable).apply();
+		TableFilter.forTableView(propertyTable).lazy(true).apply();
 	}
 
 }

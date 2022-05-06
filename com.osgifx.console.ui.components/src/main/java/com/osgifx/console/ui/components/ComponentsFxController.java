@@ -113,7 +113,7 @@ public final class ComponentsFxController {
 		table.getColumns().add(stateColumn);
 
 		table.setItems(dataProvider.components());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

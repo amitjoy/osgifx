@@ -116,7 +116,7 @@ public final class ServicesFxController {
 		table.getColumns().add(registeringBundleColumn);
 
 		table.setItems(dataProvider.services());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

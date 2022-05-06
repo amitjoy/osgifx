@@ -119,7 +119,7 @@ public final class LogsFxController {
 		final var logs = dataProvider.logs();
 		table.setItems(logs);
 
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 		sortByLoggedAt(loggedAtColumn);
 	}
 
