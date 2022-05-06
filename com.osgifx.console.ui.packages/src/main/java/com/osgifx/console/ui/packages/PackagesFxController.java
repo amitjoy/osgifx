@@ -113,7 +113,7 @@ public final class PackagesFxController {
 		table.getColumns().add(hasDuplicatesColumn);
 
 		table.setItems(dataProvider.packages());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

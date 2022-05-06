@@ -128,7 +128,7 @@ public final class HttpFxController {
 		table.getColumns().add(componentTypeColumn);
 
 		table.setItems(dataProvider.httpComponents());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

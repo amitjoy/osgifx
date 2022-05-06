@@ -78,7 +78,7 @@ public final class LeaksFxController {
 		stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
 		table.setItems(dataProvider.leaks());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }

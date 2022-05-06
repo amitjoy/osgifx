@@ -121,7 +121,7 @@ public final class BundlesFxController {
 		table.getColumns().add(statusColumn);
 
 		table.setItems(dataProvider.bundles());
-		TableFilter.forTableView(table).apply();
+		TableFilter.forTableView(table).lazy(true).apply();
 	}
 
 }
