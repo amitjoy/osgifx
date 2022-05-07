@@ -17,7 +17,7 @@ package com.osgifx.console.agent.provider;
 
 import static com.osgifx.console.agent.Agent.AGENT_SERVER_PORT_KEY;
 import static com.osgifx.console.agent.Agent.DEFAULT_PORT;
-import static com.osgifx.console.agent.Agent.PORT_P;
+import static com.osgifx.console.agent.Agent.PORT_PATTERN;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import java.io.IOException;
@@ -37,22 +37,21 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.lib.io.IO;
-import aQute.remote.util.Link;
 
 /**
  * The agent bundles uses an activator instead of DS to not constrain the target
  * environment in any way.
  */
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
-public class Activator extends Thread implements BundleActivator {
-	private ServerSocket  server;
-	private BundleContext context;
+public final class Activator extends Thread implements BundleActivator {
 
+	private ServerSocket            server;
+	private BundleContext           context;
 	private ClassloaderLeakDetector classloaderLeakDetector;
-
 	private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
 
 	@Override
@@ -68,7 +67,7 @@ public class Activator extends Thread implements BundleActivator {
 		}
 
 		// Check if it matches the specification of host:port
-		final Matcher m = PORT_P.matcher(port);
+		final Matcher m = PORT_PATTERN.matcher(port);
 		if (!m.matches()) {
 			throw new IllegalArgumentException(
 			        "Invalid port specification in property '" + AGENT_SERVER_PORT_KEY + "', expects [<host>:]<port> : " + port);
@@ -89,9 +88,6 @@ public class Activator extends Thread implements BundleActivator {
 		start();
 	}
 
-	/**
-	 * Main dispatcher loop
-	 */
 	@Override
 	public void run() {
 
@@ -99,35 +95,35 @@ public class Activator extends Thread implements BundleActivator {
 			while (!isInterrupted()) {
 				try {
 					final Socket socket = server.accept();
-
 					// timeout to get interrupts
 					socket.setSoTimeout(1000);
 
 					// create a new agent, and link it up.
 					final AgentServer sa = new AgentServer(context, classloaderLeakDetector);
 					agents.add(sa);
-					final Link<Agent, Supervisor> link = new Link<Agent, Supervisor>(Supervisor.class, sa, socket) {
+					final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class, sa, socket) {
 						@Override
 						public void close() throws IOException {
 							agents.remove(sa);
 							super.close();
 						}
 					};
-					sa.setLink(link);
-					// initialize OSGi eventing if available
+					sa.setEndpoint(remoteRPC);
+					// initialize OSGi events if available
 					final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
 					if (isEventAdminAvailable) {
 						final Dictionary<String, Object> properties = new Hashtable<>();
 						properties.put("event.topics", "*");
-						context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(link.getRemote()), properties);
+						context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(remoteRPC.getRemote()),
+						        properties);
 					}
 					// initialize OSGi logging if available
 					final boolean isLogAvailable = PackageWirings.isLogWired(context);
 					if (isLogAvailable) {
-						final OSGiLogListener logListener = new OSGiLogListener(link.getRemote());
+						final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote());
 						trackLogReader(logListener);
 					}
-					link.run();
+					remoteRPC.run();
 				} catch (final Exception e) {
 				} catch (final Throwable t) {
 					t.printStackTrace();

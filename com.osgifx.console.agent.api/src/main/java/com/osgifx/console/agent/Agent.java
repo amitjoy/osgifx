@@ -66,16 +66,21 @@ public interface Agent {
 	String HEAPDUMP_LOCATION_KEY = "osgi.fx.agent.heapdump.location";
 
 	/**
+	 * The property key to enable agent logs
+	 */
+	String TRACE_LOG_KEY = "osgi.fx.agent.logs.enabled";
+
+	/**
 	 * The pattern for a server port specification: {@code [<interface>:]<port>} .
 	 */
-	Pattern PORT_P          = Pattern.compile("(?:([^:]+):)?(\\d+)");
+	Pattern PORT_PATTERN    = Pattern.compile("(?:([^:]+):)?(\\d+)");
 	/**
 	 * The port for attaching to a remote Gogo CommandSession
 	 */
 	int     COMMAND_SESSION = -1;
 
 	/**
-	 * The port for having no redircet of IO
+	 * The port for having no redirect of IO
 	 */
 	int NONE = 0;
 
@@ -453,14 +458,6 @@ public interface Agent {
 	 * @return the heap dump information
 	 */
 	XHeapdumpDTO heapdump() throws Exception;
-
-	/**
-	 * Checks if {@code ConfigAdmin} is available in the remote runtime
-	 *
-	 * @return {@code true} if {@code ConfigAdmin} is available, otherwise
-	 *         {@code false}
-	 */
-	boolean isConfigAdminAvailable();
 
 	/**
 	 * Performs a garbage collection

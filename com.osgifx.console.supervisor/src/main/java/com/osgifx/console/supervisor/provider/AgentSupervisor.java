@@ -22,24 +22,16 @@ import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import aQute.remote.util.Link;
+import com.osgifx.console.agent.link.RemoteRPC;
 
-/**
- * This is a base class that provides the basic functionality of a supervisor.
- * In general an actual supervisor extends this class to provide the
- * functionality to use on the client side.
- *
- * @param <S> The supervisor type
- * @param <A> The agent type
- */
 public class AgentSupervisor<S, A> {
 
 	private static final int     CONNECT_WAIT = 200;
 	private A                    agent;
 	private final CountDownLatch latch        = new CountDownLatch(1);
 	protected volatile int       exitCode;
-	private Link<S, A>           link;
-	private final AtomicBoolean  quit         = new AtomicBoolean(false);
+	private RemoteRPC<S, A>      remoteRPC;
+	private final AtomicBoolean  quit         = new AtomicBoolean();
 	protected String             host;
 	protected int                port;
 	protected int                timeout;
@@ -61,9 +53,9 @@ public class AgentSupervisor<S, A> {
 			try {
 				final var socket = new Socket();
 				socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
-				link = new Link<>(agent, supervisor, socket);
-				this.setAgent(link);
-				link.open();
+				remoteRPC = new RemoteRPC<>(agent, supervisor, socket);
+				this.setAgent(remoteRPC);
+				remoteRPC.open();
 				return;
 			} catch (final ConnectException e) {
 				if (retryTimeout == 0) {
@@ -77,17 +69,17 @@ public class AgentSupervisor<S, A> {
 		}
 	}
 
-	public void setAgent(final Link<S, A> link) {
-		this.agent = link.getRemote();
-		this.link  = link;
+	public void setAgent(final RemoteRPC<S, A> link) {
+		this.agent     = link.getRemote();
+		this.remoteRPC = link;
 	}
 
 	public void close() throws IOException {
 		if (quit.getAndSet(true)) {
 			return;
 		}
-		if (link.isOpen()) {
-			link.close();
+		if (remoteRPC.isOpen()) {
+			remoteRPC.close();
 		}
 		latch.countDown();
 	}
@@ -111,7 +103,7 @@ public class AgentSupervisor<S, A> {
 	}
 
 	public boolean isOpen() {
-		return link.isOpen();
+		return remoteRPC.isOpen();
 	}
 
 }
