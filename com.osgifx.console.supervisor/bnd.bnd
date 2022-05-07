@@ -1,6 +1,7 @@
 -buildpath          : ${bundles.required},\
-                      biz.aQute.remote.agent;packages=*
+                      biz.aQute.remote.agent;packages=*,\
+                      com.osgifx.console.agent.api;packages=*
 -includepackage     : com.osgifx.console.supervisor.*
 -privatepackage     : com.osgifx.console.agent.*
--conditionalpackage : aQute.*
+-conditionalpackage : aQute.*, com.osgifx.console.agent.link
 -fixupmessages      : 'split', 'private'

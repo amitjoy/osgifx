@@ -7,9 +7,9 @@ javac.compliance      : ${javac.source}
                         osgi.cmpn;version='6.0.0',\
                         osgi.core;version='6.0.0'
 -buildpath            : \
-                        com.osgifx.console.api,\
                         biz.aQute.bndlib;packages=*,\
                         biz.aQute.remote.agent;packages=*,\
+                        com.osgifx.console.agent.api;packages=*,\
                         org.apache.commons.exec,\
                         org.slf4j.api
 -privatepackage       : \
@@ -17,6 +17,7 @@ javac.compliance      : ${javac.source}
                         com.osgifx.console.supervisor
 -conditionalpackage   : \
                         aQute.*,\
+                        com.osgifx.console.agent.link,\
                         org.apache.commons.exec.*
 Import-Package        : \
                         com.sun.management;'resolution:'=optional,\

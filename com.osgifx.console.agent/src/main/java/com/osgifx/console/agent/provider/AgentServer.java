@@ -15,11 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider;
 
-import static aQute.bnd.osgi.Constants.LAUNCH_ACTIVATION_EAGER;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static java.util.Objects.requireNonNull;
-import static org.osgi.framework.Bundle.START_ACTIVATION_POLICY;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -85,13 +83,13 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 import aQute.lib.io.ByteBufferInputStream;
-import aQute.remote.util.Link;
 
 /**
  * Implementation of the Agent. This implementation implements the Agent
@@ -99,16 +97,15 @@ import aQute.remote.util.Link;
  */
 public final class AgentServer implements Agent, Closeable {
 
-	private static final Pattern BSN_P = Pattern.compile("\\s*([^;\\s]+).*");
+	private static final Pattern BSN_PATTERN = Pattern.compile("\\s*([^;\\s]+).*");
 
-	private Supervisor                remote;
-	private BundleContext             context;
-	private final Map<String, String> installed  = new HashMap<>();
-	volatile boolean                  quit;
-	private Redirector                redirector = new NullRedirector();
-	private Link<Agent, Supervisor>   link;
-	private final int                 startOptions;
-	private ClassloaderLeakDetector   leakDetector;
+	private Supervisor                   remote;
+	private BundleContext                context;
+	private final Map<String, String>    installed  = new HashMap<>();
+	volatile boolean                     quit;
+	private Redirector                   redirector = new NullRedirector();
+	private RemoteRPC<Agent, Supervisor> remoteRPC;
+	private ClassloaderLeakDetector      leakDetector;
 
 	private final ServiceTracker<Object, Object>                 scrTracker;
 	private final ServiceTracker<Object, Object>                 metatypeTracker;
@@ -125,9 +122,6 @@ public final class AgentServer implements Agent, Closeable {
 		requireNonNull(context, "Bundle context cannot be null");
 		this.context      = context;
 		this.leakDetector = leakDetector;
-
-		final boolean eager = context.getProperty(LAUNCH_ACTIVATION_EAGER) != null;
-		startOptions = eager ? 0 : START_ACTIVATION_POLICY;
 
 		final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
@@ -257,7 +251,7 @@ public final class AgentServer implements Agent, Closeable {
 		for (final long id : ids) {
 			final Bundle bundle = context.getBundle(id);
 			try {
-				bundle.start(startOptions);
+				bundle.start();
 			} catch (final BundleException e) {
 				sb.append(e.getMessage()).append("\n");
 			}
@@ -383,7 +377,7 @@ public final class AgentServer implements Agent, Closeable {
 
 		quit = true;
 		redirect(0);
-		link.close();
+		remoteRPC.close();
 	}
 
 	@Override
@@ -415,9 +409,9 @@ public final class AgentServer implements Agent, Closeable {
 		return remote;
 	}
 
-	public void setLink(final Link<Agent, Supervisor> link) {
-		setRemote(link.getRemote());
-		this.link = link;
+	public void setEndpoint(final RemoteRPC<Agent, Supervisor> remoteRPC) {
+		setRemote(remoteRPC.getRemote());
+		this.remoteRPC = remoteRPC;
 	}
 
 	@Override
@@ -449,7 +443,7 @@ public final class AgentServer implements Agent, Closeable {
 			}
 			final Attributes mainAttributes = manifest.getMainAttributes();
 			final String     value          = mainAttributes.getValue(Constants.BUNDLE_SYMBOLICNAME);
-			final Matcher    matcher        = BSN_P.matcher(value);
+			final Matcher    matcher        = BSN_PATTERN.matcher(value);
 
 			if (!matcher.matches()) {
 				throw new IllegalArgumentException("No proper Bundle-SymbolicName in bundle: " + value);
@@ -772,11 +766,6 @@ public final class AgentServer implements Agent, Closeable {
 	public XHeapdumpDTO heapdump() throws Exception {
 		final boolean isJMXWired = PackageWirings.isJmxWired(context);
 		return isJMXWired ? XHeapAdmin.heapdump() : null;
-	}
-
-	@Override
-	public boolean isConfigAdminAvailable() {
-		return PackageWirings.isConfigAdminWired(context);
 	}
 
 	private long getSystemUptime() {

@@ -5,7 +5,8 @@ javac.compliance     : ${javac.source}
 -buildpath.osgi      : \
                        osgi.annotation,\
                        osgi.cmpn;version='6.0.0',\
-                       osgi.core;version='6.0.0'
+                       osgi.core;version='6.0.0',\
+                       biz.aQute.remote.agent;packages=*
 Require-Capability   : compile
 -buildpath.base.api  : 
 -buildpath.agent.api :
