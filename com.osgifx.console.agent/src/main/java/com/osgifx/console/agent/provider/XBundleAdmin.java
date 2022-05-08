@@ -42,6 +42,7 @@ import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleRevisions;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
@@ -79,6 +80,7 @@ public class XBundleAdmin {
 		dto.vendor                 = getHeader(bundle, Constants.BUNDLE_VENDOR);
 		dto.description            = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
 		dto.startLevel             = bundle.adapt(BundleStartLevel.class).getStartLevel();
+		dto.bundleRevision         = bundle.adapt(BundleRevisionDTO.class);
 		dto.exportedPackages       = getExportedPackages(bundle);
 		dto.importedPackages       = getImportedPackages(bundle);
 		dto.wiredBundlesAsProvider = getWiredBundlesAsProvider(bundle);

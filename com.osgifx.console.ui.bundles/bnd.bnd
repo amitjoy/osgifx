@@ -5,8 +5,12 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  css = css,\
 					  fxml = fxml,\
 					  graphic = graphic
--buildpath          : ${bundles.required}
+-buildpath          : \
+                      ${bundles.required},\
+                      biz.aQute.bndlib;packages=*,\
+                      biz.aQute.bnd.util;packages=*
 -privatepackage     : com.osgifx.console.ui.bundles.*
+-conditionalpackage : aQute.* 
 Import-Package      : \
                       org.controlsfx.glyphfont,\
                       org.controlsfx.control,\
