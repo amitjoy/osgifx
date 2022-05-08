@@ -48,6 +48,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Install external feature (plugin)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | List and uninstall already installed feature(s)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Generate OBR XML   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 
 
 #### Tools and Technologies
@@ -59,7 +60,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Rich Client Platform 	| JavaFX 17                                    	|
 | Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
-| Tools                	| Bndtools 6.2                                  	|
+| Tools                	| Bndtools 6.2                                  |
 
 --------------------------------------------------------------------------------------------------------------
 
