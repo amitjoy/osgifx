@@ -20,6 +20,7 @@ import static com.osgifx.console.agent.Agent.DEFAULT_PORT;
 import static com.osgifx.console.agent.Agent.PORT_PATTERN;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -39,8 +40,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.supervisor.Supervisor;
-
-import aQute.lib.io.IO;
 
 /**
  * The agent bundles uses an activator instead of DS to not constrain the target
@@ -133,15 +132,15 @@ public final class Activator extends Thread implements BundleActivator {
 			t.printStackTrace(System.err);
 			throw t;
 		} finally {
-			IO.close(server);
+			close(server);
 		}
 	}
 
 	@Override
 	public void stop(final BundleContext context) throws Exception {
 		interrupt();
-		IO.close(server);
-		agents.forEach(IO::close);
+		close(server);
+		agents.forEach(this::close);
 		classloaderLeakDetector.stop();
 	}
 
@@ -168,6 +167,21 @@ public final class Activator extends Thread implements BundleActivator {
 			}
 		};
 		logReaderTracker.open();
+	}
+
+	private Throwable close(final Closeable in) {
+		return close((AutoCloseable) in);
+	}
+
+	private Throwable close(final AutoCloseable in) {
+		try {
+			if (in != null) {
+				in.close();
+			}
+		} catch (final Throwable e) {
+			return e;
+		}
+		return null;
 	}
 
 }

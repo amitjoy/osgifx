@@ -89,7 +89,6 @@ import com.osgifx.console.supervisor.Supervisor;
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
-import aQute.lib.io.ByteBufferInputStream;
 
 /**
  * Implementation of the Agent. This implementation implements the Agent
@@ -805,7 +804,7 @@ public final class AgentServer implements Agent, Closeable {
 			location = getLocation(data);
 		}
 
-		try (InputStream stream = new ByteBufferInputStream(data)) {
+		try (InputStream stream = new ByteArrayInputStream(data)) {
 			installedBundle = context.getBundle(location);
 			if (installedBundle == null) {
 				installedBundle = context.installBundle(location, stream);
