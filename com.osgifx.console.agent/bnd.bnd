@@ -7,7 +7,6 @@ javac.compliance      : ${javac.source}
                         osgi.cmpn;version='6.0.0',\
                         osgi.core;version='6.0.0'
 -buildpath            : \
-                        biz.aQute.bndlib;packages=*,\
                         biz.aQute.remote.agent;packages=*,\
                         com.osgifx.console.agent.api;packages=*,\
                         org.apache.commons.exec,\
