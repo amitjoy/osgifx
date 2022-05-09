@@ -13,32 +13,29 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.admin;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.util.Map;
 
-/**
- * This is a null redirector. That is, it just does nothing.
- */
-public class NullRedirector implements Redirector {
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 
-	@Override
-	public void close() throws IOException {
+public class XEventAdmin {
+
+	private final EventAdmin eventAdmin;
+
+	public XEventAdmin(final Object eventAdmin) {
+		this.eventAdmin = (EventAdmin) eventAdmin;
 	}
 
-	@Override
-	public int getPort() {
-		return 0;
+	public void sendEvent(final String topic, final Map<String, Object> properties) {
+		final Event event = new Event(topic, properties);
+		eventAdmin.sendEvent(event);
 	}
 
-	@Override
-	public void stdin(final String s) {
-	}
-
-	@Override
-	public PrintStream getOut() throws Exception {
-		return System.out;
+	public void postEvent(final String topic, final Map<String, Object> properties) {
+		final Event event = new Event(topic, properties);
+		eventAdmin.sendEvent(event);
 	}
 
 }

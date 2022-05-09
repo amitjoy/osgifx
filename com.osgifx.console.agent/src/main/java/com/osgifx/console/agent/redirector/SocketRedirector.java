@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.redirector;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +21,8 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import com.osgifx.console.agent.provider.AgentServer;
 
 /**
  * A redirector that will open a connection to a socket, assuming there is a

@@ -17,6 +17,7 @@ package com.osgifx.console.agent.provider;
 
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
+import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.management.ManagementFactory;
 import java.net.URL;
+import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +72,16 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.AgentExtension;
+import com.osgifx.console.agent.admin.XBundleAdmin;
+import com.osgifx.console.agent.admin.XComponentAdmin;
+import com.osgifx.console.agent.admin.XConfigurationAdmin;
+import com.osgifx.console.agent.admin.XEventAdmin;
+import com.osgifx.console.agent.admin.XHeapAdmin;
+import com.osgifx.console.agent.admin.XHttpAdmin;
+import com.osgifx.console.agent.admin.XMetaTypeAdmin;
+import com.osgifx.console.agent.admin.XPropertyAdmin;
+import com.osgifx.console.agent.admin.XServiceAdmin;
+import com.osgifx.console.agent.admin.XThreadAdmin;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -83,7 +95,14 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.agent.handler.ClassloaderLeakDetector;
 import com.osgifx.console.agent.link.RemoteRPC;
+import com.osgifx.console.agent.redirector.ConsoleRedirector;
+import com.osgifx.console.agent.redirector.GogoRedirector;
+import com.osgifx.console.agent.redirector.NullRedirector;
+import com.osgifx.console.agent.redirector.RedirectOutput;
+import com.osgifx.console.agent.redirector.Redirector;
+import com.osgifx.console.agent.redirector.SocketRedirector;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -96,12 +115,14 @@ import aQute.lib.converter.TypeReference;
  */
 public final class AgentServer implements Agent, Closeable {
 
-	private static final Pattern BSN_PATTERN = Pattern.compile("\\s*([^;\\s]+).*");
+	private static final long    RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
+	private static final long    WATCHDOG_TIMEOUT = Duration.ofSeconds(30).toMillis();
+	private static final Pattern BSN_PATTERN      = Pattern.compile("\\s*([^;\\s]+).*");
 
 	private Supervisor                   remote;
 	private BundleContext                context;
 	private final Map<String, String>    installed  = new HashMap<>();
-	volatile boolean                     quit;
+	public volatile boolean              quit;
 	private Redirector                   redirector = new NullRedirector();
 	private RemoteRPC<Agent, Supervisor> remoteRPC;
 	private ClassloaderLeakDetector      leakDetector;
@@ -709,21 +730,26 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public String exec(final String command) {
+		String cmd;
+		if (isWindows()) {
+			cmd = "cmd.exe /C " + command;
+		} else {
+			cmd = command;
+		}
 		try {
-			final CommandLine                 cmdLine       = CommandLine.parse(command);
+			final CommandLine                 cmdLine       = CommandLine.parse(cmd);
 			final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+			final ExecuteWatchdog             watchdog      = new ExecuteWatchdog(WATCHDOG_TIMEOUT);
+			final Executor                    executor      = new DefaultExecutor();
+			final ByteArrayOutputStream       outputStream  = new ByteArrayOutputStream();
+			final PumpStreamHandler           streamHandler = new PumpStreamHandler(outputStream);
 
-			final ExecuteWatchdog watchdog = new ExecuteWatchdog(30_000L);
-			final Executor        executor = new DefaultExecutor();
 			executor.setExitValue(1);
 			executor.setWatchdog(watchdog);
-			final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-			final PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
 			executor.setStreamHandler(streamHandler);
 			executor.execute(cmdLine, resultHandler);
+			resultHandler.waitFor(RESULT_TIMEOUT);
 
-			resultHandler.waitFor();
 			return outputStream.toString();
 		} catch (final Exception e) {
 			Thread.currentThread().interrupt();
@@ -870,6 +896,11 @@ public final class AgentServer implements Agent, Closeable {
 		default:
 			return Converter.cnv(XAttributeDefType.clazz(type), source);
 		}
+	}
+
+	private static boolean isWindows() {
+		final String os = System.getProperty("os.name", "generic").toLowerCase(ENGLISH);
+		return os.contains("win");
 	}
 
 }

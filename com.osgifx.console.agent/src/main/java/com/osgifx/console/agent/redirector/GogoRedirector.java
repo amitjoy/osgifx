@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.redirector;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -27,6 +27,8 @@ import org.apache.felix.service.command.CommandSession;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
+
+import com.osgifx.console.agent.provider.AgentServer;
 
 /**
  * Create a new Gogo Shell Command Session if there is a Gogo Command Processor

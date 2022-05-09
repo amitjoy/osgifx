@@ -13,32 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.redirector;
 
-import java.io.Closeable;
+import java.io.IOException;
 import java.io.PrintStream;
 
 /**
- * API def for a redirector.
+ * This is a null redirector. That is, it just does nothing.
  */
-public interface Redirector extends Closeable {
+public class NullRedirector implements Redirector {
 
-	/**
-	 * The port (or pseudo port) this one is connected to
-	 *
-	 * @return the port
-	 */
-	int getPort();
+	@Override
+	public void close() throws IOException {
+	}
 
-	/**
-	 * Provide input
-	 *
-	 * @param s the input
-	 */
-	void stdin(String s) throws Exception;
+	@Override
+	public int getPort() {
+		return 0;
+	}
 
-	/**
-	 * Get the output stream
-	 */
-	PrintStream getOut() throws Exception;
+	@Override
+	public void stdin(final String s) {
+	}
+
+	@Override
+	public PrintStream getOut() throws Exception {
+		return System.out;
+	}
+
 }
