@@ -419,7 +419,6 @@ public final class ConfigurationEditorFxController {
 		return field;
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T> Field<?> processArray(final String key, final Object currentValue, final List<String> defaultValue,
 	        final List<String> options, final boolean hasOCD, final Class<T> clazz, final XAttributeDefType adType) {
 		final Field<?> field;
@@ -427,10 +426,8 @@ public final class ConfigurationEditorFxController {
 			T[] effectiveValue;
 			if (currentValue != null) {
 				effectiveValue = converter.convert(currentValue, getArrayClass(clazz));
-			} else if (defaultValue != null) {
-				effectiveValue = converter.convert(defaultValue, getArrayClass(clazz));
 			} else {
-				effectiveValue = (T[]) Array.newInstance(clazz, 0);
+				effectiveValue = converter.convert(defaultValue, getArrayClass(clazz));
 			}
 			if (options != null && !options.isEmpty()) {
 				final var selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
@@ -470,11 +467,9 @@ public final class ConfigurationEditorFxController {
 			if (currentValue != null) {
 				effectiveValue = converter.convert(currentValue, new TypeReference<List<T>>() {
 				});
-			} else if (defaultValue != null) {
+			} else {
 				effectiveValue = converter.convert(defaultValue, new TypeReference<List<T>>() {
 				});
-			} else {
-				effectiveValue = List.of();
 			}
 			if (options != null && !options.isEmpty()) {
 				final var selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
