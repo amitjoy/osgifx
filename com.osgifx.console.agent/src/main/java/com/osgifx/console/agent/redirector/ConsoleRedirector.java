@@ -13,13 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.redirector;
 
 import static com.osgifx.console.agent.Agent.CONSOLE;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.osgifx.console.agent.provider.AgentServer;
 
 /**
  * The Console Redirector redirects System.in, System.out, and System.err to the

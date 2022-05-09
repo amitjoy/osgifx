@@ -13,29 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.redirector;
 
-import java.util.Map;
+import java.io.Closeable;
+import java.io.PrintStream;
 
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
+/**
+ * API def for a redirector.
+ */
+public interface Redirector extends Closeable {
 
-public class XEventAdmin {
+	/**
+	 * The port (or pseudo port) this one is connected to
+	 *
+	 * @return the port
+	 */
+	int getPort();
 
-	private final EventAdmin eventAdmin;
+	/**
+	 * Provide input
+	 *
+	 * @param s the input
+	 */
+	void stdin(String s) throws Exception;
 
-	public XEventAdmin(final Object eventAdmin) {
-		this.eventAdmin = (EventAdmin) eventAdmin;
-	}
-
-	public void sendEvent(final String topic, final Map<String, Object> properties) {
-		final Event event = new Event(topic, properties);
-		eventAdmin.sendEvent(event);
-	}
-
-	public void postEvent(final String topic, final Map<String, Object> properties) {
-		final Event event = new Event(topic, properties);
-		eventAdmin.sendEvent(event);
-	}
-
+	/**
+	 * Get the output stream
+	 */
+	PrintStream getOut() throws Exception;
 }

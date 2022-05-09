@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.handler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 
+import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.reflect.Reflect;

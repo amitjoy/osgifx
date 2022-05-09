@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.redirector;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,6 +21,8 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.osgifx.console.agent.provider.AgentServer;
 
 /**
  * Handles the redirection of the output. Any text written to this PrintStream

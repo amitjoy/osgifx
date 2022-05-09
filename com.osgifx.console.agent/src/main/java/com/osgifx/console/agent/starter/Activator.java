@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.starter;
 
 import static com.osgifx.console.agent.Agent.AGENT_SERVER_PORT_KEY;
 import static com.osgifx.console.agent.Agent.DEFAULT_PORT;
@@ -38,7 +38,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.admin.XLogReaderAdmin;
+import com.osgifx.console.agent.handler.ClassloaderLeakDetector;
+import com.osgifx.console.agent.handler.OSGiEventHandler;
+import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.link.RemoteRPC;
+import com.osgifx.console.agent.provider.AgentServer;
+import com.osgifx.console.agent.provider.PackageWirings;
 import com.osgifx.console.supervisor.Supervisor;
 
 /**

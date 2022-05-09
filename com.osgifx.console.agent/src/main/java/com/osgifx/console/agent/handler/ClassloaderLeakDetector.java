@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.handler;
 
 import static java.lang.Long.toHexString;
 import static java.util.Objects.hash;
@@ -45,6 +45,7 @@ import org.osgi.framework.Version;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.util.tracker.BundleTracker;
 
+import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XBundleDTO;
 
 /**
@@ -195,7 +196,7 @@ public final class ClassloaderLeakDetector implements Runnable {
 		context.registerService(ClassloaderLeakDetector.class, this, new Hashtable<>(properties));
 	}
 
-	Set<XBundleDTO> getSuspiciousBundles() {
+	public Set<XBundleDTO> getSuspiciousBundles() {
 		final Set<Long>        activeBundleIds   = Stream.of(context.getBundles()).map(Bundle::getBundleId).collect(toSet());
 		final List<BundleInfo> suspiciousBundles = new ArrayList<>(bundleInfos.values());
 		// filter out bundles that are ACTIVE and have only one classloader created for

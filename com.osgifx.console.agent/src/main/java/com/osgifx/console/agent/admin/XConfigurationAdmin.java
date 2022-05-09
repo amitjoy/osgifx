@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.admin;
 
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
@@ -40,6 +40,7 @@ import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.reflect.Reflect;
 
 public class XConfigurationAdmin {
