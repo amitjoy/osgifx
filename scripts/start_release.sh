@@ -6,7 +6,7 @@ echo "Updating OSGi.fx Version to $1"
 
 echo "Committing the changes to current branch"
 git add .
-git commit -m "Bumped version to $1 for release"
+git commit -m "Release Preparation for $1"
 
 echo "Creating tag: v$1"
 git tag v$1
