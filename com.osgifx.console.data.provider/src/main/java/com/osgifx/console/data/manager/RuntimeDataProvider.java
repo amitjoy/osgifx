@@ -75,7 +75,7 @@ public final class RuntimeDataProvider implements DataProvider {
 	private Supervisor    supervisor;
 
 	private FluentLogger                           logger;
-	private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newHashMap();
+	private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newConcurrentMap();
 
 	@Activate
 	public void activate() {
@@ -181,7 +181,7 @@ public final class RuntimeDataProvider implements DataProvider {
 		infoSuppliers.put(id, supplier);
 	}
 
-	void unbindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
+	void unbindInfoSupplier(final ServiceReference<RuntimeInfoSupplier> reference) {
 		final var id = (String) reference.getProperty(PROPERTY_ID);
 		infoSuppliers.remove(id);
 	}
