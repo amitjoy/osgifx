@@ -2,6 +2,7 @@
 
 biz.aQute.bnd:biz.aQute.bndlib:6.2.0
 biz.aQute.bnd:biz.aQute.resolve:6.2.0
+biz.aQute.bnd:biz.aQute.remote.agent:6.2.0
 biz.aQute.bnd:biz.aQute.launchpad:6.2.0
 biz.aQute.bnd:biz.aQute.remote.agent:6.2.0
 biz.aQute.bnd:biz.aQute.bnd.util:6.2.0
