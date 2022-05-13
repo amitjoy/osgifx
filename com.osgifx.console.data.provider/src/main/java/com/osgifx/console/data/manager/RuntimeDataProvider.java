@@ -28,6 +28,7 @@ import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
 import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_ALL_TOPIC;
+import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
@@ -60,7 +61,6 @@ import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.data.supplier.RuntimeInfoSupplier;
 import com.osgifx.console.supervisor.Supervisor;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
@@ -92,10 +92,10 @@ public final class RuntimeDataProvider implements DataProvider {
 						             .stream()
 						             .map(s -> CompletableFuture.runAsync(s::retrieve))
 						             .toList();
-				// @formatter:on
 				CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-				        .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
-				        .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
+				                 .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
+				                 .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
+				// @formatter:on
 			} else {
 				infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
 				RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
@@ -187,7 +187,7 @@ public final class RuntimeDataProvider implements DataProvider {
 	}
 
 	private ObservableList<?> getData(final String id) {
-		return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply).orElse(FXCollections.observableArrayList());
+		return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply).orElse(observableArrayList());
 	}
 
 	private void retrieve(final String id) {
