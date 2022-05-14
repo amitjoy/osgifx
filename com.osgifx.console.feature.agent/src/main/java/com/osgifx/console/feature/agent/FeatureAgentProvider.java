@@ -357,7 +357,7 @@ public final class FeatureAgentProvider implements FeatureAgent {
 		if (existingBundle.isPresent()) {
 			final var b   = existingBundle.get();
 			final var dto = b.adapt(BundleDTO.class);
-			logger.atInfo().log("There exists a bundle with the same bsn and version - '%s', ", dto);
+			logger.atInfo().log("There exists a bundle with the same bsn - '%s'", dto);
 
 			try (InputStream is = new FileInputStream(bundleFile.get())) {
 				logger.atInfo().log("Updating bundle - '%s', ", dto);
