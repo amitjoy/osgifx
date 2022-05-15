@@ -199,8 +199,7 @@ public final class ClassloaderLeakDetector implements Runnable {
 	public Set<XBundleDTO> getSuspiciousBundles() {
 		final Set<Long>        activeBundleIds   = Stream.of(context.getBundles()).map(Bundle::getBundleId).collect(toSet());
 		final List<BundleInfo> suspiciousBundles = new ArrayList<>(bundleInfos.values());
-		// filter out bundles that are ACTIVE and have only one classloader created for
-		// them
+		// filter out ACTIVE bundles that have only one classloader created for them
 		suspiciousBundles.removeIf(bi -> bi.hasSingleInstance() && activeBundleIds.contains(bi.bundleId));
 		return suspiciousBundles.stream().map(this::toDTO).collect(Collectors.toSet());
 	}
