@@ -267,7 +267,6 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public String start(final long... ids) {
 		final StringBuilder sb = new StringBuilder();
-
 		for (final long id : ids) {
 			final Bundle bundle = context.getBundle(id);
 			try {
@@ -282,7 +281,6 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public String stop(final long... ids) {
 		final StringBuilder sb = new StringBuilder();
-
 		for (final long id : ids) {
 			final Bundle bundle = context.getBundle(id);
 			try {
@@ -297,7 +295,6 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public String uninstall(final long... ids) {
 		final StringBuilder sb = new StringBuilder();
-
 		for (final long id : ids) {
 			final Bundle bundle = context.getBundle(id);
 			try {
@@ -311,20 +308,6 @@ public final class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
-	public String updateFromURL(final long id, final String url) throws Exception {
-		final StringBuilder sb = new StringBuilder();
-		try (final InputStream is = new URL(url).openStream()) {
-			final Bundle bundle = context.getBundle(id);
-			bundle.update(is);
-			refresh(true);
-		} catch (final Exception e) {
-			sb.append(e.getMessage()).append("\n");
-		}
-
-		return sb.length() == 0 ? null : sb.toString();
-	}
-
-	@Override
 	public boolean redirect(final int port) throws Exception {
 		if (redirector != null) {
 			if (redirector.getPort() == port) {
@@ -333,11 +316,9 @@ public final class AgentServer implements Agent, Closeable {
 			redirector.close();
 			redirector = new NullRedirector();
 		}
-
 		if (port == Agent.NONE) {
 			return true;
 		}
-
 		if (port <= Agent.COMMAND_SESSION) {
 			try {
 				redirector = new GogoRedirector(this, context);
@@ -346,7 +327,6 @@ public final class AgentServer implements Agent, Closeable {
 			}
 			return true;
 		}
-
 		if (port == Agent.CONSOLE) {
 			redirector = new ConsoleRedirector(this);
 			return true;
@@ -394,7 +374,6 @@ public final class AgentServer implements Agent, Closeable {
 		if (quit) {
 			return;
 		}
-
 		quit = true;
 		redirect(0);
 		remoteRPC.close();
@@ -494,10 +473,8 @@ public final class AgentServer implements Agent, Closeable {
 		switch (bundles.size()) {
 		case 0:
 			return "manual:" + entry.getKey();
-
 		case 1:
 			return bundles.iterator().next().getLocation();
-
 		default:
 			throw new IllegalArgumentException(
 			        "No location specified but there are multiple bundles with the same bsn " + entry.getKey() + ": " + bundles);
