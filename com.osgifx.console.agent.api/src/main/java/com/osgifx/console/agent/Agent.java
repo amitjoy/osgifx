@@ -162,20 +162,6 @@ public interface Agent {
 	String uninstall(long... id) throws Exception;
 
 	/**
-	 * Updates a single bundle from a url
-	 * <p>
-	 * <b>NOTICE:</b> this method makes assumptions about the target e.g. that it
-	 * will be able to use out-of-band communication to read from the URL and have
-	 * the necessary url handlers to open the URL stream.
-	 * </p>
-	 *
-	 * @param id  bundle to update
-	 * @param url location of bundle contents
-	 * @return any errors that occurred
-	 */
-	String updateFromURL(long id, String url) throws Exception;
-
-	/**
 	 * Redirect I/O from port. Port can be {@link #CONSOLE},
 	 * {@link #COMMAND_SESSION}, {@link #NONE}, or a TCP Telnet port.
 	 *
