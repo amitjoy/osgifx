@@ -25,10 +25,8 @@ import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
-import com.osgifx.console.agent.dto.XFrameworkEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.supervisor.EventListener;
-import com.osgifx.console.supervisor.FrameworkEventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -39,9 +37,8 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 	private Appendable stderr;
 	private int        shell = -100; // always invalid so we update it
 
-	private final List<EventListener>          eventListeners          = new CopyOnWriteArrayList<>();
-	private final List<LogEntryListener>       logEntryListeners       = new CopyOnWriteArrayList<>();
-	private final List<FrameworkEventListener> frameworkEventListeners = new CopyOnWriteArrayList<>();
+	private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
+	private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
 
 	@Override
 	public boolean stdout(final String out) throws Exception {
@@ -147,11 +144,6 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 	}
 
 	@Override
-	public void onFrameworkEvent(final XFrameworkEventDTO event) {
-		frameworkEventListeners.forEach(listener -> listener.onEvent(event));
-	}
-
-	@Override
 	public void logged(final XLogEntryDTO logEvent) {
 		logEntryListeners.forEach(listener -> listener.logged(logEvent));
 	}
@@ -167,19 +159,6 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 	@Override
 	public void removeOSGiEventListener(final EventListener eventListener) {
 		eventListeners.remove(eventListener);
-	}
-
-	@Override
-	public synchronized void addOSGiFrameworkEventListener(final FrameworkEventListener eventListener) {
-		if (frameworkEventListeners.contains(eventListener)) {
-			return;
-		}
-		frameworkEventListeners.add(eventListener);
-	}
-
-	@Override
-	public void removeOSGiFrameworkEventListener(final FrameworkEventListener eventListener) {
-		frameworkEventListeners.remove(eventListener);
 	}
 
 	@Override
