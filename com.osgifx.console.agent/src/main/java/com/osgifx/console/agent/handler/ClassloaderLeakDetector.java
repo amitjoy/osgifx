@@ -28,8 +28,6 @@ import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,8 +109,6 @@ public final class ClassloaderLeakDetector implements Runnable {
 		referencePoller = new Thread(this, "classloader-leak-detector");
 		referencePoller.setDaemon(true);
 		referencePoller.start();
-
-		registerMarkerService();
 	}
 
 	public void stop() {
@@ -179,21 +175,6 @@ public final class ClassloaderLeakDetector implements Runnable {
 		// bi cannot be null
 		bi.decrementUsageCount(ref);
 		refs.remove(ref);
-	}
-
-	private void registerMarkerService() {
-		final Map<String, Object> properties = new HashMap<>();
-
-		// Configuration Printer Properties
-		properties.put("felix.webconsole.label", "Leak Detection");
-		properties.put("felix.webconsole.title", "Classloader Leak Detector");
-		properties.put("felix.webconsole.configprinter.modes", "always");
-
-		// Gogo Command Properties
-		properties.put("osgi.command.scope", "qivicon");
-		properties.put("osgi.command.function", "leaks");
-
-		context.registerService(ClassloaderLeakDetector.class, this, new Hashtable<>(properties));
 	}
 
 	public Set<XBundleDTO> getSuspiciousBundles() {
