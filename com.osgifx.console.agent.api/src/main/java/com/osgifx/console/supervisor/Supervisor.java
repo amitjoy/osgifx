@@ -17,7 +17,6 @@ package com.osgifx.console.supervisor;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
-import com.osgifx.console.agent.dto.XFrameworkEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 
 /**
@@ -68,11 +67,6 @@ public interface Supervisor {
 	void onOSGiEvent(XEventDTO event);
 
 	/**
-	 * Callback method for OSGi Framework Events
-	 */
-	void onFrameworkEvent(XFrameworkEventDTO event);
-
-	/**
 	 * Callback method for logs
 	 */
 	void logged(XLogEntryDTO event);
@@ -91,21 +85,6 @@ public interface Supervisor {
 	 * @param eventListener the listener to deregister
 	 */
 	void removeOSGiEventListener(EventListener eventListener);
-
-	/**
-	 * Registers the specified listener to listen to the OSGi framework events from
-	 * the remote machine
-	 *
-	 * @param eventListener the event listener to register
-	 */
-	void addOSGiFrameworkEventListener(FrameworkEventListener eventListener);
-
-	/**
-	 * Deregisters previously registered listener
-	 *
-	 * @param eventListener the listener to deregister
-	 */
-	void removeOSGiFrameworkEventListener(FrameworkEventListener eventListener);
 
 	/**
 	 * Registers the specified listener to receive to the OSGi logs from the remote
