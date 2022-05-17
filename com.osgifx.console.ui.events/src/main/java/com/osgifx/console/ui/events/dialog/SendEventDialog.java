@@ -33,6 +33,8 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.Triple;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -44,6 +46,7 @@ import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.util.converter.ValueConverter;
+import com.osgifx.console.util.fx.ConsoleFxHelper;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
@@ -69,8 +72,9 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
 	@Log
 	@Inject
-	private FluentLogger         logger;
-	private final ValueConverter converter = new ValueConverter();
+	private FluentLogger            logger;
+	private final ValueConverter    converter         = new ValueConverter();
+	private final ValidationSupport validationSupport = new ValidationSupport();
 
 	private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries = Maps.newHashMap();
 
@@ -86,6 +90,14 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
 		final var txtTopic = (CustomTextField) TextFields.createClearableTextField();
 		txtTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
+		validationSupport.registerValidator(txtTopic, Validator.createPredicateValidator(value -> {
+			try {
+				ConsoleFxHelper.validateTopic(value.toString().trim());
+				return true;
+			} catch (final Exception e) {
+				return false;
+			}
+		}, "Invalid Event Topic"));
 
 		final var isSyncToggle = new ToggleSwitch("Is Synchronous?");
 
