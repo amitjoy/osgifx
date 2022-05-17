@@ -184,11 +184,20 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 			return true;
 		}
 		for (final String topic : listenerTopics) {
-			if (!topic.contains("*")) {
-				return receivedEventTopic.equals(topic);
+			// positive match if only *
+			if ("*".equals(topic)) {
+				return true;
 			}
-			final var prefix = topic.substring(0, topic.lastIndexOf('/'));
-			if (receivedEventTopic.startsWith(prefix)) {
+			// positive match if it does contain * at the end and is a substring of the
+			// received event topic
+			if (topic.contains("*")) {
+				final var prefix = topic.substring(0, topic.lastIndexOf('/'));
+				if (receivedEventTopic.startsWith(prefix)) {
+					return true;
+				}
+			}
+			// positive match if the it matches exactly the received event topic
+			if (receivedEventTopic.equalsIgnoreCase(topic)) {
 				return true;
 			}
 		}
