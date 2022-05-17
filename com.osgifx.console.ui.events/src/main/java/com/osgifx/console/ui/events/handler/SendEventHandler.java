@@ -24,6 +24,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -39,14 +40,16 @@ public final class SendEventHandler {
 
 	@Log
 	@Inject
-	private FluentLogger    logger;
+	private FluentLogger      logger;
 	@Inject
-	private IEclipseContext context;
+	private IEclipseContext   context;
+	@Inject
+	private ThreadSynchronize threadSync;
 	@Inject
 	@Named("is_connected")
-	private boolean         isConnected;
+	private boolean           isConnected;
 	@Inject
-	private EventManager    eventManager;
+	private EventManager      eventManager;
 
 	@Execute
 	public void execute() {
@@ -77,14 +80,15 @@ public final class SendEventHandler {
 							result = eventManager.postEvent(topic, properties);
 						}
 						if (result) {
-							Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic);
+							threadSync.asyncExec(
+							        () -> Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic));
 							logger.atInfo().log("Event successfully sent successfully to %s", topic);
 						} else {
-							Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic);
+							threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic));
 						}
 					} catch (final Exception e) {
 						logger.atError().withException(e).log("Event cannot be sent");
-						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+						threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
 					}
 					return null;
 				}
