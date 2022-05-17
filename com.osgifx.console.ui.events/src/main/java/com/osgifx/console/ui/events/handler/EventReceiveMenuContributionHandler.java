@@ -29,6 +29,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -64,9 +66,6 @@ public final class EventReceiveMenuContributionHandler {
 	@Inject
 	private FluentLogger                   logger;
 	@Inject
-	@OSGiBundle
-	private BundleContext                  context;
-	@Inject
 	private Supervisor                     supervisor;
 	@Inject
 	private ConfigurationAdmin             configAdmin;
@@ -80,6 +79,11 @@ public final class EventReceiveMenuContributionHandler {
 	@Inject
 	@Named("is_connected")
 	private boolean                        isConnected;
+	@Inject
+	@OSGiBundle
+	private BundleContext                  bundleContext;
+	@Inject
+	private IEclipseContext                eclipseContext;
 	@Inject
 	@Optional
 	@ContextValue("subscribed_topics")
@@ -109,6 +113,7 @@ public final class EventReceiveMenuContributionHandler {
 
 		if (accessibilityPhrase) {
 			final var dialog = new TopicEntryDialog();
+			ContextInjectionFactory.inject(dialog, eclipseContext);
 			dialog.init();
 
 			final var event = dialog.showAndWait();
@@ -165,7 +170,7 @@ public final class EventReceiveMenuContributionHandler {
 			accessibilityPhrase = "true";
 		}
 		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
-		final var bsn         = context.getBundle().getSymbolicName();
+		final var bsn         = bundleContext.getBundle().getSymbolicName();
 
 		dynamicItem.setLabel(label);
 		dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);

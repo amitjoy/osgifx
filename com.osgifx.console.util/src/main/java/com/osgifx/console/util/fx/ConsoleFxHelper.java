@@ -37,48 +37,57 @@ public final class ConsoleFxHelper {
 		return source;
 	}
 
-	public static void validateTopic(final String topic) {
-		final var chars  = topic.toCharArray();
-		final var length = chars.length;
-		if (length == 0) {
-			return;
+	public static boolean validateTopic(final String topic) {
+		if (topic.isBlank()) {
+			return false;
 		}
-		for (var i = 0; i < length; i++) {
-			final var ch = chars[i];
-			if (ch == '/') {
-				// cannot start or end with a '/' but anywhere else is okay
-				// cannot have "//" as that implies empty token
-				if (i == 0 || i == length - 1 || chars[i - 1] == '/') {
-					throw new IllegalArgumentException("Invalid topic: " + topic);
-				}
-				continue;
+		final var alphabetLowerCaseMatcher = CharMatcher.inRange('a', 'z');
+		final var alphabetUpperCaseMatcher = CharMatcher.inRange('A', 'Z');
+		final var digitMatcher             = CharMatcher.inRange('0', '9');
+		final var underscoreMatcher        = CharMatcher.is('_');
+		final var slashMatcher             = CharMatcher.is('/');
+		final var hyphenMatcher            = CharMatcher.is('-');
+		final var wildcardMatcher          = CharMatcher.is('*');
+
+		// @formatter:off
+		final var valid = alphabetLowerCaseMatcher.or(alphabetUpperCaseMatcher)
+				                                  .or(digitMatcher)
+				                                  .or(underscoreMatcher)
+				                                  .or(slashMatcher)
+				                                  .or(hyphenMatcher)
+				                                  .or(wildcardMatcher)
+				                                  .matchesAllOf(topic);
+		// @formatter:on
+		if (!valid) {
+			return false;
+		}
+		if (topic.contains("/")) {
+			// topic cannot begin with /
+			final var firstIndex = slashMatcher.indexIn(topic);
+			if (firstIndex == 0) {
+				return false;
 			}
-			if ('A' <= ch && ch <= 'Z' || 'a' <= ch && ch <= 'z') {
-				continue;
+			// topic cannot end with / and must not have consecutive two /
+			final var lastIndex = slashMatcher.lastIndexIn(topic);
+			if (lastIndex == topic.charAt(topic.length() - 1) || topic.contains("//")) {
+				return false;
 			}
-			if ('0' <= ch && ch <= '9' || ch == '_' || ch == '-') {
-				continue;
-			}
-			if (ch == '*') {
-				continue;
-			}
-			throw new IllegalArgumentException("Invalid topic: " + topic);
 		}
 		if (topic.contains("*")) {
 			// check all indices of * as it can only be at the end
-			final var charMatcher = CharMatcher.is('*');
-			final var count       = charMatcher.countIn(topic);
-			// if there are more than 1 *, it is invalid
+			final var count = wildcardMatcher.countIn(topic);
+			// if there are more than 1 *, the topic is invalid
 			if (count > 1) {
-				throw new IllegalArgumentException("Invalid topic: " + topic);
+				return false;
 			}
-			final var index = charMatcher.indexIn(topic);
-			// if the * is not at the end, it is invalid and the character before * must
-			// always be a / unless the topic has only a single * (length = 1)
+			final var index = wildcardMatcher.indexIn(topic);
+			// if the * is not at the end, the topic is invalid and the character before *
+			// must always be a / unless the topic has only a single * (length = 1)
 			if (index != topic.length() - 1 || topic.length() > 1 && topic.charAt(index - 1) != '/') {
-				throw new IllegalArgumentException("Invalid topic: " + topic);
+				return false;
 			}
 		}
+		return true;
 	}
 
 }
