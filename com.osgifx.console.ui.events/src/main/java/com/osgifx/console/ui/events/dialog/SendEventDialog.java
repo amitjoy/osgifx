@@ -17,6 +17,7 @@ package com.osgifx.console.ui.events.dialog;
 
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.util.converter.ValueConverter;
-import com.osgifx.console.util.fx.ConsoleFxHelper;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
@@ -90,14 +90,8 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
 		final var txtTopic = (CustomTextField) TextFields.createClearableTextField();
 		txtTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
-		validationSupport.registerValidator(txtTopic, Validator.createPredicateValidator(value -> {
-			try {
-				ConsoleFxHelper.validateTopic(value.toString().trim());
-				return true;
-			} catch (final Exception e) {
-				return false;
-			}
-		}, "Invalid Event Topic"));
+		validationSupport.registerValidator(txtTopic,
+		        Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
 		final var isSyncToggle = new ToggleSwitch("Is Synchronous?");
 
@@ -137,16 +131,22 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
 		setResultConverter(dialogButton -> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
+			if (data == ButtonData.CANCEL_CLOSE) {
+				return null;
+			}
 			try {
+				if (validationSupport.isInvalid()) {
+					throw new RuntimeException("Topic validation failed");
+				}
 				return data == ButtonData.OK_DONE ? getInput(txtTopic, isSyncToggle) : null;
 			} catch (final Exception e) {
 				logger.atError().withException(e).log("Configuration values cannot be converted");
+				throw e;
 			}
-			return null;
 		});
 	}
 
-	private EventDTO getInput(final CustomTextField txtTopic, final ToggleSwitch isSyncToggle) throws Exception {
+	private EventDTO getInput(final CustomTextField txtTopic, final ToggleSwitch isSyncToggle) {
 		final List<ConfigValue> properties = Lists.newArrayList();
 		for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : entries
 		        .entrySet()) {

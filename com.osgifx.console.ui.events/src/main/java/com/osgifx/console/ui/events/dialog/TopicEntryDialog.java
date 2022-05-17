@@ -16,9 +16,12 @@
 package com.osgifx.console.ui.events.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
 
 import java.util.List;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -26,11 +29,12 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.osgifx.console.util.fx.ConsoleFxHelper;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.geometry.Pos;
@@ -45,6 +49,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 
 public final class TopicEntryDialog extends Dialog<Set<String>> {
+
+	@Log
+	@Inject
+	private FluentLogger logger;
 
 	private final List<PropertiesForm> entries           = Lists.newArrayList();
 	private final ValidationSupport    validationSupport = new ValidationSupport();
@@ -86,10 +94,17 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
 		});
 		setResultConverter(dialogButton -> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
+			if (data == ButtonData.CANCEL_CLOSE) {
+				return null;
+			}
 			try {
+				if (validationSupport.isInvalid()) {
+					throw new RuntimeException("Topic validation failed");
+				}
 				return data == ButtonData.OK_DONE ? getInput() : null;
 			} catch (final Exception e) {
-				return null;
+				logger.atError().withException(e).log("Invalid topic");
+				throw e;
 			}
 		});
 	}
@@ -120,14 +135,8 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
 			textTopic = (CustomTextField) TextFields.createClearableTextField();
 			textTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
 			textTopic.setPromptText("Event Topic");
-			validationSupport.registerValidator(textTopic, Validator.createPredicateValidator(value -> {
-				try {
-					ConsoleFxHelper.validateTopic(value.toString().trim());
-					return true;
-				} catch (final Exception e) {
-					return false;
-				}
-			}, "Invalid Event Topic"));
+			validationSupport.registerValidator(textTopic,
+			        Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
 			btnAddField    = new Button();
 			btnRemoveField = new Button();
