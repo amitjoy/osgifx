@@ -18,6 +18,7 @@ package com.osgifx.console.ui;
 import org.osgi.annotation.versioning.ProviderType;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
@@ -43,5 +44,29 @@ public interface ConsoleStatusBar {
 	 * @return the property used to store the progress of a task
 	 */
 	DoubleProperty progressProperty();
+
+	/**
+	 * Adds the specified node to the left of the status bar
+	 *
+	 * @param node the specified node
+	 */
+	void addToLeft(Node node);
+
+	/**
+	 * Adds the specified node to the right of the status bar
+	 *
+	 * @param node the specified node
+	 */
+	void addToRight(Node node);
+
+	/**
+	 * Removes all elements that are positioned right on the bar
+	 */
+	void clearAllInRight();
+
+	/**
+	 * Removes all elements that are positioned left on the bar
+	 */
+	void clearAllInLeft();
 
 }

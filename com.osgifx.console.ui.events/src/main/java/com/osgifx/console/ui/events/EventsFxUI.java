@@ -15,16 +15,22 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events;
 
-import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.CommonEventTopics.EVENT_RECEIVE_STARTED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.CommonEventTopics.EVENT_RECEIVE_STOPPED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static javafx.scene.paint.Color.TRANSPARENT;
+import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_CENTER;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.controlsfx.control.PopOver;
+import org.controlsfx.glyphfont.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -39,8 +45,17 @@ import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.VBox;
 
 public final class EventsFxUI {
 
@@ -54,6 +69,12 @@ public final class EventsFxUI {
 	private ConsoleStatusBar  statusBar;
 	@Inject
 	private ConsoleMaskerPane progressPane;
+	@Inject
+	@Named("is_connected")
+	private boolean           isConnected;
+	@Inject
+	@Named("subscribed_topics")
+	private Set<String>       subscribedTopics;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -72,8 +93,8 @@ public final class EventsFxUI {
 
 	@Inject
 	@Optional
-	private void updateControlsOnEvent( //
-	        @UIEventTopic(BUNDLE_ACTION_EVENT_TOPICS) final String data, //
+	private void updateOnEventReceiveStopped( //
+	        @UIEventTopic(EVENT_RECEIVE_STOPPED_EVENT_TOPIC) final String data, //
 	        final BorderPane parent, //
 	        @LocalInstance final FXMLLoader loader) {
 		createControls(parent, loader);
@@ -115,14 +136,57 @@ public final class EventsFxUI {
 			protected void succeeded() {
 				parent.getChildren().clear();
 				parent.setCenter(tabContent);
-				statusBar.addTo(parent);
+				initStatusBar(parent);
 				progressPane.setVisible(false);
 			}
 		};
 		parent.getChildren().clear();
 		progressPane.addTo(parent);
-		statusBar.addTo(parent);
+		initStatusBar(parent);
 		CompletableFuture.runAsync(task);
+	}
+
+	private void initStatusBar(final BorderPane parent) {
+		if (isConnected) {
+			final var glyph = new Glyph("FontAwesome", "INFO");
+			glyph.useGradientEffect();
+			glyph.useHoverEffect();
+
+			final var popOver = new PopOver(initPopOverNode(subscribedTopics));
+			popOver.setArrowLocation(BOTTOM_CENTER);
+
+			final var button = new Button("", glyph);
+			button.setOnMouseEntered(mouseEvent -> popOver.show(button));
+			button.setOnMouseExited(mouseEvent -> popOver.hide());
+			button.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
+
+			statusBar.clearAllInRight();
+			statusBar.addToRight(button);
+		} else {
+			statusBar.clearAllInRight();
+		}
+		statusBar.addTo(parent);
+	}
+
+	private Node initPopOverNode(final Set<String> topics) {
+		Node listV = null;
+		if (!topics.isEmpty()) {
+			final var listView = new ListView<String>();
+			topics.forEach(t -> listView.getItems().add(t));
+			listView.addEventFilter(KeyEvent.KEY_PRESSED, KeyEvent::consume);
+			listView.setStyle("-fx-focus-color: transparent;");
+			listV = listView;
+		}
+		VBox vBox;
+		if (listV != null) {
+			vBox = new VBox(new Label("Configured Topics"), listV);
+		} else {
+			vBox = new VBox(new Label("No configured topics"));
+		}
+		VBox.setMargin(vBox, new Insets(10, 10, 10, 10));
+		vBox.setStyle("-fx-padding: 18;");
+
+		return vBox;
 	}
 
 }

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.application.ui;
 
+import static java.util.Objects.requireNonNullElse;
 import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.scene.paint.Color.GREEN;
 import static javafx.scene.paint.Color.TRANSPARENT;
@@ -30,6 +31,7 @@ import com.osgifx.console.ui.ConsoleStatusBar;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.Background;
@@ -72,6 +74,28 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
 	@Override
 	public DoubleProperty progressProperty() {
 		return statusBar.progressProperty();
+	}
+
+	@Override
+	public void addToLeft(final Node node) {
+		requireNonNullElse(node, "Specified node cannot be null");
+		statusBar.getLeftItems().add(node);
+	}
+
+	@Override
+	public void addToRight(final Node node) {
+		requireNonNullElse(node, "Specified node cannot be null");
+		statusBar.getRightItems().add(node);
+	}
+
+	@Override
+	public void clearAllInLeft() {
+		statusBar.getLeftItems().clear();
+	}
+
+	@Override
+	public void clearAllInRight() {
+		statusBar.getRightItems().clear();
 	}
 
 }

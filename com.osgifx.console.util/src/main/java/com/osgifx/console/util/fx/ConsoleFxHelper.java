@@ -18,6 +18,8 @@ package com.osgifx.console.util.fx;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.CharMatcher;
+
 public final class ConsoleFxHelper {
 
 	private ConsoleFxHelper() {
@@ -33,6 +35,50 @@ public final class ConsoleFxHelper {
 			return List.of();
 		}
 		return source;
+	}
+
+	public static void validateTopic(final String topic) {
+		final var chars  = topic.toCharArray();
+		final var length = chars.length;
+		if (length == 0) {
+			return;
+		}
+		for (var i = 0; i < length; i++) {
+			final var ch = chars[i];
+			if (ch == '/') {
+				// cannot start or end with a '/' but anywhere else is okay
+				// cannot have "//" as that implies empty token
+				if (i == 0 || i == length - 1 || chars[i - 1] == '/') {
+					throw new IllegalArgumentException("Invalid topic: " + topic);
+				}
+				continue;
+			}
+			if ('A' <= ch && ch <= 'Z' || 'a' <= ch && ch <= 'z') {
+				continue;
+			}
+			if ('0' <= ch && ch <= '9' || ch == '_' || ch == '-') {
+				continue;
+			}
+			if (ch == '*') {
+				continue;
+			}
+			throw new IllegalArgumentException("Invalid topic: " + topic);
+		}
+		if (topic.contains("*")) {
+			// check all indices of * as it can only be at the end
+			final var charMatcher = CharMatcher.is('*');
+			final var count       = charMatcher.countIn(topic);
+			// if there are more than 1 *, it is invalid
+			if (count > 1) {
+				throw new IllegalArgumentException("Invalid topic: " + topic);
+			}
+			final var index = charMatcher.indexIn(topic);
+			// if the * is not at the end, it is invalid and the character before * must
+			// always be a / unless the topic has only a single * (length = 1)
+			if (index != topic.length() - 1 || topic.length() > 1 && topic.charAt(index - 1) != '/') {
+				throw new IllegalArgumentException("Invalid topic: " + topic);
+			}
+		}
 	}
 
 }

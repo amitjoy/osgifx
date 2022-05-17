@@ -16,6 +16,7 @@
 package com.osgifx.console.application.addon;
 
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -38,6 +39,7 @@ public final class ModifiablePropertyAddon {
 		modifiableProperties.put("is_connected", false);
 		modifiableProperties.put("connected.agent", null);
 		modifiableProperties.put("selected.settings", null);
+		modifiableProperties.put("subscribed_topics", Set.of());
 	}
 
 	@PostConstruct
