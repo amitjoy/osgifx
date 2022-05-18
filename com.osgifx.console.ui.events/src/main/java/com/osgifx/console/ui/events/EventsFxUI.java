@@ -148,7 +148,7 @@ public final class EventsFxUI {
 
 	private void initStatusBar(final BorderPane parent) {
 		if (isConnected) {
-			final var glyph = new Glyph("FontAwesome", "INFO");
+			final var glyph = new Glyph("FontAwesome", "GEAR");
 			glyph.useGradientEffect();
 			glyph.useHoverEffect();
 
