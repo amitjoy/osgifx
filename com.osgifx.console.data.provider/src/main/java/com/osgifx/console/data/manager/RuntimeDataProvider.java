@@ -49,6 +49,7 @@ import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -173,6 +174,16 @@ public final class RuntimeDataProvider implements DataProvider {
 			return null;
 		}
 		return agent.getMemoryInfo();
+	}
+
+	@Override
+	public XDmtNodeDTO readDmtNode(final String rootURI) {
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atWarning().log("Agent is not connected");
+			return null;
+		}
+		return agent.readDmtNode(rootURI);
 	}
 
 	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)

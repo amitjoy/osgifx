@@ -37,6 +37,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.batchinstall',\
                                       bnd.identity;id='com.osgifx.console.ui.components',\
                                       bnd.identity;id='com.osgifx.console.ui.configurations',\
+                                      bnd.identity;id='com.osgifx.console.ui.dmt',\
                                       bnd.identity;id='com.osgifx.console.ui.events',\
                                       bnd.identity;id='com.osgifx.console.ui.feature',\
                                       bnd.identity;id='com.osgifx.console.ui.logs',\
@@ -73,7 +74,8 @@ install.order                     :   \
                                       com.osgifx.console.ui.terminal,\
                                       com.osgifx.console.ui.heap,\
                                       com.osgifx.console.ui.leaks,\
-                                      com.osgifx.console.ui.http                                      
+                                      com.osgifx.console.ui.http,\
+                                      com.osgifx.console.ui.dmt                                      
 
 -runbundles.X    	              :   ${install.order}
 

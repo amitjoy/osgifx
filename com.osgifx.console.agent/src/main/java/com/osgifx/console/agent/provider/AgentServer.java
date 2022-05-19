@@ -75,6 +75,7 @@ import com.osgifx.console.agent.AgentExtension;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
+import com.osgifx.console.agent.admin.XDmtAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHeapAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
@@ -87,6 +88,7 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
@@ -129,6 +131,7 @@ public final class AgentServer implements Agent, Closeable {
 
 	private final ServiceTracker<Object, Object>                 scrTracker;
 	private final ServiceTracker<Object, Object>                 metatypeTracker;
+	private final ServiceTracker<Object, Object>                 dmtAdminTracker;
 	private final ServiceTracker<Object, Object>                 eventAdminTracker;
 	private final ServiceTracker<Object, Object>                 configAdminTracker;
 	private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
@@ -146,6 +149,7 @@ public final class AgentServer implements Agent, Closeable {
 		final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
 		metatypeTracker           = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
+		dmtAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
 		eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
 		configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
 		scrTracker                = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
@@ -213,6 +217,7 @@ public final class AgentServer implements Agent, Closeable {
 									};
 		scrTracker.open();
 		metatypeTracker.open();
+		dmtAdminTracker.open();
 		eventAdminTracker.open();
 		configAdminTracker.open();
 		gogoCommandsTracker.open();
@@ -386,6 +391,7 @@ public final class AgentServer implements Agent, Closeable {
 
 			scrTracker.close();
 			metatypeTracker.close();
+			dmtAdminTracker.close();
 			configAdminTracker.close();
 			gogoCommandsTracker.close();
 			agentExtensionTracker.close();
@@ -527,6 +533,16 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public List<XThreadDTO> getAllThreads() {
 		return XThreadAdmin.get();
+	}
+
+	@Override
+	public XDmtNodeDTO readDmtNode(final String rootURI) {
+		final boolean isDmtAdminAvailable = PackageWirings.isDmtAdminWired(context);
+		if (isDmtAdminAvailable) {
+			final XDmtAdmin dmtAdmin = new XDmtAdmin(dmtAdminTracker.getService());
+			return dmtAdmin.readDmtNode(rootURI);
+		}
+		return null;
 	}
 
 	@Override

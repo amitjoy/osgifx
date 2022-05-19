@@ -5,7 +5,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  css = css,\
 					  fxml = fxml,\
 					  graphic = graphic
--buildpath: \
+-buildpath          : \
                       ${bundles.required},\
                       org.apache.commons.commons-io,\
                       org.apache.felix.cm.json,\
