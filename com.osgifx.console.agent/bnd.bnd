@@ -29,6 +29,7 @@ Import-Package        : \
                         org.osgi.service.http.runtime;'resolution:'=optional,\
                         org.osgi.service.http.runtime.dto;'resolution:'=optional,\
                         org.osgi.service.cm;'resolution:'=optional,\
+                        org.osgi.service.dmt;'resolution:'=optional,\
                         org.osgi.service.event;'resolution:'=optional,\
                         org.osgi.service.log;'resolution:'=optional,\
                         org.osgi.service.metatype;'resolution:'=optional,\

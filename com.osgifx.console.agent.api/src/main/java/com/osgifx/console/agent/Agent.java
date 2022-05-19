@@ -28,6 +28,7 @@ import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
@@ -252,6 +253,14 @@ public interface Agent {
 	 * @return the detailed information of all the threads
 	 */
 	List<XThreadDTO> getAllThreads();
+
+	/**
+	 * Returns all the children of the specified DMT node URI
+	 *
+	 * @param rootURI the root URI for which the children will be returned
+	 * @return all the children of the specified DMT node
+	 */
+	XDmtNodeDTO readDmtNode(String rootURI);
 
 	/**
 	 * Enables the component description by name

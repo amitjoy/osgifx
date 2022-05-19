@@ -20,6 +20,7 @@ import org.osgi.annotation.versioning.ProviderType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -132,5 +133,12 @@ public interface DataProvider {
 	 * @return the memory information
 	 */
 	XMemoryInfoDTO memory();
+
+	/**
+	 * Returns the DMT node information of the specified node
+	 *
+	 * @return the DMT node information
+	 */
+	XDmtNodeDTO readDmtNode(String rootURI);
 
 }
