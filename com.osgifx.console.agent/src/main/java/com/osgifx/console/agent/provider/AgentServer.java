@@ -532,7 +532,8 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public List<XThreadDTO> getAllThreads() {
-		return XThreadAdmin.get();
+		final XThreadAdmin threadAdmin = new XThreadAdmin(context);
+		return threadAdmin.get();
 	}
 
 	@Override

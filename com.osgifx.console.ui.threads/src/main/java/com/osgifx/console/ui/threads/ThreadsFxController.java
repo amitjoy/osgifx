@@ -56,6 +56,8 @@ public final class ThreadsFxController {
 	private TableColumn<XThreadDTO, String> isAliveColumn;
 	@FXML
 	private TableColumn<XThreadDTO, String> isDaemonColumn;
+	@FXML
+	private TableColumn<XThreadDTO, String> isDeadlockedColumn;
 	@Inject
 	@Named("is_connected")
 	private boolean                         isConnected;
@@ -85,6 +87,7 @@ public final class ThreadsFxController {
 		isInterruptedColumn.setCellValueFactory(new DTOCellValueFactory<>("isInterrupted", String.class));
 		isAliveColumn.setCellValueFactory(new DTOCellValueFactory<>("isAlive", String.class));
 		isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
+		isDeadlockedColumn.setCellValueFactory(new DTOCellValueFactory<>("isDeadlocked", String.class));
 
 		table.setItems(dataProvider.threads());
 		TableFilter.forTableView(table).lazy(true).apply();
