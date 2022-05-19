@@ -18,37 +18,29 @@ package com.osgifx.console.ui.dmt;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
-import com.osgifx.console.agent.dto.XDmtNodeDTO;
-import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 
 public final class DmtFxUI {
-
-	private static final String ROOT_DMT_NODE = ".";
 
 	@Log
 	@Inject
@@ -57,18 +49,13 @@ public final class DmtFxUI {
 	@OSGiBundle
 	private BundleContext     context;
 	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
 	private ConsoleStatusBar  statusBar;
 	@Inject
 	private ConsoleMaskerPane progressPane;
-	@Inject
-	private DataProvider      dataProvider;
 
 	@PostConstruct
-	public void postConstruct(final BorderPane parent) {
-		createControls(parent);
+	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+		createControls(parent, loader);
 		logger.atDebug().log("DMT part has been initialized");
 	}
 
@@ -76,9 +63,10 @@ public final class DmtFxUI {
 	@Optional
 	private void updateOnAgentConnectedEvent( //
 	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent) {
+	        final BorderPane parent, //
+	        @LocalInstance final FXMLLoader loader) {
 		logger.atInfo().log("Agent connected event received");
-		createControls(parent);
+		createControls(parent, loader);
 
 	}
 
@@ -86,13 +74,14 @@ public final class DmtFxUI {
 	@Optional
 	private void updateOnAgentDisconnectedEvent( //
 	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent) {
+	        final BorderPane parent, //
+	        @LocalInstance final FXMLLoader loader) {
 		logger.atInfo().log("Agent disconnected event received");
-		createControls(parent);
+		createControls(parent, loader);
 
 	}
 
-	private void createControls(final BorderPane parent) {
+	private void createControls(final BorderPane parent, final FXMLLoader loader) {
 		progressPane.setVisible(true);
 		final Task<Void> task = new Task<>() {
 
@@ -100,62 +89,8 @@ public final class DmtFxUI {
 
 			@Override
 			protected Void call() throws Exception {
-				tabContent = initTree();
+				tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
 				return null;
-			}
-
-			private Node initTree() {
-				final var dmtNode  = dataProvider.readDmtNode(ROOT_DMT_NODE);
-				final var treeView = new TreeView<XDmtNodeDTO>();
-				if (dmtNode == null) {
-					return treeView;
-				}
-				final var rootItem = new TreeItem<>(dmtNode);
-
-				treeView.setRoot(rootItem);
-				treeView.setCellFactory(arg0 -> initCellFactory());
-				initTree(dmtNode, rootItem);
-				expandTreeView(rootItem);
-
-				return treeView;
-			}
-
-			private TreeCell<XDmtNodeDTO> initCellFactory() {
-				return new TreeCell<>() {
-					@Override
-					protected void updateItem(final XDmtNodeDTO node, final boolean empty) {
-						super.updateItem(node, empty);
-						if (node != null) {
-							final Map<String, String> properties = Maps.newHashMap();
-
-							properties.computeIfAbsent("value", e -> node.value);
-							properties.computeIfAbsent("format", e -> node.format);
-
-							final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
-							final var result             = new StringBuilder(node.uri);
-
-							if (!propertiesToString.isEmpty()) {
-								result.append(" [");
-								result.append(propertiesToString);
-								result.append("]");
-							}
-							setText(result.toString());
-						}
-					}
-				};
-			}
-
-			private void initTree(final XDmtNodeDTO dmtNode, final TreeItem<XDmtNodeDTO> parent) {
-				var node = parent;
-				if (!ROOT_DMT_NODE.equals(dmtNode.uri)) {
-					node = new TreeItem<>(dmtNode);
-					parent.getChildren().add(node);
-				}
-				if (!dmtNode.children.isEmpty()) {
-					for (final XDmtNodeDTO child : dmtNode.children) {
-						initTree(child, node);
-					}
-				}
 			}
 
 			@Override
@@ -170,15 +105,6 @@ public final class DmtFxUI {
 		progressPane.addTo(parent);
 		statusBar.addTo(parent);
 		CompletableFuture.runAsync(task);
-	}
-
-	private void expandTreeView(final TreeItem<?> item) {
-		if (item != null && !item.isLeaf()) {
-			item.setExpanded(true);
-			for (final TreeItem<?> child : item.getChildren()) {
-				expandTreeView(child);
-			}
-		}
 	}
 
 }
