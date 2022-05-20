@@ -27,14 +27,14 @@
     	</placeholder>
       	<columns>
           <TableColumn prefWidth="30.0" text="" />
-          <TableColumn fx:id="nameColumn" prefWidth="550.0" text="Name" />
+          <TableColumn fx:id="nameColumn" prefWidth="540.0" text="Name" />
           <TableColumn fx:id="idColumn" prefWidth="90.0" text="ID" />
           <TableColumn fx:id="priorityColumn" prefWidth="90.0" text="Priority" />
           <TableColumn fx:id="stateColumn" prefWidth="140.0" text="State" />
           <TableColumn fx:id="isInterruptedColumn" prefWidth="100.0" text="Is Interrupted?" />
           <TableColumn fx:id="isAliveColumn" prefWidth="100.0" text="Is Alive?" />
           <TableColumn fx:id="isDaemonColumn" prefWidth="100.0" text="Is Daemon?" />
-          <TableColumn fx:id="isDeadlockedColumn" prefWidth="100.0" text="Is Deadlocked?" />
+          <TableColumn fx:id="isDeadlockedColumn" prefWidth="110.0" text="Is Deadlocked?" />
         </columns>
       </TableView>
    </children>
