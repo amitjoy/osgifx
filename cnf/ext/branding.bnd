@@ -11,6 +11,6 @@ Bundle-Developers                     =         amit.kumar.mondal; \
                                                    organizationURL="https://www.telekom.de/"; \
                                                    roles="architect,developer"; \
                                                    timezone="Europe/Berlin"
-Bundle-SCM                            =         url=https://github.com/amitjoy/osgifx-console.git, \
-                                                connection=scm:git:https://github.com/amitjoy/osgifx-console.git, \
-                                                developerConnection=scm:git:git@github.com:amitjoy/osgifx-console.git
+Bundle-SCM                            =         url=https://github.com/amitjoy/osgifx.git, \
+                                                connection=scm:git:https://github.com/amitjoy/osgifx.git, \
+                                                developerConnection=scm:git:git@github.com:amitjoy/osgifx.git
