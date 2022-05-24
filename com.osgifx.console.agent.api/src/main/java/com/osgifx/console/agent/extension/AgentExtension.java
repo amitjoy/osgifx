@@ -13,27 +13,44 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent;
+package com.osgifx.console.agent.extension;
 
-import java.util.Map;
+import org.osgi.dto.DTO;
 
 /**
  * Service interface to be used by consumers for providing custom
- * functionalities that can be invoked through the bnd agent.
+ * functionalities that can be invoked through the agent.
  * <p>
- * The services must provide the following key as a service property.
+ * The service must provide the following key as a service property.
+ *
+ * @see AgentExtensionName
  */
-@FunctionalInterface
-public interface AgentExtension {
+public interface AgentExtension<C extends DTO, R extends DTO> {
 
 	/** The service property key to be set */
 	String PROPERTY_KEY = "agent.extension.name";
 
 	/**
-	 * Returns the results as a type supported by the bnd converter
+	 * Returns the result compliant with {@code OSGi DTO specification}
 	 *
-	 * @param context the context for the extension
-	 * @return the result as a bnd converter supported type
+	 * @param context the context for the extension (also to be compliant with
+	 *                {@code OSGi DTO specification})
+	 * @return the result in compliance with {@code OSGi DTO specification}
 	 */
-	Object execute(Map<String, Object> context);
+	R execute(C context);
+
+	/**
+	 * The source type of the context
+	 *
+	 * @return {@code OSGi DTO specification} compliant DTO
+	 */
+	Class<C> getContextType();
+
+	/**
+	 * The source type of the context
+	 *
+	 * @return {@code OSGi DTO specification} compliant DTO
+	 */
+	Class<R> getResultType();
+
 }

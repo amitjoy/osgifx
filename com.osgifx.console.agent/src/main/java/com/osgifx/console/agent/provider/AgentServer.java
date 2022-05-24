@@ -58,6 +58,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.osgi.dto.DTO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -71,7 +72,6 @@ import org.osgi.framework.wiring.FrameworkWiring;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
-import com.osgifx.console.agent.AgentExtension;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
@@ -97,6 +97,7 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.ClassloaderLeakDetector;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.redirector.ConsoleRedirector;
@@ -115,6 +116,7 @@ import aQute.lib.converter.TypeReference;
  * Implementation of the Agent. This implementation implements the Agent
  * interfaces and communicates with a Supervisor interfaces.
  */
+@SuppressWarnings("rawtypes")
 public final class AgentServer implements Agent, Closeable {
 
 	private static final long    RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
@@ -138,8 +140,8 @@ public final class AgentServer implements Agent, Closeable {
 	private final ServiceTracker<Object, Object>                 httpServiceRuntimeTracker;
 	private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
 
-	private final Set<String>                 gogoCommands    = new CopyOnWriteArraySet<>();
-	private final Map<String, AgentExtension> agentExtensions = new ConcurrentHashMap<>();
+	private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
+	private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
 
 	public AgentServer(final BundleContext context, final ClassloaderLeakDetector leakDetector) throws Exception {
 		requireNonNull(context, "Bundle context cannot be null");
@@ -157,6 +159,7 @@ public final class AgentServer implements Agent, Closeable {
 		agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
 
 										@Override
+										@SuppressWarnings("unchecked")
 										public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
 											final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
 											if (name == null) {
@@ -711,12 +714,16 @@ public final class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
-	public Object executeExtension(final String name, final Map<String, Object> context) {
+	public Map<String, Object> executeExtension(final String name, final Map<String, Object> context) {
 		if (!agentExtensions.containsKey(name)) {
 			throw new RuntimeException("Agent extension with name '" + name + "' doesn't exist");
 		}
 		try {
-			return agentExtensions.get(name).execute(context);
+			final AgentExtension<DTO, DTO> extension = agentExtensions.get(name);
+			final DTO                      cnv       = Converter.cnv(extension.getContextType(), context);
+			final DTO                      result    = extension.execute(cnv);
+			return Converter.cnv(new TypeReference<Map<String, Object>>() {
+			}, result);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
