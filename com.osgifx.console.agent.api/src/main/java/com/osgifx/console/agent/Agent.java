@@ -37,6 +37,8 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.agent.extension.AgentExtension;
+import com.osgifx.console.agent.extension.AgentExtensionName;
 
 /**
  * An agent runs on remote OSGi framework and provides the means to control this
@@ -410,12 +412,13 @@ public interface Agent {
 	 *
 	 * @param name    the name of the extension
 	 * @param context the context for the extension to be provided for execution
-	 *                (note that, the map should also contain values supported by
-	 *                bnd's {@code Converter})
-	 * @return the value having the type supported by bnd's {@code Converter}
+	 *                (note that, the map should be compliant with
+	 *                {@code OSGi DTO specification}
+	 * @return the value in compliance with {@code OSGi DTO specification}
 	 * @see AgentExtension
+	 * @see AgentExtensionName
 	 */
-	Object executeExtension(String name, Map<String, Object> context);
+	Map<String, Object> executeExtension(String name, Map<String, Object> context);
 
 	/**
 	 * Executes the specified terminal (CLI) command in a separate process.
