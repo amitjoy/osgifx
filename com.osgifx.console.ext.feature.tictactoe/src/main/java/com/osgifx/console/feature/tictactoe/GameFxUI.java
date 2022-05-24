@@ -18,21 +18,26 @@ package com.osgifx.console.feature.tictactoe;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.controlsfx.control.MaskerPane;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
+import com.osgifx.console.util.agent.ExtensionHelper;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
@@ -44,18 +49,42 @@ public final class GameFxUI {
 
 	@Log
 	@Inject
-	private FluentLogger     logger;
+	private FluentLogger      logger;
 	@Inject
 	@OSGiBundle
-	private BundleContext    context;
+	private BundleContext     context;
 	@Inject
-	private ConsoleStatusBar statusBar;
-	private final MaskerPane progressPane = new MaskerPane();
+	private ConsoleStatusBar  statusBar;
+	@Inject
+	private Supervisor        supervisor;
+	@Inject
+	private ConsoleMaskerPane progressPane;
+	@Inject
+	@Named("is_connected")
+	private boolean           isConnected;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
 		createControls(parent, loader);
 		logger.atDebug().log("Tic-Tac-Toe game play part has been initialized");
+	}
+
+	@Focus
+	public void onFocus() {
+		if (isConnected) {
+			final var agent = supervisor.getAgent();
+			final var name  = "my-agent-extension";
+
+			final Map<String, Object> context1 = Map.of("propValue", 500);
+			final var                 result1  = agent.executeExtension(name, context1);
+			System.out.println(result1);
+
+			final var context2 = new MyContextDTO();
+			context2.propValue = 500;
+
+			final var result2 = ExtensionHelper.executeExtension(agent, name, context2, MyResultDTO.class);
+			System.out.println(result2);
+		}
 	}
 
 	@Inject
@@ -99,7 +128,7 @@ public final class GameFxUI {
 			}
 		};
 		parent.getChildren().clear();
-		parent.setCenter(progressPane);
+		progressPane.addTo(parent);
 		statusBar.addTo(parent);
 
 		CompletableFuture.runAsync(task);
