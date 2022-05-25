@@ -113,10 +113,6 @@ import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 
-/**
- * Implementation of the Agent. This implementation implements the Agent
- * interfaces and communicates with a Supervisor interfaces.
- */
 @SuppressWarnings("rawtypes")
 public final class AgentServer implements Agent, Closeable {
 
@@ -236,7 +232,8 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public XResultDTO installWithMultipleData(final Collection<byte[]> data, final int startLevel) {
-		requireNonNull(data);
+		requireNonNull(data, "Data cannot be null");
+
 		final XResultDTO    result = new XResultDTO();
 		final StringBuilder b      = new StringBuilder();
 		try {
@@ -355,6 +352,8 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public String shell(final String cmd) throws Exception {
+		requireNonNull(cmd, "Command cannot be null");
+
 		redirect(Agent.COMMAND_SESSION);
 		stdin(cmd);
 		final PrintStream ps = redirector.getOut();
@@ -472,7 +471,6 @@ public final class AgentServer implements Agent, Closeable {
 	}
 
 	private Set<Bundle> findBundles(final String bsn, final Version version) {
-
 		return Stream.of(context.getBundles()).filter(b -> bsn.equals(b.getSymbolicName()))
 		        .filter(b -> version == null || version.equals(b.getVersion())).collect(Collectors.toSet());
 	}
@@ -542,6 +540,8 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public XDmtNodeDTO readDmtNode(final String rootURI) {
+		requireNonNull(rootURI, "DMT node root URI cannot be null");
+
 		final boolean isDmtAdminAvailable = PackageWirings.isDmtAdminWired(context);
 		if (isDmtAdminAvailable) {
 			final XDmtAdmin dmtAdmin = new XDmtAdmin(dmtAdminTracker.getService());
@@ -611,6 +611,7 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public XResultDTO createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
 		requireNonNull(newProperties, "Configuration properties cannot be null");
+
 		try {
 			final Map<String, Object> finalProperties = parseProperties(newProperties);
 			return createOrUpdateConfiguration(pid, finalProperties);
@@ -730,6 +731,9 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public Map<String, Object> executeExtension(final String name, final Map<String, Object> context) {
+		requireNonNull(name, "Agent extension name cannot be null");
+		requireNonNull(context, "Agent extension execution context cannot be null");
+
 		if (!agentExtensions.containsKey(name)) {
 			throw new RuntimeException("Agent extension with name '" + name + "' doesn't exist");
 		}
@@ -746,6 +750,8 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public String exec(final String command) {
+		requireNonNull(command, "CLI command cannot be null");
+
 		String cmd;
 		if (isWindows()) {
 			cmd = "cmd.exe /C " + command;
@@ -841,11 +847,9 @@ public final class AgentServer implements Agent, Closeable {
 		requireNonNull(data);
 
 		Bundle installedBundle;
-
 		if (location == null) {
 			location = getLocation(data);
 		}
-
 		try (InputStream stream = new ByteArrayInputStream(data)) {
 			installedBundle = context.getBundle(location);
 			if (installedBundle == null) {
