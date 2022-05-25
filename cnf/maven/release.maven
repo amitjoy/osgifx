@@ -1,8 +1,4 @@
-com.osgifx:com.osgifx.console.agent:0.0.4
-com.osgifx:com.osgifx.console.agent:0.0.5.202204260112
-com.osgifx:com.osgifx.console.agent:0.0.6
-com.osgifx:com.osgifx.console.agent:0.0.7
-com.osgifx:com.osgifx.console.agent:0.0.9
-com.osgifx:com.osgifx.console.agent:0.0.10
-com.osgifx:com.osgifx.console.agent:1.0.0
-com.osgifx:com.osgifx.console.agent:1.1.0
+com.osgifx:com.osgifx.console.agent.api:1.1.0
+com.osgifx:com.osgifx.console.api:1.1.0
+com.osgifx:com.osgifx.console.smartgraph:1.1.0
+com.osgifx:com.osgifx.console.util:1.1.0

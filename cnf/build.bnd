@@ -30,7 +30,6 @@ sonatype.url.staging                  =         ${sonatype.url}/service/local/st
 usr                                   =         ${env;GITHUB_ACTOR;}
 pwd                                   =         ${env;GITHUB_TOKEN;}
 -connection-settings                  =         ${if;${pwd};server;-dummy};id=${github.packages.url};username=${usr};password=${pwd}, -bnd
--releaserepo                          =         Release
 
 efxclipse.version                     =         3.8.0
 efxclipse.url                         =         http://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
@@ -44,6 +43,8 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 
 -pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
 -groupid                              =         com.osgifx
+-baselinerepo                         =         Release
+-releaserepo                          =         Release
 
 OSGifx-Version                        =         ${cat;${.}/app.version}
 Bundle-Version                        =         ${OSGifx-Version}.${tstamp}

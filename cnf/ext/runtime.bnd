@@ -72,18 +72,18 @@ bundles.e4.efxclipse: \
                  org.eclipse.fx.ui.workbench.services
 
 bundles.required: \
-				${bundles.e4.core},\
-                ${bundles.e4.efxclipse},\
-				${bundles.deps},\
-				${bundles.eclipse.core},\
-				com.google.guava,\
-				org.apache.commons.lang,\
-				org.eclipse.equinox.preferences,\
-                controlsfx,\
-                javax.inject,\
-                com.osgifx.console.util,\
-                eu.hansolo.tilesfx,\
-                com.osgifx.console.wrapper.formsfx
+				 ${bundles.e4.core},\
+                 ${bundles.e4.efxclipse},\
+				 ${bundles.deps},\
+				 ${bundles.eclipse.core},\
+				 com.google.guava,\
+				 org.apache.commons.lang,\
+				 org.eclipse.equinox.preferences,\
+                 controlsfx,\
+                 javax.inject,\
+                 com.osgifx.console.util;version=snapshot,\
+                 eu.hansolo.tilesfx,\
+                 com.osgifx.console.wrapper.formsfx
                 
 bundles.configurations: \
                  org.apache.felix.configadmin,\
