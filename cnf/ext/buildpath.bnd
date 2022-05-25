@@ -1,5 +1,5 @@
--buildpath.agent.api                  =         com.osgifx.console.agent.api
--buildpath.base.api                   =         com.osgifx.console.api
+-buildpath.agent.api                  =         com.osgifx.console.agent.api;version=snapshot
+-buildpath.base.api                   =         com.osgifx.console.api;version=snapshot
 -buildpath.osgi                       =         osgi.annotation,\
                                                 osgi.core;version='8.0.0',\
                                                 org.osgi.application,\

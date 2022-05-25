@@ -7,7 +7,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  graphic = graphic
 -buildpath          : \
                       ${bundles.required},\
-                      com.osgifx.console.smartgraph,\
+                      com.osgifx.console.smartgraph;version=snapshot,\
                       org.jgrapht.core,\
                       org.jgrapht.io
 -privatepackage     : \

@@ -1,3 +1,4 @@
--buildpath: org.apache.felix.converter,\
-            com.google.guava,\
-            controlsfx
+-baseline  : *
+-buildpath : org.apache.felix.converter,\
+             com.google.guava,\
+             controlsfx
