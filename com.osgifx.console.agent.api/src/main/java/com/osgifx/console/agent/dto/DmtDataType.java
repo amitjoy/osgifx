@@ -13,6 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("2.0.0")
 package com.osgifx.console.agent.dto;
+
+public enum DmtDataType {
+	BASE64, BINARY, BOOLEAN, DATE, FLOAT, INTEGER, NULL, STRING, TIME, XML, LONG, DATE_TIME
+}
