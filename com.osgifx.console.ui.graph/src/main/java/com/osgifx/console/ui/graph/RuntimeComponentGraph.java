@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
-import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;

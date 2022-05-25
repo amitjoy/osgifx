@@ -17,7 +17,7 @@ package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.PID;
-import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_EVENTS_TOPIC;
+import static com.osgifx.console.event.topics.EventReceiveEventTopics.CLEAR_EVENTS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 

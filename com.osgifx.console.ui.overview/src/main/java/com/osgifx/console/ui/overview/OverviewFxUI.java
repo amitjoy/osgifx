@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.overview;
 
-import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_ALL_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static java.util.Objects.requireNonNullElse;

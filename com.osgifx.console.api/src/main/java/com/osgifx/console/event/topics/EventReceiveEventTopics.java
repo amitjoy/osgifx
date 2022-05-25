@@ -15,17 +15,17 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
-public final class BundleActionEventTopics {
+public final class EventReceiveEventTopics {
 
-	private BundleActionEventTopics() {
+	private EventReceiveEventTopics() {
 		throw new IllegalAccessError("Cannot be instantiated");
 	}
 
-	public static final String BUNDLE_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/bundle/";
-	public static final String BUNDLE_ACTION_EVENT_TOPICS       = BUNDLE_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String BUNDLE_STARTED_EVENT_TOPIC       = BUNDLE_ACTION_EVENT_TOPIC_PREFIX + "started";
-	public static final String BUNDLE_STOPPED_EVENT_TOPIC       = BUNDLE_ACTION_EVENT_TOPIC_PREFIX + "stopped";
-	public static final String BUNDLE_INSTALLED_EVENT_TOPIC     = BUNDLE_ACTION_EVENT_TOPIC_PREFIX + "installed";
-	public static final String BUNDLE_UNINSTALLED_EVENT_TOPIC   = BUNDLE_ACTION_EVENT_TOPIC_PREFIX + "uninstalled";
+	public static final String CLEAR_EVENTS_TOPIC = "com/osgifx/clear/events";
+
+	public static final String EVENT_RECEIVE_EVENT_TOPIC_PREFIX  = "osgi/fx/event/receive/";
+	public static final String EVENT_RECEIVE_EVENT_TOPICS        = EVENT_RECEIVE_EVENT_TOPIC_PREFIX + "*";
+	public static final String EVENT_RECEIVE_STARTED_EVENT_TOPIC = EVENT_RECEIVE_EVENT_TOPIC_PREFIX + "started";
+	public static final String EVENT_RECEIVE_STOPPED_EVENT_TOPIC = EVENT_RECEIVE_EVENT_TOPIC_PREFIX + "stopped";
 
 }

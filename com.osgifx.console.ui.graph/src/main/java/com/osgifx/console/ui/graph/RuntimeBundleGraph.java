@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
-import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
 import static com.osgifx.console.ui.graph.BundleVertex.VERTEX_ID_FUNCTION;
 import static java.util.stream.Collectors.toMap;
 

@@ -16,9 +16,9 @@
 package com.osgifx.console.data.supplier;
 
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
-import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_CONFIGURATIONS_TOPIC;
 import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONENT_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CONFIGURATIONS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
