@@ -15,14 +15,20 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dmt;
 
+import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
@@ -31,8 +37,12 @@ import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
+import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -47,16 +57,26 @@ public final class DmtFxController {
 
 	@Log
 	@Inject
-	private FluentLogger     logger;
+	private FluentLogger      logger;
+	@Inject
+	private IEclipseContext   context;
 	@FXML
-	private TreeView<String> dmtTree;
+	private TreeView<String>  dmtTree;
 	@FXML
-	private TextField        searchBox;
+	private TextField         searchBox;
 	@Inject
 	@Named("is_connected")
-	private boolean          isConnected;
+	private boolean           isConnected;
 	@Inject
-	private DataProvider     dataProvider;
+	private ThreadSynchronize threadSync;
+	@Inject
+	private IEventBroker      eventBroker;
+	@Inject
+	private DataProvider      dataProvider;
+	@Inject
+	private Supervisor        supervisor;
+
+	private final Map<FilterableTreeItem<String>, XDmtNodeDTO> items = Maps.newHashMap();
 
 	@FXML
 	public void initialize() {
@@ -98,6 +118,8 @@ public final class DmtFxController {
 		var node = parent;
 		if (!ROOT_DMT_NODE.equals(dmtNode.uri)) {
 			node = new FilterableTreeItem<>(initItemText(dmtNode));
+			addDoubleClickEvent();
+			items.put(node, dmtNode);
 			parent.getInternalChildren().add(node);
 		}
 		if (!dmtNode.children.isEmpty()) {
@@ -107,11 +129,68 @@ public final class DmtFxController {
 		}
 	}
 
+	private void addDoubleClickEvent() {
+		dmtTree.setOnMouseClicked(mouseEvent -> {
+			if (mouseEvent.getClickCount() == 2) {
+				final var item = dmtTree.getSelectionModel().getSelectedItem();
+				final var node = items.get(item);
+				if (node != null && !node.children.isEmpty()) {
+					return;
+				}
+				showDialog(node);
+			}
+		});
+	}
+
+	private void showDialog(final XDmtNodeDTO node) {
+		if (node.format == null) {
+			logger.atInfo().log("DMT node update not allowed as the node format is null - '%s'", node.uri);
+			return;
+		}
+		final var updateNodeDialog = new UpdateNodeDialog();
+		ContextInjectionFactory.inject(updateNodeDialog, context);
+		logger.atInfo().log("Injected update DMT node dialog to eclipse context");
+
+		updateNodeDialog.init(node);
+
+		final var result = updateNodeDialog.showAndWait();
+		if (!result.isPresent()) {
+			logger.atInfo().log("No button has been selected");
+			return;
+		}
+		final var agent = supervisor.getAgent();
+		if (agent == null) {
+			logger.atError().log("Agent is not connected");
+			return;
+		}
+		final var dto          = result.get();
+		final var updateResult = agent.updateDmtNode(dto.uri(), dto.value(), dto.format());
+		logger.atInfo().log("DMT node '%s' update request processed", node.uri);
+		switch (updateResult.result) {
+		case XResultDTO.SUCCESS:
+			logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
+			threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", node.uri + "has been updated successfully updated"));
+			eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
+			logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
+			break;
+		case XResultDTO.ERROR:
+			logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
+			threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", updateResult.response));
+			break;
+		case XResultDTO.SKIPPED:
+			logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
+			threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", updateResult.response));
+			break;
+		default:
+			break;
+		}
+	}
+
 	private String initItemText(final XDmtNodeDTO node) {
 		final Map<String, String> properties = Maps.newHashMap();
 
 		properties.computeIfAbsent("value", e -> node.value);
-		properties.computeIfAbsent("format", e -> node.format);
+		properties.computeIfAbsent("format", e -> Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
 
 		final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
 		final var result             = new StringBuilder(node.uri);

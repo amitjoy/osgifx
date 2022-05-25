@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dmt;
 
+import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
@@ -67,7 +68,6 @@ public final class DmtFxUI {
 	        @LocalInstance final FXMLLoader loader) {
 		logger.atInfo().log("Agent connected event received");
 		createControls(parent, loader);
-
 	}
 
 	@Inject
@@ -78,7 +78,16 @@ public final class DmtFxUI {
 	        @LocalInstance final FXMLLoader loader) {
 		logger.atInfo().log("Agent disconnected event received");
 		createControls(parent, loader);
+	}
 
+	@Inject
+	@Optional
+	private void updateOnDmtNodeUpdatedEvent( //
+	        @UIEventTopic(DMT_UPDATED_EVENT_TOPIC) final String data, //
+	        final BorderPane parent, //
+	        @LocalInstance final FXMLLoader loader) {
+		logger.atInfo().log("DMT node updated event received");
+		createControls(parent, loader);
 	}
 
 	private void createControls(final BorderPane parent, final FXMLLoader loader) {

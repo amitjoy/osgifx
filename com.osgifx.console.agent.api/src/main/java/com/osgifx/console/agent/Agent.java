@@ -25,6 +25,7 @@ import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
 
 import com.osgifx.console.agent.dto.ConfigValue;
+import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -263,6 +264,15 @@ public interface Agent {
 	 * @return all the children of the specified DMT node
 	 */
 	XDmtNodeDTO readDmtNode(String rootURI);
+
+	/**
+	 * Update the specified DMT leaf node with the specified value
+	 *
+	 * @param uri    the DMT node URI
+	 * @param value  the value to set
+	 * @param format the format to use
+	 */
+	XResultDTO updateDmtNode(String uri, Object value, DmtDataType format);
 
 	/**
 	 * Enables the component description by name

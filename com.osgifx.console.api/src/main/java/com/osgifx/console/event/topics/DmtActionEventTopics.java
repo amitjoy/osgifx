@@ -13,18 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.dto;
+package com.osgifx.console.event.topics;
 
-import java.util.List;
+public final class DmtActionEventTopics {
 
-import org.osgi.dto.DTO;
+	private DmtActionEventTopics() {
+		throw new IllegalAccessError("Cannot be instantiated");
+	}
 
-public class XDmtNodeDTO extends DTO {
-
-	public String            uri;
-	public String            value;
-	public DmtDataType       format;
-	public String            createdAt;
-	public List<XDmtNodeDTO> children;
+	public static final String DMT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/dmt/";
+	public static final String DMT_ACTION_EVENT_TOPICS       = DMT_ACTION_EVENT_TOPIC_PREFIX + "*";
+	public static final String DMT_UPDATED_EVENT_TOPIC       = DMT_ACTION_EVENT_TOPIC_PREFIX + "updated";
 
 }

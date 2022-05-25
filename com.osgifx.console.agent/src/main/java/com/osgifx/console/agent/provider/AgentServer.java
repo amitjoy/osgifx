@@ -84,6 +84,7 @@ import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
 import com.osgifx.console.agent.admin.XThreadAdmin;
 import com.osgifx.console.agent.dto.ConfigValue;
+import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -547,6 +548,20 @@ public final class AgentServer implements Agent, Closeable {
 			return dmtAdmin.readDmtNode(rootURI);
 		}
 		return null;
+	}
+
+	@Override
+	public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
+		requireNonNull(uri, "DMT node URI cannot be null");
+		requireNonNull(value, "DMT value cannot be null");
+		requireNonNull(format, "DMT value type cannot be null");
+
+		final boolean isDmtAdminAvailable = PackageWirings.isDmtAdminWired(context);
+		if (isDmtAdminAvailable) {
+			final XDmtAdmin dmtAdmin = new XDmtAdmin(dmtAdminTracker.getService());
+			return dmtAdmin.updateDmtNode(uri, value, format);
+		}
+		return createResult(SKIPPED, "DMT bundle is not installed to process this request");
 	}
 
 	@Override
