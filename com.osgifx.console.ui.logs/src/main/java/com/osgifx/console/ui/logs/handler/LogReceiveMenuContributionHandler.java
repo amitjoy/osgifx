@@ -15,8 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs.handler;
 
-import static com.osgifx.console.event.topics.CommonEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
-import static com.osgifx.console.event.topics.CommonEventTopics.LOG_RECEIVE_STOPPED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STOPPED_EVENT_TOPIC;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.List;

@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs.handler;
 
-import static com.osgifx.console.event.topics.CommonEventTopics.CLEAR_LOGS_TOPIC;
+import static com.osgifx.console.event.topics.LogReceiveEventTopics.CLEAR_LOGS_TOPIC;
 
 import javax.inject.Inject;
 import javax.inject.Named;

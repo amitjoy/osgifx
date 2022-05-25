@@ -27,7 +27,7 @@ import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES
 import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
-import static com.osgifx.console.event.topics.CommonEventTopics.DATA_RETRIEVED_ALL_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
