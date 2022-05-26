@@ -67,8 +67,7 @@ public final class CheckForFeatureUpdatesDialog extends Dialog<SelectedFeaturesF
 		});
 	}
 
-	public static class SelectedFeaturesForUpdateDTO {
-		public List<FeatureDTO> features;
+	public record SelectedFeaturesForUpdateDTO(List<FeatureDTO> features) {
 	}
 
 	public void initFeaturesToBeUpdated(final Collection<FeatureDTO> tobeUpdatedFeatures) {
