@@ -117,7 +117,7 @@ public final class CheckForFeatureUpdatesHandler {
 						final var              selected                    = selectedFeatures.get();
 						final List<FeatureDTO> successfullyUpdatedFeatures = Lists.newArrayList();
 						final List<FeatureDTO> notUpdatedFeatures          = Lists.newArrayList();
-						for (final FeatureDTO entry : selected.features) {
+						for (final FeatureDTO entry : selected.features()) {
 							final var repoURL = entry.archiveURL;
 							try {
 								final var feature = featureAgent.readFeature(new URL(repoURL), featureIdAsString(entry.id));

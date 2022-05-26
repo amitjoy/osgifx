@@ -61,8 +61,7 @@ public final class CheckForUpdatesDialogController {
 	}
 
 	public SelectedFeaturesForUpdateDTO getSelectedFeatures() {
-		final var dto = new SelectedFeaturesForUpdateDTO();
-		dto.features = Lists.newArrayList();
+		final var dto           = new SelectedFeaturesForUpdateDTO(Lists.newArrayList());
 		final var selectedItems = featuresView.getCheckModel().getCheckedItems();
 		for (final TreeItem<String> treeItem : selectedItems) {
 			final var parent = treeItem.getParent();
@@ -70,7 +69,7 @@ public final class CheckForUpdatesDialogController {
 				continue;
 			}
 			final var feature = features.get(treeItem);
-			dto.features.add(feature);
+			dto.features().add(feature);
 		}
 		return dto;
 	}
