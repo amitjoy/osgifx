@@ -109,7 +109,7 @@ public final class TerminalFxController {
 			protected String call() throws Exception {
 				String outputText;
 				try {
-					if (agent == null || (outputText = agent.exec(command)) == null) {
+					if (agent == null || (outputText = agent.execCliCommand(command)) == null) {
 						logger.atWarning().log("Agent is not connected");
 						outputText = "Agent is not connected";
 					}

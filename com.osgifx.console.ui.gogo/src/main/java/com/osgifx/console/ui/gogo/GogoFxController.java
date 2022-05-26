@@ -113,7 +113,7 @@ public final class GogoFxController {
 			protected String call() throws Exception {
 				String outputText;
 				try {
-					if (agent == null || (outputText = agent.shell(command)) == null) {
+					if (agent == null || (outputText = agent.execGogoCommand(command)) == null) {
 						logger.atWarning().log("Agent is not connected");
 						outputText = "Agent is not connected";
 					}

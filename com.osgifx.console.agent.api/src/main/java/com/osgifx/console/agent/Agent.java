@@ -43,10 +43,7 @@ import com.osgifx.console.agent.extension.AgentExtensionName;
 
 /**
  * An agent runs on remote OSGi framework and provides the means to control this
- * framework. This API can also be used to install a framework before an agent
- * is started. Such a pre-agent is called an Envoy. An Envoy implements
- * {@link #createFramework(String, Collection, Map)} and {@link #isEnvoy()} only
- * but switches to the agent API once the framework is installed.
+ * framework
  */
 @ProviderType
 public interface Agent {
@@ -77,11 +74,12 @@ public interface Agent {
 	/**
 	 * The pattern for a server port specification: {@code [<interface>:]<port>} .
 	 */
-	Pattern PORT_PATTERN    = Pattern.compile("(?:([^:]+):)?(\\d+)");
+	Pattern PORT_PATTERN = Pattern.compile("(?:([^:]+):)?(\\d+)");
+
 	/**
 	 * The port for attaching to a remote Gogo CommandSession
 	 */
-	int     COMMAND_SESSION = -1;
+	int COMMAND_SESSION = -1;
 
 	/**
 	 * The port for having no redirect of IO
@@ -184,12 +182,20 @@ public interface Agent {
 	boolean stdin(String s) throws Exception;
 
 	/**
-	 * Execute a remote command on Gogo (if present) and return the result.
+	 * Executes a remote command on Gogo shell (if present).
 	 *
-	 * @param cmd the command to execute
-	 * @return the result
+	 * @param command the command to execute
+	 * @return the response
 	 */
-	String shell(String cmd) throws Exception;
+	String execGogoCommand(String command) throws Exception;
+
+	/**
+	 * Executes the specified terminal (CLI) command in a separate process.
+	 *
+	 * @param command the command to execute
+	 * @return the response
+	 */
+	String execCliCommand(String command);
 
 	/**
 	 * Abort the remote agent. The agent should send an event back and die. This is
@@ -429,14 +435,6 @@ public interface Agent {
 	 * @see AgentExtensionName
 	 */
 	Map<String, Object> executeExtension(String name, Map<String, Object> context);
-
-	/**
-	 * Executes the specified terminal (CLI) command in a separate process.
-	 *
-	 * @param command the command to execute
-	 * @return the response
-	 */
-	String exec(String command);
 
 	/**
 	 * Returns the list of suspicious bundles causing probable classloader leaks
