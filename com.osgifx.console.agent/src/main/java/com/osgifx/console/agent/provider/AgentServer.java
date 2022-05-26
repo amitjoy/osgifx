@@ -351,17 +351,48 @@ public final class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
-	public String shell(final String cmd) throws Exception {
-		requireNonNull(cmd, "Command cannot be null");
+	public String execGogoCommand(final String command) throws Exception {
+		requireNonNull(command, "Command cannot be null");
 
 		redirect(Agent.COMMAND_SESSION);
-		stdin(cmd);
+		stdin(command);
 		final PrintStream ps = redirector.getOut();
 		if (ps instanceof RedirectOutput) {
 			final RedirectOutput rout = (RedirectOutput) ps;
 			return rout.getLastOutput();
 		}
 		return null;
+	}
+
+	@Override
+	public String execCliCommand(final String command) {
+		requireNonNull(command, "CLI command cannot be null");
+
+		String cmd;
+		if (isWindows()) {
+			cmd = "cmd.exe /C " + command;
+		} else {
+			cmd = command;
+		}
+		try {
+			final CommandLine                 cmdLine       = CommandLine.parse(cmd);
+			final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+			final ExecuteWatchdog             watchdog      = new ExecuteWatchdog(WATCHDOG_TIMEOUT);
+			final Executor                    executor      = new DefaultExecutor();
+			final ByteArrayOutputStream       outputStream  = new ByteArrayOutputStream();
+			final PumpStreamHandler           streamHandler = new PumpStreamHandler(outputStream);
+
+			executor.setExitValue(1);
+			executor.setWatchdog(watchdog);
+			executor.setStreamHandler(streamHandler);
+			executor.execute(cmdLine, resultHandler);
+			resultHandler.waitFor(RESULT_TIMEOUT);
+
+			return outputStream.toString();
+		} catch (final Exception e) {
+			Thread.currentThread().interrupt();
+			return Exceptions.toString(e);
+		}
 	}
 
 	public void setSupervisor(final Supervisor remote) {
@@ -745,37 +776,6 @@ public final class AgentServer implements Agent, Closeable {
 			}, result);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public String exec(final String command) {
-		requireNonNull(command, "CLI command cannot be null");
-
-		String cmd;
-		if (isWindows()) {
-			cmd = "cmd.exe /C " + command;
-		} else {
-			cmd = command;
-		}
-		try {
-			final CommandLine                 cmdLine       = CommandLine.parse(cmd);
-			final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			final ExecuteWatchdog             watchdog      = new ExecuteWatchdog(WATCHDOG_TIMEOUT);
-			final Executor                    executor      = new DefaultExecutor();
-			final ByteArrayOutputStream       outputStream  = new ByteArrayOutputStream();
-			final PumpStreamHandler           streamHandler = new PumpStreamHandler(outputStream);
-
-			executor.setExitValue(1);
-			executor.setWatchdog(watchdog);
-			executor.setStreamHandler(streamHandler);
-			executor.execute(cmdLine, resultHandler);
-			resultHandler.waitFor(RESULT_TIMEOUT);
-
-			return outputStream.toString();
-		} catch (final Exception e) {
-			Thread.currentThread().interrupt();
-			return Exceptions.toString(e);
 		}
 	}
 
