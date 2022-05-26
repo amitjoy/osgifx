@@ -59,11 +59,12 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 	@Inject
 	private FluentLogger    logger;
 	private Field<?>        valueField;
+	private Form            form;
 	private final Converter converter = Converters.standardConverter();
 
 	public void init(final XDmtNodeDTO dmtNode) {
-		final var form = createForm(dmtNode);
-		if (form == null) {
+		final var formRenderer = createForm(dmtNode);
+		if (formRenderer == null) {
 			return;
 		}
 		final var dialogPane = getDialogPane();
@@ -76,7 +77,8 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 		final var updateButtonType = new ButtonType("Update", ButtonData.OK_DONE);
 		dialogPane.getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
 
-		dialogPane.setContent(form);
+		dialogPane.setContent(formRenderer);
+		getDialogPane().lookupButton(updateButtonType).disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
 
 		setResultConverter(dialogButton -> {
 			try {
@@ -105,7 +107,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 			logger.atInfo().log("Value field is null for '%s'", dmtNode.uri);
 			return null;
 		}
-		final var form     = Form.of(Section.of(valueField).title("URI: " + dmtNode.uri + " Type: " + type));
+		form = Form.of(Section.of(valueField).title("URI: " + dmtNode.uri + " Type: " + type));
 		final var renderer = new FormRenderer(form);
 
 		GridPane.setColumnSpan(renderer, 2);
@@ -120,16 +122,16 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 		Field<?> valueField = null;
 		switch (dmtNode.format) {
 		case STRING:
-			valueField = Field.ofStringType(dmtNode.value);
+			valueField = Field.ofStringType(dmtNode.value).required(true);
 			break;
 		case BOOLEAN:
 			valueField = Field.ofBooleanType(convert(dmtNode.value, boolean.class));
 			break;
 		case FLOAT:
-			valueField = Field.ofDoubleType(convert(dmtNode.value, double.class));
+			valueField = Field.ofDoubleType(convert(dmtNode.value, double.class)).required(true);
 			break;
 		case LONG, INTEGER:
-			valueField = Field.ofIntegerType(convert(dmtNode.value, int.class));
+			valueField = Field.ofIntegerType(convert(dmtNode.value, int.class)).required(true);
 			break;
 		case NULL:
 			// no need to handle as the value will remain null
@@ -138,7 +140,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 			// no need to handle as we are dealing with byte array
 			break;
 		case XML:
-			valueField = Field.ofStringType(dmtNode.value).multiline(true);
+			valueField = Field.ofStringType(dmtNode.value).multiline(true).required(true);
 			break;
 		case BASE64:
 			// no need to handle as we are dealing with byte array
@@ -156,7 +158,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 				} catch (final Exception ex) {
 					return false;
 				}
-			}, "DMT date must be in the format of CCYYMMDD"));
+			}, "DMT date must be in the format of CCYYMMDD")).required(true);
 			break;
 		case DATE_TIME:
 			valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
@@ -166,7 +168,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 				} catch (final Exception ex) {
 					return false;
 				}
-			}, "DMT time must be in the format of hhmmss"));
+			}, "DMT time must be in the format of hhmmss")).required(true);
 			break;
 		case TIME:
 			valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
@@ -176,7 +178,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 				} catch (final Exception ex) {
 					return false;
 				}
-			}, "DMT time must be in the format of hhmmss"));
+			}, "DMT time must be in the format of hhmmss")).required(true);
 			break;
 		default:
 			break;
