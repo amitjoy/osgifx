@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Creating tag: v$1"
-git tag v$1
+echo "Retrieving version"
+version=$(cat cnf/app.version)
+
+echo "Creating tag: v$version"
+git tag v$version
