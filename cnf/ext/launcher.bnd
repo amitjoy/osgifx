@@ -47,8 +47,8 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                             com.sun.javafx.tk,\
                                             com.sun.javafx.webkit,\
                                             com.sun.webkit,\
-		                                    com.sun.management,\
-		                                    javafx.animation,\
+		                                com.sun.management,\
+		                                javafx.animation,\
                                           	javafx.application,\
                                           	javafx.beans,\
                                           	javafx.beans.binding,\
@@ -84,7 +84,7 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                           	javafx.stage,\
                                           	javafx.util,\
                                           	javafx.util.converter,\
-		                                    sun.misc"
+		                                sun.misc"
 
 -runsystempackages              =         com.sun.glass.ui,\
                                           com.sun.javafx.collections,\
