@@ -11,10 +11,6 @@ startlevels                       :   org.apache.felix.scr;startlevel=1,\
 -runstartlevel                    :   begin = ${default.startlevel}, step = -1, order = sortbynameversion
 -runbundles+                      :   ${startlevels}, *;startlevel=${default.startlevel}
 
-# the following property is used to assign bundle initial start level. This is
-# required for assigning default start levels to externally installed features.
--runproperties.startlevel         :   launch.startlevel.default=100
-
 # this is used to start all bundles having start levels till this number. Any bundle
 # having start level beyond this beginning start level will not be started
 -runproperties.beginning          :   org.osgi.framework.startlevel.beginning=50000
@@ -39,7 +35,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.configurations',\
                                       bnd.identity;id='com.osgifx.console.ui.dmt',\
                                       bnd.identity;id='com.osgifx.console.ui.events',\
-                                      bnd.identity;id='com.osgifx.console.ui.feature',\
+                                      bnd.identity;id='com.osgifx.console.ui.extension',\
                                       bnd.identity;id='com.osgifx.console.ui.logs',\
                                       bnd.identity;id='com.osgifx.console.ui.gogo',\
                                       bnd.identity;id='com.osgifx.console.ui.graph',\
@@ -87,13 +83,12 @@ install.order                     :   \
 	com.osgifx.console.agent;version=snapshot;startlevel=10,\
 	com.osgifx.console.application;version=snapshot;startlevel=10,\
 	com.osgifx.console.data.provider;version=snapshot;startlevel=10,\
-	com.osgifx.console.feature.agent;version=snapshot;startlevel=10,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=10,\
 	com.osgifx.console.logging;version=snapshot;startlevel=10,\
 	com.osgifx.console.smartgraph;version=snapshot;startlevel=10,\
 	com.osgifx.console.supervisor;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.batchinstall;version=snapshot;startlevel=10,\
-	com.osgifx.console.ui.feature;version=snapshot;startlevel=10,\
+	com.osgifx.console.ui.extension;version=snapshot;startlevel=10,\
 	com.osgifx.console.util;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=10,\
@@ -110,8 +105,9 @@ install.order                     :   \
 	org.apache.felix.configadmin;version='[1.9.24,1.9.25)';startlevel=10,\
 	org.apache.felix.configurator;version='[1.0.14,1.0.15)';startlevel=10,\
 	org.apache.felix.converter;version='[1.0.18,1.0.19)';startlevel=10,\
+	org.apache.felix.dependencymanager;version='[4.6.1,4.6.2)';startlevel=10,\
+	org.apache.felix.deploymentadmin;version='[0.9.10,0.9.11)';startlevel=10,\
 	org.apache.felix.eventadmin;version='[1.6.2,1.6.3)';startlevel=10,\
-	org.apache.felix.feature;version='[0.9.4,0.9.5)';startlevel=10,\
 	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)';startlevel=10,\
 	org.apache.felix.gogo.runtime;version='[1.1.0,1.1.1)';startlevel=10,\
 	org.apache.felix.gogo.shell;version='[1.1.0,1.1.1)';startlevel=10,\
@@ -169,6 +165,5 @@ install.order                     :   \
 	org.eclipse.fx.ui.workbench.services;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.jdt.annotation;version='[2.2.400,2.2.401)';startlevel=10,\
 	org.eclipse.osgi.services;version='[3.10.200,3.10.201)';startlevel=10,\
-	org.osgi.service.feature;version='[1.0.0,1.0.1)';startlevel=10,\
 	org.osgi.util.function;version='[1.2.0,1.2.1)';startlevel=10,\
 	org.osgi.util.promise;version='[1.2.0,1.2.1)';startlevel=10

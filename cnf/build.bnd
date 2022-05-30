@@ -87,5 +87,5 @@ Git-SHA                               =         ${system-allow-fail;git rev-list
                   pretty              =         true; \
                   local               =         ${build}/local
 
--plugin.6.Exporter                    =         com.osgifx.console.feature.exporter.FeatureExporter
--pluginpath                           =         ${build}/plugin/com.osgifx.console.feature.exporter.jar
+-plugin.6.osgi.dp.exporter            =         com.osgifx.console.bnd.dp.packager.DeploymentPackageExporter
+-pluginpath                           =         ${build}/plugin/com.osgifx.console.bnd.dp.packager.jar

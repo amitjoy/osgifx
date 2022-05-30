@@ -1,0 +1,13 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+-fixupmessages      : 'No translation found'
+-privatepackage     : com.osgifx.console.extension.tictactoe
+-includeresource    : \
+                      plugin.xml = _plugin.xml,\
+					  fragment.e4xmi = fragment.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic
+-nobundles          : ${is;${driver};gradle}
+-buildpath          : \
+                      ${bundles.required},\
+                      com.osgifx.console.wrapper.grid

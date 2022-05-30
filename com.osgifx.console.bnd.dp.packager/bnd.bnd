@@ -1,0 +1,14 @@
+-buildpath          : \
+                      biz.aQute.bndlib;packages=*,\
+                      com.google.guava,\
+                      org.apache.commons.commons-io
+-conditionalpackage : \
+                      aQute.lib*,\
+                      com.google.common.*,\
+                      org.apache.commons*
+Import-Package      : \
+                      com.google.errorprone.annotations;'resolution:'=optional,\
+                      com.google.errorprone.annotations.concurrent;'resolution:'=optional,\
+                      javax.annotation;'resolution:'=optional,\
+                      org.checkerframework.checker.nullness.qual;'resolution:'=optional,\
+                      *

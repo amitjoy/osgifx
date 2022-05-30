@@ -2,4 +2,10 @@
 	org.eclipse.equinox.preferences; \
 		capability:='osgi.service; \
 			osgi.extender=osgi.service; \
-			objectClass=org.eclipse.core.runtime.preferences.IPreferencesService'
+			objectClass=org.eclipse.core.runtime.preferences.IPreferencesService',\
+
+-augment.2 = \
+	org.apache.felix.deploymentadmin; \
+		capability:='osgi.service; \
+			osgi.extender=osgi.service; \
+			objectClass=org.osgi.service.deploymentadmin.DeploymentAdmin'

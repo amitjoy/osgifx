@@ -1,0 +1,16 @@
+-nobundles          : ${is;${driver};gradle}
+-dependson          : com.osgifx.console.wrapper,\
+                      com.osgifx.console.extension.ui.tictactoe
+-export             : dp.bndrun;\
+                           type             =  "osgi.dp.exporter";\
+                           symbolicName     =  "osgi.fx.extension.tictactoe";\
+                           version          =  "1.0.0";\
+                           name             =  "Tic-Tac-Toe OSGi.fx Deployment Package";\
+                           copyright        =  "Copyright (c) Amit Kumar Mondal 2022. All Rights Reserved.";\
+                           contact          =  "admin@amitinside.com";\
+                           description      =  "A sample extension for OSGi.fx";\
+                           docURL           =  "https://osgifx.com";\
+                           icon             =  "icons/icon.png";\
+                           vendor           =  "OSGi.fx";\
+                           license          =  "https://www.apache.org/licenses/LICENSE-2.0.txt";\
+                           output           =  "tic-tac-toe.dp";

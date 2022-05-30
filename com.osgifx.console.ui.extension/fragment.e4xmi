@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_yTtpcH8JEeyYfeV-7UqQeg" featurename="children" parentElementId="com.osgifx.console.application.menu.help">
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_yTtpcn8JEeyYfeV-7UqQeg" elementId="com.osgifx.console.application.directmenuitem.install.extension" label="Install Extension" iconURI="platform:/plugin/com.osgifx.console.ui.extension/graphic/icons/plugin.png" tooltip="Shows dialog for users to install extensions" contributionURI="bundleclass://com.osgifx.console.ui.extension/com.osgifx.console.ui.extension.handler.ExtensionInstallHandler"/>
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_yTtpc38JEeyYfeV-7UqQeg" elementId="com.osgifx.console.application.directmenuitem.view.extensions" label="View Installed Extensions" iconURI="platform:/plugin/com.osgifx.console.ui.extension/graphic/icons/extensions.png" tooltip="Shows all installed extensions" contributionURI="bundleclass://com.osgifx.console.ui.extension/com.osgifx.console.ui.extension.handler.ExtensionsViewHandler"/>
+  </fragments>
+</fragment:ModelFragments>
