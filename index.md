@@ -46,7 +46,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Show suspicious classloader leaks 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Show HTTP runtime components (Servlets, Listeners, Filters, Resources and Error Pages) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
 | Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install external feature (plugin)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Install extension (plugin)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | List and uninstall already installed feature(s)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Generate OBR XML   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Device Management Tree (DMT) Traversal and Update   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
@@ -91,15 +91,15 @@ Note that, the configuration JSON files need to comply with [OSGi Configurator S
 
 --------------------------------------------------------------------------------------------------------------
 
-#### External Feature Development
+#### Extension Development
 
-External plugins or features can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. As a starting point, please have a look at the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.ext.feature.tictactoe). Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily leverage their modular functionalities to build your own features (extensions).
+External plugins or extensions can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. As a starting point, please have a look at the sample [Tic-Tac-Toe](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe). Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily leverage their modular capabilities to build your own extensions.
 
-Once the feature is built, you can test it by installing it from the `Help -> Install External Feature` menu option.
+Once the extension is developed, you can test it by installing it from the `Help -> Install Extension` menu option.
 
-Note that, to develop an external feature, you need to provide a ZIP archive comprising one or more feature JSON files. Have a look at [OSGi Features Specification](http://docs.osgi.org/specification/osgi.cmpn/8.0.0/service.feature.html) on how to prepare the JSON files. For every feature, you need to provide the bundles (JARs) in the `bundles` directory inside the archive.
+Note that, to develop an extension, you need to provide OSGi Deployment Package archive. Have a look at [OSGi Deployment Admin Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.deploymentadmin.html) on how to prepare such deployment packages.
 
-For ease of development, you can use the OSGi.fx workspace to further develop your own features as the workspace comprises a new bnd plugin which will enable you to automatically prepare the ZIP archive from a bndrun file. As an example, please refer to the sample [Tic-Tac-Toe feature](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.ext.feature.tictactoe).
+For ease of development, you can use the OSGi.fx workspace to further develop your own extensions as the workspace comprises a new bnd plugin which will enable you to automatically generate a deployment package from a bndrun file. As an example, please refer to the sample [Tic-Tac-Toe extension](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe).
 
 --------------------------------------------------------------------------------------------------------------
 
