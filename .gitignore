@@ -245,6 +245,7 @@ bin_test/
 **/.osgifx-ws/*
 **/fxartifacts/*
 **/heapdumps/*
+**/exception.txt
 
 # jdeploy
 jdeploy/*

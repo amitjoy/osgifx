@@ -87,5 +87,4 @@ bundles.required: \
                 
 bundles.configurations: \
                  org.apache.felix.configadmin,\
-                 org.apache.felix.configurator,\
-                 org.apache.felix.feature
+                 org.apache.felix.configurator

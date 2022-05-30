@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2021-2022 Amit Kumar Mondal
+  
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.extension.dialog.ExtensionsViewDialogController">
+   <center>
+      <TableView fx:id="extensionsList" prefHeight="200.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
+      	<placeholder>
+        	<Label text="No installed extensions" />
+    	</placeholder>
+        <columns>
+          <TableColumn fx:id="nameColumn" prefWidth="300.0" text="Name" />
+          <TableColumn fx:id="displayNameColumn" prefWidth="500.0" text="Display Name" />
+          <TableColumn fx:id="versionColumn" prefWidth="200.0" text="Version" />
+        </columns>
+      </TableView>
+   </center>
+</BorderPane>
