@@ -1,8 +1,3 @@
-# the following policy will sort the bundles topologically and place the bundles with the least 
-# dependencies first. You, can of course, manually maintain the list of bundles specified in 
-# '-runbundles' but it is not a recommended way.
--runstartlevel  : step = -1, order = leastdependenciesfirst
-
 # the 'distro' provides all the requirements and capabilities of the complete default runtime, hence,
 # resolving against the distro will only look for dependencies which only your feature requires
 -distro         : com.osgifx.console.runtime
@@ -12,5 +7,5 @@
 
 # the following is automatically generated due to resolve operation
 -runbundles: \
-	com.osgifx.console.wrapper.grid;version=snapshot;startlevel=100,\
-	com.osgifx.console.extension.ui.tictactoe;version=snapshot;startlevel=100
+	com.osgifx.console.extension.ui.tictactoe;version=snapshot,\
+	com.osgifx.console.wrapper.grid;version=snapshot
