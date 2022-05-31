@@ -18,11 +18,12 @@ package com.osgifx.console.agent.admin;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.osgi.framework.BundleContext;
@@ -48,21 +49,17 @@ public class XPropertyAdmin {
 
 	private static List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {
 		final Map<String, XPropertyDTO> allProperties = new HashMap<>();
-
 		for (final Entry<String, Object> property : properties.entrySet()) {
 			final String       key   = property.getKey();
 			final String       value = property.getValue().toString();
 			final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.FRAMEWORK);
 			allProperties.put(key, dto);
 		}
-
-		@SuppressWarnings("rawtypes")
-		final Map                        systemProperties = System.getProperties();
-		@SuppressWarnings("unchecked")
-		final Set<Entry<String, String>> sets             = ((Map<String, String>) systemProperties).entrySet();
-		for (final Entry<String, String> property : sets) {
-			final String       key   = property.getKey();
-			final String       value = property.getValue();
+		final Properties     systemProperties = System.getProperties();
+		final Enumeration<?> keys             = systemProperties.propertyNames();
+		while (keys.hasMoreElements()) {
+			final String       key   = keys.nextElement().toString();
+			final String       value = systemProperties.getProperty(key);
 			final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.SYSTEM);
 			allProperties.put(key, dto);
 		}
