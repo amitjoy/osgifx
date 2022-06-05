@@ -23,7 +23,7 @@ public final class ConfigurationActionEventTopics {
 
 	public static final String CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/configuration/";
 	public static final String CONFIGURATION_ACTION_EVENT_TOPICS       = CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String CONFIGURATION_UPDATED_EVENT_TOPIC       = "osgi/fx/console/configuration/updated";
-	public static final String CONFIGURATION_DELETED_EVENT_TOPIC       = "osgi/fx/console/configuration/deleted";
+	public static final String CONFIGURATION_UPDATED_EVENT_TOPIC       = CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX + "updated";
+	public static final String CONFIGURATION_DELETED_EVENT_TOPIC       = CONFIGURATION_ACTION_EVENT_TOPIC_PREFIX + "deleted";
 
 }
