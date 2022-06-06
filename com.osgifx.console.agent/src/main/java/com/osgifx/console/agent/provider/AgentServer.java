@@ -83,6 +83,7 @@ import com.osgifx.console.agent.admin.XMetaTypeAdmin;
 import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
 import com.osgifx.console.agent.admin.XThreadAdmin;
+import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XAttributeDefType;
@@ -96,6 +97,8 @@ import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
@@ -131,6 +134,7 @@ public final class AgentServer implements Agent, Closeable {
 	private final ServiceTracker<Object, Object>                 scrTracker;
 	private final ServiceTracker<Object, Object>                 metatypeTracker;
 	private final ServiceTracker<Object, Object>                 dmtAdminTracker;
+	private final ServiceTracker<Object, Object>                 userAdminTracker;
 	private final ServiceTracker<Object, Object>                 eventAdminTracker;
 	private final ServiceTracker<Object, Object>                 configAdminTracker;
 	private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
@@ -149,6 +153,7 @@ public final class AgentServer implements Agent, Closeable {
 
 		metatypeTracker           = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
 		dmtAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
+		userAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
 		eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
 		configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
 		scrTracker                = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
@@ -218,6 +223,7 @@ public final class AgentServer implements Agent, Closeable {
 		scrTracker.open();
 		metatypeTracker.open();
 		dmtAdminTracker.open();
+		userAdminTracker.open();
 		eventAdminTracker.open();
 		configAdminTracker.open();
 		gogoCommandsTracker.open();
@@ -426,6 +432,7 @@ public final class AgentServer implements Agent, Closeable {
 			scrTracker.close();
 			metatypeTracker.close();
 			dmtAdminTracker.close();
+			userAdminTracker.close();
 			configAdminTracker.close();
 			gogoCommandsTracker.close();
 			agentExtensionTracker.close();
@@ -758,6 +765,61 @@ public final class AgentServer implements Agent, Closeable {
 	@Override
 	public Set<String> getGogoCommands() {
 		return new HashSet<>(gogoCommands);
+	}
+
+	@Override
+	public XResultDTO createRole(final String name, final Type type) {
+		requireNonNull(name, "Role name cannot be null");
+		requireNonNull(type, "Role type name cannot be null");
+
+		final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+		if (isUserAdminAvailable) {
+			try {
+				final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
+				return userAdmin.createRole(name, type);
+			} catch (final Exception e) {
+				return createResult(ERROR, "The role cannot be created");
+			}
+		}
+		return createResult(SKIPPED, "User Admin bundle is not installed to process this request");
+	}
+
+	@Override
+	public XResultDTO updateRole(final XRoleDTO dto) {
+		requireNonNull(dto, "New role information cannot be null");
+
+		final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+		if (isUserAdminAvailable) {
+			try {
+				final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
+				return userAdmin.updateRole(dto);
+			} catch (final Exception e) {
+				return createResult(ERROR, "The role cannot be updated");
+			}
+		}
+		return createResult(SKIPPED, "User Admin bundle is not installed to process this request");
+	}
+
+	@Override
+	public XResultDTO removeRole(final String name) {
+		requireNonNull(name, "Role name cannot be null");
+
+		final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+		if (isUserAdminAvailable) {
+			try {
+				final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
+				return userAdmin.removeRole(name);
+			} catch (final Exception e) {
+				return createResult(ERROR, "The role cannot be removed");
+			}
+		}
+		return createResult(SKIPPED, "User Admin bundle is not installed to process this request");
+	}
+
+	@Override
+	public List<XRoleDTO> getAllRoles() {
+		final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
+		return userAdmin.getRoles();
 	}
 
 	@Override

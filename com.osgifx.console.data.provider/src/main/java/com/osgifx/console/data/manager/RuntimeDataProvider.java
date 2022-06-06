@@ -24,6 +24,7 @@ import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
 import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
 import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
+import static com.osgifx.console.data.supplier.RolesInfoSupplier.ROLES_ID;
 import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
@@ -55,6 +56,7 @@ import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
@@ -164,6 +166,11 @@ public final class RuntimeDataProvider implements DataProvider {
 	@Override
 	public ObservableList<XHttpComponentDTO> httpComponents() {
 		return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
+	}
+
+	@Override
+	public ObservableList<XRoleDTO> roles() {
+		return (ObservableList<XRoleDTO>) getData(ROLES_ID);
 	}
 
 	@Override

@@ -51,6 +51,10 @@ public final class PackageWirings {
 		return PackageWirings.isWired("org.osgi.service.dmt", context);
 	}
 
+	public static boolean isUserAdminWired(final BundleContext context) {
+		return PackageWirings.isWired("org.osgi.service.useradmin", context);
+	}
+
 	public static boolean isMetatypeWired(final BundleContext context) {
 		return PackageWirings.isWired("org.osgi.service.metatype", context);
 	}
