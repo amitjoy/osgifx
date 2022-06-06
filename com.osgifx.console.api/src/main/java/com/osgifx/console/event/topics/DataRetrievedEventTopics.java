@@ -30,6 +30,7 @@ public final class DataRetrievedEventTopics {
 	public static final String DATA_RETRIEVED_LEAKS_TOPIC          = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "leaks";
 	public static final String DATA_RETRIEVED_PACKAGES_TOPIC       = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "packages";
 	public static final String DATA_RETRIEVED_PROPERTIES_TOPIC     = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "properties";
+	public static final String DATA_RETRIEVED_ROLES_TOPIC          = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "roles";
 	public static final String DATA_RETRIEVED_SERVICES_TOPIC       = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "services";
 	public static final String DATA_RETRIEVED_THREADS_TOPIC        = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "threads";
 

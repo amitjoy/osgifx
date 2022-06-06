@@ -36,6 +36,7 @@ import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
@@ -418,6 +419,46 @@ public interface Agent {
 	 *         the remote runtime does not have Gogo bundle(s) installed
 	 */
 	Set<String> getGogoCommands();
+
+	/**
+	 * Creates the role as specified by the given name and the type
+	 *
+	 * @param name the name of the role (cannot be {@code null})
+	 * @param type the type of role to create
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
+	 * @throws NullPointerException if the {@code name} or {@code type} is
+	 *                              {@code null}
+	 */
+	XResultDTO createRole(String name, XRoleDTO.Type type);
+
+	/**
+	 * Updates the role as specified by the given name from the specified
+	 * {@code dto}
+	 *
+	 * @param dto the new information
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
+	 * @throws NullPointerException if the {@code dto} is {@code null}
+	 */
+	XResultDTO updateRole(XRoleDTO dto);
+
+	/**
+	 * Removes the role as specified by the given name
+	 *
+	 * @param name the name of the role (cannot be {@code null})
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
+	 * @throws NullPointerException if the {@code name} is {@code null}
+	 */
+	XResultDTO removeRole(String name);
+
+	/**
+	 * Returns the existing roles stored in {@code UserAdmin}
+	 *
+	 * @return the list of roles (can be empty)
+	 */
+	List<XRoleDTO> getAllRoles();
 
 	/**
 	 * Returns the result from the specified agent extension.

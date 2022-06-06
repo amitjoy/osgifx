@@ -33,5 +33,6 @@ Import-Package        : \
                         org.osgi.service.event;'resolution:'=optional,\
                         org.osgi.service.log;'resolution:'=optional,\
                         org.osgi.service.metatype;'resolution:'=optional,\
+                        org.osgi.service.useradmin;'resolution:'=optional,\
                         org.osgi.util.promise;'resolution:'=optional,\
                         *

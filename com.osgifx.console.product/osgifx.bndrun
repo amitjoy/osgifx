@@ -48,6 +48,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.services',\
                                       bnd.identity;id='com.osgifx.console.ui.terminal',\
                                       bnd.identity;id='com.osgifx.console.ui.threads',\
+                                      bnd.identity;id='com.osgifx.console.ui.roles',\
                                       \
                                       ${requirement.product}
 
@@ -71,7 +72,8 @@ install.order                     :   \
                                       com.osgifx.console.ui.heap,\
                                       com.osgifx.console.ui.leaks,\
                                       com.osgifx.console.ui.http,\
-                                      com.osgifx.console.ui.dmt                                      
+                                      com.osgifx.console.ui.roles,\
+                                      com.osgifx.console.ui.dmt                               
 
 -runbundles.X    	              :   ${install.order}
 

@@ -26,6 +26,7 @@ import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
@@ -126,6 +127,13 @@ public interface DataProvider {
 	 * @return the observable list of all HTTP components
 	 */
 	ObservableList<XHttpComponentDTO> httpComponents();
+
+	/**
+	 * Returns the different roles (users and groups) stored in {@code UserAdmin}
+	 *
+	 * @return the observable list of all roles
+	 */
+	ObservableList<XRoleDTO> roles();
 
 	/**
 	 * Returns the memory information of the remote runtime
