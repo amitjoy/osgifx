@@ -22,7 +22,6 @@ import static com.osgifx.console.event.topics.RoleActionEventTopics.ROLE_UPDATED
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import javax.inject.Inject;
 
@@ -36,6 +35,7 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.MultiSelectionField;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.view.controls.SimpleCheckBoxControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -104,6 +104,7 @@ public final class RoleEditorFxController {
 			updateRole(role);
 		});
 		cancelButton.setOnAction(e -> form.reset());
+		cancelButton.disableProperty().bind(form.changedProperty().not());
 		saveRoleButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
 	}
 
@@ -156,10 +157,10 @@ public final class RoleEditorFxController {
 	}
 
 	private List<Field<?>> initGenericFields(final XRoleDTO role) {
-		final Field<?> nameField    = Field.ofStringType(role.name).label("Name").editable(false);
-		final Field<?> typePidField = Field.ofStringType(role.type.name()).label("Type").editable(false);
+		final Field<?> roleNameField = Field.ofStringType(role.name).label("Name").editable(false);
+		final Field<?> roleTypeField = Field.ofStringType(role.type.name()).label("Type").editable(false);
 
-		return Lists.newArrayList(nameField, typePidField);
+		return Lists.newArrayList(roleNameField, roleTypeField);
 	}
 
 	private List<Field<?>> initFields(final XRoleDTO role) {
@@ -169,36 +170,50 @@ public final class RoleEditorFxController {
 		final var props = properties == null ? Map.of() : properties;
 		final var creds = credentials == null ? Map.of() : credentials;
 
-		final Field<?> propertiesField  = Field.ofStringType(mapToString(props)).multiline(true).label("Properties")
-		        .valueDescription(KV_DESCRIPTION).validate(CustomValidator.forPredicate(validateKV(), KV_VALIDATION_MESSAGE));
-		final Field<?> credentialsField = Field.ofStringType(mapToString(creds)).multiline(true).label("Credentials")
-		        .valueDescription(KV_DESCRIPTION).validate(CustomValidator.forPredicate(validateKV(), KV_VALIDATION_MESSAGE));
+		// @formatter:off
+		final Field<?> propertiesField  = Field.ofStringType(mapToString(props))
+				                               .multiline(true)
+				                               .label("Properties")
+				                               .valueDescription(KV_DESCRIPTION)
+				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
+
+		final Field<?> credentialsField = Field.ofStringType(mapToString(creds))
+				                               .multiline(true)
+				                               .label("Credentials")
+				                               .valueDescription(KV_DESCRIPTION)
+				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
+		// @formatter:on
 
 		if (role.type == Type.GROUP) {
-			final var      allExistingRoles     = getAllExistingRoles(role);
-			final Field<?> basicMembersField    = Field
-			        .ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.basicMembers)).label("Basic Members");
-			final Field<?> requiredMembersField = Field
-			        .ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.requiredMembers))
-			        .label("Required Members");
+			final var allExistingRoles = getAllExistingRoles(role);
+
+			// @formatter:off
+			final Field<?> basicMembersField    =
+					Field.ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.basicMembers))
+					     .render(new SimpleCheckBoxControl<>())
+					     .label("Basic Members");
+
+			final Field<?> requiredMembersField =
+					Field.ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.requiredMembers))
+			             .render(new SimpleCheckBoxControl<>())
+			             .label("Required Members");
+			// @formatter:on
 
 			return List.of(propertiesField, credentialsField, basicMembersField, requiredMembersField);
 		}
 		return List.of(propertiesField, credentialsField);
 	}
 
-	private Predicate<String> validateKV() {
-		return value -> {
-			try {
-				if (value.isBlank()) {
-					return true;
-				}
-				prepareProperties(value);
+	private boolean validateKeyValuePairs(final String value) {
+		try {
+			if (value.isBlank()) {
 				return true;
-			} catch (final Exception e) {
-				return false;
 			}
-		};
+			prepareKeyValuePairs(value);
+			return true;
+		} catch (final Exception e) {
+			return false;
+		}
 	}
 
 	private String mapToString(final Map<?, ?> map) {
@@ -220,12 +235,12 @@ public final class RoleEditorFxController {
 
 	private Map<String, Object> initProperties() {
 		final Field<?> field = form.getFields().get(2);
-		return prepareProperties(((DataField<?, ?, ?>) field).getValue());
+		return prepareKeyValuePairs(((DataField<?, ?, ?>) field).getValue());
 	}
 
 	private Map<String, Object> initCredentials() {
 		final Field<?> field = form.getFields().get(3);
-		return prepareProperties(((DataField<?, ?, ?>) field).getValue());
+		return prepareKeyValuePairs(((DataField<?, ?, ?>) field).getValue());
 	}
 
 	private List<XRoleDTO> initBasicMembers(final XRoleDTO role) {
@@ -237,19 +252,19 @@ public final class RoleEditorFxController {
 	}
 
 	private List<XRoleDTO> initRequiredMembers(final XRoleDTO role) {
-		final var field = role.type == Type.GROUP ? form.getFields().get(4) : null;
+		final var field = role.type == Type.GROUP ? form.getFields().get(5) : null;
 		if (field == null) {
 			return null;
 		}
 		return prepareMembers(((MultiSelectionField<?>) field).getSelection());
 	}
 
-	private Map<String, Object> prepareProperties(final Object value) {
+	private Map<String, Object> prepareKeyValuePairs(final Object value) {
 		final var v = value.toString();
 		if (v.isBlank()) {
 			return Map.of();
 		}
-		final var splittedMap = Splitter.on(System.lineSeparator()).withKeyValueSeparator('=').split(v);
+		final var splittedMap = Splitter.on(System.lineSeparator()).trimResults().withKeyValueSeparator('=').split(v);
 		return Maps.newHashMap(splittedMap);
 	}
 

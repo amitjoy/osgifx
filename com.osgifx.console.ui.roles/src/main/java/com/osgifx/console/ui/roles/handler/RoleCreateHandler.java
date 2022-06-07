@@ -88,7 +88,7 @@ public final class RoleCreateHandler {
 							logger.atInfo().log("Role - '%s' has been successfully created", name);
 						} else {
 							threadSync.asyncExec(() -> Fx.showErrorNotification("New Role", response.response));
-							logger.atError().log("Role - '%s' cannot be created created", response.response);
+							logger.atError().log("Role - '%s' cannot be created", response.response);
 						}
 					} catch (final Exception e) {
 						logger.atError().withException(e).log("Role cannot be created");

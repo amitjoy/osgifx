@@ -19,13 +19,15 @@ import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.provider.AgentServer.createResult;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.osgi.service.useradmin.Group;
@@ -83,6 +85,18 @@ public class XUserAdmin {
 			if (role == null) {
 				return createResult(ERROR, "The role '" + roleDTO.name + "' could not be found");
 			}
+			try {
+				cyclesCache.add(roleDTO.name);
+
+				final List<XRoleDTO> allMembers        = mergeMembers(roleDTO.basicMembers, roleDTO.requiredMembers);
+				final boolean        hasCycleInMembers = hasCycleInMembers(allMembers);
+
+				if (hasCycleInMembers) {
+					return createResult(ERROR, "Cyclic members found while updating '" + roleDTO.name + "'");
+				}
+			} finally {
+				cyclesCache.clear();
+			}
 			// update properties
 			final Dictionary          properties    = role.getProperties();
 			final Map<String, Object> newProperties = roleDTO.properties;
@@ -139,6 +153,28 @@ public class XUserAdmin {
 		}
 	}
 
+	List<String> cyclesCache = new ArrayList<>();
+
+	private boolean hasCycleInMembers(final List<XRoleDTO> members) {
+		if (members == null) {
+			return false;
+		}
+		for (final XRoleDTO role : members) {
+			if (cyclesCache.contains(role.name)) {
+				return true;
+			}
+			cyclesCache.add(role.name);
+
+			final List<XRoleDTO> allMembers = mergeMembers(role.basicMembers, role.requiredMembers);
+			final boolean        isCycle    = hasCycleInMembers(allMembers);
+
+			if (isCycle) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public XResultDTO removeRole(final String name) {
 		if (userAdmin == null) {
 			return createResult(SKIPPED, "UserAdmin service is not available");
@@ -185,7 +221,7 @@ public class XUserAdmin {
 		if (basicMembers == null) {
 			return null;
 		}
-		return Stream.of(basicMembers).map(this::toRole).collect(Collectors.toList());
+		return Stream.of(basicMembers).map(this::toRole).collect(toList());
 	}
 
 	private List<XRoleDTO> toRequiredMembers(final Role role) {
@@ -193,7 +229,7 @@ public class XUserAdmin {
 		if (requiredMembers == null) {
 			return null;
 		}
-		return Stream.of(requiredMembers).map(this::toRole).collect(Collectors.toList());
+		return Stream.of(requiredMembers).map(this::toRole).collect(toList());
 	}
 
 	private Type toType(final int type) {
@@ -205,6 +241,10 @@ public class XUserAdmin {
 		default:
 			return Type.DEFAULT;
 		}
+	}
+
+	private List<XRoleDTO> mergeMembers(final List<XRoleDTO> basicMembers, final List<XRoleDTO> requiredMembers) {
+		return Stream.of(basicMembers, requiredMembers).filter(Objects::nonNull).flatMap(Collection::stream).collect(toList());
 	}
 
 }

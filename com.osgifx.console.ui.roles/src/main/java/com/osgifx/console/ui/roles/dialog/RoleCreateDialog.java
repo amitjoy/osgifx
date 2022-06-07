@@ -30,6 +30,7 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.base.Enums;
 import com.google.common.base.Optional;
 import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.ui.roles.dialog.RoleCreateDialog.RoleDTO;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.collections.FXCollections;
@@ -44,6 +45,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 
 public final class RoleCreateDialog extends Dialog<RoleDTO> {
+
+	public record RoleDTO(String name, XRoleDTO.Type type) {
+
+	}
 
 	@Log
 	@Inject
@@ -104,10 +109,13 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
 		setResultConverter(dialogButton -> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
 			try {
-				if (validationSupport.isInvalid()) {
-					throw new RuntimeException("Role name validation failed");
+				if (data == ButtonData.OK_DONE) {
+					if (validationSupport.isInvalid()) {
+						throw new RuntimeException("Role name validation failed");
+					}
+					return getInput(dropdownRoleType.getValue(), txtRoleName.getText());
 				}
-				return data == ButtonData.OK_DONE ? getInput(dropdownRoleType.getValue(), txtRoleName.getText()) : null;
+				return null;
 			} catch (final Exception e) {
 				logger.atError().withException(e).log("Role cannot be created");
 				throw e;
