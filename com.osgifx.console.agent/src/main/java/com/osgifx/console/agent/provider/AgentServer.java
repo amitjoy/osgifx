@@ -818,8 +818,12 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public List<XRoleDTO> getAllRoles() {
-		final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
-		return userAdmin.getRoles();
+		final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+		if (isUserAdminAvailable) {
+			final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
+			return userAdmin.getRoles();
+		}
+		return Collections.emptyList();
 	}
 
 	@Override
