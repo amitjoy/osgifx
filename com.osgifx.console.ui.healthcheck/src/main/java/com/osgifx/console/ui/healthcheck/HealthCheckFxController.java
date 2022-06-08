@@ -225,21 +225,23 @@ public final class HealthCheckFxController {
 				final var genericInfoTable = new Table();
 
 				genericInfoTable.setShowVerticalLines(true);
-				genericInfoTable.setHeaders("Name", "Value");
+				genericInfoTable.setHeaders("Generic HC Info", "");
 
 				genericInfoTable.addRow("Name", result.healthCheckName != null ? result.healthCheckName : "<NO NAME>");
 				genericInfoTable.addRow("Tags", result.healthCheckTags != null ? result.healthCheckTags.toString() : "<NO TAGS>");
-				genericInfoTable.addRow("Elapsed Time", String.valueOf(result.elapsedTime));
+				genericInfoTable.addRow("Elapsed Time", String.valueOf(result.elapsedTime) + " ms");
 				genericInfoTable.addRow("Finished At", new Date(result.finishedAt).toString());
 				genericInfoTable.addRow("Timeout", String.valueOf(result.isTimedOut));
 
 				output.append(genericInfoTable.print());
 
+				var i = 0;
 				for (final ResultDTO entry : result.results) {
 					final var resultEntriesTable = new Table();
 
+					i++;
 					resultEntriesTable.setShowVerticalLines(true);
-					resultEntriesTable.setHeaders("Name", "Value");
+					resultEntriesTable.setHeaders("HC Result Entry: " + i, "");
 
 					resultEntriesTable.addRow("Status", Strings.nullToEmpty(entry.status));
 					resultEntriesTable.addRow("Message", Strings.nullToEmpty(entry.message));
