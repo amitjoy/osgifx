@@ -12,6 +12,7 @@ biz.aQute.bnd:biz.aQute.bnd.util:6.3.0
 
 org.apache.commons:commons-exec:1.3
 org.apache.commons:commons-lang3:3.12.0
+org.apache.felix:org.apache.felix.healthcheck.api:2.0.4
 
 # Font Awesome FX
 

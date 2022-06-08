@@ -30,6 +30,8 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
+import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
@@ -459,6 +461,22 @@ public interface Agent {
 	 * @return the list of roles (can be empty)
 	 */
 	List<XRoleDTO> getAllRoles();
+
+	/**
+	 * Returns the existing Felix healthchecks
+	 *
+	 * @return the list of healthchecks (can be empty)
+	 */
+	List<XHealthCheckDTO> getAllHealthChecks();
+
+	/**
+	 * Executes the specified healthchecks
+	 *
+	 * @param tags  the tags to execute (can be {@code null})
+	 * @param names the names to execute (can be {@code null})
+	 * @return the list of results (can be empty)
+	 */
+	List<XHealthCheckResultDTO> executeHealthChecks(List<String> tags, List<String> names);
 
 	/**
 	 * Returns the result from the specified agent extension.

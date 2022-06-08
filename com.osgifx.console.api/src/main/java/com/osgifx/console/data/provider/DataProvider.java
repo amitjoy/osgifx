@@ -22,6 +22,7 @@ import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -127,6 +128,13 @@ public interface DataProvider {
 	 * @return the observable list of all HTTP components
 	 */
 	ObservableList<XHttpComponentDTO> httpComponents();
+
+	/**
+	 * Returns the Felix health checks
+	 *
+	 * @return the observable list of all Felix health checks
+	 */
+	ObservableList<XHealthCheckDTO> healthchecks();
 
 	/**
 	 * Returns the different roles (users and groups) stored in {@code UserAdmin}

@@ -10,6 +10,7 @@ javac.compliance      : ${javac.source}
                         biz.aQute.remote.agent;packages=*,\
                         com.osgifx.console.agent.api;version=snapshot;packages=*,\
                         org.apache.commons.exec,\
+                        org.apache.felix.healthcheck.api,\
                         org.slf4j.api
 -privatepackage       : \
                         com.osgifx.console.agent.*,\
@@ -23,6 +24,7 @@ Import-Package        : \
                         javax.management;'resolution:'=optional,\
                         javax.management.openmbean;'resolution:'=optional,\
                         javax.management.remote;'resolution:'=optional,\
+                        org.apache.felix.hc.*;'resolution:'=optional,\
                         org.apache.felix.service.command;'resolution:'=optional,\
                         org.osgi.service.component.runtime;'resolution:'=optional,\
                         org.osgi.service.component.runtime.dto;'resolution:'=optional,\

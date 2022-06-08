@@ -19,6 +19,7 @@ import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
+import static com.osgifx.console.data.supplier.HealthChecksInfoSupplier.HEALTHCHECKS_ID;
 import static com.osgifx.console.data.supplier.HttpComponentsInfoSupplier.HTTP_ID;
 import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
 import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
@@ -52,6 +53,7 @@ import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -166,6 +168,11 @@ public final class RuntimeDataProvider implements DataProvider {
 	@Override
 	public ObservableList<XHttpComponentDTO> httpComponents() {
 		return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
+	}
+
+	@Override
+	public ObservableList<XHealthCheckDTO> healthchecks() {
+		return (ObservableList<XHealthCheckDTO>) getData(HEALTHCHECKS_ID);
 	}
 
 	@Override
