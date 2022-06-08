@@ -77,6 +77,7 @@ import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
+import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHeapAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
@@ -91,6 +92,8 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
+import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
@@ -138,6 +141,7 @@ public final class AgentServer implements Agent, Closeable {
 	private final ServiceTracker<Object, Object>                 eventAdminTracker;
 	private final ServiceTracker<Object, Object>                 configAdminTracker;
 	private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
+	private final ServiceTracker<Object, Object>                 felixHcExecutorTracker;
 	private final ServiceTracker<Object, Object>                 httpServiceRuntimeTracker;
 	private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
 
@@ -156,6 +160,7 @@ public final class AgentServer implements Agent, Closeable {
 		userAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
 		eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
 		configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
+		felixHcExecutorTracker    = new ServiceTracker<>(context, "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
 		scrTracker                = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
 		httpServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime", null);
 		agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
@@ -228,6 +233,7 @@ public final class AgentServer implements Agent, Closeable {
 		configAdminTracker.open();
 		gogoCommandsTracker.open();
 		agentExtensionTracker.open();
+		felixHcExecutorTracker.open();
 		httpServiceRuntimeTracker.open();
 	}
 
@@ -436,6 +442,7 @@ public final class AgentServer implements Agent, Closeable {
 			configAdminTracker.close();
 			gogoCommandsTracker.close();
 			agentExtensionTracker.close();
+			felixHcExecutorTracker.close();
 			httpServiceRuntimeTracker.close();
 		} catch (final Exception e) {
 			throw new IOException(e);
@@ -822,6 +829,26 @@ public final class AgentServer implements Agent, Closeable {
 		if (isUserAdminAvailable) {
 			final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
 			return userAdmin.getRoles();
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<XHealthCheckDTO> getAllHealthChecks() {
+		final boolean isFelixHcAvailable = PackageWirings.isFelixHcWired(context);
+		if (isFelixHcAvailable) {
+			final XHcAdmin hcAdmin = new XHcAdmin(context, felixHcExecutorTracker.getService());
+			return hcAdmin.getHealthchecks();
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<XHealthCheckResultDTO> executeHealthChecks(final List<String> tags, final List<String> names) {
+		final boolean isFelixHcAvailable = PackageWirings.isFelixHcWired(context);
+		if (isFelixHcAvailable) {
+			final XHcAdmin hcAdmin = new XHcAdmin(context, felixHcExecutorTracker.getService());
+			return hcAdmin.executeHealthChecks(tags, names);
 		}
 		return Collections.emptyList();
 	}

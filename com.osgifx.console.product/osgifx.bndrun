@@ -36,6 +36,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.dmt',\
                                       bnd.identity;id='com.osgifx.console.ui.events',\
                                       bnd.identity;id='com.osgifx.console.ui.extension',\
+                                      bnd.identity;id='com.osgifx.console.ui.healthcheck',\
                                       bnd.identity;id='com.osgifx.console.ui.logs',\
                                       bnd.identity;id='com.osgifx.console.ui.gogo',\
                                       bnd.identity;id='com.osgifx.console.ui.graph',\
@@ -73,7 +74,8 @@ install.order                     :   \
                                       com.osgifx.console.ui.leaks,\
                                       com.osgifx.console.ui.http,\
                                       com.osgifx.console.ui.roles,\
-                                      com.osgifx.console.ui.dmt                               
+                                      com.osgifx.console.ui.dmt,\
+                                      com.osgifx.console.ui.healthcheck
 
 -runbundles.X    	              :   ${install.order}
 

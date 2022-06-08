@@ -75,4 +75,8 @@ public final class PackageWirings {
 		return PackageWirings.isWired("javax.management", context);
 	}
 
+	public static boolean isFelixHcWired(final BundleContext context) {
+		return PackageWirings.isWired("org.apache.felix.hc.api", context);
+	}
+
 }

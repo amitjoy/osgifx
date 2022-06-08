@@ -26,6 +26,7 @@ public final class DataRetrievedEventTopics {
 	public static final String DATA_RETRIEVED_BUNDLES_TOPIC        = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "bundles";
 	public static final String DATA_RETRIEVED_COMPONENTS_TOPIC     = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "components";
 	public static final String DATA_RETRIEVED_CONFIGURATIONS_TOPIC = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "configurations";
+	public static final String DATA_RETRIEVED_HEALTHCHECKS_TOPIC   = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "healthchecks";
 	public static final String DATA_RETRIEVED_HTTP_TOPIC           = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "http";
 	public static final String DATA_RETRIEVED_LEAKS_TOPIC          = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "leaks";
 	public static final String DATA_RETRIEVED_PACKAGES_TOPIC       = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "packages";
