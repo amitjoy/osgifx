@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.felix.hc.api.HealthCheck;
 import org.apache.felix.hc.api.Result;
 import org.apache.felix.hc.api.ResultLog;
+import org.apache.felix.hc.api.execution.HealthCheckExecutionOptions;
 import org.apache.felix.hc.api.execution.HealthCheckExecutionResult;
 import org.apache.felix.hc.api.execution.HealthCheckExecutor;
 import org.apache.felix.hc.api.execution.HealthCheckSelector;
@@ -76,7 +77,10 @@ public class XHcAdmin {
 		selector = HealthCheckSelector.tags(tags.toArray(new String[0]));
 		selector.withNames(names.toArray(new String[0]));
 
-		final List<HealthCheckExecutionResult> results = felixHcExecutor.execute(selector);
+		final HealthCheckExecutionOptions options = new HealthCheckExecutionOptions();
+		options.setCombineTagsWithOr(true);
+
+		final List<HealthCheckExecutionResult> results = felixHcExecutor.execute(selector, options);
 		return results.stream().map(this::toResultDTO).collect(Collectors.toList());
 	}
 
