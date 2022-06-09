@@ -182,7 +182,6 @@ public final class HealthCheckFxController {
 
 	@FXML
 	private void executeHc(final ActionEvent event) {
-		logger.atInfo().log("Executing health checks");
 		final var selectedMetadata = hcMetadataList.getCheckModel().getCheckedItems();
 		if (selectedMetadata.isEmpty()) {
 			logger.atInfo().log("No healthcheck metadata has been selected. Skipped execution.");
@@ -200,9 +199,11 @@ public final class HealthCheckFxController {
 				progressPane.setVisible(true);
 				final var isName = nameHcButton.isSelected();
 				if (isName) {
+					logger.atInfo().log("Executing healthchecks with names: %s", selectedMetadata);
 					final var hcResults = agent.executeHealthChecks(null, selectedMetadata);
 					addToOutputArea(hcResults);
 				} else {
+					logger.atInfo().log("Executing healthchecks with tags: %s", selectedMetadata);
 					final var hcResults = agent.executeHealthChecks(selectedMetadata, null);
 					addToOutputArea(hcResults);
 				}
