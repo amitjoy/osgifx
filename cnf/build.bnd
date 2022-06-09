@@ -43,8 +43,9 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 
 -pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
 -groupid                              =         com.osgifx
--baselinerepo                         =         Release
 -releaserepo                          =         Release
+-baselinerepo                         =         Release
+-diffignore                           =         Bundle-Version
 
 OSGifx-Version                        =         ${cat;${.}/app.version}
 Bundle-Version                        =         ${OSGifx-Version}.${tstamp}
