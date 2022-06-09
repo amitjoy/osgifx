@@ -12,38 +12,48 @@
   <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="100" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
   </p>
 
-<img src="https://user-images.githubusercontent.com/13380182/152663681-615aaf56-9945-41d2-9861-e68880da9f3f.png" />
-<img src="https://user-images.githubusercontent.com/13380182/153308167-eba08b08-ad74-4e8c-8032-f7864bd93288.png" />
-<img src="https://user-images.githubusercontent.com/13380182/152663696-cce697a0-610f-4b7c-8306-843e926cdbd5.png" />
-<img src="https://user-images.githubusercontent.com/13380182/152663960-5539ada8-d9ab-4ce8-807d-8857a81360c3.png" />
+<img src="screenshots/1.png" />
+<img src="screenshots/2.png" />
+<img src="screenshots/3.png" />
+<img src="screenshots/4.png" />
+<img src="screenshots/5.png" />
 <p align="center">
 	<details>
 		<summary><h2>Click here for more screenshots</h2></summary>
-		<img src="https://user-images.githubusercontent.com/13380182/152663676-f29732d5-a18f-4c1d-a88c-06aa938a101b.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663677-17ff2ba7-95cf-4113-91b2-12f40f97bb92.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663678-f18513b8-736f-4091-b942-fc4fa1f61bc6.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663680-6a4051f8-fded-41d4-bc2c-06d2d07883f7.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663683-16dc47cc-f0ce-4508-a7cb-6676bebce8bb.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663684-0a3c80ad-e539-43a6-afae-065a653213ab.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/153308825-7398e4d6-ab26-4860-ac52-61f17039d0b2.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/153308417-21417cb3-8761-4ccc-a8c6-7777a10c9b6b.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663687-af054d21-8451-4226-82dd-974491b53a4e.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663689-1c74d0b7-73a4-4bfd-854d-05e84a756cc6.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663690-2dd6b1bf-9b29-42f0-a12f-146a083e3a1a.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663691-99c457c3-8524-4d05-8e38-ab3658604f64.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663693-ada6d47e-6392-43dd-babf-c1e819cd6840.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663694-90219591-7a01-44a7-b57c-5e1cbe7f235e.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663695-5f9a53e5-a18b-46f4-8c0d-6b1ecee677a0.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663697-55c966a9-94a2-4eaf-a270-05610bbf4371.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663698-fd148901-e492-4436-986e-d958e13996ad.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/162635128-38d26996-aa8b-4b48-ba7d-b30a2685077d.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663700-ca3cc38c-74fd-4ebb-b736-66af21757123.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663701-80a05b53-a8ad-42c2-a1e1-a20073ea28b5.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663702-3a709ee4-9aee-4b2b-b861-8dc169df5d83.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/152663703-983aaba6-44fe-42b2-b1d0-1c10a60c8a41.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/162635203-d6f990af-5ca9-49ec-96ca-0b99689a1633.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/153309982-c2445505-2667-483c-9f1c-cb97679295cf.png" />
-		<img src="https://user-images.githubusercontent.com/13380182/154861104-56f11a38-8adb-4fa6-b3a4-6621f2ca12fc.png" />
+		<img src="screenshots/6.png" />
+		<img src="screenshots/7.png" />
+		<img src="screenshots/8.png" />
+		<img src="screenshots/9.png" />
+		<img src="screenshots/10.png" />
+		<img src="screenshots/11.png" />
+		<img src="screenshots/12.png" />
+		<img src="screenshots/13.png" />
+		<img src="screenshots/14.png" />
+		<img src="screenshots/15.png" />
+		<img src="screenshots/16.png" />
+		<img src="screenshots/17.png" />
+		<img src="screenshots/18.png" />
+		<img src="screenshots/19.png" />
+		<img src="screenshots/20.png" />
+		<img src="screenshots/21.png" />
+		<img src="screenshots/22.png" />
+		<img src="screenshots/23.png" />
+		<img src="screenshots/24.png" />
+		<img src="screenshots/25.png" />
+		<img src="screenshots/26.png" />
+		<img src="screenshots/27.png" />
+		<img src="screenshots/28.png" />
+		<img src="screenshots/29.png" />
+		<img src="screenshots/30.png" />
+		<img src="screenshots/31.png" />
+		<img src="screenshots/32.png" />
+		<img src="screenshots/33.png" />
+		<img src="screenshots/34.png" />
+		<img src="screenshots/35.png" />
+		<img src="screenshots/36.png" />
+		<img src="screenshots/37.png" />
+		<img src="screenshots/38.png" />
+		<img src="screenshots/39.png" />
 	</details>
 </p>
 
@@ -56,9 +66,9 @@
 | Java (Application)    | 17                                         	|
 | Java (Agent)          | 1.8                                         	|
 | Rich Client Platform 	| JavaFX 17                                    	|
-| Runtime Frameworks   	| OSGi (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
-| UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
-| Tools                	| Bndtools 6.2                                  |
+| Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
+| UI Libraries         	| ControlsFX, TilesFX, FormsFX                   |
+| Tools                	| Bndtools 6.3.1                                 |
 
 ------------------------------------------------------------------------------------------------------------
 
