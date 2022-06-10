@@ -43,6 +43,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
 public final class RoleCreateDialog extends Dialog<RoleDTO> {
 
@@ -105,6 +106,26 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
 
 		dropdownRoleType.getSelectionModel().select(0);
 		txtRoleName.setPromptText(pidCaption);
+		
+		setResultConverter(new Callback<ButtonType, RoleCreateDialog.RoleDTO>() {
+			
+			@Override
+			public RoleDTO call(ButtonType param) {
+				final var data = param == null ? null : param.getButtonData();
+				try {
+					if (data == ButtonData.OK_DONE) {
+						if (validationSupport.isInvalid()) {
+							throw new RuntimeException("Role name validation failed");
+						}
+						return getInput(dropdownRoleType.getValue(), txtRoleName.getText());
+					}
+					return null;
+				} catch (final Exception e) {
+					logger.atError().withException(e).log("Role cannot be created");
+					throw e;
+				}
+			}
+		});
 
 		setResultConverter(dialogButton -> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
