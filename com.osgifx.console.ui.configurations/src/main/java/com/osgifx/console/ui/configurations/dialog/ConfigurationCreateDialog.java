@@ -33,12 +33,15 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
+import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.Triple;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
@@ -69,8 +72,9 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
 	@Log
 	@Inject
-	private FluentLogger         logger;
-	private final ValueConverter converter = new ValueConverter();
+	private FluentLogger            logger;
+	private final ValueConverter    converter         = new ValueConverter();
+	private final ValidationSupport validationSupport = new ValidationSupport();
 
 	private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> configurationEntries = Maps
 	        .newHashMap();
@@ -86,6 +90,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
 		final var txtPid = (CustomTextField) TextFields.createClearableTextField();
+		validationSupport.registerValidator(txtPid, Validator.createEmptyValidator("Invalid PID"));
 		txtPid.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
 
 		final var txtFactoryPid = (CustomTextField) TextFields.createClearableTextField();
@@ -130,11 +135,18 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 		setResultConverter(dialogButton -> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
 			try {
-				return data == ButtonData.OK_DONE ? getInput(txtPid, txtFactoryPid) : null;
+				if (data == ButtonData.OK_DONE) {
+					if (validationSupport.isInvalid()) {
+						throw new RuntimeException("Validation for configuration creation failed");
+					}
+					return getInput(txtPid, txtFactoryPid);
+				}
+				return null;
 			} catch (final Exception e) {
 				logger.atError().withException(e).log("Configuration values cannot be converted");
+				Throwables.throwIfInstanceOf(e, RuntimeException.class);
+				return null;
 			}
-			return null;
 		});
 	}
 
