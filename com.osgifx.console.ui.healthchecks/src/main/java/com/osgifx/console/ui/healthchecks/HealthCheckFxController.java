@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.healthcheck;
+package com.osgifx.console.ui.healthchecks;
 
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_HEALTHCHECKS_TOPIC;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
@@ -67,7 +67,6 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -109,7 +108,6 @@ public final class HealthCheckFxController {
 			initHcList();
 			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "hc-executor"));
 			progressPane = new MaskerPane();
-			logger.atDebug().log("FXML controller has been initialized");
 			hcTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
 			logger.atDebug().log("FXML controller has been initialized");
 			initButtons();
@@ -161,17 +159,6 @@ public final class HealthCheckFxController {
 
 	private void initHcList() {
 		hcMetadataList.getSelectionModel().setSelectionMode(MULTIPLE);
-		hcMetadataList.setCellFactory(param -> new CheckBoxListCell<>(hcMetadataList::getItemBooleanProperty) {
-			@Override
-			public void updateItem(final String hcMetadata, final boolean empty) {
-				threadSync.syncExec(() -> super.updateItem(hcMetadata, empty));
-				if (empty || hcMetadata == null) {
-					threadSync.syncExec(() -> setText(null));
-				} else {
-					threadSync.syncExec(() -> setText(hcMetadata));
-				}
-			}
-		});
 		initNames(); // the first time load only the names
 		logger.atInfo().log("Heathcheck metadata list has been initialized");
 	}
