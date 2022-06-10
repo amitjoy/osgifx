@@ -22,7 +22,6 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.SegmentedButton?>
@@ -80,11 +79,6 @@
             </BorderPane>
          </center>
       </BorderPane>
-      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="console">
-    	<children>
-            <TextArea fx:id="hcResultArea" editable="false" prefHeight="354.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            </TextArea>
-         </children>
-    </AnchorPane>
+      <BorderPane fx:id="hcResultArea" />
    </items>
 </SplitPane>

@@ -20,8 +20,8 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,6 +41,10 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.Form;
+import com.dlsc.formsfx.model.structure.Section;
+import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -48,7 +52,6 @@ import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.util.fx.Table;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,11 +59,17 @@ import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class HealthCheckFxController {
@@ -83,7 +92,7 @@ public final class HealthCheckFxController {
 	@FXML
 	private Button                deselectAllButton;
 	@FXML
-	private TextArea              hcResultArea;
+	private BorderPane            hcResultArea;
 	@Inject
 	private DataProvider          dataProvider;
 	@Inject
@@ -216,42 +225,62 @@ public final class HealthCheckFxController {
 			}
 
 			private void addToOutputArea(final List<XHealthCheckResultDTO> hcResults) {
-				hcResultArea.clear();
-				hcResults.stream().map(this::formatResult).forEach(hcResultArea::appendText);
+				try {
+					threadSync.asyncExec(() -> {
+						hcResultArea.getChildren().clear();
+						final var content = new Accordion();
+						hcResultArea.setCenter(content);
+						hcResults.stream().map(this::formatResult).forEach(f -> content.getPanes().add(f));
+					});
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
 			}
 
-			private String formatResult(final XHealthCheckResultDTO result) {
-				final var output = new StringBuilder();
+			private TitledPane formatResult(final XHealthCheckResultDTO result) {
+				final var form = Form.of(Section.of(initGenericFields(result).toArray(new Field[0])).title("Generic Properties"),
+				        Section.of(initResultEntryFields(result).toArray(new Field[0])).title("Results: ")).title("Result");
 
-				final var genericInfoTable = new Table();
+				final var renderer = new FormRenderer(form);
 
-				genericInfoTable.setShowVerticalLines(true);
-				genericInfoTable.setHeaders("Generic HC Info", "");
+				GridPane.setColumnSpan(renderer, 2);
+				GridPane.setRowIndex(renderer, 3);
+				GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
+				GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
-				genericInfoTable.addRow("Name", result.healthCheckName != null ? result.healthCheckName : "<NO NAME>");
-				genericInfoTable.addRow("Tags", result.healthCheckTags != null ? result.healthCheckTags.toString() : "<NO TAGS>");
-				genericInfoTable.addRow("Elapsed Time", String.valueOf(result.elapsedTime) + " ms");
-				genericInfoTable.addRow("Finished At", new Date(result.finishedAt).toString());
-				genericInfoTable.addRow("Timeout", String.valueOf(result.isTimedOut));
+				final var content = new ScrollPane(renderer);
+				content.setFitToHeight(true);
+				content.setFitToWidth(true);
+				content.setHbarPolicy(ScrollBarPolicy.NEVER);
 
-				output.append(genericInfoTable.print());
+				return new TitledPane(result.healthCheckName, content);
+			}
+
+			private List<Field<?>> initGenericFields(final XHealthCheckResultDTO result) {
+				final Field<?> elapsedTimeField = Field.ofStringType(String.valueOf(result.elapsedTime) + " ms").label("Elapsed Time")
+				        .editable(false);
+				final Field<?> timeoutField     = Field.ofBooleanType(result.isTimedOut).label("Timeout").editable(false);
+
+				return List.of(elapsedTimeField, timeoutField);
+			}
+
+			private List<Field<?>> initResultEntryFields(final XHealthCheckResultDTO result) {
+				final List<Field<?>> allResultFields = new ArrayList<>();
 
 				var i = 0;
 				for (final ResultDTO entry : result.results) {
-					final var resultEntriesTable = new Table();
-
 					i++;
-					resultEntriesTable.setShowVerticalLines(true);
-					resultEntriesTable.setHeaders("HC Result Entry: " + i, "");
+					final Field<?> separatorField = Field.ofStringType("").label("Result " + i).editable(false);
+					final Field<?> statusField    = Field.ofStringType(Strings.nullToEmpty(entry.status)).label("Status").editable(false);
+					final Field<?> messageField   = Field.ofStringType(Strings.nullToEmpty(entry.message)).label("Message").editable(false);
+					final Field<?> logLevelField  = Field.ofStringType(Strings.nullToEmpty(entry.logLevel)).label("Log Level")
+					        .editable(false);
+					final Field<?> exceptionField = Field.ofStringType(Strings.nullToEmpty(entry.exception)).label("Exception")
+					        .multiline(true).editable(false);
 
-					resultEntriesTable.addRow("Status", Strings.nullToEmpty(entry.status));
-					resultEntriesTable.addRow("Message", Strings.nullToEmpty(entry.message));
-					resultEntriesTable.addRow("Log Level", Strings.nullToEmpty(entry.logLevel));
-					resultEntriesTable.addRow("Exception", Strings.nullToEmpty(entry.exception));
-
-					output.append(resultEntriesTable.print());
+					allResultFields.addAll(List.of(separatorField, statusField, messageField, logLevelField, exceptionField));
 				}
-				return output.toString();
+				return allResultFields;
 			}
 
 		};
