@@ -7,7 +7,7 @@
     "main": "index.js",
     "preferGlobal": true,
     "repository": "https://github.com/amitjoy/osgifx",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "jdeploy": {
         "jdk": false,
         "args": [
