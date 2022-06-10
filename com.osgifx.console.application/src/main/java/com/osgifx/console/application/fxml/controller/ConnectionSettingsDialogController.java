@@ -27,6 +27,7 @@ import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -62,6 +63,10 @@ public final class ConnectionSettingsDialogController {
 
 		TableFilter.forTableView(connectionTable).apply();
 		logger.atDebug().log("FXML controller has been initialized");
+	}
+
+	public ReadOnlyObjectProperty<ConnectionSettingDTO> selectedSettings() {
+		return connectionTable.getSelectionModel().selectedItemProperty();
 	}
 
 }

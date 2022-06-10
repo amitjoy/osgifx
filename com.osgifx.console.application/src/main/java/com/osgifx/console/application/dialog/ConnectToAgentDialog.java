@@ -30,6 +30,7 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
 import com.google.common.collect.Maps;
+import com.osgifx.console.application.fxml.controller.ConnectionSettingsDialogController;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
@@ -76,7 +77,11 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
 		buttonTypes.put(REMOVE_CONNECTION, removeConnectionButton);
 		buttonTypes.put(CONNECT, OK);
 
-		final var content = Fx.loadFXML(loader, context, "/fxml/connection-chooser-window.fxml");
+		final var content    = Fx.loadFXML(loader, context, "/fxml/connection-chooser-window.fxml");
+		final var controller = (ConnectionSettingsDialogController) loader.getController();
+
+		dialogPane.lookupButton(removeConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
+		dialogPane.lookupButton(ButtonType.OK).disableProperty().bind(controller.selectedSettings().isNull());
 		dialogPane.setContent(content);
 	}
 
