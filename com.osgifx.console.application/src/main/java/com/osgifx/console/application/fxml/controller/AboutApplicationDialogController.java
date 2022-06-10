@@ -32,6 +32,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 
 public final class AboutApplicationDialogController {
@@ -42,7 +43,7 @@ public final class AboutApplicationDialogController {
 	@FXML
 	private HyperlinkLabel appDetails;
 	@FXML
-	private HyperlinkLabel eclipseLink;
+	private Label          eclipseLink;
 	@Inject
 	private Application    jfxApplication;
 	@FXML
@@ -56,8 +57,7 @@ public final class AboutApplicationDialogController {
 		appDetails.setText(replace(appDetails.getText()));
 		javaVersionTxt.setText(replace(javaVersionTxt.getText()));
 		appDetails.setOnAction(this::handleLinkOnClick);
-		eclipseLink.setOnAction(this::handleLinkOnClick);
-		logger.atDebug().log("FXML controller (%s) has been initialized", getClass());
+		logger.atDebug().log("FXML controller has been initialized");
 	}
 
 	private void handleLinkOnClick(final ActionEvent event) {
