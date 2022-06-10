@@ -98,10 +98,13 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
 				return null;
 			}
 			try {
-				if (validationSupport.isInvalid()) {
-					throw new RuntimeException("Topic validation failed");
+				if (data == ButtonData.OK_DONE) {
+					if (validationSupport.isInvalid()) {
+						throw new RuntimeException("Topic validation failed");
+					}
+					return getInput();
 				}
-				return data == ButtonData.OK_DONE ? getInput() : null;
+				return null;
 			} catch (final Exception e) {
 				logger.atError().withException(e).log("Invalid topic");
 				throw e;
@@ -155,6 +158,8 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
 			if (content.getChildren().size() > 1) {
 				content.getChildren().remove(form);
 				getDialogPane().getScene().getWindow().sizeToScene();
+				validationSupport.deregisterValidator(textTopic);
+				textTopic.getProperties().clear();
 			}
 			entries.remove(form);
 		}
