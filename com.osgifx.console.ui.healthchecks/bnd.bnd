@@ -7,9 +7,8 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  graphic = graphic
 -buildpath          : \
                       ${bundles.required}
--privatepackage     : \
-                      com.osgifx.console.ui.healthcheck
 Import-Package      : \
                       org.controlsfx.control,\
                       org.controlsfx.glyphfont,\
                       *
+-privatepackage     : com.osgifx.console.ui.healthchecks
