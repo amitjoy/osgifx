@@ -24,6 +24,8 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,23 +35,25 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public final class BundleInstallDialogController {
 
 	@Log
 	@Inject
-	private FluentLogger      logger;
+	private FluentLogger               logger;
 	@Inject
-	private ThreadSynchronize threadSync;
+	private ThreadSynchronize          threadSync;
 	@FXML
-	private Button            fileChooser;
+	private Button                     fileChooser;
 	@FXML
-	private ToggleSwitch      startBundleToggle;
+	private ToggleSwitch               startBundleToggle;
 	@FXML
-	private GridPane          installBundleDialogPane;
+	private GridPane                   installBundleDialogPane;
 	@FXML
-	private TextField         startLevel;
-	private File              bundle;
+	private TextField                  startLevel;
+	private File                       bundle;
+	private final ObjectProperty<File> bundleProperty = new SimpleObjectProperty<>();
 
 	private static final int DEFAULT_START_LEVEL = 10;
 
@@ -64,9 +68,10 @@ public final class BundleInstallDialogController {
 	private void chooseBundle(final ActionEvent event) {
 		logger.atInfo().log("FXML controller 'chooseBundle(..)' event has been invoked");
 		final var bundleChooser = new FileChooser();
-		bundleChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JAR Files", "*.jar"));
+		bundleChooser.getExtensionFilters().add(new ExtensionFilter("JAR Files", "*.jar"));
 		bundle = bundleChooser.showOpenDialog(null);
 		if (bundle != null) {
+			bundleProperty.set(bundle);
 			fileChooser.setText(bundle.getName());
 			fileChooser.setTooltip(new Tooltip(bundle.getName()));
 		}
@@ -123,6 +128,10 @@ public final class BundleInstallDialogController {
 				startLevel.setText(newValue.replaceAll("[^\\d]", ""));
 			}
 		});
+	}
+
+	public ObjectProperty<File> bundleProperty() {
+		return bundleProperty;
 	}
 
 }
