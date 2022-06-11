@@ -30,6 +30,9 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog.ArtifactDTO;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -55,13 +58,22 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
 		        .setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '" + ARTIFACTS_DIRECTORY + "' directory");
 		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
 
-		final var loginButtonType = new ButtonType("Install", ButtonData.OK_DONE);
-		dialogPane.getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+		final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
+		dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);
 
 		final var dialogContent = Fx.loadFXML(loader, context, "/fxml/batch-install-dialog.fxml");
 		dialogPane.setContent(dialogContent);
 
-		final var controller = (BatchInstallDialogController) loader.getController();
+		final var controller              = (BatchInstallDialogController) loader.getController();
+		final var targetItemsProperty     = controller.targetItemsProperty();
+		final var targetItemsListProperty = new SimpleListProperty<ArtifactDTO>();
+
+		targetItemsListProperty.bind(targetItemsProperty);
+		final BooleanProperty isItemSelected = new SimpleBooleanProperty();
+
+		isItemSelected.bind(targetItemsListProperty.emptyProperty());
+
+		dialogPane.lookupButton(installButtonType).disableProperty().bind(isItemSelected);
 		setResultConverter(dialogButton -> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
 			return data == ButtonData.OK_DONE ? controller.getSelectedArtifacts() : null;
