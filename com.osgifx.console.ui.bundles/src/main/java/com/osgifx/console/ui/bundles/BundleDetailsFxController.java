@@ -83,6 +83,8 @@ public final class BundleDetailsFxController {
 	@FXML
 	private Label                                      startLevelLabel;
 	@FXML
+	private Label                                      startDurationLabel;
+	@FXML
 	private Button                                     startBundleButton;
 	@FXML
 	private Button                                     stopBundleButton;
@@ -172,6 +174,12 @@ public final class BundleDetailsFxController {
 		revisionsLabel.setText(String.valueOf(bundle.revisions));
 		descLabel.setText(bundle.description);
 		startLevelLabel.setText(String.valueOf(bundle.startLevel));
+
+		if (bundle.startDurationInMillis != -1) {
+			startDurationLabel.setText(String.valueOf(bundle.startDurationInMillis) + " ms");
+		} else {
+			startDurationLabel.setText("<IGNORED>");
+		}
 
 		exportedPackagesNameTableColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 		exportedPackagesVersionTableColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));

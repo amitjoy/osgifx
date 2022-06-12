@@ -33,6 +33,7 @@ public class XBundleDTO extends BundleDTO {
 	public String                vendor;
 	public String                description;
 	public int                   startLevel;
+	public long                  startDurationInMillis;
 	public BundleRevisionDTO     bundleRevision;
 	public List<XPackageDTO>     exportedPackages;
 	public List<XPackageDTO>     importedPackages;

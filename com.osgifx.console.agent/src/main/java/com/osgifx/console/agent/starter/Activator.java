@@ -44,6 +44,7 @@ import com.osgifx.console.agent.handler.OSGiEventHandler;
 import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.provider.AgentServer;
+import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.PackageWirings;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -54,16 +55,21 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-	private ServerSocket            server;
-	private BundleContext           context;
-	private ClassloaderLeakDetector classloaderLeakDetector;
-	private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
+	private ServerSocket              server;
+	private BundleContext             context;
+	private ClassloaderLeakDetector   classloaderLeakDetector;
+	private BundleStartTimeCalculator bundleStartTimeCalculator;
+	private final List<AgentServer>   agents = new CopyOnWriteArrayList<>();
 
 	@Override
 	public void start(final BundleContext context) throws Exception {
-		this.context            = context;
-		classloaderLeakDetector = new ClassloaderLeakDetector();
+		this.context = context;
+
+		bundleStartTimeCalculator = new BundleStartTimeCalculator(context.getBundle().getBundleId());
+		classloaderLeakDetector   = new ClassloaderLeakDetector(bundleStartTimeCalculator);
 		classloaderLeakDetector.start(context);
+
+		context.addBundleListener(bundleStartTimeCalculator);
 
 		// Get the specified port in the framework properties
 		String port = context.getProperty(AGENT_SERVER_PORT_KEY);
@@ -104,7 +110,7 @@ public final class Activator extends Thread implements BundleActivator {
 					socket.setSoTimeout(1000);
 
 					// create a new agent, and link it up.
-					final AgentServer sa = new AgentServer(context, classloaderLeakDetector);
+					final AgentServer sa = new AgentServer(context, classloaderLeakDetector, bundleStartTimeCalculator);
 					agents.add(sa);
 					final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class, sa, socket) {
 						@Override
@@ -125,7 +131,7 @@ public final class Activator extends Thread implements BundleActivator {
 					// initialize OSGi logging if available
 					final boolean isLogAvailable = PackageWirings.isLogWired(context);
 					if (isLogAvailable) {
-						final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote());
+						final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote(), bundleStartTimeCalculator);
 						trackLogReader(logListener);
 					}
 					remoteRPC.run();
