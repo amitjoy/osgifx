@@ -80,6 +80,7 @@ import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHeapAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
+import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
 import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
@@ -89,6 +90,7 @@ import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -139,6 +141,7 @@ public final class AgentServer implements Agent, Closeable {
 	private final ServiceTracker<Object, Object>                 metatypeTracker;
 	private final ServiceTracker<Object, Object>                 dmtAdminTracker;
 	private final ServiceTracker<Object, Object>                 userAdminTracker;
+	private final ServiceTracker<Object, Object>                 loggerAdminTracker;
 	private final ServiceTracker<Object, Object>                 eventAdminTracker;
 	private final ServiceTracker<Object, Object>                 configAdminTracker;
 	private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
@@ -161,6 +164,7 @@ public final class AgentServer implements Agent, Closeable {
 		metatypeTracker           = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
 		dmtAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
 		userAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
+		loggerAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.log.admin.LoggerAdmin", null);
 		eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
 		configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
 		felixHcExecutorTracker    = new ServiceTracker<>(context, "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
@@ -232,6 +236,7 @@ public final class AgentServer implements Agent, Closeable {
 		metatypeTracker.open();
 		dmtAdminTracker.open();
 		userAdminTracker.open();
+		loggerAdminTracker.open();
 		eventAdminTracker.open();
 		configAdminTracker.open();
 		gogoCommandsTracker.open();
@@ -442,6 +447,8 @@ public final class AgentServer implements Agent, Closeable {
 			metatypeTracker.close();
 			dmtAdminTracker.close();
 			userAdminTracker.close();
+			loggerAdminTracker.close();
+			eventAdminTracker.close();
 			configAdminTracker.close();
 			gogoCommandsTracker.close();
 			agentExtensionTracker.close();
@@ -610,6 +617,17 @@ public final class AgentServer implements Agent, Closeable {
 			return dmtAdmin.updateDmtNode(uri, value, format);
 		}
 		return createResult(SKIPPED, "DMT bundle is not installed to process this request");
+	}
+
+	@Override
+	public XResultDTO updateBundleLoggerContext(final String bsn, final Map<String, String> logLevels) {
+		final boolean isR7LogAvailable = PackageWirings.isR7LoggerAdminWired(context);
+		if (isR7LogAvailable) {
+			final boolean      isConfigAdminWired = PackageWirings.isConfigAdminWired(context);
+			final XLoggerAdmin loggerAdmin        = new XLoggerAdmin(loggerAdminTracker.getService(), isConfigAdminWired, context);
+			return loggerAdmin.updateLoggerContext(bsn, logLevels);
+		}
+		return createResult(SKIPPED, "R7 Log bundle is not installed to process this request");
 	}
 
 	@Override
@@ -832,6 +850,17 @@ public final class AgentServer implements Agent, Closeable {
 		if (isUserAdminAvailable) {
 			final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
 			return userAdmin.getRoles();
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public List<XBundleLoggerContextDTO> getBundleLoggerContexts() {
+		final boolean isR7LogAvailable = PackageWirings.isR7LoggerAdminWired(context);
+		if (isR7LogAvailable) {
+			final boolean      isConfigAdminWired = PackageWirings.isConfigAdminWired(context);
+			final XLoggerAdmin loggerAdmin        = new XLoggerAdmin(loggerAdminTracker.getService(), isConfigAdminWired, context);
+			return loggerAdmin.getLoggerContexts();
 		}
 		return Collections.emptyList();
 	}
