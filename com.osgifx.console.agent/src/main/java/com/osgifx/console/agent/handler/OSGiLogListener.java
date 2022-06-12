@@ -24,15 +24,18 @@ import org.osgi.service.log.LogListener;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.reflect.Reflect;
 import com.osgifx.console.supervisor.Supervisor;
 
 public class OSGiLogListener implements LogListener {
 
-	private final Supervisor supervisor;
+	private final Supervisor                supervisor;
+	private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
-	public OSGiLogListener(final Supervisor supervisor) {
-		this.supervisor = supervisor;
+	public OSGiLogListener(final Supervisor supervisor, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+		this.supervisor                = supervisor;
+		this.bundleStartTimeCalculator = bundleStartTimeCalculator;
 	}
 
 	@Override
@@ -45,7 +48,7 @@ public class OSGiLogListener implements LogListener {
 	private XLogEntryDTO toDTO(final LogEntry entry) {
 		final XLogEntryDTO dto = new XLogEntryDTO();
 
-		dto.bundle  = XBundleAdmin.toDTO(entry.getBundle());
+		dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
 		dto.message = entry.getMessage();
 
 		dto.level     = getLevel(entry.getLevel());

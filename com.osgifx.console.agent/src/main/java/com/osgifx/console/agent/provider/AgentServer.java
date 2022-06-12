@@ -133,6 +133,7 @@ public final class AgentServer implements Agent, Closeable {
 	private Redirector                   redirector = new NullRedirector();
 	private RemoteRPC<Agent, Supervisor> remoteRPC;
 	private ClassloaderLeakDetector      leakDetector;
+	private BundleStartTimeCalculator    bundleStartTimeCalculator;
 
 	private final ServiceTracker<Object, Object>                 scrTracker;
 	private final ServiceTracker<Object, Object>                 metatypeTracker;
@@ -148,10 +149,12 @@ public final class AgentServer implements Agent, Closeable {
 	private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
 	private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
 
-	public AgentServer(final BundleContext context, final ClassloaderLeakDetector leakDetector) throws Exception {
+	public AgentServer(final BundleContext context, final ClassloaderLeakDetector leakDetector,
+	        final BundleStartTimeCalculator bundleStartTimeCalculator) throws Exception {
 		requireNonNull(context, "Bundle context cannot be null");
-		this.context      = context;
-		this.leakDetector = leakDetector;
+		this.context                   = context;
+		this.leakDetector              = leakDetector;
+		this.bundleStartTimeCalculator = bundleStartTimeCalculator;
 
 		final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
@@ -536,7 +539,7 @@ public final class AgentServer implements Agent, Closeable {
 
 	@Override
 	public List<XBundleDTO> getAllBundles() {
-		return XBundleAdmin.get(context);
+		return XBundleAdmin.get(context, bundleStartTimeCalculator);
 	}
 
 	@Override
