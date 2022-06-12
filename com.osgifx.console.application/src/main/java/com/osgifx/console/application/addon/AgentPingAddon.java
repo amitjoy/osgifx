@@ -55,6 +55,10 @@ public final class AgentPingAddon {
 	@ContextValue("is_connected")
 	private ContextBoundValue<Boolean>  isConnected;
 	@Inject
+	@Optional
+	@ContextValue("is_local_agent")
+	private ContextBoundValue<Boolean>  isLocalAgent;
+	@Inject
 	@ContextValue("connected.agent")
 	private ContextBoundValue<String>   connectedAgent;
 	private ScheduledExecutorService    executor;
@@ -91,6 +95,7 @@ public final class AgentPingAddon {
 		// disconnected event is received simultaneously
 		if (!executor.isShutdown()) {
 			isConnected.publish(false);
+			isLocalAgent.publish(false);
 		}
 		connectedAgent.publish(null);
 	}

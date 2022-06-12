@@ -50,6 +50,10 @@ public final class DisconnectFromAgentHandler {
 	private ContextBoundValue<Boolean>              isConnected;
 	@Inject
 	@Optional
+	@ContextValue("is_local_agent")
+	private ContextBoundValue<Boolean>              isLocalAgent;
+	@Inject
+	@Optional
 	@ContextValue("connected.agent")
 	private ContextBoundValue<String>               connectedAgent;
 	@Inject
@@ -74,6 +78,7 @@ public final class DisconnectFromAgentHandler {
 			protected void succeeded() {
 				eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
 				isConnected.publish(false);
+				isLocalAgent.publish(false);
 				selectedSettings.publish(null);
 				connectedAgent.publish(null);
 			}

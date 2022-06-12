@@ -25,6 +25,8 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.di.ContextBoundValue;
+import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -37,12 +39,16 @@ public final class AgentConnectedAddon {
 
 	@Log
 	@Inject
-	private FluentLogger      logger;
+	private FluentLogger               logger;
 	@Inject
-	private ThreadSynchronize threadSync;
+	private ThreadSynchronize          threadSync;
 	@Inject
-	private DataProvider      dataProvider;
-	private ProgressDialog    progressDialog;
+	private DataProvider               dataProvider;
+	@Inject
+	@Optional
+	@ContextValue("is_local_agent")
+	private ContextBoundValue<Boolean> isLocalAgent;
+	private ProgressDialog             progressDialog;
 
 	@Inject
 	@Optional
@@ -63,9 +69,11 @@ public final class AgentConnectedAddon {
 			}
 		};
 
+		final var agent  = isLocalAgent.getValue() ? "local" : "remote";
+		final var header = "Retrieving information from " + agent + " agent";
+
 		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(dataRetrievalTask);
-		progressDialog = FxDialog.showProgressDialog("Retrieving information from remote agent", dataRetrievalTask,
-		        getClass().getClassLoader(), () -> taskFuture.cancel(true));
+		progressDialog = FxDialog.showProgressDialog(header, dataRetrievalTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
 	}
 
 }
