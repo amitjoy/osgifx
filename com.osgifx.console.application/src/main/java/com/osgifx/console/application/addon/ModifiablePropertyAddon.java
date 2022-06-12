@@ -37,6 +37,7 @@ public final class ModifiablePropertyAddon {
 
 	public ModifiablePropertyAddon() {
 		modifiableProperties.put("is_connected", false);
+		modifiableProperties.put("is_local_agent", false);
 		modifiableProperties.put("connected.agent", null);
 		modifiableProperties.put("selected.settings", null);
 		modifiableProperties.put("subscribed_topics", Set.of());
