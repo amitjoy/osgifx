@@ -21,18 +21,19 @@ public final class DataRetrievedEventTopics {
 		throw new IllegalAccessError("Cannot be instantiated");
 	}
 
-	public static final String DATA_RETRIEVED_EVENT_TOPIC_PREFIX   = "com/osgifx/data/retrieved/";
-	public static final String DATA_RETRIEVED_ALL_TOPIC            = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "all";
-	public static final String DATA_RETRIEVED_BUNDLES_TOPIC        = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "bundles";
-	public static final String DATA_RETRIEVED_COMPONENTS_TOPIC     = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "components";
-	public static final String DATA_RETRIEVED_CONFIGURATIONS_TOPIC = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "configurations";
-	public static final String DATA_RETRIEVED_HEALTHCHECKS_TOPIC   = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "healthchecks";
-	public static final String DATA_RETRIEVED_HTTP_TOPIC           = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "http";
-	public static final String DATA_RETRIEVED_LEAKS_TOPIC          = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "leaks";
-	public static final String DATA_RETRIEVED_PACKAGES_TOPIC       = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "packages";
-	public static final String DATA_RETRIEVED_PROPERTIES_TOPIC     = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "properties";
-	public static final String DATA_RETRIEVED_ROLES_TOPIC          = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "roles";
-	public static final String DATA_RETRIEVED_SERVICES_TOPIC       = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "services";
-	public static final String DATA_RETRIEVED_THREADS_TOPIC        = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "threads";
+	public static final String DATA_RETRIEVED_EVENT_TOPIC_PREFIX    = "com/osgifx/data/retrieved/";
+	public static final String DATA_RETRIEVED_ALL_TOPIC             = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "all";
+	public static final String DATA_RETRIEVED_BUNDLES_TOPIC         = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "bundles";
+	public static final String DATA_RETRIEVED_COMPONENTS_TOPIC      = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "components";
+	public static final String DATA_RETRIEVED_CONFIGURATIONS_TOPIC  = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "configurations";
+	public static final String DATA_RETRIEVED_HEALTHCHECKS_TOPIC    = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "healthchecks";
+	public static final String DATA_RETRIEVED_HTTP_TOPIC            = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "http";
+	public static final String DATA_RETRIEVED_LEAKS_TOPIC           = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "leaks";
+	public static final String DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "loggerContexts";
+	public static final String DATA_RETRIEVED_PACKAGES_TOPIC        = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "packages";
+	public static final String DATA_RETRIEVED_PROPERTIES_TOPIC      = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "properties";
+	public static final String DATA_RETRIEVED_ROLES_TOPIC           = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "roles";
+	public static final String DATA_RETRIEVED_SERVICES_TOPIC        = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "services";
+	public static final String DATA_RETRIEVED_THREADS_TOPIC         = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "threads";
 
 }

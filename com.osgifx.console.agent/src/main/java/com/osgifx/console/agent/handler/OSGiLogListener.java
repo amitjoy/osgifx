@@ -45,13 +45,14 @@ public class OSGiLogListener implements LogListener {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private XLogEntryDTO toDTO(final LogEntry entry) {
 		final XLogEntryDTO dto = new XLogEntryDTO();
 
 		dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
 		dto.message = entry.getMessage();
 
-		dto.level     = getLevel(entry.getLevel());
+		dto.level     = getLevel(entry.getLevel());             // must not use OSGi R7 reference to getLogLevel()
 		dto.exception = toExceptionString(entry.getException());
 		dto.loggedAt  = entry.getTime();
 

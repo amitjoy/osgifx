@@ -30,9 +30,9 @@ public final class PackageWirings {
 	public static boolean isWired(final String packageName, final BundleContext context) {
 		final BundleWiring wiring = context.getBundle().adapt(BundleWiring.class);
 		for (final BundleWire wire : wiring.getRequiredWires(PACKAGE_NAMESPACE)) {
-			final String       pkg            = (String) wire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
+			final String       pkgName        = (String) wire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
 			final BundleWiring providerWiring = wire.getProviderWiring();
-			if (pkg.startsWith(packageName) && providerWiring != null) {
+			if (pkgName.startsWith(packageName) && providerWiring != null) {
 				return true;
 			}
 		}
@@ -65,6 +65,10 @@ public final class PackageWirings {
 
 	public static boolean isLogWired(final BundleContext context) {
 		return PackageWirings.isWired("org.osgi.service.log", context);
+	}
+
+	public static boolean isR7LoggerAdminWired(final BundleContext context) {
+		return PackageWirings.isWired("org.osgi.service.log.admin", context);
 	}
 
 	public static boolean isHttpServiceRuntimeWired(final BundleContext context) {

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   Copyright 2021-2022 Amit Kumar Mondal
   
@@ -14,20 +15,25 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import org.controlsfx.control.SegmentedButton?>
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.logs.LogsFxController">
-   <children>
-      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="table" layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <placeholder>
-        	<Label text="No logs" />
-    	</placeholder>
-        <columns>
-        </columns>
-      </TableView>
-   </children>
-</AnchorPane>
+<BorderPane fx:id="mainPane" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.logs.StarterFxController">
+   <top>
+		<SegmentedButton fx:id="logsActionTypeButton" BorderPane.alignment="CENTER">
+			<BorderPane.margin>
+				<Insets bottom="5.0" left="5.0" top="5.0" />
+			</BorderPane.margin>
+			<buttons>
+				<ToggleButton fx:id="logsViewButton" selected="true" text="Log Events" />
+				<ToggleButton fx:id="configurationsViewButton" text="OSGi R7 Log Configurations" />
+			</buttons>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+		</SegmentedButton>
+   </top>
+</BorderPane>
