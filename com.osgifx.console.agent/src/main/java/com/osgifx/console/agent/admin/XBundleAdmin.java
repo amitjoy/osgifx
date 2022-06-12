@@ -24,6 +24,7 @@ import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +50,8 @@ import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
 import com.osgifx.console.agent.dto.XPackageDTO.XpackageType;
 import com.osgifx.console.agent.dto.XServiceInfoDTO;
+import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
+import com.osgifx.console.agent.provider.BundleStartTimeCalculator.BundleStartDuration;
 
 public class XBundleAdmin {
 
@@ -56,30 +59,39 @@ public class XBundleAdmin {
 		throw new IllegalAccessError("Cannot be instantiated");
 	}
 
-	public static List<XBundleDTO> get(final BundleContext context) {
+	public static List<XBundleDTO> get(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
 		requireNonNull(context);
 		try {
-			return Stream.of(context.getBundles()).map(XBundleAdmin::toDTO).collect(toList());
+			return Stream.of(context.getBundles()).map(b -> XBundleAdmin.toDTO(b, bundleStartTimeCalculator)).collect(toList());
 		} catch (final Exception e) {
 			return Collections.emptyList();
 		}
 	}
 
-	public static XBundleDTO toDTO(final Bundle bundle) {
+	public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
 		final XBundleDTO dto = new XBundleDTO();
 
-		dto.id                     = bundle.getBundleId();
-		dto.state                  = findState(bundle.getState());
-		dto.symbolicName           = bundle.getSymbolicName();
-		dto.version                = bundle.getVersion().toString();
-		dto.location               = bundle.getLocation();
-		dto.category               = getHeader(bundle, Constants.BUNDLE_CATEGORY);
-		dto.isFragment             = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
-		dto.lastModified           = bundle.getLastModified();
-		dto.documentation          = getHeader(bundle, Constants.BUNDLE_DOCURL);
-		dto.vendor                 = getHeader(bundle, Constants.BUNDLE_VENDOR);
-		dto.description            = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
-		dto.startLevel             = bundle.adapt(BundleStartLevel.class).getStartLevel();
+		dto.id            = bundle.getBundleId();
+		dto.state         = findState(bundle.getState());
+		dto.symbolicName  = bundle.getSymbolicName();
+		dto.version       = bundle.getVersion().toString();
+		dto.location      = bundle.getLocation();
+		dto.category      = getHeader(bundle, Constants.BUNDLE_CATEGORY);
+		dto.isFragment    = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
+		dto.lastModified  = bundle.getLastModified();
+		dto.documentation = getHeader(bundle, Constants.BUNDLE_DOCURL);
+		dto.vendor        = getHeader(bundle, Constants.BUNDLE_VENDOR);
+		dto.description   = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
+		dto.startLevel    = bundle.adapt(BundleStartLevel.class).getStartLevel();
+		// @formatter:off
+		dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()
+                                                              .stream()
+                                                              .filter(b -> b.getSymbolicName().equals(dto.symbolicName))
+                                                              .map(BundleStartDuration::getStartedAfter)
+                                                              .map(Duration::toMillis)
+                                                              .findAny()
+                                                              .orElse(-1L);
+		// @formatter:on
 		dto.bundleRevision         = bundle.adapt(BundleRevisionDTO.class);
 		dto.exportedPackages       = getExportedPackages(bundle);
 		dto.importedPackages       = getImportedPackages(bundle);

@@ -5,7 +5,8 @@ default.startlevel                :   10
 
 # the launcher needs to be started at the end as it needs the rest of the 
 # components to be ready before application startup
-startlevels                       :   org.apache.felix.scr;startlevel=1,\
+startlevels                       :   com.osgifx.console.agent;startlevel=1,\
+                                      org.apache.felix.scr;startlevel=2,\
                                       org.eclipse.fx.ui.controls;startlevel=3
 
 -runstartlevel                    :   begin = ${default.startlevel}, step = -1, order = sortbynameversion

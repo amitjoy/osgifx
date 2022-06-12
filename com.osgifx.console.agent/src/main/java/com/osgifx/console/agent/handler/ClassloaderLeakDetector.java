@@ -45,6 +45,7 @@ import org.osgi.util.tracker.BundleTracker;
 
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 
 /**
  * A support for tracing classloader leaks which occur due to improper cleanup
@@ -96,9 +97,14 @@ public final class ClassloaderLeakDetector implements Runnable {
 	private final ReferenceQueue<ClassLoader> queue       = new ReferenceQueue<>();
 	private final Map<Long, BundleInfo>       bundleInfos = new ConcurrentHashMap<>();
 
-	private BundleContext         context;
-	private Thread                referencePoller;
-	private BundleTracker<Bundle> bundleTracker;
+	private BundleContext                   context;
+	private Thread                          referencePoller;
+	private BundleTracker<Bundle>           bundleTracker;
+	private final BundleStartTimeCalculator bundleStartTimeCalculator;
+
+	public ClassloaderLeakDetector(final BundleStartTimeCalculator bundleStartTimeCalculator) {
+		this.bundleStartTimeCalculator = bundleStartTimeCalculator;
+	}
 
 	public void start(final BundleContext context) {
 		this.context = context;
@@ -187,7 +193,7 @@ public final class ClassloaderLeakDetector implements Runnable {
 
 	private XBundleDTO toDTO(final BundleInfo bundleInfo) {
 		final Bundle bundle = context.getBundle(bundleInfo.bundleId);
-		return XBundleAdmin.toDTO(bundle);
+		return XBundleAdmin.toDTO(bundle, bundleStartTimeCalculator);
 	}
 
 	private static class BundleInfo {
