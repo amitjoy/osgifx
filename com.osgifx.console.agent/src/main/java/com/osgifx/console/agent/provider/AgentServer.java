@@ -17,6 +17,7 @@ package com.osgifx.console.agent.provider;
 
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
+import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
 
@@ -745,7 +746,7 @@ public final class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
-	public void sendEvent(final String topic, final List<ConfigValue> properties) {
+	public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
 		requireNonNull(topic, "Event topic cannot be null");
 		requireNonNull(properties, "Event properties cannot be null");
 
@@ -755,14 +756,16 @@ public final class AgentServer implements Agent, Closeable {
 			try {
 				final Map<String, Object> finalProperties = parseProperties(properties);
 				eventAdmin.sendEvent(topic, finalProperties);
+				return createResult(SUCCESS, "Event has been sent successfully");
 			} catch (final Exception e) {
-				throw new RuntimeException(e);
+				return createResult(ERROR, "Event could not be sent successfully");
 			}
 		}
+		return createResult(SKIPPED, "EventAdmin bundle is not installed to process this request");
 	}
 
 	@Override
-	public void postEvent(final String topic, final List<ConfigValue> properties) {
+	public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
 		requireNonNull(topic, "Event topic cannot be null");
 		requireNonNull(properties, "Event properties cannot be null");
 
@@ -772,10 +775,12 @@ public final class AgentServer implements Agent, Closeable {
 			try {
 				final Map<String, Object> finalProperties = parseProperties(properties);
 				eventAdmin.postEvent(topic, finalProperties);
+				return createResult(SUCCESS, "Event has been sent successfully");
 			} catch (final Exception e) {
-				throw new RuntimeException(e);
+				return createResult(ERROR, "Event could not be sent successfully");
 			}
 		}
+		return createResult(SKIPPED, "EventAdmin bundle is not installed to process this request");
 	}
 
 	@Override
