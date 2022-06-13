@@ -103,23 +103,36 @@ public final class GraphFxComponentController {
 		try {
 			addExportToDotContextMenu();
 			initComponentsList();
-			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen"));
+			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen-component"));
 			progressPane = new MaskerPane();
-			strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-			wiringSelection.getItems().addAll("Find all components that are required by", "Find all component cycles");
-			wiringSelection.getSelectionModel().select(0);
-			wiringSelection.getSelectionModel().selectedIndexProperty()
-			        .addListener((ChangeListener<Number>) (observable, oldValue, newValue) -> {
-				        final var condition = newValue.intValue() == 1;
-
-				        searchText.setDisable(condition);
-				        componentsList.setDisable(condition);
-				        componentsList.getCheckModel().clearChecks();
-			        });
+			initStrategyButton();
+			initWiringSelection();
 			logger.atDebug().log("FXML controller has been initialized");
 		} catch (final Exception e) {
 			logger.atError().withException(e).log("FXML controller could not be initialized");
 		}
+	}
+
+	private void initStrategyButton() {
+		strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
+		strategyButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+			if (newVal == null) {
+				oldVal.setSelected(true);
+			}
+		});
+	}
+
+	private void initWiringSelection() {
+		wiringSelection.getItems().addAll("Find all components that are required by", "Find all component cycles");
+		wiringSelection.getSelectionModel().select(0);
+		wiringSelection.getSelectionModel().selectedIndexProperty()
+		        .addListener((ChangeListener<Number>) (observable, oldValue, newValue) -> {
+			        final var condition = newValue.intValue() == 1;
+
+			        searchText.setDisable(condition);
+			        componentsList.setDisable(condition);
+			        componentsList.getCheckModel().clearChecks();
+		        });
 	}
 
 	@PreDestroy

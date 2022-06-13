@@ -108,12 +108,21 @@ public final class HealthCheckFxController {
 			initHcList();
 			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "hc-executor"));
 			progressPane = new MaskerPane();
-			hcTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
 			logger.atDebug().log("FXML controller has been initialized");
+			initHcTypeButton();
 			initButtons();
 		} catch (final Exception e) {
 			logger.atError().withException(e).log("FXML controller could not be initialized");
 		}
+	}
+
+	private void initHcTypeButton() {
+		hcTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
+		hcTypeButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+			if (newVal == null) {
+				oldVal.setSelected(true);
+			}
+		});
 	}
 
 	private void initButtons() {
