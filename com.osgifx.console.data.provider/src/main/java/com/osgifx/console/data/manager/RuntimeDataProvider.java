@@ -22,6 +22,7 @@ import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.data.supplier.HealthChecksInfoSupplier.HEALTHCHECKS_ID;
 import static com.osgifx.console.data.supplier.HttpComponentsInfoSupplier.HTTP_ID;
 import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
+import static com.osgifx.console.data.supplier.LoggerContextsInfoSupplier.LOGGER_CONTEXTS_ID;
 import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
 import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
@@ -49,6 +50,7 @@ import org.osgi.service.event.EventAdmin;
 
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -178,6 +180,11 @@ public final class RuntimeDataProvider implements DataProvider {
 	@Override
 	public ObservableList<XRoleDTO> roles() {
 		return (ObservableList<XRoleDTO>) getData(ROLES_ID);
+	}
+
+	@Override
+	public ObservableList<XBundleLoggerContextDTO> loggerContexts() {
+		return (ObservableList<XBundleLoggerContextDTO>) getData(LOGGER_CONTEXTS_ID);
 	}
 
 	@Override

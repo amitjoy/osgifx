@@ -45,7 +45,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
-public final class LogsFxController {
+public final class LogsViewFxController {
 
 	@Log
 	@Inject
@@ -81,7 +81,7 @@ public final class LogsFxController {
 	}
 
 	private void createControls() {
-		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-logs.fxml");
 		final var controller     = (LogDetailsFxController) loader.getController();
 		final var expanderColumn = new TableRowExpanderColumn<XLogEntryDTO>(current -> {
 										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
