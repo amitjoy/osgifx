@@ -405,16 +405,20 @@ public interface Agent {
 	 *
 	 * @param topic      topic of the event to be published
 	 * @param properties data to be published with the event
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
 	 */
-	void sendEvent(String topic, List<ConfigValue> properties);
+	XResultDTO sendEvent(String topic, List<ConfigValue> properties);
 
 	/**
 	 * Publish event asynchronously ((this method returns immediately))
 	 *
 	 * @param topic      topic of the event to be published
 	 * @param properties data to be published with the event
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
 	 */
-	void postEvent(String topic, List<ConfigValue> properties);
+	XResultDTO postEvent(String topic, List<ConfigValue> properties);
 
 	/**
 	 * Returns the memory information of the remote system

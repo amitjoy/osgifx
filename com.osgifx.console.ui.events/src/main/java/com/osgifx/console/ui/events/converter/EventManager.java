@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.osgifx.console.agent.dto.ConfigValue;
+import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = EventManager.class)
@@ -39,24 +40,22 @@ public final class EventManager {
 		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 	}
 
-	public boolean sendEvent(final String topic, final List<ConfigValue> properties) {
+	public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
 		final var agent = supervisor.getAgent();
 		if (agent == null) {
 			logger.atWarning().log("Remote agent cannot be connected");
-			return false;
+			return null;
 		}
-		agent.sendEvent(topic, properties);
-		return true;
+		return agent.sendEvent(topic, properties);
 	}
 
-	public boolean postEvent(final String topic, final List<ConfigValue> properties) {
+	public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
 		final var agent = supervisor.getAgent();
 		if (agent == null) {
 			logger.atWarning().log("Remote agent cannot be connected");
-			return false;
+			return null;
 		}
-		agent.postEvent(topic, properties);
-		return true;
+		return agent.postEvent(topic, properties);
 	}
 
 }

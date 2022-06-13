@@ -29,6 +29,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
+import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.ui.events.converter.EventManager;
 import com.osgifx.console.ui.events.dialog.SendEventDialog;
 import com.osgifx.console.util.fx.Fx;
@@ -73,21 +74,33 @@ public final class SendEventHandler {
 							return null;
 						}
 
-						boolean result;
+						XResultDTO result;
 						if (isSync) {
 							result = eventManager.sendEvent(topic, properties);
 						} else {
 							result = eventManager.postEvent(topic, properties);
 						}
-						if (result) {
-							threadSync.asyncExec(
-							        () -> Fx.showSuccessNotification("Send Event", "Event successfully sent successfully to " + topic));
-							logger.atInfo().log("Event successfully sent successfully to %s", topic);
-						} else {
-							threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", "Event cannot be sent to " + topic));
+						if (result == null) {
+							return null;
+						}
+						switch (result.result) {
+						case XResultDTO.SUCCESS:
+							threadSync.asyncExec(() -> Fx.showSuccessNotification("Send Event", result.response));
+							logger.atInfo().log("Event sent successfully to '%s'", topic);
+							break;
+						case XResultDTO.ERROR:
+							threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
+							logger.atError().log("Event could not be sent to '%s'", topic);
+							break;
+						case XResultDTO.SKIPPED:
+							threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
+							logger.atError().log("Event could not be sent to '%s' because %s", topic, result.response);
+							break;
+						default:
+							break;
 						}
 					} catch (final Exception e) {
-						logger.atError().withException(e).log("Event cannot be sent");
+						logger.atError().withException(e).log("Event could not be sent");
 						threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
 					}
 					return null;
