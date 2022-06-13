@@ -59,10 +59,19 @@ public final class StarterFxController {
 
 	@FXML
 	public void initialize() {
-		logsActionTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
+		initLogsActionTypeButton();
 		initButtons();
 		showLogEvents();
 		logger.atDebug().log("FXML controller has been initialized");
+	}
+
+	private void initLogsActionTypeButton() {
+		logsActionTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
+		logsActionTypeButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+			if (newVal == null) {
+				oldVal.setSelected(true);
+			}
+		});
 	}
 
 	private void initButtons() {
