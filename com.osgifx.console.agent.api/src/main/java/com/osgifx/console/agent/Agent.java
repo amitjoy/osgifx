@@ -124,7 +124,8 @@ public interface Agent {
 	 * @param data       The byte array instances from which the bundle will be read
 	 *                   (cannot be {@code null})
 	 * @param startLevel the start level of the bundles
-	 * @return A Bundle DTO (cannot be {@code null})
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
 	 */
 	XResultDTO installWithMultipleData(Collection<byte[]> data, int startLevel);
 
@@ -137,7 +138,7 @@ public interface Agent {
 	 * </p>
 	 *
 	 * @param location the bundle location
-	 * @param url      url of the bundle that can retrived using url.openStream()
+	 * @param url      url of the bundle that can retrieved using url.openStream()
 	 * @return A bundle DTO
 	 */
 	BundleDTO installFromURL(String location, String url) throws Exception;
