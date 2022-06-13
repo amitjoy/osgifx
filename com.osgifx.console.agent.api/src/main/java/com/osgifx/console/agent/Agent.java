@@ -27,6 +27,7 @@ import org.osgi.framework.dto.BundleDTO;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -284,6 +285,17 @@ public interface Agent {
 	XResultDTO updateDmtNode(String uri, Object value, DmtDataType format);
 
 	/**
+	 * Updates the logger context of the specified bundle
+	 *
+	 * @param bsn       the bundle symbolic name denoting the name of the logger
+	 *                  context
+	 * @param logLevels the log levels to update
+	 * @return the detailed information about the operation whether it succeeded or
+	 *         failed
+	 */
+	XResultDTO updateBundleLoggerContext(String bsn, Map<String, String> logLevels);
+
+	/**
 	 * Enables the component description by name
 	 *
 	 * @param name The name of the component description to enable.
@@ -509,6 +521,13 @@ public interface Agent {
 	 * @return the list of all HTTP components
 	 */
 	List<XHttpComponentDTO> getHttpComponents();
+
+	/**
+	 * Returns the bundle logger contexts (only valid for OSGi R7)
+	 *
+	 * @return the list of all bundle logger contexts
+	 */
+	List<XBundleLoggerContextDTO> getBundleLoggerContexts();
 
 	/**
 	 * Returns the heap usage information

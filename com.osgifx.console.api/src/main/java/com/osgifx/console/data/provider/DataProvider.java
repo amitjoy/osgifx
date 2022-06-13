@@ -18,6 +18,7 @@ package com.osgifx.console.data.provider;
 import org.osgi.annotation.versioning.ProviderType;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -142,6 +143,13 @@ public interface DataProvider {
 	 * @return the observable list of all roles
 	 */
 	ObservableList<XRoleDTO> roles();
+
+	/**
+	 * Returns the different logger contexts
+	 *
+	 * @return the observable list of all logger contexts
+	 */
+	ObservableList<XBundleLoggerContextDTO> loggerContexts();
 
 	/**
 	 * Returns the memory information of the remote runtime
