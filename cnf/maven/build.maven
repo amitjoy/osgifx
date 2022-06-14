@@ -45,7 +45,7 @@ org.osgi:org.osgi.service.dmt:2.0.2
 org.osgi:org.osgi.service.event:1.4.1
 org.osgi:org.osgi.service.http:1.2.2
 org.osgi:org.osgi.service.http.whiteboard:1.1.1
-org.osgi:org.osgi.service.log:1.4.0
+org.osgi:org.osgi.service.log:1.5.0
 org.osgi:org.osgi.service.metatype:1.4.1
 org.osgi:org.osgi.service.metatype.annotations:1.4.1
 org.osgi:org.osgi.service.useradmin:1.1.1
@@ -60,7 +60,7 @@ org.osgi:osgi.enroute.junit.wrapper:4.12.0
 
 net.bytebuddy:byte-buddy:1.12.10
 net.bytebuddy:byte-buddy-agent:1.12.10
-org.assertj:assertj-core:3.22.0
+org.assertj:assertj-core:3.23.1
 org.awaitility:awaitility:4.2.0
 
 # TilesFx
