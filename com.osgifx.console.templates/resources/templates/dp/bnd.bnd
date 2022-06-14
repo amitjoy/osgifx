@@ -1,0 +1,13 @@
+-export             : dp.bndrun;\
+                           type             =  "osgi.dp.exporter";\
+                           symbolicName     =  "osgi.fx.extension.sample";\
+                           version          =  "1.0.0";\
+                           name             =  "Sample OSGi.fx Deployment Package";\
+                           copyright        =  "Copyright (c) Developer Name <Year>. All Rights Reserved.";\
+                           contact          =  "developer@email.com";\
+                           description      =  "A sample extension for OSGi.fx";\
+                           docURL           =  "https://osgifx.com";\
+                           icon             =  "icons/icon.png";\
+                           vendor           =  "OSGi.fx";\
+                           license          =  "https://www.apache.org/licenses/LICENSE-2.0.txt";\
+                           output           =  "sample-extension.dp";

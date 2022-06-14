@@ -1,0 +1,7 @@
+-privatepackage    : $basePackageName$
+javac.source       : 1.8
+javac.target       : \${javac.source}
+javac.compliance   : \${javac.source}
+-noimportjava      : true
+-testpath          : osgi.enroute.junit.wrapper,\
+                     osgi.enroute.hamcrest.wrapper 
