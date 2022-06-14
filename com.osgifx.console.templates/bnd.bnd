@@ -1,0 +1,31 @@
+-resourceonly      : true
+-includeresource   : help, resources
+icon               : data:image/gif;base64,${base64;icons/icon.gif}
+category           : OSGi.fx Templates
+Bundle-Name        : OSGi.fx Project Templates
+Provide-Capability : ${templates}
+
+templates: \
+	org.bndtools.template; \
+		org.bndtools.template   =  project; \
+		name                    =  UI Extension; \
+		category                =  ${category}; \
+		dir                     =  templates/ui; \
+		icon                    =  "${icon}"; \
+		help                    =  ui-help.xml, \
+	\
+	org.bndtools.template; \
+		org.bndtools.template   =  project; \
+		name                    =  Agent Extension; \
+		category                =  ${category}; \
+		dir                     =  templates/agent; \
+		icon                    =  "${icon}"; \
+		help                    =  agent-help.xml, \
+	\
+	org.bndtools.template; \
+		org.bndtools.template   =  project; \
+		name                    =  Deployment Package; \
+		category                =  ${category}; \
+		dir                     =  templates/dp; \
+		icon                    =  "${icon}"; \
+		help                    =  dp-help.xml
