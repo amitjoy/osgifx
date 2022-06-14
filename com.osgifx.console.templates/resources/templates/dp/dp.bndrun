@@ -1,0 +1,8 @@
+# the 'distro' provides all the requirements and capabilities of the complete default runtime, hence,
+# resolving against the distro will only look for dependencies which only your feature requires
+-distro         : com.osgifx.console.runtime
+
+# only add the leaf feature bundle here which will be used to pull in other dependencies it requires
+-runrequires    : bnd.identity;id='my.sample.ui.bundle'
+
+# resolve this bndrun
