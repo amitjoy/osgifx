@@ -1,11 +1,11 @@
-# the 'distro' provides all the requirements and capabilities of the complete default runtime, hence,
-# resolving against the distro will only look for dependencies which only your feature requires
+# the 'distro' provides all the capabilities of the OSGi.fx runtime, hence, resolving against the distro will
+# only pull in all the dependencies which only your extension requires
 -distro         : com.osgifx.console.runtime
 
-# only add the leaf feature bundle here which will be used to pull in other dependencies it requires
+# only add the leaf extension bundle here which will be used to pull in other dependencies it requires
 -runrequires    : bnd.identity;id='com.osgifx.console.extension.ui.tictactoe'
 
-# the following is automatically generated due to resolve operation
--runbundles: \
+# the following is automatically generated due to the resolve operation
+-runbundles     : \
 	com.osgifx.console.extension.ui.tictactoe;version=snapshot,\
 	com.osgifx.console.wrapper.grid;version=snapshot
