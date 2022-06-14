@@ -341,20 +341,6 @@ public interface Agent {
 	XResultDTO disableComponentById(long id);
 
 	/**
-	 * Creates or updates the associated {@code Configuration} object with the
-	 * specified properties.
-	 * <p>
-	 * Note that, this is only possible if the remote runtime has ConfigAdmin (CM)
-	 * bundle installed.
-	 *
-	 * @param pid           the configuration PID to update
-	 * @param newProperties the new properties to associate
-	 * @return the detailed information about the operation whether it succeeded or
-	 *         failed
-	 */
-	XResultDTO createOrUpdateConfiguration(String pid, Map<String, Object> newProperties);
-
-	/**
 	 * Creates or updates the associated {@code Configuration} objects with the
 	 * specified properties.
 	 * <p>
