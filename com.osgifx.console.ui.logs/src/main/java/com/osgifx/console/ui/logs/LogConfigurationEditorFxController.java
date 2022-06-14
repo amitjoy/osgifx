@@ -22,6 +22,7 @@ import static com.osgifx.console.event.topics.LoggerContextActionEventTopics.LOG
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,6 +30,7 @@ import javax.inject.Named;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.service.log.LogLevel;
 
 import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.Field;
@@ -136,9 +138,9 @@ public final class LogConfigurationEditorFxController {
 	}
 
 	private List<Field<?>> initGenericFields(final XBundleLoggerContextDTO loggerContext) {
+		final var      rootLogLevel      = Optional.ofNullable(loggerContext.rootLogLevel).map(LogLevel::name).orElse("<NOT SET>");
 		final Field<?> nameField         = Field.ofStringType(loggerContext.name).label("Name").editable(false);
-		final Field<?> rootLogLevelField = Field.ofStringType(loggerContext.rootLogLevel.name()).label("Global Root Log Level")
-		        .editable(false);
+		final Field<?> rootLogLevelField = Field.ofStringType(rootLogLevel).label("Global Root Log Level").editable(false);
 
 		return Lists.newArrayList(nameField, rootLogLevelField);
 	}
