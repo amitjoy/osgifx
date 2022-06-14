@@ -22,15 +22,18 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -51,12 +54,24 @@ public final class HealthCheckFxUI {
 	@Inject
 	private ConsoleStatusBar  statusBar;
 	@Inject
+	@Named("is_connected")
+	private boolean           isConnected;
+	@Inject
+	private DataProvider      dataProvider;
+	@Inject
 	private ConsoleMaskerPane progressPane;
 
 	@PostConstruct
 	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
 		createControls(parent, loader);
 		logger.atDebug().log("Healthcheck part has been initialized");
+	}
+
+	@Focus
+	public void onFocus() {
+		if (isConnected) {
+			dataProvider.retrieveInfo("healthchecks", true);
+		}
 	}
 
 	@Inject
