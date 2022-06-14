@@ -66,13 +66,8 @@ public class XLoggerAdmin {
 			final XBundleLoggerContextDTO bundleLoggerContext = new XBundleLoggerContextDTO();
 
 			bundleLoggerContext.name         = bsn;
-			bundleLoggerContext.rootLogLevel = loggerAdmin.getLoggerContext(null).getLogLevels().get(ROOT_LOGGER_NAME).name();
-			// @formatter:off
-			bundleLoggerContext.logLevels = loggerContext.getLogLevels()
-					                                     .entrySet()
-					                                     .stream()
-                                                         .collect(toMap(Map.Entry::getKey, e -> e.getValue().name()));
-			// @formatter:on
+			bundleLoggerContext.rootLogLevel = loggerAdmin.getLoggerContext(null).getLogLevels().get(ROOT_LOGGER_NAME);
+			bundleLoggerContext.logLevels    = loggerContext.getLogLevels();
 			loggerContexts.add(bundleLoggerContext);
 		}
 		return loggerContexts;

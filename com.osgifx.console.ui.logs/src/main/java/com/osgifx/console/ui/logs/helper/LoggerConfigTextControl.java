@@ -13,15 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.configurations;
+package com.osgifx.console.ui.logs.helper;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.osgi.service.log.LogLevel;
 
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.osgifx.console.agent.dto.XAttributeDefType;
-import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
+import com.osgifx.console.ui.logs.dialog.LoggerConfigurationDialog;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
@@ -32,7 +33,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-public final class MultipleCardinalityTextControl extends SimpleControl<StringField> {
+public final class LoggerConfigTextControl extends SimpleControl<StringField> {
 
 	/**
 	 * This StackPane is needed for achieving the readonly effect by putting the
@@ -49,16 +50,6 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 	protected TextArea  editableArea;
 	protected Label     readOnlyLabel;
 	protected Label     fieldLabel;
-
-	private final String            key;
-	private final XAttributeDefType type;
-	private final ClassLoader       classLoader;
-
-	public MultipleCardinalityTextControl(final String key, final XAttributeDefType type) {
-		this.key    = key;
-		this.type   = type;
-		classLoader = getClass().getClassLoader();
-	}
 
 	@Override
 	public void initializeParts() {
@@ -79,19 +70,12 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 		editableField.setPromptText(field.placeholderProperty().getValue());
 
 		editableArea.setOnMouseClicked(event -> {
-			final var dialog = new MultipleCardinalityPropertiesDialog();
-			if (!Strings.isNullOrEmpty(key.trim())) {
-				final var currentValue         = field.getValue();
-				final var splitByLineSeparator = Splitter.on(System.lineSeparator()).splitToList(currentValue);
-				final var joinedValue          = Joiner.on(",").join(splitByLineSeparator);
-				dialog.init(key, type, joinedValue, classLoader);
+			final var dialog = new LoggerConfigurationDialog();
+			final var ll     = prepareLogLevels(LogsHelper.prepareKeyValuePairs(editableArea.getText()));
+			dialog.init(ll);
 
-				final var entries = dialog.showAndWait();
-				if (entries.isPresent()) {
-					final var list = Splitter.on(",").splitToList(entries.get());
-					editableArea.setText(Joiner.on(System.lineSeparator()).join(list));
-				}
-			}
+			final var entries = dialog.showAndWait();
+			entries.ifPresent(editableArea::setText);
 		});
 	}
 
@@ -184,6 +168,12 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 
 		editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
 		editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
+	}
+
+	private Map<String, LogLevel> prepareLogLevels(final Map<String, String> logLevels) {
+		final Map<String, LogLevel> ll = new HashMap<>();
+		logLevels.forEach((k, v) -> ll.put(k, LogLevel.valueOf(v)));
+		return ll;
 	}
 
 }
