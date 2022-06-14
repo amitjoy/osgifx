@@ -758,34 +758,16 @@ public final class AgentServer implements Agent, Closeable {
 
 		try {
 			final Map<String, Object> finalProperties = parseProperties(newProperties);
-			return createOrUpdateConfiguration(pid, finalProperties);
+			return createOrUpdateConfig(pid, finalProperties);
 		} catch (final Exception e) {
 			return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
 		}
 	}
 
 	@Override
-	public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
-		requireNonNull(pid, "Configuration PID cannot be null");
-		requireNonNull(newProperties, "Configuration properties cannot be null");
-
-		final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
-		if (isConfigAdminAvailable) {
-			final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
-			        metatypeTracker.getService());
-			try {
-				return configAdmin.createOrUpdateConfiguration(pid, newProperties);
-			} catch (final Exception e) {
-				return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
-			}
-		}
-		return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
-	}
-
-	@Override
 	public Map<String, XResultDTO> createOrUpdateConfigurations(final Map<String, Map<String, Object>> configurations) {
 		final Map<String, XResultDTO> results = new HashMap<>();
-		configurations.forEach((k, v) -> results.put(k, createOrUpdateConfiguration(k, v)));
+		configurations.forEach((k, v) -> results.put(k, createOrUpdateConfig(k, v)));
 		return results;
 	}
 
@@ -1128,6 +1110,23 @@ public final class AgentServer implements Agent, Closeable {
 	private static boolean isWindows() {
 		final String os = System.getProperty("os.name", "generic").toLowerCase(ENGLISH);
 		return os.contains("win");
+	}
+
+	private XResultDTO createOrUpdateConfig(final String pid, final Map<String, Object> newProperties) {
+		requireNonNull(pid, "Configuration PID cannot be null");
+		requireNonNull(newProperties, "Configuration properties cannot be null");
+
+		final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
+		if (isConfigAdminAvailable) {
+			final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
+			        metatypeTracker.getService());
+			try {
+				return configAdmin.createOrUpdateConfiguration(pid, newProperties);
+			} catch (final Exception e) {
+				return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
+			}
+		}
+		return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
 	}
 
 }
