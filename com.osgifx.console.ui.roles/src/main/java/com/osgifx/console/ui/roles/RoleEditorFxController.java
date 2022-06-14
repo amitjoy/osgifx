@@ -173,14 +173,14 @@ public final class RoleEditorFxController {
 		final Field<?> propertiesField  = Field.ofStringType(RolesHelper.mapToString(props))
 				                               .multiline(true)
 				                               .label("Properties")
-				                               .render(new RolesConfigTextControl())
+				                               .render(new RolesConfigTextControl("Properties"))
 				                               .valueDescription(KV_DESCRIPTION)
 				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 
 		final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds))
 				                               .multiline(true)
 				                               .label("Credentials")
-				                               .render(new RolesConfigTextControl())
+				                               .render(new RolesConfigTextControl("Credentials"))
 				                               .valueDescription(KV_DESCRIPTION)
 				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 		// @formatter:on
