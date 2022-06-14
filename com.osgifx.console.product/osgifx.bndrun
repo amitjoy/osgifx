@@ -1,3 +1,6 @@
+# distro generation bnd cli command
+#    - bnd remote -p 1729 distro -o com.osgifx.console.runtime.jar com.osgifx.console.runtime
+
 -include                          :   ${workspace}/cnf/efx.bndrun
 
 # this is required for assigning the start levels for all inbuilt bundles
