@@ -485,7 +485,7 @@ public final class ConfigurationEditorFxController {
 			final var          control        = new MultipleCardinalityTextControl(key, adType);
 			final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
 												});
-			field = Field.ofStringType(String.join(",", convertedValue)).render(control);
+			field = Field.ofStringType(Joiner.on(lineSeparator()).join(convertedValue)).render(control).multiline(true);
 		}
 		return field;
 	}
