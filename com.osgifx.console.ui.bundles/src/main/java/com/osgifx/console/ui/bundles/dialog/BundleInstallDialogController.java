@@ -108,11 +108,12 @@ public final class BundleInstallDialogController {
 			var       success = false;
 			if (db.hasFiles()) {
 				success = true;
-				// Only get the first file from the list
+				// only get the first file from the list
 				final var file = db.getFiles().get(0);
 				threadSync.asyncExec(() -> {
 					fileChooser.setText(file.getName());
 					bundle = file;
+					bundleProperty.set(bundle);
 					fileChooser.setTooltip(new Tooltip(bundle.getName()));
 				});
 			}
