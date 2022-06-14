@@ -102,7 +102,7 @@ public final class GraphFxBundleController {
 		try {
 			addExportToDotContextMenu();
 			initBundlesList();
-			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen-bundles"));
+			executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen-bundle"));
 			progressPane = new MaskerPane();
 			initStrategyButton();
 			initWiringSelection();
