@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -69,7 +70,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.startlevel.BundleStartLevel;
+import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.FrameworkWiring;
+import org.osgi.framework.wiring.dto.BundleRevisionDTO;
+import org.osgi.resource.Capability;
+import org.osgi.resource.Requirement;
+import org.osgi.resource.dto.CapabilityDTO;
+import org.osgi.resource.dto.RequirementDTO;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
@@ -125,9 +132,10 @@ import aQute.lib.converter.TypeReference;
 @SuppressWarnings("rawtypes")
 public final class AgentServer implements Agent, Closeable {
 
-	private static final long    RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
-	private static final long    WATCHDOG_TIMEOUT = Duration.ofSeconds(30).toMillis();
-	private static final Pattern BSN_PATTERN      = Pattern.compile("\\s*([^;\\s]+).*");
+	private static final long          RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
+	private static final long          WATCHDOG_TIMEOUT = Duration.ofSeconds(30).toMillis();
+	private static final AtomicInteger sequence         = new AtomicInteger(1000);
+	private static final Pattern       BSN_PATTERN      = Pattern.compile("\\s*([^;\\s]+).*");
 
 	private Supervisor                   remote;
 	private BundleContext                context;
@@ -335,6 +343,33 @@ public final class AgentServer implements Agent, Closeable {
 	}
 
 	@Override
+	public List<BundleRevisionDTO> getBundleRevisons(final long... bundleId) throws Exception {
+
+		Bundle[] bundles;
+		if (bundleId.length == 0) {
+			bundles = context.getBundles();
+		} else {
+			bundles = new Bundle[bundleId.length];
+			for (int i = 0; i < bundleId.length; i++) {
+				bundles[i] = context.getBundle(bundleId[i]);
+				if (bundles[i] == null) {
+					throw new IllegalArgumentException("Bundle " + bundleId[i] + " does not exist");
+				}
+			}
+		}
+
+		final List<BundleRevisionDTO> revisions = new ArrayList<>(bundles.length);
+
+		for (final Bundle b : bundles) {
+			final BundleRevision    resource = b.adapt(BundleRevision.class);
+			final BundleRevisionDTO bwd      = toDTO(resource);
+			revisions.add(bwd);
+		}
+
+		return revisions;
+	}
+
+	@Override
 	public boolean redirect(final int port) throws Exception {
 		if (redirector != null) {
 			if (redirector.getPort() == port) {
@@ -428,6 +463,48 @@ public final class AgentServer implements Agent, Closeable {
 		bd.symbolicName = b.getSymbolicName();
 		bd.version      = b.getVersion() == null ? "0" : b.getVersion().toString();
 		return bd;
+	}
+
+	private BundleRevisionDTO toDTO(final BundleRevision resource) {
+		final BundleRevisionDTO brd = new BundleRevisionDTO();
+		brd.bundle       = resource.getBundle().getBundleId();
+		brd.id           = sequence.getAndIncrement();
+		brd.symbolicName = resource.getSymbolicName();
+		brd.type         = resource.getTypes();
+		brd.version      = resource.getVersion().toString();
+
+		brd.requirements = new ArrayList<>();
+
+		for (final Requirement r : resource.getRequirements(null)) {
+			brd.requirements.add(toDTO(brd.id, r));
+		}
+
+		brd.capabilities = new ArrayList<>();
+		for (final Capability c : resource.getCapabilities(null)) {
+			brd.capabilities.add(toDTO(brd.id, c));
+		}
+
+		return brd;
+	}
+
+	private RequirementDTO toDTO(final int resource, final Requirement r) {
+		final RequirementDTO rd = new RequirementDTO();
+		rd.id         = sequence.getAndIncrement();
+		rd.resource   = resource;
+		rd.namespace  = r.getNamespace();
+		rd.directives = r.getDirectives();
+		rd.attributes = r.getAttributes();
+		return rd;
+	}
+
+	private CapabilityDTO toDTO(final int resource, final Capability r) {
+		final CapabilityDTO rd = new CapabilityDTO();
+		rd.id         = sequence.getAndIncrement();
+		rd.resource   = resource;
+		rd.namespace  = r.getNamespace();
+		rd.directives = r.getDirectives();
+		rd.attributes = r.getAttributes();
+		return rd;
 	}
 
 	void cleanup(final int event) throws Exception {

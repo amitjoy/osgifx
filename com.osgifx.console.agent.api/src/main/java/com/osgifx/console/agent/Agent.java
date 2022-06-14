@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
+import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
@@ -165,8 +166,15 @@ public interface Agent {
 	 * @param id the bundle ids
 	 * @return any errors that occurred
 	 */
-
 	String uninstall(long... id) throws Exception;
+
+	/**
+	 * Returns the Bundle Revisions for the given bundle IDs. If no IDs are given,
+	 * the revisions for all bundles must be returned.
+	 *
+	 * @return the bundle revisions
+	 */
+	List<BundleRevisionDTO> getBundleRevisons(final long... bundleId) throws Exception;
 
 	/**
 	 * Redirect I/O from port. Port can be {@link #CONSOLE},
