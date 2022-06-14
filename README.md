@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300" alt="logo" src="https://user-images.githubusercontent.com/13380182/140794373-b357f431-d86b-421c-aca7-0102d85e1bc8.png" />
+  <img width="300" alt="logo" src="screenshots/logo.png" />
   <br/>
   <p align="center">An easy-to-use desktop application to manage OSGi frameworks remotely</p>
 </p>
