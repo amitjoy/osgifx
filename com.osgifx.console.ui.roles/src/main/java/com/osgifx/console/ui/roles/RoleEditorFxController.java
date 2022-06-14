@@ -37,14 +37,13 @@ import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.view.controls.SimpleCheckBoxControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.roles.helper.RolesConfigTextControl;
+import com.osgifx.console.ui.roles.helper.RolesHelper;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -171,15 +170,17 @@ public final class RoleEditorFxController {
 		final var creds = credentials == null ? Map.of() : credentials;
 
 		// @formatter:off
-		final Field<?> propertiesField  = Field.ofStringType(mapToString(props))
+		final Field<?> propertiesField  = Field.ofStringType(RolesHelper.mapToString(props))
 				                               .multiline(true)
 				                               .label("Properties")
+				                               .render(new RolesConfigTextControl())
 				                               .valueDescription(KV_DESCRIPTION)
 				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 
-		final Field<?> credentialsField = Field.ofStringType(mapToString(creds))
+		final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds))
 				                               .multiline(true)
 				                               .label("Credentials")
+				                               .render(new RolesConfigTextControl())
 				                               .valueDescription(KV_DESCRIPTION)
 				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 		// @formatter:on
@@ -209,15 +210,11 @@ public final class RoleEditorFxController {
 			if (value.isBlank()) {
 				return true;
 			}
-			prepareKeyValuePairs(value);
+			RolesHelper.prepareKeyValuePairs(value);
 			return true;
 		} catch (final Exception e) {
 			return false;
 		}
-	}
-
-	private String mapToString(final Map<?, ?> map) {
-		return Joiner.on(System.lineSeparator()).withKeyValueSeparator("=").join(map);
 	}
 
 	private XRoleDTO initNewRole(final XRoleDTO role) {
@@ -235,12 +232,12 @@ public final class RoleEditorFxController {
 
 	private Map<String, Object> initProperties() {
 		final Field<?> field = form.getFields().get(2);
-		return prepareKeyValuePairs(((DataField<?, ?, ?>) field).getValue());
+		return RolesHelper.prepareKeyValuePairs(((DataField<?, ?, ?>) field).getValue());
 	}
 
 	private Map<String, Object> initCredentials() {
 		final Field<?> field = form.getFields().get(3);
-		return prepareKeyValuePairs(((DataField<?, ?, ?>) field).getValue());
+		return RolesHelper.prepareKeyValuePairs(((DataField<?, ?, ?>) field).getValue());
 	}
 
 	private List<XRoleDTO> initBasicMembers(final XRoleDTO role) {
@@ -257,15 +254,6 @@ public final class RoleEditorFxController {
 			return null;
 		}
 		return prepareMembers(((MultiSelectionField<?>) field).getSelection());
-	}
-
-	private Map<String, Object> prepareKeyValuePairs(final Object value) {
-		final var v = value.toString();
-		if (v.isBlank()) {
-			return Map.of();
-		}
-		final var splittedMap = Splitter.on(System.lineSeparator()).trimResults().withKeyValueSeparator('=').split(v);
-		return Maps.newHashMap(splittedMap);
 	}
 
 	private List<XRoleDTO> prepareMembers(final List<? extends Object> selections) {
