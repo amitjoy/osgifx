@@ -18,6 +18,7 @@ package com.osgifx.console.ui.configurations;
 import static com.osgifx.console.agent.dto.XAttributeDefType.CHAR_ARRAY;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_DELETED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
+import static java.lang.System.lineSeparator;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -40,6 +41,7 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
@@ -449,7 +451,7 @@ public final class ConfigurationEditorFxController {
 				convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
 				});
 			}
-			field = Field.ofStringType(String.join(",", convertedValue)).render(control);
+			field = Field.ofStringType(Joiner.on(lineSeparator()).join(convertedValue)).render(control).multiline(true);
 		}
 		return field;
 	}

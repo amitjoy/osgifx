@@ -18,11 +18,12 @@ package com.osgifx.console.agent.dto;
 import java.util.Map;
 
 import org.osgi.dto.DTO;
+import org.osgi.service.log.LogLevel;
 
 public class XBundleLoggerContextDTO extends DTO {
 
-	public String              name;
-	public String              rootLogLevel;
-	public Map<String, String> logLevels;
+	public String                name;
+	public LogLevel              rootLogLevel;
+	public Map<String, LogLevel> logLevels;
 
 }

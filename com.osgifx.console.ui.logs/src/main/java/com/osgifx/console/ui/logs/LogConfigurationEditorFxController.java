@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs;
 
+import static com.dlsc.formsfx.model.validators.CustomValidator.forPredicate;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.event.topics.LoggerContextActionEventTopics.LOGGER_CONTEXT_UPDATED_EVENT_TOPIC;
@@ -33,14 +34,12 @@ import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
-import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.logs.helper.LoggerConfigTextControl;
+import com.osgifx.console.ui.logs.helper.LogsHelper;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -53,28 +52,29 @@ import javafx.scene.layout.GridPane;
 public final class LogConfigurationEditorFxController {
 
 	private static final String KV_DESCRIPTION        = "key=value pairs separated by line breaks, for example, a.b.c=WARN";
-	private static final String KV_VALIDATION_MESSAGE = "key-value pairs cannot be validated";
+	private static final String KV_VALIDATION_MESSAGE = "key=value pairs cannot be validated";
 
 	@Log
 	@Inject
-	private FluentLogger logger;
+	private FluentLogger            logger;
 	@FXML
-	private GridPane     mainPane;
+	private GridPane                mainPane;
 	@Inject
 	@Named("is_connected")
-	private boolean      isConnected;
+	private boolean                 isConnected;
 	@Inject
-	private Supervisor   supervisor;
+	private Supervisor              supervisor;
 	@Inject
-	private EventBroker  eventBroker;
+	private EventBroker             eventBroker;
 	@FXML
-	private BorderPane   rootPanel;
+	private BorderPane              rootPanel;
 	@FXML
-	private Button       cancelButton;
+	private Button                  cancelButton;
 	@FXML
-	private Button       saveLogConfigButton;
-	private Form         form;
-	private FormRenderer formRenderer;
+	private Button                  saveLogConfigButton;
+	private Form                    form;
+	private FormRenderer            formRenderer;
+	private XBundleLoggerContextDTO loggerContext;
 
 	@FXML
 	public void initialize() {
@@ -82,22 +82,23 @@ public final class LogConfigurationEditorFxController {
 	}
 
 	public void initControls(final XBundleLoggerContextDTO loggerContext) {
+		this.loggerContext = loggerContext;
 		if (formRenderer != null) {
 			rootPanel.getChildren().remove(formRenderer);
 		}
 		formRenderer = createForm(loggerContext);
-		initButtons(loggerContext);
+		initButtons();
 		rootPanel.setCenter(formRenderer);
 	}
 
-	private void initButtons(final XBundleLoggerContextDTO loggerContext) {
-		saveLogConfigButton.setOnAction(event -> saveLogConfig(loggerContext));
+	private void initButtons() {
+		saveLogConfigButton.setOnAction(event -> saveLogConfig());
 		cancelButton.setOnAction(e -> form.reset());
 		cancelButton.disableProperty().bind(form.changedProperty().not());
 		saveLogConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
 	}
 
-	private void saveLogConfig(final XBundleLoggerContextDTO loggerContext) {
+	private void saveLogConfig() {
 		final var name = loggerContext.name;
 		logger.atInfo().log("String log configuration for context '%s'", name);
 		final var result = supervisor.getAgent().updateBundleLoggerContext(name, getLogLevels());
@@ -115,7 +116,7 @@ public final class LogConfigurationEditorFxController {
 	}
 
 	private Map<String, String> getLogLevels() {
-		return prepareKeyValuePairs(((DataField<?, ?, ?>) form.getFields().get(2)).getValue());
+		return LogsHelper.prepareKeyValuePairs(((DataField<?, ?, ?>) form.getFields().get(2)).getValue());
 	}
 
 	private FormRenderer createForm(final XBundleLoggerContextDTO loggerContext) {
@@ -136,7 +137,8 @@ public final class LogConfigurationEditorFxController {
 
 	private List<Field<?>> initGenericFields(final XBundleLoggerContextDTO loggerContext) {
 		final Field<?> nameField         = Field.ofStringType(loggerContext.name).label("Name").editable(false);
-		final Field<?> rootLogLevelField = Field.ofStringType(loggerContext.rootLogLevel).label("Global Root Log Level").editable(false);
+		final Field<?> rootLogLevelField = Field.ofStringType(loggerContext.rootLogLevel.name()).label("Global Root Log Level")
+		        .editable(false);
 
 		return Lists.newArrayList(nameField, rootLogLevelField);
 	}
@@ -146,38 +148,14 @@ public final class LogConfigurationEditorFxController {
 		final var logLevels  = logLevelsX == null ? Map.of() : logLevelsX;
 
 		// @formatter:off
-		final Field<?> logLevelsField  = Field.ofStringType(mapToString(logLevels))
+		final Field<?> logLevelsField  = Field.ofStringType(LogsHelper.mapToString(logLevels))
 				                              .multiline(true)
+				                              .render(new LoggerConfigTextControl())
 				                              .label("Log Levels")
 				                              .valueDescription(KV_DESCRIPTION)
-				                              .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
+				                              .validate(forPredicate(LogsHelper::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 		// @formatter:on
 		return List.of(logLevelsField);
-	}
-
-	private String mapToString(final Map<?, ?> map) {
-		return Joiner.on(System.lineSeparator()).withKeyValueSeparator("=").join(map);
-	}
-
-	private boolean validateKeyValuePairs(final String value) {
-		try {
-			if (value.isBlank()) {
-				return true;
-			}
-			prepareKeyValuePairs(value);
-			return true;
-		} catch (final Exception e) {
-			return false;
-		}
-	}
-
-	private Map<String, String> prepareKeyValuePairs(final Object value) {
-		final var v = value.toString();
-		if (v.isBlank()) {
-			return Map.of();
-		}
-		final var splittedMap = Splitter.on(System.lineSeparator()).trimResults().withKeyValueSeparator('=').split(v);
-		return Maps.newHashMap(splittedMap);
 	}
 
 }

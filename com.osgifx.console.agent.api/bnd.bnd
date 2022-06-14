@@ -8,6 +8,7 @@ javac.compliance     : ${javac.source}
                        org.osgi.service.component.annotations,\
                        osgi.cmpn;version='6.0.0',\
                        osgi.core;version='6.0.0',\
+                       org.osgi.service.log,\
                        biz.aQute.remote.agent;packages=*,\
                        org.apache.felix.healthcheck.api
 Require-Capability   : compile
