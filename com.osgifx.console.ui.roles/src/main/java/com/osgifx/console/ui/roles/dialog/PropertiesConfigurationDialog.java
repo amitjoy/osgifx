@@ -45,11 +45,11 @@ public final class PropertiesConfigurationDialog extends Dialog<String> {
 
 	private final List<PropertiesForm> entries = Lists.newArrayList();
 
-	public void init(final Map<String, Object> properties) {
+	public void init(final String type, final Map<String, Object> properties) {
 		final var dialogPane = getDialogPane();
 
 		initStyle(StageStyle.UNDECORATED);
-		dialogPane.setHeaderText("Logger Configuration");
+		dialogPane.setHeaderText("Role " + type);
 		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 		dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/configuration.png").toString()));
 		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);

@@ -46,6 +46,12 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 	protected Label     readOnlyLabel;
 	protected Label     fieldLabel;
 
+	private final String type;
+
+	public RolesConfigTextControl(final String type) {
+		this.type = type;
+	}
+
 	@Override
 	public void initializeParts() {
 		super.initializeParts();
@@ -67,7 +73,7 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 		editableArea.setOnMouseClicked(event -> {
 			final var dialog     = new PropertiesConfigurationDialog();
 			final var properties = RolesHelper.prepareKeyValuePairs(editableArea.getText());
-			dialog.init(properties);
+			dialog.init(type, properties);
 
 			final var entries = dialog.showAndWait();
 			entries.ifPresent(editableArea::setText);
