@@ -33,8 +33,6 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
-import org.controlsfx.validation.ValidationSupport;
-import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.Triple;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -72,9 +70,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
 	@Log
 	@Inject
-	private FluentLogger            logger;
-	private final ValueConverter    converter         = new ValueConverter();
-	private final ValidationSupport validationSupport = new ValidationSupport();
+	private FluentLogger         logger;
+	private final ValueConverter converter = new ValueConverter();
 
 	private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> configurationEntries = Maps
 	        .newHashMap();
@@ -90,7 +87,6 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
 		final var txtPid = (CustomTextField) TextFields.createClearableTextField();
-		validationSupport.registerValidator(txtPid, Validator.createEmptyValidator("Invalid PID"));
 		txtPid.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
 
 		final var txtFactoryPid = (CustomTextField) TextFields.createClearableTextField();
@@ -136,9 +132,6 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 			final var data = dialogButton == null ? null : dialogButton.getButtonData();
 			try {
 				if (data == ButtonData.OK_DONE) {
-					if (validationSupport.isInvalid()) {
-						throw new RuntimeException("Validation for configuration creation failed");
-					}
 					return getInput(txtPid, txtFactoryPid);
 				}
 				return null;
