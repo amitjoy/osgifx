@@ -175,11 +175,11 @@ public final class GraphFxComponentController {
 		componentsList.setCellFactory(param -> new CheckBoxListCell<>(componentsList::getItemBooleanProperty) {
 			@Override
 			public void updateItem(final XComponentDTO component, final boolean empty) {
-				super.updateItem(component, empty);
+				threadSync.asyncExec(() -> super.updateItem(component, empty));
 				if (empty || component == null) {
-					setText(null);
+					threadSync.asyncExec(() -> setText(null));
 				} else {
-					setText(component.name);
+					threadSync.asyncExec(() -> setText(component.name));
 				}
 			}
 		});
