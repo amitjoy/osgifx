@@ -23,9 +23,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -35,6 +37,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -60,7 +63,12 @@ public final class GraphFxUI {
 	@Inject
 	private ThreadSynchronize             threadSync;
 	@Inject
+	@Named("is_connected")
+	private boolean                       isConnected;
+	@Inject
 	private EPartService                  partService;
+	@Inject
+	private DataProvider                  dataProvider;
 	@Inject
 	private ConsoleMaskerPane             progressPane;
 	private final AtomicReference<String> loadedType = new AtomicReference<>();
@@ -72,6 +80,14 @@ public final class GraphFxUI {
 	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
 		createControls(parent, loader);
 		logger.atDebug().log("Graph part has been initialized");
+	}
+
+	@Focus
+	public void onFocus() {
+		if (isConnected) {
+			dataProvider.retrieveInfo("bundles", true);
+			dataProvider.retrieveInfo("components", true);
+		}
 	}
 
 	@Inject
