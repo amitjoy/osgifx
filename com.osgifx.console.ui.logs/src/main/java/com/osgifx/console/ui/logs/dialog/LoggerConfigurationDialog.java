@@ -53,7 +53,7 @@ public final class LoggerConfigurationDialog extends Dialog<String> {
 		final var dialogPane = getDialogPane();
 
 		initStyle(StageStyle.UNDECORATED);
-		dialogPane.setHeaderText("Logger Configuration");
+		dialogPane.setHeaderText("Logger Context Configuration");
 		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 		dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/configuration.png").toString()));
 		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);

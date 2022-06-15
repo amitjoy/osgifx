@@ -25,7 +25,7 @@
 <?import org.controlsfx.control.SegmentedButton?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<SplitPane dividerPositions="0.27728285077951004" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.graph.GraphFxComponentController">
+<SplitPane dividerPositions="0.27728285077951004" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.graph.GraphFxComponentController">
    <items>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>

@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.controlsfx.control.ListSelectionView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" fx:controller="com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialogController" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" fx:controller="com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialogController" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
    <center>
       <ListSelectionView fx:id="artifactsList" BorderPane.alignment="CENTER" />
    </center>
