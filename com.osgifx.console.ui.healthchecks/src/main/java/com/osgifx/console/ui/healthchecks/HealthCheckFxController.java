@@ -295,10 +295,12 @@ public final class HealthCheckFxController {
 	@Optional
 	private void onUnderlyingDataUpdate(@EventTopic(DATA_RETRIEVED_HEALTHCHECKS_TOPIC) final String data) {
 		if (nameHcButton.isSelected()) {
-			initNames();
+			threadSync.syncExec(this::initNames);
 		} else {
-			tagHcButton.setSelected(true);
-			initTags();
+			threadSync.syncExec(() -> {
+				tagHcButton.setSelected(true);
+				initTags();
+			});
 		}
 	}
 
