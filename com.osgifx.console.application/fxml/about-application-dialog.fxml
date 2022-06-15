@@ -26,7 +26,7 @@
 <?import javafx.scene.text.Text?>
 <?import org.controlsfx.control.HyperlinkLabel?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="400.0" style="-fx-font-size: 10pt;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.application.fxml.controller.AboutApplicationDialogController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="400.0" style="-fx-font-size: 10pt;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.application.fxml.controller.AboutApplicationDialogController">
    <children> 
       <GridPane layoutY="69.0" prefHeight="225.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
