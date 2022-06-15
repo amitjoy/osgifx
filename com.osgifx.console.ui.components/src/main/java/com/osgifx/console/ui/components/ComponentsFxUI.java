@@ -70,7 +70,7 @@ public final class ComponentsFxUI {
 	@Focus
 	public void onFocus() {
 		if (isConnected) {
-			dataProvider.retrieveInfo("components", true);
+			refreshData();
 		}
 	}
 
@@ -116,8 +116,23 @@ public final class ComponentsFxUI {
 		};
 		parent.getChildren().clear();
 		progressPane.addTo(parent);
-		statusBar.addTo(parent);
+		initStatusBar(parent);
 		CompletableFuture.runAsync(task);
+	}
+
+	private void initStatusBar(final BorderPane parent) {
+		if (isConnected) {
+			final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+			statusBar.clearAllInRight();
+			statusBar.addToRight(node);
+		} else {
+			statusBar.clearAllInRight();
+		}
+		statusBar.addTo(parent);
+	}
+
+	private void refreshData() {
+		dataProvider.retrieveInfo("components", true);
 	}
 
 }

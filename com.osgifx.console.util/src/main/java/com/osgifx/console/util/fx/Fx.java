@@ -28,6 +28,7 @@ import org.osgi.framework.BundleContext;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -37,6 +38,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -201,5 +203,21 @@ public final class Fx {
 		placeholder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.POWER_OFF));
 
 		table.setPlaceholder(placeholder);
+	}
+
+	public static Node initStatusBarButton(final Runnable job, final String tooltip, final String fontawesomeGlyphID) {
+		final var glyphIcon = fontawesomeGlyphID != null ? fontawesomeGlyphID : "GEAR";
+		final var glyph     = new Glyph("FontAwesome", glyphIcon);
+		glyph.useGradientEffect();
+		glyph.useHoverEffect();
+
+		final var button = new Button("", glyph);
+		if (job != null) {
+			button.setOnMouseClicked(mouseEvent -> job.run());
+		}
+		if (tooltip != null) {
+			button.setTooltip(new Tooltip(tooltip));
+		}
+		return button;
 	}
 }
