@@ -1,7 +1,5 @@
 {
-    "bin": {
-        "osgifx": "jdeploy-bundle/jdeploy.js"
-    },
+    "bin": {"osgifx": "jdeploy-bundle/jdeploy.js"},
     "author": "Amit Kumar Mondal",
     "description": "An easy-to-use application to manage OSGi frameworks remotely",
     "main": "index.js",
@@ -32,11 +30,7 @@
     },
     "license": "Apache License, Version 2.0",
     "name": "osgifx",
-    "files": [
-        "jdeploy-bundle"
-    ],
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
+    "files": ["jdeploy-bundle"],
+    "scripts": {"test": "echo \"Error: no test specified\" && exit 1"},
     "homepage": "https://osgifx.com"
 }
