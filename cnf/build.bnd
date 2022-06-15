@@ -29,7 +29,7 @@ sonatype.url.staging                  =         ${sonatype.url}/service/local/st
 
 usr                                   =         ${env;GITHUB_ACTOR;}
 pwd                                   =         ${env;GITHUB_TOKEN;}
--connection-settings                  =         ${if;${pwd};server;-dummy};id=${github.packages.url};username=${usr};password=${pwd}, -bnd
+-connection-settings                  =         ${if;${pwd};server;-dummy};id=${github.packages.url};username=${usr};password=${pwd}}
 
 efxclipse.version                     =         3.8.0
 efxclipse.url                         =         http://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
