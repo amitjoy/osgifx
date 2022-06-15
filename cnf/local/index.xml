@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1655206083707">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1655275673496">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="license" value="http://www.eclipse.org/legal/epl-2.0, https://www.gnu.org/software/classpath/license.html"/>
@@ -261,10 +261,10 @@
       <attribute name="osgi.wiring.host" value="controlsfx"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="size" value="1378395" type="Long"/>
+      <attribute name="size" value="1378380" type="Long"/>
       <attribute name="url" value="controlsfx/controlsfx-11.1.2.jar"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
-      <attribute name="osgi.content" value="CA487876D467480F02E76BC32039CF36BE6B2FC06D64B5731836DE1EE930330A"/>
+      <attribute name="osgi.content" value="C3A7CBD0D5D2548B59B98E2E281F73FD6A9583CA24E2812D238CE8EBAA562A41"/>
     </capability>
     <requirement namespace="osgi.wiring.package">
       <directive name="filter" value="(osgi.wiring.package=com.sun.javafx.event)"/>
