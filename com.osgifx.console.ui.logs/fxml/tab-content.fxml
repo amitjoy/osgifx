@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.controlsfx.control.SegmentedButton?>
 
-<BorderPane fx:id="mainPane" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.logs.StarterFxController">
+<BorderPane fx:id="mainPane" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.logs.StarterFxController">
    <top>
 		<SegmentedButton fx:id="logsActionTypeButton" BorderPane.alignment="CENTER">
 			<BorderPane.margin>
