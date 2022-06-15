@@ -127,7 +127,7 @@ install.order                     :   \
 	org.eclipse.core.databinding.property;version='[1.9.0,1.9.1)';startlevel=10,\
 	org.eclipse.core.expressions;version='[3.6.600,3.6.601)';startlevel=10,\
 	org.eclipse.core.jobs;version='[3.13.0,3.13.1)';startlevel=10,\
-	org.eclipse.core.runtime;version='[3.17.0,3.17.1)';startlevel=10,\
+	org.eclipse.core.runtime;version='[3.25.0,3.25.1)';startlevel=10,\
 	org.eclipse.e4.core.commands;version='[1.0.100,1.0.101)';startlevel=10,\
 	org.eclipse.e4.core.contexts;version='[1.10.0,1.10.1)';startlevel=10,\
 	org.eclipse.e4.core.di;version='[1.8.200,1.8.201)';startlevel=10,\
@@ -148,7 +148,7 @@ install.order                     :   \
 	org.eclipse.equinox.common;version='[3.16.100,3.16.101)';startlevel=10,\
 	org.eclipse.equinox.console;version='[1.4.0,1.4.1)';startlevel=10,\
 	org.eclipse.equinox.event;version='[1.6.100,1.6.101)';startlevel=10,\
-	org.eclipse.equinox.preferences;version='[3.7.600,3.7.601)';startlevel=10,\
+	org.eclipse.equinox.preferences;version='[3.10.1,3.10.2)';startlevel=10,\
 	org.eclipse.equinox.registry;version='[3.11.100,3.11.101)';startlevel=10,\
 	org.eclipse.fx.core;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.fx.core.databinding;version='[3.8.0,3.8.1)';startlevel=10,\
@@ -173,5 +173,6 @@ install.order                     :   \
 	org.eclipse.fx.ui.workbench.services;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.jdt.annotation;version='[2.2.400,2.2.401)';startlevel=10,\
 	org.eclipse.osgi.services;version='[3.10.200,3.10.201)';startlevel=10,\
+	org.osgi.service.prefs;version='[1.1.2,1.1.3)';startlevel=10,\
 	org.osgi.util.function;version='[1.2.0,1.2.1)';startlevel=10,\
 	org.osgi.util.promise;version='[1.2.0,1.2.1)';startlevel=10
