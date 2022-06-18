@@ -119,7 +119,7 @@ install.order                     :   \
 	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)';startlevel=10,\
 	org.apache.felix.gogo.runtime;version='[1.1.0,1.1.1)';startlevel=10,\
 	org.apache.felix.gogo.shell;version='[1.1.0,1.1.1)';startlevel=10,\
-	org.apache.felix.scr;version='[2.2.0,2.2.1)';startlevel=10,\
+	org.apache.felix.scr;version='[2.2.2,2.2.3)';startlevel=10,\
 	org.apache.sling.commons.johnzon;version='[1.2.14,1.2.15)';startlevel=10,\
 	org.eclipse.core.commands;version='[3.10.200,3.10.201)';startlevel=10,\
 	org.eclipse.core.contenttype;version='[3.8.100,3.8.101)';startlevel=10,\
@@ -173,6 +173,7 @@ install.order                     :   \
 	org.eclipse.fx.ui.workbench.services;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.jdt.annotation;version='[2.2.400,2.2.401)';startlevel=10,\
 	org.eclipse.osgi.services;version='[3.10.200,3.10.201)';startlevel=10,\
+	org.osgi.service.component;version='[1.5.0,1.5.1)';startlevel=10,\
 	org.osgi.service.prefs;version='[1.1.2,1.1.3)';startlevel=10,\
 	org.osgi.util.function;version='[1.2.0,1.2.1)';startlevel=10,\
 	org.osgi.util.promise;version='[1.2.0,1.2.1)';startlevel=10
