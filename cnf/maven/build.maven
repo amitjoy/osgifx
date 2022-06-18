@@ -36,7 +36,6 @@ org.osgi:org.osgi.namespace.unresolvable:1.0.0
 org.osgi:org.osgi.service.application:1.1.0
 org.osgi:org.osgi.service.async:1.0.0
 org.osgi:org.osgi.service.cm:1.6.1
-org.osgi:org.osgi.service.component:1.5.0
 org.osgi:org.osgi.service.component.annotations:1.5.0
 org.osgi:org.osgi.service.configurator:1.0.1
 org.osgi:org.osgi.service.coordinator:1.0.2
@@ -66,7 +65,7 @@ org.awaitility:awaitility:4.2.0
 # TilesFx
 
 eu.hansolo:tilesfx:17.1.9
-eu.hansolo:toolbox:17.0.23
+eu.hansolo:toolbox:17.0.24
 eu.hansolo:toolboxfx:17.0.28
 
 # FormsFx
