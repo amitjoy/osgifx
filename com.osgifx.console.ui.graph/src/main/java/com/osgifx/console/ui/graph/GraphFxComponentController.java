@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
@@ -202,7 +203,8 @@ public final class GraphFxComponentController implements GraphController {
 			if (filter == null || filter.isBlank()) {
 				filteredComponentsList.setPredicate(s -> true);
 			} else {
-				filteredComponentsList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(s.name::contains));
+				filteredComponentsList
+				        .setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s.name, e)));
 			}
 		});
 		return filteredComponentsList;
