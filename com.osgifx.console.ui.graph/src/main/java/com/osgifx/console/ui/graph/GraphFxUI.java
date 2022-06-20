@@ -63,6 +63,11 @@ public final class GraphFxUI {
 	@Inject
 	private ThreadSynchronize             threadSync;
 	@Inject
+	@LocalInstance
+	private FXMLLoader                    fxmlLoader;
+	@Inject
+	private BorderPane                    parentNode;
+	@Inject
 	@Named("is_connected")
 	private boolean                       isConnected;
 	@Inject
@@ -77,8 +82,8 @@ public final class GraphFxUI {
 	private static final String COMPONENTS_GRAPH_TYPE = "Components";
 
 	@PostConstruct
-	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-		createControls(parent, loader);
+	public void postConstruct() {
+		createControls();
 		logger.atDebug().log("Graph part has been initialized");
 	}
 
@@ -92,56 +97,64 @@ public final class GraphFxUI {
 
 	@Inject
 	@Optional
-	private void updateOnAgentConnectedEvent( //
-	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
+	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
 		logger.atInfo().log("Agent connected event received");
-		createControls(parent, loader);
+		createControls();
 	}
 
 	@Inject
 	@Optional
-	private void updateOnAgentDisconnectedEvent( //
-	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
+	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
 		logger.atInfo().log("Agent disconnected event received");
-		createControls(parent, loader);
+		createControls();
 	}
 
-	private void createControls(final BorderPane parent, final FXMLLoader loader) {
-		statusBar.addTo(parent);
+	private void createControls() {
+		initStatusBar();
 		if (loadedType.get() == null) {
 			threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
 			        "/graphic/images/graph.png", type -> {
 				        final Task<Void> task = new Task<>() {
 					        @Override
 					        protected Void call() throws Exception {
-						        loadContent(parent, loader, type);
+						        loadContent(type);
 						        return null;
 					        }
 				        };
 				        CompletableFuture.runAsync(task);
 			        }, () -> partService.hidePart(part), BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE));
 		} else {
-			loadContent(parent, loader, loadedType.get());
+			loadContent(loadedType.get());
 		}
 	}
 
-	private void loadContent(final BorderPane parent, final FXMLLoader loader, final String type) {
+	private void loadContent(final String type) {
 		Node tabContent = null;
-		threadSync.asyncExec(() -> progressPane.addTo(parent));
+		threadSync.asyncExec(() -> progressPane.addTo(parentNode));
 		if (BUNDLES_GRAPH_TYPE.equalsIgnoreCase(type)) {
-			tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-bundles.fxml");
+			tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content-for-bundles.fxml");
 			loadedType.set(BUNDLES_GRAPH_TYPE);
 		} else {
-			tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content-for-components.fxml");
+			tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content-for-components.fxml");
 			loadedType.set(COMPONENTS_GRAPH_TYPE);
 		}
 		final var content = tabContent; // required for lambda as it needs to be effectively final
 		progressPane.setVisible(false);
-		threadSync.asyncExec(() -> parent.setCenter(content));
+		threadSync.asyncExec(() -> parentNode.setCenter(content));
+	}
+
+	private void initStatusBar() {
+		if (isConnected) {
+			final var node = Fx.initStatusBarButton(() -> {
+				final var controller = (GraphController) fxmlLoader.getController();
+				controller.updateModel();
+			}, "Refresh", "REFRESH");
+			statusBar.clearAllInRight();
+			statusBar.addToRight(node);
+		} else {
+			statusBar.clearAllInRight();
+		}
+		statusBar.addTo(parentNode);
 	}
 
 }

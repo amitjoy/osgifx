@@ -67,7 +67,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
-public final class GraphFxBundleController {
+public final class GraphFxBundleController implements GraphController {
 
 	@Log
 	@Inject
@@ -110,6 +110,12 @@ public final class GraphFxBundleController {
 		} catch (final Exception e) {
 			logger.atError().withException(e).log("FXML controller could not be initialized");
 		}
+	}
+
+	@Override
+	public void updateModel() {
+		threadSync.asyncExec(this::initBundlesList);
+		logger.atInfo().log("Graph bundle data model has been updated");
 	}
 
 	private void initStrategyButton() {
