@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
@@ -33,6 +34,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -52,6 +54,11 @@ public final class LogsFxUI {
 	private BundleContext     context;
 	@Inject
 	private ConsoleStatusBar  statusBar;
+	@Inject
+	@Named("is_connected")
+	private boolean           isConnected;
+	@Inject
+	private DataProvider      dataProvider;
 	@Inject
 	private ConsoleMaskerPane progressPane;
 
@@ -121,8 +128,24 @@ public final class LogsFxUI {
 		};
 		parent.getChildren().clear();
 		progressPane.addTo(parent);
-		statusBar.addTo(parent);
+		initStatusBar(parent);
 		CompletableFuture.runAsync(task);
+	}
+
+	private void initStatusBar(final BorderPane parent) {
+		if (isConnected) {
+			final var node = //
+			        Fx.initStatusBarButton( //
+			                () -> dataProvider.retrieveInfo("loggerContexts", true), //
+			                "Refresh Log Configurations", //
+			                "REFRESH");
+
+			statusBar.clearAllInRight();
+			statusBar.addToRight(node);
+		} else {
+			statusBar.clearAllInRight();
+		}
+		statusBar.addTo(parent);
 	}
 
 }
