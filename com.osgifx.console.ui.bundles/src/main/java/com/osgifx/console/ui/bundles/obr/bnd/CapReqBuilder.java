@@ -18,9 +18,7 @@ package com.osgifx.console.ui.bundles.obr.bnd;
 import static java.util.Objects.requireNonNull;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,14 +40,17 @@ import org.osgi.resource.Resource;
 import org.osgi.resource.dto.CapabilityDTO;
 import org.osgi.resource.dto.RequirementDTO;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import aQute.lib.converter.Converter;
 
 public class CapReqBuilder {
 
 	private final String              namespace;
 	private Resource                  resource;
-	private final Map<String, Object> attributes = new HashMap<>();
-	private final Map<String, String> directives = new HashMap<>();
+	private final Map<String, Object> attributes = Maps.newHashMap();
+	private final Map<String, String> directives = Maps.newHashMap();
 
 	public CapReqBuilder(final String namespace) {
 		this.namespace = requireNonNull(namespace);
@@ -290,7 +291,7 @@ public class CapReqBuilder {
 				return value;
 			}
 
-			final List<Version> osgis = new ArrayList<>();
+			final List<Version> osgis = Lists.newArrayList();
 			for (final Object m : (Collection<?>) value) {
 				osgis.add((Version) toVersions(m));
 			}

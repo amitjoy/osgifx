@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.heap;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -27,6 +26,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.fx.core.ThreadSynchronize;
 
+import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
@@ -63,7 +63,7 @@ import javafx.util.Duration;
 @Creatable
 public final class HeapMonitorPane extends BorderPane {
 
-	private final List<HeapMonitorChart> memoryUsageCharts = new ArrayList<>();
+	private final List<HeapMonitorChart> memoryUsageCharts = Lists.newArrayList();
 	private final StringProperty         totalUsedHeap     = new SimpleStringProperty();
 	private final StringProperty         gcCollectionCount = new SimpleStringProperty();
 	private final StringProperty         gcCollectionTime  = new SimpleStringProperty();
@@ -163,7 +163,7 @@ public final class HeapMonitorPane extends BorderPane {
 		uptTime.setValue(formattedUptime);
 
 		var                garbageCollectionTime = 0L;
-		final List<String> gcCollections         = new ArrayList<>();
+		final List<String> gcCollections         = Lists.newArrayList();
 		for (final XGarbageCollectorMXBean gc : agent.getHeapUsage().gcBeans) {
 			gcCollections.add(gc.name + "=" + gc.collectionCount);
 			garbageCollectionTime += gc.collectionTime;
