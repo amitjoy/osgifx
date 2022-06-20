@@ -91,6 +91,11 @@ public final class DmtFxController {
 		}
 	}
 
+	public void updateModel() {
+		threadSync.asyncExec(() -> initTree());
+		logger.atInfo().log("DMT data model has been updated");
+	}
+
 	private void initTree() {
 		final var dmtNode = dataProvider.readDmtNode(ROOT_DMT_NODE);
 		if (dmtNode == null) {
