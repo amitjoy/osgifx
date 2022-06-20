@@ -19,7 +19,6 @@ import static aQute.lib.collections.Logic.retain;
 import static java.util.Collections.unmodifiableList;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +30,8 @@ import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
+
+import com.google.common.collect.Lists;
 
 class ResourceImpl implements Resource, Comparable<Resource> {
 
@@ -51,11 +52,11 @@ class ResourceImpl implements Resource, Comparable<Resource> {
 			list.add(capability);
 		}
 		for (final Map.Entry<String, List<Capability>> entry : prepare.entrySet()) {
-			entry.setValue(unmodifiableList(new ArrayList<>(entry.getValue())));
+			entry.setValue(unmodifiableList(Lists.newArrayList(entry.getValue())));
 		}
-		allCapabilities = unmodifiableList(new ArrayList<>(capabilities));
+		allCapabilities = unmodifiableList(Lists.newArrayList(capabilities));
 		capabilityMap   = prepare;
-		locations       = null;                                           // clear so equals/hashCode can recompute
+		locations       = null;                                              // clear so equals/hashCode can recompute
 	}
 
 	@Override
@@ -75,9 +76,9 @@ class ResourceImpl implements Resource, Comparable<Resource> {
 			list.add(requirement);
 		}
 		for (final Map.Entry<String, List<Requirement>> entry : prepare.entrySet()) {
-			entry.setValue(unmodifiableList(new ArrayList<>(entry.getValue())));
+			entry.setValue(unmodifiableList(Lists.newArrayList(entry.getValue())));
 		}
-		allRequirements = unmodifiableList(new ArrayList<>(requirements));
+		allRequirements = unmodifiableList(Lists.newArrayList(requirements));
 		requirementMap  = prepare;
 	}
 

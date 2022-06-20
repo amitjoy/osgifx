@@ -15,10 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
-import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.Lists;
 
 public class VersionRange {
 
@@ -167,7 +168,7 @@ public class VersionRange {
 	}
 
 	public Iterable<Version> filter(final Iterable<Version> versions) {
-		final List<Version> list = new ArrayList<>();
+		final List<Version> list = Lists.newArrayList();
 		for (final Version v : versions) {
 			if (includes(v)) {
 				list.add(v);
