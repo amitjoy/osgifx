@@ -188,7 +188,7 @@ public final class GraphFxBundleController implements GraphController {
 		final var filteredBundlesList = new FilteredList<>(bundles, s -> true);
 		searchText.textProperty().addListener(obs -> {
 			final var filter = searchText.getText();
-			if (filter == null || filter.length() == 0) {
+			if (filter == null || filter.isBlank()) {
 				filteredBundlesList.setPredicate(s -> true);
 			} else {
 				filteredBundlesList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(s.symbolicName::contains));
