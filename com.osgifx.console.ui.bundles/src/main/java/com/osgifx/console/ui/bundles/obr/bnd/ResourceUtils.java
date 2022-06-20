@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,6 +54,8 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Namespace;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
+
+import com.google.common.collect.Lists;
 
 import aQute.bnd.osgi.Constants;
 import aQute.lib.converter.Converter;
@@ -496,7 +497,7 @@ public class ResourceUtils {
 	}
 
 	public static List<Resource> sort(final Collection<Resource> a) {
-		final List<Resource> list = new ArrayList<>(a);
+		final List<Resource> list = Lists.newArrayList(a);
 		Collections.sort(list, ResourceUtils::compareTo);
 		return list;
 	}
@@ -508,7 +509,7 @@ public class ResourceUtils {
 	 * @return a sorted set of resources
 	 */
 	public static List<Resource> sortByNameVersion(final Collection<Resource> resources) {
-		final var sorted = new ArrayList<>(resources);
+		final var sorted = Lists.newArrayList(resources);
 		Collections.sort(sorted, ResourceUtils::compareTo);
 		return sorted;
 	}

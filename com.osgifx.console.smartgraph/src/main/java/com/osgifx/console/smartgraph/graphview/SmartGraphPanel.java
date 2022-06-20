@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -89,15 +88,15 @@ public class SmartGraphPanel<V, E> extends Pane {
 	private final Map<Vertex<V>, SmartGraphVertexNode<V>>   vertexNodes;
 	private final Map<Edge<E, V>, SmartGraphEdgeBase>       edgeNodes;
 	private Map<Edge<E, V>, Tuple<Vertex<V>>>               connections;
-	private final Map<Tuple<SmartGraphVertexNode>, Integer> placedEdges = new HashMap<>();
-	private boolean                                         initialized = false;
+	private final Map<Tuple<SmartGraphVertexNode>, Integer> placedEdges = Maps.newHashMap();
+	private boolean                                         initialized;
 	private final boolean                                   edgesWithArrows;
 
 	/*
 	 * INTERACTION WITH VERTICES AND EDGES
 	 */
-	private Consumer<SmartGraphVertex<V>>  vertexClickConsumer = null;
-	private Consumer<SmartGraphEdge<E, V>> edgeClickConsumer   = null;
+	private Consumer<SmartGraphVertex<V>>  vertexClickConsumer;
+	private Consumer<SmartGraphEdge<E, V>> edgeClickConsumer;
 
 	/*
 	 * AUTOMATIC LAYOUT RELATED ATTRIBUTES

@@ -16,9 +16,9 @@
 package com.osgifx.console.smartgraph.graphview;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import com.osgifx.console.smartgraph.graph.Vertex;
 
 import javafx.geometry.Point2D;
@@ -74,7 +74,7 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
 		this.attachedLabel    = null;
 		this.isDragging       = false;
 
-		this.adjacentVertices = new HashSet<>();
+		this.adjacentVertices = Sets.newHashSet();
 
 		styleProxy = new SmartStyleProxy(this);
 		styleProxy.addStyleClass("vertex");

@@ -15,8 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.extension.tictactoe;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import eu.lestard.grid.Cell;
 import eu.lestard.grid.GridModel;
@@ -58,7 +59,7 @@ public final class GameLogic {
 	}
 
 	private void checkWin() {
-		final List<Cell<States>> diagonalOne = new ArrayList<>();
+		final List<Cell<States>> diagonalOne = Lists.newArrayList();
 		diagonalOne.add(gridModel.getCell(0, 0));
 		diagonalOne.add(gridModel.getCell(1, 1));
 		diagonalOne.add(gridModel.getCell(2, 2));
@@ -67,7 +68,7 @@ public final class GameLogic {
 			return;
 		}
 
-		final List<Cell<States>> diagonalTwo = new ArrayList<>();
+		final List<Cell<States>> diagonalTwo = Lists.newArrayList();
 		diagonalTwo.add(gridModel.getCell(2, 0));
 		diagonalTwo.add(gridModel.getCell(1, 1));
 		diagonalTwo.add(gridModel.getCell(0, 2));

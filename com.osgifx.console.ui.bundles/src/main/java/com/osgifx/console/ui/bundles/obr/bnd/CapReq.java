@@ -18,7 +18,6 @@ package com.osgifx.console.ui.bundles.obr.bnd;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,6 +25,8 @@ import org.osgi.resource.Capability;
 import org.osgi.resource.Namespace;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
+
+import com.google.common.collect.Maps;
 
 class CapReq {
 
@@ -45,8 +46,8 @@ class CapReq {
 		this.mode       = requireNonNull(mode);
 		this.namespace  = requireNonNull(namespace);
 		this.resource   = resource;
-		this.directives = unmodifiableMap(new HashMap<>(directives));
-		this.attributes = unmodifiableMap(new HashMap<>(attributes));
+		this.directives = unmodifiableMap(Maps.newHashMap(directives));
+		this.attributes = unmodifiableMap(Maps.newHashMap(attributes));
 	}
 
 	public String getNamespace() {
