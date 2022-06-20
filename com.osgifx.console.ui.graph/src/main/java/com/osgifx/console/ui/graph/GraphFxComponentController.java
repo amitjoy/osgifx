@@ -199,7 +199,7 @@ public final class GraphFxComponentController implements GraphController {
 		final var filteredComponentsList = new FilteredList<>(components, s -> true);
 		searchText.textProperty().addListener(obs -> {
 			final var filter = searchText.getText();
-			if (filter == null || filter.length() == 0) {
+			if (filter == null || filter.isBlank()) {
 				filteredComponentsList.setPredicate(s -> true);
 			} else {
 				filteredComponentsList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(s.name::contains));
