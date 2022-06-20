@@ -23,12 +23,13 @@ import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import org.osgi.resource.Resource;
+
+import com.google.common.collect.Sets;
 
 import aQute.lib.tag.Tag;
 
@@ -40,7 +41,7 @@ import aQute.lib.tag.Tag;
 public class XMLResourceGenerator {
 
 	private final Tag           repository = new Tag("repository");
-	private final Set<Resource> visited    = new HashSet<>();
+	private final Set<Resource> visited    = Sets.newHashSet();
 	private int                 indent     = 0;
 	private boolean             compress   = false;
 

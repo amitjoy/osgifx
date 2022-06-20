@@ -15,10 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public final class Table {
 
@@ -32,7 +33,7 @@ public final class Table {
 	private final List<String[]> rows;
 
 	public Table() {
-		rows = new ArrayList<>();
+		rows = Lists.newArrayList();
 		setShowVerticalLines(false);
 	}
 

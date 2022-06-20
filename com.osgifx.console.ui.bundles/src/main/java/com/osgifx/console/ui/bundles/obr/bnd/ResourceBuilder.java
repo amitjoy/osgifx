@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,8 @@ import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 import org.osgi.resource.dto.CapabilityDTO;
 import org.osgi.resource.dto.RequirementDTO;
+
+import com.google.common.collect.Lists;
 
 public class ResourceBuilder {
 	private final ResourceImpl                  resource     = new ResourceImpl();
@@ -118,11 +119,11 @@ public class ResourceBuilder {
 	}
 
 	public List<Capability> getCapabilities() {
-		return new ArrayList<>(capabilities.values());
+		return Lists.newArrayList(capabilities.values());
 	}
 
 	public List<Requirement> getRequirements() {
-		return new ArrayList<>(requirements.values());
+		return Lists.newArrayList(requirements.values());
 	}
 
 }

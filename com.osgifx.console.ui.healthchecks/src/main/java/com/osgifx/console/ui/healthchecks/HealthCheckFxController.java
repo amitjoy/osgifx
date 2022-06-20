@@ -20,7 +20,6 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +45,7 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
@@ -261,7 +261,7 @@ public final class HealthCheckFxController {
 			}
 
 			private List<Field<?>> initResultEntryFields(final XHealthCheckResultDTO result) {
-				final List<Field<?>> allResultFields = new ArrayList<>();
+				final List<Field<?>> allResultFields = Lists.newArrayList();
 
 				var i = 0;
 				for (final ResultDTO entry : result.results) {
