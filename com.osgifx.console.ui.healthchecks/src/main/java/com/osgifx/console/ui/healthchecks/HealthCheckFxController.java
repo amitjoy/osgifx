@@ -21,7 +21,6 @@ import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,11 +30,12 @@ import java.util.stream.Stream;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.EventTopic;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -45,7 +45,6 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.google.common.base.Functions;
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
@@ -133,13 +132,13 @@ public final class HealthCheckFxController {
 	private void initNames() {
 		final var metadata               = initMetadata(false);
 		final var filteredHcMetadataList = initSearchFilter(metadata);
-		hcMetadataList.setItems(filteredHcMetadataList.sorted(Comparator.comparing(Functions.identity())));
+		hcMetadataList.setItems(filteredHcMetadataList.sorted());
 	}
 
 	private void initTags() {
 		final var metadata               = initMetadata(true);
 		final var filteredHcMetadataList = initSearchFilter(metadata);
-		hcMetadataList.setItems(filteredHcMetadataList.sorted(Comparator.comparing(Functions.identity())));
+		hcMetadataList.setItems(filteredHcMetadataList);
 	}
 
 	private ObservableList<String> initMetadata(final boolean isTag) {
@@ -173,14 +172,15 @@ public final class HealthCheckFxController {
 	}
 
 	private FilteredList<String> initSearchFilter(final ObservableList<String> metadata) {
-		final var filteredMetadataList = new FilteredList<>(metadata, s -> true);
+		final var filteredMetadataList = new FilteredList<>(metadata);
 		searchText.textProperty().addListener(obs -> {
 			final var filter = searchText.getText();
-			if (filter == null || filter.length() == 0) {
+			if (filter == null || filter.isBlank()) {
 				filteredMetadataList.setPredicate(s -> true);
 			} else {
-				filteredMetadataList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(s::contains));
+				filteredMetadataList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s, e)));
 			}
+			searchText.requestFocus();
 		});
 		return filteredMetadataList;
 	}
@@ -293,14 +293,12 @@ public final class HealthCheckFxController {
 
 	@Inject
 	@Optional
-	private void onUnderlyingDataUpdate(@EventTopic(DATA_RETRIEVED_HEALTHCHECKS_TOPIC) final String data) {
+	private void onUnderlyingDataUpdate(@UIEventTopic(DATA_RETRIEVED_HEALTHCHECKS_TOPIC) final String data) {
 		if (nameHcButton.isSelected()) {
-			threadSync.syncExec(this::initNames);
+			initNames();
 		} else {
-			threadSync.syncExec(() -> {
-				tagHcButton.setSelected(true);
-				initTags();
-			});
+			tagHcButton.setSelected(true);
+			initTags();
 		}
 	}
 
