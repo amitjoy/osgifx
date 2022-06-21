@@ -50,6 +50,8 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.configurations.control.MultipleCardinalityTextControl;
+import com.osgifx.console.ui.configurations.control.PeekablePasswordControl;
 import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -322,9 +324,9 @@ public final class ConfigurationEditorFxController {
 			break;
 		case PASSWORD:
 			if (currentValue != null) {
-				field = Field.ofPasswordType(converter.convert(currentValue, String.class));
+				field = Field.ofPasswordType(converter.convert(currentValue, String.class)).render(new PeekablePasswordControl());
 			} else {
-				field = Field.ofPasswordType(converter.convert(defaultValue, String.class));
+				field = Field.ofPasswordType(converter.convert(defaultValue, String.class)).render(new PeekablePasswordControl());
 			}
 			break;
 		case CHAR:
