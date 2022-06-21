@@ -124,8 +124,11 @@ public final class HeapMonitorChart extends BorderPane {
 
 	private synchronized void updateMemoryUsage() {
 		final var memoryUsage = memoryUsageSupplier.get();
-		final var used        = memoryUsage.used / KB_CONVERSION;
-		final var max         = memoryUsage.max / KB_CONVERSION;
+		if (memoryUsage == null) {
+			return;
+		}
+		final var used = memoryUsage.used / KB_CONVERSION;
+		final var max  = memoryUsage.max / KB_CONVERSION;
 
 		counter.set(System.currentTimeMillis());
 
