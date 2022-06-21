@@ -1,5 +1,7 @@
-- Features:
+- 🚀 **Features and Enhancements**
+
 	- 
-	
-- Bugs:
+
+- 🐞 **Bug Fixes**
+
 	- 
