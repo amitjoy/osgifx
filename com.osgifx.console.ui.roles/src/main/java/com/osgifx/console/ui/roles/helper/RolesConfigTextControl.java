@@ -17,13 +17,13 @@ package com.osgifx.console.ui.roles.helper;
 
 import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.ConfigurationType.CREDENTIALS;
 
-import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog;
 import com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.ConfigurationType;
 
@@ -204,17 +204,25 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 
 		@Override
 		protected String maskText(final String txt) {
-			final var          pairs    = RolesHelper.prepareKeyValuePairs(txt);
-			final var          maskChar = "*";
-			final List<String> output   = Lists.newArrayList();
+			final var                 pairs    = RolesHelper.prepareKeyValuePairs(txt);
+			final var                 maskChar = "*";
+			final Map<String, String> output   = Maps.newHashMap();
 			pairs.forEach((k, v) -> {
-				// mask 80% of the characters
-				final var noOfChars   = (int) (v.toString().length() * .8);
-				final var maskString  = StringUtils.repeat(maskChar, noOfChars);
-				final var maskedValue = StringUtils.overlay(v.toString(), maskString, 0, noOfChars);
-				output.add(k + "=" + maskedValue);
+				int       noOfChars;
+				final var input       = v.toString();
+				final var inputLength = input.length();
+
+				// mask 80% of the characters if the string length is more than 4
+				if (inputLength <= 4) {
+					noOfChars = inputLength;
+				} else {
+					noOfChars = (int) (inputLength * .8);
+				}
+				final var mask        = StringUtils.repeat(maskChar, noOfChars);
+				final var maskedValue = StringUtils.overlay(input, mask, 0, noOfChars);
+				output.put(k, maskedValue);
 			});
-			return String.join(System.lineSeparator(), output);
+			return RolesHelper.mapToString(output);
 		}
 	}
 
