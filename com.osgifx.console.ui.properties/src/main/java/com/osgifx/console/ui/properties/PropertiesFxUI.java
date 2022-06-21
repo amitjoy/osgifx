@@ -69,7 +69,9 @@ public final class PropertiesFxUI {
 
 	@Focus
 	public void onFocus() {
-		refreshData();
+		if (isConnected) {
+			refreshData();
+		}
 	}
 
 	@Inject
