@@ -101,6 +101,7 @@ public class XUserAdmin {
 			final Dictionary          properties    = role.getProperties();
 			final Map<String, Object> newProperties = roleDTO.properties;
 			if (newProperties != null) {
+				clear(properties);
 				newProperties.forEach(properties::put);
 			}
 			// update credentials if user
@@ -108,6 +109,7 @@ public class XUserAdmin {
 				final Dictionary          credentials    = ((User) role).getCredentials();
 				final Map<String, Object> newCredentials = roleDTO.credentials;
 				if (newCredentials != null) {
+					clear(credentials);
 					newCredentials.forEach(credentials::put);
 				}
 			}
@@ -245,6 +247,11 @@ public class XUserAdmin {
 
 	private List<XRoleDTO> mergeMembers(final List<XRoleDTO> basicMembers, final List<XRoleDTO> requiredMembers) {
 		return Stream.of(basicMembers, requiredMembers).filter(Objects::nonNull).flatMap(Collection::stream).collect(toList());
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void clear(final Dictionary dictionary) {
+		Collections.list(dictionary.keys()).forEach(dictionary::remove);
 	}
 
 }
