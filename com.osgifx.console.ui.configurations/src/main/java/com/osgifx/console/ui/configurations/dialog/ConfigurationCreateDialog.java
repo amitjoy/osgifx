@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import org.controlsfx.control.ToggleSwitch;
-import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
@@ -47,6 +46,7 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
+import com.osgifx.console.util.fx.PeekablePasswordField;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -274,8 +274,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 				break;
 			case PASSWORD:
 				final var valueCaptionAsPwd = "Password Value";
-				final var pwdField = (CustomPasswordField) TextFields.createClearablePasswordField();
-				pwdField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+				final var pwdField = new PeekablePasswordField();
 				pwdField.setPromptText(valueCaptionAsPwd);
 				return pwdField;
 			case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST,

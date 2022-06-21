@@ -13,33 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.roles.helper;
-
-import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.ConfigurationType.CREDENTIALS;
-
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
+package com.osgifx.console.ui.configurations.control;
 
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
-import com.google.common.collect.Lists;
-import com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog;
-import com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.ConfigurationType;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.osgifx.console.agent.dto.XAttributeDefType;
+import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
 
-public final class RolesConfigTextControl extends SimpleControl<StringField> {
+public final class MultipleCardinalityTextControl extends SimpleControl<StringField> {
 
 	/**
 	 * This StackPane is needed for achieving the readonly effect by putting the
@@ -57,10 +50,14 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 	protected Label     readOnlyLabel;
 	protected Label     fieldLabel;
 
-	private final ConfigurationType type;
+	private final String            key;
+	private final XAttributeDefType type;
+	private final ClassLoader       classLoader;
 
-	public RolesConfigTextControl(final ConfigurationType type) {
-		this.type = type;
+	public MultipleCardinalityTextControl(final String key, final XAttributeDefType type) {
+		this.key    = key;
+		this.type   = type;
+		classLoader = getClass().getClassLoader();
 	}
 
 	@Override
@@ -74,14 +71,6 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 		editableField = new TextField(field.getValue());
 		editableArea  = new TextArea(field.getValue());
 
-		if (type == CREDENTIALS) {
-			try {
-				editableArea.setSkin(new TextAreaMaskSkin(editableArea));
-			} catch (final Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
 		editableArea.setEditable(false);
 		editableArea.setFocusTraversable(false);
 
@@ -90,12 +79,19 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 		editableField.setPromptText(field.placeholderProperty().getValue());
 
 		editableArea.setOnMouseClicked(event -> {
-			final var dialog     = new PropertiesConfigurationDialog();
-			final var properties = RolesHelper.prepareKeyValuePairs(editableArea.getText());
-			dialog.init(type, properties);
+			final var dialog = new MultipleCardinalityPropertiesDialog();
+			if (!Strings.isNullOrEmpty(key.trim())) {
+				final var currentValue         = field.getValue();
+				final var splitByLineSeparator = Splitter.on(System.lineSeparator()).splitToList(currentValue);
+				final var joinedValue          = Joiner.on(",").join(splitByLineSeparator);
+				dialog.init(key, type, joinedValue, classLoader);
 
-			final var entries = dialog.showAndWait();
-			entries.ifPresent(editableArea::setText);
+				final var entries = dialog.showAndWait();
+				if (entries.isPresent()) {
+					final var list = Splitter.on(",").splitToList(entries.get());
+					editableArea.setText(Joiner.on(System.lineSeparator()).join(list));
+				}
+			}
 		});
 	}
 
@@ -188,34 +184,6 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
 
 		editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
 		editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
-	}
-
-	private static class TextAreaMaskSkin extends TextAreaSkin {
-
-		public TextAreaMaskSkin(final TextArea textArea) throws Exception {
-			super(textArea);
-			final var field = TextAreaSkin.class.getDeclaredField("paragraphNodes");
-			field.setAccessible(true);
-			final var group = (Group) field.get(this);
-			final var text  = (Text) group.getChildren().get(0);
-			text.setText(maskText(textArea.textProperty().getValueSafe()));
-			text.textProperty().addListener(o -> text.setText(maskText(textArea.textProperty().getValueSafe())));
-		}
-
-		@Override
-		protected String maskText(final String txt) {
-			final var          pairs    = RolesHelper.prepareKeyValuePairs(txt);
-			final var          maskChar = "*";
-			final List<String> output   = Lists.newArrayList();
-			pairs.forEach((k, v) -> {
-				// mask 80% of the characters
-				final var noOfChars   = (int) (v.toString().length() * .8);
-				final var maskString  = StringUtils.repeat(maskChar, noOfChars);
-				final var maskedValue = StringUtils.overlay(v.toString(), maskString, 0, noOfChars);
-				output.add(k + "=" + maskedValue);
-			});
-			return String.join(System.lineSeparator(), output);
-		}
 	}
 
 }
