@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 import org.osgi.framework.FrameworkUtil;
@@ -38,7 +40,7 @@ public final class HeapMonitorChart extends BorderPane {
 	private static final long   KB_CONVERSION          = 1000 * 1000L;
 	private static final String MEMORY_USAGE_CHART_CSS = "css/heap.css";
 	private static final int    Y_AXIS_TICK_COUNT      = 16;
-	private static final long   MAX_MILLI              = 120_000;
+	private static final long   MAX_MILLI              = 120_000L;
 
 	private static final int         X_AXIS_TICK_UNIT = 10_000;
 	private static DateTimeFormatter FORMATTER        = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -46,20 +48,21 @@ public final class HeapMonitorChart extends BorderPane {
 	private final long startCounter;
 	private final long initialUpperBound;
 
-	private XYChart.Series<Number, Number> maxMemorySeries;
-	private XYChart.Series<Number, Number> usageSeries;
 	private NumberAxis                     xAxis;
 	private final String                   title;
+	private final AtomicLong               counter;
+	private XYChart.Series<Number, Number> usageSeries;
+	private XYChart.Series<Number, Number> maxMemorySeries;
 	private final Supplier<XMemoryUsage>   memoryUsageSupplier;
-	private long                           counter;
 
-	private boolean    firstUpdateCall = true;
-	private NumberAxis yAxis;
+	private final AtomicBoolean firstUpdateCall;
+	private NumberAxis          yAxis;
 
 	public HeapMonitorChart(final String title, final Supplier<XMemoryUsage> memoryUsageSupplier, final long startCounter) {
 		this.title               = title;
 		this.memoryUsageSupplier = memoryUsageSupplier;
-		counter                  = startCounter;
+		counter                  = new AtomicLong(startCounter);
+		firstUpdateCall          = new AtomicBoolean(true);
 		this.startCounter        = startCounter;
 		initialUpperBound        = startCounter + MAX_MILLI;
 		setCenter(createContent());
@@ -69,14 +72,18 @@ public final class HeapMonitorChart extends BorderPane {
 		final var memoryUsage = memoryUsageSupplier.get();
 		final var used        = memoryUsage.used / KB_CONVERSION;
 		final var max         = memoryUsage.max / KB_CONVERSION;
+
 		xAxis = new NumberAxis(startCounter, initialUpperBound, X_AXIS_TICK_UNIT);
+
 		final double tickSize = max / Y_AXIS_TICK_COUNT;
 		final var    rounding = 10d;
+
 		yAxis = new NumberAxis(0, Math.max(max, used), Math.round(tickSize / rounding) * rounding);
-		final var chart = new AreaChart<>(xAxis, yAxis);
-		// setup chart
+
+		final var chart             = new AreaChart<>(xAxis, yAxis);
 		final var bundle            = FrameworkUtil.getBundle(getClass());
 		final var stockLineChartCss = bundle.getResource(MEMORY_USAGE_CHART_CSS).toExternalForm();
+
 		chart.getStylesheets().add(stockLineChartCss);
 		chart.setCreateSymbols(false);
 		chart.setAnimated(false);
@@ -115,29 +122,31 @@ public final class HeapMonitorChart extends BorderPane {
 		return chart;
 	}
 
-	private void updateMemoryUsage() {
+	private synchronized void updateMemoryUsage() {
 		final var memoryUsage = memoryUsageSupplier.get();
 		final var used        = memoryUsage.used / KB_CONVERSION;
 		final var max         = memoryUsage.max / KB_CONVERSION;
-		counter = System.currentTimeMillis();
-		if (firstUpdateCall) {
-			xAxis.setLowerBound(counter);
-			firstUpdateCall = false;
+
+		counter.set(System.currentTimeMillis());
+
+		if (firstUpdateCall.get()) {
+			xAxis.setLowerBound(counter.get());
+			firstUpdateCall.set(false);
 		}
 		yAxis.setUpperBound(Math.max(used, max));
 
 		final var usedHeapSizeList = usageSeries.getData();
 		final var maxHeapSizeList  = maxMemorySeries.getData();
 
-		usedHeapSizeList.add(new XYChart.Data<>(counter, used));
-		maxHeapSizeList.add(new XYChart.Data<>(counter, max));
+		usedHeapSizeList.add(new XYChart.Data<>(counter.get(), used));
+		maxHeapSizeList.add(new XYChart.Data<>(counter.get(), max));
 
 		// if we go over upper bound, delete old data, and change the bounds
-		if (counter > initialUpperBound) {
+		if (counter.get() > initialUpperBound) {
 			final var numberNumberData = usedHeapSizeList.get(1);
 			final var secondValue      = numberNumberData.getXValue();
 			xAxis.setLowerBound(secondValue.doubleValue());
-			xAxis.setUpperBound(counter);
+			xAxis.setUpperBound(counter.get());
 			usedHeapSizeList.remove(0);
 			maxHeapSizeList.remove(0);
 
