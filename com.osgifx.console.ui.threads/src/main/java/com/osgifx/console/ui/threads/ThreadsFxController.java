@@ -33,6 +33,7 @@ import com.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.paint.Color;
 
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ThreadsFxController {
@@ -81,13 +82,17 @@ public final class ThreadsFxController {
 
 	private void initCells() {
 		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+		Fx.addCellFactory(nameColumn, b -> b.isDeadlocked, Color.RED, Color.BLACK);
+
 		idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
 		priorityColumn.setCellValueFactory(new DTOCellValueFactory<>("priority", String.class));
 		stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 		isInterruptedColumn.setCellValueFactory(new DTOCellValueFactory<>("isInterrupted", String.class));
 		isAliveColumn.setCellValueFactory(new DTOCellValueFactory<>("isAlive", String.class));
 		isDaemonColumn.setCellValueFactory(new DTOCellValueFactory<>("isDaemon", String.class));
+
 		isDeadlockedColumn.setCellValueFactory(new DTOCellValueFactory<>("isDeadlocked", String.class));
+		Fx.addCellFactory(isDeadlockedColumn, b -> b.isDeadlocked, Color.RED, Color.BLACK);
 
 		table.setItems(dataProvider.threads());
 		TableFilter.forTableView(table).lazy(true).apply();
