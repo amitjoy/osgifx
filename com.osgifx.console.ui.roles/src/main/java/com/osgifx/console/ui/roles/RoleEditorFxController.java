@@ -19,6 +19,8 @@ import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.event.topics.RoleActionEventTopics.ROLE_DELETED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.RoleActionEventTopics.ROLE_UPDATED_EVENT_TOPIC;
+import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.ConfigurationType.CREDENTIALS;
+import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.ConfigurationType.PROPERTIES;
 
 import java.util.List;
 import java.util.Map;
@@ -173,14 +175,14 @@ public final class RoleEditorFxController {
 		final Field<?> propertiesField  = Field.ofStringType(RolesHelper.mapToString(props))
 				                               .multiline(true)
 				                               .label("Properties")
-				                               .render(new RolesConfigTextControl("Properties"))
+				                               .render(new RolesConfigTextControl(PROPERTIES))
 				                               .valueDescription(KV_DESCRIPTION)
 				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 
 		final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds))
 				                               .multiline(true)
 				                               .label("Credentials")
-				                               .render(new RolesConfigTextControl("Credentials"))
+				                               .render(new RolesConfigTextControl(CREDENTIALS))
 				                               .valueDescription(KV_DESCRIPTION)
 				                               .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 		// @formatter:on

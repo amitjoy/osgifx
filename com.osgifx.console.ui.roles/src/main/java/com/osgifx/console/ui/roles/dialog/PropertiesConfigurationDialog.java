@@ -29,13 +29,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.ui.roles.helper.RolesHelper;
 import com.osgifx.console.util.fx.FxDialog;
+import com.osgifx.console.util.fx.PeekablePasswordField;
 
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -43,13 +46,19 @@ import javafx.stage.StageStyle;
 
 public final class PropertiesConfigurationDialog extends Dialog<String> {
 
+	public enum ConfigurationType {
+		PROPERTIES, CREDENTIALS
+	}
+
+	private ConfigurationType          type;
 	private final List<PropertiesForm> entries = Lists.newArrayList();
 
-	public void init(final String type, final Map<String, Object> properties) {
+	public void init(final ConfigurationType type, final Map<String, Object> properties) {
+		this.type = type;
 		final var dialogPane = getDialogPane();
 
 		initStyle(StageStyle.UNDECORATED);
-		dialogPane.setHeaderText("Role " + type);
+		dialogPane.setHeaderText("Role " + type.name().toLowerCase());
 		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 		dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/configuration.png").toString()));
 		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
@@ -100,7 +109,7 @@ public final class PropertiesConfigurationDialog extends Dialog<String> {
 		final Map<String, String> props = Maps.newHashMap();
 		for (final PropertiesForm form : entries) {
 			final var key   = form.txtKey.getText();
-			final var value = form.txtValue.getText();
+			final var value = ((TextField) form.txtValue).getText();
 			if (!key.isBlank() && !value.isBlank()) {
 				props.put(key, value);
 			}
@@ -114,7 +123,7 @@ public final class PropertiesConfigurationDialog extends Dialog<String> {
 		private final Button btnRemoveField;
 
 		private final CustomTextField txtKey;
-		private final CustomTextField txtValue;
+		private Node                  txtValue;
 
 		public PropertiesForm(final VBox parent, final String propKey, final String propValue) {
 			setAlignment(Pos.CENTER_LEFT);
@@ -126,11 +135,16 @@ public final class PropertiesConfigurationDialog extends Dialog<String> {
 			txtKey.setPromptText("Key");
 			txtKey.setText(propKey != null ? propKey : "");
 
-			txtValue = (CustomTextField) TextFields.createClearableTextField();
-			txtValue.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
-
-			txtValue.setPromptText("Value");
-			txtValue.setText(propValue != null ? propValue : "");
+			if (type == ConfigurationType.PROPERTIES) {
+				txtValue = TextFields.createClearableTextField();
+				((CustomTextField) txtValue).setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+				((CustomTextField) txtValue).setPromptText("Value");
+				((CustomTextField) txtValue).setText(propValue != null ? propValue : "");
+			} else {
+				txtValue = new PeekablePasswordField();
+				((PeekablePasswordField) txtValue).setPromptText("Value");
+				((PeekablePasswordField) txtValue).setText(propValue != null ? propValue : "");
+			}
 
 			btnAddField    = new Button();
 			btnRemoveField = new Button();
