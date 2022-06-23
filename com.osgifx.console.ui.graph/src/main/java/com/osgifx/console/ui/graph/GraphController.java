@@ -17,6 +17,12 @@ package com.osgifx.console.ui.graph;
 
 public interface GraphController {
 
+	enum Type {
+		BUNDLES, COMPONENTS;
+	}
+
 	void updateModel();
+
+	Type type();
 
 }

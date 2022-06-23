@@ -19,7 +19,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -32,11 +31,15 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.fx.core.ThreadSynchronize;
-import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.ui.di.FXMLBuilder;
+import org.eclipse.fx.ui.di.FXMLBuilder.Data;
+import org.eclipse.fx.ui.di.FXMLLoader;
+import org.eclipse.fx.ui.di.FXMLLoaderFactory;
 import org.osgi.framework.BundleContext;
 
+import com.google.common.base.Enums;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -44,42 +47,39 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 
+@SuppressWarnings("deprecation")
 public final class GraphFxUI {
 
 	@Log
 	@Inject
-	private FluentLogger                  logger;
+	private FluentLogger      logger;
 	@Inject
-	private MPart                         part;
+	private MPart             part;
 	@Inject
 	@OSGiBundle
-	private BundleContext                 context;
+	private BundleContext     context;
 	@Inject
-	private ConsoleStatusBar              statusBar;
+	private ConsoleStatusBar  statusBar;
 	@Inject
-	private ThreadSynchronize             threadSync;
+	private ThreadSynchronize threadSync;
 	@Inject
-	@LocalInstance
-	private FXMLLoader                    fxmlLoader;
+	@FXMLLoader
+	private FXMLLoaderFactory fxmlLoader;
 	@Inject
-	private BorderPane                    parentNode;
+	private BorderPane        parentNode;
 	@Inject
 	@Named("is_connected")
-	private boolean                       isConnected;
+	private boolean           isConnected;
 	@Inject
-	private EPartService                  partService;
+	private EPartService      partService;
 	@Inject
-	private DataProvider                  dataProvider;
+	private DataProvider      dataProvider;
 	@Inject
-	private ConsoleMaskerPane             progressPane;
-	private final AtomicReference<String> loadedType = new AtomicReference<>();
-
-	private static final String BUNDLES_GRAPH_TYPE    = "Bundles";
-	private static final String COMPONENTS_GRAPH_TYPE = "Components";
+	private ConsoleMaskerPane progressPane;
+	private GraphController   loadedController;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -111,33 +111,43 @@ public final class GraphFxUI {
 
 	private void createControls() {
 		initStatusBar();
-		if (loadedType.get() == null) {
+		if (loadedController == null) {
 			threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
-			        "/graphic/images/graph.png", type -> {
+			        "/graphic/images/graph.png", strType -> {
 				        final Task<Void> task = new Task<>() {
 					        @Override
 					        protected Void call() throws Exception {
+						        final var type = //
+						                Enums.getIfPresent(GraphController.Type.class, strType.toUpperCase()) //
+						                        .or(GraphController.Type.BUNDLES);
 						        loadContent(type);
 						        return null;
 					        }
 				        };
 				        CompletableFuture.runAsync(task);
-			        }, () -> partService.hidePart(part), BUNDLES_GRAPH_TYPE, BUNDLES_GRAPH_TYPE, COMPONENTS_GRAPH_TYPE));
+			        }, () -> partService.hidePart(part), "Bundles", "Bundles", "Components"));
 		} else {
-			loadContent(loadedType.get());
+			loadContent(loadedController.type());
 		}
 	}
 
-	private void loadContent(final String type) {
-		Node tabContent = null;
+	private void loadContent(final GraphController.Type type) {
+		Node tabContent;
 		threadSync.asyncExec(() -> progressPane.addTo(parentNode));
-		if (BUNDLES_GRAPH_TYPE.equalsIgnoreCase(type)) {
-			tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content-for-bundles.fxml");
-			loadedType.set(BUNDLES_GRAPH_TYPE);
+		String resource;
+		if (type == GraphController.Type.BUNDLES) {
+			resource = "/fxml/tab-content-for-bundles.fxml";
 		} else {
-			tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content-for-components.fxml");
-			loadedType.set(COMPONENTS_GRAPH_TYPE);
+			resource = "/fxml/tab-content-for-components.fxml";
 		}
+		final var data = loadFXML(resource);
+		if (data == null) {
+			logger.atError().log("Graph UI resource '%s' could not be loaded", resource);
+			return;
+		}
+		tabContent       = data.getNode();
+		loadedController = data.getController();
+
 		final var content = tabContent; // required for lambda as it needs to be effectively final
 		progressPane.setVisible(false);
 		threadSync.asyncExec(() -> parentNode.setCenter(content));
@@ -146,8 +156,7 @@ public final class GraphFxUI {
 	private void initStatusBar() {
 		if (isConnected) {
 			final var node = Fx.initStatusBarButton(() -> {
-				final var controller = (GraphController) fxmlLoader.getController();
-				controller.updateModel();
+				loadedController.updateModel();
 			}, "Refresh", "REFRESH");
 			statusBar.clearAllInRight();
 			statusBar.addToRight(node);
@@ -155,6 +164,15 @@ public final class GraphFxUI {
 			statusBar.clearAllInRight();
 		}
 		statusBar.addTo(parentNode);
+	}
+
+	private Data<Node, GraphController> loadFXML(final String resourceName) {
+		final FXMLBuilder<Node> builder = fxmlLoader.loadBundleRelative(resourceName);
+		try {
+			return builder.loadWithController();
+		} catch (final Exception e) {
+			return null;
+		}
 	}
 
 }
