@@ -120,6 +120,11 @@ public final class GraphFxComponentController implements GraphController {
 		logger.atInfo().log("Graph component data model has been updated");
 	}
 
+	@Override
+	public Type type() {
+		return Type.COMPONENTS;
+	}
+
 	private void initStrategyButton() {
 		strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
 		strategyButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {

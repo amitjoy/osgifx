@@ -119,6 +119,11 @@ public final class GraphFxBundleController implements GraphController {
 		logger.atInfo().log("Graph bundle data model has been updated");
 	}
 
+	@Override
+	public Type type() {
+		return Type.BUNDLES;
+	}
+
 	private void initStrategyButton() {
 		strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
 		strategyButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
