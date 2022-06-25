@@ -39,80 +39,80 @@ import javafx.concurrent.Task;
 
 public final class SendEventHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEclipseContext   context;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private EventManager      eventManager;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEclipseContext   context;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private EventManager      eventManager;
 
-	@Execute
-	public void execute() {
-		final var dialog = new SendEventDialog();
-		ContextInjectionFactory.inject(dialog, context);
-		logger.atInfo().log("Injected send event dialog to eclipse context");
-		dialog.init();
+    @Execute
+    public void execute() {
+        final var dialog = new SendEventDialog();
+        ContextInjectionFactory.inject(dialog, context);
+        logger.atInfo().log("Injected send event dialog to eclipse context");
+        dialog.init();
 
-		final var event = dialog.showAndWait();
-		if (event.isPresent()) {
-			final Task<Void> sendEventTask = new Task<>() {
-				@Override
-				protected Void call() throws Exception {
-					try {
-						final var dto        = event.get();
-						final var topic      = dto.topic();
-						final var isSync     = dto.isSync();
-						final var properties = dto.properties();
+        final var event = dialog.showAndWait();
+        if (event.isPresent()) {
+            final Task<Void> sendEventTask = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var dto        = event.get();
+                        final var topic      = dto.topic();
+                        final var isSync     = dto.isSync();
+                        final var properties = dto.properties();
 
-						if (Strings.isNullOrEmpty(topic) || properties == null) {
-							return null;
-						}
+                        if (Strings.isNullOrEmpty(topic) || properties == null) {
+                            return null;
+                        }
 
-						XResultDTO result;
-						if (isSync) {
-							result = eventManager.sendEvent(topic, properties);
-						} else {
-							result = eventManager.postEvent(topic, properties);
-						}
-						if (result == null) {
-							return null;
-						}
-						switch (result.result) {
-						case XResultDTO.SUCCESS:
-							threadSync.asyncExec(() -> Fx.showSuccessNotification("Send Event", result.response));
-							logger.atInfo().log("Event sent successfully to '%s'", topic);
-							break;
-						case XResultDTO.ERROR:
-							threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
-							logger.atError().log("Event could not be sent to '%s'", topic);
-							break;
-						case XResultDTO.SKIPPED:
-							threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
-							logger.atError().log("Event could not be sent to '%s' because %s", topic, result.response);
-							break;
-						default:
-							break;
-						}
-					} catch (final Exception e) {
-						logger.atError().withException(e).log("Event could not be sent");
-						threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-					}
-					return null;
-				}
-			};
-			CompletableFuture.runAsync(sendEventTask);
-		}
-	}
+                        XResultDTO result;
+                        if (isSync) {
+                            result = eventManager.sendEvent(topic, properties);
+                        } else {
+                            result = eventManager.postEvent(topic, properties);
+                        }
+                        if (result == null) {
+                            return null;
+                        }
+                        switch (result.result) {
+                        case XResultDTO.SUCCESS:
+                            threadSync.asyncExec(() -> Fx.showSuccessNotification("Send Event", result.response));
+                            logger.atInfo().log("Event sent successfully to '%s'", topic);
+                            break;
+                        case XResultDTO.ERROR:
+                            threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
+                            logger.atError().log("Event could not be sent to '%s'", topic);
+                            break;
+                        case XResultDTO.SKIPPED:
+                            threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
+                            logger.atError().log("Event could not be sent to '%s' because %s", topic, result.response);
+                            break;
+                        default:
+                            break;
+                        }
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Event could not be sent");
+                        threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                    }
+                    return null;
+                }
+            };
+            CompletableFuture.runAsync(sendEventTask);
+        }
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

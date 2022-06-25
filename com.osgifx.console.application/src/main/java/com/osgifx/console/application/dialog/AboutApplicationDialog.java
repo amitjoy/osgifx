@@ -33,26 +33,26 @@ import javafx.stage.StageStyle;
 
 public final class AboutApplicationDialog extends Dialog<Void> {
 
-	@Inject
-	@LocalInstance
-	private FXMLLoader    loader;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
+    @Inject
+    @LocalInstance
+    private FXMLLoader    loader;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
 
-	public void init() {
-		final var dialogPane = getDialogPane();
-		initStyle(StageStyle.UNDECORATED);
+    public void init() {
+        final var dialogPane = getDialogPane();
+        initStyle(StageStyle.UNDECORATED);
 
-		dialogPane.setPrefHeight(200);
-		dialogPane.setPrefWidth(400);
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-		dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/about.png").toString()));
-		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
-		dialogPane.setHeaderText("About OSGi.fx");
+        dialogPane.setPrefHeight(200);
+        dialogPane.setPrefWidth(400);
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+        dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/about.png").toString()));
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.setHeaderText("About OSGi.fx");
 
-		final var content = Fx.loadFXML(loader, context, "/fxml/about-application-dialog.fxml");
-		dialogPane.setContent(content);
-	}
+        final var content = Fx.loadFXML(loader, context, "/fxml/about-application-dialog.fxml");
+        dialogPane.setContent(content);
+    }
 
 }

@@ -44,90 +44,90 @@ import javafx.scene.layout.BorderPane;
 
 public final class DmtFxUI {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	@OSGiBundle
-	private BundleContext     context;
-	@Inject
-	private ConsoleStatusBar  statusBar;
-	@Inject
-	private BorderPane        parentNode;
-	@Inject
-	@LocalInstance
-	private FXMLLoader        fxmlLoader;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private ConsoleMaskerPane progressPane;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext     context;
+    @Inject
+    private ConsoleStatusBar  statusBar;
+    @Inject
+    private BorderPane        parentNode;
+    @Inject
+    @LocalInstance
+    private FXMLLoader        fxmlLoader;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private ConsoleMaskerPane progressPane;
 
-	@PostConstruct
-	public void postConstruct() {
-		createControls();
-		logger.atDebug().log("DMT part has been initialized");
-	}
+    @PostConstruct
+    public void postConstruct() {
+        createControls();
+        logger.atDebug().log("DMT part has been initialized");
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent connected event received");
-		createControls();
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event received");
+        createControls();
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent disconnected event received");
-		createControls();
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event received");
+        createControls();
+    }
 
-	@Inject
-	@Optional
-	private void updateOnDmtNodeUpdatedEvent(@UIEventTopic(DMT_UPDATED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("DMT node updated event received");
-		createControls();
-	}
+    @Inject
+    @Optional
+    private void updateOnDmtNodeUpdatedEvent(@UIEventTopic(DMT_UPDATED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("DMT node updated event received");
+        createControls();
+    }
 
-	private void createControls() {
-		progressPane.setVisible(true);
-		final Task<Void> task = new Task<>() {
+    private void createControls() {
+        progressPane.setVisible(true);
+        final Task<Void> task = new Task<>() {
 
-			Node tabContent;
+            Node tabContent;
 
-			@Override
-			protected Void call() throws Exception {
-				tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content.fxml");
-				return null;
-			}
+            @Override
+            protected Void call() throws Exception {
+                tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content.fxml");
+                return null;
+            }
 
-			@Override
-			protected void succeeded() {
-				parentNode.getChildren().clear();
-				parentNode.setCenter(tabContent);
-				initStatusBar(parentNode);
-				progressPane.setVisible(false);
-			}
-		};
-		parentNode.getChildren().clear();
-		progressPane.addTo(parentNode);
-		initStatusBar(parentNode);
-		CompletableFuture.runAsync(task);
-	}
+            @Override
+            protected void succeeded() {
+                parentNode.getChildren().clear();
+                parentNode.setCenter(tabContent);
+                initStatusBar(parentNode);
+                progressPane.setVisible(false);
+            }
+        };
+        parentNode.getChildren().clear();
+        progressPane.addTo(parentNode);
+        initStatusBar(parentNode);
+        CompletableFuture.runAsync(task);
+    }
 
-	private void initStatusBar(final BorderPane parent) {
-		if (isConnected) {
-			final var node = Fx.initStatusBarButton(() -> {
-				final var controller = (DmtFxController) fxmlLoader.getController();
-				controller.updateModel();
-			}, "Refresh", "REFRESH");
-			statusBar.clearAllInRight();
-			statusBar.addToRight(node);
-		} else {
-			statusBar.clearAllInRight();
-		}
-		statusBar.addTo(parent);
-	}
+    private void initStatusBar(final BorderPane parent) {
+        if (isConnected) {
+            final var node = Fx.initStatusBarButton(() -> {
+                final var controller = (DmtFxController) fxmlLoader.getController();
+                controller.updateModel();
+            }, "Refresh", "REFRESH");
+            statusBar.clearAllInRight();
+            statusBar.addToRight(node);
+        } else {
+            statusBar.clearAllInRight();
+        }
+        statusBar.addTo(parent);
+    }
 
 }

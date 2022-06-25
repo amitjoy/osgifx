@@ -38,33 +38,33 @@ import javafx.collections.ObservableList;
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, CLEAR_LOGS_TOPIC })
 public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryListener, EventHandler {
 
-	public static final String LOGS_ID = "logs";
+    public static final String LOGS_ID = "logs";
 
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
 
-	private final ObservableList<XLogEntryDTO> logs = observableArrayList();
+    private final ObservableList<XLogEntryDTO> logs = observableArrayList();
 
-	@Override
-	public void retrieve() {
-		// nothing to retrieve manually
-	}
+    @Override
+    public void retrieve() {
+        // nothing to retrieve manually
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return logs;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return logs;
+    }
 
-	@Override
-	public synchronized void logged(final XLogEntryDTO logEntry) {
-		logs.add(logEntry);
-	}
+    @Override
+    public synchronized void logged(final XLogEntryDTO logEntry) {
+        logs.add(logEntry);
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		threadSync.asyncExec(logs::clear);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        threadSync.asyncExec(logs::clear);
+    }
 
 }

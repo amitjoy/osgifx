@@ -30,18 +30,18 @@ package com.osgifx.console.smartgraph.graphview;
  */
 public interface SmartGraphEdgeBase<E, V> extends SmartGraphEdge<E, V>, SmartLabelledNode {
 
-	/**
-	 * Attaches a {@link SmartArrow} to this edge, binding its position/rotation.
-	 *
-	 * @param arrow arrow to attach
-	 */
-	void attachArrow(SmartArrow arrow);
+    /**
+     * Attaches a {@link SmartArrow} to this edge, binding its position/rotation.
+     *
+     * @param arrow arrow to attach
+     */
+    void attachArrow(SmartArrow arrow);
 
-	/**
-	 * Returns the attached {@link SmartArrow}, if any.
-	 *
-	 * @return reference of the attached arrow; null if none.
-	 */
-	SmartArrow getAttachedArrow();
+    /**
+     * Returns the attached {@link SmartArrow}, if any.
+     *
+     * @return reference of the attached arrow; null if none.
+     */
+    SmartArrow getAttachedArrow();
 
 }

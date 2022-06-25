@@ -46,50 +46,50 @@ import javafx.collections.ObservableList;
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, COMPONENT_ACTION_EVENT_TOPICS, CONFIGURATION_ACTION_EVENT_TOPICS })
 public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String CONFIGURATIONS_ID = "configurations";
+    public static final String CONFIGURATIONS_ID = "configurations";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XConfigurationDTO> configurations = observableArrayList();
+    private final ObservableList<XConfigurationDTO> configurations = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving configurations info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
-		logger.atInfo().log("Configurations info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving configurations info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
+        logger.atInfo().log("Configurations info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return configurations;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return configurations;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(configurations::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(configurations::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

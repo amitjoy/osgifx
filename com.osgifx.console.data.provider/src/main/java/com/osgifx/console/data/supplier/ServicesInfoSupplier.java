@@ -53,50 +53,50 @@ import javafx.collections.ObservableList;
 //@formatter:on
 public final class ServicesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String SERVICES_ID = "services";
+    public static final String SERVICES_ID = "services";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XServiceDTO> services = observableArrayList();
+    private final ObservableList<XServiceDTO> services = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving services info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		services.setAll(makeNullSafe(agent.getAllServices()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_SERVICES_TOPIC);
-		logger.atInfo().log("Services info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving services info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        services.setAll(makeNullSafe(agent.getAllServices()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_SERVICES_TOPIC);
+        logger.atInfo().log("Services info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return services;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return services;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(services::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(services::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

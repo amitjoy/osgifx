@@ -53,166 +53,166 @@ import javafx.scene.control.TreeView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class DmtFxController {
 
-	private static final String ROOT_DMT_NODE = ".";
+    private static final String ROOT_DMT_NODE = ".";
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEclipseContext   context;
-	@FXML
-	private TreeView<String>  dmtTree;
-	@FXML
-	private TextField         searchBox;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private DataProvider      dataProvider;
-	@Inject
-	private Supervisor        supervisor;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEclipseContext   context;
+    @FXML
+    private TreeView<String>  dmtTree;
+    @FXML
+    private TextField         searchBox;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private DataProvider      dataProvider;
+    @Inject
+    private Supervisor        supervisor;
 
-	private final Map<FilterableTreeItem<String>, XDmtNodeDTO> items = Maps.newHashMap();
+    private final Map<FilterableTreeItem<String>, XDmtNodeDTO> items = Maps.newHashMap();
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			return;
-		}
-		try {
-			initTree();
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            return;
+        }
+        try {
+            initTree();
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	public void updateModel() {
-		threadSync.asyncExec(() -> initTree());
-		logger.atInfo().log("DMT data model has been updated");
-	}
+    public void updateModel() {
+        threadSync.asyncExec(() -> initTree());
+        logger.atInfo().log("DMT data model has been updated");
+    }
 
-	private void initTree() {
-		final var dmtNode = dataProvider.readDmtNode(ROOT_DMT_NODE);
-		if (dmtNode == null) {
-			return;
-		}
-		final var rootItem = new FilterableTreeItem<>(dmtNode.uri);
+    private void initTree() {
+        final var dmtNode = dataProvider.readDmtNode(ROOT_DMT_NODE);
+        if (dmtNode == null) {
+            return;
+        }
+        final var rootItem = new FilterableTreeItem<>(dmtNode.uri);
 
-		addSearchBinding(rootItem);
-		dmtTree.setRoot(rootItem);
-		dmtTree.setShowRoot(false);
-		initTree(dmtNode, rootItem);
-		expandTreeView(rootItem);
-	}
+        addSearchBinding(rootItem);
+        dmtTree.setRoot(rootItem);
+        dmtTree.setShowRoot(false);
+        initTree(dmtNode, rootItem);
+        expandTreeView(rootItem);
+    }
 
-	private void addSearchBinding(final FilterableTreeItem<String> treeItem) {
-		treeItem.predicateProperty().bind(Bindings.createObjectBinding(() -> {
-			if (searchBox.getText() == null || searchBox.getText().isEmpty()) {
-				return null;
-			}
-			return TreeItemPredicate.create(itemText -> StringUtils.containsIgnoreCase(itemText, searchBox.getText()));
-		}, searchBox.textProperty()));
-	}
+    private void addSearchBinding(final FilterableTreeItem<String> treeItem) {
+        treeItem.predicateProperty().bind(Bindings.createObjectBinding(() -> {
+            if (searchBox.getText() == null || searchBox.getText().isEmpty()) {
+                return null;
+            }
+            return TreeItemPredicate.create(itemText -> StringUtils.containsIgnoreCase(itemText, searchBox.getText()));
+        }, searchBox.textProperty()));
+    }
 
-	private void initTree(final XDmtNodeDTO dmtNode, final FilterableTreeItem<String> parent) {
-		var node = parent;
-		if (!ROOT_DMT_NODE.equals(dmtNode.uri)) {
-			node = new FilterableTreeItem<>(initItemText(dmtNode));
-			addDoubleClickEvent();
-			items.put(node, dmtNode);
-			parent.getInternalChildren().add(node);
-		}
-		if (!dmtNode.children.isEmpty()) {
-			for (final XDmtNodeDTO child : dmtNode.children) {
-				initTree(child, node);
-			}
-		}
-	}
+    private void initTree(final XDmtNodeDTO dmtNode, final FilterableTreeItem<String> parent) {
+        var node = parent;
+        if (!ROOT_DMT_NODE.equals(dmtNode.uri)) {
+            node = new FilterableTreeItem<>(initItemText(dmtNode));
+            addDoubleClickEvent();
+            items.put(node, dmtNode);
+            parent.getInternalChildren().add(node);
+        }
+        if (!dmtNode.children.isEmpty()) {
+            for (final XDmtNodeDTO child : dmtNode.children) {
+                initTree(child, node);
+            }
+        }
+    }
 
-	private void addDoubleClickEvent() {
-		dmtTree.setOnMouseClicked(mouseEvent -> {
-			if (mouseEvent.getClickCount() == 2) {
-				final var item = dmtTree.getSelectionModel().getSelectedItem();
-				final var node = items.get(item);
-				if (node != null && !node.children.isEmpty()) {
-					return;
-				}
-				showDialog(node);
-			}
-		});
-	}
+    private void addDoubleClickEvent() {
+        dmtTree.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2) {
+                final var item = dmtTree.getSelectionModel().getSelectedItem();
+                final var node = items.get(item);
+                if (node != null && !node.children.isEmpty()) {
+                    return;
+                }
+                showDialog(node);
+            }
+        });
+    }
 
-	private void showDialog(final XDmtNodeDTO node) {
-		if (node.format == null) {
-			logger.atInfo().log("DMT node update not allowed as the node format is null - '%s'", node.uri);
-			return;
-		}
-		final var updateNodeDialog = new UpdateNodeDialog();
-		ContextInjectionFactory.inject(updateNodeDialog, context);
-		logger.atInfo().log("Injected update DMT node dialog to eclipse context");
+    private void showDialog(final XDmtNodeDTO node) {
+        if (node.format == null) {
+            logger.atInfo().log("DMT node update not allowed as the node format is null - '%s'", node.uri);
+            return;
+        }
+        final var updateNodeDialog = new UpdateNodeDialog();
+        ContextInjectionFactory.inject(updateNodeDialog, context);
+        logger.atInfo().log("Injected update DMT node dialog to eclipse context");
 
-		updateNodeDialog.init(node);
+        updateNodeDialog.init(node);
 
-		final var result = updateNodeDialog.showAndWait();
-		if (!result.isPresent()) {
-			logger.atInfo().log("No button has been selected");
-			return;
-		}
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atError().log("Agent is not connected");
-			return;
-		}
-		final var dto          = result.get();
-		final var updateResult = agent.updateDmtNode(dto.uri(), dto.value(), dto.format());
-		logger.atInfo().log("DMT node '%s' update request processed", node.uri);
-		switch (updateResult.result) {
-		case XResultDTO.SUCCESS:
-			logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
-			threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", node.uri + "has been updated successfully updated"));
-			eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
-			logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
-			break;
-		case XResultDTO.ERROR:
-			logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
-			threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", updateResult.response));
-			break;
-		case XResultDTO.SKIPPED:
-			logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
-			threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", updateResult.response));
-			break;
-		default:
-			break;
-		}
-	}
+        final var result = updateNodeDialog.showAndWait();
+        if (!result.isPresent()) {
+            logger.atInfo().log("No button has been selected");
+            return;
+        }
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atError().log("Agent is not connected");
+            return;
+        }
+        final var dto          = result.get();
+        final var updateResult = agent.updateDmtNode(dto.uri(), dto.value(), dto.format());
+        logger.atInfo().log("DMT node '%s' update request processed", node.uri);
+        switch (updateResult.result) {
+        case XResultDTO.SUCCESS:
+            logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
+            threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", node.uri + "has been updated successfully updated"));
+            eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
+            logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
+            break;
+        case XResultDTO.ERROR:
+            logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
+            threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", updateResult.response));
+            break;
+        case XResultDTO.SKIPPED:
+            logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
+            threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", updateResult.response));
+            break;
+        default:
+            break;
+        }
+    }
 
-	private String initItemText(final XDmtNodeDTO node) {
-		final Map<String, String> properties = Maps.newHashMap();
+    private String initItemText(final XDmtNodeDTO node) {
+        final Map<String, String> properties = Maps.newHashMap();
 
-		properties.computeIfAbsent("value", e -> node.value);
-		properties.computeIfAbsent("format", e -> Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
+        properties.computeIfAbsent("value", e -> node.value);
+        properties.computeIfAbsent("format", e -> Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
 
-		final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
-		final var result             = new StringBuilder(node.uri);
+        final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
+        final var result             = new StringBuilder(node.uri);
 
-		if (!propertiesToString.isEmpty()) {
-			result.append(" [");
-			result.append(propertiesToString);
-			result.append("]");
-		}
-		return result.toString();
-	}
+        if (!propertiesToString.isEmpty()) {
+            result.append(" [");
+            result.append(propertiesToString);
+            result.append("]");
+        }
+        return result.toString();
+    }
 
-	private void expandTreeView(final TreeItem<?> item) {
-		if (item != null && !item.isLeaf()) {
-			item.setExpanded(true);
-			item.getChildren().forEach(this::expandTreeView);
-		}
-	}
+    private void expandTreeView(final TreeItem<?> item) {
+        if (item != null && !item.isLeaf()) {
+            item.setExpanded(true);
+            item.getChildren().forEach(this::expandTreeView);
+        }
+    }
 
 }

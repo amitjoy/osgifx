@@ -22,16 +22,16 @@ import org.osgi.resource.Resource;
 
 public class CapabilityImpl extends CapReq implements Capability {
 
-	CapabilityImpl(final String namespace, final Resource resource, final Map<String, String> directives,
-	        final Map<String, Object> attributes) {
-		super(MODE.Capability, namespace, resource, directives, attributes);
-	}
+    CapabilityImpl(final String namespace, final Resource resource, final Map<String, String> directives,
+            final Map<String, Object> attributes) {
+        super(MODE.Capability, namespace, resource, directives, attributes);
+    }
 
-	@Override
-	public String toString() {
-		final var sb = new StringBuilder();
-		sb.append("Provide");
-		super.toString(sb);
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        final var sb = new StringBuilder();
+        sb.append("Provide");
+        super.toString(sb);
+        return sb.toString();
+    }
 }

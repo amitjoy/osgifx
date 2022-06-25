@@ -35,40 +35,40 @@ import javafx.scene.layout.BorderPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class HeapMonitorFxUI {
 
-	@Log
-	@Inject
-	private FluentLogger     logger;
-	@Inject
-	private ConsoleStatusBar statusBar;
-	@Inject
-	private HeapMonitorPane  memoryViewPane;
+    @Log
+    @Inject
+    private FluentLogger     logger;
+    @Inject
+    private ConsoleStatusBar statusBar;
+    @Inject
+    private HeapMonitorPane  memoryViewPane;
 
-	@PostConstruct
-	public void postConstruct(final BorderPane parent) {
-		createControls(parent);
-		logger.atDebug().log("Heap monitor part has been initialized");
-	}
+    @PostConstruct
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        logger.atDebug().log("Heap monitor part has been initialized");
+    }
 
-	private void createControls(final BorderPane parent) {
-		parent.setCenter(memoryViewPane);
-		statusBar.addTo(parent);
-	}
+    private void createControls(final BorderPane parent) {
+        parent.setCenter(memoryViewPane);
+        statusBar.addTo(parent);
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
-		logger.atInfo().log("Agent connected event received");
-		createControls(parent);
-		memoryViewPane.init();
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+        logger.atInfo().log("Agent connected event received");
+        createControls(parent);
+        memoryViewPane.init();
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
-		logger.atInfo().log("Agent disconnected event received");
-		memoryViewPane.stopUpdates();
-		createControls(parent);
-		memoryViewPane.init();
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+        logger.atInfo().log("Agent disconnected event received");
+        memoryViewPane.stopUpdates();
+        createControls(parent);
+        memoryViewPane.init();
+    }
 
 }

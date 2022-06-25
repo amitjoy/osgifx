@@ -30,20 +30,20 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = Theme.class)
 public final class DefaultTheme extends AbstractTheme {
 
-	@Activate
-	public DefaultTheme(final BundleContext context) {
-		super("theme.default", "Default Theme", context.getBundle().getResource(STANDARD_CSS));
-	}
+    @Activate
+    public DefaultTheme(final BundleContext context) {
+        super("theme.default", "Default Theme", context.getBundle().getResource(STANDARD_CSS));
+    }
 
-	@Override
-	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-	public synchronized void registerStylesheet(final Stylesheet stylesheet) {
-		super.registerStylesheet(stylesheet);
-	}
+    @Override
+    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+    public synchronized void registerStylesheet(final Stylesheet stylesheet) {
+        super.registerStylesheet(stylesheet);
+    }
 
-	@Override
-	public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
-		super.unregisterStylesheet(stylesheet);
-	}
+    @Override
+    public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
+        super.unregisterStylesheet(stylesheet);
+    }
 
 }

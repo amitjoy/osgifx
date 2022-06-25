@@ -22,8 +22,8 @@ import org.osgi.service.log.LogLevel;
 
 public class XBundleLoggerContextDTO extends DTO {
 
-	public String                name;
-	public LogLevel              rootLogLevel;
-	public Map<String, LogLevel> logLevels;
+    public String                name;
+    public LogLevel              rootLogLevel;
+    public Map<String, LogLevel> logLevels;
 
 }

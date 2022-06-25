@@ -93,193 +93,193 @@ import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
  */
 public final class ClassloaderLeakDetector implements Runnable {
 
-	private final Set<Reference<?>>           refs        = ConcurrentHashMap.newKeySet();
-	private final ReferenceQueue<ClassLoader> queue       = new ReferenceQueue<>();
-	private final Map<Long, BundleInfo>       bundleInfos = new ConcurrentHashMap<>();
+    private final Set<Reference<?>>           refs        = ConcurrentHashMap.newKeySet();
+    private final ReferenceQueue<ClassLoader> queue       = new ReferenceQueue<>();
+    private final Map<Long, BundleInfo>       bundleInfos = new ConcurrentHashMap<>();
 
-	private BundleContext                   context;
-	private Thread                          referencePoller;
-	private BundleTracker<Bundle>           bundleTracker;
-	private final BundleStartTimeCalculator bundleStartTimeCalculator;
+    private BundleContext                   context;
+    private Thread                          referencePoller;
+    private BundleTracker<Bundle>           bundleTracker;
+    private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
-	public ClassloaderLeakDetector(final BundleStartTimeCalculator bundleStartTimeCalculator) {
-		this.bundleStartTimeCalculator = bundleStartTimeCalculator;
-	}
+    public ClassloaderLeakDetector(final BundleStartTimeCalculator bundleStartTimeCalculator) {
+        this.bundleStartTimeCalculator = bundleStartTimeCalculator;
+    }
 
-	public void start(final BundleContext context) {
-		this.context = context;
+    public void start(final BundleContext context) {
+        this.context = context;
 
-		bundleTracker = new LeakDetectorBundleTracker(context);
-		bundleTracker.open();
+        bundleTracker = new LeakDetectorBundleTracker(context);
+        bundleTracker.open();
 
-		referencePoller = new Thread(this, "classloader-leak-detector");
-		referencePoller.setDaemon(true);
-		referencePoller.start();
-	}
+        referencePoller = new Thread(this, "classloader-leak-detector");
+        referencePoller.setDaemon(true);
+        referencePoller.start();
+    }
 
-	public void stop() {
-		bundleTracker.close();
-		referencePoller.interrupt();
-	}
+    public void stop() {
+        bundleTracker.close();
+        referencePoller.interrupt();
+    }
 
-	private class LeakDetectorBundleTracker extends BundleTracker<Bundle> {
+    private class LeakDetectorBundleTracker extends BundleTracker<Bundle> {
 
-		public LeakDetectorBundleTracker(final BundleContext context) {
-			// track only started bundles
-			super(context, ACTIVE, null);
-		}
+        public LeakDetectorBundleTracker(final BundleContext context) {
+            // track only started bundles
+            super(context, ACTIVE, null);
+        }
 
-		@Override
-		public Bundle addingBundle(final Bundle bundle, final BundleEvent event) {
-			final ClassLoader cl = classloader(bundle);
-			// classloader would be null for fragments
-			if (cl != null) {
-				final BundleReference ref = new BundleReference(bundle, cl);
-				refs.add(ref);
+        @Override
+        public Bundle addingBundle(final Bundle bundle, final BundleEvent event) {
+            final ClassLoader cl = classloader(bundle);
+            // classloader would be null for fragments
+            if (cl != null) {
+                final BundleReference ref = new BundleReference(bundle, cl);
+                refs.add(ref);
 
-				// Note that a bundle can be started multiple times e.g. when refreshed
-				// so we need to account for that also
-				final BundleInfo bi = bundleInfos.computeIfAbsent(bundle.getBundleId(), id -> new BundleInfo(bundle));
-				bi.incrementUsageCount(ref);
-			}
-			return bundle;
-		}
+                // Note that a bundle can be started multiple times e.g. when refreshed
+                // so we need to account for that also
+                final BundleInfo bi = bundleInfos.computeIfAbsent(bundle.getBundleId(), id -> new BundleInfo(bundle));
+                bi.incrementUsageCount(ref);
+            }
+            return bundle;
+        }
 
-		private ClassLoader classloader(final Bundle b) {
-			final BundleWiring bw = b.adapt(BundleWiring.class);
-			if (bw != null) {
-				return bw.getClassLoader();
-			}
-			return null;
-		}
-	}
+        private ClassLoader classloader(final Bundle b) {
+            final BundleWiring bw = b.adapt(BundleWiring.class);
+            if (bw != null) {
+                return bw.getClassLoader();
+            }
+            return null;
+        }
+    }
 
-	// GC callback
-	@Override
-	public void run() {
-		BundleReference ref;
-		while (!Thread.currentThread().isInterrupted()) {
-			try {
-				ref = (BundleReference) queue.remove();
-				if (ref != null) {
-					removeBundle(ref);
-				}
-			} catch (final InterruptedException e) {
-				Thread.currentThread().interrupt();
-				break;
-			}
-		}
-		// drain out the queue
-		while (queue.poll() != null) {
-			// ensuring the unreachability via the phantom references
-		}
-	}
+    // GC callback
+    @Override
+    public void run() {
+        BundleReference ref;
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                ref = (BundleReference) queue.remove();
+                if (ref != null) {
+                    removeBundle(ref);
+                }
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        // drain out the queue
+        while (queue.poll() != null) {
+            // ensuring the unreachability via the phantom references
+        }
+    }
 
-	private void removeBundle(final BundleReference ref) {
-		final BundleInfo bi = bundleInfos.get(ref.bundleId);
+    private void removeBundle(final BundleReference ref) {
+        final BundleInfo bi = bundleInfos.get(ref.bundleId);
 
-		// bi cannot be null
-		bi.decrementUsageCount(ref);
-		refs.remove(ref);
-	}
+        // bi cannot be null
+        bi.decrementUsageCount(ref);
+        refs.remove(ref);
+    }
 
-	public Set<XBundleDTO> getSuspiciousBundles() {
-		final Set<Long>        activeBundleIds   = Stream.of(context.getBundles()).map(Bundle::getBundleId).collect(toSet());
-		final List<BundleInfo> suspiciousBundles = new ArrayList<>(bundleInfos.values());
-		// filter out ACTIVE bundles that have only one classloader created for them
-		suspiciousBundles.removeIf(bi -> bi.hasSingleInstance() && activeBundleIds.contains(bi.bundleId));
-		return suspiciousBundles.stream().map(this::toDTO).collect(Collectors.toSet());
-	}
+    public Set<XBundleDTO> getSuspiciousBundles() {
+        final Set<Long>        activeBundleIds   = Stream.of(context.getBundles()).map(Bundle::getBundleId).collect(toSet());
+        final List<BundleInfo> suspiciousBundles = new ArrayList<>(bundleInfos.values());
+        // filter out ACTIVE bundles that have only one classloader created for them
+        suspiciousBundles.removeIf(bi -> bi.hasSingleInstance() && activeBundleIds.contains(bi.bundleId));
+        return suspiciousBundles.stream().map(this::toDTO).collect(Collectors.toSet());
+    }
 
-	private XBundleDTO toDTO(final BundleInfo bundleInfo) {
-		final Bundle bundle = context.getBundle(bundleInfo.bundleId);
-		return XBundleAdmin.toDTO(bundle, bundleStartTimeCalculator);
-	}
+    private XBundleDTO toDTO(final BundleInfo bundleInfo) {
+        final Bundle bundle = context.getBundle(bundleInfo.bundleId);
+        return XBundleAdmin.toDTO(bundle, bundleStartTimeCalculator);
+    }
 
-	private static class BundleInfo {
+    private static class BundleInfo {
 
-		final long    bundleId;
-		final Version version;
-		final String  symbolicName;
+        final long    bundleId;
+        final Version version;
+        final String  symbolicName;
 
-		private final Set<ClassloaderInfo> classloaderInfos = ConcurrentHashMap.newKeySet();
+        private final Set<ClassloaderInfo> classloaderInfos = ConcurrentHashMap.newKeySet();
 
-		public BundleInfo(final Bundle b) {
-			bundleId     = b.getBundleId();
-			version      = b.getVersion();
-			symbolicName = b.getSymbolicName();
-		}
+        public BundleInfo(final Bundle b) {
+            bundleId     = b.getBundleId();
+            version      = b.getVersion();
+            symbolicName = b.getSymbolicName();
+        }
 
-		public void incrementUsageCount(final BundleReference ref) {
-			classloaderInfos.add(ref.classloaderInfo);
-		}
+        public void incrementUsageCount(final BundleReference ref) {
+            classloaderInfos.add(ref.classloaderInfo);
+        }
 
-		public void decrementUsageCount(final BundleReference ref) {
-			classloaderInfos.remove(ref.classloaderInfo);
-		}
+        public void decrementUsageCount(final BundleReference ref) {
+            classloaderInfos.remove(ref.classloaderInfo);
+        }
 
-		public boolean hasSingleInstance() {
-			return classloaderInfos.size() == 1;
-		}
+        public boolean hasSingleInstance() {
+            return classloaderInfos.size() == 1;
+        }
 
-		@Override
-		public String toString() {
-			return String.format("%s (%s) - Classloader Count [%s]", symbolicName, version, classloaderInfos.size());
-		}
-	}
+        @Override
+        public String toString() {
+            return String.format("%s (%s) - Classloader Count [%s]", symbolicName, version, classloaderInfos.size());
+        }
+    }
 
-	private static class ClassloaderInfo {
+    private static class ClassloaderInfo {
 
-		final long creationTime;
-		final long systemHashCode;
+        final long creationTime;
+        final long systemHashCode;
 
-		private ClassloaderInfo(final ClassLoader cl) {
-			creationTime   = System.currentTimeMillis();
-			systemHashCode = System.identityHashCode(cl);
-		}
+        private ClassloaderInfo(final ClassLoader cl) {
+            creationTime   = System.currentTimeMillis();
+            systemHashCode = System.identityHashCode(cl);
+        }
 
-		public String address() {
-			return toHexString(systemHashCode);
-		}
+        public String address() {
+            return toHexString(systemHashCode);
+        }
 
-		public String creationDate() {
-			final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
-			return dateFormat.format(new Date(creationTime));
-		}
+        public String creationDate() {
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
+            return dateFormat.format(new Date(creationTime));
+        }
 
-		@Override
-		public boolean equals(final Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (o == null || getClass() != o.getClass()) {
-				return false;
-			}
-			final ClassloaderInfo that = (ClassloaderInfo) o;
-			return systemHashCode == that.systemHashCode;
-		}
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            final ClassloaderInfo that = (ClassloaderInfo) o;
+            return systemHashCode == that.systemHashCode;
+        }
 
-		@Override
-		public int hashCode() {
-			return hash(systemHashCode);
-		}
+        @Override
+        public int hashCode() {
+            return hash(systemHashCode);
+        }
 
-		@Override
-		public String toString() {
-			return String.format("Identity HashCode - %s, Creation Time %s", address(), creationDate());
-		}
-	}
+        @Override
+        public String toString() {
+            return String.format("Identity HashCode - %s, Creation Time %s", address(), creationDate());
+        }
+    }
 
-	private class BundleReference extends PhantomReference<ClassLoader> {
+    private class BundleReference extends PhantomReference<ClassLoader> {
 
-		final long            bundleId;
-		final ClassloaderInfo classloaderInfo;
+        final long            bundleId;
+        final ClassloaderInfo classloaderInfo;
 
-		public BundleReference(final Bundle bundle, final ClassLoader classloader) {
-			super(classloader, queue);
-			bundleId        = bundle.getBundleId();
-			classloaderInfo = new ClassloaderInfo(classloader);
-		}
-	}
+        public BundleReference(final Bundle bundle, final ClassLoader classloader) {
+            super(classloader, queue);
+            bundleId        = bundle.getBundleId();
+            classloaderInfo = new ClassloaderInfo(classloader);
+        }
+    }
 
 }

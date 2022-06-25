@@ -22,10 +22,10 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 
 public final class PackageDTO {
 
-	public String           name;
-	public String           version;
-	public boolean          isDuplicateExport;
-	public List<XBundleDTO> exporters = new ArrayList<>();
-	public List<XBundleDTO> importers = new ArrayList<>();
+    public String           name;
+    public String           version;
+    public boolean          isDuplicateExport;
+    public List<XBundleDTO> exporters = new ArrayList<>();
+    public List<XBundleDTO> importers = new ArrayList<>();
 
 }

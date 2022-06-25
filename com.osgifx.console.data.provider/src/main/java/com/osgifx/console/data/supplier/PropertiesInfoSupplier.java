@@ -42,46 +42,46 @@ import javafx.collections.ObservableList;
 @EventTopics(AGENT_DISCONNECTED_EVENT_TOPIC)
 public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String PROPERTIES_ID = "properties";
+    public static final String PROPERTIES_ID = "properties";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XPropertyDTO> properties = observableArrayList();
+    private final ObservableList<XPropertyDTO> properties = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving properties info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		properties.setAll(makeNullSafe(agent.getAllProperties()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
-		logger.atInfo().log("Properties info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving properties info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        properties.setAll(makeNullSafe(agent.getAllProperties()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
+        logger.atInfo().log("Properties info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return properties;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return properties;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		threadSync.asyncExec(properties::clear);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        threadSync.asyncExec(properties::clear);
+    }
 
 }

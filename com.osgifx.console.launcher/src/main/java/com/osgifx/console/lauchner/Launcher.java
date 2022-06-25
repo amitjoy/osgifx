@@ -35,37 +35,37 @@ import com.osgifx.console.propertytypes.MainThread;
 @MainThread
 public final class Launcher implements Runnable {
 
-	private static final String APPLICATION_ID = "com.osgifx.console.application.osgifx";
+    private static final String APPLICATION_ID = "com.osgifx.console.application.osgifx";
 
-	@Reference(target = "(" + SERVICE_PID + "=" + APPLICATION_ID + ")", cardinality = OPTIONAL)
-	private volatile ApplicationDescriptor applicationDescriptor;
+    @Reference(target = "(" + SERVICE_PID + "=" + APPLICATION_ID + ")", cardinality = OPTIONAL)
+    private volatile ApplicationDescriptor applicationDescriptor;
 
-	@Reference
-	private LoggerFactory factory;
-	private FluentLogger  logger;
+    @Reference
+    private LoggerFactory factory;
+    private FluentLogger  logger;
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public void run() {
-		try {
-			if (applicationDescriptor == null) {
-				logger.atError().log("Application descriptor '%s' not found", APPLICATION_ID);
-				return;
-			}
-			logger.atInfo().log("Application descriptor '%s' found", APPLICATION_ID);
-			final var handle = applicationDescriptor.launch(emptyMap());
-			handle.getExitValue(0);
-		} catch (final ApplicationException e) {
-			logger.atError().withException(e).log(Optional.ofNullable(e.getMessage()).orElse(""));
-			throw new RuntimeException(e);
-		} catch (final InterruptedException e) {
-			logger.atError().withException(e).log(Optional.ofNullable(e.getMessage()).orElse(""));
-			Thread.currentThread().interrupt();
-		}
-	}
+    @Override
+    public void run() {
+        try {
+            if (applicationDescriptor == null) {
+                logger.atError().log("Application descriptor '%s' not found", APPLICATION_ID);
+                return;
+            }
+            logger.atInfo().log("Application descriptor '%s' found", APPLICATION_ID);
+            final var handle = applicationDescriptor.launch(emptyMap());
+            handle.getExitValue(0);
+        } catch (final ApplicationException e) {
+            logger.atError().withException(e).log(Optional.ofNullable(e.getMessage()).orElse(""));
+            throw new RuntimeException(e);
+        } catch (final InterruptedException e) {
+            logger.atError().withException(e).log(Optional.ofNullable(e.getMessage()).orElse(""));
+            Thread.currentThread().interrupt();
+        }
+    }
 
 }

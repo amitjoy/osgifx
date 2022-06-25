@@ -47,112 +47,112 @@ import javafx.scene.layout.BorderPane;
 
 public final class LogsFxUI {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	@OSGiBundle
-	private BundleContext     context;
-	@Inject
-	private ConsoleStatusBar  statusBar;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private DataProvider      dataProvider;
-	@Inject
-	private ConsoleMaskerPane progressPane;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext     context;
+    @Inject
+    private ConsoleStatusBar  statusBar;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private DataProvider      dataProvider;
+    @Inject
+    private ConsoleMaskerPane progressPane;
 
-	@PostConstruct
-	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-		createControls(parent, loader);
-		logger.atDebug().log("Logs part has been initialized");
-	}
+    @PostConstruct
+    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+        logger.atDebug().log("Logs part has been initialized");
+    }
 
-	@Focus
-	public void onFocus() {
-		if (isConnected) {
-			refreshData();
-		}
-	}
+    @Focus
+    public void onFocus() {
+        if (isConnected) {
+            refreshData();
+        }
+    }
 
-	@Inject
-	@Optional
-	private void updateOnLogReceiveStarted( //
-	        @UIEventTopic(LOG_RECEIVE_STARTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		createControls(parent, loader);
-	}
+    @Inject
+    @Optional
+    private void updateOnLogReceiveStarted( //
+            @UIEventTopic(LOG_RECEIVE_STARTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+    }
 
-	@Inject
-	@Optional
-	private void updateControlsOnEvent( //
-	        @UIEventTopic(BUNDLE_ACTION_EVENT_TOPICS) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		createControls(parent, loader);
-	}
+    @Inject
+    @Optional
+    private void updateControlsOnEvent( //
+            @UIEventTopic(BUNDLE_ACTION_EVENT_TOPICS) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentConnectedEvent( //
-	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		logger.atInfo().log("Agent connected event received");
-		createControls(parent, loader);
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent( //
+            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        logger.atInfo().log("Agent connected event received");
+        createControls(parent, loader);
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentDisconnectedEvent( //
-	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		logger.atInfo().log("Agent disconnected event received");
-		createControls(parent, loader);
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent( //
+            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        logger.atInfo().log("Agent disconnected event received");
+        createControls(parent, loader);
+    }
 
-	private void createControls(final BorderPane parent, final FXMLLoader loader) {
-		progressPane.setVisible(true);
-		final Task<Void> task = new Task<>() {
+    private void createControls(final BorderPane parent, final FXMLLoader loader) {
+        progressPane.setVisible(true);
+        final Task<Void> task = new Task<>() {
 
-			Node tabContent;
+            Node tabContent;
 
-			@Override
-			protected Void call() throws Exception {
-				tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
-				return null;
-			}
+            @Override
+            protected Void call() throws Exception {
+                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+                return null;
+            }
 
-			@Override
-			protected void succeeded() {
-				parent.getChildren().clear();
-				parent.setCenter(tabContent);
-				statusBar.addTo(parent);
-				progressPane.setVisible(false);
-			}
-		};
-		parent.getChildren().clear();
-		progressPane.addTo(parent);
-		initStatusBar(parent);
-		CompletableFuture.runAsync(task);
-	}
+            @Override
+            protected void succeeded() {
+                parent.getChildren().clear();
+                parent.setCenter(tabContent);
+                statusBar.addTo(parent);
+                progressPane.setVisible(false);
+            }
+        };
+        parent.getChildren().clear();
+        progressPane.addTo(parent);
+        initStatusBar(parent);
+        CompletableFuture.runAsync(task);
+    }
 
-	private void initStatusBar(final BorderPane parent) {
-		if (isConnected) {
-			final var node = Fx.initStatusBarButton(this::refreshData, "Refresh Log Configurations", "REFRESH");
-			statusBar.clearAllInRight();
-			statusBar.addToRight(node);
-		} else {
-			statusBar.clearAllInRight();
-		}
-		statusBar.addTo(parent);
-	}
+    private void initStatusBar(final BorderPane parent) {
+        if (isConnected) {
+            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh Log Configurations", "REFRESH");
+            statusBar.clearAllInRight();
+            statusBar.addToRight(node);
+        } else {
+            statusBar.clearAllInRight();
+        }
+        statusBar.addTo(parent);
+    }
 
-	private void refreshData() {
-		dataProvider.retrieveInfo("loggerContexts", true);
-	}
+    private void refreshData() {
+        dataProvider.retrieveInfo("loggerContexts", true);
+    }
 
 }

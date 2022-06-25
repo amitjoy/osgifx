@@ -22,9 +22,9 @@ import org.osgi.resource.Resource;
 
 public class RequirementImpl extends CapReq implements Requirement {
 
-	RequirementImpl(final String namespace, final Resource resource, final Map<String, String> directives,
-	        final Map<String, Object> attributes) {
-		super(MODE.Requirement, namespace, resource, directives, attributes);
-	}
+    RequirementImpl(final String namespace, final Resource resource, final Map<String, String> directives,
+            final Map<String, Object> attributes) {
+        super(MODE.Requirement, namespace, resource, directives, attributes);
+    }
 
 }

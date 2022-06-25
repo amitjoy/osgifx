@@ -21,10 +21,10 @@ import org.osgi.dto.DTO;
 
 public class XDmtNodeDTO extends DTO {
 
-	public String            uri;
-	public String            value;
-	public DmtDataType       format;
-	public String            createdAt;
-	public List<XDmtNodeDTO> children;
+    public String            uri;
+    public String            value;
+    public DmtDataType       format;
+    public String            createdAt;
+    public List<XDmtNodeDTO> children;
 
 }

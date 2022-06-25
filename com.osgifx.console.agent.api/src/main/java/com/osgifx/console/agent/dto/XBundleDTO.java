@@ -23,28 +23,28 @@ import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
 public class XBundleDTO extends BundleDTO {
 
-	public String                state;
-	public String                location;
-	public String                category;
-	public int                   revisions;
-	public boolean               isFragment;
-	public long                  lastModified;
-	public String                documentation;
-	public String                vendor;
-	public String                description;
-	public int                   startLevel;
-	public long                  startDurationInMillis;
-	public BundleRevisionDTO     bundleRevision;
-	public List<XPackageDTO>     exportedPackages;
-	public List<XPackageDTO>     importedPackages;
-	public List<XBundleInfoDTO>  wiredBundlesAsProvider;
-	public List<XBundleInfoDTO>  wiredBundlesAsRequirer;
-	public List<XServiceInfoDTO> registeredServices;
-	public Map<String, String>   manifestHeaders;
-	public List<XServiceInfoDTO> usedServices;
-	public List<XBundleInfoDTO>  hostBundles;
-	public List<XBundleInfoDTO>  fragmentsAttached;
-	public boolean               isPersistentlyStarted;
-	public boolean               isActivationPolicyUsed;
+    public String                state;
+    public String                location;
+    public String                category;
+    public int                   revisions;
+    public boolean               isFragment;
+    public long                  lastModified;
+    public String                documentation;
+    public String                vendor;
+    public String                description;
+    public int                   startLevel;
+    public long                  startDurationInMillis;
+    public BundleRevisionDTO     bundleRevision;
+    public List<XPackageDTO>     exportedPackages;
+    public List<XPackageDTO>     importedPackages;
+    public List<XBundleInfoDTO>  wiredBundlesAsProvider;
+    public List<XBundleInfoDTO>  wiredBundlesAsRequirer;
+    public List<XServiceInfoDTO> registeredServices;
+    public Map<String, String>   manifestHeaders;
+    public List<XServiceInfoDTO> usedServices;
+    public List<XBundleInfoDTO>  hostBundles;
+    public List<XBundleInfoDTO>  fragmentsAttached;
+    public boolean               isPersistentlyStarted;
+    public boolean               isActivationPolicyUsed;
 
 }

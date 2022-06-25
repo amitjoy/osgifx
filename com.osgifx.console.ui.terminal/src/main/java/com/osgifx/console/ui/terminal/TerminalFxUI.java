@@ -42,67 +42,67 @@ import javafx.scene.layout.BorderPane;
 
 public final class TerminalFxUI {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	@OSGiBundle
-	private BundleContext     context;
-	@Inject
-	private ConsoleStatusBar  statusBar;
-	@Inject
-	private ConsoleMaskerPane progressPane;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext     context;
+    @Inject
+    private ConsoleStatusBar  statusBar;
+    @Inject
+    private ConsoleMaskerPane progressPane;
 
-	@PostConstruct
-	public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-		createControls(parent, loader);
-		logger.atDebug().log("Terminal part has been initialized");
-	}
+    @PostConstruct
+    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
+        logger.atDebug().log("Terminal part has been initialized");
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentConnectedEvent( //
-	        @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		logger.atInfo().log("Agent connected event received");
-		createControls(parent, loader);
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent( //
+            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        logger.atInfo().log("Agent connected event received");
+        createControls(parent, loader);
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentDisconnectedEvent( //
-	        @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-	        final BorderPane parent, //
-	        @LocalInstance final FXMLLoader loader) {
-		logger.atInfo().log("Agent disconnected event received");
-		createControls(parent, loader);
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent( //
+            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+            final BorderPane parent, //
+            @LocalInstance final FXMLLoader loader) {
+        logger.atInfo().log("Agent disconnected event received");
+        createControls(parent, loader);
+    }
 
-	private void createControls(final BorderPane parent, final FXMLLoader loader) {
-		progressPane.setVisible(true);
-		final Task<Void> task = new Task<>() {
+    private void createControls(final BorderPane parent, final FXMLLoader loader) {
+        progressPane.setVisible(true);
+        final Task<Void> task = new Task<>() {
 
-			Node tabContent;
+            Node tabContent;
 
-			@Override
-			protected Void call() throws Exception {
-				tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
-				return null;
-			}
+            @Override
+            protected Void call() throws Exception {
+                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+                return null;
+            }
 
-			@Override
-			protected void succeeded() {
-				parent.getChildren().clear();
-				parent.setCenter(tabContent);
-				statusBar.addTo(parent);
-				progressPane.setVisible(false);
-			}
-		};
-		parent.getChildren().clear();
-		progressPane.addTo(parent);
-		statusBar.addTo(parent);
-		CompletableFuture.runAsync(task);
-	}
+            @Override
+            protected void succeeded() {
+                parent.getChildren().clear();
+                parent.setCenter(tabContent);
+                statusBar.addTo(parent);
+                progressPane.setVisible(false);
+            }
+        };
+        parent.getChildren().clear();
+        progressPane.addTo(parent);
+        statusBar.addTo(parent);
+        CompletableFuture.runAsync(task);
+    }
 
 }

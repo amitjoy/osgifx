@@ -19,7 +19,7 @@ import org.osgi.dto.DTO;
 
 public class XHeapdumpDTO extends DTO {
 
-	public long   size;
-	public String location;
+    public long   size;
+    public String location;
 
 }

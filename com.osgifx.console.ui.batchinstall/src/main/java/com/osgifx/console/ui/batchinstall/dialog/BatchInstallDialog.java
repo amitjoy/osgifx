@@ -42,50 +42,50 @@ import javafx.stage.StageStyle;
 
 public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
 
-	@Inject
-	@LocalInstance
-	private FXMLLoader    loader;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
+    @Inject
+    @LocalInstance
+    private FXMLLoader    loader;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
 
-	public void init() {
-		final var dialogPane = getDialogPane();
-		initStyle(StageStyle.UNDECORATED);
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+    public void init() {
+        final var dialogPane = getDialogPane();
+        initStyle(StageStyle.UNDECORATED);
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-		dialogPane
-		        .setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '" + ARTIFACTS_DIRECTORY + "' directory");
-		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
+        dialogPane
+                .setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '" + ARTIFACTS_DIRECTORY + "' directory");
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
 
-		final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
-		dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);
+        final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);
 
-		final var dialogContent = Fx.loadFXML(loader, context, "/fxml/batch-install-dialog.fxml");
-		dialogPane.setContent(dialogContent);
+        final var dialogContent = Fx.loadFXML(loader, context, "/fxml/batch-install-dialog.fxml");
+        dialogPane.setContent(dialogContent);
 
-		final var controller              = (BatchInstallDialogController) loader.getController();
-		final var targetItemsProperty     = controller.targetItemsProperty();
-		final var targetItemsListProperty = new SimpleListProperty<ArtifactDTO>();
+        final var controller              = (BatchInstallDialogController) loader.getController();
+        final var targetItemsProperty     = controller.targetItemsProperty();
+        final var targetItemsListProperty = new SimpleListProperty<ArtifactDTO>();
 
-		targetItemsListProperty.bind(targetItemsProperty);
-		final BooleanProperty isItemSelected = new SimpleBooleanProperty();
+        targetItemsListProperty.bind(targetItemsProperty);
+        final BooleanProperty isItemSelected = new SimpleBooleanProperty();
 
-		isItemSelected.bind(targetItemsListProperty.emptyProperty());
+        isItemSelected.bind(targetItemsListProperty.emptyProperty());
 
-		dialogPane.lookupButton(installButtonType).disableProperty().bind(isItemSelected);
-		setResultConverter(dialogButton -> {
-			final var data = dialogButton == null ? null : dialogButton.getButtonData();
-			return data == ButtonData.OK_DONE ? controller.getSelectedArtifacts() : null;
-		});
-	}
+        dialogPane.lookupButton(installButtonType).disableProperty().bind(isItemSelected);
+        setResultConverter(dialogButton -> {
+            final var data = dialogButton == null ? null : dialogButton.getButtonData();
+            return data == ButtonData.OK_DONE ? controller.getSelectedArtifacts() : null;
+        });
+    }
 
-	public void traverseDirectoryForFiles() {
-		final var controller = (BatchInstallDialogController) loader.getController();
-		controller.initArtifacts();
-	}
+    public void traverseDirectoryForFiles() {
+        final var controller = (BatchInstallDialogController) loader.getController();
+        controller.initArtifacts();
+    }
 
-	public static record ArtifactDTO(File file, boolean isConfiguration) {
-	}
+    public static record ArtifactDTO(File file, boolean isConfiguration) {
+    }
 
 }

@@ -37,48 +37,48 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LeaksFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                     logger;
-	@FXML
-	private TableView<XBundleDTO>            table;
-	@FXML
-	private TableColumn<XBundleDTO, Integer> idColumn;
-	@FXML
-	private TableColumn<XBundleDTO, String>  bsnColumn;
-	@FXML
-	private TableColumn<XBundleDTO, String>  versionColumn;
-	@FXML
-	private TableColumn<XBundleDTO, String>  stateColumn;
-	@Inject
-	@Named("is_connected")
-	private boolean                          isConnected;
-	@Inject
-	private DataProvider                     dataProvider;
+    @Log
+    @Inject
+    private FluentLogger                     logger;
+    @FXML
+    private TableView<XBundleDTO>            table;
+    @FXML
+    private TableColumn<XBundleDTO, Integer> idColumn;
+    @FXML
+    private TableColumn<XBundleDTO, String>  bsnColumn;
+    @FXML
+    private TableColumn<XBundleDTO, String>  versionColumn;
+    @FXML
+    private TableColumn<XBundleDTO, String>  stateColumn;
+    @Inject
+    @Named("is_connected")
+    private boolean                          isConnected;
+    @Inject
+    private DataProvider                     dataProvider;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			initCells();
-			Fx.addContextMenuToCopyContent(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            initCells();
+            Fx.addContextMenuToCopyContent(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void initCells() {
-		idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
-		bsnColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
-		versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
-		stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
+    private void initCells() {
+        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+        bsnColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
+        stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
-		table.setItems(dataProvider.leaks());
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        table.setItems(dataProvider.leaks());
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

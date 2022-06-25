@@ -41,77 +41,77 @@ import javafx.concurrent.Task;
 
 public final class BatchInstallHandler {
 
-	private static final String HEADER = "Installing artifacts from directory";
+    private static final String HEADER = "Installing artifacts from directory";
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEclipseContext   context;
-	@Inject
-	private ArtifactInstaller installer;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	private ProgressDialog    progressDialog;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEclipseContext   context;
+    @Inject
+    private ArtifactInstaller installer;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    private ProgressDialog    progressDialog;
 
-	@Execute
-	public void execute() {
-		final var dialog = new BatchInstallDialog();
+    @Execute
+    public void execute() {
+        final var dialog = new BatchInstallDialog();
 
-		ContextInjectionFactory.inject(dialog, context);
-		logger.atDebug().log("Injected batch install dialog to eclipse context");
-		dialog.init();
+        ContextInjectionFactory.inject(dialog, context);
+        logger.atDebug().log("Injected batch install dialog to eclipse context");
+        dialog.init();
 
-		dialog.traverseDirectoryForFiles();
-		final var selectedFeatures = dialog.showAndWait();
-		if (selectedFeatures.isPresent()) {
-			final Task<String> batchTask = new Task<>() {
-				@Override
-				protected String call() throws Exception {
-					return installer.installArtifacts(selectedFeatures.get());
-				}
-			};
-			batchTask.setOnSucceeded(t -> {
-				final var result = batchTask.getValue();
-				if (result != null) {
-					if (!result.isEmpty()) {
-						threadSync.asyncExec(() -> {
-							progressDialog.close();
-							FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
-						});
-					} else {
-						threadSync.asyncExec(progressDialog::close);
-					}
-				}
-			});
-			final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(batchTask).exceptionally(e -> {
-				if (progressDialog != null) {
-					threadSync.asyncExec(() -> {
-						progressDialog.close();
-						FxDialog.showExceptionDialog(e, BatchInstallHandler.class.getClassLoader());
-					});
-				}
-				return null;
-			});
-			progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
-		}
-	}
+        dialog.traverseDirectoryForFiles();
+        final var selectedFeatures = dialog.showAndWait();
+        if (selectedFeatures.isPresent()) {
+            final Task<String> batchTask = new Task<>() {
+                @Override
+                protected String call() throws Exception {
+                    return installer.installArtifacts(selectedFeatures.get());
+                }
+            };
+            batchTask.setOnSucceeded(t -> {
+                final var result = batchTask.getValue();
+                if (result != null) {
+                    if (!result.isEmpty()) {
+                        threadSync.asyncExec(() -> {
+                            progressDialog.close();
+                            FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
+                        });
+                    } else {
+                        threadSync.asyncExec(progressDialog::close);
+                    }
+                }
+            });
+            final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(batchTask).exceptionally(e -> {
+                if (progressDialog != null) {
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, BatchInstallHandler.class.getClassLoader());
+                    });
+                }
+                return null;
+            });
+            progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
+        }
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent disconnected event received");
-		if (progressDialog != null) {
-			progressDialog.close();
-		}
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event received");
+        if (progressDialog != null) {
+            progressDialog.close();
+        }
+    }
 
 }

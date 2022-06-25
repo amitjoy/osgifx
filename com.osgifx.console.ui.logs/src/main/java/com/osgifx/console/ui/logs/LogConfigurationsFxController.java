@@ -44,72 +44,72 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogConfigurationsFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                                  logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                                    loader;
-	@FXML
-	private TableView<XBundleLoggerContextDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                                 context;
-	@Inject
-	@Named("is_connected")
-	private boolean                                       isConnected;
-	@Inject
-	private DataProvider                                  dataProvider;
-	private TableRowDataFeatures<XBundleLoggerContextDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                                  logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                                    loader;
+    @FXML
+    private TableView<XBundleLoggerContextDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                                 context;
+    @Inject
+    @Named("is_connected")
+    private boolean                                       isConnected;
+    @Inject
+    private DataProvider                                  dataProvider;
+    private TableRowDataFeatures<XBundleLoggerContextDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-log-configurations.fxml");
-		final var controller     = (LogConfigurationEditorFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XBundleLoggerContextDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-log-configurations.fxml");
+        final var controller     = (LogConfigurationEditorFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<XBundleLoggerContextDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var nameColumn = new TableColumn<XBundleLoggerContextDTO, String>("Logger Context Name");
+        final var nameColumn = new TableColumn<XBundleLoggerContextDTO, String>("Logger Context Name");
 
-		nameColumn.setPrefWidth(650);
-		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+        nameColumn.setPrefWidth(650);
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-		final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>("Has Custom Log Levels?");
+        final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>("Has Custom Log Levels?");
 
-		hasCustomLogLevelsColumn.setPrefWidth(250);
-		hasCustomLogLevelsColumn.setCellValueFactory(c -> new SimpleBooleanProperty(!c.getValue().logLevels.isEmpty()));
+        hasCustomLogLevelsColumn.setPrefWidth(250);
+        hasCustomLogLevelsColumn.setCellValueFactory(c -> new SimpleBooleanProperty(!c.getValue().logLevels.isEmpty()));
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(nameColumn);
-		table.getColumns().add(hasCustomLogLevelsColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(nameColumn);
+        table.getColumns().add(hasCustomLogLevelsColumn);
 
-		final var loggerContexts = dataProvider.loggerContexts();
-		table.setItems(loggerContexts);
+        final var loggerContexts = dataProvider.loggerContexts();
+        table.setItems(loggerContexts);
 
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

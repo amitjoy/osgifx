@@ -74,26 +74,26 @@ import javafx.collections.ObservableList;
 @SuppressWarnings("unchecked")
 public final class RuntimeDataProvider implements DataProvider {
 
-	@Reference
-	private LoggerFactory factory;
-	@Reference
-	private EventAdmin    eventAdmin;
-	@Reference
-	private Supervisor    supervisor;
+    @Reference
+    private LoggerFactory factory;
+    @Reference
+    private EventAdmin    eventAdmin;
+    @Reference
+    private Supervisor    supervisor;
 
-	private FluentLogger                           logger;
-	private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newConcurrentMap();
+    private FluentLogger                           logger;
+    private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newConcurrentMap();
 
-	@Activate
-	public void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    public void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public void retrieveInfo(final String id, final boolean isAsync) {
-		if (id == null) {
-			if (isAsync) {
-				// @formatter:off
+    @Override
+    public void retrieveInfo(final String id, final boolean isAsync) {
+        if (id == null) {
+            if (isAsync) {
+                // @formatter:off
 				final Collection<CompletableFuture<Void>> futures =
 						infoSuppliers.values()
 						             .stream()
@@ -103,127 +103,127 @@ public final class RuntimeDataProvider implements DataProvider {
 				                 .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
 				                 .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
 				// @formatter:on
-			} else {
-				infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
-				RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
-				logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
-			}
-		} else if (isAsync) {
-			CompletableFuture.runAsync(() -> retrieve(id))
-			        .thenRunAsync(() -> logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id));
-		} else {
-			retrieve(id);
-			logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
-		}
-	}
+            } else {
+                infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
+                logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
+            }
+        } else if (isAsync) {
+            CompletableFuture.runAsync(() -> retrieve(id))
+                    .thenRunAsync(() -> logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id));
+        } else {
+            retrieve(id);
+            logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
+        }
+    }
 
-	@Override
-	public ObservableList<XBundleDTO> bundles() {
-		return (ObservableList<XBundleDTO>) getData(BUNDLES_ID);
-	}
+    @Override
+    public ObservableList<XBundleDTO> bundles() {
+        return (ObservableList<XBundleDTO>) getData(BUNDLES_ID);
+    }
 
-	@Override
-	public ObservableList<PackageDTO> packages() {
-		return (ObservableList<PackageDTO>) getData(PACKAGES_ID);
-	}
+    @Override
+    public ObservableList<PackageDTO> packages() {
+        return (ObservableList<PackageDTO>) getData(PACKAGES_ID);
+    }
 
-	@Override
-	public ObservableList<XServiceDTO> services() {
-		return (ObservableList<XServiceDTO>) getData(SERVICES_ID);
-	}
+    @Override
+    public ObservableList<XServiceDTO> services() {
+        return (ObservableList<XServiceDTO>) getData(SERVICES_ID);
+    }
 
-	@Override
-	public ObservableList<XComponentDTO> components() {
-		return (ObservableList<XComponentDTO>) getData(COMPONENTS_ID);
-	}
+    @Override
+    public ObservableList<XComponentDTO> components() {
+        return (ObservableList<XComponentDTO>) getData(COMPONENTS_ID);
+    }
 
-	@Override
-	public ObservableList<XConfigurationDTO> configurations() {
-		return (ObservableList<XConfigurationDTO>) getData(CONFIGURATIONS_ID);
-	}
+    @Override
+    public ObservableList<XConfigurationDTO> configurations() {
+        return (ObservableList<XConfigurationDTO>) getData(CONFIGURATIONS_ID);
+    }
 
-	@Override
-	public ObservableList<XEventDTO> events() {
-		return (ObservableList<XEventDTO>) getData(EVENTS_ID);
-	}
+    @Override
+    public ObservableList<XEventDTO> events() {
+        return (ObservableList<XEventDTO>) getData(EVENTS_ID);
+    }
 
-	@Override
-	public ObservableList<XLogEntryDTO> logs() {
-		return (ObservableList<XLogEntryDTO>) getData(LOGS_ID);
-	}
+    @Override
+    public ObservableList<XLogEntryDTO> logs() {
+        return (ObservableList<XLogEntryDTO>) getData(LOGS_ID);
+    }
 
-	@Override
-	public ObservableList<XPropertyDTO> properties() {
-		return (ObservableList<XPropertyDTO>) getData(PROPERTIES_ID);
-	}
+    @Override
+    public ObservableList<XPropertyDTO> properties() {
+        return (ObservableList<XPropertyDTO>) getData(PROPERTIES_ID);
+    }
 
-	@Override
-	public ObservableList<XThreadDTO> threads() {
-		return (ObservableList<XThreadDTO>) getData(THREADS_ID);
-	}
+    @Override
+    public ObservableList<XThreadDTO> threads() {
+        return (ObservableList<XThreadDTO>) getData(THREADS_ID);
+    }
 
-	@Override
-	public ObservableList<XBundleDTO> leaks() {
-		return (ObservableList<XBundleDTO>) getData(LEAKS_ID);
-	}
+    @Override
+    public ObservableList<XBundleDTO> leaks() {
+        return (ObservableList<XBundleDTO>) getData(LEAKS_ID);
+    }
 
-	@Override
-	public ObservableList<XHttpComponentDTO> httpComponents() {
-		return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
-	}
+    @Override
+    public ObservableList<XHttpComponentDTO> httpComponents() {
+        return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
+    }
 
-	@Override
-	public ObservableList<XHealthCheckDTO> healthchecks() {
-		return (ObservableList<XHealthCheckDTO>) getData(HEALTHCHECKS_ID);
-	}
+    @Override
+    public ObservableList<XHealthCheckDTO> healthchecks() {
+        return (ObservableList<XHealthCheckDTO>) getData(HEALTHCHECKS_ID);
+    }
 
-	@Override
-	public ObservableList<XRoleDTO> roles() {
-		return (ObservableList<XRoleDTO>) getData(ROLES_ID);
-	}
+    @Override
+    public ObservableList<XRoleDTO> roles() {
+        return (ObservableList<XRoleDTO>) getData(ROLES_ID);
+    }
 
-	@Override
-	public ObservableList<XBundleLoggerContextDTO> loggerContexts() {
-		return (ObservableList<XBundleLoggerContextDTO>) getData(LOGGER_CONTEXTS_ID);
-	}
+    @Override
+    public ObservableList<XBundleLoggerContextDTO> loggerContexts() {
+        return (ObservableList<XBundleLoggerContextDTO>) getData(LOGGER_CONTEXTS_ID);
+    }
 
-	@Override
-	public XMemoryInfoDTO memory() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return null;
-		}
-		return agent.getMemoryInfo();
-	}
+    @Override
+    public XMemoryInfoDTO memory() {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return null;
+        }
+        return agent.getMemoryInfo();
+    }
 
-	@Override
-	public XDmtNodeDTO readDmtNode(final String rootURI) {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return null;
-		}
-		return agent.readDmtNode(rootURI);
-	}
+    @Override
+    public XDmtNodeDTO readDmtNode(final String rootURI) {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return null;
+        }
+        return agent.readDmtNode(rootURI);
+    }
 
-	@Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-	void bindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
-		final var id = (String) reference.getProperty(PROPERTY_ID);
-		infoSuppliers.put(id, supplier);
-	}
+    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
+    void bindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
+        final var id = (String) reference.getProperty(PROPERTY_ID);
+        infoSuppliers.put(id, supplier);
+    }
 
-	void unbindInfoSupplier(final ServiceReference<RuntimeInfoSupplier> reference) {
-		final var id = (String) reference.getProperty(PROPERTY_ID);
-		infoSuppliers.remove(id);
-	}
+    void unbindInfoSupplier(final ServiceReference<RuntimeInfoSupplier> reference) {
+        final var id = (String) reference.getProperty(PROPERTY_ID);
+        infoSuppliers.remove(id);
+    }
 
-	private ObservableList<?> getData(final String id) {
-		return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply).orElse(observableArrayList());
-	}
+    private ObservableList<?> getData(final String id) {
+        return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply).orElse(observableArrayList());
+    }
 
-	private void retrieve(final String id) {
-		Optional.ofNullable(infoSuppliers.get(id)).ifPresent(RuntimeInfoSupplier::retrieve);
-	}
+    private void retrieve(final String id) {
+        Optional.ofNullable(infoSuppliers.get(id)).ifPresent(RuntimeInfoSupplier::retrieve);
+    }
 
 }

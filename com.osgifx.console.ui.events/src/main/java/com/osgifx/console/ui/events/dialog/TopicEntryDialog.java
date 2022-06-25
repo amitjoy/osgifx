@@ -50,124 +50,124 @@ import javafx.stage.StageStyle;
 
 public final class TopicEntryDialog extends Dialog<Set<String>> {
 
-	@Log
-	@Inject
-	private FluentLogger logger;
+    @Log
+    @Inject
+    private FluentLogger logger;
 
-	private final List<PropertiesForm> entries           = Lists.newArrayList();
-	private final ValidationSupport    validationSupport = new ValidationSupport();
+    private final List<PropertiesForm> entries           = Lists.newArrayList();
+    private final ValidationSupport    validationSupport = new ValidationSupport();
 
-	public void init() {
-		final var dialogPane = getDialogPane();
+    public void init() {
+        final var dialogPane = getDialogPane();
 
-		initStyle(StageStyle.UNDECORATED);
-		dialogPane.setHeaderText("Receive Events from Topics");
-		dialogPane.getStylesheets().add(getClass().getClassLoader().getResource(STANDARD_CSS).toExternalForm());
-		dialogPane.setGraphic(new ImageView(getClass().getClassLoader().getResource("/graphic/images/event-receive.png").toString()));
-		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        initStyle(StageStyle.UNDECORATED);
+        dialogPane.setHeaderText("Receive Events from Topics");
+        dialogPane.getStylesheets().add(getClass().getClassLoader().getResource(STANDARD_CSS).toExternalForm());
+        dialogPane.setGraphic(new ImageView(getClass().getClassLoader().getResource("/graphic/images/event-receive.png").toString()));
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-		final var lbMessage = new Label("");
-		lbMessage.getStyleClass().addAll("message-banner");
-		lbMessage.setVisible(false);
-		lbMessage.setManaged(false);
+        final var lbMessage = new Label("");
+        lbMessage.getStyleClass().addAll("message-banner");
+        lbMessage.setVisible(false);
+        lbMessage.setManaged(false);
 
-		final var content = new VBox(10);
-		addFieldPair(content);
+        final var content = new VBox(10);
+        addFieldPair(content);
 
-		dialogPane.setContent(content);
+        dialogPane.setContent(content);
 
-		final var finishButtonType = new ButtonType("Finish", ButtonData.OK_DONE);
-		dialogPane.getButtonTypes().addAll(finishButtonType);
+        final var finishButtonType = new ButtonType("Finish", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(finishButtonType);
 
-		final var finishButton = (Button) dialogPane.lookupButton(finishButtonType);
-		finishButton.setOnAction(actionEvent -> {
-			try {
-				lbMessage.setVisible(false);
-				lbMessage.setManaged(false);
-				hide();
-			} catch (final Exception ex) {
-				lbMessage.setVisible(true);
-				lbMessage.setManaged(true);
-				lbMessage.setText(ex.getMessage());
-				FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
-			}
-		});
-		setResultConverter(dialogButton -> {
-			final var data = dialogButton == null ? null : dialogButton.getButtonData();
-			if (data == ButtonData.CANCEL_CLOSE) {
-				return null;
-			}
-			try {
-				if (data == ButtonData.OK_DONE) {
-					if (validationSupport.isInvalid()) {
-						throw new RuntimeException("Topic validation failed");
-					}
-					return getInput();
-				}
-				return null;
-			} catch (final Exception e) {
-				logger.atError().withException(e).log("Invalid topic");
-				throw e;
-			}
-		});
-	}
+        final var finishButton = (Button) dialogPane.lookupButton(finishButtonType);
+        finishButton.setOnAction(actionEvent -> {
+            try {
+                lbMessage.setVisible(false);
+                lbMessage.setManaged(false);
+                hide();
+            } catch (final Exception ex) {
+                lbMessage.setVisible(true);
+                lbMessage.setManaged(true);
+                lbMessage.setText(ex.getMessage());
+                FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
+            }
+        });
+        setResultConverter(dialogButton -> {
+            final var data = dialogButton == null ? null : dialogButton.getButtonData();
+            if (data == ButtonData.CANCEL_CLOSE) {
+                return null;
+            }
+            try {
+                if (data == ButtonData.OK_DONE) {
+                    if (validationSupport.isInvalid()) {
+                        throw new RuntimeException("Topic validation failed");
+                    }
+                    return getInput();
+                }
+                return null;
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Invalid topic");
+                throw e;
+            }
+        });
+    }
 
-	private Set<String> getInput() {
-		final Set<String> topics = Sets.newHashSet();
-		for (final PropertiesForm form : entries) {
-			final var value = form.textTopic.getText();
-			if (Strings.isNullOrEmpty(value)) {
-				continue;
-			}
-			topics.add(value);
-		}
-		return topics;
-	}
+    private Set<String> getInput() {
+        final Set<String> topics = Sets.newHashSet();
+        for (final PropertiesForm form : entries) {
+            final var value = form.textTopic.getText();
+            if (Strings.isNullOrEmpty(value)) {
+                continue;
+            }
+            topics.add(value);
+        }
+        return topics;
+    }
 
-	private class PropertiesForm extends HBox {
+    private class PropertiesForm extends HBox {
 
-		private final Button btnAddField;
-		private final Button btnRemoveField;
+        private final Button btnAddField;
+        private final Button btnRemoveField;
 
-		private final CustomTextField textTopic;
+        private final CustomTextField textTopic;
 
-		public PropertiesForm(final VBox parent) {
-			setAlignment(Pos.CENTER_LEFT);
-			setSpacing(5);
+        public PropertiesForm(final VBox parent) {
+            setAlignment(Pos.CENTER_LEFT);
+            setSpacing(5);
 
-			textTopic = (CustomTextField) TextFields.createClearableTextField();
-			textTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
-			textTopic.setPromptText("Event Topic");
-			validationSupport.registerValidator(textTopic,
-			        Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
+            textTopic = (CustomTextField) TextFields.createClearableTextField();
+            textTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
+            textTopic.setPromptText("Event Topic");
+            validationSupport.registerValidator(textTopic,
+                    Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
-			btnAddField    = new Button();
-			btnRemoveField = new Button();
+            btnAddField    = new Button();
+            btnRemoveField = new Button();
 
-			btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
-			btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
+            btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
+            btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
 
-			btnAddField.setOnAction(e -> addFieldPair(parent));
-			btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
+            btnAddField.setOnAction(e -> addFieldPair(parent));
+            btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
 
-			getChildren().addAll(textTopic, btnAddField, btnRemoveField);
-			entries.add(this);
-		}
+            getChildren().addAll(textTopic, btnAddField, btnRemoveField);
+            entries.add(this);
+        }
 
-		private void removeFieldPair(final VBox content, final PropertiesForm form) {
-			if (content.getChildren().size() > 1) {
-				content.getChildren().remove(form);
-				getDialogPane().getScene().getWindow().sizeToScene();
-				validationSupport.deregisterValidator(textTopic);
-				textTopic.getProperties().clear();
-			}
-			entries.remove(form);
-		}
-	}
+        private void removeFieldPair(final VBox content, final PropertiesForm form) {
+            if (content.getChildren().size() > 1) {
+                content.getChildren().remove(form);
+                getDialogPane().getScene().getWindow().sizeToScene();
+                validationSupport.deregisterValidator(textTopic);
+                textTopic.getProperties().clear();
+            }
+            entries.remove(form);
+        }
+    }
 
-	private void addFieldPair(final VBox content) {
-		content.getChildren().add(new PropertiesForm(content));
-		getDialogPane().getScene().getWindow().sizeToScene();
-	}
+    private void addFieldPair(final VBox content) {
+        content.getChildren().add(new PropertiesForm(content));
+        getDialogPane().getScene().getWindow().sizeToScene();
+    }
 
 }

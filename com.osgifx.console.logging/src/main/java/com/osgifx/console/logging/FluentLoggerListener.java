@@ -32,43 +32,43 @@ import com.google.common.collect.Maps;
 @Component
 public final class FluentLoggerListener implements LogListener {
 
-	@Reference
-	private LoggerFactory                   factory;
-	@Reference
-	private LogReaderService                logReader;
-	private final Map<String, FluentLogger> loggers = Maps.newConcurrentMap();
+    @Reference
+    private LoggerFactory                   factory;
+    @Reference
+    private LogReaderService                logReader;
+    private final Map<String, FluentLogger> loggers = Maps.newConcurrentMap();
 
-	@Activate
-	void activate() {
-		logReader.addLogListener(this);
-	}
+    @Activate
+    void activate() {
+        logReader.addLogListener(this);
+    }
 
-	@Override
-	public void logged(final LogEntry entry) {
-		final var logger = loggers.computeIfAbsent(entry.getLoggerName(),
-		        e -> FluentLogger.of(factory.createLogger(entry.getLoggerName())));
-		log(entry, logger);
-	}
+    @Override
+    public void logged(final LogEntry entry) {
+        final var logger = loggers.computeIfAbsent(entry.getLoggerName(),
+                e -> FluentLogger.of(factory.createLogger(entry.getLoggerName())));
+        log(entry, logger);
+    }
 
-	private void log(final LogEntry entry, final FluentLogger logger) {
-		final var context   = logger.at(findLogLevel(entry));
-		final var exception = entry.getException();
-		if (exception != null) {
-			context.withException(exception);
-		}
-		context.log(entry.getMessage());
-	}
+    private void log(final LogEntry entry, final FluentLogger logger) {
+        final var context   = logger.at(findLogLevel(entry));
+        final var exception = entry.getException();
+        if (exception != null) {
+            context.withException(exception);
+        }
+        context.log(entry.getMessage());
+    }
 
-	private Level findLogLevel(final LogEntry entry) {
-		return switch (entry.getLogLevel()) {
-		case DEBUG -> Level.DEBUG;
-		case ERROR -> Level.ERROR;
-		case INFO -> Level.INFO;
-		case TRACE -> Level.TRACE;
-		case WARN -> Level.WARNING;
-		case AUDIT -> throw new RuntimeException("AUDIT severity cannot be handled");
-		default -> throw new RuntimeException("Log severity cannot be handled");
-		};
-	}
+    private Level findLogLevel(final LogEntry entry) {
+        return switch (entry.getLogLevel()) {
+        case DEBUG -> Level.DEBUG;
+        case ERROR -> Level.ERROR;
+        case INFO -> Level.INFO;
+        case TRACE -> Level.TRACE;
+        case WARN -> Level.WARNING;
+        case AUDIT -> throw new RuntimeException("AUDIT severity cannot be handled");
+        default -> throw new RuntimeException("Log severity cannot be handled");
+        };
+    }
 
 }
