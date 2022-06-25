@@ -29,44 +29,44 @@ import javafx.scene.layout.Pane;
 @ProviderType
 public interface ConsoleStatusBar {
 
-	/**
-	 * Adds the current status bar to the specified {@link Pane}
-	 *
-	 * @param pane the parent pane (cannot be {@code null})
-	 * @throws NullPointerException if the specified pane is {@code null}
-	 */
-	void addTo(BorderPane pane);
+    /**
+     * Adds the current status bar to the specified {@link Pane}
+     *
+     * @param pane the parent pane (cannot be {@code null})
+     * @throws NullPointerException if the specified pane is {@code null}
+     */
+    void addTo(BorderPane pane);
 
-	/**
-	 * The property used to store the progress, a value between 0 and 1. A negative
-	 * value causes the progress bar to show an indeterminate state.
-	 *
-	 * @return the property used to store the progress of a task
-	 */
-	DoubleProperty progressProperty();
+    /**
+     * The property used to store the progress, a value between 0 and 1. A negative
+     * value causes the progress bar to show an indeterminate state.
+     *
+     * @return the property used to store the progress of a task
+     */
+    DoubleProperty progressProperty();
 
-	/**
-	 * Adds the specified node to the left of the status bar
-	 *
-	 * @param node the specified node
-	 */
-	void addToLeft(Node node);
+    /**
+     * Adds the specified node to the left of the status bar
+     *
+     * @param node the specified node
+     */
+    void addToLeft(Node node);
 
-	/**
-	 * Adds the specified node to the right of the status bar
-	 *
-	 * @param node the specified node
-	 */
-	void addToRight(Node node);
+    /**
+     * Adds the specified node to the right of the status bar
+     *
+     * @param node the specified node
+     */
+    void addToRight(Node node);
 
-	/**
-	 * Removes all elements that are positioned right on the bar
-	 */
-	void clearAllInRight();
+    /**
+     * Removes all elements that are positioned right on the bar
+     */
+    void clearAllInRight();
 
-	/**
-	 * Removes all elements that are positioned left on the bar
-	 */
-	void clearAllInLeft();
+    /**
+     * Removes all elements that are positioned left on the bar
+     */
+    void clearAllInLeft();
 
 }

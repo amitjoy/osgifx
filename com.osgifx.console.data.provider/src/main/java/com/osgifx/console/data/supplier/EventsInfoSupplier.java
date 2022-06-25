@@ -45,51 +45,51 @@ import javafx.collections.ObservableList;
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, CLEAR_EVENTS_TOPIC })
 public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListener, EventHandler {
 
-	static final String PID = "event.receive.topics";
+    static final String PID = "event.receive.topics";
 
-	@interface Configuration {
-		String[] topics();
-	}
+    @interface Configuration {
+        String[] topics();
+    }
 
-	public static final String EVENTS_ID = "events";
+    public static final String EVENTS_ID = "events";
 
-	private Configuration     configuration;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
+    private Configuration     configuration;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
 
-	private final ObservableList<XEventDTO> events = observableArrayList();
+    private final ObservableList<XEventDTO> events = observableArrayList();
 
-	@Activate
-	@Modified
-	void init(final Configuration configuration) {
-		this.configuration = configuration;
-	}
+    @Activate
+    @Modified
+    void init(final Configuration configuration) {
+        this.configuration = configuration;
+    }
 
-	@Override
-	public void retrieve() {
-		// nothing to retrieve manually
-	}
+    @Override
+    public void retrieve() {
+        // nothing to retrieve manually
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return events;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return events;
+    }
 
-	@Override
-	public synchronized void onEvent(final XEventDTO event) {
-		events.add(event);
-	}
+    @Override
+    public synchronized void onEvent(final XEventDTO event) {
+        events.add(event);
+    }
 
-	@Override
-	public Collection<String> topics() {
-		return configuration != null ? Sets.newHashSet(configuration.topics()) : Set.of();
-	}
+    @Override
+    public Collection<String> topics() {
+        return configuration != null ? Sets.newHashSet(configuration.topics()) : Set.of();
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		threadSync.asyncExec(events::clear);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        threadSync.asyncExec(events::clear);
+    }
 
 }

@@ -22,15 +22,15 @@ import org.osgi.dto.DTO;
 
 public class XRoleDTO extends DTO {
 
-	public enum Type {
-		USER, GROUP, DEFAULT
-	}
+    public enum Type {
+        USER, GROUP, DEFAULT
+    }
 
-	public Type                type;
-	public String              name;
-	public Map<String, Object> properties;
-	public Map<String, Object> credentials;
-	public List<XRoleDTO>      basicMembers;
-	public List<XRoleDTO>      requiredMembers;
+    public Type                type;
+    public String              name;
+    public Map<String, Object> properties;
+    public Map<String, Object> credentials;
+    public List<XRoleDTO>      basicMembers;
+    public List<XRoleDTO>      requiredMembers;
 
 }

@@ -34,44 +34,44 @@ import com.osgifx.console.agent.dto.XPropertyDTO.XPropertyType;
 
 public class XPropertyAdmin {
 
-	private XPropertyAdmin() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private XPropertyAdmin() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static List<XPropertyDTO> get(final BundleContext context) {
-		try {
-			final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
-			return prepareProperties(dto.properties);
-		} catch (final Exception e) {
-			return Collections.emptyList();
-		}
-	}
+    public static List<XPropertyDTO> get(final BundleContext context) {
+        try {
+            final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
+            return prepareProperties(dto.properties);
+        } catch (final Exception e) {
+            return Collections.emptyList();
+        }
+    }
 
-	private static List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {
-		final Map<String, XPropertyDTO> allProperties = new HashMap<>();
-		for (final Entry<String, Object> property : properties.entrySet()) {
-			final String       key   = property.getKey();
-			final String       value = property.getValue().toString();
-			final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.FRAMEWORK);
-			allProperties.put(key, dto);
-		}
-		final Properties     systemProperties = System.getProperties();
-		final Enumeration<?> keys             = systemProperties.propertyNames();
-		while (keys.hasMoreElements()) {
-			final String       key   = keys.nextElement().toString();
-			final String       value = systemProperties.getProperty(key);
-			final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.SYSTEM);
-			allProperties.put(key, dto);
-		}
-		return allProperties.values().stream().collect(Collectors.toList());
-	}
+    private static List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {
+        final Map<String, XPropertyDTO> allProperties = new HashMap<>();
+        for (final Entry<String, Object> property : properties.entrySet()) {
+            final String       key   = property.getKey();
+            final String       value = property.getValue().toString();
+            final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.FRAMEWORK);
+            allProperties.put(key, dto);
+        }
+        final Properties     systemProperties = System.getProperties();
+        final Enumeration<?> keys             = systemProperties.propertyNames();
+        while (keys.hasMoreElements()) {
+            final String       key   = keys.nextElement().toString();
+            final String       value = systemProperties.getProperty(key);
+            final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.SYSTEM);
+            allProperties.put(key, dto);
+        }
+        return allProperties.values().stream().collect(Collectors.toList());
+    }
 
-	private static XPropertyDTO createPropertyDTO(final String name, final String value, final XPropertyType type) {
-		final XPropertyDTO dto = new XPropertyDTO();
-		dto.name  = name;
-		dto.value = value;
-		dto.type  = type;
-		return dto;
-	}
+    private static XPropertyDTO createPropertyDTO(final String name, final String value, final XPropertyType type) {
+        final XPropertyDTO dto = new XPropertyDTO();
+        dto.name  = name;
+        dto.value = value;
+        dto.type  = type;
+        return dto;
+    }
 
 }

@@ -53,50 +53,50 @@ import javafx.collections.ObservableList;
 // @formatter:on
 public final class HealthChecksInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String HEALTHCHECKS_ID = "healthchecks";
+    public static final String HEALTHCHECKS_ID = "healthchecks";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XHealthCheckDTO> healthchecks = observableArrayList();
+    private final ObservableList<XHealthCheckDTO> healthchecks = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving health checks info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		healthchecks.setAll(makeNullSafe(agent.getAllHealthChecks()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HEALTHCHECKS_TOPIC);
-		logger.atInfo().log("Healthchecks info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving health checks info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        healthchecks.setAll(makeNullSafe(agent.getAllHealthChecks()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HEALTHCHECKS_TOPIC);
+        logger.atInfo().log("Healthchecks info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return healthchecks;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return healthchecks;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(healthchecks::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(healthchecks::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

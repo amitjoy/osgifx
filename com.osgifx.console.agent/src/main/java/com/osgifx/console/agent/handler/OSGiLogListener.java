@@ -30,86 +30,86 @@ import com.osgifx.console.supervisor.Supervisor;
 
 public class OSGiLogListener implements LogListener {
 
-	private final Supervisor                supervisor;
-	private final BundleStartTimeCalculator bundleStartTimeCalculator;
+    private final Supervisor                supervisor;
+    private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
-	public OSGiLogListener(final Supervisor supervisor, final BundleStartTimeCalculator bundleStartTimeCalculator) {
-		this.supervisor                = supervisor;
-		this.bundleStartTimeCalculator = bundleStartTimeCalculator;
-	}
+    public OSGiLogListener(final Supervisor supervisor, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+        this.supervisor                = supervisor;
+        this.bundleStartTimeCalculator = bundleStartTimeCalculator;
+    }
 
-	@Override
-	public void logged(final LogEntry entry) {
-		if (supervisor != null) {
-			supervisor.logged(toDTO(entry));
-		}
-	}
+    @Override
+    public void logged(final LogEntry entry) {
+        if (supervisor != null) {
+            supervisor.logged(toDTO(entry));
+        }
+    }
 
-	@SuppressWarnings("deprecation")
-	private XLogEntryDTO toDTO(final LogEntry entry) {
-		final XLogEntryDTO dto = new XLogEntryDTO();
+    @SuppressWarnings("deprecation")
+    private XLogEntryDTO toDTO(final LogEntry entry) {
+        final XLogEntryDTO dto = new XLogEntryDTO();
 
-		dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
-		dto.message = entry.getMessage();
+        dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
+        dto.message = entry.getMessage();
 
-		dto.level     = getLevel(entry.getLevel());             // must not use OSGi R7 reference to getLogLevel()
-		dto.exception = toExceptionString(entry.getException());
-		dto.loggedAt  = entry.getTime();
+        dto.level     = getLevel(entry.getLevel());             // must not use OSGi R7 reference to getLogLevel()
+        dto.exception = toExceptionString(entry.getException());
+        dto.loggedAt  = entry.getTime();
 
-		final XResultDTO threadInfoResult = executeR7method(entry, "getThreadInfo");
-		final int        resultThreadInfo = threadInfoResult.result;
+        final XResultDTO threadInfoResult = executeR7method(entry, "getThreadInfo");
+        final int        resultThreadInfo = threadInfoResult.result;
 
-		if (resultThreadInfo == XResultDTO.SUCCESS) {
-			dto.threadInfo = threadInfoResult.response;
-		}
+        if (resultThreadInfo == XResultDTO.SUCCESS) {
+            dto.threadInfo = threadInfoResult.response;
+        }
 
-		final XResultDTO loggerNameResult = executeR7method(entry, "getLoggerName");
-		final int        resultLoggerName = loggerNameResult.result;
+        final XResultDTO loggerNameResult = executeR7method(entry, "getLoggerName");
+        final int        resultLoggerName = loggerNameResult.result;
 
-		if (resultLoggerName == XResultDTO.SUCCESS) {
-			dto.logger = threadInfoResult.response;
-		}
+        if (resultLoggerName == XResultDTO.SUCCESS) {
+            dto.logger = threadInfoResult.response;
+        }
 
-		return dto;
-	}
+        return dto;
+    }
 
-	private String getLevel(final int level) {
-		switch (level) {
-		case 0:
-			return "AUDIT";
-		case 1:
-			return "ERROR";
-		case 2:
-			return "WARN";
-		case 3:
-			return "INFO";
-		case 4:
-			return "DEBUG";
-		case 5:
-			return "TRACE";
-		default:
-			return "INFO";
-		}
-	}
+    private String getLevel(final int level) {
+        switch (level) {
+        case 0:
+            return "AUDIT";
+        case 1:
+            return "ERROR";
+        case 2:
+            return "WARN";
+        case 3:
+            return "INFO";
+        case 4:
+            return "DEBUG";
+        case 5:
+            return "TRACE";
+        default:
+            return "INFO";
+        }
+    }
 
-	private XResultDTO executeR7method(final Object object, final String methodName) {
-		final XResultDTO dto = new XResultDTO();
-		try {
-			dto.response = Reflect.on(object).call(methodName).get();
-			dto.result   = XResultDTO.SUCCESS;
-		} catch (final Exception e) {
-			dto.result = XResultDTO.ERROR;
-		}
-		return dto;
-	}
+    private XResultDTO executeR7method(final Object object, final String methodName) {
+        final XResultDTO dto = new XResultDTO();
+        try {
+            dto.response = Reflect.on(object).call(methodName).get();
+            dto.result   = XResultDTO.SUCCESS;
+        } catch (final Exception e) {
+            dto.result = XResultDTO.ERROR;
+        }
+        return dto;
+    }
 
-	public static String toExceptionString(final Throwable exception) {
-		if (exception == null) {
-			return null;
-		}
-		final StringWriter sw = new StringWriter();
-		exception.printStackTrace(new PrintWriter(sw));
-		return sw.toString();
-	}
+    public static String toExceptionString(final Throwable exception) {
+        if (exception == null) {
+            return null;
+        }
+        final StringWriter sw = new StringWriter();
+        exception.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+    }
 
 }

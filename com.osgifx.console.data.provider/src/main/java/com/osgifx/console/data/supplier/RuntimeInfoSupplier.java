@@ -24,21 +24,21 @@ import javafx.collections.ObservableList;
 
 public interface RuntimeInfoSupplier {
 
-	String PROPERTY_ID = "supplier.id";
+    String PROPERTY_ID = "supplier.id";
 
-	/**
-	 * Retrieves from the remote runtime
-	 */
-	void retrieve();
+    /**
+     * Retrieves from the remote runtime
+     */
+    void retrieve();
 
-	/**
-	 * Returns the observable list
-	 */
-	ObservableList<?> supply();
+    /**
+     * Returns the observable list
+     */
+    ObservableList<?> supply();
 
-	static void sendEvent(final EventAdmin eventAdmin, final String topic) {
-		final var event = new Event(topic, Map.of());
-		eventAdmin.postEvent(event);
-	}
+    static void sendEvent(final EventAdmin eventAdmin, final String topic) {
+        final var event = new Event(topic, Map.of());
+        eventAdmin.postEvent(event);
+    }
 
 }

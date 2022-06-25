@@ -27,84 +27,84 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
  */
 public interface Supervisor {
 
-	/** The topic where an event will be sent after the agent gets connected */
-	String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
+    /** The topic where an event will be sent after the agent gets connected */
+    String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
 
-	/** The topic where an event will be sent after the agent gets disconnected */
-	String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
+    /** The topic where an event will be sent after the agent gets disconnected */
+    String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
 
-	/**
-	 * Redirected standard output
-	 *
-	 * @param out the text that was redirected
-	 * @return ignored (to make sync)
-	 */
-	boolean stdout(String out) throws Exception;
+    /**
+     * Redirected standard output
+     *
+     * @param out the text that was redirected
+     * @return ignored (to make sync)
+     */
+    boolean stdout(String out) throws Exception;
 
-	/**
-	 * Redirected standard error.
-	 *
-	 * @param out the text that was redirected
-	 * @return ignored (to make sync)
-	 */
-	boolean stderr(String out) throws Exception;
+    /**
+     * Redirected standard error.
+     *
+     * @param out the text that was redirected
+     * @return ignored (to make sync)
+     */
+    boolean stderr(String out) throws Exception;
 
-	/**
-	 * Connects to the specific host and port using the provided timeout in
-	 * connection
-	 *
-	 * @param host    the host name
-	 * @param port    the port address
-	 * @param timeout the timeout in milliseconds
-	 *
-	 * @throws Exception if any issue occurs during connection
-	 */
-	void connect(String host, int port, int timeout) throws Exception;
+    /**
+     * Connects to the specific host and port using the provided timeout in
+     * connection
+     *
+     * @param host    the host name
+     * @param port    the port address
+     * @param timeout the timeout in milliseconds
+     *
+     * @throws Exception if any issue occurs during connection
+     */
+    void connect(String host, int port, int timeout) throws Exception;
 
-	/**
-	 * Callback method for OSGi Event Admin Events
-	 */
-	void onOSGiEvent(XEventDTO event);
+    /**
+     * Callback method for OSGi Event Admin Events
+     */
+    void onOSGiEvent(XEventDTO event);
 
-	/**
-	 * Callback method for logs
-	 */
-	void logged(XLogEntryDTO event);
+    /**
+     * Callback method for logs
+     */
+    void logged(XLogEntryDTO event);
 
-	/**
-	 * Registers the specified listener to listen to the OSGi events from the remote
-	 * machine
-	 *
-	 * @param eventListener the event listener to register
-	 */
-	void addOSGiEventListener(EventListener eventListener);
+    /**
+     * Registers the specified listener to listen to the OSGi events from the remote
+     * machine
+     *
+     * @param eventListener the event listener to register
+     */
+    void addOSGiEventListener(EventListener eventListener);
 
-	/**
-	 * Deregisters previously registered listener
-	 *
-	 * @param eventListener the listener to deregister
-	 */
-	void removeOSGiEventListener(EventListener eventListener);
+    /**
+     * Deregisters previously registered listener
+     *
+     * @param eventListener the listener to deregister
+     */
+    void removeOSGiEventListener(EventListener eventListener);
 
-	/**
-	 * Registers the specified listener to receive to the OSGi logs from the remote
-	 * machine
-	 *
-	 * @param logEntryListener the log entry listener to register
-	 */
-	void addOSGiLogListener(LogEntryListener logEntryListener);
+    /**
+     * Registers the specified listener to receive to the OSGi logs from the remote
+     * machine
+     *
+     * @param logEntryListener the log entry listener to register
+     */
+    void addOSGiLogListener(LogEntryListener logEntryListener);
 
-	/**
-	 * Deregisters previously registered log entry listener
-	 *
-	 * @param logEntryListener the log consumer to deregister
-	 */
-	void removeOSGiLogListener(LogEntryListener logEntryListener);
+    /**
+     * Deregisters previously registered log entry listener
+     *
+     * @param logEntryListener the log consumer to deregister
+     */
+    void removeOSGiLogListener(LogEntryListener logEntryListener);
 
-	/**
-	 * Returns the associated agent
-	 *
-	 * @return the agent
-	 */
-	Agent getAgent();
+    /**
+     * Returns the associated agent
+     *
+     * @return the agent
+     */
+    Agent getAgent();
 }

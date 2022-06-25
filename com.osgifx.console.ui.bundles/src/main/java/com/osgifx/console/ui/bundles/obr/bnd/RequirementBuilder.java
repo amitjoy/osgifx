@@ -20,25 +20,25 @@ import org.osgi.resource.Resource;
 
 public class RequirementBuilder extends CapReqBuilder {
 
-	public RequirementBuilder(final Resource resource, final String namespace) {
-		super(resource, namespace);
-	}
+    public RequirementBuilder(final Resource resource, final String namespace) {
+        super(resource, namespace);
+    }
 
-	public RequirementBuilder(final String namespace) {
-		super(namespace);
-	}
+    public RequirementBuilder(final String namespace) {
+        super(namespace);
+    }
 
-	public Requirement build() {
-		return super.buildRequirement();
-	}
+    public Requirement build() {
+        return super.buildRequirement();
+    }
 
-	public Requirement synthetic() {
-		return super.buildSyntheticRequirement();
-	}
+    public Requirement synthetic() {
+        return super.buildSyntheticRequirement();
+    }
 
-	public RequirementBuilder addFilter(final String filter) {
-		addDirective("filter", filter);
-		return this;
-	}
+    public RequirementBuilder addFilter(final String filter) {
+        addDirective("filter", filter);
+        return this;
+    }
 
 }

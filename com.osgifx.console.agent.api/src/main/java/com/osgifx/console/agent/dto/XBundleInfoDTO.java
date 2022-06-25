@@ -19,7 +19,7 @@ import org.osgi.dto.DTO;
 
 public class XBundleInfoDTO extends DTO {
 
-	public long   id;
-	public String symbolicName;
+    public long   id;
+    public String symbolicName;
 
 }

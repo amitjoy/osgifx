@@ -21,14 +21,14 @@ import org.osgi.dto.DTO;
 
 public class XHealthCheckDTO extends DTO {
 
-	public long         serviceID;
-	public String       name;
-	public String       mbeanName;
-	public String       cronExpression;
-	public Long         interval;
-	public Long         resultTTL;
-	public Long         resultCacheTTL;
-	public Long         keepNonOkResultsSticky;
-	public List<String> tags;
+    public long         serviceID;
+    public String       name;
+    public String       mbeanName;
+    public String       cronExpression;
+    public Long         interval;
+    public Long         resultTTL;
+    public Long         resultCacheTTL;
+    public Long         keepNonOkResultsSticky;
+    public List<String> tags;
 
 }

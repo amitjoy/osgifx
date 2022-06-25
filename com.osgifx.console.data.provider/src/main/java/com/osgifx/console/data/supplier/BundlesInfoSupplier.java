@@ -45,50 +45,50 @@ import javafx.collections.ObservableList;
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
 public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String BUNDLES_ID = "bundles";
+    public static final String BUNDLES_ID = "bundles";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XBundleDTO> bundles = observableArrayList();
+    private final ObservableList<XBundleDTO> bundles = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving bundles info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		bundles.setAll(makeNullSafe(agent.getAllBundles()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
-		logger.atInfo().log("Bundles info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving bundles info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        bundles.setAll(makeNullSafe(agent.getAllBundles()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
+        logger.atInfo().log("Bundles info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return bundles;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return bundles;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(bundles::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(bundles::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

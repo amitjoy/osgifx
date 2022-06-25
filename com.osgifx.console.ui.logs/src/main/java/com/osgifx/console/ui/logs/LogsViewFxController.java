@@ -47,86 +47,86 @@ import javafx.scene.paint.Color;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogsViewFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                       logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                         loader;
-	@FXML
-	private TableView<XLogEntryDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                      context;
-	@Inject
-	@Named("is_connected")
-	private boolean                            isConnected;
-	@Inject
-	private DataProvider                       dataProvider;
-	private TableRowDataFeatures<XLogEntryDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                       logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                         loader;
+    @FXML
+    private TableView<XLogEntryDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                      context;
+    @Inject
+    @Named("is_connected")
+    private boolean                            isConnected;
+    @Inject
+    private DataProvider                       dataProvider;
+    private TableRowDataFeatures<XLogEntryDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-logs.fxml");
-		final var controller     = (LogDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XLogEntryDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-logs.fxml");
+        final var controller     = (LogDetailsFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<XLogEntryDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var loggedAtColumn = new TableColumn<XLogEntryDTO, Date>("Logged At");
+        final var loggedAtColumn = new TableColumn<XLogEntryDTO, Date>("Logged At");
 
-		loggedAtColumn.setPrefWidth(270);
-		loggedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("loggedAt", Date.class));
+        loggedAtColumn.setPrefWidth(270);
+        loggedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("loggedAt", Date.class));
 
-		final var logLevelColumn = new TableColumn<XLogEntryDTO, String>("Level");
+        final var logLevelColumn = new TableColumn<XLogEntryDTO, String>("Level");
 
-		logLevelColumn.setPrefWidth(110);
-		logLevelColumn.setCellValueFactory(new DTOCellValueFactory<>("level", String.class));
+        logLevelColumn.setPrefWidth(110);
+        logLevelColumn.setCellValueFactory(new DTOCellValueFactory<>("level", String.class));
 
-		final var messageColumn = new TableColumn<XLogEntryDTO, String>("Message");
+        final var messageColumn = new TableColumn<XLogEntryDTO, String>("Message");
 
-		messageColumn.setPrefWidth(750);
-		messageColumn.setCellValueFactory(new DTOCellValueFactory<>("message", String.class));
-		Fx.addCellFactory(messageColumn, c -> "ERROR".equalsIgnoreCase(c.level), Color.MEDIUMVIOLETRED, Color.BLACK);
+        messageColumn.setPrefWidth(750);
+        messageColumn.setCellValueFactory(new DTOCellValueFactory<>("message", String.class));
+        Fx.addCellFactory(messageColumn, c -> "ERROR".equalsIgnoreCase(c.level), Color.MEDIUMVIOLETRED, Color.BLACK);
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(loggedAtColumn);
-		table.getColumns().add(logLevelColumn);
-		table.getColumns().add(messageColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(loggedAtColumn);
+        table.getColumns().add(logLevelColumn);
+        table.getColumns().add(messageColumn);
 
-		final var logs = dataProvider.logs();
-		table.setItems(logs);
+        final var logs = dataProvider.logs();
+        table.setItems(logs);
 
-		TableFilter.forTableView(table).lazy(true).apply();
-		sortByLoggedAt(loggedAtColumn);
-	}
+        TableFilter.forTableView(table).lazy(true).apply();
+        sortByLoggedAt(loggedAtColumn);
+    }
 
-	private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {
-		column.setSortType(TableColumn.SortType.DESCENDING);
-		table.getSortOrder().add(column);
-		table.sort();
-	}
+    private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {
+        column.setSortType(TableColumn.SortType.DESCENDING);
+        table.getSortOrder().add(column);
+        table.sort();
+    }
 
 }

@@ -29,34 +29,34 @@ import com.osgifx.console.supervisor.Supervisor;
 @Component(service = ConfigurationManager.class)
 public final class ConfigurationManager {
 
-	@Reference
-	private LoggerFactory factory;
-	@Reference
-	private Supervisor    supervisor;
-	private FluentLogger  logger;
+    @Reference
+    private LoggerFactory factory;
+    @Reference
+    private Supervisor    supervisor;
+    private FluentLogger  logger;
 
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	public boolean createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return false;
-		}
-		final var result = agent.createOrUpdateConfiguration(pid, newProperties);
-		return result.result == XResultDTO.SUCCESS;
-	}
+    public boolean createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return false;
+        }
+        final var result = agent.createOrUpdateConfiguration(pid, newProperties);
+        return result.result == XResultDTO.SUCCESS;
+    }
 
-	public boolean createFactoryConfiguration(final String factoryPid, final List<ConfigValue> newProperties) {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return false;
-		}
-		final var result = agent.createFactoryConfiguration(factoryPid, newProperties);
-		return result.result == XResultDTO.SUCCESS;
-	}
+    public boolean createFactoryConfiguration(final String factoryPid, final List<ConfigValue> newProperties) {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return false;
+        }
+        final var result = agent.createFactoryConfiguration(factoryPid, newProperties);
+        return result.result == XResultDTO.SUCCESS;
+    }
 
 }

@@ -46,109 +46,109 @@ import com.osgifx.console.util.fx.Fx;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class LogReceiveMenuContributionHandler {
 
-	public static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
+    public static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
 
-	@Log
-	@Inject
-	private FluentLogger     logger;
-	@Inject
-	@OSGiBundle
-	private BundleContext    context;
-	@Inject
-	private Supervisor       supervisor;
-	@Inject
-	private IEventBroker     eventBroker;
-	@Inject
-	private EModelService    modelService;
-	@Inject
-	private LogEntryListener logEntryListener;
-	@Inject
-	@Named("is_connected")
-	private boolean          isConnected;
+    @Log
+    @Inject
+    private FluentLogger     logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext    context;
+    @Inject
+    private Supervisor       supervisor;
+    @Inject
+    private IEventBroker     eventBroker;
+    @Inject
+    private EModelService    modelService;
+    @Inject
+    private LogEntryListener logEntryListener;
+    @Inject
+    @Named("is_connected")
+    private boolean          isConnected;
 
-	@PostConstruct
-	public void init() {
-		final var currentState = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
-		if (currentState) {
-			supervisor.addOSGiLogListener(logEntryListener);
-			logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
-		} else {
-			supervisor.removeOSGiLogListener(logEntryListener);
-			logger.atInfo().throttleByCount(10).log("OSGi log listener has been removed");
-		}
-	}
+    @PostConstruct
+    public void init() {
+        final var currentState = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
+        if (currentState) {
+            supervisor.addOSGiLogListener(logEntryListener);
+            logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
+        } else {
+            supervisor.removeOSGiLogListener(logEntryListener);
+            logger.atInfo().throttleByCount(10).log("OSGi log listener has been removed");
+        }
+    }
 
-	@AboutToShow
-	public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-		final var value = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
-		prepareMenu(items, value);
-	}
+    @AboutToShow
+    public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
+        final var value = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
+        prepareMenu(items, value);
+    }
 
-	@Execute
-	public void execute(final MDirectMenuItem menuItem) {
-		final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
+    @Execute
+    public void execute(final MDirectMenuItem menuItem) {
+        final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
 
-		if (accessibilityPhrase) {
-			eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-		} else {
-			eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-		}
+        if (accessibilityPhrase) {
+            eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+        } else {
+            eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+        }
 
-		System.setProperty(PROPERTY_KEY_LOG_DISPLAY, String.valueOf(accessibilityPhrase));
+        System.setProperty(PROPERTY_KEY_LOG_DISPLAY, String.valueOf(accessibilityPhrase));
 
-		if (accessibilityPhrase) {
-			supervisor.addOSGiLogListener(logEntryListener);
-			Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
-			logger.atInfo().log("OSGi logs will now be received");
-		} else {
-			supervisor.removeOSGiLogListener(logEntryListener);
-			Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
-			logger.atInfo().log("OSGi logs will not be received anymore");
-		}
-	}
+        if (accessibilityPhrase) {
+            supervisor.addOSGiLogListener(logEntryListener);
+            Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
+            logger.atInfo().log("OSGi logs will now be received");
+        } else {
+            supervisor.removeOSGiLogListener(logEntryListener);
+            Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
+            logger.atInfo().log("OSGi logs will not be received anymore");
+        }
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
-	private void prepareMenu(final List<MMenuElement> items, final boolean value) {
-		final MDirectMenuItem eventActionMenu;
-		if (value) {
-			eventActionMenu = createLogActionMenu(Type.STOP);
-		} else {
-			eventActionMenu = createLogActionMenu(Type.START);
-		}
-		items.add(eventActionMenu);
-	}
+    private void prepareMenu(final List<MMenuElement> items, final boolean value) {
+        final MDirectMenuItem eventActionMenu;
+        if (value) {
+            eventActionMenu = createLogActionMenu(Type.STOP);
+        } else {
+            eventActionMenu = createLogActionMenu(Type.START);
+        }
+        items.add(eventActionMenu);
+    }
 
-	private MDirectMenuItem createLogActionMenu(final Type type) {
-		String label;
-		String icon;
-		String accessibilityPhrase;
-		if (type == Type.STOP) {
-			label               = "Stop Displaying Logs";
-			icon                = "stop.png";
-			accessibilityPhrase = "false";
-		} else {
-			label               = "Start Displaying Logs";
-			icon                = "start.png";
-			accessibilityPhrase = "true";
-		}
-		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
-		final var bsn         = context.getBundle().getSymbolicName();
+    private MDirectMenuItem createLogActionMenu(final Type type) {
+        String label;
+        String icon;
+        String accessibilityPhrase;
+        if (type == Type.STOP) {
+            label               = "Stop Displaying Logs";
+            icon                = "stop.png";
+            accessibilityPhrase = "false";
+        } else {
+            label               = "Start Displaying Logs";
+            icon                = "start.png";
+            accessibilityPhrase = "true";
+        }
+        final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+        final var bsn         = context.getBundle().getSymbolicName();
 
-		dynamicItem.setLabel(label);
-		dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
-		dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
-		dynamicItem.setContributorURI("platform:/plugin/" + bsn);
-		dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
+        dynamicItem.setLabel(label);
+        dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
+        dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
+        dynamicItem.setContributorURI("platform:/plugin/" + bsn);
+        dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
-		return dynamicItem;
-	}
+        return dynamicItem;
+    }
 
-	private enum Type {
-		START, STOP
-	}
+    private enum Type {
+        START, STOP
+    }
 
 }

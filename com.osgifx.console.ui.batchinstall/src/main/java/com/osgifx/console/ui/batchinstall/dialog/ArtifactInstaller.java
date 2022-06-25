@@ -44,119 +44,119 @@ import com.osgifx.console.util.fx.FxDialog;
 @Component(service = ArtifactInstaller.class)
 public class ArtifactInstaller {
 
-	private static final int DEFAULT_START_LEVEL = 10;
+    private static final int DEFAULT_START_LEVEL = 10;
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	public String installArtifacts(final List<ArtifactDTO> artifacts) {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return null;
-		}
-		final var                              result  = new StringBuilder();
-		final Map<String, byte[]>              data    = Maps.newHashMap();
-		final Map<String, Map<String, Object>> configs = Maps.newHashMap();
-		for (final ArtifactDTO artifact : artifacts) {
-			if (artifact.isConfiguration()) {
-				try {
-					final var pids = readConfigFile(artifact.file());
-					for (final ConfigDTO config : pids) {
-						configs.put(config.pid, config.properties);
-					}
-				} catch (final Exception e) {
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-					return null;
-				}
-			} else {
-				final var jar = toValidJarFile(artifact.file());
-				if (jar == null) {
-					continue;
-				}
-				try {
-					data.put(jar.bsn, Files.toByteArray(artifact.file()));
-				} catch (final Exception e) {
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-				}
-			}
-		}
-		if (!data.isEmpty()) {
-			final var r = agent.installWithMultipleData(data.values(), DEFAULT_START_LEVEL);
-			if (!r.response.isEmpty()) {
-				result.append(r.response);
-			}
-		}
-		if (!configs.isEmpty()) {
-			final var results = agent.createOrUpdateConfigurations(configs);
-			results.forEach((k, v) -> {
-				if (v.result == ERROR) {
-					result.append(k);
-					result.append(": ");
-					result.append(v.response);
-					result.append(System.lineSeparator());
-				}
-			});
-		}
-		return result.toString();
-	}
+    public String installArtifacts(final List<ArtifactDTO> artifacts) {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return null;
+        }
+        final var                              result  = new StringBuilder();
+        final Map<String, byte[]>              data    = Maps.newHashMap();
+        final Map<String, Map<String, Object>> configs = Maps.newHashMap();
+        for (final ArtifactDTO artifact : artifacts) {
+            if (artifact.isConfiguration()) {
+                try {
+                    final var pids = readConfigFile(artifact.file());
+                    for (final ConfigDTO config : pids) {
+                        configs.put(config.pid, config.properties);
+                    }
+                } catch (final Exception e) {
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                    return null;
+                }
+            } else {
+                final var jar = toValidJarFile(artifact.file());
+                if (jar == null) {
+                    continue;
+                }
+                try {
+                    data.put(jar.bsn, Files.toByteArray(artifact.file()));
+                } catch (final Exception e) {
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+            }
+        }
+        if (!data.isEmpty()) {
+            final var r = agent.installWithMultipleData(data.values(), DEFAULT_START_LEVEL);
+            if (!r.response.isEmpty()) {
+                result.append(r.response);
+            }
+        }
+        if (!configs.isEmpty()) {
+            final var results = agent.createOrUpdateConfigurations(configs);
+            results.forEach((k, v) -> {
+                if (v.result == ERROR) {
+                    result.append(k);
+                    result.append(": ");
+                    result.append(v.response);
+                    result.append(System.lineSeparator());
+                }
+            });
+        }
+        return result.toString();
+    }
 
-	private JarDTO toValidJarFile(final File file) {
-		try {
-			final var bsn     = readAttributeFromManifest(file, BUNDLE_SYMBOLICNAME);
-			final var version = readAttributeFromManifest(file, BUNDLE_VERSION);
-			return new JarDTO(file, bsn, version);
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("'%s' is not a valid bundle", file.getName());
-		}
-		return null;
-	}
+    private JarDTO toValidJarFile(final File file) {
+        try {
+            final var bsn     = readAttributeFromManifest(file, BUNDLE_SYMBOLICNAME);
+            final var version = readAttributeFromManifest(file, BUNDLE_VERSION);
+            return new JarDTO(file, bsn, version);
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("'%s' is not a valid bundle", file.getName());
+        }
+        return null;
+    }
 
-	private List<ConfigDTO> readConfigFile(final File file) throws Exception {
-		final List<ConfigDTO> configs = Lists.newArrayList();
-		try (var reader = new FileReader(file)) {
+    private List<ConfigDTO> readConfigFile(final File file) throws Exception {
+        final List<ConfigDTO> configs = Lists.newArrayList();
+        try (var reader = new FileReader(file)) {
 
-			final var configReader   = Configurations.buildReader().withIdentifier(file.getName()).build(reader);
-			final var resource       = configReader.readConfigurationResource();
-			final var configurations = resource.getConfigurations();
+            final var configReader   = Configurations.buildReader().withIdentifier(file.getName()).build(reader);
+            final var resource       = configReader.readConfigurationResource();
+            final var configurations = resource.getConfigurations();
 
-			configurations.forEach((k, v) -> configs.add(new ConfigDTO(k, v)));
+            configurations.forEach((k, v) -> configs.add(new ConfigDTO(k, v)));
 
-			return configs;
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("'%s' cannot be read", file.getName());
-			throw e;
-		}
-	}
+            return configs;
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("'%s' cannot be read", file.getName());
+            throw e;
+        }
+    }
 
-	public static record ConfigDTO(String pid, Map<String, Object> properties) {
-	}
+    public static record ConfigDTO(String pid, Map<String, Object> properties) {
+    }
 
-	public static record JarDTO(File file, String bsn, String version) {
-	}
+    public static record JarDTO(File file, String bsn, String version) {
+    }
 
-	private static String readAttributeFromManifest(final File jarResource, final String attribute) throws Exception {
-		try (var is = new FileInputStream(jarResource); var jarStream = new JarInputStream(is);) {
-			final var manifest = jarStream.getManifest();
-			if (manifest == null) {
-				throw new RuntimeException(jarResource + " is not a valid JAR");
-			}
-			final var value = manifest.getMainAttributes().getValue(attribute);
-			if (value.contains(";")) {
-				return value.split(";")[0];
-			}
-			return value;
-		}
-	}
+    private static String readAttributeFromManifest(final File jarResource, final String attribute) throws Exception {
+        try (var is = new FileInputStream(jarResource); var jarStream = new JarInputStream(is);) {
+            final var manifest = jarStream.getManifest();
+            if (manifest == null) {
+                throw new RuntimeException(jarResource + " is not a valid JAR");
+            }
+            final var value = manifest.getMainAttributes().getValue(attribute);
+            if (value.contains(";")) {
+                return value.split(";")[0];
+            }
+            return value;
+        }
+    }
 
 }

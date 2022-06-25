@@ -21,18 +21,18 @@ import org.osgi.dto.DTO;
 
 public class XHealthCheckResultDTO extends DTO {
 
-	public static class ResultDTO extends DTO {
-		public String status;
-		public String message;
-		public String logLevel;
-		public String exception;
-	}
+    public static class ResultDTO extends DTO {
+        public String status;
+        public String message;
+        public String logLevel;
+        public String exception;
+    }
 
-	public String          healthCheckName;
-	public List<String>    healthCheckTags;
-	public List<ResultDTO> results;
-	public long            elapsedTime;
-	public long            finishedAt;
-	public boolean         isTimedOut;
+    public String          healthCheckName;
+    public List<String>    healthCheckTags;
+    public List<ResultDTO> results;
+    public long            elapsedTime;
+    public long            finishedAt;
+    public boolean         isTimedOut;
 
 }

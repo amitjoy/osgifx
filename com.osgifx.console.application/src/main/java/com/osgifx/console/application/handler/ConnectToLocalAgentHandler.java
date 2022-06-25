@@ -42,92 +42,92 @@ import javafx.concurrent.Task;
 
 public final class ConnectToLocalAgentHandler {
 
-	@Log
-	@Inject
-	private FluentLogger               logger;
-	@Inject
-	private ThreadSynchronize          threadSync;
-	@Inject
-	private IEventBroker               eventBroker;
-	@Inject
-	private Supervisor                 supervisor;
-	@Inject
-	@ContextValue("is_connected")
-	private ContextBoundValue<Boolean> isConnected;
-	@Inject
-	@Optional
-	@ContextValue("is_local_agent")
-	private ContextBoundValue<Boolean> isLocalAgent;
-	@Inject
-	@ContextValue("connected.agent")
-	private ContextBoundValue<String>  connectedAgent;
-	@Inject
-	@Named("local.agent.host")
-	private String                     localAgentHost;
-	@Inject
-	@Adapt
-	@Named("local.agent.port")
-	private int                        localAgentPort;
-	@Inject
-	@Adapt
-	@Named("local.agent.timeout")
-	private int                        localAgentTimeout;
-	private ProgressDialog             progressDialog;
+    @Log
+    @Inject
+    private FluentLogger               logger;
+    @Inject
+    private ThreadSynchronize          threadSync;
+    @Inject
+    private IEventBroker               eventBroker;
+    @Inject
+    private Supervisor                 supervisor;
+    @Inject
+    @ContextValue("is_connected")
+    private ContextBoundValue<Boolean> isConnected;
+    @Inject
+    @Optional
+    @ContextValue("is_local_agent")
+    private ContextBoundValue<Boolean> isLocalAgent;
+    @Inject
+    @ContextValue("connected.agent")
+    private ContextBoundValue<String>  connectedAgent;
+    @Inject
+    @Named("local.agent.host")
+    private String                     localAgentHost;
+    @Inject
+    @Adapt
+    @Named("local.agent.port")
+    private int                        localAgentPort;
+    @Inject
+    @Adapt
+    @Named("local.agent.timeout")
+    private int                        localAgentTimeout;
+    private ProgressDialog             progressDialog;
 
-	@Execute
-	public void execute() {
-		final Task<Void> connectTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					updateMessage("Connecting to Local Agent on " + localAgentPort);
-					supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
-					logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost, localAgentPort);
-					return null;
-				} catch (final InterruptedException e) {
-					logger.atInfo().log("Connection task interrupted");
-					threadSync.asyncExec(progressDialog::close);
-					throw e;
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Cannot connect to Local Agent on %s:%s", localAgentHost, localAgentPort);
-					threadSync.asyncExec(() -> {
-						progressDialog.close();
-						FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-					});
-					throw e;
-				}
-			}
+    @Execute
+    public void execute() {
+        final Task<Void> connectTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    updateMessage("Connecting to Local Agent on " + localAgentPort);
+                    supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
+                    logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost, localAgentPort);
+                    return null;
+                } catch (final InterruptedException e) {
+                    logger.atInfo().log("Connection task interrupted");
+                    threadSync.asyncExec(progressDialog::close);
+                    throw e;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot connect to Local Agent on %s:%s", localAgentHost, localAgentPort);
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
 
-			@Override
-			protected void succeeded() {
-				logger.atInfo().log("Agent connected event has been sent for Local Agent on %s:%s", localAgentHost, localAgentPort);
+            @Override
+            protected void succeeded() {
+                logger.atInfo().log("Agent connected event has been sent for Local Agent on %s:%s", localAgentHost, localAgentPort);
 
-				final var connection = localAgentHost + ":" + localAgentPort;
+                final var connection = localAgentHost + ":" + localAgentPort;
 
-				eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
-				connectedAgent.publish(connection);
-				isConnected.publish(true);
-				isLocalAgent.publish(true);
-			}
-		};
+                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
+                connectedAgent.publish(connection);
+                isConnected.publish(true);
+                isLocalAgent.publish(true);
+            }
+        };
 
-		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(connectTask);
-		progressDialog = FxDialog.showProgressDialog("Local Agent Connection", connectTask, getClass().getClassLoader(),
-		        () -> taskFuture.cancel(true));
-	}
+        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(connectTask);
+        progressDialog = FxDialog.showProgressDialog("Local Agent Connection", connectTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return !isConnected.getValue();
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return !isConnected.getValue();
+    }
 
-	@Inject
-	@Optional
-	private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent connected event received");
-		if (progressDialog != null) {
-			progressDialog.close();
-		}
-	}
+    @Inject
+    @Optional
+    private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event received");
+        if (progressDialog != null) {
+            progressDialog.close();
+        }
+    }
 
 }

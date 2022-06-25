@@ -19,8 +19,8 @@ import java.io.File;
 
 public class DeploymentPackageEntryDTO {
 
-	public String name;
-	public String sha;
-	public File   file;
+    public String name;
+    public String sha;
+    public File   file;
 
 }

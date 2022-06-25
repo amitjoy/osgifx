@@ -31,60 +31,60 @@ import com.osgifx.console.agent.provider.AgentServer;
  */
 public class ConsoleRedirector implements Redirector {
 
-	private static RedirectOutput                    stdout;
-	private static RedirectOutput                    stderr;
-	private static RedirectInput                     stdin;
-	private static CopyOnWriteArrayList<AgentServer> agents = new CopyOnWriteArrayList<>();
-	volatile boolean                                 quit   = false;
-	private final AgentServer                        agent;
+    private static RedirectOutput                    stdout;
+    private static RedirectOutput                    stderr;
+    private static RedirectInput                     stdin;
+    private static CopyOnWriteArrayList<AgentServer> agents = new CopyOnWriteArrayList<>();
+    volatile boolean                                 quit   = false;
+    private final AgentServer                        agent;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param agent the agent we're redirecting for
-	 */
-	public ConsoleRedirector(final AgentServer agent) throws IOException {
-		this.agent = agent;
-		synchronized (agents) {
-			if (!agents.contains(agent)) {
-				agents.add(agent);
-				if (agents.size() == 1) {
-					System.setOut(stdout = new RedirectOutput(agents, System.out, false));
-					System.setErr(stderr = new RedirectOutput(agents, System.err, true));
-					System.setIn(stdin = new RedirectInput(System.in));
-				}
-			}
-		}
-	}
+    /**
+     * Constructor.
+     *
+     * @param agent the agent we're redirecting for
+     */
+    public ConsoleRedirector(final AgentServer agent) throws IOException {
+        this.agent = agent;
+        synchronized (agents) {
+            if (!agents.contains(agent)) {
+                agents.add(agent);
+                if (agents.size() == 1) {
+                    System.setOut(stdout = new RedirectOutput(agents, System.out, false));
+                    System.setErr(stderr = new RedirectOutput(agents, System.err, true));
+                    System.setIn(stdin = new RedirectInput(System.in));
+                }
+            }
+        }
+    }
 
-	/**
-	 * Clean up
-	 */
-	@Override
-	public void close() throws IOException {
-		quit = true;
-		synchronized (agents) {
-			if (agents.remove(agent) && agents.isEmpty()) {
-				System.setOut(stdout.getOut());
-				System.setErr(stderr.getOut());
-				System.setIn(stdin.getOrg());
-			}
-		}
-	}
+    /**
+     * Clean up
+     */
+    @Override
+    public void close() throws IOException {
+        quit = true;
+        synchronized (agents) {
+            if (agents.remove(agent) && agents.isEmpty()) {
+                System.setOut(stdout.getOut());
+                System.setErr(stderr.getOut());
+                System.setIn(stdin.getOrg());
+            }
+        }
+    }
 
-	@Override
-	public int getPort() {
-		return CONSOLE;
-	}
+    @Override
+    public int getPort() {
+        return CONSOLE;
+    }
 
-	@Override
-	public void stdin(final String s) throws IOException {
-		stdin.add(s);
-	}
+    @Override
+    public void stdin(final String s) throws IOException {
+        stdin.add(s);
+    }
 
-	@Override
-	public PrintStream getOut() {
-		return stdout;
-	}
+    @Override
+    public PrintStream getOut() {
+        return stdout;
+    }
 
 }

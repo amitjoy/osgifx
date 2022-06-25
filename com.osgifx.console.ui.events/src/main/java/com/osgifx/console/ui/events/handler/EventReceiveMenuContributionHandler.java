@@ -59,145 +59,145 @@ import com.osgifx.console.util.fx.Fx;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class EventReceiveMenuContributionHandler {
 
-	private static final String PID                        = "event.receive.topics";
-	public static final String  PROPERTY_KEY_EVENT_DISPLAY = "osgi.fx.event";
+    private static final String PID                        = "event.receive.topics";
+    public static final String  PROPERTY_KEY_EVENT_DISPLAY = "osgi.fx.event";
 
-	@Log
-	@Inject
-	private FluentLogger                   logger;
-	@Inject
-	private Supervisor                     supervisor;
-	@Inject
-	private ConfigurationAdmin             configAdmin;
-	@Inject
-	private IEventBroker                   eventBroker;
-	@Inject
-	@Service(filterExpression = "(supplier.id=events)")
-	private EventListener                  eventListener;
-	@Inject
-	private EModelService                  modelService;
-	@Inject
-	@Named("is_connected")
-	private boolean                        isConnected;
-	@Inject
-	@OSGiBundle
-	private BundleContext                  bundleContext;
-	@Inject
-	private IEclipseContext                eclipseContext;
-	@Inject
-	@Optional
-	@ContextValue("subscribed_topics")
-	private ContextBoundValue<Set<String>> subscribedTopics;
+    @Log
+    @Inject
+    private FluentLogger                   logger;
+    @Inject
+    private Supervisor                     supervisor;
+    @Inject
+    private ConfigurationAdmin             configAdmin;
+    @Inject
+    private IEventBroker                   eventBroker;
+    @Inject
+    @Service(filterExpression = "(supplier.id=events)")
+    private EventListener                  eventListener;
+    @Inject
+    private EModelService                  modelService;
+    @Inject
+    @Named("is_connected")
+    private boolean                        isConnected;
+    @Inject
+    @OSGiBundle
+    private BundleContext                  bundleContext;
+    @Inject
+    private IEclipseContext                eclipseContext;
+    @Inject
+    @Optional
+    @ContextValue("subscribed_topics")
+    private ContextBoundValue<Set<String>> subscribedTopics;
 
-	@PostConstruct
-	public void init() {
-		final var currentState = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
-		if (currentState) {
-			supervisor.addOSGiEventListener(eventListener);
-			logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
-		} else {
-			supervisor.removeOSGiEventListener(eventListener);
-			logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
-		}
-	}
+    @PostConstruct
+    public void init() {
+        final var currentState = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
+        if (currentState) {
+            supervisor.addOSGiEventListener(eventListener);
+            logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
+        } else {
+            supervisor.removeOSGiEventListener(eventListener);
+            logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
+        }
+    }
 
-	@AboutToShow
-	public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-		final var value = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
-		prepareMenu(items, value);
-	}
+    @AboutToShow
+    public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
+        final var value = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
+        prepareMenu(items, value);
+    }
 
-	@Execute
-	public void execute(final MDirectMenuItem menuItem) {
-		final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
+    @Execute
+    public void execute(final MDirectMenuItem menuItem) {
+        final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
 
-		if (accessibilityPhrase) {
-			final var dialog = new TopicEntryDialog();
-			ContextInjectionFactory.inject(dialog, eclipseContext);
-			dialog.init();
+        if (accessibilityPhrase) {
+            final var dialog = new TopicEntryDialog();
+            ContextInjectionFactory.inject(dialog, eclipseContext);
+            dialog.init();
 
-			final var event = dialog.showAndWait();
-			if (!event.isPresent()) {
-				return;
-			}
-			final var topics = event.get();
-			if (topics.isEmpty()) {
-				return;
-			}
-			subscribedTopics.publish(topics);
-			updateConfig(topics);
-			supervisor.addOSGiEventListener(eventListener);
-			eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-			Fx.showSuccessNotification("Event Notification", "Events will now be received");
-			logger.atInfo().log("OSGi events will now be received");
-		} else {
-			subscribedTopics.publish(Set.of());
-			updateConfig(Set.of());
-			supervisor.removeOSGiEventListener(eventListener);
-			eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-			Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
-			logger.atInfo().log("OSGi events will not be received anymore");
-		}
-		System.setProperty(PROPERTY_KEY_EVENT_DISPLAY, String.valueOf(accessibilityPhrase));
-	}
+            final var event = dialog.showAndWait();
+            if (!event.isPresent()) {
+                return;
+            }
+            final var topics = event.get();
+            if (topics.isEmpty()) {
+                return;
+            }
+            subscribedTopics.publish(topics);
+            updateConfig(topics);
+            supervisor.addOSGiEventListener(eventListener);
+            eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+            Fx.showSuccessNotification("Event Notification", "Events will now be received");
+            logger.atInfo().log("OSGi events will now be received");
+        } else {
+            subscribedTopics.publish(Set.of());
+            updateConfig(Set.of());
+            supervisor.removeOSGiEventListener(eventListener);
+            eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+            Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
+            logger.atInfo().log("OSGi events will not be received anymore");
+        }
+        System.setProperty(PROPERTY_KEY_EVENT_DISPLAY, String.valueOf(accessibilityPhrase));
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
-	private void prepareMenu(final List<MMenuElement> items, final boolean value) {
-		final MDirectMenuItem eventActionMenu;
-		if (value) {
-			eventActionMenu = createEventActionMenu(Type.STOP);
-		} else {
-			eventActionMenu = createEventActionMenu(Type.START);
-		}
-		items.add(eventActionMenu);
-	}
+    private void prepareMenu(final List<MMenuElement> items, final boolean value) {
+        final MDirectMenuItem eventActionMenu;
+        if (value) {
+            eventActionMenu = createEventActionMenu(Type.STOP);
+        } else {
+            eventActionMenu = createEventActionMenu(Type.START);
+        }
+        items.add(eventActionMenu);
+    }
 
-	private MDirectMenuItem createEventActionMenu(final Type type) {
-		String label;
-		String icon;
-		String accessibilityPhrase;
-		if (type == Type.STOP) {
-			label               = "Stop Receiving Events";
-			icon                = "stop.png";
-			accessibilityPhrase = "false";
-		} else {
-			label               = "Start Receiving Events";
-			icon                = "start.png";
-			accessibilityPhrase = "true";
-		}
-		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
-		final var bsn         = bundleContext.getBundle().getSymbolicName();
+    private MDirectMenuItem createEventActionMenu(final Type type) {
+        String label;
+        String icon;
+        String accessibilityPhrase;
+        if (type == Type.STOP) {
+            label               = "Stop Receiving Events";
+            icon                = "stop.png";
+            accessibilityPhrase = "false";
+        } else {
+            label               = "Start Receiving Events";
+            icon                = "start.png";
+            accessibilityPhrase = "true";
+        }
+        final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+        final var bsn         = bundleContext.getBundle().getSymbolicName();
 
-		dynamicItem.setLabel(label);
-		dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
-		dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
-		dynamicItem.setContributorURI("platform:/plugin/" + bsn);
-		dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
+        dynamicItem.setLabel(label);
+        dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
+        dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
+        dynamicItem.setContributorURI("platform:/plugin/" + bsn);
+        dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
-		return dynamicItem;
-	}
+        return dynamicItem;
+    }
 
-	private void updateConfig(final Set<String> topics) {
-		try {
-			final var configuration = configAdmin.getConfiguration(PID, "?");
-			if (!topics.isEmpty()) {
-				final Dictionary<String, String[]> properties = FrameworkUtil.asDictionary(Map.of("topics", topics.toArray(new String[0])));
-				configuration.update(properties);
-			} else {
-				configuration.delete();
-			}
-		} catch (final IOException e) {
-			logger.atError().withException(e).log("Cannot rretrieve configuration '%s'", PID);
-		}
+    private void updateConfig(final Set<String> topics) {
+        try {
+            final var configuration = configAdmin.getConfiguration(PID, "?");
+            if (!topics.isEmpty()) {
+                final Dictionary<String, String[]> properties = FrameworkUtil.asDictionary(Map.of("topics", topics.toArray(new String[0])));
+                configuration.update(properties);
+            } else {
+                configuration.delete();
+            }
+        } catch (final IOException e) {
+            logger.atError().withException(e).log("Cannot rretrieve configuration '%s'", PID);
+        }
 
-	}
+    }
 
-	private enum Type {
-		START, STOP
-	}
+    private enum Type {
+        START, STOP
+    }
 
 }

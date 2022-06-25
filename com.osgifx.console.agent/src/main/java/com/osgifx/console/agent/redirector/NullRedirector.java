@@ -23,22 +23,22 @@ import java.io.PrintStream;
  */
 public class NullRedirector implements Redirector {
 
-	@Override
-	public void close() throws IOException {
-	}
+    @Override
+    public void close() throws IOException {
+    }
 
-	@Override
-	public int getPort() {
-		return 0;
-	}
+    @Override
+    public int getPort() {
+        return 0;
+    }
 
-	@Override
-	public void stdin(final String s) {
-	}
+    @Override
+    public void stdin(final String s) {
+    }
 
-	@Override
-	public PrintStream getOut() throws Exception {
-		return System.out;
-	}
+    @Override
+    public PrintStream getOut() throws Exception {
+        return System.out;
+    }
 
 }

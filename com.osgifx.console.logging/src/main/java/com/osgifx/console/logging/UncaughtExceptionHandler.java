@@ -25,18 +25,18 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 public final class UncaughtExceptionHandler implements ExceptionHandler {
 
-	@Reference
-	private LoggerFactory factory;
-	private FluentLogger  logger;
+    @Reference
+    private LoggerFactory factory;
+    private FluentLogger  logger;
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public void handleException(final ExceptionData data) {
-		logger.atError().withException(data.throwable()).log("Uncaught Exception");
-	}
+    @Override
+    public void handleException(final ExceptionData data) {
+        logger.atError().withException(data.throwable()).log("Uncaught Exception");
+    }
 
 }

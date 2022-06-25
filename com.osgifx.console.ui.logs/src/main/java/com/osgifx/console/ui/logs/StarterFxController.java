@@ -39,65 +39,65 @@ import javafx.scene.layout.BorderPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class StarterFxController {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	@FXMLLoader
-	private FXMLLoaderFactory loader;
-	@FXML
-	private BorderPane        mainPane;
-	@FXML
-	private ToggleButton      logsViewButton;
-	@FXML
-	private ToggleButton      configurationsViewButton;
-	@FXML
-	private SegmentedButton   logsActionTypeButton;
-	@Inject
-	@OSGiBundle
-	private BundleContext     context;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    @FXMLLoader
+    private FXMLLoaderFactory loader;
+    @FXML
+    private BorderPane        mainPane;
+    @FXML
+    private ToggleButton      logsViewButton;
+    @FXML
+    private ToggleButton      configurationsViewButton;
+    @FXML
+    private SegmentedButton   logsActionTypeButton;
+    @Inject
+    @OSGiBundle
+    private BundleContext     context;
 
-	@FXML
-	public void initialize() {
-		initLogsActionTypeButton();
-		initButtons();
-		showLogEvents();
-		logger.atDebug().log("FXML controller has been initialized");
-	}
+    @FXML
+    public void initialize() {
+        initLogsActionTypeButton();
+        initButtons();
+        showLogEvents();
+        logger.atDebug().log("FXML controller has been initialized");
+    }
 
-	private void initLogsActionTypeButton() {
-		logsActionTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
-		logsActionTypeButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
-			if (newVal == null) {
-				oldVal.setSelected(true);
-			}
-		});
-	}
+    private void initLogsActionTypeButton() {
+        logsActionTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
+        logsActionTypeButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+            if (newVal == null) {
+                oldVal.setSelected(true);
+            }
+        });
+    }
 
-	private void initButtons() {
-		logsViewButton.setOnMouseClicked(e -> showLogEvents());
-		configurationsViewButton.setOnMouseClicked(e -> showConfigurations());
-	}
+    private void initButtons() {
+        logsViewButton.setOnMouseClicked(e -> showLogEvents());
+        configurationsViewButton.setOnMouseClicked(e -> showConfigurations());
+    }
 
-	private void showLogEvents() {
-		final var node = loadFXML("/fxml/tab-content-for-logs.fxml");
-		mainPane.setCenter(node);
-		logger.atDebug().log("Loaded log events");
-	}
+    private void showLogEvents() {
+        final var node = loadFXML("/fxml/tab-content-for-logs.fxml");
+        mainPane.setCenter(node);
+        logger.atDebug().log("Loaded log events");
+    }
 
-	private void showConfigurations() {
-		final var node = loadFXML("/fxml/tab-content-for-configurations.fxml");
-		mainPane.setCenter(node);
-		logger.atDebug().log("Loaded log configurations");
-	}
+    private void showConfigurations() {
+        final var node = loadFXML("/fxml/tab-content-for-configurations.fxml");
+        mainPane.setCenter(node);
+        logger.atDebug().log("Loaded log configurations");
+    }
 
-	private Node loadFXML(final String resourceName) {
-		final FXMLBuilder<Node> builder = loader.loadBundleRelative(resourceName);
-		try {
-			return builder.load();
-		} catch (final Exception e) {
-			return null;
-		}
-	}
+    private Node loadFXML(final String resourceName) {
+        final FXMLBuilder<Node> builder = loader.loadBundleRelative(resourceName);
+        try {
+            return builder.load();
+        } catch (final Exception e) {
+            return null;
+        }
+    }
 
 }

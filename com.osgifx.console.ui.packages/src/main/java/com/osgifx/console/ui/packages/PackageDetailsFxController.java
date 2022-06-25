@@ -35,51 +35,51 @@ import javafx.scene.control.TableView;
 
 public final class PackageDetailsFxController {
 
-	@FXML
-	private Label                          nameLabel;
-	@FXML
-	private Label                          versionLabel;
-	@FXML
-	private ToggleSwitch                   duplicateLabel;
-	@FXML
-	private TableView<BundleDTO>           exportersTable;
-	@FXML
-	private TableColumn<BundleDTO, String> exportersTableIdColumn;
-	@FXML
-	private TableColumn<BundleDTO, String> exportersTableBsnColumn;
-	@FXML
-	private TableView<BundleDTO>           importersTable;
-	@FXML
-	private TableColumn<BundleDTO, String> importersTableIdColumn;
-	@FXML
-	private TableColumn<BundleDTO, String> importersTableBsnColumn;
-	@Log
-	@Inject
-	private FluentLogger                   logger;
+    @FXML
+    private Label                          nameLabel;
+    @FXML
+    private Label                          versionLabel;
+    @FXML
+    private ToggleSwitch                   duplicateLabel;
+    @FXML
+    private TableView<BundleDTO>           exportersTable;
+    @FXML
+    private TableColumn<BundleDTO, String> exportersTableIdColumn;
+    @FXML
+    private TableColumn<BundleDTO, String> exportersTableBsnColumn;
+    @FXML
+    private TableView<BundleDTO>           importersTable;
+    @FXML
+    private TableColumn<BundleDTO, String> importersTableIdColumn;
+    @FXML
+    private TableColumn<BundleDTO, String> importersTableBsnColumn;
+    @Log
+    @Inject
+    private FluentLogger                   logger;
 
-	@FXML
-	public void initialize() {
-		logger.atDebug().log("FXML controller has been initialized");
-	}
+    @FXML
+    public void initialize() {
+        logger.atDebug().log("FXML controller has been initialized");
+    }
 
-	void initControls(final PackageDTO pkg) {
-		nameLabel.setText(pkg.name);
-		versionLabel.setText(pkg.version);
-		duplicateLabel.setSelected(pkg.isDuplicateExport);
+    void initControls(final PackageDTO pkg) {
+        nameLabel.setText(pkg.name);
+        versionLabel.setText(pkg.version);
+        duplicateLabel.setSelected(pkg.isDuplicateExport);
 
-		exportersTableIdColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
-		exportersTableBsnColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
-		exportersTable.setItems(FXCollections.observableArrayList(pkg.exporters));
+        exportersTableIdColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+        exportersTableBsnColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        exportersTable.setItems(FXCollections.observableArrayList(pkg.exporters));
 
-		importersTableIdColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
-		importersTableBsnColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
-		importersTable.setItems(FXCollections.observableArrayList(pkg.importers));
+        importersTableIdColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
+        importersTableBsnColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        importersTable.setItems(FXCollections.observableArrayList(pkg.importers));
 
-		TableFilter.forTableView(exportersTable).apply();
-		TableFilter.forTableView(importersTable).apply();
+        TableFilter.forTableView(exportersTable).apply();
+        TableFilter.forTableView(importersTable).apply();
 
-		Fx.addContextMenuToCopyContent(exportersTable);
-		Fx.addContextMenuToCopyContent(importersTable);
-	}
+        Fx.addContextMenuToCopyContent(exportersTable);
+        Fx.addContextMenuToCopyContent(importersTable);
+    }
 
 }

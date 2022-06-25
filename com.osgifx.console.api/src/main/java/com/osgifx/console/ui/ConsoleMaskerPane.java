@@ -27,24 +27,24 @@ import javafx.scene.layout.Pane;
 @ProviderType
 public interface ConsoleMaskerPane {
 
-	/**
-	 * Adds the current masker pane to the specified {@link Pane}
-	 *
-	 * @param pane the parent pane (cannot be {@code null})
-	 * @throws NullPointerException if the specified pane is {@code null}
-	 */
-	void addTo(BorderPane pane);
+    /**
+     * Adds the current masker pane to the specified {@link Pane}
+     *
+     * @param pane the parent pane (cannot be {@code null})
+     * @throws NullPointerException if the specified pane is {@code null}
+     */
+    void addTo(BorderPane pane);
 
-	/**
-	 * Changes the visibility of the masker pane
-	 *
-	 * @param isVisible set the flag for visibility
-	 */
-	void setVisible(boolean isVisible);
+    /**
+     * Changes the visibility of the masker pane
+     *
+     * @param isVisible set the flag for visibility
+     */
+    void setVisible(boolean isVisible);
 
-	/**
-	 * Returns if the masker pane is visible
-	 */
-	boolean isVisible();
+    /**
+     * Returns if the masker pane is visible
+     */
+    boolean isVisible();
 
 }

@@ -23,25 +23,25 @@ import com.google.common.collect.Lists;
 @Component(service = TerminalHistory.class)
 public final class TerminalHistory {
 
-	private final EvictingQueue<String> history = EvictingQueue.create(20);
+    private final EvictingQueue<String> history = EvictingQueue.create(20);
 
-	public synchronized void add(final String command) {
-		history.add(command);
-	}
+    public synchronized void add(final String command) {
+        history.add(command);
+    }
 
-	public synchronized void clear() {
-		history.clear();
-	}
+    public synchronized void clear() {
+        history.clear();
+    }
 
-	public synchronized int size() {
-		return history.size();
-	}
+    public synchronized int size() {
+        return history.size();
+    }
 
-	public synchronized String get(final int index) {
-		if (history.isEmpty()) {
-			return "";
-		}
-		return Lists.newArrayList(history).get(index);
-	}
+    public synchronized String get(final int index) {
+        if (history.isEmpty()) {
+            return "";
+        }
+        return Lists.newArrayList(history).get(index);
+    }
 
 }

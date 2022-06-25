@@ -23,25 +23,25 @@ import org.osgi.framework.ServiceRegistration;
 
 public final class Services {
 
-	private Services() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private Services() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static <T> ServiceRegistration<T> register(final Class<T> type, final T instance, final Object... props) {
-		final var ht = new Hashtable<String, Object>();
-		for (var i = 0; i < props.length; i += 2) {
-			final var key   = (String) props[i];
-			Object    value = null;
-			if (i + 1 < props.length) {
-				value = props[i + 1];
-			}
-			ht.put(key, value);
-		}
-		return bundleContext().registerService(type, instance, ht);
-	}
+    public static <T> ServiceRegistration<T> register(final Class<T> type, final T instance, final Object... props) {
+        final var ht = new Hashtable<String, Object>();
+        for (var i = 0; i < props.length; i += 2) {
+            final var key   = (String) props[i];
+            Object    value = null;
+            if (i + 1 < props.length) {
+                value = props[i + 1];
+            }
+            ht.put(key, value);
+        }
+        return bundleContext().registerService(type, instance, ht);
+    }
 
-	private static BundleContext bundleContext() {
-		return FrameworkUtil.getBundle(Services.class).getBundleContext();
-	}
+    private static BundleContext bundleContext() {
+        return FrameworkUtil.getBundle(Services.class).getBundleContext();
+    }
 
 }

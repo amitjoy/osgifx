@@ -33,25 +33,25 @@ import javafx.stage.StageStyle;
 
 public final class ExtensionsViewDialog extends Dialog<Void> {
 
-	@Inject
-	@LocalInstance
-	private FXMLLoader    loader;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
+    @Inject
+    @LocalInstance
+    private FXMLLoader    loader;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
 
-	public void init() {
-		final var dialogPane = getDialogPane();
-		initStyle(StageStyle.UNDECORATED);
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+    public void init() {
+        final var dialogPane = getDialogPane();
+        initStyle(StageStyle.UNDECORATED);
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-		dialogPane.setHeaderText("Installed Extension(s)");
-		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/extensions.png").toString()));
+        dialogPane.setHeaderText("Installed Extension(s)");
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/extensions.png").toString()));
 
-		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-		final var dialogContent = Fx.loadFXML(loader, context, "/fxml/view-extensions-dialog.fxml");
-		dialogPane.setContent(dialogContent);
-	}
+        final var dialogContent = Fx.loadFXML(loader, context, "/fxml/view-extensions-dialog.fxml");
+        dialogPane.setContent(dialogContent);
+    }
 
 }

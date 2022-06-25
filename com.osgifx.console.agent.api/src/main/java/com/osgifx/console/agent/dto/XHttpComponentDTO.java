@@ -21,31 +21,31 @@ import org.osgi.dto.DTO;
 
 public class XHttpComponentDTO extends DTO {
 
-	public String       name;
-	public boolean      asyncSupported;
-	public long         serviceId;
-	public List<String> patterns;
-	public String       contextName;
-	public String       contextPath;
-	public long         contextServiceId;
-	public String       type;
+    public String       name;
+    public boolean      asyncSupported;
+    public long         serviceId;
+    public List<String> patterns;
+    public String       contextName;
+    public String       contextPath;
+    public long         contextServiceId;
+    public String       type;
 
-	// ERROR PAGE
-	public List<String> exceptions;
-	public List<Long>   errorCodes;
+    // ERROR PAGE
+    public List<String> exceptions;
+    public List<Long>   errorCodes;
 
-	// FILTER
-	public List<String> servletNames;
-	public List<String> regexs;
-	public List<String> dispatcher;
+    // FILTER
+    public List<String> servletNames;
+    public List<String> regexs;
+    public List<String> dispatcher;
 
-	// LISTENER
-	public List<String> types;
+    // LISTENER
+    public List<String> types;
 
-	// RESOURCE
-	public String prefix;
+    // RESOURCE
+    public String prefix;
 
-	// SERVLET
-	public String servletInfo;
+    // SERVLET
+    public String servletInfo;
 
 }

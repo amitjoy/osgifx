@@ -36,41 +36,41 @@ import org.osgi.framework.BundleContext;
 
 public final class ExtensionListMenuContributionHandler {
 
-	@Log
-	@Inject
-	private FluentLogger  logger;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
-	@Inject
-	private EPartService  partService;
-	@Inject
-	private EModelService modelService;
+    @Log
+    @Inject
+    private FluentLogger  logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
+    @Inject
+    private EPartService  partService;
+    @Inject
+    private EModelService modelService;
 
-	@AboutToShow
-	public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-		final var parts = partService.getParts();
-		parts.stream().map(this::createViewMenu).forEach(items::add);
-	}
+    @AboutToShow
+    public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
+        final var parts = partService.getParts();
+        parts.stream().map(this::createViewMenu).forEach(items::add);
+    }
 
-	@Execute
-	public void execute(final MDirectMenuItem menuItem) {
-		final var partId = menuItem.getAccessibilityPhrase();
-		logger.atInfo().log("Activating part '%s'", partId);
-		partService.showPart(partId, ACTIVATE);
-	}
+    @Execute
+    public void execute(final MDirectMenuItem menuItem) {
+        final var partId = menuItem.getAccessibilityPhrase();
+        logger.atInfo().log("Activating part '%s'", partId);
+        partService.showPart(partId, ACTIVATE);
+    }
 
-	private MDirectMenuItem createViewMenu(final MPart part) {
-		final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
-		final var bsn         = context.getBundle().getSymbolicName();
+    private MDirectMenuItem createViewMenu(final MPart part) {
+        final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
+        final var bsn         = context.getBundle().getSymbolicName();
 
-		dynamicItem.setLabel(part.getLabel());
-		dynamicItem.setIconURI(part.getIconURI());
-		dynamicItem.setAccessibilityPhrase(part.getElementId());
-		dynamicItem.setContributorURI("platform:/plugin/" + bsn);
-		dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
+        dynamicItem.setLabel(part.getLabel());
+        dynamicItem.setIconURI(part.getIconURI());
+        dynamicItem.setAccessibilityPhrase(part.getElementId());
+        dynamicItem.setContributorURI("platform:/plugin/" + bsn);
+        dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
-		return dynamicItem;
-	}
+        return dynamicItem;
+    }
 
 }

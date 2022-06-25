@@ -27,5 +27,5 @@ import org.osgi.service.component.annotations.ComponentPropertyType;
 @Retention(CLASS)
 @ComponentPropertyType
 public @interface SupplierID {
-	String value();
+    String value();
 }

@@ -41,128 +41,128 @@ import javafx.collections.ObservableList;
 @ProviderType
 public interface DataProvider {
 
-	/**
-	 * Retrieves information from the remote runtime
-	 *
-	 * @param id      the identifier to execute a specific information, otherwise,
-	 *                set to {@code null} to retrieve all informations
-	 * @param isAsync set to {@code true} if the information needs to be retrieved
-	 *                asynchronously
-	 */
-	void retrieveInfo(String id, boolean isAsync);
+    /**
+     * Retrieves information from the remote runtime
+     *
+     * @param id      the identifier to execute a specific information, otherwise,
+     *                set to {@code null} to retrieve all informations
+     * @param isAsync set to {@code true} if the information needs to be retrieved
+     *                asynchronously
+     */
+    void retrieveInfo(String id, boolean isAsync);
 
-	/**
-	 * Returns the observable list of bundles
-	 *
-	 * @return the observable list of bundles
-	 */
-	ObservableList<XBundleDTO> bundles();
+    /**
+     * Returns the observable list of bundles
+     *
+     * @return the observable list of bundles
+     */
+    ObservableList<XBundleDTO> bundles();
 
-	/**
-	 * Returns the observable list of packages
-	 *
-	 * @return the observable list of packages
-	 */
-	ObservableList<PackageDTO> packages();
+    /**
+     * Returns the observable list of packages
+     *
+     * @return the observable list of packages
+     */
+    ObservableList<PackageDTO> packages();
 
-	/**
-	 * Returns the observable list of services
-	 *
-	 * @return the observable list of services
-	 */
-	ObservableList<XServiceDTO> services();
+    /**
+     * Returns the observable list of services
+     *
+     * @return the observable list of services
+     */
+    ObservableList<XServiceDTO> services();
 
-	/**
-	 * Returns the observable list of components
-	 *
-	 * @return the observable list of components
-	 */
-	ObservableList<XComponentDTO> components();
+    /**
+     * Returns the observable list of components
+     *
+     * @return the observable list of components
+     */
+    ObservableList<XComponentDTO> components();
 
-	/**
-	 * Returns the observable list of configurations
-	 *
-	 * @return the observable list of configurations
-	 */
-	ObservableList<XConfigurationDTO> configurations();
+    /**
+     * Returns the observable list of configurations
+     *
+     * @return the observable list of configurations
+     */
+    ObservableList<XConfigurationDTO> configurations();
 
-	/**
-	 * Returns the observable list of events
-	 *
-	 * @return the observable list of events
-	 */
-	ObservableList<XEventDTO> events();
+    /**
+     * Returns the observable list of events
+     *
+     * @return the observable list of events
+     */
+    ObservableList<XEventDTO> events();
 
-	/**
-	 * Returns the observable list of logs
-	 *
-	 * @return the observable list of logs
-	 */
-	ObservableList<XLogEntryDTO> logs();
+    /**
+     * Returns the observable list of logs
+     *
+     * @return the observable list of logs
+     */
+    ObservableList<XLogEntryDTO> logs();
 
-	/**
-	 * Returns the observable list of properties
-	 *
-	 * @return the observable list of properties
-	 */
-	ObservableList<XPropertyDTO> properties();
+    /**
+     * Returns the observable list of properties
+     *
+     * @return the observable list of properties
+     */
+    ObservableList<XPropertyDTO> properties();
 
-	/**
-	 * Returns the observable list of threads
-	 *
-	 * @return the observable list of threads
-	 */
-	ObservableList<XThreadDTO> threads();
+    /**
+     * Returns the observable list of threads
+     *
+     * @return the observable list of threads
+     */
+    ObservableList<XThreadDTO> threads();
 
-	/**
-	 * Returns the observable list of classloader leaks
-	 *
-	 * @return the observable list of classloader leaks
-	 */
+    /**
+     * Returns the observable list of classloader leaks
+     *
+     * @return the observable list of classloader leaks
+     */
 
-	ObservableList<XBundleDTO> leaks();
+    ObservableList<XBundleDTO> leaks();
 
-	/**
-	 * Returns the HTTP runtime information that includes list of all servlets,
-	 * resources, listeners, filters and error pages
-	 *
-	 * @return the observable list of all HTTP components
-	 */
-	ObservableList<XHttpComponentDTO> httpComponents();
+    /**
+     * Returns the HTTP runtime information that includes list of all servlets,
+     * resources, listeners, filters and error pages
+     *
+     * @return the observable list of all HTTP components
+     */
+    ObservableList<XHttpComponentDTO> httpComponents();
 
-	/**
-	 * Returns the Felix health checks
-	 *
-	 * @return the observable list of all Felix health checks
-	 */
-	ObservableList<XHealthCheckDTO> healthchecks();
+    /**
+     * Returns the Felix health checks
+     *
+     * @return the observable list of all Felix health checks
+     */
+    ObservableList<XHealthCheckDTO> healthchecks();
 
-	/**
-	 * Returns the different roles (users and groups) stored in {@code UserAdmin}
-	 *
-	 * @return the observable list of all roles
-	 */
-	ObservableList<XRoleDTO> roles();
+    /**
+     * Returns the different roles (users and groups) stored in {@code UserAdmin}
+     *
+     * @return the observable list of all roles
+     */
+    ObservableList<XRoleDTO> roles();
 
-	/**
-	 * Returns the different logger contexts
-	 *
-	 * @return the observable list of all logger contexts
-	 */
-	ObservableList<XBundleLoggerContextDTO> loggerContexts();
+    /**
+     * Returns the different logger contexts
+     *
+     * @return the observable list of all logger contexts
+     */
+    ObservableList<XBundleLoggerContextDTO> loggerContexts();
 
-	/**
-	 * Returns the memory information of the remote runtime
-	 *
-	 * @return the memory information
-	 */
-	XMemoryInfoDTO memory();
+    /**
+     * Returns the memory information of the remote runtime
+     *
+     * @return the memory information
+     */
+    XMemoryInfoDTO memory();
 
-	/**
-	 * Returns the DMT node information of the specified node
-	 *
-	 * @return the DMT node information
-	 */
-	XDmtNodeDTO readDmtNode(String rootURI);
+    /**
+     * Returns the DMT node information of the specified node
+     *
+     * @return the DMT node information
+     */
+    XDmtNodeDTO readDmtNode(String rootURI);
 
 }

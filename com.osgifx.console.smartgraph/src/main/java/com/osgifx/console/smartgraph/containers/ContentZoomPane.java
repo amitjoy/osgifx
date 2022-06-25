@@ -40,151 +40,151 @@ import javafx.scene.text.Text;
  */
 public class ContentZoomPane extends BorderPane {
 
-	/*
-	 * PAN AND ZOOM
-	 */
-	private final DoubleProperty scaleFactorProperty = new ReadOnlyDoubleWrapper(1);
-	private final Node           content;
+    /*
+     * PAN AND ZOOM
+     */
+    private final DoubleProperty scaleFactorProperty = new ReadOnlyDoubleWrapper(1);
+    private final Node           content;
 
-	private static final double MIN_SCALE    = 1;
-	private static final double MAX_SCALE    = 5;
-	private static final double SCROLL_DELTA = 0.25;
+    private static final double MIN_SCALE    = 1;
+    private static final double MAX_SCALE    = 5;
+    private static final double SCROLL_DELTA = 0.25;
 
-	public ContentZoomPane(final Node content) {
-		if (content == null) {
-			throw new IllegalArgumentException("Content cannot be null.");
-		}
+    public ContentZoomPane(final Node content) {
+        if (content == null) {
+            throw new IllegalArgumentException("Content cannot be null.");
+        }
 
-		this.content = content;
+        this.content = content;
 
-		final var center = content;
-		content.toFront();
+        final var center = content;
+        content.toFront();
 
-		setCenter(center);
-		setRight(createSlider());
+        setCenter(center);
+        setRight(createSlider());
 
-		enablePanAndZoom();
-	}
+        enablePanAndZoom();
+    }
 
-	private Node createSlider() {
+    private Node createSlider() {
 
-		final var slider = new Slider(MIN_SCALE, MAX_SCALE, MIN_SCALE);
-		slider.setOrientation(Orientation.VERTICAL);
-		slider.setShowTickMarks(true);
-		slider.setShowTickLabels(true);
-		slider.setMajorTickUnit(SCROLL_DELTA);
-		slider.setMinorTickCount(1);
-		slider.setBlockIncrement(0.125f);
-		slider.setSnapToTicks(true);
+        final var slider = new Slider(MIN_SCALE, MAX_SCALE, MIN_SCALE);
+        slider.setOrientation(Orientation.VERTICAL);
+        slider.setShowTickMarks(true);
+        slider.setShowTickLabels(true);
+        slider.setMajorTickUnit(SCROLL_DELTA);
+        slider.setMinorTickCount(1);
+        slider.setBlockIncrement(0.125f);
+        slider.setSnapToTicks(true);
 
-		final var label = new Text("Zoom");
+        final var label = new Text("Zoom");
 
-		final var paneSlider = new VBox(slider, label);
+        final var paneSlider = new VBox(slider, label);
 
-		paneSlider.setPadding(new Insets(10, 10, 10, 10));
-		paneSlider.setSpacing(10);
+        paneSlider.setPadding(new Insets(10, 10, 10, 10));
+        paneSlider.setSpacing(10);
 
-		slider.valueProperty().bind(scaleFactorProperty());
+        slider.valueProperty().bind(scaleFactorProperty());
 
-		return paneSlider;
-	}
+        return paneSlider;
+    }
 
-	public void setContentPivot(final double x, final double y) {
-		content.setTranslateX(content.getTranslateX() - x);
-		content.setTranslateY(content.getTranslateY() - y);
-	}
+    public void setContentPivot(final double x, final double y) {
+        content.setTranslateX(content.getTranslateX() - x);
+        content.setTranslateY(content.getTranslateY() - y);
+    }
 
-	public static double boundValue(final double value, final double min, final double max) {
+    public static double boundValue(final double value, final double min, final double max) {
 
-		if (Double.compare(value, min) < 0) {
-			return min;
-		}
+        if (Double.compare(value, min) < 0) {
+            return min;
+        }
 
-		if (Double.compare(value, max) > 0) {
-			return max;
-		}
+        if (Double.compare(value, max) > 0) {
+            return max;
+        }
 
-		return value;
-	}
+        return value;
+    }
 
-	private void enablePanAndZoom() {
+    private void enablePanAndZoom() {
 
-		setOnScroll((final ScrollEvent event) -> {
+        setOnScroll((final ScrollEvent event) -> {
 
-			final double direction = event.getDeltaY() >= 0 ? 1 : -1;
+            final double direction = event.getDeltaY() >= 0 ? 1 : -1;
 
-			final double currentScale  = scaleFactorProperty.getValue();
-			var          computedScale = currentScale + direction * SCROLL_DELTA;
+            final double currentScale  = scaleFactorProperty.getValue();
+            var          computedScale = currentScale + direction * SCROLL_DELTA;
 
-			computedScale = boundValue(computedScale, MIN_SCALE, MAX_SCALE);
+            computedScale = boundValue(computedScale, MIN_SCALE, MAX_SCALE);
 
-			if (currentScale != computedScale) {
+            if (currentScale != computedScale) {
 
-				content.setScaleX(computedScale);
-				content.setScaleY(computedScale);
+                content.setScaleX(computedScale);
+                content.setScaleY(computedScale);
 
-				if (computedScale == 1) {
-					content.setTranslateX(-getTranslateX());
-					content.setTranslateY(-getTranslateY());
-				} else {
-					scaleFactorProperty.setValue(computedScale);
+                if (computedScale == 1) {
+                    content.setTranslateX(-getTranslateX());
+                    content.setTranslateY(-getTranslateY());
+                } else {
+                    scaleFactorProperty.setValue(computedScale);
 
-					final var bounds = content.localToScene(content.getBoundsInLocal());
-					final var f      = computedScale / currentScale - 1;
-					final var dx     = event.getX() - (bounds.getWidth() / 2 + bounds.getMinX());
-					final var dy     = event.getY() - (bounds.getHeight() / 2 + bounds.getMinY());
+                    final var bounds = content.localToScene(content.getBoundsInLocal());
+                    final var f      = computedScale / currentScale - 1;
+                    final var dx     = event.getX() - (bounds.getWidth() / 2 + bounds.getMinX());
+                    final var dy     = event.getY() - (bounds.getHeight() / 2 + bounds.getMinY());
 
-					setContentPivot(f * dx, f * dy);
-				}
+                    setContentPivot(f * dx, f * dy);
+                }
 
-			}
-			// do not propagate
-			event.consume();
+            }
+            // do not propagate
+            event.consume();
 
-		});
+        });
 
-		final var sceneDragContext = new DragContext();
+        final var sceneDragContext = new DragContext();
 
-		setOnMousePressed((final MouseEvent event) -> {
+        setOnMousePressed((final MouseEvent event) -> {
 
-			if (event.isSecondaryButtonDown()) {
-				getScene().setCursor(Cursor.MOVE);
+            if (event.isSecondaryButtonDown()) {
+                getScene().setCursor(Cursor.MOVE);
 
-				sceneDragContext.mouseAnchorX = event.getX();
-				sceneDragContext.mouseAnchorY = event.getY();
+                sceneDragContext.mouseAnchorX = event.getX();
+                sceneDragContext.mouseAnchorY = event.getY();
 
-				sceneDragContext.translateAnchorX = content.getTranslateX();
-				sceneDragContext.translateAnchorY = content.getTranslateY();
-			}
+                sceneDragContext.translateAnchorX = content.getTranslateX();
+                sceneDragContext.translateAnchorY = content.getTranslateY();
+            }
 
-		});
+        });
 
-		setOnMouseReleased((final MouseEvent event) -> {
-			getScene().setCursor(Cursor.DEFAULT);
-		});
+        setOnMouseReleased((final MouseEvent event) -> {
+            getScene().setCursor(Cursor.DEFAULT);
+        });
 
-		setOnMouseDragged((final MouseEvent event) -> {
-			if (event.isSecondaryButtonDown()) {
+        setOnMouseDragged((final MouseEvent event) -> {
+            if (event.isSecondaryButtonDown()) {
 
-				content.setTranslateX(sceneDragContext.translateAnchorX + event.getX() - sceneDragContext.mouseAnchorX);
-				content.setTranslateY(sceneDragContext.translateAnchorY + event.getY() - sceneDragContext.mouseAnchorY);
-			}
-		});
+                content.setTranslateX(sceneDragContext.translateAnchorX + event.getX() - sceneDragContext.mouseAnchorX);
+                content.setTranslateY(sceneDragContext.translateAnchorY + event.getY() - sceneDragContext.mouseAnchorY);
+            }
+        });
 
-	}
+    }
 
-	public DoubleProperty scaleFactorProperty() {
-		return scaleFactorProperty;
-	}
+    public DoubleProperty scaleFactorProperty() {
+        return scaleFactorProperty;
+    }
 
-	static class DragContext {
+    static class DragContext {
 
-		double mouseAnchorX;
-		double mouseAnchorY;
+        double mouseAnchorX;
+        double mouseAnchorY;
 
-		double translateAnchorX;
-		double translateAnchorY;
+        double translateAnchorX;
+        double translateAnchorY;
 
-	}
+    }
 
 }

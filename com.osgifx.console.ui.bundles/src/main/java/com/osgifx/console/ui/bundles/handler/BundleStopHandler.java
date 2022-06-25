@@ -37,52 +37,52 @@ import javafx.concurrent.Task;
 
 public final class BundleStopHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@Optional
-	@Named("is_connected")
-	private boolean           isConnected;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @Optional
+    @Named("is_connected")
+    private boolean           isConnected;
 
-	@Execute
-	public void execute(@Named("id") final String id) {
-		if (!isConnected) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return;
-		}
-		final Task<Void> stopTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					final var agent = supervisor.getAgent();
-					final var error = agent.stop(Long.parseLong(id));
-					if (error == null) {
-						logger.atInfo().log("Bundle with ID '%s' has been stopped", id);
-						eventBroker.post(BUNDLE_STOPPED_EVENT_TOPIC, id);
-					} else {
-						logger.atError().log(error);
-						threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Stop Error", error, getClass().getClassLoader()));
-					}
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Bundle with ID '%s' cannot be stopped", id);
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-				}
-				return null;
-			}
-		};
-		CompletableFuture.runAsync(stopTask);
-	}
+    @Execute
+    public void execute(@Named("id") final String id) {
+        if (!isConnected) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return;
+        }
+        final Task<Void> stopTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    final var agent = supervisor.getAgent();
+                    final var error = agent.stop(Long.parseLong(id));
+                    if (error == null) {
+                        logger.atInfo().log("Bundle with ID '%s' has been stopped", id);
+                        eventBroker.post(BUNDLE_STOPPED_EVENT_TOPIC, id);
+                    } else {
+                        logger.atError().log(error);
+                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Stop Error", error, getClass().getClassLoader()));
+                    }
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Bundle with ID '%s' cannot be stopped", id);
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+                return null;
+            }
+        };
+        CompletableFuture.runAsync(stopTask);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

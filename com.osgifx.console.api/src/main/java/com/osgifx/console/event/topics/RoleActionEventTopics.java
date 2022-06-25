@@ -17,14 +17,14 @@ package com.osgifx.console.event.topics;
 
 public final class RoleActionEventTopics {
 
-	private RoleActionEventTopics() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private RoleActionEventTopics() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static final String ROLE_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/role/";
-	public static final String ROLE_ACTION_EVENT_TOPICS       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String ROLE_CREATED_EVENT_TOPIC       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "created";
-	public static final String ROLE_UPDATED_EVENT_TOPIC       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "updated";
-	public static final String ROLE_DELETED_EVENT_TOPIC       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "deleted";
+    public static final String ROLE_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/role/";
+    public static final String ROLE_ACTION_EVENT_TOPICS       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "*";
+    public static final String ROLE_CREATED_EVENT_TOPIC       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "created";
+    public static final String ROLE_UPDATED_EVENT_TOPIC       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "updated";
+    public static final String ROLE_DELETED_EVENT_TOPIC       = ROLE_ACTION_EVENT_TOPIC_PREFIX + "deleted";
 
 }

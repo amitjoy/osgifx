@@ -43,88 +43,88 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=org.osgi.service.deploymentadmin.DeploymentAdmin)")
 public final class ExtensionsViewDialogController {
 
-	@Log
-	@Inject
-	private FluentLogger                              logger;
-	@FXML
-	private TableView<DeploymentPackageDTO>           extensionsList;
-	@FXML
-	private TableColumn<DeploymentPackageDTO, String> nameColumn;
-	@FXML
-	private TableColumn<DeploymentPackageDTO, String> displayNameColumn;
-	@FXML
-	private TableColumn<DeploymentPackageDTO, String> versionColumn;
-	@Inject
-	private DeploymentAdmin                           deploymentAdmin;
-	@Inject
-	private IWorkbench                                workbench;
-	@Inject
-	private ThreadSynchronize                         threadSync;
-	private ObservableList<DeploymentPackageDTO>      extensions;
+    @Log
+    @Inject
+    private FluentLogger                              logger;
+    @FXML
+    private TableView<DeploymentPackageDTO>           extensionsList;
+    @FXML
+    private TableColumn<DeploymentPackageDTO, String> nameColumn;
+    @FXML
+    private TableColumn<DeploymentPackageDTO, String> displayNameColumn;
+    @FXML
+    private TableColumn<DeploymentPackageDTO, String> versionColumn;
+    @Inject
+    private DeploymentAdmin                           deploymentAdmin;
+    @Inject
+    private IWorkbench                                workbench;
+    @Inject
+    private ThreadSynchronize                         threadSync;
+    private ObservableList<DeploymentPackageDTO>      extensions;
 
-	@FXML
-	public void initialize() {
-		final var installedExtensions = deploymentAdmin.listDeploymentPackages();
-		extensions = FXCollections.observableArrayList(Stream.of(installedExtensions).map(this::toDTO).toList());
-		extensionsList.setItems(extensions);
-		logger.atDebug().log("FXML controller has been initialized");
+    @FXML
+    public void initialize() {
+        final var installedExtensions = deploymentAdmin.listDeploymentPackages();
+        extensions = FXCollections.observableArrayList(Stream.of(installedExtensions).map(this::toDTO).toList());
+        extensionsList.setItems(extensions);
+        logger.atDebug().log("FXML controller has been initialized");
 
-		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-		displayNameColumn.setCellValueFactory(new DTOCellValueFactory<>("displayName", String.class));
-		versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+        displayNameColumn.setCellValueFactory(new DTOCellValueFactory<>("displayName", String.class));
+        versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
-		initContextMenu();
-	}
+        initContextMenu();
+    }
 
-	private void initContextMenu() {
-		final var item = new MenuItem("Uninstall");
-		item.setOnAction(event -> {
-			final var dp = extensionsList.getSelectionModel().getSelectedItem();
-			try {
-				final var isRemoved = removeDeploymentPackage(dp);
-				if (isRemoved) {
-					threadSync.asyncExec(() -> {
-						final var header = "Extension Uninstallation";
-						FxDialog.showInfoDialog(header, dp.name + " has been uninstalled", getClass().getClassLoader());
-						extensions.clear();
+    private void initContextMenu() {
+        final var item = new MenuItem("Uninstall");
+        item.setOnAction(event -> {
+            final var dp = extensionsList.getSelectionModel().getSelectedItem();
+            try {
+                final var isRemoved = removeDeploymentPackage(dp);
+                if (isRemoved) {
+                    threadSync.asyncExec(() -> {
+                        final var header = "Extension Uninstallation";
+                        FxDialog.showInfoDialog(header, dp.name + " has been uninstalled", getClass().getClassLoader());
+                        extensions.clear();
 
-						final var existingExtensions = deploymentAdmin.listDeploymentPackages();
-						extensions.addAll(Stream.of(existingExtensions).map(this::toDTO).toList());
+                        final var existingExtensions = deploymentAdmin.listDeploymentPackages();
+                        extensions.addAll(Stream.of(existingExtensions).map(this::toDTO).toList());
 
-						// show information about the restart of the application
-						FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
-						        getClass().getClassLoader(), btn -> workbench.restart());
-					});
-				}
-			} catch (final Exception e) {
-				threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-			}
-		});
-		final var menu = new ContextMenu();
-		menu.getItems().add(item);
-		extensionsList.setContextMenu(menu);
-	}
+                        // show information about the restart of the application
+                        FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
+                                getClass().getClassLoader(), btn -> workbench.restart());
+                    });
+                }
+            } catch (final Exception e) {
+                threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+            }
+        });
+        final var menu = new ContextMenu();
+        menu.getItems().add(item);
+        extensionsList.setContextMenu(menu);
+    }
 
-	private DeploymentPackageDTO toDTO(final DeploymentPackage deploymentPackage) {
-		final var dto = new DeploymentPackageDTO();
+    private DeploymentPackageDTO toDTO(final DeploymentPackage deploymentPackage) {
+        final var dto = new DeploymentPackageDTO();
 
-		dto.name        = deploymentPackage.getName();
-		dto.displayName = deploymentPackage.getDisplayName();
-		dto.version     = deploymentPackage.getVersion().toString();
+        dto.name        = deploymentPackage.getName();
+        dto.displayName = deploymentPackage.getDisplayName();
+        dto.version     = deploymentPackage.getVersion().toString();
 
-		return dto;
-	}
+        return dto;
+    }
 
-	private boolean removeDeploymentPackage(final DeploymentPackageDTO dp) throws Exception {
-		for (final DeploymentPackage deploymentPackage : deploymentAdmin.listDeploymentPackages()) {
-			final var name    = deploymentPackage.getName();
-			final var version = deploymentPackage.getVersion().toString();
-			if (name.equals(dp.name) && version.equals(dp.version)) {
-				deploymentPackage.uninstall();
-				return true;
-			}
-		}
-		return false;
-	}
+    private boolean removeDeploymentPackage(final DeploymentPackageDTO dp) throws Exception {
+        for (final DeploymentPackage deploymentPackage : deploymentAdmin.listDeploymentPackages()) {
+            final var name    = deploymentPackage.getName();
+            final var version = deploymentPackage.getVersion().toString();
+            if (name.equals(dp.name) && version.equals(dp.version)) {
+                deploymentPackage.uninstall();
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

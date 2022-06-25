@@ -35,60 +35,60 @@ import javafx.scene.image.ImageView;
 
 public final class BatchInstallDialogController {
 
-	public static final String ARTIFACTS_DIRECTORY = "./fxartifacts";
+    public static final String ARTIFACTS_DIRECTORY = "./fxartifacts";
 
-	@Log
-	@Inject
-	private FluentLogger                   logger;
-	@FXML
-	private ListSelectionView<ArtifactDTO> artifactsList;
+    @Log
+    @Inject
+    private FluentLogger                   logger;
+    @FXML
+    private ListSelectionView<ArtifactDTO> artifactsList;
 
-	@FXML
-	public void initialize() {
-		logger.atDebug().log("FXML controller has been initialized");
-		artifactsList.setCellFactory(listView -> new ListCell<>() {
-			@Override
-			public void updateItem(final ArtifactDTO artifact, final boolean empty) {
-				super.updateItem(artifact, empty);
+    @FXML
+    public void initialize() {
+        logger.atDebug().log("FXML controller has been initialized");
+        artifactsList.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            public void updateItem(final ArtifactDTO artifact, final boolean empty) {
+                super.updateItem(artifact, empty);
 
-				if (artifact == null || empty) {
-					setText(null);
-					setGraphic(null);
-				} else {
-					setText(artifact.file().getName());
-					setGraphic(new ImageView(this.getClass()
-					        .getResource(artifact.isConfiguration() ? "/graphic/images/config.png" : "/graphic/images/bundle.png")
-					        .toString()));
-				}
-			}
-		});
-		initArtifacts();
-	}
+                if (artifact == null || empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(artifact.file().getName());
+                    setGraphic(new ImageView(this.getClass()
+                            .getResource(artifact.isConfiguration() ? "/graphic/images/config.png" : "/graphic/images/bundle.png")
+                            .toString()));
+                }
+            }
+        });
+        initArtifacts();
+    }
 
-	public void initArtifacts() {
-		final var         directory = new File(ARTIFACTS_DIRECTORY);
-		List<ArtifactDTO> artifacts;
-		if (directory.exists()) {
-			final var files = FileUtils.listFiles(directory, new String[] { "jar", "json" }, false);
-			artifacts = files.stream().map(this::createArtifact).toList();
-		} else {
-			artifacts = List.of();
-		}
-		artifactsList.getSourceItems().clear();
-		artifactsList.getTargetItems().clear();
-		artifactsList.getSourceItems().addAll(artifacts);
-	}
+    public void initArtifacts() {
+        final var         directory = new File(ARTIFACTS_DIRECTORY);
+        List<ArtifactDTO> artifacts;
+        if (directory.exists()) {
+            final var files = FileUtils.listFiles(directory, new String[] { "jar", "json" }, false);
+            artifacts = files.stream().map(this::createArtifact).toList();
+        } else {
+            artifacts = List.of();
+        }
+        artifactsList.getSourceItems().clear();
+        artifactsList.getTargetItems().clear();
+        artifactsList.getSourceItems().addAll(artifacts);
+    }
 
-	private ArtifactDTO createArtifact(final File file) {
-		return new ArtifactDTO(file, file.getName().endsWith(".json"));
-	}
+    private ArtifactDTO createArtifact(final File file) {
+        return new ArtifactDTO(file, file.getName().endsWith(".json"));
+    }
 
-	public List<ArtifactDTO> getSelectedArtifacts() {
-		return artifactsList.getTargetItems();
-	}
+    public List<ArtifactDTO> getSelectedArtifacts() {
+        return artifactsList.getTargetItems();
+    }
 
-	public ObjectProperty<ObservableList<ArtifactDTO>> targetItemsProperty() {
-		return artifactsList.targetItemsProperty();
-	}
+    public ObjectProperty<ObservableList<ArtifactDTO>> targetItemsProperty() {
+        return artifactsList.targetItemsProperty();
+    }
 
 }
