@@ -27,30 +27,30 @@ import org.osgi.dto.DTO;
  */
 public interface AgentExtension<C extends DTO, R extends DTO> {
 
-	/** The service property key to be set */
-	String PROPERTY_KEY = "agent.extension.name";
+    /** The service property key to be set */
+    String PROPERTY_KEY = "agent.extension.name";
 
-	/**
-	 * Returns the result compliant with {@code OSGi DTO specification}
-	 *
-	 * @param context the context for the extension (also to be compliant with
-	 *                {@code OSGi DTO specification})
-	 * @return the result in compliance with {@code OSGi DTO specification}
-	 */
-	R execute(C context);
+    /**
+     * Returns the result compliant with {@code OSGi DTO specification}
+     *
+     * @param context the context for the extension (also to be compliant with
+     *                {@code OSGi DTO specification})
+     * @return the result in compliance with {@code OSGi DTO specification}
+     */
+    R execute(C context);
 
-	/**
-	 * The source type of the context
-	 *
-	 * @return {@code OSGi DTO specification} compliant DTO
-	 */
-	Class<C> getContextType();
+    /**
+     * The source type of the context
+     *
+     * @return {@code OSGi DTO specification} compliant DTO
+     */
+    Class<C> getContextType();
 
-	/**
-	 * The source type of the context
-	 *
-	 * @return {@code OSGi DTO specification} compliant DTO
-	 */
-	Class<R> getResultType();
+    /**
+     * The source type of the context
+     *
+     * @return {@code OSGi DTO specification} compliant DTO
+     */
+    Class<R> getResultType();
 
 }

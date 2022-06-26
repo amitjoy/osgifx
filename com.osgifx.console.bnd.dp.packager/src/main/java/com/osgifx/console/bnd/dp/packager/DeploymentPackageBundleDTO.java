@@ -17,7 +17,7 @@ package com.osgifx.console.bnd.dp.packager;
 
 public final class DeploymentPackageBundleDTO extends DeploymentPackageEntryDTO {
 
-	public String symbolicName;
-	public String version;
+    public String symbolicName;
+    public String version;
 
 }

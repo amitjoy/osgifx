@@ -40,75 +40,75 @@ import javafx.concurrent.Task;
 
 public final class BundleInstallHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEclipseContext   context;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private ThreadSynchronize threadSync;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEclipseContext   context;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private ThreadSynchronize threadSync;
 
-	@Execute
-	public void execute() {
-		final var dialog = new BundleInstallDialog();
+    @Execute
+    public void execute() {
+        final var dialog = new BundleInstallDialog();
 
-		ContextInjectionFactory.inject(dialog, context);
-		logger.atInfo().log("Injected install bundle dialog to eclipse context");
-		dialog.init();
+        ContextInjectionFactory.inject(dialog, context);
+        logger.atInfo().log("Injected install bundle dialog to eclipse context");
+        dialog.init();
 
-		final var remoteInstall = dialog.showAndWait();
-		if (remoteInstall.isPresent()) {
-			final Task<Void> installTask = new Task<>() {
-				@Override
-				protected Void call() throws Exception {
-					try {
-						final var dto        = remoteInstall.get();
-						final var file       = dto.file();
-						final var startLevel = dto.startLevel();
-						if (file == null) {
-							return null;
-						}
-						logger.atInfo().log("Selected file to install or update as bundle: %s", file);
+        final var remoteInstall = dialog.showAndWait();
+        if (remoteInstall.isPresent()) {
+            final Task<Void> installTask = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var dto        = remoteInstall.get();
+                        final var file       = dto.file();
+                        final var startLevel = dto.startLevel();
+                        if (file == null) {
+                            return null;
+                        }
+                        logger.atInfo().log("Selected file to install or update as bundle: %s", file);
 
-						final var agent = supervisor.getAgent();
-						if (agent == null) {
-							logger.atWarning().log("Remote agent cannot be connected");
-							return null;
-						}
-						final var bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
-						if (bundle == null) {
-							logger.atError().log("Bundle cannot be installed or updated");
-							return null;
-						}
-						logger.atInfo().log("Bundle has been installed or updated: %s", bundle);
-						if (dto.startBundle()) {
-							agent.start(bundle.id);
-							logger.atInfo().log("Bundle has been started: %s", bundle);
-						}
-						eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
-						threadSync.asyncExec(() -> Fx.showSuccessNotification("Remote Bundle Install",
-						        bundle.symbolicName + " successfully installed/updated"));
-					} catch (final Exception e) {
-						logger.atError().withException(e).log("Bundle cannot be installed or updated");
-						threadSync.asyncExec(() -> Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated"));
-					}
-					return null;
-				}
-			};
-			CompletableFuture.runAsync(installTask);
-		}
-	}
+                        final var agent = supervisor.getAgent();
+                        if (agent == null) {
+                            logger.atWarning().log("Remote agent cannot be connected");
+                            return null;
+                        }
+                        final var bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
+                        if (bundle == null) {
+                            logger.atError().log("Bundle cannot be installed or updated");
+                            return null;
+                        }
+                        logger.atInfo().log("Bundle has been installed or updated: %s", bundle);
+                        if (dto.startBundle()) {
+                            agent.start(bundle.id);
+                            logger.atInfo().log("Bundle has been started: %s", bundle);
+                        }
+                        eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
+                        threadSync.asyncExec(() -> Fx.showSuccessNotification("Remote Bundle Install",
+                                bundle.symbolicName + " successfully installed/updated"));
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Bundle cannot be installed or updated");
+                        threadSync.asyncExec(() -> Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated"));
+                    }
+                    return null;
+                }
+            };
+            CompletableFuture.runAsync(installTask);
+        }
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

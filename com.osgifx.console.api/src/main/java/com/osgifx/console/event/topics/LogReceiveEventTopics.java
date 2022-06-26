@@ -17,15 +17,15 @@ package com.osgifx.console.event.topics;
 
 public final class LogReceiveEventTopics {
 
-	private LogReceiveEventTopics() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private LogReceiveEventTopics() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static final String CLEAR_LOGS_TOPIC = "com/osgifx/clear/logs";
+    public static final String CLEAR_LOGS_TOPIC = "com/osgifx/clear/logs";
 
-	public static final String LOG_RECEIVE_EVENT_TOPIC_PREFIX  = "osgi/fx/log/receive/";
-	public static final String LOG_RECEIVE_EVENT_TOPICS        = LOG_RECEIVE_EVENT_TOPIC_PREFIX + "*";
-	public static final String LOG_RECEIVE_STARTED_EVENT_TOPIC = LOG_RECEIVE_EVENT_TOPIC_PREFIX + "started";
-	public static final String LOG_RECEIVE_STOPPED_EVENT_TOPIC = LOG_RECEIVE_EVENT_TOPIC_PREFIX + "stopped";
+    public static final String LOG_RECEIVE_EVENT_TOPIC_PREFIX  = "osgi/fx/log/receive/";
+    public static final String LOG_RECEIVE_EVENT_TOPICS        = LOG_RECEIVE_EVENT_TOPIC_PREFIX + "*";
+    public static final String LOG_RECEIVE_STARTED_EVENT_TOPIC = LOG_RECEIVE_EVENT_TOPIC_PREFIX + "started";
+    public static final String LOG_RECEIVE_STOPPED_EVENT_TOPIC = LOG_RECEIVE_EVENT_TOPIC_PREFIX + "stopped";
 
 }

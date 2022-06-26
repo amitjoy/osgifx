@@ -41,106 +41,106 @@ import javafx.stage.StageStyle;
 
 public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private ThreadSynchronize threadSync;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private ThreadSynchronize threadSync;
 
-	public void init() {
-		final var dialogPane = getDialogPane();
-		initStyle(StageStyle.UNDECORATED);
+    public void init() {
+        final var dialogPane = getDialogPane();
+        initStyle(StageStyle.UNDECORATED);
 
-		dialogPane.setHeaderText("Add Connection Settings");
-		dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
-		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.setHeaderText("Add Connection Settings");
+        dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-		final var txtHostname = (CustomTextField) TextFields.createClearableTextField();
-		txtHostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
+        final var txtHostname = (CustomTextField) TextFields.createClearableTextField();
+        txtHostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
 
-		final var txtPort = (CustomTextField) TextFields.createClearableTextField();
-		txtPort.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        final var txtPort = (CustomTextField) TextFields.createClearableTextField();
+        txtPort.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
 
-		final var txtTimeout = (CustomTextField) TextFields.createClearableTextField();
-		txtTimeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
+        final var txtTimeout = (CustomTextField) TextFields.createClearableTextField();
+        txtTimeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
 
-		final var lbMessage = new Label("");
-		lbMessage.getStyleClass().addAll("message-banner");
-		lbMessage.setVisible(false);
-		lbMessage.setManaged(false);
+        final var lbMessage = new Label("");
+        lbMessage.getStyleClass().addAll("message-banner");
+        lbMessage.setVisible(false);
+        lbMessage.setManaged(false);
 
-		final var content = new VBox(10);
+        final var content = new VBox(10);
 
-		content.getChildren().add(lbMessage);
-		content.getChildren().add(txtHostname);
-		content.getChildren().add(txtPort);
-		content.getChildren().add(txtTimeout);
+        content.getChildren().add(lbMessage);
+        content.getChildren().add(txtHostname);
+        content.getChildren().add(txtPort);
+        content.getChildren().add(txtTimeout);
 
-		dialogPane.setContent(content);
+        dialogPane.setContent(content);
 
-		final var saveButtonType = new ButtonType("Save", ButtonData.OK_DONE);
-		dialogPane.getButtonTypes().addAll(saveButtonType);
+        final var saveButtonType = new ButtonType("Save", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(saveButtonType);
 
-		final var loginButton = (Button) dialogPane.lookupButton(saveButtonType);
-		loginButton.setOnAction(actionEvent -> {
-			try {
-				lbMessage.setVisible(false);
-				lbMessage.setManaged(false);
-				hide();
-			} catch (final Exception ex) {
-				lbMessage.setVisible(true);
-				lbMessage.setManaged(true);
-				lbMessage.setText(ex.getMessage());
-				FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
-			}
-		});
-		final var hostnameCaption = "Hostname";
-		final var portCaption     = "Port (between 1 to 65536)";
-		final var timeoutCaption  = "Timeout in millis";
+        final var loginButton = (Button) dialogPane.lookupButton(saveButtonType);
+        loginButton.setOnAction(actionEvent -> {
+            try {
+                lbMessage.setVisible(false);
+                lbMessage.setManaged(false);
+                hide();
+            } catch (final Exception ex) {
+                lbMessage.setVisible(true);
+                lbMessage.setManaged(true);
+                lbMessage.setText(ex.getMessage());
+                FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
+            }
+        });
+        final var hostnameCaption = "Hostname";
+        final var portCaption     = "Port (between 1 to 65536)";
+        final var timeoutCaption  = "Timeout in millis";
 
-		txtHostname.setPromptText(hostnameCaption);
-		txtPort.setPromptText(portCaption);
-		txtTimeout.setPromptText(timeoutCaption);
+        txtHostname.setPromptText(hostnameCaption);
+        txtPort.setPromptText(portCaption);
+        txtTimeout.setPromptText(timeoutCaption);
 
-		final var validationSupport = new ValidationSupport();
-		threadSync.asyncExec(() -> {
-			final var requiredFormat       = "'%s' is required";
-			final var requiredPortFormat   = "'%s' should be a valid port number";
-			final var requiredNumberFormat = "'%s' should be a valid integer number";
-			validationSupport.registerValidator(txtHostname,
-			        Validator.createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
-			validationSupport.registerValidator(txtPort, Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
-			validationSupport.registerValidator(txtPort, Validator.createPredicateValidator(value -> {
-				try {
-					final var port = Integer.parseInt(value.toString());
-					return port > 0 && port < 65536;
-				} catch (final Exception e) {
-					return false;
-				}
-			}, String.format(requiredPortFormat, portCaption)));
-			validationSupport.registerValidator(txtTimeout, Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
-			validationSupport.registerValidator(txtTimeout, Validator.createPredicateValidator(value -> {
-				try {
-					Integer.parseInt(value.toString());
-					return true;
-				} catch (final Exception e) {
-					return false;
-				}
-			}, String.format(requiredNumberFormat, timeoutCaption)));
-		});
-		setResultConverter(dialogButton -> {
-			try {
-				return dialogButton == saveButtonType
-				        ? new ConnectionSettingDTO(txtHostname.getText(), Integer.parseInt(txtPort.getText()),
-				                Integer.parseInt(txtTimeout.getText()))
-				        : null;
-			} catch (final Exception e) {
-				logger.atError().withException(e).log("Connection settings cannot be added due to validation problem");
-				throw e;
-			}
-		});
-	}
+        final var validationSupport = new ValidationSupport();
+        threadSync.asyncExec(() -> {
+            final var requiredFormat       = "'%s' is required";
+            final var requiredPortFormat   = "'%s' should be a valid port number";
+            final var requiredNumberFormat = "'%s' should be a valid integer number";
+            validationSupport.registerValidator(txtHostname,
+                    Validator.createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
+            validationSupport.registerValidator(txtPort, Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
+            validationSupport.registerValidator(txtPort, Validator.createPredicateValidator(value -> {
+                try {
+                    final var port = Integer.parseInt(value.toString());
+                    return port > 0 && port < 65536;
+                } catch (final Exception e) {
+                    return false;
+                }
+            }, String.format(requiredPortFormat, portCaption)));
+            validationSupport.registerValidator(txtTimeout, Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
+            validationSupport.registerValidator(txtTimeout, Validator.createPredicateValidator(value -> {
+                try {
+                    Integer.parseInt(value.toString());
+                    return true;
+                } catch (final Exception e) {
+                    return false;
+                }
+            }, String.format(requiredNumberFormat, timeoutCaption)));
+        });
+        setResultConverter(dialogButton -> {
+            try {
+                return dialogButton == saveButtonType
+                        ? new ConnectionSettingDTO(txtHostname.getText(), Integer.parseInt(txtPort.getText()),
+                                Integer.parseInt(txtTimeout.getText()))
+                        : null;
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Connection settings cannot be added due to validation problem");
+                throw e;
+            }
+        });
+    }
 
 }

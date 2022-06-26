@@ -42,51 +42,51 @@ import javafx.stage.StageStyle;
 
 public final class ConnectToAgentDialog extends Dialog<ButtonType> {
 
-	public enum ActionType {
-		CONNECT, ADD_CONNECTION, REMOVE_CONNECTION
-	}
+    public enum ActionType {
+        CONNECT, ADD_CONNECTION, REMOVE_CONNECTION
+    }
 
-	@Inject
-	@LocalInstance
-	private FXMLLoader    loader;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
+    @Inject
+    @LocalInstance
+    private FXMLLoader    loader;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
 
-	private final Map<ActionType, ButtonType> buttonTypes = Maps.newHashMap();
+    private final Map<ActionType, ButtonType> buttonTypes = Maps.newHashMap();
 
-	public void init() {
-		final var dialogPane = getDialogPane();
-		initStyle(StageStyle.UNDECORATED);
-		dialogPane.setPrefHeight(170);
-		dialogPane.setPrefWidth(400);
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+    public void init() {
+        final var dialogPane = getDialogPane();
+        initStyle(StageStyle.UNDECORATED);
+        dialogPane.setPrefHeight(170);
+        dialogPane.setPrefWidth(400);
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-		dialogPane.setHeaderText("Connect to Remote Agent");
-		dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
+        dialogPane.setHeaderText("Connect to Remote Agent");
+        dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
 
-		final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
-		final var removeConnectionButton = new ButtonType("Remove", ButtonBar.ButtonData.LEFT);
+        final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
+        final var removeConnectionButton = new ButtonType("Remove", ButtonBar.ButtonData.LEFT);
 
-		dialogPane.getButtonTypes().addAll(ButtonType.OK);
-		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
-		dialogPane.getButtonTypes().addAll(addConnectionButton);
-		dialogPane.getButtonTypes().addAll(removeConnectionButton);
+        dialogPane.getButtonTypes().addAll(ButtonType.OK);
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.getButtonTypes().addAll(addConnectionButton);
+        dialogPane.getButtonTypes().addAll(removeConnectionButton);
 
-		buttonTypes.put(ADD_CONNECTION, addConnectionButton);
-		buttonTypes.put(REMOVE_CONNECTION, removeConnectionButton);
-		buttonTypes.put(CONNECT, OK);
+        buttonTypes.put(ADD_CONNECTION, addConnectionButton);
+        buttonTypes.put(REMOVE_CONNECTION, removeConnectionButton);
+        buttonTypes.put(CONNECT, OK);
 
-		final var content    = Fx.loadFXML(loader, context, "/fxml/connection-chooser-window.fxml");
-		final var controller = (ConnectionSettingsDialogController) loader.getController();
+        final var content    = Fx.loadFXML(loader, context, "/fxml/connection-chooser-window.fxml");
+        final var controller = (ConnectionSettingsDialogController) loader.getController();
 
-		dialogPane.lookupButton(removeConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
-		dialogPane.lookupButton(ButtonType.OK).disableProperty().bind(controller.selectedSettings().isNull());
-		dialogPane.setContent(content);
-	}
+        dialogPane.lookupButton(removeConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
+        dialogPane.lookupButton(ButtonType.OK).disableProperty().bind(controller.selectedSettings().isNull());
+        dialogPane.setContent(content);
+    }
 
-	public ButtonType getButtonType(final ActionType type) {
-		return buttonTypes.get(type);
-	}
+    public ButtonType getButtonType(final ActionType type) {
+        return buttonTypes.get(type);
+    }
 
 }

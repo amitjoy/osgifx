@@ -29,100 +29,100 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 
 public final class ValueConverter {
 
-	private final Converter converter;
+    private final Converter converter;
 
-	public ValueConverter() {
-		final var c  = Converters.standardConverter();
-		final var cb = c.newConverterBuilder();
+    public ValueConverter() {
+        final var c  = Converters.standardConverter();
+        final var cb = c.newConverterBuilder();
 
-		initRules(cb);
-		converter = cb.build();
-	}
+        initRules(cb);
+        converter = cb.build();
+    }
 
-	private void initRules(final ConverterBuilder cb) {
-		cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
-		});
-		cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
-		});
-		cb.rule(new Rule<String, int[]>(v -> Stream.of(v.split(",")).mapToInt(Integer::parseInt).toArray()) {
-		});
-		cb.rule(new Rule<String, List<Integer>>(v -> Stream.of(v.split(",")).map(Integer::parseInt).toList()) {
-		});
-		cb.rule(new Rule<String, boolean[]>(v -> {
-			final var split = v.split(",");
-			final var array = new boolean[split.length];
-			for (var i = 0; i < split.length; i++) {
-				final var value = Boolean.parseBoolean(split[i]);
-				array[i] = value;
-			}
-			return array;
-		}) {
-		});
-		cb.rule(new Rule<String, List<Boolean>>(v -> Stream.of(v.split(",")).map(Boolean::parseBoolean).toList()) {
-		});
-		cb.rule(new Rule<String, double[]>(v -> Stream.of(v.split(",")).mapToDouble(Double::parseDouble).toArray()) {
-		});
-		cb.rule(new Rule<String, List<Double>>(v -> Stream.of(v.split(",")).map(Double::parseDouble).toList()) {
-		});
-		cb.rule(new Rule<String, float[]>(v -> {
-			final var elements = Stream.of(v.split(",")).map(Double::parseDouble).toList();
-			return Floats.toArray(elements);
-		}) {
-		});
-		cb.rule(new Rule<String, List<Float>>(v -> Stream.of(v.split(",")).map(Float::parseFloat).toList()) {
-		});
-		cb.rule(new Rule<String, char[]>(v -> {
-			final var split = v.split(",");
-			final var array = new char[split.length];
-			for (var i = 0; i < split.length; i++) {
-				final var value = split[i].charAt(0);
-				array[i] = value;
-			}
-			return array;
-		}) {
-		});
-		cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(",")).map(e -> e.charAt(0)).toList()) {
-		});
-		cb.rule(new Rule<String, long[]>(v -> Stream.of(v.split(",")).mapToLong(Long::parseLong).toArray()) {
-		});
-		cb.rule(new Rule<String, List<Long>>(v -> Stream.of(v.split(",")).map(Long::parseLong).toList()) {
-		});
-	}
+    private void initRules(final ConverterBuilder cb) {
+        cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
+        });
+        cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
+        });
+        cb.rule(new Rule<String, int[]>(v -> Stream.of(v.split(",")).mapToInt(Integer::parseInt).toArray()) {
+        });
+        cb.rule(new Rule<String, List<Integer>>(v -> Stream.of(v.split(",")).map(Integer::parseInt).toList()) {
+        });
+        cb.rule(new Rule<String, boolean[]>(v -> {
+            final var split = v.split(",");
+            final var array = new boolean[split.length];
+            for (var i = 0; i < split.length; i++) {
+                final var value = Boolean.parseBoolean(split[i]);
+                array[i] = value;
+            }
+            return array;
+        }) {
+        });
+        cb.rule(new Rule<String, List<Boolean>>(v -> Stream.of(v.split(",")).map(Boolean::parseBoolean).toList()) {
+        });
+        cb.rule(new Rule<String, double[]>(v -> Stream.of(v.split(",")).mapToDouble(Double::parseDouble).toArray()) {
+        });
+        cb.rule(new Rule<String, List<Double>>(v -> Stream.of(v.split(",")).map(Double::parseDouble).toList()) {
+        });
+        cb.rule(new Rule<String, float[]>(v -> {
+            final var elements = Stream.of(v.split(",")).map(Double::parseDouble).toList();
+            return Floats.toArray(elements);
+        }) {
+        });
+        cb.rule(new Rule<String, List<Float>>(v -> Stream.of(v.split(",")).map(Float::parseFloat).toList()) {
+        });
+        cb.rule(new Rule<String, char[]>(v -> {
+            final var split = v.split(",");
+            final var array = new char[split.length];
+            for (var i = 0; i < split.length; i++) {
+                final var value = split[i].charAt(0);
+                array[i] = value;
+            }
+            return array;
+        }) {
+        });
+        cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(",")).map(e -> e.charAt(0)).toList()) {
+        });
+        cb.rule(new Rule<String, long[]>(v -> Stream.of(v.split(",")).mapToLong(Long::parseLong).toArray()) {
+        });
+        cb.rule(new Rule<String, List<Long>>(v -> Stream.of(v.split(",")).map(Long::parseLong).toList()) {
+        });
+    }
 
-	public Object convert(final Object value, final XAttributeDefType target) {
-		final Class<?> clazz = XAttributeDefType.clazz(target);
-		return switch (target) {
-		case STRING_ARRAY -> converter.convert(value).defaultValue(new String[0]).to(String[].class);
-		case STRING_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<String>>() {
-		});
-		case INTEGER_ARRAY -> converter.convert(value).defaultValue(new int[0]).to(int[].class);
-		case INTEGER_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Integer>>() {
-		});
-		case BOOLEAN_ARRAY -> converter.convert(value).defaultValue(new boolean[0]).to(boolean[].class);
-		case BOOLEAN_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Boolean>>() {
-		});
-		case DOUBLE_ARRAY -> converter.convert(value).defaultValue(new double[0]).to(double[].class);
-		case DOUBLE_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Double>>() {
-		});
-		case FLOAT_ARRAY -> converter.convert(value).defaultValue(new float[0]).to(float[].class);
-		case FLOAT_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Float>>() {
-		});
-		case CHAR_ARRAY -> converter.convert(value).defaultValue(new char[0]).to(char[].class);
-		case CHAR_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Character>>() {
-		});
-		case LONG_ARRAY -> converter.convert(value).defaultValue(new long[0]).to(long[].class);
-		case LONG_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Long>>() {
-		});
-		default -> converter.convert(value).defaultValue(clazz == String.class ? "" : null).to(clazz);
-		};
-	}
+    public Object convert(final Object value, final XAttributeDefType target) {
+        final Class<?> clazz = XAttributeDefType.clazz(target);
+        return switch (target) {
+        case STRING_ARRAY -> converter.convert(value).defaultValue(new String[0]).to(String[].class);
+        case STRING_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<String>>() {
+        });
+        case INTEGER_ARRAY -> converter.convert(value).defaultValue(new int[0]).to(int[].class);
+        case INTEGER_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Integer>>() {
+        });
+        case BOOLEAN_ARRAY -> converter.convert(value).defaultValue(new boolean[0]).to(boolean[].class);
+        case BOOLEAN_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Boolean>>() {
+        });
+        case DOUBLE_ARRAY -> converter.convert(value).defaultValue(new double[0]).to(double[].class);
+        case DOUBLE_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Double>>() {
+        });
+        case FLOAT_ARRAY -> converter.convert(value).defaultValue(new float[0]).to(float[].class);
+        case FLOAT_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Float>>() {
+        });
+        case CHAR_ARRAY -> converter.convert(value).defaultValue(new char[0]).to(char[].class);
+        case CHAR_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Character>>() {
+        });
+        case LONG_ARRAY -> converter.convert(value).defaultValue(new long[0]).to(long[].class);
+        case LONG_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Long>>() {
+        });
+        default -> converter.convert(value).defaultValue(clazz == String.class ? "" : null).to(clazz);
+        };
+    }
 
-	public <T> T convert(final Object value, final Class<T> clazz) {
-		return converter.convert(value).defaultValue(clazz == String.class ? "" : null).to(clazz);
-	}
+    public <T> T convert(final Object value, final Class<T> clazz) {
+        return converter.convert(value).defaultValue(clazz == String.class ? "" : null).to(clazz);
+    }
 
-	public <T> T convert(final Object value, final TypeReference<T> ref) {
-		return converter.convert(value).to(ref);
-	}
+    public <T> T convert(final Object value, final TypeReference<T> ref) {
+        return converter.convert(value).to(ref);
+    }
 
 }

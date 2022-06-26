@@ -23,33 +23,33 @@ import com.google.common.collect.Maps;
 
 public class RolesHelper {
 
-	private RolesHelper() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private RolesHelper() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static boolean validateKeyValuePairs(final String value) {
-		try {
-			if (value.isBlank()) {
-				return true;
-			}
-			prepareKeyValuePairs(value);
-			return true;
-		} catch (final Exception e) {
-			return false;
-		}
-	}
+    public static boolean validateKeyValuePairs(final String value) {
+        try {
+            if (value.isBlank()) {
+                return true;
+            }
+            prepareKeyValuePairs(value);
+            return true;
+        } catch (final Exception e) {
+            return false;
+        }
+    }
 
-	public static Map<String, Object> prepareKeyValuePairs(final Object value) {
-		final var v = value.toString();
-		if (v.isBlank()) {
-			return Map.of();
-		}
-		final var splittedMap = Splitter.on(System.lineSeparator()).trimResults().withKeyValueSeparator('=').split(v);
-		return Maps.newHashMap(splittedMap);
-	}
+    public static Map<String, Object> prepareKeyValuePairs(final Object value) {
+        final var v = value.toString();
+        if (v.isBlank()) {
+            return Map.of();
+        }
+        final var splittedMap = Splitter.on(System.lineSeparator()).trimResults().withKeyValueSeparator('=').split(v);
+        return Maps.newHashMap(splittedMap);
+    }
 
-	public static String mapToString(final Map<?, ?> map) {
-		return Joiner.on(System.lineSeparator()).withKeyValueSeparator("=").join(map);
-	}
+    public static String mapToString(final Map<?, ?> map) {
+        return Joiner.on(System.lineSeparator()).withKeyValueSeparator("=").join(map);
+    }
 
 }

@@ -33,42 +33,42 @@ import org.osgi.service.component.annotations.Reference;
 @Component
 public final class FxStartupTracker implements StartupProgressTrackerService {
 
-	@Reference
-	private LoggerFactory factory;
-	private FluentLogger  logger;
+    @Reference
+    private LoggerFactory factory;
+    private FluentLogger  logger;
 
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public OSGiRV applicationLaunched(final ApplicationContext applicationContext) {
-		return StartupProgressTrackerService.OSGiRV.EXIT;
-	}
+    @Override
+    public OSGiRV applicationLaunched(final ApplicationContext applicationContext) {
+        return StartupProgressTrackerService.OSGiRV.EXIT;
+    }
 
-	@Override
-	public void stateReached(final ProgressState state) {
-		if (state == JAVAFX_INITIALIZED) {
-			logger.atInfo().log("[StartUp] The JavaFX subsystem has been initialized. This state reached on JavaFX event thread");
-		}
-		if (state == JAVAFX_INITIALIZED_LAUNCHER_THREAD) {
-			logger.atInfo().log("[StartUp] The JavaFX subsystem has been initialized. This state reached on launcher thread.");
-		}
-		if (state == DI_SYSTEM_INITIALIZED) {
-			logger.atInfo().log("[StartUp] The DI-System has been initialized");
-		}
-		if (state == POST_CONTEXT_LF_FINISHED) {
-			logger.atInfo().log("[StartUp] The lifecycle has been finished");
-		}
-		if (state == WORKBENCH_GUI_SHOWING) {
-			logger.atInfo().log("[StartUp] The workbench UI is showing");
-		}
-		if (state == WORKBENCH_GUI_SHOWN) {
-			logger.atInfo().log("[StartUp] The workbench UI is shown");
-		}
-		if (state == LOCATION_CHECK_FAILED) {
-			logger.atInfo().log("[StartUp] State reached when check for workspace could not be locked");
-		}
-	}
+    @Override
+    public void stateReached(final ProgressState state) {
+        if (state == JAVAFX_INITIALIZED) {
+            logger.atInfo().log("[StartUp] The JavaFX subsystem has been initialized. This state reached on JavaFX event thread");
+        }
+        if (state == JAVAFX_INITIALIZED_LAUNCHER_THREAD) {
+            logger.atInfo().log("[StartUp] The JavaFX subsystem has been initialized. This state reached on launcher thread.");
+        }
+        if (state == DI_SYSTEM_INITIALIZED) {
+            logger.atInfo().log("[StartUp] The DI-System has been initialized");
+        }
+        if (state == POST_CONTEXT_LF_FINISHED) {
+            logger.atInfo().log("[StartUp] The lifecycle has been finished");
+        }
+        if (state == WORKBENCH_GUI_SHOWING) {
+            logger.atInfo().log("[StartUp] The workbench UI is showing");
+        }
+        if (state == WORKBENCH_GUI_SHOWN) {
+            logger.atInfo().log("[StartUp] The workbench UI is shown");
+        }
+        if (state == LOCATION_CHECK_FAILED) {
+            logger.atInfo().log("[StartUp] State reached when check for workspace could not be locked");
+        }
+    }
 
 }

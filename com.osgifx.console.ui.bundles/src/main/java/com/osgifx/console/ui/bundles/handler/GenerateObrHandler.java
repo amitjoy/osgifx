@@ -42,64 +42,64 @@ import javafx.stage.DirectoryChooser;
 
 public final class GenerateObrHandler {
 
-	@Log
-	@Inject
-	private FluentLogger logger;
-	@Inject
-	private DataProvider dataProvider;
-	@Inject
-	@Named("is_connected")
-	private boolean      isConnected;
-	@Inject
-	@Optional
-	@Named("connected.agent")
-	private String       connectedAgent;
+    @Log
+    @Inject
+    private FluentLogger logger;
+    @Inject
+    private DataProvider dataProvider;
+    @Inject
+    @Named("is_connected")
+    private boolean      isConnected;
+    @Inject
+    @Optional
+    @Named("connected.agent")
+    private String       connectedAgent;
 
-	@Execute
-	public void execute() {
-		final var directoryChooser = new DirectoryChooser();
-		final var location         = directoryChooser.showDialog(null);
-		if (location == null) {
-			return;
-		}
-		exportOBR(location);
-	}
+    @Execute
+    public void execute() {
+        final var directoryChooser = new DirectoryChooser();
+        final var location         = directoryChooser.showDialog(null);
+        if (location == null) {
+            return;
+        }
+        exportOBR(location);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
-	private void exportOBR(final File location) {
-		final var resources = dataProvider.bundles().stream().map(this::toResource).toList();
-		if (resources.isEmpty()) {
-			logger.atInfo().log("Resources are empty");
-			return;
-		}
-		final var xmlResourceGenerator = new XMLResourceGenerator();
-		final var name                 = connectedAgent.replace(":", "_") + "_" + LocalDateTime.now() + ".xml";
-		final var outputFile           = new File(location, name);
-		try (final var buffer = new ByteArrayOutputStream(); OutputStream fileStream = new FileOutputStream(outputFile)) {
-			xmlResourceGenerator.resources(resources);
-			xmlResourceGenerator.save(fileStream);
-			Fx.showSuccessNotification("OBR Generation", "Successfully generated");
-			logger.atInfo().log("OBR XML has been successfully generated - '%s'", outputFile);
-		} catch (final Exception e) {
-			FxDialog.showExceptionDialog(e, getClass().getClassLoader());
-			logger.atError().withException(e).log("OBR XML cannot be generated");
-		}
-	}
+    private void exportOBR(final File location) {
+        final var resources = dataProvider.bundles().stream().map(this::toResource).toList();
+        if (resources.isEmpty()) {
+            logger.atInfo().log("Resources are empty");
+            return;
+        }
+        final var xmlResourceGenerator = new XMLResourceGenerator();
+        final var name                 = connectedAgent.replace(":", "_") + "_" + LocalDateTime.now() + ".xml";
+        final var outputFile           = new File(location, name);
+        try (final var buffer = new ByteArrayOutputStream(); OutputStream fileStream = new FileOutputStream(outputFile)) {
+            xmlResourceGenerator.resources(resources);
+            xmlResourceGenerator.save(fileStream);
+            Fx.showSuccessNotification("OBR Generation", "Successfully generated");
+            logger.atInfo().log("OBR XML has been successfully generated - '%s'", outputFile);
+        } catch (final Exception e) {
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+            logger.atError().withException(e).log("OBR XML cannot be generated");
+        }
+    }
 
-	private Resource toResource(final XBundleDTO bundle) {
-		try {
-			final var builder = new ResourceBuilder();
-			builder.addCapabilities(bundle.bundleRevision.capabilities);
-			builder.addRequirements(bundle.bundleRevision.requirements);
-			return builder.build();
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
-		}
+    private Resource toResource(final XBundleDTO bundle) {
+        try {
+            final var builder = new ResourceBuilder();
+            builder.addCapabilities(bundle.bundleRevision.capabilities);
+            builder.addRequirements(bundle.bundleRevision.requirements);
+            return builder.build();
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
 
-	}
+    }
 
 }

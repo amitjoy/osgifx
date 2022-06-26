@@ -44,76 +44,76 @@ import javafx.scene.layout.GridPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class PackagesFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                     logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                       loader;
-	@FXML
-	private TableView<PackageDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                    context;
-	@Inject
-	@Named("is_connected")
-	private boolean                          isConnected;
-	@Inject
-	private DataProvider                     dataProvider;
-	private TableRowDataFeatures<PackageDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                     logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                       loader;
+    @FXML
+    private TableView<PackageDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                    context;
+    @Inject
+    @Named("is_connected")
+    private boolean                          isConnected;
+    @Inject
+    private DataProvider                     dataProvider;
+    private TableRowDataFeatures<PackageDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
-		final var controller     = (PackageDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<PackageDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+        final var controller     = (PackageDetailsFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<PackageDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var nameColumn = new TableColumn<PackageDTO, String>("Name");
+        final var nameColumn = new TableColumn<PackageDTO, String>("Name");
 
-		nameColumn.setPrefWidth(550);
-		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+        nameColumn.setPrefWidth(550);
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-		final var versionColumn = new TableColumn<PackageDTO, String>("Version");
+        final var versionColumn = new TableColumn<PackageDTO, String>("Version");
 
-		versionColumn.setPrefWidth(450);
-		versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
+        versionColumn.setPrefWidth(450);
+        versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
-		final var hasDuplicatesColumn = new TableColumn<PackageDTO, String>("Is Duplicate Export?");
+        final var hasDuplicatesColumn = new TableColumn<PackageDTO, String>("Is Duplicate Export?");
 
-		hasDuplicatesColumn.setPrefWidth(200);
-		hasDuplicatesColumn.setCellValueFactory(new DTOCellValueFactory<>("isDuplicateExport", String.class));
+        hasDuplicatesColumn.setPrefWidth(200);
+        hasDuplicatesColumn.setCellValueFactory(new DTOCellValueFactory<>("isDuplicateExport", String.class));
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(nameColumn);
-		table.getColumns().add(versionColumn);
-		table.getColumns().add(hasDuplicatesColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(nameColumn);
+        table.getColumns().add(versionColumn);
+        table.getColumns().add(hasDuplicatesColumn);
 
-		table.setItems(dataProvider.packages());
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        table.setItems(dataProvider.packages());
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

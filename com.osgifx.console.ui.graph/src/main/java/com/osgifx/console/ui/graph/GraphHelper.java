@@ -26,25 +26,25 @@ import com.osgifx.console.smartgraph.graph.Graph;
 
 public final class GraphHelper {
 
-	private GraphHelper() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private GraphHelper() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static <V> org.jgrapht.Graph<V, DefaultEdge> toJGraphT(final Graph<V, String> smartGraph) {
-		final org.jgrapht.Graph<V, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-		smartGraph.vertices().forEach(v -> graph.addVertex(v.element()));
-		for (final Edge<String, V> edge : smartGraph.edges()) {
-			final var vertices = edge.vertices();
-			if (vertices[0] != null && vertices[1].element() != null) {
-				graph.addEdge(vertices[0].element(), vertices[1].element());
-			}
-		}
-		return graph;
-	}
+    public static <V> org.jgrapht.Graph<V, DefaultEdge> toJGraphT(final Graph<V, String> smartGraph) {
+        final org.jgrapht.Graph<V, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+        smartGraph.vertices().forEach(v -> graph.addVertex(v.element()));
+        for (final Edge<String, V> edge : smartGraph.edges()) {
+            final var vertices = edge.vertices();
+            if (vertices[0] != null && vertices[1].element() != null) {
+                graph.addEdge(vertices[0].element(), vertices[1].element());
+            }
+        }
+        return graph;
+    }
 
-	public static String generateDotFileName(final String prefix) {
-		final var timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
-		return "OSGi.fx_" + prefix + "_" + timeStamp + ".dot";
-	}
+    public static String generateDotFileName(final String prefix) {
+        final var timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(new Date());
+        return "OSGi.fx_" + prefix + "_" + timeStamp + ".dot";
+    }
 
 }

@@ -22,20 +22,20 @@ import org.osgi.service.event.EventAdmin;
 
 public class XEventAdmin {
 
-	private final EventAdmin eventAdmin;
+    private final EventAdmin eventAdmin;
 
-	public XEventAdmin(final Object eventAdmin) {
-		this.eventAdmin = (EventAdmin) eventAdmin;
-	}
+    public XEventAdmin(final Object eventAdmin) {
+        this.eventAdmin = (EventAdmin) eventAdmin;
+    }
 
-	public void sendEvent(final String topic, final Map<String, Object> properties) {
-		final Event event = new Event(topic, properties);
-		eventAdmin.sendEvent(event);
-	}
+    public void sendEvent(final String topic, final Map<String, Object> properties) {
+        final Event event = new Event(topic, properties);
+        eventAdmin.sendEvent(event);
+    }
 
-	public void postEvent(final String topic, final Map<String, Object> properties) {
-		final Event event = new Event(topic, properties);
-		eventAdmin.sendEvent(event);
-	}
+    public void postEvent(final String topic, final Map<String, Object> properties) {
+        final Event event = new Event(topic, properties);
+        eventAdmin.sendEvent(event);
+    }
 
 }

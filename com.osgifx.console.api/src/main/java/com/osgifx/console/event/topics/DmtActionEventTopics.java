@@ -17,12 +17,12 @@ package com.osgifx.console.event.topics;
 
 public final class DmtActionEventTopics {
 
-	private DmtActionEventTopics() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private DmtActionEventTopics() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static final String DMT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/dmt/";
-	public static final String DMT_ACTION_EVENT_TOPICS       = DMT_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String DMT_UPDATED_EVENT_TOPIC       = DMT_ACTION_EVENT_TOPIC_PREFIX + "updated";
+    public static final String DMT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/dmt/";
+    public static final String DMT_ACTION_EVENT_TOPICS       = DMT_ACTION_EVENT_TOPIC_PREFIX + "*";
+    public static final String DMT_UPDATED_EVENT_TOPIC       = DMT_ACTION_EVENT_TOPIC_PREFIX + "updated";
 
 }

@@ -51,96 +51,96 @@ import javafx.collections.ObservableList;
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
 public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String PACKAGES_ID = "packages";
+    public static final String PACKAGES_ID = "packages";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<PackageDTO> packages = observableArrayList();
+    private final ObservableList<PackageDTO> packages = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving packages info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		packages.setAll(preparePackages(agent.getAllBundles()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
-		logger.atInfo().log("Packages info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving packages info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        packages.setAll(preparePackages(agent.getAllBundles()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
+        logger.atInfo().log("Packages info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return packages;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return packages;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(packages::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(packages::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
-	private synchronized ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {
-		final List<PackageDTO>        packages      = Lists.newArrayList();
-		final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
+    private synchronized ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {
+        final List<PackageDTO>        packages      = Lists.newArrayList();
+        final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
 
-		for (final XBundleDTO bundle : bundles) {
-			final var exportedPackages = toPackageDTOs(bundle.exportedPackages);
-			final var importedPackages = toPackageDTOs(bundle.importedPackages);
+        for (final XBundleDTO bundle : bundles) {
+            final var exportedPackages = toPackageDTOs(bundle.exportedPackages);
+            final var importedPackages = toPackageDTOs(bundle.importedPackages);
 
-			exportedPackages.forEach(p -> p.exporters.add(bundle));
-			importedPackages.forEach(p -> p.importers.add(bundle));
+            exportedPackages.forEach(p -> p.exporters.add(bundle));
+            importedPackages.forEach(p -> p.importers.add(bundle));
 
-			packages.addAll(exportedPackages);
-			packages.addAll(importedPackages);
-		}
-		for (final PackageDTO pkg : packages) {
-			final var key = pkg.name + ":" + pkg.version;
-			if (!finalPackages.containsKey(key)) {
-				finalPackages.put(key, pkg);
-			} else {
-				final var packageDTO = finalPackages.get(key);
+            packages.addAll(exportedPackages);
+            packages.addAll(importedPackages);
+        }
+        for (final PackageDTO pkg : packages) {
+            final var key = pkg.name + ":" + pkg.version;
+            if (!finalPackages.containsKey(key)) {
+                finalPackages.put(key, pkg);
+            } else {
+                final var packageDTO = finalPackages.get(key);
 
-				packageDTO.exporters.addAll(pkg.exporters);
-				packageDTO.importers.addAll(pkg.importers);
-			}
-		}
-		for (final PackageDTO pkg : finalPackages.values()) {
-			if (pkg.exporters.size() > 1) {
-				pkg.isDuplicateExport = true;
-			}
-		}
-		return FXCollections.observableArrayList(finalPackages.values());
-	}
+                packageDTO.exporters.addAll(pkg.exporters);
+                packageDTO.importers.addAll(pkg.importers);
+            }
+        }
+        for (final PackageDTO pkg : finalPackages.values()) {
+            if (pkg.exporters.size() > 1) {
+                pkg.isDuplicateExport = true;
+            }
+        }
+        return FXCollections.observableArrayList(finalPackages.values());
+    }
 
-	private List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
-		return exportedPackages.stream().map(this::toPackageDTO).toList();
-	}
+    private List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
+        return exportedPackages.stream().map(this::toPackageDTO).toList();
+    }
 
-	private PackageDTO toPackageDTO(final XPackageDTO xpkg) {
-		final var pkg = new PackageDTO();
+    private PackageDTO toPackageDTO(final XPackageDTO xpkg) {
+        final var pkg = new PackageDTO();
 
-		pkg.name    = xpkg.name;
-		pkg.version = xpkg.version;
+        pkg.name    = xpkg.name;
+        pkg.version = xpkg.version;
 
-		return pkg;
-	}
+        return pkg;
+    }
 
 }

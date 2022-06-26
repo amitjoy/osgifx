@@ -37,49 +37,49 @@ import javafx.scene.text.Text;
 
 public final class AboutApplicationDialogController {
 
-	@Log
-	@Inject
-	private FluentLogger   logger;
-	@FXML
-	private HyperlinkLabel appDetails;
-	@FXML
-	private Label          eclipseLink;
-	@Inject
-	private Application    jfxApplication;
-	@FXML
-	private Text           javaVersionTxt;
-	@Inject
-	@OSGiBundle
-	private BundleContext  bundleContext;
+    @Log
+    @Inject
+    private FluentLogger   logger;
+    @FXML
+    private HyperlinkLabel appDetails;
+    @FXML
+    private Label          eclipseLink;
+    @Inject
+    private Application    jfxApplication;
+    @FXML
+    private Text           javaVersionTxt;
+    @Inject
+    @OSGiBundle
+    private BundleContext  bundleContext;
 
-	@FXML
-	public void initialize() {
-		appDetails.setText(replace(appDetails.getText()));
-		javaVersionTxt.setText(replace(javaVersionTxt.getText()));
-		appDetails.setOnAction(this::handleLinkOnClick);
-		logger.atDebug().log("FXML controller has been initialized");
-	}
+    @FXML
+    public void initialize() {
+        appDetails.setText(replace(appDetails.getText()));
+        javaVersionTxt.setText(replace(javaVersionTxt.getText()));
+        appDetails.setOnAction(this::handleLinkOnClick);
+        logger.atDebug().log("FXML controller has been initialized");
+    }
 
-	private void handleLinkOnClick(final ActionEvent event) {
-		final var source = event.getSource();
-		if (!(source instanceof final Hyperlink link)) {
-			return;
-		}
-		final var eclipseWebLink = link.getText();
-		jfxApplication.getHostServices().showDocument(eclipseWebLink);
-	}
+    private void handleLinkOnClick(final ActionEvent event) {
+        final var source = event.getSource();
+        if (!(source instanceof final Hyperlink link)) {
+            return;
+        }
+        final var eclipseWebLink = link.getText();
+        jfxApplication.getHostServices().showDocument(eclipseWebLink);
+    }
 
-	public String replace(final String input) {
-		final var headers       = bundleContext.getBundle().getHeaders();
-		final var appVersion    = headers.get("OSGifx-Version");
-		final var appLink       = headers.get(BUNDLE_DOCURL);
-		final var javaVersion   = Runtime.version().toString();
-		final var javafxVersion = String.valueOf(SystemUtils.getMajorFXVersion());
+    public String replace(final String input) {
+        final var headers       = bundleContext.getBundle().getHeaders();
+        final var appVersion    = headers.get("OSGifx-Version");
+        final var appLink       = headers.get(BUNDLE_DOCURL);
+        final var javaVersion   = Runtime.version().toString();
+        final var javafxVersion = String.valueOf(SystemUtils.getMajorFXVersion());
 
-		final Map<String, String> substitutors = Map.of("appVersion", appVersion, "appLink", appLink, "javaVersion", javaVersion,
-		        "javafxVersion", javafxVersion);
+        final Map<String, String> substitutors = Map.of("appVersion", appVersion, "appLink", appLink, "javaVersion", javaVersion,
+                "javafxVersion", javafxVersion);
 
-		return substitutors.entrySet().stream().reduce(input, (s, e) -> s.replace("(" + e.getKey() + ")", e.getValue()), (s, s2) -> s);
-	}
+        return substitutors.entrySet().stream().reduce(input, (s, e) -> s.replace("(" + e.getKey() + ")", e.getValue()), (s, s2) -> s);
+    }
 
 }

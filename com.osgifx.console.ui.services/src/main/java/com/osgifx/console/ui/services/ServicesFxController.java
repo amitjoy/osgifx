@@ -46,77 +46,77 @@ import javafx.scene.paint.Color;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ServicesFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                      logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                        loader;
-	@FXML
-	private TableView<XServiceDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                     context;
-	@Inject
-	@Named("is_connected")
-	private boolean                           isConnected;
-	@Inject
-	private DataProvider                      dataProvider;
-	private TableRowDataFeatures<XServiceDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                      logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                        loader;
+    @FXML
+    private TableView<XServiceDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                     context;
+    @Inject
+    @Named("is_connected")
+    private boolean                           isConnected;
+    @Inject
+    private DataProvider                      dataProvider;
+    private TableRowDataFeatures<XServiceDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
-		final var controller     = (ServiceDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XServiceDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+        final var controller     = (ServiceDetailsFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<XServiceDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var idColumn = new TableColumn<XServiceDTO, Integer>("ID");
+        final var idColumn = new TableColumn<XServiceDTO, Integer>("ID");
 
-		idColumn.setPrefWidth(100);
-		idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+        idColumn.setPrefWidth(100);
+        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
-		final var objectClassColumn = new TableColumn<XServiceDTO, String>("Object Class");
+        final var objectClassColumn = new TableColumn<XServiceDTO, String>("Object Class");
 
-		objectClassColumn.setPrefWidth(700);
-		objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
-		Fx.addCellFactory(objectClassColumn, s -> s.properties.containsKey(COMPONENT_ID), Color.SLATEBLUE, Color.BLACK);
+        objectClassColumn.setPrefWidth(700);
+        objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
+        Fx.addCellFactory(objectClassColumn, s -> s.properties.containsKey(COMPONENT_ID), Color.SLATEBLUE, Color.BLACK);
 
-		final var registeringBundleColumn = new TableColumn<XServiceDTO, String>("Registering Bundle");
+        final var registeringBundleColumn = new TableColumn<XServiceDTO, String>("Registering Bundle");
 
-		registeringBundleColumn.setPrefWidth(400);
-		registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
+        registeringBundleColumn.setPrefWidth(400);
+        registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(idColumn);
-		table.getColumns().add(objectClassColumn);
-		table.getColumns().add(registeringBundleColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(idColumn);
+        table.getColumns().add(objectClassColumn);
+        table.getColumns().add(registeringBundleColumn);
 
-		table.setItems(dataProvider.services());
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        table.setItems(dataProvider.services());
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

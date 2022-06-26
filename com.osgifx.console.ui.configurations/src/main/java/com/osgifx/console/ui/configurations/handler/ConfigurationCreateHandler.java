@@ -41,77 +41,77 @@ import javafx.concurrent.Task;
 
 public final class ConfigurationCreateHandler {
 
-	@Log
-	@Inject
-	private FluentLogger         logger;
-	@Inject
-	private IEclipseContext      context;
-	@Inject
-	private ThreadSynchronize    threadSync;
-	@Inject
-	private IEventBroker         eventBroker;
-	@Inject
-	@Named("is_connected")
-	private boolean              isConnected;
-	@Inject
-	private ConfigurationManager configManager;
+    @Log
+    @Inject
+    private FluentLogger         logger;
+    @Inject
+    private IEclipseContext      context;
+    @Inject
+    private ThreadSynchronize    threadSync;
+    @Inject
+    private IEventBroker         eventBroker;
+    @Inject
+    @Named("is_connected")
+    private boolean              isConnected;
+    @Inject
+    private ConfigurationManager configManager;
 
-	@Execute
-	public void execute() {
-		final var dialog = new ConfigurationCreateDialog();
-		ContextInjectionFactory.inject(dialog, context);
-		logger.atInfo().log("Injected configuration create dialog to eclipse context");
-		dialog.init();
+    @Execute
+    public void execute() {
+        final var dialog = new ConfigurationCreateDialog();
+        ContextInjectionFactory.inject(dialog, context);
+        logger.atInfo().log("Injected configuration create dialog to eclipse context");
+        dialog.init();
 
-		final var configuration = dialog.showAndWait();
-		if (configuration.isPresent()) {
-			final Task<Void> createTask = new Task<>() {
-				@Override
-				protected Void call() throws Exception {
-					try {
-						final var dto        = configuration.get();
-						final var pid        = dto.pid();
-						final var factoryPid = dto.factoryPid();
-						final var properties = dto.properties();
+        final var configuration = dialog.showAndWait();
+        if (configuration.isPresent()) {
+            final Task<Void> createTask = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var dto        = configuration.get();
+                        final var pid        = dto.pid();
+                        final var factoryPid = dto.factoryPid();
+                        final var properties = dto.properties();
 
-						if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
-							return null;
-						}
+                        if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
+                            return null;
+                        }
 
-						boolean result;
-						String  effectivePID;
-						if (!Strings.isNullOrEmpty(pid)) {
-							result       = configManager.createOrUpdateConfiguration(pid, properties);
-							effectivePID = pid;
-						} else if (!Strings.isNullOrEmpty(factoryPid)) {
-							result       = configManager.createFactoryConfiguration(factoryPid, properties);
-							effectivePID = factoryPid;
-						} else {
-							return null;
-						}
-						if (result) {
-							eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
-							threadSync.asyncExec(() -> Fx.showSuccessNotification("New Configuration",
-							        "Configuration - '" + effectivePID + "' has been successfully created"));
-							logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
-						} else {
-							threadSync.asyncExec(() -> Fx.showErrorNotification("New Configuration",
-							        "Configuration - '" + effectivePID + "' cannot be created"));
-						}
-					} catch (final Exception e) {
-						logger.atError().withException(e).log("Configuration cannot be created");
-						threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-					}
-					return null;
-				}
-			};
-			CompletableFuture.runAsync(createTask);
-		}
-	}
+                        boolean result;
+                        String  effectivePID;
+                        if (!Strings.isNullOrEmpty(pid)) {
+                            result       = configManager.createOrUpdateConfiguration(pid, properties);
+                            effectivePID = pid;
+                        } else if (!Strings.isNullOrEmpty(factoryPid)) {
+                            result       = configManager.createFactoryConfiguration(factoryPid, properties);
+                            effectivePID = factoryPid;
+                        } else {
+                            return null;
+                        }
+                        if (result) {
+                            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+                            threadSync.asyncExec(() -> Fx.showSuccessNotification("New Configuration",
+                                    "Configuration - '" + effectivePID + "' has been successfully created"));
+                            logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
+                        } else {
+                            threadSync.asyncExec(() -> Fx.showErrorNotification("New Configuration",
+                                    "Configuration - '" + effectivePID + "' cannot be created"));
+                        }
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Configuration cannot be created");
+                        threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                    }
+                    return null;
+                }
+            };
+            CompletableFuture.runAsync(createTask);
+        }
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

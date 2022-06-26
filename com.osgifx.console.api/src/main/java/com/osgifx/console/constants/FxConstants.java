@@ -20,10 +20,10 @@ package com.osgifx.console.constants;
  */
 public final class FxConstants {
 
-	private FxConstants() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private FxConstants() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static final String STANDARD_CSS = "/css/default.css";
+    public static final String STANDARD_CSS = "/css/default.css";
 
 }

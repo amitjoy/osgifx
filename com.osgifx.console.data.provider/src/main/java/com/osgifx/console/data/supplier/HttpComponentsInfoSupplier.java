@@ -53,49 +53,49 @@ import javafx.collections.ObservableList;
 // @formatter:on
 public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String HTTP_ID = "http";
+    public static final String HTTP_ID = "http";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XHttpComponentDTO> httpComponents = observableArrayList();
+    private final ObservableList<XHttpComponentDTO> httpComponents = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving HTTP components info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		httpComponents.setAll(makeNullSafe(agent.getHttpComponents()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HTTP_TOPIC);
-		logger.atInfo().log("HTTP components info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving HTTP components info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        httpComponents.setAll(makeNullSafe(agent.getHttpComponents()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HTTP_TOPIC);
+        logger.atInfo().log("HTTP components info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return httpComponents;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return httpComponents;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(httpComponents::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(httpComponents::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 }

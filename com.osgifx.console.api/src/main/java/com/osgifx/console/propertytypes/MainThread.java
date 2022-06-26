@@ -36,5 +36,5 @@ import org.osgi.service.component.annotations.ComponentPropertyType;
 @Retention(CLASS)
 @ComponentPropertyType
 public @interface MainThread {
-	String value() default "true";
+    String value() default "true";
 }

@@ -17,6 +17,6 @@ package com.osgifx.console.bnd.dp.packager;
 
 public final class DeploymentPackageResourceProcessorDTO extends DeploymentPackageEntryDTO {
 
-	public String resourceProcessorPID;
+    public String resourceProcessorPID;
 
 }

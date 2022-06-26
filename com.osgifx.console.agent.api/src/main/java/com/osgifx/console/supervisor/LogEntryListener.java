@@ -26,10 +26,10 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 @FunctionalInterface
 public interface LogEntryListener {
 
-	/**
-	 * The callback to be executed when the log event will be received
-	 *
-	 * @param logEntry the remote event for the log entry
-	 */
-	void logged(XLogEntryDTO logEntry);
+    /**
+     * The callback to be executed when the log event will be received
+     *
+     * @param logEntry the remote event for the log entry
+     */
+    void logged(XLogEntryDTO logEntry);
 }

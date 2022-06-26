@@ -37,5 +37,5 @@ import org.osgi.service.component.annotations.ComponentPropertyType;
 @Retention(CLASS)
 @ComponentPropertyType
 public @interface AgentExtensionName {
-	String value();
+    String value();
 }

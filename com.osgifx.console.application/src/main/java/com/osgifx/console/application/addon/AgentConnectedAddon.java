@@ -37,43 +37,43 @@ import javafx.concurrent.Task;
 
 public final class AgentConnectedAddon {
 
-	@Log
-	@Inject
-	private FluentLogger               logger;
-	@Inject
-	private ThreadSynchronize          threadSync;
-	@Inject
-	private DataProvider               dataProvider;
-	@Inject
-	@Optional
-	@ContextValue("is_local_agent")
-	private ContextBoundValue<Boolean> isLocalAgent;
-	private ProgressDialog             progressDialog;
+    @Log
+    @Inject
+    private FluentLogger               logger;
+    @Inject
+    private ThreadSynchronize          threadSync;
+    @Inject
+    private DataProvider               dataProvider;
+    @Inject
+    @Optional
+    @ContextValue("is_local_agent")
+    private ContextBoundValue<Boolean> isLocalAgent;
+    private ProgressDialog             progressDialog;
 
-	@Inject
-	@Optional
-	private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent connected event has been received");
-		final Task<Void> dataRetrievalTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				// we always load all the data when agent gets connected
-				// later we will load only the respective data when we select a specific tab
-				dataProvider.retrieveInfo(null, false);
-				return null;
-			}
+    @Inject
+    @Optional
+    private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event has been received");
+        final Task<Void> dataRetrievalTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // we always load all the data when agent gets connected
+                // later we will load only the respective data when we select a specific tab
+                dataProvider.retrieveInfo(null, false);
+                return null;
+            }
 
-			@Override
-			protected void succeeded() {
-				threadSync.asyncExec(progressDialog::close);
-			}
-		};
+            @Override
+            protected void succeeded() {
+                threadSync.asyncExec(progressDialog::close);
+            }
+        };
 
-		final var agent  = isLocalAgent.getValue() ? "local" : "remote";
-		final var header = "Retrieving information from " + agent + " agent";
+        final var agent  = isLocalAgent.getValue() ? "local" : "remote";
+        final var header = "Retrieving information from " + agent + " agent";
 
-		final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(dataRetrievalTask);
-		progressDialog = FxDialog.showProgressDialog(header, dataRetrievalTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
-	}
+        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(dataRetrievalTask);
+        progressDialog = FxDialog.showProgressDialog(header, dataRetrievalTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
+    }
 
 }

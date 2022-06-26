@@ -38,55 +38,55 @@ import javafx.concurrent.Task;
 
 public final class ComponentEnableHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@Optional
-	@Named("is_connected")
-	private boolean           isConnected;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @Optional
+    @Named("is_connected")
+    private boolean           isConnected;
 
-	@Execute
-	public void execute(@Named("name") final String name) {
-		if (!isConnected) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return;
-		}
-		final Task<Void> enableTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					final var agent  = supervisor.getAgent();
-					final var result = agent.enableComponentByName(name);
-					if (result.result == XResultDTO.SUCCESS) {
-						logger.atInfo().log(result.response);
-						eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
-					} else if (result.result == XResultDTO.SKIPPED) {
-						logger.atWarning().log(result.response);
-					} else {
-						logger.atError().log(result.response);
-						threadSync.asyncExec(
-						        () -> FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader()));
-					}
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-				}
-				return null;
-			}
-		};
-		CompletableFuture.runAsync(enableTask);
-	}
+    @Execute
+    public void execute(@Named("name") final String name) {
+        if (!isConnected) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return;
+        }
+        final Task<Void> enableTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    final var agent  = supervisor.getAgent();
+                    final var result = agent.enableComponentByName(name);
+                    if (result.result == XResultDTO.SUCCESS) {
+                        logger.atInfo().log(result.response);
+                        eventBroker.post(COMPONENT_ENABLED_EVENT_TOPIC, name);
+                    } else if (result.result == XResultDTO.SKIPPED) {
+                        logger.atWarning().log(result.response);
+                    } else {
+                        logger.atError().log(result.response);
+                        threadSync.asyncExec(
+                                () -> FxDialog.showErrorDialog("Component Enable Error", result.response, getClass().getClassLoader()));
+                    }
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Component with name '%s' cannot be enabled", name);
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+                return null;
+            }
+        };
+        CompletableFuture.runAsync(enableTask);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

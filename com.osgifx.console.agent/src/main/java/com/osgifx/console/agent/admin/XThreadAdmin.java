@@ -31,48 +31,48 @@ import com.osgifx.console.agent.provider.PackageWirings;
 
 public class XThreadAdmin {
 
-	private final BundleContext bundleContext;
+    private final BundleContext bundleContext;
 
-	public XThreadAdmin(final BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
-	}
+    public XThreadAdmin(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
+    }
 
-	public List<XThreadDTO> get() {
-		try {
-			final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
-			final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
-			return threadList.stream().map(this::toDTO).collect(Collectors.toList());
-		} catch (final Exception e) {
-			return Collections.emptyList();
-		}
-	}
+    public List<XThreadDTO> get() {
+        try {
+            final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
+            final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
+            return threadList.stream().map(this::toDTO).collect(Collectors.toList());
+        } catch (final Exception e) {
+            return Collections.emptyList();
+        }
+    }
 
-	private XThreadDTO toDTO(final Thread thread) {
-		final XThreadDTO dto = new XThreadDTO();
+    private XThreadDTO toDTO(final Thread thread) {
+        final XThreadDTO dto = new XThreadDTO();
 
-		dto.name          = thread.getName();
-		dto.id            = thread.getId();
-		dto.priority      = thread.getPriority();
-		dto.state         = thread.getState().name();
-		dto.isDeadlocked  = isDeadlocked(thread.getId());
-		dto.isInterrupted = thread.isInterrupted();
-		dto.isAlive       = thread.isAlive();
-		dto.isDaemon      = thread.isDaemon();
+        dto.name          = thread.getName();
+        dto.id            = thread.getId();
+        dto.priority      = thread.getPriority();
+        dto.state         = thread.getState().name();
+        dto.isDeadlocked  = isDeadlocked(thread.getId());
+        dto.isInterrupted = thread.isInterrupted();
+        dto.isAlive       = thread.isAlive();
+        dto.isDaemon      = thread.isDaemon();
 
-		return dto;
-	}
+        return dto;
+    }
 
-	private boolean isDeadlocked(final long id) {
-		final boolean isJMXWired = PackageWirings.isJmxWired(bundleContext);
-		if (isJMXWired) {
-			final ThreadMXBean bean      = ManagementFactory.getThreadMXBean();
-			final long[]       deadlocks = bean.findDeadlockedThreads();
-			if (deadlocks == null) {
-				return false;
-			}
-			return Arrays.stream(deadlocks).anyMatch(e -> e == id);
-		}
-		return false;
-	}
+    private boolean isDeadlocked(final long id) {
+        final boolean isJMXWired = PackageWirings.isJmxWired(bundleContext);
+        if (isJMXWired) {
+            final ThreadMXBean bean      = ManagementFactory.getThreadMXBean();
+            final long[]       deadlocks = bean.findDeadlockedThreads();
+            if (deadlocks == null) {
+                return false;
+            }
+            return Arrays.stream(deadlocks).anyMatch(e -> e == id);
+        }
+        return false;
+    }
 
 }

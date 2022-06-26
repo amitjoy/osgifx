@@ -53,50 +53,50 @@ import javafx.collections.ObservableList;
 // @formatter:on
 public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String COMPONENTS_ID = "components";
+    public static final String COMPONENTS_ID = "components";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XComponentDTO> components = observableArrayList();
+    private final ObservableList<XComponentDTO> components = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving components info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		components.setAll(makeNullSafe(agent.getAllComponents()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_COMPONENTS_TOPIC);
-		logger.atInfo().log("Components info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving components info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        components.setAll(makeNullSafe(agent.getAllComponents()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_COMPONENTS_TOPIC);
+        logger.atInfo().log("Components info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return components;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return components;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(components::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(components::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

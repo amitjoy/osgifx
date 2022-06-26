@@ -40,55 +40,55 @@ import javafx.concurrent.Task;
 @Creatable
 public final class ComponentDisableHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@Optional
-	@Named("is_connected")
-	private boolean           isConnected;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @Optional
+    @Named("is_connected")
+    private boolean           isConnected;
 
-	@Execute
-	public void execute(@Named("id") final String id) {
-		if (!isConnected) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return;
-		}
-		final Task<Void> disableTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					final var agent  = supervisor.getAgent();
-					final var result = agent.disableComponentById(Long.parseLong(id));
-					if (result.result == XResultDTO.SUCCESS) {
-						logger.atInfo().log(result.response);
-						eventBroker.post(COMPONENT_DISABLED_EVENT_TOPIC, id);
-					} else if (result.result == XResultDTO.SKIPPED) {
-						logger.atWarning().log(result.response);
-					} else {
-						logger.atError().log(result.response);
-						threadSync.asyncExec(
-						        () -> FxDialog.showErrorDialog("Component Disable Error", result.response, getClass().getClassLoader()));
-					}
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Service component with ID '%s' cannot be disabled", id);
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-				}
-				return null;
-			}
-		};
-		CompletableFuture.runAsync(disableTask);
-	}
+    @Execute
+    public void execute(@Named("id") final String id) {
+        if (!isConnected) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return;
+        }
+        final Task<Void> disableTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    final var agent  = supervisor.getAgent();
+                    final var result = agent.disableComponentById(Long.parseLong(id));
+                    if (result.result == XResultDTO.SUCCESS) {
+                        logger.atInfo().log(result.response);
+                        eventBroker.post(COMPONENT_DISABLED_EVENT_TOPIC, id);
+                    } else if (result.result == XResultDTO.SKIPPED) {
+                        logger.atWarning().log(result.response);
+                    } else {
+                        logger.atError().log(result.response);
+                        threadSync.asyncExec(
+                                () -> FxDialog.showErrorDialog("Component Disable Error", result.response, getClass().getClassLoader()));
+                    }
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Service component with ID '%s' cannot be disabled", id);
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+                return null;
+            }
+        };
+        CompletableFuture.runAsync(disableTask);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

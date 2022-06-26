@@ -28,23 +28,23 @@ import javafx.stage.Stage;
 
 public final class TopAreaDecorationController {
 
-	@Log
-	@Inject
-	private FluentLogger logger;
-	@FXML
-	private ToolBar      decorationArea;
+    @Log
+    @Inject
+    private FluentLogger logger;
+    @FXML
+    private ToolBar      decorationArea;
 
-	@FXML
-	public void initialize() {
-		logger.atDebug().log("FXML controller has been initialized");
-	}
+    @FXML
+    public void initialize() {
+        logger.atDebug().log("FXML controller has been initialized");
+    }
 
-	@FXML
-	public void handleClose(final ActionEvent event) {
-		Platform.exit();
-	}
+    @FXML
+    public void handleClose(final ActionEvent event) {
+        Platform.exit();
+    }
 
-	Stage getStage() {
-		return (Stage) decorationArea.getScene().getWindow();
-	}
+    Stage getStage() {
+        return (Stage) decorationArea.getScene().getWindow();
+    }
 }

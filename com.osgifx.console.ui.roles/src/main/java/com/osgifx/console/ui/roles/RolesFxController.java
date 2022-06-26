@@ -44,68 +44,68 @@ import javafx.scene.layout.BorderPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class RolesFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                   logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                     loader;
-	@FXML
-	private TableView<XRoleDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                  context;
-	@Inject
-	@Named("is_connected")
-	private boolean                        isConnected;
-	@Inject
-	private DataProvider                   dataProvider;
-	private TableRowDataFeatures<XRoleDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                   logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                     loader;
+    @FXML
+    private TableView<XRoleDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                  context;
+    @Inject
+    @Named("is_connected")
+    private boolean                        isConnected;
+    @Inject
+    private DataProvider                   dataProvider;
+    private TableRowDataFeatures<XRoleDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
-		final var controller     = (RoleEditorFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XRoleDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+        final var controller     = (RoleEditorFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<XRoleDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var roleNameColumn = new TableColumn<XRoleDTO, String>("Name");
-		roleNameColumn.setPrefWidth(580);
-		roleNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+        final var roleNameColumn = new TableColumn<XRoleDTO, String>("Name");
+        roleNameColumn.setPrefWidth(580);
+        roleNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-		final var roleTypeColumn = new TableColumn<XRoleDTO, String>("Type");
-		roleTypeColumn.setPrefWidth(400);
-		roleTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
+        final var roleTypeColumn = new TableColumn<XRoleDTO, String>("Type");
+        roleTypeColumn.setPrefWidth(400);
+        roleTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(roleNameColumn);
-		table.getColumns().add(roleTypeColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(roleNameColumn);
+        table.getColumns().add(roleTypeColumn);
 
-		table.setItems(dataProvider.roles());
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        table.setItems(dataProvider.roles());
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

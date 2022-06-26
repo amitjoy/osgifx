@@ -28,24 +28,24 @@ import org.eclipse.fx.core.log.Log;
 
 public final class ClearEventsTableHandler {
 
-	@Log
-	@Inject
-	private FluentLogger logger;
-	@Inject
-	private IEventBroker eventBroker;
-	@Inject
-	@Named("is_connected")
-	private boolean      isConnected;
+    @Log
+    @Inject
+    private FluentLogger logger;
+    @Inject
+    private IEventBroker eventBroker;
+    @Inject
+    @Named("is_connected")
+    private boolean      isConnected;
 
-	@Execute
-	public void execute() {
-		eventBroker.post(CLEAR_EVENTS_TOPIC, "");
-		logger.atInfo().log("Clear events table command sent");
-	}
+    @Execute
+    public void execute() {
+        eventBroker.post(CLEAR_EVENTS_TOPIC, "");
+        logger.atInfo().log("Clear events table command sent");
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

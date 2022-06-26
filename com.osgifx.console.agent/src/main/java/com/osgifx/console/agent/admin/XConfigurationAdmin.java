@@ -45,138 +45,138 @@ import com.osgifx.console.agent.reflect.Reflect;
 
 public class XConfigurationAdmin {
 
-	private final BundleContext      context;
-	private final Object             metatype;
-	private final ConfigurationAdmin configAdmin;
+    private final BundleContext      context;
+    private final Object             metatype;
+    private final ConfigurationAdmin configAdmin;
 
-	public XConfigurationAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
-		this.context     = requireNonNull(context);
-		this.metatype    = metatype;
-		this.configAdmin = (ConfigurationAdmin) configAdmin;
-	}
+    public XConfigurationAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
+        this.context     = requireNonNull(context);
+        this.metatype    = metatype;
+        this.configAdmin = (ConfigurationAdmin) configAdmin;
+    }
 
-	public List<XConfigurationDTO> getConfigurations() {
-		if (configAdmin == null) {
-			return Collections.emptyList();
-		}
-		List<XConfigurationDTO> configsWithoutMetatype = null;
-		try {
-			configsWithoutMetatype = findConfigsWithoutMetatype();
-		} catch (final Exception e) {
-			return Collections.emptyList();
-		}
-		return configsWithoutMetatype;
-	}
+    public List<XConfigurationDTO> getConfigurations() {
+        if (configAdmin == null) {
+            return Collections.emptyList();
+        }
+        List<XConfigurationDTO> configsWithoutMetatype = null;
+        try {
+            configsWithoutMetatype = findConfigsWithoutMetatype();
+        } catch (final Exception e) {
+            return Collections.emptyList();
+        }
+        return configsWithoutMetatype;
+    }
 
-	public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
-		if (configAdmin == null) {
-			return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
-		}
-		XResultDTO result = null;
-		try {
-			String              action        = null;
-			final Configuration configuration = configAdmin.getConfiguration(pid, "?");
-			if (configuration.getProperties() == null) { // new configuration
-				action = "created";
-			} else {
-				action = "updated";
-			}
-			executeUpdate(configuration, newProperties);
-			result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been " + action);
-		} catch (final Exception e) {
-			result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
-		}
-		return result;
-	}
+    public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
+        if (configAdmin == null) {
+            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+        }
+        XResultDTO result = null;
+        try {
+            String              action        = null;
+            final Configuration configuration = configAdmin.getConfiguration(pid, "?");
+            if (configuration.getProperties() == null) { // new configuration
+                action = "created";
+            } else {
+                action = "updated";
+            }
+            executeUpdate(configuration, newProperties);
+            result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been " + action);
+        } catch (final Exception e) {
+            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
+        }
+        return result;
+    }
 
-	private void executeUpdate(final Configuration configuration, final Map<String, Object> newProperties) {
-		final Dictionary<String, Object> properties = new Hashtable<>(newProperties);
-		try {
-			Reflect.on(configuration).call("updateIfDifferent", properties).get();
-		} catch (final Exception e) {
-			Reflect.on(configuration).call("update", properties).get();
-		}
-	}
+    private void executeUpdate(final Configuration configuration, final Map<String, Object> newProperties) {
+        final Dictionary<String, Object> properties = new Hashtable<>(newProperties);
+        try {
+            Reflect.on(configuration).call("updateIfDifferent", properties).get();
+        } catch (final Exception e) {
+            Reflect.on(configuration).call("update", properties).get();
+        }
+    }
 
-	public XResultDTO deleteConfiguration(final String pid) {
-		if (configAdmin == null) {
-			return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
-		}
-		XResultDTO result = null;
-		try {
-			final Configuration[] configs = configAdmin.listConfigurations(null);
-			if (configs == null) {
-				return createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
-			}
-			for (final Configuration configuration : configs) {
-				if (configuration.getPid().equals(pid)) {
-					configuration.delete();
-					result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been deleted");
-				}
-			}
-			if (result == null) {
-				result = createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
-			}
-		} catch (final Exception e) {
-			result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
-		}
-		return result;
-	}
+    public XResultDTO deleteConfiguration(final String pid) {
+        if (configAdmin == null) {
+            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+        }
+        XResultDTO result = null;
+        try {
+            final Configuration[] configs = configAdmin.listConfigurations(null);
+            if (configs == null) {
+                return createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
+            }
+            for (final Configuration configuration : configs) {
+                if (configuration.getPid().equals(pid)) {
+                    configuration.delete();
+                    result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been deleted");
+                }
+            }
+            if (result == null) {
+                result = createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
+            }
+        } catch (final Exception e) {
+            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
+        }
+        return result;
+    }
 
-	public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
-		if (configAdmin == null) {
-			return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
-		}
-		XResultDTO result = null;
-		try {
-			final Configuration configuration = configAdmin.createFactoryConfiguration(factoryPid, "?");
-			configuration.update(new Hashtable<>(newProperties));
-			result = createResult(SUCCESS, "Configuration with factory PID '" + factoryPid + " ' has been created");
-		} catch (final Exception e) {
-			result = createResult(ERROR, "Configuration with factory PID '" + factoryPid + "' cannot be created due to " + e.getMessage());
-		}
-		return result;
-	}
+    public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
+        if (configAdmin == null) {
+            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+        }
+        XResultDTO result = null;
+        try {
+            final Configuration configuration = configAdmin.createFactoryConfiguration(factoryPid, "?");
+            configuration.update(new Hashtable<>(newProperties));
+            result = createResult(SUCCESS, "Configuration with factory PID '" + factoryPid + " ' has been created");
+        } catch (final Exception e) {
+            result = createResult(ERROR, "Configuration with factory PID '" + factoryPid + "' cannot be created due to " + e.getMessage());
+        }
+        return result;
+    }
 
-	private List<XConfigurationDTO> findConfigsWithoutMetatype() throws IOException, InvalidSyntaxException {
-		final List<XConfigurationDTO> dtos    = new ArrayList<>();
-		final Configuration[]         configs = configAdmin.listConfigurations(null);
-		if (configs == null) {
-			return dtos;
-		}
-		for (final Configuration config : configs) {
-			final boolean hasMetatype = metatype == null ? false : XMetaTypeAdmin.hasMetatype(context, metatype, config);
-			if (!hasMetatype) {
-				dtos.add(toConfigDTO(config));
-			}
-		}
-		return dtos;
-	}
+    private List<XConfigurationDTO> findConfigsWithoutMetatype() throws IOException, InvalidSyntaxException {
+        final List<XConfigurationDTO> dtos    = new ArrayList<>();
+        final Configuration[]         configs = configAdmin.listConfigurations(null);
+        if (configs == null) {
+            return dtos;
+        }
+        for (final Configuration config : configs) {
+            final boolean hasMetatype = metatype == null ? false : XMetaTypeAdmin.hasMetatype(context, metatype, config);
+            if (!hasMetatype) {
+                dtos.add(toConfigDTO(config));
+            }
+        }
+        return dtos;
+    }
 
-	private XConfigurationDTO toConfigDTO(final Configuration configuration) {
-		final XConfigurationDTO dto = new XConfigurationDTO();
+    private XConfigurationDTO toConfigDTO(final Configuration configuration) {
+        final XConfigurationDTO dto = new XConfigurationDTO();
 
-		dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
-		dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
-		dto.properties  = prepareConfiguration(configuration);
-		dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
-		dto.isPersisted = true;
+        dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
+        dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
+        dto.properties  = prepareConfiguration(configuration);
+        dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
+        dto.isPersisted = true;
 
-		return dto;
-	}
+        return dto;
+    }
 
-	public static Map<String, ConfigValue> prepareConfiguration(final Configuration config) {
-		if (config == null) {
-			return Collections.emptyMap();
-		}
-		final Map<String, ConfigValue> props = new HashMap<>();
-		for (final Entry<String, Object> entry : AgentServer.valueOf(config.getProperties()).entrySet()) {
-			final String      key         = entry.getKey();
-			final Object      value       = entry.getValue();
-			final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));
-			props.put(key, configValue);
-		}
-		return props;
-	}
+    public static Map<String, ConfigValue> prepareConfiguration(final Configuration config) {
+        if (config == null) {
+            return Collections.emptyMap();
+        }
+        final Map<String, ConfigValue> props = new HashMap<>();
+        for (final Entry<String, Object> entry : AgentServer.valueOf(config.getProperties()).entrySet()) {
+            final String      key         = entry.getKey();
+            final Object      value       = entry.getValue();
+            final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));
+            props.put(key, configValue);
+        }
+        return props;
+    }
 
 }

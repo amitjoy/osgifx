@@ -30,44 +30,44 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = Handler.class)
 public final class FxConsoleLogHandler extends Handler {
 
-	private static final String LOG_FILE_NAME = "log.txt";
+    private static final String LOG_FILE_NAME = "log.txt";
 
-	private final FileHandler        fileHandler;
-	private final CustomLogFormatter formatter;
+    private final FileHandler        fileHandler;
+    private final CustomLogFormatter formatter;
 
-	@Activate
-	public FxConsoleLogHandler(final BundleContext context) throws SecurityException, IOException, URISyntaxException {
-		var area = context.getProperty("osgi.instance.area.default");
+    @Activate
+    public FxConsoleLogHandler(final BundleContext context) throws SecurityException, IOException, URISyntaxException {
+        var area = context.getProperty("osgi.instance.area.default");
 
-		// remove the prefix
-		final var prefix = "file:";
-		area = area.substring(area.indexOf(prefix) + prefix.length());
+        // remove the prefix
+        final var prefix = "file:";
+        area = area.substring(area.indexOf(prefix) + prefix.length());
 
-		final var path         = new URI(area).getPath();
-		final var parent       = new File(path);
-		final var logDirectory = new File(parent, "log");
+        final var path         = new URI(area).getPath();
+        final var parent       = new File(path);
+        final var logDirectory = new File(parent, "log");
 
-		// create missing directories
-		logDirectory.mkdirs();
+        // create missing directories
+        logDirectory.mkdirs();
 
-		formatter   = new CustomLogFormatter();
-		fileHandler = new FileHandler(logDirectory.getPath() + "/" + LOG_FILE_NAME, true);
-		fileHandler.setFormatter(formatter);
-	}
+        formatter   = new CustomLogFormatter();
+        fileHandler = new FileHandler(logDirectory.getPath() + "/" + LOG_FILE_NAME, true);
+        fileHandler.setFormatter(formatter);
+    }
 
-	@Override
-	public void publish(final LogRecord logRecord) {
-		fileHandler.publish(logRecord);
-	}
+    @Override
+    public void publish(final LogRecord logRecord) {
+        fileHandler.publish(logRecord);
+    }
 
-	@Override
-	public void flush() {
-		fileHandler.flush();
-	}
+    @Override
+    public void flush() {
+        fileHandler.flush();
+    }
 
-	@Override
-	public void close() throws SecurityException {
-		fileHandler.close();
-	}
+    @Override
+    public void close() throws SecurityException {
+        fileHandler.close();
+    }
 
 }

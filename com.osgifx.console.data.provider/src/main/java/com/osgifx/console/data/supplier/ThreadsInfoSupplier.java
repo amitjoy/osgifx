@@ -42,45 +42,45 @@ import javafx.collections.ObservableList;
 @EventTopics(AGENT_DISCONNECTED_EVENT_TOPIC)
 public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String THREADS_ID = "threads";
+    public static final String THREADS_ID = "threads";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XThreadDTO> threads = observableArrayList();
+    private final ObservableList<XThreadDTO> threads = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving threads info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		threads.setAll(makeNullSafe(agent.getAllThreads()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_THREADS_TOPIC);
-		logger.atInfo().log("Threads info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving threads info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        threads.setAll(makeNullSafe(agent.getAllThreads()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_THREADS_TOPIC);
+        logger.atInfo().log("Threads info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return threads;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return threads;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		threadSync.asyncExec(threads::clear);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        threadSync.asyncExec(threads::clear);
+    }
 }

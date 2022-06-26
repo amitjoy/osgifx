@@ -37,52 +37,52 @@ import javafx.concurrent.Task;
 
 public final class BundleStartHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	@Optional
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private ThreadSynchronize threadSync;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    @Optional
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private ThreadSynchronize threadSync;
 
-	@Execute
-	public void execute(@Named("id") final String id) {
-		if (!isConnected) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return;
-		}
-		final Task<Void> startTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					final var agent = supervisor.getAgent();
-					final var error = agent.start(Long.parseLong(id));
-					if (error == null) {
-						logger.atInfo().log("Bundle with ID '%s' has been started", id);
-						eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
-					} else {
-						logger.atError().log(error);
-						threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader()));
-					}
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-				}
-				return null;
-			}
-		};
-		CompletableFuture.runAsync(startTask);
-	}
+    @Execute
+    public void execute(@Named("id") final String id) {
+        if (!isConnected) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return;
+        }
+        final Task<Void> startTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    final var agent = supervisor.getAgent();
+                    final var error = agent.start(Long.parseLong(id));
+                    if (error == null) {
+                        logger.atInfo().log("Bundle with ID '%s' has been started", id);
+                        eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
+                    } else {
+                        logger.atError().log(error);
+                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader()));
+                    }
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+                return null;
+            }
+        };
+        CompletableFuture.runAsync(startTask);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

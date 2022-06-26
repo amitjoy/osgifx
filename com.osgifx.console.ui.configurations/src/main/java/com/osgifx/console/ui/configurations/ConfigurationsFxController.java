@@ -47,81 +47,81 @@ import javafx.scene.paint.Color;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ConfigurationsFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                            logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                              loader;
-	@FXML
-	private TableView<XConfigurationDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                           context;
-	@Inject
-	@Named("is_connected")
-	private boolean                                 isConnected;
-	@Inject
-	private DataProvider                            dataProvider;
-	private TableRowDataFeatures<XConfigurationDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                            logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                              loader;
+    @FXML
+    private TableView<XConfigurationDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                           context;
+    @Inject
+    @Named("is_connected")
+    private boolean                                 isConnected;
+    @Inject
+    private DataProvider                            dataProvider;
+    private TableRowDataFeatures<XConfigurationDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
-		final var controller     = (ConfigurationEditorFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XConfigurationDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+        final var controller     = (ConfigurationEditorFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<XConfigurationDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var pidColumn = new TableColumn<XConfigurationDTO, String>("PID/Factory PID");
-		pidColumn.setPrefWidth(580);
-		pidColumn.setCellValueFactory(
-		        new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
-		Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);
+        final var pidColumn = new TableColumn<XConfigurationDTO, String>("PID/Factory PID");
+        pidColumn.setPrefWidth(580);
+        pidColumn.setCellValueFactory(
+                new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
+        Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);
 
-		final var nameColumn = new TableColumn<XConfigurationDTO, String>("Name");
-		nameColumn.setPrefWidth(400);
-		nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class,
-		        s -> Optional.ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
+        final var nameColumn = new TableColumn<XConfigurationDTO, String>("Name");
+        nameColumn.setPrefWidth(400);
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class,
+                s -> Optional.ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
 
-		final var locationColumn = new TableColumn<XConfigurationDTO, String>("Location");
-		locationColumn.setPrefWidth(150);
-		locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No bound location"));
+        final var locationColumn = new TableColumn<XConfigurationDTO, String>("Location");
+        locationColumn.setPrefWidth(150);
+        locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No bound location"));
 
-		final var isFactoryColumn = new TableColumn<XConfigurationDTO, String>("Is Factory?");
-		isFactoryColumn.setPrefWidth(100);
-		isFactoryColumn.setCellValueFactory(new DTOCellValueFactory<>("isFactory", String.class));
+        final var isFactoryColumn = new TableColumn<XConfigurationDTO, String>("Is Factory?");
+        isFactoryColumn.setPrefWidth(100);
+        isFactoryColumn.setCellValueFactory(new DTOCellValueFactory<>("isFactory", String.class));
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(pidColumn);
-		table.getColumns().add(nameColumn);
-		table.getColumns().add(locationColumn);
-		table.getColumns().add(isFactoryColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(pidColumn);
+        table.getColumns().add(nameColumn);
+        table.getColumns().add(locationColumn);
+        table.getColumns().add(isFactoryColumn);
 
-		table.setItems(dataProvider.configurations());
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        table.setItems(dataProvider.configurations());
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

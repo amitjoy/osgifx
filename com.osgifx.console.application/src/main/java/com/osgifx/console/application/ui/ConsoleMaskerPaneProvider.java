@@ -23,21 +23,21 @@ import javafx.scene.layout.BorderPane;
 
 public final class ConsoleMaskerPaneProvider implements ConsoleMaskerPane {
 
-	private final MaskerPane maskerPane = new MaskerPane();
+    private final MaskerPane maskerPane = new MaskerPane();
 
-	@Override
-	public void addTo(final BorderPane pane) {
-		pane.setCenter(maskerPane);
-	}
+    @Override
+    public void addTo(final BorderPane pane) {
+        pane.setCenter(maskerPane);
+    }
 
-	@Override
-	public void setVisible(final boolean isVisible) {
-		maskerPane.setVisible(isVisible);
-	}
+    @Override
+    public void setVisible(final boolean isVisible) {
+        maskerPane.setVisible(isVisible);
+    }
 
-	@Override
-	public boolean isVisible() {
-		return maskerPane.isVisible();
-	}
+    @Override
+    public boolean isVisible() {
+        return maskerPane.isVisible();
+    }
 
 }

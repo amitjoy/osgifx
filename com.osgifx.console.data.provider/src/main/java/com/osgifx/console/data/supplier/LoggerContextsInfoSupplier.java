@@ -55,50 +55,50 @@ import javafx.collections.ObservableList;
 //@formatter:on
 public final class LoggerContextsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String LOGGER_CONTEXTS_ID = "loggerContexts";
+    public static final String LOGGER_CONTEXTS_ID = "loggerContexts";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XBundleLoggerContextDTO> loggerContexts = observableArrayList();
+    private final ObservableList<XBundleLoggerContextDTO> loggerContexts = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving logger contexts info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		loggerContexts.setAll(makeNullSafe(agent.getBundleLoggerContexts()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC);
-		logger.atInfo().log("Logger contexts info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving logger contexts info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        loggerContexts.setAll(makeNullSafe(agent.getBundleLoggerContexts()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC);
+        logger.atInfo().log("Logger contexts info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return loggerContexts;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return loggerContexts;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(loggerContexts::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(loggerContexts::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

@@ -36,45 +36,45 @@ import javafx.scene.control.TableView;
 
 public final class ServiceDetailsFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                               logger;
-	@FXML
-	private Label                                      idLabel;
-	@FXML
-	private Label                                      bundleIdLabel;
-	@FXML
-	private Label                                      bundleBsnLabel;
-	@FXML
-	private ListView<String>                           objectClassesList;
-	@FXML
-	private TableView<Entry<String, String>>           propertiesTable;
-	@FXML
-	private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
-	@FXML
-	private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
+    @Log
+    @Inject
+    private FluentLogger                               logger;
+    @FXML
+    private Label                                      idLabel;
+    @FXML
+    private Label                                      bundleIdLabel;
+    @FXML
+    private Label                                      bundleBsnLabel;
+    @FXML
+    private ListView<String>                           objectClassesList;
+    @FXML
+    private TableView<Entry<String, String>>           propertiesTable;
+    @FXML
+    private TableColumn<Entry<String, String>, String> propertiesTableColumn1;
+    @FXML
+    private TableColumn<Entry<String, String>, String> propertiesTableColumn2;
 
-	@FXML
-	public void initialize() {
-		logger.atDebug().log("FXML controller has been initialized");
-	}
+    @FXML
+    public void initialize() {
+        logger.atDebug().log("FXML controller has been initialized");
+    }
 
-	void initControls(final XServiceDTO service) {
-		idLabel.setText(String.valueOf(service.id));
-		bundleBsnLabel.setText(service.registeringBundle);
-		bundleIdLabel.setText(String.valueOf(service.bundleId));
+    void initControls(final XServiceDTO service) {
+        idLabel.setText(String.valueOf(service.id));
+        bundleBsnLabel.setText(service.registeringBundle);
+        bundleIdLabel.setText(String.valueOf(service.bundleId));
 
-		propertiesTableColumn1.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
-		propertiesTableColumn2.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
-		propertiesTable.setItems(FXCollections.observableArrayList(service.properties.entrySet()));
+        propertiesTableColumn1.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
+        propertiesTableColumn2.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
+        propertiesTable.setItems(FXCollections.observableArrayList(service.properties.entrySet()));
 
-		objectClassesList.getItems().clear();
-		objectClassesList.getItems().addAll(service.types);
+        objectClassesList.getItems().clear();
+        objectClassesList.getItems().addAll(service.types);
 
-		TableFilter.forTableView(propertiesTable).apply();
+        TableFilter.forTableView(propertiesTable).apply();
 
-		Fx.addContextMenuToCopyContent(propertiesTable);
-		Fx.addContextMenuToCopyContent(objectClassesList);
-	}
+        Fx.addContextMenuToCopyContent(propertiesTable);
+        Fx.addContextMenuToCopyContent(objectClassesList);
+    }
 
 }

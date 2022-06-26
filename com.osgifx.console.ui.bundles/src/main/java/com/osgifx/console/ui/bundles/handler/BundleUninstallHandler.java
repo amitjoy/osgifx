@@ -37,52 +37,52 @@ import javafx.concurrent.Task;
 
 public final class BundleUninstallHandler {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private IEventBroker      eventBroker;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@Optional
-	@Named("is_connected")
-	private boolean           isConnected;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @Optional
+    @Named("is_connected")
+    private boolean           isConnected;
 
-	@Execute
-	public void execute(@Named("id") final String id) {
-		if (!isConnected) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return;
-		}
-		final Task<Void> uninstallTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					final var agent = supervisor.getAgent();
-					final var error = agent.uninstall(Long.parseLong(id));
-					if (error == null) {
-						logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
-						eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
-					} else {
-						logger.atError().log(error);
-						threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Uninstall Error", error, getClass().getClassLoader()));
-					}
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);
-					threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
-				}
-				return null;
-			}
-		};
-		CompletableFuture.runAsync(uninstallTask);
-	}
+    @Execute
+    public void execute(@Named("id") final String id) {
+        if (!isConnected) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return;
+        }
+        final Task<Void> uninstallTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    final var agent = supervisor.getAgent();
+                    final var error = agent.uninstall(Long.parseLong(id));
+                    if (error == null) {
+                        logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
+                        eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
+                    } else {
+                        logger.atError().log(error);
+                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Uninstall Error", error, getClass().getClassLoader()));
+                    }
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);
+                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                }
+                return null;
+            }
+        };
+        CompletableFuture.runAsync(uninstallTask);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }
