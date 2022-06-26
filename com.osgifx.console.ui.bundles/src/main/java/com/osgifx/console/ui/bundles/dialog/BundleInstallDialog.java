@@ -34,34 +34,34 @@ import javafx.stage.StageStyle;
 
 public final class BundleInstallDialog extends Dialog<BundleInstallDTO> {
 
-	@Inject
-	@LocalInstance
-	private FXMLLoader    loader;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
+    @Inject
+    @LocalInstance
+    private FXMLLoader    loader;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
 
-	public void init() {
-		final var dialogPane = getDialogPane();
-		initStyle(StageStyle.UNDECORATED);
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+    public void init() {
+        final var dialogPane = getDialogPane();
+        initStyle(StageStyle.UNDECORATED);
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-		dialogPane.setHeaderText("Remote Bundle Install");
-		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));
+        dialogPane.setHeaderText("Remote Bundle Install");
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));
 
-		final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
-		dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);
+        final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);
 
-		final var dialogContent = Fx.loadFXML(loader, context, "/fxml/install-bundle-dialog.fxml");
-		dialogPane.setContent(dialogContent);
+        final var dialogContent = Fx.loadFXML(loader, context, "/fxml/install-bundle-dialog.fxml");
+        dialogPane.setContent(dialogContent);
 
-		final var controller = (BundleInstallDialogController) loader.getController();
-		dialogPane.lookupButton(installButtonType).disableProperty().bind(controller.bundleProperty().isNull());
+        final var controller = (BundleInstallDialogController) loader.getController();
+        dialogPane.lookupButton(installButtonType).disableProperty().bind(controller.bundleProperty().isNull());
 
-		setResultConverter(dialogButton -> {
-			final var data = dialogButton == null ? null : dialogButton.getButtonData();
-			return data == ButtonData.OK_DONE ? controller.getInstallDTO() : null;
-		});
-	}
+        setResultConverter(dialogButton -> {
+            final var data = dialogButton == null ? null : dialogButton.getButtonData();
+            return data == ButtonData.OK_DONE ? controller.getInstallDTO() : null;
+        });
+    }
 
 }

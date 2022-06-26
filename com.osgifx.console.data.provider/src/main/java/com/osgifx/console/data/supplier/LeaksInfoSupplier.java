@@ -45,50 +45,50 @@ import javafx.collections.ObservableList;
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
 public final class LeaksInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String LEAKS_ID = "leaks";
+    public static final String LEAKS_ID = "leaks";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XBundleDTO> leaks = observableArrayList();
+    private final ObservableList<XBundleDTO> leaks = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving classloader leaks info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		leaks.setAll(makeNullSafe(agent.getClassloaderLeaks()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LEAKS_TOPIC);
-		logger.atInfo().log("Classloader leaks info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving classloader leaks info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        leaks.setAll(makeNullSafe(agent.getClassloaderLeaks()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LEAKS_TOPIC);
+        logger.atInfo().log("Classloader leaks info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return leaks;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return leaks;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(leaks::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(leaks::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

@@ -27,19 +27,19 @@ import com.osgifx.console.application.dialog.AboutApplicationDialog;
 
 public final class AboutApplicationHandler {
 
-	@Log
-	@Inject
-	private FluentLogger    logger;
-	@Inject
-	private IEclipseContext context;
+    @Log
+    @Inject
+    private FluentLogger    logger;
+    @Inject
+    private IEclipseContext context;
 
-	@Execute
-	public void execute() {
-		final var dialog = new AboutApplicationDialog();
-		ContextInjectionFactory.inject(dialog, context);
-		logger.atInfo().log("Injected about dialog to eclipse context");
-		dialog.init();
-		dialog.show();
-	}
+    @Execute
+    public void execute() {
+        final var dialog = new AboutApplicationDialog();
+        ContextInjectionFactory.inject(dialog, context);
+        logger.atInfo().log("Injected about dialog to eclipse context");
+        dialog.init();
+        dialog.show();
+    }
 
 }

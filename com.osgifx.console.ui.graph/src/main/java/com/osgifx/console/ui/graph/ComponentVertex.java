@@ -20,16 +20,16 @@ import java.util.function.UnaryOperator;
 
 public record ComponentVertex(String name) {
 
-	public static final Function<String, String> VERTEX_ID_FUNCTION = Function.identity();
-	public static final UnaryOperator<String> DOT_ID_FUNCTION = name -> name.replaceAll("[^a-zA-Z0-9]", "_");
+    public static final Function<String, String> VERTEX_ID_FUNCTION = Function.identity();
+    public static final UnaryOperator<String> DOT_ID_FUNCTION = name -> name.replaceAll("[^a-zA-Z0-9]", "_");
 
-	@Override
-	public String toString() {
-		return name;
-	}
+    @Override
+    public String toString() {
+        return name;
+    }
 
-	public String toDotID() {
-		return DOT_ID_FUNCTION.apply(name);
-	}
+    public String toDotID() {
+        return DOT_ID_FUNCTION.apply(name);
+    }
 
 }

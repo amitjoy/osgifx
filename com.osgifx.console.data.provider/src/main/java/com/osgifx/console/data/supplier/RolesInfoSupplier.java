@@ -55,50 +55,50 @@ import javafx.collections.ObservableList;
 //@formatter:on
 public final class RolesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
-	public static final String ROLES_ID = "roles";
+    public static final String ROLES_ID = "roles";
 
-	@Reference
-	private LoggerFactory     factory;
-	@Reference
-	private EventAdmin        eventAdmin;
-	@Reference
-	private Supervisor        supervisor;
-	@Reference
-	private ThreadSynchronize threadSync;
-	private FluentLogger      logger;
+    @Reference
+    private LoggerFactory     factory;
+    @Reference
+    private EventAdmin        eventAdmin;
+    @Reference
+    private Supervisor        supervisor;
+    @Reference
+    private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
-	private final ObservableList<XRoleDTO> roles = observableArrayList();
+    private final ObservableList<XRoleDTO> roles = observableArrayList();
 
-	@Activate
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	@Override
-	public synchronized void retrieve() {
-		logger.atInfo().log("Retrieving roles info from remote runtime");
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Agent is not connected");
-			return;
-		}
-		roles.setAll(makeNullSafe(agent.getAllRoles()));
-		RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ROLES_TOPIC);
-		logger.atInfo().log("Roles info retrieved successfully");
-	}
+    @Override
+    public synchronized void retrieve() {
+        logger.atInfo().log("Retrieving roles info from remote runtime");
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return;
+        }
+        roles.setAll(makeNullSafe(agent.getAllRoles()));
+        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ROLES_TOPIC);
+        logger.atInfo().log("Roles info retrieved successfully");
+    }
 
-	@Override
-	public ObservableList<?> supply() {
-		return roles;
-	}
+    @Override
+    public ObservableList<?> supply() {
+        return roles;
+    }
 
-	@Override
-	public void handleEvent(final Event event) {
-		if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
-			threadSync.asyncExec(roles::clear);
-			return;
-		}
-		CompletableFuture.runAsync(this::retrieve);
-	}
+    @Override
+    public void handleEvent(final Event event) {
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(event.getTopic())) {
+            threadSync.asyncExec(roles::clear);
+            return;
+        }
+        CompletableFuture.runAsync(this::retrieve);
+    }
 
 }

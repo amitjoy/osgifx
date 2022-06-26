@@ -27,19 +27,19 @@ import com.osgifx.console.ui.extension.dialog.ExtensionsViewDialog;
 
 public final class ExtensionsViewHandler {
 
-	@Log
-	@Inject
-	private FluentLogger    logger;
-	@Inject
-	private IEclipseContext context;
+    @Log
+    @Inject
+    private FluentLogger    logger;
+    @Inject
+    private IEclipseContext context;
 
-	@Execute
-	public void execute() {
-		final var dialog = new ExtensionsViewDialog();
-		ContextInjectionFactory.inject(dialog, context);
-		logger.atInfo().log("Injected extensions view dialog to eclipse context");
-		dialog.init();
-		dialog.show();
-	}
+    @Execute
+    public void execute() {
+        final var dialog = new ExtensionsViewDialog();
+        ContextInjectionFactory.inject(dialog, context);
+        logger.atInfo().log("Injected extensions view dialog to eclipse context");
+        dialog.init();
+        dialog.show();
+    }
 
 }

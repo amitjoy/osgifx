@@ -55,145 +55,145 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-	private ServerSocket              server;
-	private BundleContext             context;
-	private ClassloaderLeakDetector   classloaderLeakDetector;
-	private BundleStartTimeCalculator bundleStartTimeCalculator;
-	private final List<AgentServer>   agents = new CopyOnWriteArrayList<>();
+    private ServerSocket              server;
+    private BundleContext             context;
+    private ClassloaderLeakDetector   classloaderLeakDetector;
+    private BundleStartTimeCalculator bundleStartTimeCalculator;
+    private final List<AgentServer>   agents = new CopyOnWriteArrayList<>();
 
-	@Override
-	public void start(final BundleContext context) throws Exception {
-		this.context = context;
+    @Override
+    public void start(final BundleContext context) throws Exception {
+        this.context = context;
 
-		bundleStartTimeCalculator = new BundleStartTimeCalculator(context.getBundle().getBundleId());
-		classloaderLeakDetector   = new ClassloaderLeakDetector(bundleStartTimeCalculator);
-		classloaderLeakDetector.start(context);
+        bundleStartTimeCalculator = new BundleStartTimeCalculator(context.getBundle().getBundleId());
+        classloaderLeakDetector   = new ClassloaderLeakDetector(bundleStartTimeCalculator);
+        classloaderLeakDetector.start(context);
 
-		context.addBundleListener(bundleStartTimeCalculator);
+        context.addBundleListener(bundleStartTimeCalculator);
 
-		// Get the specified port in the framework properties
-		String port = context.getProperty(AGENT_SERVER_PORT_KEY);
-		if (port == null) {
-			port = DEFAULT_PORT + "";
-		}
+        // Get the specified port in the framework properties
+        String port = context.getProperty(AGENT_SERVER_PORT_KEY);
+        if (port == null) {
+            port = DEFAULT_PORT + "";
+        }
 
-		// Check if it matches the specification of host:port
-		final Matcher m = PORT_PATTERN.matcher(port);
-		if (!m.matches()) {
-			throw new IllegalArgumentException(
-			        "Invalid port specification in property '" + AGENT_SERVER_PORT_KEY + "', expects [<host>:]<port> : " + port);
-		}
+        // Check if it matches the specification of host:port
+        final Matcher m = PORT_PATTERN.matcher(port);
+        if (!m.matches()) {
+            throw new IllegalArgumentException(
+                    "Invalid port specification in property '" + AGENT_SERVER_PORT_KEY + "', expects [<host>:]<port> : " + port);
+        }
 
-		// if the host is not set, use localhost
-		String host = m.group(1);
-		if (host == null) {
-			host = "localhost";
-		} else {
-			port = m.group(2);
-		}
+        // if the host is not set, use localhost
+        String host = m.group(1);
+        if (host == null) {
+            host = "localhost";
+        } else {
+            port = m.group(2);
+        }
 
-		System.err.println("OSGi.fx Agent Host: " + host + ":" + port);
+        System.err.println("OSGi.fx Agent Host: " + host + ":" + port);
 
-		final int p = Integer.parseInt(port);
-		server = "*".equals(host) ? new ServerSocket(p) : new ServerSocket(p, 3, InetAddress.getByName(host));
-		start();
-	}
+        final int p = Integer.parseInt(port);
+        server = "*".equals(host) ? new ServerSocket(p) : new ServerSocket(p, 3, InetAddress.getByName(host));
+        start();
+    }
 
-	@Override
-	public void run() {
+    @Override
+    public void run() {
 
-		try {
-			while (!isInterrupted()) {
-				try {
-					final Socket socket = server.accept();
-					// timeout to get interrupts
-					socket.setSoTimeout(1000);
+        try {
+            while (!isInterrupted()) {
+                try {
+                    final Socket socket = server.accept();
+                    // timeout to get interrupts
+                    socket.setSoTimeout(1000);
 
-					// create a new agent, and link it up.
-					final AgentServer sa = new AgentServer(context, classloaderLeakDetector, bundleStartTimeCalculator);
-					agents.add(sa);
-					final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class, sa, socket) {
-						@Override
-						public void close() throws IOException {
-							agents.remove(sa);
-							super.close();
-						}
-					};
-					sa.setEndpoint(remoteRPC);
-					// initialize OSGi events if available
-					final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
-					if (isEventAdminAvailable) {
-						final Dictionary<String, Object> properties = new Hashtable<>();
-						properties.put("event.topics", "*");
-						context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(remoteRPC.getRemote()),
-						        properties);
-					}
-					// initialize OSGi logging if available
-					final boolean isLogAvailable = PackageWirings.isLogWired(context);
-					if (isLogAvailable) {
-						final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote(), bundleStartTimeCalculator);
-						trackLogReader(logListener);
-					}
-					remoteRPC.run();
-				} catch (final Exception e) {
-				} catch (final Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		} catch (final Throwable t) {
-			t.printStackTrace(System.err);
-			throw t;
-		} finally {
-			close(server);
-		}
-	}
+                    // create a new agent, and link it up.
+                    final AgentServer sa = new AgentServer(context, classloaderLeakDetector, bundleStartTimeCalculator);
+                    agents.add(sa);
+                    final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class, sa, socket) {
+                        @Override
+                        public void close() throws IOException {
+                            agents.remove(sa);
+                            super.close();
+                        }
+                    };
+                    sa.setEndpoint(remoteRPC);
+                    // initialize OSGi events if available
+                    final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+                    if (isEventAdminAvailable) {
+                        final Dictionary<String, Object> properties = new Hashtable<>();
+                        properties.put("event.topics", "*");
+                        context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(remoteRPC.getRemote()),
+                                properties);
+                    }
+                    // initialize OSGi logging if available
+                    final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                    if (isLogAvailable) {
+                        final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote(), bundleStartTimeCalculator);
+                        trackLogReader(logListener);
+                    }
+                    remoteRPC.run();
+                } catch (final Exception e) {
+                } catch (final Throwable t) {
+                    t.printStackTrace();
+                }
+            }
+        } catch (final Throwable t) {
+            t.printStackTrace(System.err);
+            throw t;
+        } finally {
+            close(server);
+        }
+    }
 
-	@Override
-	public void stop(final BundleContext context) throws Exception {
-		interrupt();
-		close(server);
-		agents.forEach(this::close);
-		classloaderLeakDetector.stop();
-	}
+    @Override
+    public void stop(final BundleContext context) throws Exception {
+        interrupt();
+        close(server);
+        agents.forEach(this::close);
+        classloaderLeakDetector.stop();
+    }
 
-	private void trackLogReader(final OSGiLogListener logListener) {
-		final ServiceTracker<Object, Object> logReaderTracker = new ServiceTracker<Object, Object>(context,
-		        "org.osgi.service.log.LogReaderService", null) {
+    private void trackLogReader(final OSGiLogListener logListener) {
+        final ServiceTracker<Object, Object> logReaderTracker = new ServiceTracker<Object, Object>(context,
+                "org.osgi.service.log.LogReaderService", null) {
 
-			@Override
-			public Object addingService(final ServiceReference<Object> reference) {
-				final boolean isLogAvailable = PackageWirings.isLogWired(context);
-				final Object  service        = super.addingService(reference);
-				if (isLogAvailable) {
-					XLogReaderAdmin.register(service, logListener);
-				}
-				return service;
-			}
+            @Override
+            public Object addingService(final ServiceReference<Object> reference) {
+                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                final Object  service        = super.addingService(reference);
+                if (isLogAvailable) {
+                    XLogReaderAdmin.register(service, logListener);
+                }
+                return service;
+            }
 
-			@Override
-			public void removedService(final ServiceReference<Object> reference, final Object service) {
-				final boolean isLogAvailable = PackageWirings.isLogWired(context);
-				if (isLogAvailable) {
-					XLogReaderAdmin.unregister(service, logListener);
-				}
-			}
-		};
-		logReaderTracker.open();
-	}
+            @Override
+            public void removedService(final ServiceReference<Object> reference, final Object service) {
+                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                if (isLogAvailable) {
+                    XLogReaderAdmin.unregister(service, logListener);
+                }
+            }
+        };
+        logReaderTracker.open();
+    }
 
-	private Throwable close(final Closeable in) {
-		return close((AutoCloseable) in);
-	}
+    private Throwable close(final Closeable in) {
+        return close((AutoCloseable) in);
+    }
 
-	private Throwable close(final AutoCloseable in) {
-		try {
-			if (in != null) {
-				in.close();
-			}
-		} catch (final Throwable e) {
-			return e;
-		}
-		return null;
-	}
+    private Throwable close(final AutoCloseable in) {
+        try {
+            if (in != null) {
+                in.close();
+            }
+        } catch (final Throwable e) {
+            return e;
+        }
+        return null;
+    }
 
 }

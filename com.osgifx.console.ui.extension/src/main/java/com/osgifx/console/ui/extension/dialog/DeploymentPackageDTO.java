@@ -16,7 +16,7 @@
 package com.osgifx.console.ui.extension.dialog;
 
 public class DeploymentPackageDTO {
-	public String name;
-	public String displayName;
-	public String version;
+    public String name;
+    public String displayName;
+    public String version;
 }

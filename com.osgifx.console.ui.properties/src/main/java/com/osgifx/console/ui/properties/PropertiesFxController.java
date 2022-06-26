@@ -37,45 +37,45 @@ import javafx.scene.control.TableView;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class PropertiesFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                      logger;
-	@FXML
-	private TableView<XPropertyDTO>           propertyTable;
-	@FXML
-	private TableColumn<XPropertyDTO, String> propertyName;
-	@FXML
-	private TableColumn<XPropertyDTO, String> propertyValue;
-	@FXML
-	private TableColumn<XPropertyDTO, String> propertyType;
-	@Inject
-	@Named("is_connected")
-	private boolean                           isConnected;
-	@Inject
-	private DataProvider                      dataProvider;
+    @Log
+    @Inject
+    private FluentLogger                      logger;
+    @FXML
+    private TableView<XPropertyDTO>           propertyTable;
+    @FXML
+    private TableColumn<XPropertyDTO, String> propertyName;
+    @FXML
+    private TableColumn<XPropertyDTO, String> propertyValue;
+    @FXML
+    private TableColumn<XPropertyDTO, String> propertyType;
+    @Inject
+    @Named("is_connected")
+    private boolean                           isConnected;
+    @Inject
+    private DataProvider                      dataProvider;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(propertyTable);
-			return;
-		}
-		try {
-			initCells();
-			Fx.addContextMenuToCopyContent(propertyTable);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(propertyTable);
+            return;
+        }
+        try {
+            initCells();
+            Fx.addContextMenuToCopyContent(propertyTable);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void initCells() {
-		propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-		propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
-		propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
+    private void initCells() {
+        propertyName.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+        propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
+        propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
-		propertyTable.setItems(dataProvider.properties());
-		TableFilter.forTableView(propertyTable).lazy(true).apply();
-	}
+        propertyTable.setItems(dataProvider.properties());
+        TableFilter.forTableView(propertyTable).lazy(true).apply();
+    }
 
 }

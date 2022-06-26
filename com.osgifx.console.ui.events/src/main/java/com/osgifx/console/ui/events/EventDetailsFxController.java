@@ -37,43 +37,43 @@ import javafx.scene.control.TableView;
 
 public final class EventDetailsFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                               logger;
-	@FXML
-	private Label                                      receivedAtLabel;
-	@FXML
-	private Label                                      topicLabel;
-	@FXML
-	private TableView<Entry<String, String>>           propertiesTable;
-	@FXML
-	private TableColumn<Entry<String, String>, String> propertiesKeyTableColumn;
-	@FXML
-	private TableColumn<Entry<String, String>, String> propertiesValueTableColumn;
-	private Converter                                  converter;
+    @Log
+    @Inject
+    private FluentLogger                               logger;
+    @FXML
+    private Label                                      receivedAtLabel;
+    @FXML
+    private Label                                      topicLabel;
+    @FXML
+    private TableView<Entry<String, String>>           propertiesTable;
+    @FXML
+    private TableColumn<Entry<String, String>, String> propertiesKeyTableColumn;
+    @FXML
+    private TableColumn<Entry<String, String>, String> propertiesValueTableColumn;
+    private Converter                                  converter;
 
-	@FXML
-	public void initialize() {
-		converter = Converters.standardConverter();
-		logger.atDebug().log("FXML controller has been initialized");
-	}
+    @FXML
+    public void initialize() {
+        converter = Converters.standardConverter();
+        logger.atDebug().log("FXML controller has been initialized");
+    }
 
-	public void initControls(final XEventDTO event) {
-		receivedAtLabel.setText(formatReceivedAt(event.received));
-		topicLabel.setText(event.topic);
+    public void initControls(final XEventDTO event) {
+        receivedAtLabel.setText(formatReceivedAt(event.received));
+        topicLabel.setText(event.topic);
 
-		propertiesKeyTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
-		propertiesValueTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
-		propertiesTable.setItems(FXCollections.observableArrayList(event.properties.entrySet()));
+        propertiesKeyTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
+        propertiesValueTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
+        propertiesTable.setItems(FXCollections.observableArrayList(event.properties.entrySet()));
 
-		Fx.addContextMenuToCopyContent(propertiesTable);
-	}
+        Fx.addContextMenuToCopyContent(propertiesTable);
+    }
 
-	private String formatReceivedAt(final long receivedAt) {
-		if (receivedAt == 0) {
-			return "No received timestamp";
-		}
-		return converter.convert(receivedAt).to(Date.class).toString();
-	}
+    private String formatReceivedAt(final long receivedAt) {
+        if (receivedAt == 0) {
+            return "No received timestamp";
+        }
+        return converter.convert(receivedAt).to(Date.class).toString();
+    }
 
 }

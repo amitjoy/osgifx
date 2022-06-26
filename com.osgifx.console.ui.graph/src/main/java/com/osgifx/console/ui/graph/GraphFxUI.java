@@ -53,126 +53,126 @@ import javafx.scene.layout.BorderPane;
 @SuppressWarnings("deprecation")
 public final class GraphFxUI {
 
-	@Log
-	@Inject
-	private FluentLogger      logger;
-	@Inject
-	private MPart             part;
-	@Inject
-	@OSGiBundle
-	private BundleContext     context;
-	@Inject
-	private ConsoleStatusBar  statusBar;
-	@Inject
-	private ThreadSynchronize threadSync;
-	@Inject
-	@FXMLLoader
-	private FXMLLoaderFactory fxmlLoader;
-	@Inject
-	private BorderPane        parentNode;
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private EPartService      partService;
-	@Inject
-	private DataProvider      dataProvider;
-	@Inject
-	private ConsoleMaskerPane progressPane;
-	private GraphController   loadedController;
+    @Log
+    @Inject
+    private FluentLogger      logger;
+    @Inject
+    private MPart             part;
+    @Inject
+    @OSGiBundle
+    private BundleContext     context;
+    @Inject
+    private ConsoleStatusBar  statusBar;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    @FXMLLoader
+    private FXMLLoaderFactory fxmlLoader;
+    @Inject
+    private BorderPane        parentNode;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private EPartService      partService;
+    @Inject
+    private DataProvider      dataProvider;
+    @Inject
+    private ConsoleMaskerPane progressPane;
+    private GraphController   loadedController;
 
-	@PostConstruct
-	public void postConstruct() {
-		createControls();
-		logger.atDebug().log("Graph part has been initialized");
-	}
+    @PostConstruct
+    public void postConstruct() {
+        createControls();
+        logger.atDebug().log("Graph part has been initialized");
+    }
 
-	@Focus
-	public void onFocus() {
-		if (isConnected) {
-			dataProvider.retrieveInfo("bundles", true);
-			dataProvider.retrieveInfo("components", true);
-		}
-	}
+    @Focus
+    public void onFocus() {
+        if (isConnected) {
+            dataProvider.retrieveInfo("bundles", true);
+            dataProvider.retrieveInfo("components", true);
+        }
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent connected event received");
-		createControls();
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event received");
+        createControls();
+    }
 
-	@Inject
-	@Optional
-	private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent disconnected event received");
-		createControls();
-	}
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event received");
+        createControls();
+    }
 
-	private void createControls() {
-		initStatusBar();
-		if (loadedController == null) {
-			threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
-			        "/graphic/images/graph.png", strType -> {
-				        final Task<Void> task = new Task<>() {
-					        @Override
-					        protected Void call() throws Exception {
-						        final var type = //
-						                Enums.getIfPresent(GraphController.Type.class, strType.toUpperCase()) //
-						                        .or(GraphController.Type.BUNDLES);
-						        loadContent(type);
-						        return null;
-					        }
-				        };
-				        CompletableFuture.runAsync(task);
-			        }, () -> partService.hidePart(part), "Bundles", "Bundles", "Components"));
-		} else {
-			loadContent(loadedController.type());
-		}
-	}
+    private void createControls() {
+        initStatusBar();
+        if (loadedController == null) {
+            threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
+                    "/graphic/images/graph.png", strType -> {
+                        final Task<Void> task = new Task<>() {
+                            @Override
+                            protected Void call() throws Exception {
+                                final var type = //
+                                        Enums.getIfPresent(GraphController.Type.class, strType.toUpperCase()) //
+                                                .or(GraphController.Type.BUNDLES);
+                                loadContent(type);
+                                return null;
+                            }
+                        };
+                        CompletableFuture.runAsync(task);
+                    }, () -> partService.hidePart(part), "Bundles", "Bundles", "Components"));
+        } else {
+            loadContent(loadedController.type());
+        }
+    }
 
-	private void loadContent(final GraphController.Type type) {
-		Node tabContent;
-		threadSync.asyncExec(() -> progressPane.addTo(parentNode));
-		String resource;
-		if (type == GraphController.Type.BUNDLES) {
-			resource = "/fxml/tab-content-for-bundles.fxml";
-		} else {
-			resource = "/fxml/tab-content-for-components.fxml";
-		}
-		final var data = loadFXML(resource);
-		if (data == null) {
-			logger.atError().log("Graph UI resource '%s' could not be loaded", resource);
-			return;
-		}
-		tabContent       = data.getNode();
-		loadedController = data.getController();
+    private void loadContent(final GraphController.Type type) {
+        Node tabContent;
+        threadSync.asyncExec(() -> progressPane.addTo(parentNode));
+        String resource;
+        if (type == GraphController.Type.BUNDLES) {
+            resource = "/fxml/tab-content-for-bundles.fxml";
+        } else {
+            resource = "/fxml/tab-content-for-components.fxml";
+        }
+        final var data = loadFXML(resource);
+        if (data == null) {
+            logger.atError().log("Graph UI resource '%s' could not be loaded", resource);
+            return;
+        }
+        tabContent       = data.getNode();
+        loadedController = data.getController();
 
-		final var content = tabContent; // required for lambda as it needs to be effectively final
-		progressPane.setVisible(false);
-		threadSync.asyncExec(() -> parentNode.setCenter(content));
-	}
+        final var content = tabContent; // required for lambda as it needs to be effectively final
+        progressPane.setVisible(false);
+        threadSync.asyncExec(() -> parentNode.setCenter(content));
+    }
 
-	private void initStatusBar() {
-		if (isConnected) {
-			final var node = Fx.initStatusBarButton(() -> {
-				loadedController.updateModel();
-			}, "Refresh", "REFRESH");
-			statusBar.clearAllInRight();
-			statusBar.addToRight(node);
-		} else {
-			statusBar.clearAllInRight();
-		}
-		statusBar.addTo(parentNode);
-	}
+    private void initStatusBar() {
+        if (isConnected) {
+            final var node = Fx.initStatusBarButton(() -> {
+                loadedController.updateModel();
+            }, "Refresh", "REFRESH");
+            statusBar.clearAllInRight();
+            statusBar.addToRight(node);
+        } else {
+            statusBar.clearAllInRight();
+        }
+        statusBar.addTo(parentNode);
+    }
 
-	private Data<Node, GraphController> loadFXML(final String resourceName) {
-		final FXMLBuilder<Node> builder = fxmlLoader.loadBundleRelative(resourceName);
-		try {
-			return builder.loadWithController();
-		} catch (final Exception e) {
-			return null;
-		}
-	}
+    private Data<Node, GraphController> loadFXML(final String resourceName) {
+        final FXMLBuilder<Node> builder = fxmlLoader.loadBundleRelative(resourceName);
+        try {
+            return builder.loadWithController();
+        } catch (final Exception e) {
+            return null;
+        }
+    }
 
 }

@@ -38,115 +38,115 @@ import com.osgifx.console.agent.dto.XHeapdumpDTO;
 
 public final class XHeapAdmin {
 
-	private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
-	private static volatile Object hotspotMBean;
+    private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
+    private static volatile Object hotspotMBean;
 
-	public static XHeapUsageDTO init() {
-		final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
-		try {
-			final MemoryMXBean                 memoryMBean      = ManagementFactory.getMemoryMXBean();
-			final RuntimeMXBean                runtimeMBean     = ManagementFactory.getRuntimeMXBean();
-			final List<GarbageCollectorMXBean> gcMBeans         = ManagementFactory.getGarbageCollectorMXBeans();
-			final List<MemoryPoolMXBean>       memoryPoolMBeans = ManagementFactory.getMemoryPoolMXBeans();
+    public static XHeapUsageDTO init() {
+        final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
+        try {
+            final MemoryMXBean                 memoryMBean      = ManagementFactory.getMemoryMXBean();
+            final RuntimeMXBean                runtimeMBean     = ManagementFactory.getRuntimeMXBean();
+            final List<GarbageCollectorMXBean> gcMBeans         = ManagementFactory.getGarbageCollectorMXBeans();
+            final List<MemoryPoolMXBean>       memoryPoolMBeans = ManagementFactory.getMemoryPoolMXBeans();
 
-			heapUsage.memoryUsage     = initMemoryUsageMBean(memoryMBean.getHeapMemoryUsage());
-			heapUsage.uptime          = runtimeMBean.getUptime();
-			heapUsage.gcBeans         = initGcMBeans(gcMBeans);
-			heapUsage.memoryPoolBeans = initMemoryPoolMBeans(memoryPoolMBeans);
-		} catch (final Exception e) {
-			// nothing to do
-		}
-		return heapUsage;
-	}
+            heapUsage.memoryUsage     = initMemoryUsageMBean(memoryMBean.getHeapMemoryUsage());
+            heapUsage.uptime          = runtimeMBean.getUptime();
+            heapUsage.gcBeans         = initGcMBeans(gcMBeans);
+            heapUsage.memoryPoolBeans = initMemoryPoolMBeans(memoryPoolMBeans);
+        } catch (final Exception e) {
+            // nothing to do
+        }
+        return heapUsage;
+    }
 
-	private static XMemoryUsage initMemoryUsageMBean(final MemoryUsage memoryUsage) {
-		final XMemoryUsage memUsage = new XMemoryUsage();
+    private static XMemoryUsage initMemoryUsageMBean(final MemoryUsage memoryUsage) {
+        final XMemoryUsage memUsage = new XMemoryUsage();
 
-		memUsage.max  = memoryUsage.getMax();
-		memUsage.used = memoryUsage.getUsed();
+        memUsage.max  = memoryUsage.getMax();
+        memUsage.used = memoryUsage.getUsed();
 
-		return memUsage;
-	}
+        return memUsage;
+    }
 
-	private static XMemoryPoolMXBean[] initMemoryPoolMBeans(final List<MemoryPoolMXBean> memoryPoolMBeans) {
-		final Collection<XMemoryPoolMXBean> beans = new ArrayList<>();
-		for (final MemoryPoolMXBean mpBean : memoryPoolMBeans) {
-			final XMemoryPoolMXBean bean = new XMemoryPoolMXBean();
-			bean.name        = mpBean.getName();
-			bean.type        = mpBean.getType().name();
-			bean.memoryUsage = initMemoryUsageMBean(mpBean.getUsage());
-			beans.add(bean);
-		}
-		return beans.toArray(new XMemoryPoolMXBean[0]);
-	}
+    private static XMemoryPoolMXBean[] initMemoryPoolMBeans(final List<MemoryPoolMXBean> memoryPoolMBeans) {
+        final Collection<XMemoryPoolMXBean> beans = new ArrayList<>();
+        for (final MemoryPoolMXBean mpBean : memoryPoolMBeans) {
+            final XMemoryPoolMXBean bean = new XMemoryPoolMXBean();
+            bean.name        = mpBean.getName();
+            bean.type        = mpBean.getType().name();
+            bean.memoryUsage = initMemoryUsageMBean(mpBean.getUsage());
+            beans.add(bean);
+        }
+        return beans.toArray(new XMemoryPoolMXBean[0]);
+    }
 
-	private static XGarbageCollectorMXBean[] initGcMBeans(final List<GarbageCollectorMXBean> gcMBeans) {
-		final Collection<XGarbageCollectorMXBean> beans = new ArrayList<>();
-		for (final GarbageCollectorMXBean gc : gcMBeans) {
-			final XGarbageCollectorMXBean bean = new XGarbageCollectorMXBean();
-			bean.name            = gc.getName();
-			bean.collectionCount = gc.getCollectionCount();
-			bean.collectionTime  = gc.getCollectionTime();
-			beans.add(bean);
-		}
-		return beans.toArray(new XGarbageCollectorMXBean[0]);
-	}
+    private static XGarbageCollectorMXBean[] initGcMBeans(final List<GarbageCollectorMXBean> gcMBeans) {
+        final Collection<XGarbageCollectorMXBean> beans = new ArrayList<>();
+        for (final GarbageCollectorMXBean gc : gcMBeans) {
+            final XGarbageCollectorMXBean bean = new XGarbageCollectorMXBean();
+            bean.name            = gc.getName();
+            bean.collectionCount = gc.getCollectionCount();
+            bean.collectionTime  = gc.getCollectionTime();
+            beans.add(bean);
+        }
+        return beans.toArray(new XGarbageCollectorMXBean[0]);
+    }
 
-	public static XHeapdumpDTO heapdump() {
-		final File   location = getLocation();
-		final String fileName = "heapdump_fx_" + System.currentTimeMillis() + ".hprof";
-		final File   heapdump = new File(location, fileName);
+    public static XHeapdumpDTO heapdump() {
+        final File   location = getLocation();
+        final String fileName = "heapdump_fx_" + System.currentTimeMillis() + ".hprof";
+        final File   heapdump = new File(location, fileName);
 
-		initHotspotMBean();
-		try {
-			final Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
-			final Method   m     = clazz.getMethod("dumpHeap", String.class, boolean.class);
-			m.invoke(hotspotMBean, heapdump.getAbsolutePath(), true);
-		} catch (final RuntimeException re) {
-			throw re;
-		} catch (final Exception exp) {
-			throw new RuntimeException(exp);
-		}
-		final XHeapdumpDTO dto = new XHeapdumpDTO();
+        initHotspotMBean();
+        try {
+            final Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+            final Method   m     = clazz.getMethod("dumpHeap", String.class, boolean.class);
+            m.invoke(hotspotMBean, heapdump.getAbsolutePath(), true);
+        } catch (final RuntimeException re) {
+            throw re;
+        } catch (final Exception exp) {
+            throw new RuntimeException(exp);
+        }
+        final XHeapdumpDTO dto = new XHeapdumpDTO();
 
-		dto.size     = heapdump.length();
-		dto.location = heapdump.getAbsolutePath();
+        dto.size     = heapdump.length();
+        dto.location = heapdump.getAbsolutePath();
 
-		return dto;
-	}
+        return dto;
+    }
 
-	private static void initHotspotMBean() {
-		if (hotspotMBean == null) {
-			synchronized (XHeapAdmin.class) {
-				if (hotspotMBean == null) {
-					hotspotMBean = getHotspotMBean();
-				}
-			}
-		}
-	}
+    private static void initHotspotMBean() {
+        if (hotspotMBean == null) {
+            synchronized (XHeapAdmin.class) {
+                if (hotspotMBean == null) {
+                    hotspotMBean = getHotspotMBean();
+                }
+            }
+        }
+    }
 
-	private static Object getHotspotMBean() {
-		try {
-			final Class<?>    clazz  = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
-			final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-			return ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
-		} catch (final RuntimeException re) {
-			throw re;
-		} catch (final Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
+    private static Object getHotspotMBean() {
+        try {
+            final Class<?>    clazz  = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            return ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
+        } catch (final RuntimeException re) {
+            throw re;
+        } catch (final Exception exp) {
+            throw new RuntimeException(exp);
+        }
+    }
 
-	private static File getLocation() {
-		final String externalLocation = System.getProperty(Agent.HEAPDUMP_LOCATION_KEY);
-		if (externalLocation != null) {
-			final File file = new File(externalLocation);
-			file.mkdirs();
-			return file;
-		}
-		final File file = new File("./heapdumps");
-		file.mkdirs();
-		return file;
-	}
+    private static File getLocation() {
+        final String externalLocation = System.getProperty(Agent.HEAPDUMP_LOCATION_KEY);
+        if (externalLocation != null) {
+            final File file = new File(externalLocation);
+            file.mkdirs();
+            return file;
+        }
+        final File file = new File("./heapdumps");
+        file.mkdirs();
+        return file;
+    }
 
 }

@@ -19,19 +19,19 @@ import java.util.Collection;
 
 public final class DeploymentPackageDTO {
 
-	public String                                symbolicName;
-	public String                                version;
-	public String                                fixPack;
-	public String                                name;
-	public String                                copyright;
-	public String                                contactAddress;
-	public String                                description;
-	public String                                docURL;
-	public String                                icon;
-	public String                                vendor;
-	public String                                license;
-	public String                                requiredStorage;
-	public String                                isCustomizer;
-	public Collection<DeploymentPackageEntryDTO> entries;
+    public String                                symbolicName;
+    public String                                version;
+    public String                                fixPack;
+    public String                                name;
+    public String                                copyright;
+    public String                                contactAddress;
+    public String                                description;
+    public String                                docURL;
+    public String                                icon;
+    public String                                vendor;
+    public String                                license;
+    public String                                requiredStorage;
+    public String                                isCustomizer;
+    public Collection<DeploymentPackageEntryDTO> entries;
 
 }

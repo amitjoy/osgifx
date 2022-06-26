@@ -44,91 +44,91 @@ import javafx.scene.layout.BorderPane;
 @Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class HttpFxController {
 
-	@Log
-	@Inject
-	private FluentLogger                            logger;
-	@Inject
-	@LocalInstance
-	private FXMLLoader                              loader;
-	@FXML
-	private TableView<XHttpComponentDTO>            table;
-	@Inject
-	@OSGiBundle
-	private BundleContext                           context;
-	@Inject
-	@Named("is_connected")
-	private boolean                                 isConnected;
-	@Inject
-	private DataProvider                            dataProvider;
-	private TableRowDataFeatures<XHttpComponentDTO> previouslyExpanded;
+    @Log
+    @Inject
+    private FluentLogger                            logger;
+    @Inject
+    @LocalInstance
+    private FXMLLoader                              loader;
+    @FXML
+    private TableView<XHttpComponentDTO>            table;
+    @Inject
+    @OSGiBundle
+    private BundleContext                           context;
+    @Inject
+    @Named("is_connected")
+    private boolean                                 isConnected;
+    @Inject
+    private DataProvider                            dataProvider;
+    private TableRowDataFeatures<XHttpComponentDTO> previouslyExpanded;
 
-	@FXML
-	public void initialize() {
-		if (!isConnected) {
-			Fx.addTablePlaceholderWhenDisconnected(table);
-			return;
-		}
-		try {
-			createControls();
-			Fx.disableSelectionModel(table);
-			logger.atDebug().log("FXML controller has been initialized");
-		} catch (final Exception e) {
-			logger.atError().withException(e).log("FXML controller could not be initialized");
-		}
-	}
+    @FXML
+    public void initialize() {
+        if (!isConnected) {
+            Fx.addTablePlaceholderWhenDisconnected(table);
+            return;
+        }
+        try {
+            createControls();
+            Fx.disableSelectionModel(table);
+            logger.atDebug().log("FXML controller has been initialized");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("FXML controller could not be initialized");
+        }
+    }
 
-	private void createControls() {
-		final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
-		final var controller     = (HttpDetailsFxController) loader.getController();
-		final var expanderColumn = new TableRowExpanderColumn<XHttpComponentDTO>(current -> {
-										if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
-											return expandedNode;
-										}
-										if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
-											previouslyExpanded.toggleExpanded();
-										}
-										controller.initControls(current.getValue());
-										previouslyExpanded = current;
-										return expandedNode;
-									});
+    private void createControls() {
+        final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+        final var controller     = (HttpDetailsFxController) loader.getController();
+        final var expanderColumn = new TableRowExpanderColumn<XHttpComponentDTO>(current -> {
+                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                         return expandedNode;
+                                     }
+                                     if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
+                                         previouslyExpanded.toggleExpanded();
+                                     }
+                                     controller.initControls(current.getValue());
+                                     previouslyExpanded = current;
+                                     return expandedNode;
+                                 });
 
-		final var componentColumn = new TableColumn<XHttpComponentDTO, String>("Component Name");
-		componentColumn.setPrefWidth(600);
-		componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> {
-			// resource doesn't have associated name field
-			try {
-				s.getClass().getField("name");
-			} catch (final Exception e) {
-				return "No name associated";
-			}
-			return null; // not gonna happen
-		}));
+        final var componentColumn = new TableColumn<XHttpComponentDTO, String>("Component Name");
+        componentColumn.setPrefWidth(600);
+        componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> {
+            // resource doesn't have associated name field
+            try {
+                s.getClass().getField("name");
+            } catch (final Exception e) {
+                return "No name associated";
+            }
+            return null; // not gonna happen
+        }));
 
-		final var contextNameColumn = new TableColumn<XHttpComponentDTO, String>("Context Name");
-		contextNameColumn.setPrefWidth(150);
-		contextNameColumn.setCellValueFactory(new DTOCellValueFactory<>("contextName", String.class));
+        final var contextNameColumn = new TableColumn<XHttpComponentDTO, String>("Context Name");
+        contextNameColumn.setPrefWidth(150);
+        contextNameColumn.setCellValueFactory(new DTOCellValueFactory<>("contextName", String.class));
 
-		final var contextPathColumn = new TableColumn<XHttpComponentDTO, String>("Context Path");
-		contextPathColumn.setPrefWidth(200);
-		contextPathColumn.setCellValueFactory(new DTOCellValueFactory<>("contextPath", String.class));
+        final var contextPathColumn = new TableColumn<XHttpComponentDTO, String>("Context Path");
+        contextPathColumn.setPrefWidth(200);
+        contextPathColumn.setCellValueFactory(new DTOCellValueFactory<>("contextPath", String.class));
 
-		final var contextServiceIdColumn = new TableColumn<XHttpComponentDTO, String>("Context Service ID");
-		contextServiceIdColumn.setPrefWidth(140);
-		contextServiceIdColumn.setCellValueFactory(new DTOCellValueFactory<>("contextServiceId", String.class));
+        final var contextServiceIdColumn = new TableColumn<XHttpComponentDTO, String>("Context Service ID");
+        contextServiceIdColumn.setPrefWidth(140);
+        contextServiceIdColumn.setCellValueFactory(new DTOCellValueFactory<>("contextServiceId", String.class));
 
-		final var componentTypeColumn = new TableColumn<XHttpComponentDTO, String>("Type");
-		componentTypeColumn.setPrefWidth(100);
-		componentTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
+        final var componentTypeColumn = new TableColumn<XHttpComponentDTO, String>("Type");
+        componentTypeColumn.setPrefWidth(100);
+        componentTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
-		table.getColumns().add(expanderColumn);
-		table.getColumns().add(componentColumn);
-		table.getColumns().add(contextNameColumn);
-		table.getColumns().add(contextPathColumn);
-		table.getColumns().add(contextServiceIdColumn);
-		table.getColumns().add(componentTypeColumn);
+        table.getColumns().add(expanderColumn);
+        table.getColumns().add(componentColumn);
+        table.getColumns().add(contextNameColumn);
+        table.getColumns().add(contextPathColumn);
+        table.getColumns().add(contextServiceIdColumn);
+        table.getColumns().add(componentTypeColumn);
 
-		table.setItems(dataProvider.httpComponents());
-		TableFilter.forTableView(table).lazy(true).apply();
-	}
+        table.setItems(dataProvider.httpComponents());
+        TableFilter.forTableView(table).lazy(true).apply();
+    }
 
 }

@@ -29,33 +29,33 @@ import com.osgifx.console.supervisor.Supervisor;
 @Component(service = EventManager.class)
 public final class EventManager {
 
-	@Reference
-	private Supervisor supervisor;
+    @Reference
+    private Supervisor supervisor;
 
-	@Reference
-	private LoggerFactory factory;
-	private FluentLogger  logger;
+    @Reference
+    private LoggerFactory factory;
+    private FluentLogger  logger;
 
-	void activate() {
-		logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-	}
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
-	public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return null;
-		}
-		return agent.sendEvent(topic, properties);
-	}
+    public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return null;
+        }
+        return agent.sendEvent(topic, properties);
+    }
 
-	public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			logger.atWarning().log("Remote agent cannot be connected");
-			return null;
-		}
-		return agent.postEvent(topic, properties);
-	}
+    public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Remote agent cannot be connected");
+            return null;
+        }
+        return agent.postEvent(topic, properties);
+    }
 
 }

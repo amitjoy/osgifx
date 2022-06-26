@@ -29,133 +29,133 @@ import javafx.scene.layout.StackPane;
 
 public class PeekablePasswordControl extends SimpleControl<PasswordField> {
 
-	/**
-	 * This StackPane is needed for achieving the readonly effect by putting the
-	 * readOnlyLabel over the editableField on the change of the visibleProperty.
-	 */
-	protected StackPane stack;
+    /**
+     * This StackPane is needed for achieving the readonly effect by putting the
+     * readOnlyLabel over the editableField on the change of the visibleProperty.
+     */
+    protected StackPane stack;
 
-	/**
-	 * The fieldLabel is the container that displays the label property of the
-	 * field. - The editableField allows users to modify the field's value. - The
-	 * readOnlyLabel displays the field's value if it is not editable.
-	 */
-	protected PeekablePasswordField editableField;
-	protected Label                 readOnlyLabel;
-	protected Label                 fieldLabel;
+    /**
+     * The fieldLabel is the container that displays the label property of the
+     * field. - The editableField allows users to modify the field's value. - The
+     * readOnlyLabel displays the field's value if it is not editable.
+     */
+    protected PeekablePasswordField editableField;
+    protected Label                 readOnlyLabel;
+    protected Label                 fieldLabel;
 
-	/*
-	 * Translates characters found in user input into '*'
-	 */
-	protected StringBinding obfuscatedUserInputBinding;
+    /*
+     * Translates characters found in user input into '*'
+     */
+    protected StringBinding obfuscatedUserInputBinding;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void initializeParts() {
-		super.initializeParts();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initializeParts() {
+        super.initializeParts();
 
-		getStyleClass().add("simple-password-control");
+        getStyleClass().add("simple-password-control");
 
-		stack = new StackPane();
+        stack = new StackPane();
 
-		editableField = new PeekablePasswordField();
-		editableField.setText(field.getValue());
+        editableField = new PeekablePasswordField();
+        editableField.setText(field.getValue());
 
-		readOnlyLabel = new Label(obfuscate(field.getValue()));
-		fieldLabel    = new Label(field.labelProperty().getValue());
-		editableField.setPromptText(field.placeholderProperty().getValue());
-	}
+        readOnlyLabel = new Label(obfuscate(field.getValue()));
+        fieldLabel    = new Label(field.labelProperty().getValue());
+        editableField.setPromptText(field.placeholderProperty().getValue());
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void layoutParts() {
-		super.layoutParts();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void layoutParts() {
+        super.layoutParts();
 
-		readOnlyLabel.getStyleClass().add("read-only-label");
+        readOnlyLabel.getStyleClass().add("read-only-label");
 
-		readOnlyLabel.setPrefHeight(26);
+        readOnlyLabel.setPrefHeight(26);
 
-		stack.getChildren().addAll(editableField, readOnlyLabel);
+        stack.getChildren().addAll(editableField, readOnlyLabel);
 
-		stack.setAlignment(Pos.CENTER_LEFT);
+        stack.setAlignment(Pos.CENTER_LEFT);
 
-		final var labelDescription = field.getLabelDescription();
-		final var valueDescription = field.getValueDescription();
+        final var labelDescription = field.getLabelDescription();
+        final var valueDescription = field.getValueDescription();
 
-		final var columns = field.getSpan();
+        final var columns = field.getSpan();
 
-		if (columns < 3) {
-			var rowIndex = 0;
-			add(fieldLabel, 0, rowIndex, columns, 1);
-			rowIndex++;
-			if (labelDescription != null) {
-				GridPane.setValignment(labelDescription, VPos.TOP);
-				add(labelDescription, 0, rowIndex, columns, 1);
-				rowIndex++;
-			}
-			add(stack, 0, rowIndex, columns, 1);
-			rowIndex++;
-			if (valueDescription != null) {
-				GridPane.setValignment(valueDescription, VPos.TOP);
-				add(valueDescription, 0, rowIndex, columns, 1);
-			}
-		} else {
-			add(fieldLabel, 0, 0, 2, 1);
-			if (labelDescription != null) {
-				GridPane.setValignment(labelDescription, VPos.TOP);
-				add(labelDescription, 0, 1, 2, 1);
-			}
-			add(stack, 2, 0, columns - 2, 1);
-			if (valueDescription != null) {
-				GridPane.setValignment(valueDescription, VPos.TOP);
-				add(valueDescription, 2, 1, columns - 2, 1);
-			}
-		}
-	}
+        if (columns < 3) {
+            var rowIndex = 0;
+            add(fieldLabel, 0, rowIndex, columns, 1);
+            rowIndex++;
+            if (labelDescription != null) {
+                GridPane.setValignment(labelDescription, VPos.TOP);
+                add(labelDescription, 0, rowIndex, columns, 1);
+                rowIndex++;
+            }
+            add(stack, 0, rowIndex, columns, 1);
+            rowIndex++;
+            if (valueDescription != null) {
+                GridPane.setValignment(valueDescription, VPos.TOP);
+                add(valueDescription, 0, rowIndex, columns, 1);
+            }
+        } else {
+            add(fieldLabel, 0, 0, 2, 1);
+            if (labelDescription != null) {
+                GridPane.setValignment(labelDescription, VPos.TOP);
+                add(labelDescription, 0, 1, 2, 1);
+            }
+            add(stack, 2, 0, columns - 2, 1);
+            if (valueDescription != null) {
+                GridPane.setValignment(valueDescription, VPos.TOP);
+                add(valueDescription, 2, 1, columns - 2, 1);
+            }
+        }
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setupBindings() {
-		super.setupBindings();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setupBindings() {
+        super.setupBindings();
 
-		editableField.visibleProperty().bind(field.editableProperty());
-		readOnlyLabel.visibleProperty().bind(field.editableProperty().not());
+        editableField.visibleProperty().bind(field.editableProperty());
+        readOnlyLabel.visibleProperty().bind(field.editableProperty().not());
 
-		editableField.textProperty().bindBidirectional(field.userInputProperty());
-		obfuscatedUserInputBinding = Bindings.createStringBinding(() -> obfuscate(field.getUserInput()), field.userInputProperty());
-		readOnlyLabel.textProperty().bind(obfuscatedUserInputBinding);
-		fieldLabel.textProperty().bind(field.labelProperty());
-		editableField.promptTextProperty().bind(field.placeholderProperty());
-		editableField.managedProperty().bind(editableField.visibleProperty());
-	}
+        editableField.textProperty().bindBidirectional(field.userInputProperty());
+        obfuscatedUserInputBinding = Bindings.createStringBinding(() -> obfuscate(field.getUserInput()), field.userInputProperty());
+        readOnlyLabel.textProperty().bind(obfuscatedUserInputBinding);
+        fieldLabel.textProperty().bind(field.labelProperty());
+        editableField.promptTextProperty().bind(field.placeholderProperty());
+        editableField.managedProperty().bind(editableField.visibleProperty());
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setupValueChangedListeners() {
-		super.setupValueChangedListeners();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setupValueChangedListeners() {
+        super.setupValueChangedListeners();
 
-		field.errorMessagesProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
+        field.errorMessagesProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
 
-		editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-	}
+        editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
+    }
 
-	protected String obfuscate(final String input) {
-		if (input == null) {
-			return "";
-		}
-		final var length = input.length();
-		final var b      = new StringBuilder();
-		for (var i = 0; i < length; i++) {
-			b.append('*');
-		}
-		return b.toString();
-	}
+    protected String obfuscate(final String input) {
+        if (input == null) {
+            return "";
+        }
+        final var length = input.length();
+        final var b      = new StringBuilder();
+        for (var i = 0; i < length; i++) {
+            b.append('*');
+        }
+        return b.toString();
+    }
 }

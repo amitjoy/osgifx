@@ -70,248 +70,248 @@ import javafx.stage.StageStyle;
 
 public final class SendEventDialog extends Dialog<EventDTO> {
 
-	@Log
-	@Inject
-	private FluentLogger            logger;
-	private final ValueConverter    converter         = new ValueConverter();
-	private final ValidationSupport validationSupport = new ValidationSupport();
+    @Log
+    @Inject
+    private FluentLogger            logger;
+    private final ValueConverter    converter         = new ValueConverter();
+    private final ValidationSupport validationSupport = new ValidationSupport();
 
-	private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries = Maps.newHashMap();
+    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries = Maps.newHashMap();
 
-	public void init() {
-		final var dialogPane = getDialogPane();
+    public void init() {
+        final var dialogPane = getDialogPane();
 
-		initStyle(StageStyle.UNDECORATED);
-		dialogPane.setHeaderText("Send OSGi Events");
-		dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
-		dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-		dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/events.png").toString()));
-		dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        initStyle(StageStyle.UNDECORATED);
+        dialogPane.setHeaderText("Send OSGi Events");
+        dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
+        dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/events.png").toString()));
+        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-		final var txtTopic = (CustomTextField) TextFields.createClearableTextField();
-		txtTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
-		validationSupport.registerValidator(txtTopic,
-		        Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
+        final var txtTopic = (CustomTextField) TextFields.createClearableTextField();
+        txtTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
+        validationSupport.registerValidator(txtTopic,
+                Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
-		final var isSyncToggle = new ToggleSwitch("Is Synchronous?");
+        final var isSyncToggle = new ToggleSwitch("Is Synchronous?");
 
-		final var lbMessage = new Label("");
-		lbMessage.getStyleClass().addAll("message-banner");
-		lbMessage.setVisible(false);
-		lbMessage.setManaged(false);
+        final var lbMessage = new Label("");
+        lbMessage.getStyleClass().addAll("message-banner");
+        lbMessage.setVisible(false);
+        lbMessage.setManaged(false);
 
-		final var content = new VBox(10);
+        final var content = new VBox(10);
 
-		content.getChildren().add(lbMessage);
-		content.getChildren().add(isSyncToggle);
-		content.getChildren().add(txtTopic);
-		addFieldPair(content);
+        content.getChildren().add(lbMessage);
+        content.getChildren().add(isSyncToggle);
+        content.getChildren().add(txtTopic);
+        addFieldPair(content);
 
-		dialogPane.setContent(content);
+        dialogPane.setContent(content);
 
-		final var createButtonType = new ButtonType("Send", ButtonData.OK_DONE);
-		dialogPane.getButtonTypes().addAll(createButtonType);
+        final var createButtonType = new ButtonType("Send", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(createButtonType);
 
-		final var loginButton = (Button) dialogPane.lookupButton(createButtonType);
-		loginButton.setOnAction(actionEvent -> {
-			try {
-				lbMessage.setVisible(false);
-				lbMessage.setManaged(false);
-				hide();
-			} catch (final Exception ex) {
-				lbMessage.setVisible(true);
-				lbMessage.setManaged(true);
-				lbMessage.setText(ex.getMessage());
-				FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
-			}
-		});
-		final var pidCaption = "Topic";
+        final var loginButton = (Button) dialogPane.lookupButton(createButtonType);
+        loginButton.setOnAction(actionEvent -> {
+            try {
+                lbMessage.setVisible(false);
+                lbMessage.setManaged(false);
+                hide();
+            } catch (final Exception ex) {
+                lbMessage.setVisible(true);
+                lbMessage.setManaged(true);
+                lbMessage.setText(ex.getMessage());
+                FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
+            }
+        });
+        final var pidCaption = "Topic";
 
-		txtTopic.setPromptText(pidCaption);
+        txtTopic.setPromptText(pidCaption);
 
-		setResultConverter(dialogButton -> {
-			final var data = dialogButton == null ? null : dialogButton.getButtonData();
-			if (data == ButtonData.CANCEL_CLOSE) {
-				return null;
-			}
-			try {
-				if (validationSupport.isInvalid()) {
-					throw new RuntimeException("Topic validation failed");
-				}
-				return data == ButtonData.OK_DONE ? getInput(txtTopic, isSyncToggle) : null;
-			} catch (final Exception e) {
-				logger.atError().withException(e).log("Configuration values cannot be converted");
-				throw e;
-			}
-		});
-	}
+        setResultConverter(dialogButton -> {
+            final var data = dialogButton == null ? null : dialogButton.getButtonData();
+            if (data == ButtonData.CANCEL_CLOSE) {
+                return null;
+            }
+            try {
+                if (validationSupport.isInvalid()) {
+                    throw new RuntimeException("Topic validation failed");
+                }
+                return data == ButtonData.OK_DONE ? getInput(txtTopic, isSyncToggle) : null;
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Configuration values cannot be converted");
+                throw e;
+            }
+        });
+    }
 
-	private EventDTO getInput(final CustomTextField txtTopic, final ToggleSwitch isSyncToggle) {
-		final List<ConfigValue> properties = Lists.newArrayList();
-		for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : entries
-		        .entrySet()) {
-			final var value       = entry.getValue();
-			final var configKey   = value.value1.get();
-			final var configValue = value.value2.get();
-			var       configType  = value.value3.get();
-			if (Strings.isNullOrEmpty(configKey) || Strings.isNullOrEmpty(configValue)) {
-				continue;
-			}
-			if (configType == null) {
-				configType = XAttributeDefType.STRING;
-			}
-			final var convertedValue = converter.convert(configValue, configType);
-			properties.add(ConfigValue.create(configKey, convertedValue, configType));
-		}
-		return new EventDTO(txtTopic.getText(), isSyncToggle.isSelected(), properties);
-	}
+    private EventDTO getInput(final CustomTextField txtTopic, final ToggleSwitch isSyncToggle) {
+        final List<ConfigValue> properties = Lists.newArrayList();
+        for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : entries
+                .entrySet()) {
+            final var value       = entry.getValue();
+            final var configKey   = value.value1.get();
+            final var configValue = value.value2.get();
+            var       configType  = value.value3.get();
+            if (Strings.isNullOrEmpty(configKey) || Strings.isNullOrEmpty(configValue)) {
+                continue;
+            }
+            if (configType == null) {
+                configType = XAttributeDefType.STRING;
+            }
+            final var convertedValue = converter.convert(configValue, configType);
+            properties.add(ConfigValue.create(configKey, convertedValue, configType));
+        }
+        return new EventDTO(txtTopic.getText(), isSyncToggle.isSelected(), properties);
+    }
 
-	private class PropertiesForm extends HBox {
+    private class PropertiesForm extends HBox {
 
-		private final CustomTextField txtKey;
-		private Node                  node;
+        private final CustomTextField txtKey;
+        private Node                  node;
 
-		private final Button btnAddField;
-		private final Button btnRemoveField;
+        private final Button btnAddField;
+        private final Button btnRemoveField;
 
-		public PropertiesForm(final VBox parent) {
-			setAlignment(Pos.CENTER_LEFT);
-			setSpacing(5);
+        public PropertiesForm(final VBox parent) {
+            setAlignment(Pos.CENTER_LEFT);
+            setSpacing(5);
 
-			final var keyCaption = "Key";
+            final var keyCaption = "Key";
 
-			txtKey = (CustomTextField) TextFields.createClearableTextField();
-			txtKey.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+            txtKey = (CustomTextField) TextFields.createClearableTextField();
+            txtKey.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
 
-			txtKey.setPromptText(keyCaption);
+            txtKey.setPromptText(keyCaption);
 
-			btnAddField    = new Button();
-			btnRemoveField = new Button();
+            btnAddField    = new Button();
+            btnRemoveField = new Button();
 
-			final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
-			final var                               comboBox = new ComboBox<>(options);
+            final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
+            final var                               comboBox = new ComboBox<>(options);
 
-			final var type = comboBox.getValue();
-			node = getFieldByType(type == null ? XAttributeDefType.STRING : type);
+            final var type = comboBox.getValue();
+            node = getFieldByType(type == null ? XAttributeDefType.STRING : type);
 
-			comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
-				final Class<?> clazz   = XAttributeDefType.clazz(newValue);
-				final var      newNode = getFieldByType(newValue);
-				newNode.setOnMouseClicked(e -> {
-					// multiple cardinality
-					if (clazz == null) {
-						final var dialog = new MultipleCardinalityPropertiesDialog();
-						final var key    = txtKey.getText();
-						final var field  = (TextField) node;
+            comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
+                final Class<?> clazz   = XAttributeDefType.clazz(newValue);
+                final var      newNode = getFieldByType(newValue);
+                newNode.setOnMouseClicked(e -> {
+                    // multiple cardinality
+                    if (clazz == null) {
+                        final var dialog = new MultipleCardinalityPropertiesDialog();
+                        final var key    = txtKey.getText();
+                        final var field  = (TextField) node;
 
-						dialog.init(key, newValue, field.getText(), getClass().getClassLoader());
-						final var entries = dialog.showAndWait();
-						entries.ifPresent(field::setText);
-					}
-				});
-				node = newNode;
-				final var children = getChildren();
-				if (!children.isEmpty()) {
-					children.set(1, newNode);
-				}
-			});
+                        dialog.init(key, newValue, field.getText(), getClass().getClassLoader());
+                        final var entries = dialog.showAndWait();
+                        entries.ifPresent(field::setText);
+                    }
+                });
+                node = newNode;
+                final var children = getChildren();
+                if (!children.isEmpty()) {
+                    children.set(1, newNode);
+                }
+            });
 
-			comboBox.getSelectionModel().select(0); // default STRING type
+            comboBox.getSelectionModel().select(0); // default STRING type
 
-			btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
-			btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
+            btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
+            btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
 
-			btnAddField.setOnAction(e -> addFieldPair(parent));
-			btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
+            btnAddField.setOnAction(e -> addFieldPair(parent));
+            btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
 
-			getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
+            getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 
-			final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(txtKey::getText,
-			        () -> getValue(node), comboBox::getValue);
-			entries.put(this, tuple);
-		}
+            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(txtKey::getText,
+                    () -> getValue(node), comboBox::getValue);
+            entries.put(this, tuple);
+        }
 
-		private Node getFieldByType(final XAttributeDefType type) {
-			final CustomTextField txtField;
-			if (type != BOOLEAN) {
-				txtField = (CustomTextField) TextFields.createClearableTextField();
-				txtField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
-			} else {
-				txtField = null;
-			}
-			switch (type) {
-			case LONG, INTEGER:
-				final var captionAsInt = switch (type) {
-				case LONG -> "Long Number";
-				case INTEGER -> "Integer Number";
-				default -> null;
-				};
-				txtField.setPromptText(captionAsInt);
-				txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-					if (!newValue.matches("\\d*")) {
-						txtField.setText(newValue.replaceAll("[^\\d]", ""));
-					}
-				});
-				break;
-			case BOOLEAN:
-				return new ToggleSwitch();
-			case DOUBLE, FLOAT:
-				final var captionAsDouble = "Decimal Number";
-				txtField.setPromptText(captionAsDouble);
-				final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
-				final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-				        (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches() ? change
-				                : null));
-				txtField.setTextFormatter(doubleFormatter);
-				break;
-			case CHAR:
-				final var valueCaptionAsChar = "Character Value";
-				txtField.setPromptText(valueCaptionAsChar);
-				final TextFormatter<?> charFormatter = new TextFormatter<>(
-				        (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
-				txtField.setTextFormatter(charFormatter);
-				break;
-			case STRING:
-				final var valueCaptionAsStr = "String Value";
-				txtField.setPromptText(valueCaptionAsStr);
-				break;
-			case PASSWORD:
-				final var valueCaptionAsPwd = "Password Value";
-				final var pwdField = (CustomPasswordField) TextFields.createClearablePasswordField();
-				pwdField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
-				pwdField.setPromptText(valueCaptionAsPwd);
-				return pwdField;
-			case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST,
-			        FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
-				final var valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
-				txtField.setPromptText(valueCaptionAsMultipleCardinality);
-				break;
-			}
-			return txtField;
-		}
-	}
+        private Node getFieldByType(final XAttributeDefType type) {
+            final CustomTextField txtField;
+            if (type != BOOLEAN) {
+                txtField = (CustomTextField) TextFields.createClearableTextField();
+                txtField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+            } else {
+                txtField = null;
+            }
+            switch (type) {
+            case LONG, INTEGER:
+                final var captionAsInt = switch (type) {
+                case LONG -> "Long Number";
+                case INTEGER -> "Integer Number";
+                default -> null;
+                };
+                txtField.setPromptText(captionAsInt);
+                txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                    if (!newValue.matches("\\d*")) {
+                        txtField.setText(newValue.replaceAll("[^\\d]", ""));
+                    }
+                });
+                break;
+            case BOOLEAN:
+                return new ToggleSwitch();
+            case DOUBLE, FLOAT:
+                final var captionAsDouble = "Decimal Number";
+                txtField.setPromptText(captionAsDouble);
+                final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
+                final TextFormatter<?> doubleFormatter = new TextFormatter<>(
+                        (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches() ? change
+                                : null));
+                txtField.setTextFormatter(doubleFormatter);
+                break;
+            case CHAR:
+                final var valueCaptionAsChar = "Character Value";
+                txtField.setPromptText(valueCaptionAsChar);
+                final TextFormatter<?> charFormatter = new TextFormatter<>(
+                        (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
+                txtField.setTextFormatter(charFormatter);
+                break;
+            case STRING:
+                final var valueCaptionAsStr = "String Value";
+                txtField.setPromptText(valueCaptionAsStr);
+                break;
+            case PASSWORD:
+                final var valueCaptionAsPwd = "Password Value";
+                final var pwdField = (CustomPasswordField) TextFields.createClearablePasswordField();
+                pwdField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+                pwdField.setPromptText(valueCaptionAsPwd);
+                return pwdField;
+            case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST,
+                    FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
+                final var valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
+                txtField.setPromptText(valueCaptionAsMultipleCardinality);
+                break;
+            }
+            return txtField;
+        }
+    }
 
-	private void addFieldPair(final VBox content) {
-		content.getChildren().add(new PropertiesForm(content));
-		getDialogPane().getScene().getWindow().sizeToScene();
-	}
+    private void addFieldPair(final VBox content) {
+        content.getChildren().add(new PropertiesForm(content));
+        getDialogPane().getScene().getWindow().sizeToScene();
+    }
 
-	private void removeFieldPair(final VBox content, final PropertiesForm form) {
-		if (content.getChildren().size() > 4) {
-			content.getChildren().remove(form);
-			getDialogPane().getScene().getWindow().sizeToScene();
-		}
-		entries.remove(form);
-	}
+    private void removeFieldPair(final VBox content, final PropertiesForm form) {
+        if (content.getChildren().size() > 4) {
+            content.getChildren().remove(form);
+            getDialogPane().getScene().getWindow().sizeToScene();
+        }
+        entries.remove(form);
+    }
 
-	private String getValue(final Node node) {
-		if (node instanceof final TextField tf) {
-			return tf.getText();
-		}
-		if (node instanceof final ToggleSwitch ts) {
-			return String.valueOf(ts.isSelected());
-		}
-		return null;
-	}
+    private String getValue(final Node node) {
+        if (node instanceof final TextField tf) {
+            return tf.getText();
+        }
+        if (node instanceof final ToggleSwitch ts) {
+            return String.valueOf(ts.isSelected());
+        }
+        return null;
+    }
 
 }

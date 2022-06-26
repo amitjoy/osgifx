@@ -17,12 +17,12 @@ package com.osgifx.console.event.topics;
 
 public final class LoggerContextActionEventTopics {
 
-	private LoggerContextActionEventTopics() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private LoggerContextActionEventTopics() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/logger/";
-	public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPICS       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX + "*";
-	public static final String LOGGER_CONTEXT_UPDATED_EVENT_TOPIC       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX + "updated";
+    public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/logger/";
+    public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPICS       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX + "*";
+    public static final String LOGGER_CONTEXT_UPDATED_EVENT_TOPIC       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX + "updated";
 
 }

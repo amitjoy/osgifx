@@ -33,98 +33,98 @@ import org.osgi.framework.SynchronousBundleListener;
 
 public final class BundleStartTimeCalculator implements SynchronousBundleListener {
 
-	public static final class BundleStartDuration {
+    public static final class BundleStartDuration {
 
-		private final String   symbolicName;
-		private final Instant  startingAt;
-		private final Duration startedAfter;
+        private final String   symbolicName;
+        private final Instant  startingAt;
+        private final Duration startedAfter;
 
-		public BundleStartDuration(final String symbolicName, final Instant startingAt, final Duration startedAfter) {
-			this.symbolicName = symbolicName;
-			this.startingAt   = startingAt;
-			this.startedAfter = startedAfter;
-		}
+        public BundleStartDuration(final String symbolicName, final Instant startingAt, final Duration startedAfter) {
+            this.symbolicName = symbolicName;
+            this.startingAt   = startingAt;
+            this.startedAfter = startedAfter;
+        }
 
-		public String getSymbolicName() {
-			return symbolicName;
-		}
+        public String getSymbolicName() {
+            return symbolicName;
+        }
 
-		public Instant getStartingAt() {
-			return startingAt;
-		}
+        public Instant getStartingAt() {
+            return startingAt;
+        }
 
-		public Duration getStartedAfter() {
-			return startedAfter;
-		}
-	}
+        public Duration getStartedAfter() {
+            return startedAfter;
+        }
+    }
 
-	private final Map<Long, StartTime> bundleToStartTime = new HashMap<>();
-	private final Clock                clock             = Clock.systemUTC();
-	private final long                 ourBundleId;
+    private final Map<Long, StartTime> bundleToStartTime = new HashMap<>();
+    private final Clock                clock             = Clock.systemUTC();
+    private final long                 ourBundleId;
 
-	public BundleStartTimeCalculator(final long ourBundleId) {
-		this.ourBundleId = ourBundleId;
-	}
+    public BundleStartTimeCalculator(final long ourBundleId) {
+        this.ourBundleId = ourBundleId;
+    }
 
-	@Override
-	public void bundleChanged(final BundleEvent event) {
-		final Bundle bundle = event.getBundle();
+    @Override
+    public void bundleChanged(final BundleEvent event) {
+        final Bundle bundle = event.getBundle();
 
-		// this bundle is already starting by the time this is invoked. We also can't
-		// get proper timing from the framework bundle
-		if (bundle.getBundleId() == SYSTEM_BUNDLE_ID || bundle.getBundleId() == ourBundleId) {
-			return;
-		}
+        // this bundle is already starting by the time this is invoked. We also can't
+        // get proper timing from the framework bundle
+        if (bundle.getBundleId() == SYSTEM_BUNDLE_ID || bundle.getBundleId() == ourBundleId) {
+            return;
+        }
 
-		synchronized (bundleToStartTime) {
-			switch (event.getType()) {
-			case STARTING:
-				bundleToStartTime.put(bundle.getBundleId(), new StartTime(bundle.getSymbolicName(), clock.millis()));
-				break;
-			case STARTED:
-				final StartTime startTime = bundleToStartTime.get(bundle.getBundleId());
-				if (startTime == null) {
-					return;
-				}
-				startTime.started(clock.millis());
-				break;
-			default:
-				break;
-			}
-		}
-	}
+        synchronized (bundleToStartTime) {
+            switch (event.getType()) {
+            case STARTING:
+                bundleToStartTime.put(bundle.getBundleId(), new StartTime(bundle.getSymbolicName(), clock.millis()));
+                break;
+            case STARTED:
+                final StartTime startTime = bundleToStartTime.get(bundle.getBundleId());
+                if (startTime == null) {
+                    return;
+                }
+                startTime.started(clock.millis());
+                break;
+            default:
+                break;
+            }
+        }
+    }
 
-	public List<BundleStartDuration> getBundleStartDurations() {
-		synchronized (bundleToStartTime) {
-			return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
-		}
-	}
+    public List<BundleStartDuration> getBundleStartDurations() {
+        synchronized (bundleToStartTime) {
+            return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
+        }
+    }
 
-	static class StartTime {
-		private final String bundleSymbolicName;
-		private final long   startingTimestamp;
-		private long         startedTimestamp;
+    static class StartTime {
+        private final String bundleSymbolicName;
+        private final long   startingTimestamp;
+        private long         startedTimestamp;
 
-		public StartTime(final String bundleSymbolicName, final long startingTimestamp) {
-			this.bundleSymbolicName = bundleSymbolicName;
-			this.startingTimestamp  = startingTimestamp;
-		}
+        public StartTime(final String bundleSymbolicName, final long startingTimestamp) {
+            this.bundleSymbolicName = bundleSymbolicName;
+            this.startingTimestamp  = startingTimestamp;
+        }
 
-		public long getDuration() {
-			return startedTimestamp - startingTimestamp;
-		}
+        public long getDuration() {
+            return startedTimestamp - startingTimestamp;
+        }
 
-		public String getBundleSymbolicName() {
-			return bundleSymbolicName;
-		}
+        public String getBundleSymbolicName() {
+            return bundleSymbolicName;
+        }
 
-		public void started(final long startedTimestamp) {
-			this.startedTimestamp = startedTimestamp;
-		}
+        public void started(final long startedTimestamp) {
+            this.startedTimestamp = startedTimestamp;
+        }
 
-		public BundleStartDuration toBundleStartDuration() {
-			return new BundleStartDuration(bundleSymbolicName, Instant.ofEpochMilli(startingTimestamp),
-			        Duration.ofMillis(startedTimestamp - startingTimestamp));
-		}
-	}
+        public BundleStartDuration toBundleStartDuration() {
+            return new BundleStartDuration(bundleSymbolicName, Instant.ofEpochMilli(startingTimestamp),
+                    Duration.ofMillis(startedTimestamp - startingTimestamp));
+        }
+    }
 }

@@ -28,26 +28,26 @@ import com.osgifx.console.data.provider.DataProvider;
 
 public final class RefreshHandler {
 
-	@Log
-	@Inject
-	private FluentLogger logger;
-	@Inject
-	private DataProvider dataProvider;
-	@Inject
-	@Optional
-	@Named("is_connected")
-	private boolean      isConnected;
+    @Log
+    @Inject
+    private FluentLogger logger;
+    @Inject
+    private DataProvider dataProvider;
+    @Inject
+    @Optional
+    @Named("is_connected")
+    private boolean      isConnected;
 
-	@Execute
-	public void execute() {
-		logger.atInfo().log("Refreshing data views");
-		dataProvider.retrieveInfo(null, true);
-		logger.atInfo().log("Refreshed data views successfully");
-	}
+    @Execute
+    public void execute() {
+        logger.atInfo().log("Refreshing data views");
+        dataProvider.retrieveInfo(null, true);
+        logger.atInfo().log("Refreshed data views successfully");
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected;
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected;
+    }
 
 }

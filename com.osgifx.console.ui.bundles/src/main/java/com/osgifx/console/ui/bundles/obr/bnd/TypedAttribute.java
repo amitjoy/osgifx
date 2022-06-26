@@ -18,98 +18,98 @@ package com.osgifx.console.ui.bundles.obr.bnd;
 import java.util.Collection;
 
 public class TypedAttribute {
-	public final String value;
-	public final String type;
+    public final String value;
+    public final String type;
 
-	public TypedAttribute(final String type, final String value) {
-		this.type  = "String".equals(type) ? null : type;
-		this.value = value;
-	}
+    public TypedAttribute(final String type, final String value) {
+        this.type  = "String".equals(type) ? null : type;
+        this.value = value;
+    }
 
-	public static TypedAttribute getTypedAttribute(final Object value) {
-		if (value instanceof Collection) {
-			final Collection<?> c = (Collection<?>) value;
-			if (c.isEmpty()) {
-				return null;
-			}
+    public static TypedAttribute getTypedAttribute(final Object value) {
+        if (value instanceof Collection) {
+            final Collection<?> c = (Collection<?>) value;
+            if (c.isEmpty()) {
+                return null;
+            }
 
-			final var sb      = new StringBuilder();
-			var       del     = "";
-			String    subType = null;
+            final var sb      = new StringBuilder();
+            var       del     = "";
+            String    subType = null;
 
-			for (final Object v : c) {
-				if (subType == null) {
-					subType = getType(v);
-				}
+            for (final Object v : c) {
+                if (subType == null) {
+                    subType = getType(v);
+                }
 
-				sb.append(del).append(escape(v.toString()));
-				del = ",";
-			}
-			if (subType == null) {
-				subType = "String";
-			}
+                sb.append(del).append(escape(v.toString()));
+                del = ",";
+            }
+            if (subType == null) {
+                subType = "String";
+            }
 
-			return new TypedAttribute("List<" + subType + ">", sb.toString());
-		}
+            return new TypedAttribute("List<" + subType + ">", sb.toString());
+        }
 
-		if (value.getClass().isArray()) {
-			final var array = (Object[]) value;
-			if (array.length == 0) {
-				return null;
-			}
+        if (value.getClass().isArray()) {
+            final var array = (Object[]) value;
+            if (array.length == 0) {
+                return null;
+            }
 
-			final var sb      = new StringBuilder();
-			var       del     = "";
-			String    subType = null;
+            final var sb      = new StringBuilder();
+            var       del     = "";
+            String    subType = null;
 
-			for (final Object v : array) {
-				if (subType == null) {
-					subType = getType(v);
-				}
+            for (final Object v : array) {
+                if (subType == null) {
+                    subType = getType(v);
+                }
 
-				sb.append(del).append(escape(v.toString()));
-				del = ",";
-			}
-			if (subType == null) {
-				subType = "String";
-			}
+                sb.append(del).append(escape(v.toString()));
+                del = ",";
+            }
+            if (subType == null) {
+                subType = "String";
+            }
 
-			return new TypedAttribute("List<" + subType + ">", sb.toString());
-		}
+            return new TypedAttribute("List<" + subType + ">", sb.toString());
+        }
 
-		return new TypedAttribute(getType(value), value.toString());
-	}
+        return new TypedAttribute(getType(value), value.toString());
+    }
 
-	private static Object escape(final String v) {
-		final var sb = new StringBuilder();
-		for (var i = 0; i < v.length(); i++) {
-			final var c = v.charAt(i);
-			switch (c) {
-			case '\\':
-				sb.append("\\\\");
-				break;
+    private static Object escape(final String v) {
+        final var sb = new StringBuilder();
+        for (var i = 0; i < v.length(); i++) {
+            final var c = v.charAt(i);
+            switch (c) {
+            case '\\':
+                sb.append("\\\\");
+                break;
 
-			case ',':
-				sb.append("\\,");
-			default:
-				sb.append(c);
-				break;
-			}
-		}
-		return sb.toString();
-	}
+            case ',':
+                sb.append("\\,");
+            default:
+                sb.append(c);
+                break;
+            }
+        }
+        return sb.toString();
+    }
 
-	private static String getType(final Object value) {
-		if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte) {
-			return "Long";
-		}
-		if (value instanceof Double || value instanceof Float) {
-			return "Double";
-		}
-		if (value instanceof Version || value instanceof org.osgi.framework.Version) {
-			return "Version";
-		}
+    private static String getType(final Object value) {
+        if (value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte) {
+            return "Long";
+        }
+        if (value instanceof Double || value instanceof Float) {
+            return "Double";
+        }
+        if (value instanceof Version || value instanceof org.osgi.framework.Version) {
+            return "Version";
+        }
 
-		return "String";
-	}
+        return "String";
+    }
 }

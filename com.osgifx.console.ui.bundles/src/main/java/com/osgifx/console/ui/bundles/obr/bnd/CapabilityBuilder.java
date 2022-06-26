@@ -20,20 +20,20 @@ import org.osgi.resource.Resource;
 
 public class CapabilityBuilder extends CapReqBuilder {
 
-	public CapabilityBuilder(final Resource resource, final String namespace) {
-		super(resource, namespace);
-	}
+    public CapabilityBuilder(final Resource resource, final String namespace) {
+        super(resource, namespace);
+    }
 
-	public CapabilityBuilder(final String namespace) {
-		super(namespace);
-	}
+    public CapabilityBuilder(final String namespace) {
+        super(namespace);
+    }
 
-	public Capability build() {
-		return super.buildCapability();
-	}
+    public Capability build() {
+        return super.buildCapability();
+    }
 
-	public Capability synthetic() {
-		return super.buildSyntheticCapability();
-	}
+    public Capability synthetic() {
+        return super.buildSyntheticCapability();
+    }
 
 }

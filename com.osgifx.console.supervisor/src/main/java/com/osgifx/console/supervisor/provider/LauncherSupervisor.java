@@ -33,174 +33,174 @@ import com.osgifx.console.supervisor.Supervisor;
 @Component
 public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
 
-	private Appendable stdout;
-	private Appendable stderr;
-	private int        shell = -100; // always invalid so we update it
+    private Appendable stdout;
+    private Appendable stderr;
+    private int        shell = -100; // always invalid so we update it
 
-	private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
-	private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
+    private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
+    private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
 
-	@Override
-	public boolean stdout(final String out) throws Exception {
-		if (stdout != null) {
-			stdout.append(out);
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean stdout(final String out) throws Exception {
+        if (stdout != null) {
+            stdout.append(out);
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public boolean stderr(final String out) throws Exception {
-		if (stderr != null) {
-			stderr.append(out);
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean stderr(final String out) throws Exception {
+        if (stderr != null) {
+            stderr.append(out);
+            return true;
+        }
+        return false;
+    }
 
-	public void setStdout(final Appendable out) throws Exception {
-		stdout = out;
-	}
+    public void setStdout(final Appendable out) throws Exception {
+        stdout = out;
+    }
 
-	public void setStderr(final Appendable err) throws Exception {
-		stderr = err;
-	}
+    public void setStderr(final Appendable err) throws Exception {
+        stderr = err;
+    }
 
-	public void setStdin(final InputStream in) throws Exception {
-		final var isr = new InputStreamReader(in);
+    public void setStdin(final InputStream in) throws Exception {
+        final var isr = new InputStreamReader(in);
 
-		final Thread stdin = new Thread("stdin") {
-			@Override
-			public void run() {
-				final var sb = new StringBuilder();
-				while (!isInterrupted()) {
-					try {
-						if (isr.ready()) {
-							final var read = isr.read();
-							if (read < 0) {
-								return;
-							}
-							sb.append((char) read);
-						} else if (sb.length() == 0) {
-							sleep(100);
-						} else {
-							getAgent().stdin(sb.toString());
-							sb.setLength(0);
-						}
-					} catch (final Exception e) {
-						Thread.currentThread().interrupt();
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		stdin.start();
-	}
+        final Thread stdin = new Thread("stdin") {
+            @Override
+            public void run() {
+                final var sb = new StringBuilder();
+                while (!isInterrupted()) {
+                    try {
+                        if (isr.ready()) {
+                            final var read = isr.read();
+                            if (read < 0) {
+                                return;
+                            }
+                            sb.append((char) read);
+                        } else if (sb.length() == 0) {
+                            sleep(100);
+                        } else {
+                            getAgent().stdin(sb.toString());
+                            sb.setLength(0);
+                        }
+                    } catch (final Exception e) {
+                        Thread.currentThread().interrupt();
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        stdin.start();
+    }
 
-	public void setStreams(final Appendable out, final Appendable err) throws Exception {
-		setStdout(out);
-		setStderr(err);
-		getAgent().redirect(shell);
-	}
+    public void setStreams(final Appendable out, final Appendable err) throws Exception {
+        setStdout(out);
+        setStderr(err);
+        getAgent().redirect(shell);
+    }
 
-	public void connect(final String host, final int port) throws Exception {
-		super.connect(Agent.class, this, host, port);
-	}
+    public void connect(final String host, final int port) throws Exception {
+        super.connect(Agent.class, this, host, port);
+    }
 
-	/**
-	 * The shell port to use.
-	 * <ul>
-	 * <li>&lt;0 – Attach to a local Gogo CommandSession
-	 * <li>0 – Use the standard console
-	 * <li>else – Open a stream to that port
-	 * </ul>
-	 *
-	 * @param shellPort
-	 */
-	public void setShell(final int shellPort) {
-		shell = shellPort;
-	}
+    /**
+     * The shell port to use.
+     * <ul>
+     * <li>&lt;0 – Attach to a local Gogo CommandSession
+     * <li>0 – Use the standard console
+     * <li>else – Open a stream to that port
+     * </ul>
+     *
+     * @param shellPort
+     */
+    public void setShell(final int shellPort) {
+        shell = shellPort;
+    }
 
-	public int getExitCode() {
-		return exitCode;
-	}
+    public int getExitCode() {
+        return exitCode;
+    }
 
-	public void abort() throws Exception {
-		if (isOpen()) {
-			getAgent().abort();
-		}
-	}
+    public void abort() throws Exception {
+        if (isOpen()) {
+            getAgent().abort();
+        }
+    }
 
-	public void redirect(final int shell) throws Exception {
-		if (this.shell != shell && isOpen()) {
-			getAgent().redirect(shell);
-			this.shell = shell;
-		}
-	}
+    public void redirect(final int shell) throws Exception {
+        if (this.shell != shell && isOpen()) {
+            getAgent().redirect(shell);
+            this.shell = shell;
+        }
+    }
 
-	@Override
-	public void onOSGiEvent(final XEventDTO event) {
-		eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics())).forEach(listener -> listener.onEvent(event));
-	}
+    @Override
+    public void onOSGiEvent(final XEventDTO event) {
+        eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics())).forEach(listener -> listener.onEvent(event));
+    }
 
-	@Override
-	public void logged(final XLogEntryDTO logEvent) {
-		logEntryListeners.forEach(listener -> listener.logged(logEvent));
-	}
+    @Override
+    public void logged(final XLogEntryDTO logEvent) {
+        logEntryListeners.forEach(listener -> listener.logged(logEvent));
+    }
 
-	@Override
-	public void addOSGiEventListener(final EventListener eventListener) {
-		if (eventListeners.contains(eventListener)) {
-			return;
-		}
-		eventListeners.add(eventListener);
-	}
+    @Override
+    public void addOSGiEventListener(final EventListener eventListener) {
+        if (eventListeners.contains(eventListener)) {
+            return;
+        }
+        eventListeners.add(eventListener);
+    }
 
-	@Override
-	public void removeOSGiEventListener(final EventListener eventListener) {
-		eventListeners.remove(eventListener);
-	}
+    @Override
+    public void removeOSGiEventListener(final EventListener eventListener) {
+        eventListeners.remove(eventListener);
+    }
 
-	@Override
-	public void addOSGiLogListener(final LogEntryListener logEntryListener) {
-		if (logEntryListeners.contains(logEntryListener)) {
-			return;
-		}
-		logEntryListeners.add(logEntryListener);
-	}
+    @Override
+    public void addOSGiLogListener(final LogEntryListener logEntryListener) {
+        if (logEntryListeners.contains(logEntryListener)) {
+            return;
+        }
+        logEntryListeners.add(logEntryListener);
+    }
 
-	@Override
-	public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
-		logEntryListeners.remove(logEntryListener);
-	}
+    @Override
+    public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
+        logEntryListeners.remove(logEntryListener);
+    }
 
-	@Override
-	public void connect(final String host, final int port, final int timeout) throws Exception {
-		super.connect(Agent.class, this, host, port, timeout);
-	}
+    @Override
+    public void connect(final String host, final int port, final int timeout) throws Exception {
+        super.connect(Agent.class, this, host, port, timeout);
+    }
 
-	private static boolean matchTopic(final String receivedEventTopic, final Collection<String> listenerTopics) {
-		if (listenerTopics.contains("*")) {
-			return true;
-		}
-		for (final String topic : listenerTopics) {
-			// positive match if only *
-			if ("*".equals(topic)) {
-				return true;
-			}
-			// positive match if it does contain * at the end and is a substring of the
-			// received event topic
-			if (topic.contains("*")) {
-				final var prefix = topic.substring(0, topic.lastIndexOf('/'));
-				if (receivedEventTopic.startsWith(prefix)) {
-					return true;
-				}
-			}
-			// positive match if the it matches exactly the received event topic
-			if (receivedEventTopic.equalsIgnoreCase(topic)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    private static boolean matchTopic(final String receivedEventTopic, final Collection<String> listenerTopics) {
+        if (listenerTopics.contains("*")) {
+            return true;
+        }
+        for (final String topic : listenerTopics) {
+            // positive match if only *
+            if ("*".equals(topic)) {
+                return true;
+            }
+            // positive match if it does contain * at the end and is a substring of the
+            // received event topic
+            if (topic.contains("*")) {
+                final var prefix = topic.substring(0, topic.lastIndexOf('/'));
+                if (receivedEventTopic.startsWith(prefix)) {
+                    return true;
+                }
+            }
+            // positive match if the it matches exactly the received event topic
+            if (receivedEventTopic.equalsIgnoreCase(topic)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

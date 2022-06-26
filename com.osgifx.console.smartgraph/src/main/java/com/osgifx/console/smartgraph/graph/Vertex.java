@@ -26,10 +26,10 @@ package com.osgifx.console.smartgraph.graph;
  */
 public interface Vertex<V> {
 
-	/**
-	 * Returns the element stored in the vertex.
-	 *
-	 * @return stored element
-	 */
-	V element();
+    /**
+     * Returns the element stored in the vertex.
+     *
+     * @return stored element
+     */
+    V element();
 }

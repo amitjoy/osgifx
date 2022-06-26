@@ -29,24 +29,24 @@ import org.osgi.framework.BundleContext;
 
 public final class OpenDiagnosticsHandler {
 
-	@Log
-	@Inject
-	private FluentLogger  logger;
-	@Inject
-	@OSGiBundle
-	private BundleContext context;
+    @Log
+    @Inject
+    private FluentLogger  logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext context;
 
-	@Execute
-	public void execute() {
-		var area = context.getProperty("osgi.instance.area.default");
-		// remove the prefix
-		final var prefix = "file:";
-		area = area.substring(area.indexOf(prefix) + prefix.length());
-		try {
-			Desktop.getDesktop().open(new File(area, "./log/log.txt"));
-		} catch (final IOException e) {
-			logger.atError().withException(e).log("Cannot open diagnostics file");
-		}
-	}
+    @Execute
+    public void execute() {
+        var area = context.getProperty("osgi.instance.area.default");
+        // remove the prefix
+        final var prefix = "file:";
+        area = area.substring(area.indexOf(prefix) + prefix.length());
+        try {
+            Desktop.getDesktop().open(new File(area, "./log/log.txt"));
+        } catch (final IOException e) {
+            logger.atError().withException(e).log("Cannot open diagnostics file");
+        }
+    }
 
 }

@@ -19,16 +19,16 @@ import java.util.function.BiFunction;
 
 public record BundleVertex(String symbolicName, long id) {
 
-	public static final BiFunction<String, Long, String> VERTEX_ID_FUNCTION = (bsn, id) -> bsn + ":" + id;
-	public static final BiFunction<String, Long, String> DOT_ID_FUNCTION = (bsn, id) -> (bsn + '_' + id).replaceAll("[^a-zA-Z0-9]", "_");
+    public static final BiFunction<String, Long, String> VERTEX_ID_FUNCTION = (bsn, id) -> bsn + ":" + id;
+    public static final BiFunction<String, Long, String> DOT_ID_FUNCTION = (bsn, id) -> (bsn + '_' + id).replaceAll("[^a-zA-Z0-9]", "_");
 
-	@Override
-	public String toString() {
-		return VERTEX_ID_FUNCTION.apply(symbolicName, id);
-	}
+    @Override
+    public String toString() {
+        return VERTEX_ID_FUNCTION.apply(symbolicName, id);
+    }
 
-	public String toDotID() {
-		return DOT_ID_FUNCTION.apply(symbolicName, id);
-	}
+    public String toDotID() {
+        return DOT_ID_FUNCTION.apply(symbolicName, id);
+    }
 
 }

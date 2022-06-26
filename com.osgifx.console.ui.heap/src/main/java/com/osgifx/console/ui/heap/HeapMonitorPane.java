@@ -63,302 +63,302 @@ import javafx.util.Duration;
 @Creatable
 public final class HeapMonitorPane extends BorderPane {
 
-	private final List<HeapMonitorChart> memoryUsageCharts = Lists.newArrayList();
-	private final StringProperty         totalUsedHeap     = new SimpleStringProperty();
-	private final StringProperty         gcCollectionCount = new SimpleStringProperty();
-	private final StringProperty         gcCollectionTime  = new SimpleStringProperty();
-	private final StringProperty         maxHeap           = new SimpleStringProperty();
-	private final StringProperty         uptTime           = new SimpleStringProperty();
+    private final List<HeapMonitorChart> memoryUsageCharts = Lists.newArrayList();
+    private final StringProperty         totalUsedHeap     = new SimpleStringProperty();
+    private final StringProperty         gcCollectionCount = new SimpleStringProperty();
+    private final StringProperty         gcCollectionTime  = new SimpleStringProperty();
+    private final StringProperty         maxHeap           = new SimpleStringProperty();
+    private final StringProperty         uptTime           = new SimpleStringProperty();
 
-	private Timeline animation;
+    private Timeline animation;
 
-	@Inject
-	@Named("is_connected")
-	private boolean           isConnected;
-	@Inject
-	private Supervisor        supervisor;
-	@Inject
-	private ThreadSynchronize threadSync;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    private ThreadSynchronize threadSync;
 
-	@PostConstruct
-	public void init() {
-		setTop(createControlPanel());
+    @PostConstruct
+    public void init() {
+        setTop(createControlPanel());
 
-		final var box        = createMainContent();
-		final var scrollPane = new ScrollPane(box);
+        final var box        = createMainContent();
+        final var scrollPane = new ScrollPane(box);
 
-		scrollPane.setFitToWidth(true);
-		setCenter(scrollPane);
+        scrollPane.setFitToWidth(true);
+        setCenter(scrollPane);
 
-		final var frame = new KeyFrame(Duration.millis(1_000), (final var actionEvent) -> updateHeapInformation());
+        final var frame = new KeyFrame(Duration.millis(1_000), (final var actionEvent) -> updateHeapInformation());
 
-		animation = new Timeline();
-		animation.getKeyFrames().add(frame);
-		animation.setCycleCount(Animation.INDEFINITE);
-	}
+        animation = new Timeline();
+        animation.getKeyFrames().add(frame);
+        animation.setCycleCount(Animation.INDEFINITE);
+    }
 
-	private Pane createMainContent() {
-		final var box          = new VBox();
-		final var vBoxChildren = box.getChildren();
-		final var now          = System.currentTimeMillis();
+    private Pane createMainContent() {
+        final var box          = new VBox();
+        final var vBoxChildren = box.getChildren();
+        final var now          = System.currentTimeMillis();
 
-		final Supplier<XMemoryUsage> supplier = () -> {
-			final var agent = supervisor.getAgent();
-			if (agent == null || agent.getHeapUsage() == null) {
-				return new XMemoryUsage();
-			}
-			return agent.getHeapUsage().memoryUsage;
-		};
+        final Supplier<XMemoryUsage> supplier = () -> {
+            final var agent = supervisor.getAgent();
+            if (agent == null || agent.getHeapUsage() == null) {
+                return new XMemoryUsage();
+            }
+            return agent.getHeapUsage().memoryUsage;
+        };
 
-		final var memoryUsageChartGlobal = new HeapMonitorChart("Heap", supplier, now);
-		addToList(memoryUsageChartGlobal, vBoxChildren);
+        final var memoryUsageChartGlobal = new HeapMonitorChart("Heap", supplier, now);
+        addToList(memoryUsageChartGlobal, vBoxChildren);
 
-		final var separator = new Separator();
-		separator.setPrefHeight(2);
-		vBoxChildren.add(separator);
+        final var separator = new Separator();
+        separator.setPrefHeight(2);
+        vBoxChildren.add(separator);
 
-		final var agent = supervisor.getAgent();
-		if (agent != null && agent.getHeapUsage() != null) {
-			for (final XMemoryPoolMXBean mpBean : agent.getHeapUsage().memoryPoolBeans) {
-				if ("HEAP".equals(mpBean.type)) {
-					final var memoryUsageChart = new HeapMonitorChart(mpBean.name, getMemoryUsagedByMemoryPoolBean(mpBean), now);
-					addToList(memoryUsageChart, vBoxChildren);
-				}
-			}
-		}
-		return box;
-	}
+        final var agent = supervisor.getAgent();
+        if (agent != null && agent.getHeapUsage() != null) {
+            for (final XMemoryPoolMXBean mpBean : agent.getHeapUsage().memoryPoolBeans) {
+                if ("HEAP".equals(mpBean.type)) {
+                    final var memoryUsageChart = new HeapMonitorChart(mpBean.name, getMemoryUsagedByMemoryPoolBean(mpBean), now);
+                    addToList(memoryUsageChart, vBoxChildren);
+                }
+            }
+        }
+        return box;
+    }
 
-	private void addToList(final HeapMonitorChart memoryUsageChart, final ObservableList<Node> vBoxChildren) {
-		memoryUsageChart.setPrefHeight(250);
-		memoryUsageCharts.add(memoryUsageChart);
-		vBoxChildren.add(memoryUsageChart);
-		VBox.setVgrow(memoryUsageChart, Priority.ALWAYS);
-	}
+    private void addToList(final HeapMonitorChart memoryUsageChart, final ObservableList<Node> vBoxChildren) {
+        memoryUsageChart.setPrefHeight(250);
+        memoryUsageCharts.add(memoryUsageChart);
+        vBoxChildren.add(memoryUsageChart);
+        VBox.setVgrow(memoryUsageChart, Priority.ALWAYS);
+    }
 
-	private void updateHeapInformation() {
-		if (!isConnected) {
-			return;
-		}
-		final var agent = supervisor.getAgent();
-		final var used  = agent.getHeapUsage().memoryUsage.used;
-		totalUsedHeap.setValue(formatByteSize(used));
+    private void updateHeapInformation() {
+        if (!isConnected) {
+            return;
+        }
+        final var agent = supervisor.getAgent();
+        final var used  = agent.getHeapUsage().memoryUsage.used;
+        totalUsedHeap.setValue(formatByteSize(used));
 
-		final var max = agent.getHeapUsage().memoryUsage.max;
-		maxHeap.setValue(formatByteSize(max));
+        final var max = agent.getHeapUsage().memoryUsage.max;
+        maxHeap.setValue(formatByteSize(max));
 
-		for (final HeapMonitorChart memoryUsageChart : memoryUsageCharts) {
-			memoryUsageChart.update();
-		}
-		updateGCStats();
-	}
+        for (final HeapMonitorChart memoryUsageChart : memoryUsageCharts) {
+            memoryUsageChart.update();
+        }
+        updateGCStats();
+    }
 
-	private void updateGCStats() {
-		if (!isConnected) {
-			return;
-		}
-		final var agent           = supervisor.getAgent();
-		final var mbeanUptime     = agent.getHeapUsage().uptime;
-		final var formattedUptime = formatTimeDifference(mbeanUptime);
-		uptTime.setValue(formattedUptime);
+    private void updateGCStats() {
+        if (!isConnected) {
+            return;
+        }
+        final var agent           = supervisor.getAgent();
+        final var mbeanUptime     = agent.getHeapUsage().uptime;
+        final var formattedUptime = formatTimeDifference(mbeanUptime);
+        uptTime.setValue(formattedUptime);
 
-		var                garbageCollectionTime = 0L;
-		final List<String> gcCollections         = Lists.newArrayList();
-		for (final XGarbageCollectorMXBean gc : agent.getHeapUsage().gcBeans) {
-			gcCollections.add(gc.name + "=" + gc.collectionCount);
-			garbageCollectionTime += gc.collectionTime;
-		}
-		final var formattedGCTime = formatTimeDifference(garbageCollectionTime);
-		gcCollectionCount.setValue(String.join(", ", gcCollections));
-		gcCollectionTime.setValue(formattedGCTime);
+        var                garbageCollectionTime = 0L;
+        final List<String> gcCollections         = Lists.newArrayList();
+        for (final XGarbageCollectorMXBean gc : agent.getHeapUsage().gcBeans) {
+            gcCollections.add(gc.name + "=" + gc.collectionCount);
+            garbageCollectionTime += gc.collectionTime;
+        }
+        final var formattedGCTime = formatTimeDifference(garbageCollectionTime);
+        gcCollectionCount.setValue(String.join(", ", gcCollections));
+        gcCollectionTime.setValue(formattedGCTime);
 
-	}
+    }
 
-	private static String formatByteSize(final long bytes) {
-		final var unit = 1000;
-		if (bytes < unit) {
-			return bytes + " B";
-		}
-		final var exp = (int) (Math.log(bytes) / Math.log(unit));
-		final var pre = Character.toString("kMGTPE".charAt(exp - 1));
-		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-	}
+    private static String formatByteSize(final long bytes) {
+        final var unit = 1000;
+        if (bytes < unit) {
+            return bytes + " B";
+        }
+        final var exp = (int) (Math.log(bytes) / Math.log(unit));
+        final var pre = Character.toString("kMGTPE".charAt(exp - 1));
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
 
-	private String formatTimeDifference(long durationInMilli) {
-		final var secondsInMilli = 1_000L;
-		final var minutesInMilli = secondsInMilli * 60;
-		final var hoursInMilli   = minutesInMilli * 60;
-		final var daysInMilli    = hoursInMilli * 24;
+    private String formatTimeDifference(long durationInMilli) {
+        final var secondsInMilli = 1_000L;
+        final var minutesInMilli = secondsInMilli * 60;
+        final var hoursInMilli   = minutesInMilli * 60;
+        final var daysInMilli    = hoursInMilli * 24;
 
-		final var days = durationInMilli / daysInMilli;
-		durationInMilli = durationInMilli % daysInMilli;
+        final var days = durationInMilli / daysInMilli;
+        durationInMilli = durationInMilli % daysInMilli;
 
-		final var hours = durationInMilli / hoursInMilli;
-		durationInMilli = durationInMilli % hoursInMilli;
+        final var hours = durationInMilli / hoursInMilli;
+        durationInMilli = durationInMilli % hoursInMilli;
 
-		final var minutes = durationInMilli / minutesInMilli;
-		durationInMilli = durationInMilli % minutesInMilli;
+        final var minutes = durationInMilli / minutesInMilli;
+        durationInMilli = durationInMilli % minutesInMilli;
 
-		final var seconds = durationInMilli / secondsInMilli;
+        final var seconds = durationInMilli / secondsInMilli;
 
-		return String.format("%S day, %02d hr, %02d min, %02d sec", days, hours, minutes, seconds);
+        return String.format("%S day, %02d hr, %02d min, %02d sec", days, hours, minutes, seconds);
 
-	}
+    }
 
-	private Pane createControlPanel() {
-		final var borderPane = new BorderPane();
+    private Pane createControlPanel() {
+        final var borderPane = new BorderPane();
 
-		borderPane.setLeft(createLeftPane());
-		borderPane.setRight(createRightPane());
-		borderPane.setPadding(new Insets(5, 5, 5, 5));
+        borderPane.setLeft(createLeftPane());
+        borderPane.setRight(createRightPane());
+        borderPane.setPadding(new Insets(5, 5, 5, 5));
 
-		final var border = new Border(
-		        new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT, new Insets(5)));
-		borderPane.setBorder(border);
-		return borderPane;
-	}
+        final var border = new Border(
+                new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT, new Insets(5)));
+        borderPane.setBorder(border);
+        return borderPane;
+    }
 
-	private Pane createRightPane() {
-		final var vBox = new VBox();
-		vBox.setSpacing(5);
-		final var children = vBox.getChildren();
+    private Pane createRightPane() {
+        final var vBox = new VBox();
+        vBox.setSpacing(5);
+        final var children = vBox.getChildren();
 
-		final var garbageCollectBtn = new Button("Garbage Collect");
-		garbageCollectBtn.setDisable(true);
-		garbageCollectBtn.setMaxWidth(Double.MAX_VALUE);
-		garbageCollectBtn.setOnAction(e -> performGC());
+        final var garbageCollectBtn = new Button("Garbage Collect");
+        garbageCollectBtn.setDisable(true);
+        garbageCollectBtn.setMaxWidth(Double.MAX_VALUE);
+        garbageCollectBtn.setOnAction(e -> performGC());
 
-		final var heapDumpBtn = new Button("Heap Dump");
-		heapDumpBtn.setDisable(true);
-		heapDumpBtn.setMaxWidth(Double.MAX_VALUE);
-		heapDumpBtn.setOnAction(e -> heapDump());
+        final var heapDumpBtn = new Button("Heap Dump");
+        heapDumpBtn.setDisable(true);
+        heapDumpBtn.setMaxWidth(Double.MAX_VALUE);
+        heapDumpBtn.setOnAction(e -> heapDump());
 
-		final var startStopBtn = new Button("Start");
-		startStopBtn.setDisable(!isConnected);
-		startStopBtn.setMaxWidth(Double.MAX_VALUE);
-		startStopBtn.setOnAction(e -> {
-			switch (animation.getStatus()) {
-			case RUNNING:
-				animation.pause();
+        final var startStopBtn = new Button("Start");
+        startStopBtn.setDisable(!isConnected);
+        startStopBtn.setMaxWidth(Double.MAX_VALUE);
+        startStopBtn.setOnAction(e -> {
+            switch (animation.getStatus()) {
+            case RUNNING:
+                animation.pause();
 
-				garbageCollectBtn.setDisable(true);
-				heapDumpBtn.setDisable(true);
-				startStopBtn.setText("Start");
+                garbageCollectBtn.setDisable(true);
+                heapDumpBtn.setDisable(true);
+                startStopBtn.setText("Start");
 
-				break;
-			case PAUSED, STOPPED:
-			default:
-				animation.play();
+                break;
+            case PAUSED, STOPPED:
+            default:
+                animation.play();
 
-				garbageCollectBtn.setDisable(false);
-				heapDumpBtn.setDisable(false);
-				startStopBtn.setText("Stop");
+                garbageCollectBtn.setDisable(false);
+                heapDumpBtn.setDisable(false);
+                startStopBtn.setText("Stop");
 
-				break;
-			}
-		});
+                break;
+            }
+        });
 
-		children.add(startStopBtn);
-		children.add(garbageCollectBtn);
-		children.add(heapDumpBtn);
+        children.add(startStopBtn);
+        children.add(garbageCollectBtn);
+        children.add(heapDumpBtn);
 
-		return vBox;
-	}
+        return vBox;
+    }
 
-	private void performGC() {
-		final var agent = supervisor.getAgent();
-		if (agent == null) {
-			return;
-		}
-		agent.gc();
-	}
+    private void performGC() {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            return;
+        }
+        agent.gc();
+    }
 
-	private void heapDump() {
-		if (!isConnected) {
-			return;
-		}
-		try {
-			final var agent    = supervisor.getAgent();
-			final var heapdump = agent.heapdump();
-			if (heapdump == null) {
-				return;
-			}
-			threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Successfully Created",
-			        "File: " + heapdump.location + ", size: " + formatByteSize(heapdump.size)));
-		} catch (final Exception e) {
-			threadSync.asyncExec(() -> {
-				final var message = Optional.ofNullable(e.getMessage()).orElse("Heapdump cannot be created due to runtime errors");
-				Fx.showErrorNotification("Heapdump Processing Error", message);
-			});
-		}
-	}
+    private void heapDump() {
+        if (!isConnected) {
+            return;
+        }
+        try {
+            final var agent    = supervisor.getAgent();
+            final var heapdump = agent.heapdump();
+            if (heapdump == null) {
+                return;
+            }
+            threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Successfully Created",
+                    "File: " + heapdump.location + ", size: " + formatByteSize(heapdump.size)));
+        } catch (final Exception e) {
+            threadSync.asyncExec(() -> {
+                final var message = Optional.ofNullable(e.getMessage()).orElse("Heapdump cannot be created due to runtime errors");
+                Fx.showErrorNotification("Heapdump Processing Error", message);
+            });
+        }
+    }
 
-	private Pane createLeftPane() {
-		final var gridPane = new GridPane();
+    private Pane createLeftPane() {
+        final var gridPane = new GridPane();
 
-		gridPane.add(createLabel("Used Heap : "), 0, 0);
-		final var usedHeadLabel = createRightSideLabel(totalUsedHeap);
-		gridPane.add(usedHeadLabel, 1, 0);
+        gridPane.add(createLabel("Used Heap : "), 0, 0);
+        final var usedHeadLabel = createRightSideLabel(totalUsedHeap);
+        gridPane.add(usedHeadLabel, 1, 0);
 
-		gridPane.add(createLabel("Max Heap : "), 0, 1);
-		final var maxHeapLabel = createRightSideLabel(maxHeap);
-		gridPane.add(maxHeapLabel, 1, 1);
+        gridPane.add(createLabel("Max Heap : "), 0, 1);
+        final var maxHeapLabel = createRightSideLabel(maxHeap);
+        gridPane.add(maxHeapLabel, 1, 1);
 
-		gridPane.add(createLabel("Up Time : "), 0, 2);
-		final var uptimeLabel = createRightSideLabel(uptTime);
-		gridPane.add(uptimeLabel, 1, 2);
+        gridPane.add(createLabel("Up Time : "), 0, 2);
+        final var uptimeLabel = createRightSideLabel(uptTime);
+        gridPane.add(uptimeLabel, 1, 2);
 
-		gridPane.add(createLabel("GC Count : "), 0, 3);
-		final var gcCountLabel = createRightSideLabel(gcCollectionCount);
-		gridPane.add(gcCountLabel, 1, 3);
+        gridPane.add(createLabel("GC Count : "), 0, 3);
+        final var gcCountLabel = createRightSideLabel(gcCollectionCount);
+        gridPane.add(gcCountLabel, 1, 3);
 
-		gridPane.add(createLabel("Total GC Time : "), 0, 4);
-		final var getTimeLabel = createRightSideLabel(gcCollectionTime);
-		gridPane.add(getTimeLabel, 1, 4);
-		return gridPane;
-	}
+        gridPane.add(createLabel("Total GC Time : "), 0, 4);
+        final var getTimeLabel = createRightSideLabel(gcCollectionTime);
+        gridPane.add(getTimeLabel, 1, 4);
+        return gridPane;
+    }
 
-	private Label createRightSideLabel(final StringProperty totalUsedHeap) {
-		final var label = new Label();
-		label.textProperty().bind(totalUsedHeap);
+    private Label createRightSideLabel(final StringProperty totalUsedHeap) {
+        final var label = new Label();
+        label.textProperty().bind(totalUsedHeap);
 
-		GridPane.setHalignment(label, HPos.LEFT);
+        GridPane.setHalignment(label, HPos.LEFT);
 
-		label.setTextAlignment(TextAlignment.LEFT);
-		label.setPrefWidth(800);
+        label.setTextAlignment(TextAlignment.LEFT);
+        label.setPrefWidth(800);
 
-		return label;
-	}
+        return label;
+    }
 
-	private Label createLabel(final String text) {
-		final var label = new Label(text);
-		GridPane.setHalignment(label, HPos.RIGHT);
-		label.setTextAlignment(TextAlignment.RIGHT);
-		return label;
-	}
+    private Label createLabel(final String text) {
+        final var label = new Label(text);
+        GridPane.setHalignment(label, HPos.RIGHT);
+        label.setTextAlignment(TextAlignment.RIGHT);
+        return label;
+    }
 
-	public void startUpdates() {
-		animation.play();
-	}
+    public void startUpdates() {
+        animation.play();
+    }
 
-	public void stopUpdates() {
-		animation.pause();
-	}
+    public void stopUpdates() {
+        animation.pause();
+    }
 
-	public Supplier<XMemoryUsage> getMemoryUsagedByMemoryPoolBean(final XMemoryPoolMXBean bean) {
-		return () -> {
-			if (!isConnected) {
-				return new XMemoryUsage();
-			}
-			final var agent     = supervisor.getAgent();
-			final var heapUsage = agent.getHeapUsage();
-			for (final XMemoryPoolMXBean mpbean : heapUsage.memoryPoolBeans) {
-				if (bean.name.equals(mpbean.name)) {
-					return mpbean.memoryUsage;
-				}
-			}
-			return null;
-		};
-	}
+    public Supplier<XMemoryUsage> getMemoryUsagedByMemoryPoolBean(final XMemoryPoolMXBean bean) {
+        return () -> {
+            if (!isConnected) {
+                return new XMemoryUsage();
+            }
+            final var agent     = supervisor.getAgent();
+            final var heapUsage = agent.getHeapUsage();
+            for (final XMemoryPoolMXBean mpbean : heapUsage.memoryPoolBeans) {
+                if (bean.name.equals(mpbean.name)) {
+                    return mpbean.memoryUsage;
+                }
+            }
+            return null;
+        };
+    }
 
 }

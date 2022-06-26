@@ -24,14 +24,14 @@ package com.osgifx.console.smartgraph.graph;
  */
 public class InvalidEdgeException extends RuntimeException {
 
-	private static final long serialVersionUID = 6725706014265791454L;
+    private static final long serialVersionUID = 6725706014265791454L;
 
-	public InvalidEdgeException() {
-		super("The edge is invalid or does not belong to this graph.");
-	}
+    public InvalidEdgeException() {
+        super("The edge is invalid or does not belong to this graph.");
+    }
 
-	public InvalidEdgeException(final String string) {
-		super(string);
-	}
+    public InvalidEdgeException(final String string) {
+        super(string);
+    }
 
 }

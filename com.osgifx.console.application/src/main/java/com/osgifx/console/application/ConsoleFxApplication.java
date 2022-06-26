@@ -21,9 +21,9 @@ import javafx.application.Application;
 
 public final class ConsoleFxApplication extends E4Application {
 
-	@Override
-	protected Class<? extends Application> getJfxApplicationClass() {
-		return ConsoleFxStage.class;
-	}
+    @Override
+    protected Class<? extends Application> getJfxApplicationClass() {
+        return ConsoleFxStage.class;
+    }
 
 }

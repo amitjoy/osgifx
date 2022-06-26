@@ -19,27 +19,27 @@ import aQute.bnd.osgi.Constants;
 
 public final class DeploymentPackageHeaders {
 
-	private DeploymentPackageHeaders() {
-		throw new IllegalAccessError("Cannot be instantiated");
-	}
+    private DeploymentPackageHeaders() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
 
-	public static final String DEPLOYMENT_PACKAGE_SYMBOLIC_NAME    = "DeploymentPackage-SymbolicName";
-	public static final String DEPLOYMENT_PACKAGE_VERSION          = "DeploymentPackage-Version";
-	public static final String DEPLOYMENT_PACKAGE_FIX_PACK         = "DeploymentPackage-FixPack";
-	public static final String DEPLOYMENT_PACKAGE_NAME             = "DeploymentPackage-Name";
-	public static final String DEPLOYMENT_PACKAGE_COPYRIGHT        = "DeploymentPackage-Copyright";
-	public static final String DEPLOYMENT_PACKAGE_CONTACT_ADDRESS  = "DeploymentPackage-ContactAddress";
-	public static final String DEPLOYMENT_PACKAGE_DESCRIPTION      = "DeploymentPackage-Description";
-	public static final String DEPLOYMENT_PACKAGE_DOC_URL          = "DeploymentPackage-DocURL";
-	public static final String DEPLOYMENT_PACKAGE_ICON             = "DeploymentPackage-Icon";
-	public static final String DEPLOYMENT_PACKAGE_VENDOR           = "DeploymentPackage-Vendor";
-	public static final String DEPLOYMENT_PACKAGE_LICENSE          = "DeploymentPackage-License";
-	public static final String DEPLOYMENT_PACKAGE_REQUIRED_STORAGE = "DeploymentPackage-RequiredStorage";
-	public static final String DEPLOYMENT_PACKAGE_CUSTOMIZER       = "DeploymentPackage-Customizer";
+    public static final String DEPLOYMENT_PACKAGE_SYMBOLIC_NAME    = "DeploymentPackage-SymbolicName";
+    public static final String DEPLOYMENT_PACKAGE_VERSION          = "DeploymentPackage-Version";
+    public static final String DEPLOYMENT_PACKAGE_FIX_PACK         = "DeploymentPackage-FixPack";
+    public static final String DEPLOYMENT_PACKAGE_NAME             = "DeploymentPackage-Name";
+    public static final String DEPLOYMENT_PACKAGE_COPYRIGHT        = "DeploymentPackage-Copyright";
+    public static final String DEPLOYMENT_PACKAGE_CONTACT_ADDRESS  = "DeploymentPackage-ContactAddress";
+    public static final String DEPLOYMENT_PACKAGE_DESCRIPTION      = "DeploymentPackage-Description";
+    public static final String DEPLOYMENT_PACKAGE_DOC_URL          = "DeploymentPackage-DocURL";
+    public static final String DEPLOYMENT_PACKAGE_ICON             = "DeploymentPackage-Icon";
+    public static final String DEPLOYMENT_PACKAGE_VENDOR           = "DeploymentPackage-Vendor";
+    public static final String DEPLOYMENT_PACKAGE_LICENSE          = "DeploymentPackage-License";
+    public static final String DEPLOYMENT_PACKAGE_REQUIRED_STORAGE = "DeploymentPackage-RequiredStorage";
+    public static final String DEPLOYMENT_PACKAGE_CUSTOMIZER       = "DeploymentPackage-Customizer";
 
-	public static final String DEPLOYMENT_PACKAGE_RESOURCE_SHA_DIGEST           = "SHA-1-Digest";
-	public static final String DEPLOYMENT_PACKAGE_RESOURCE_PROCESSOR_PID        = "Resource-Processor";
-	public static final String DEPLOYMENT_PACKAGE_RESOURCE_BUNDLE_SYMBOLIC_NAME = Constants.BUNDLE_SYMBOLICNAME;
-	public static final String DEPLOYMENT_PACKAGE_RESOURCE_BUNDLE_VERSION       = Constants.BUNDLE_VERSION;
+    public static final String DEPLOYMENT_PACKAGE_RESOURCE_SHA_DIGEST           = "SHA-1-Digest";
+    public static final String DEPLOYMENT_PACKAGE_RESOURCE_PROCESSOR_PID        = "Resource-Processor";
+    public static final String DEPLOYMENT_PACKAGE_RESOURCE_BUNDLE_SYMBOLIC_NAME = Constants.BUNDLE_SYMBOLICNAME;
+    public static final String DEPLOYMENT_PACKAGE_RESOURCE_BUNDLE_VERSION       = Constants.BUNDLE_VERSION;
 
 }

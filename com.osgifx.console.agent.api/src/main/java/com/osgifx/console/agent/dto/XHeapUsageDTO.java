@@ -19,26 +19,26 @@ import org.osgi.dto.DTO;
 
 public class XHeapUsageDTO extends DTO {
 
-	public long                      uptime;
-	public XMemoryUsage              memoryUsage;
-	public XMemoryPoolMXBean[]       memoryPoolBeans;
-	public XGarbageCollectorMXBean[] gcBeans;
+    public long                      uptime;
+    public XMemoryUsage              memoryUsage;
+    public XMemoryPoolMXBean[]       memoryPoolBeans;
+    public XGarbageCollectorMXBean[] gcBeans;
 
-	public static class XMemoryUsage extends DTO {
-		public long used;
-		public long max;
-	}
+    public static class XMemoryUsage extends DTO {
+        public long used;
+        public long max;
+    }
 
-	public static class XMemoryPoolMXBean extends DTO {
-		public String       type;
-		public String       name;
-		public XMemoryUsage memoryUsage;
-	}
+    public static class XMemoryPoolMXBean extends DTO {
+        public String       type;
+        public String       name;
+        public XMemoryUsage memoryUsage;
+    }
 
-	public static class XGarbageCollectorMXBean extends DTO {
-		public String name;
-		public long   collectionCount;
-		public long   collectionTime;
-	}
+    public static class XGarbageCollectorMXBean extends DTO {
+        public String name;
+        public long   collectionCount;
+        public long   collectionTime;
+    }
 
 }

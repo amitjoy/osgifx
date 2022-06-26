@@ -24,14 +24,14 @@ package com.osgifx.console.smartgraph.graph;
  */
 public class InvalidVertexException extends RuntimeException {
 
-	private static final long serialVersionUID = 991130343030333770L;
+    private static final long serialVersionUID = 991130343030333770L;
 
-	public InvalidVertexException() {
-		super("The vertex is invalid or does not belong to this graph.");
-	}
+    public InvalidVertexException() {
+        super("The vertex is invalid or does not belong to this graph.");
+    }
 
-	public InvalidVertexException(final String string) {
-		super(string);
-	}
+    public InvalidVertexException(final String string) {
+        super(string);
+    }
 
 }

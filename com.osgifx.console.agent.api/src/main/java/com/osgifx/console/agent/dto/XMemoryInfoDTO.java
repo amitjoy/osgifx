@@ -17,9 +17,9 @@ package com.osgifx.console.agent.dto;
 
 public class XMemoryInfoDTO {
 
-	public long uptime;
-	public long maxMemory;
-	public long freeMemory;
-	public long totalMemory;
+    public long uptime;
+    public long maxMemory;
+    public long freeMemory;
+    public long totalMemory;
 
 }

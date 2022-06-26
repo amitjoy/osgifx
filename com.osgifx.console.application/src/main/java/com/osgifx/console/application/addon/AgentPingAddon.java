@@ -40,70 +40,70 @@ import com.osgifx.console.supervisor.Supervisor;
 
 public final class AgentPingAddon {
 
-	private static final long   INITIAL_DELAY = Duration.ofSeconds(0).toMillis();
-	private static final long   MAX_DELAY     = Duration.ofSeconds(5).toMillis();
-	private static final String THREAD_NAME   = "osgifx-agent-ping";
+    private static final long   INITIAL_DELAY = Duration.ofSeconds(0).toMillis();
+    private static final long   MAX_DELAY     = Duration.ofSeconds(5).toMillis();
+    private static final String THREAD_NAME   = "osgifx-agent-ping";
 
-	@Log
-	@Inject
-	private FluentLogger                logger;
-	@Inject
-	private Supervisor                  supervisor;
-	@Inject
-	private IEventBroker                eventBroker;
-	@Inject
-	@ContextValue("is_connected")
-	private ContextBoundValue<Boolean>  isConnected;
-	@Inject
-	@Optional
-	@ContextValue("is_local_agent")
-	private ContextBoundValue<Boolean>  isLocalAgent;
-	@Inject
-	@ContextValue("connected.agent")
-	private ContextBoundValue<String>   connectedAgent;
-	private ScheduledExecutorService    executor;
-	private volatile ScheduledFuture<?> future;
+    @Log
+    @Inject
+    private FluentLogger                logger;
+    @Inject
+    private Supervisor                  supervisor;
+    @Inject
+    private IEventBroker                eventBroker;
+    @Inject
+    @ContextValue("is_connected")
+    private ContextBoundValue<Boolean>  isConnected;
+    @Inject
+    @Optional
+    @ContextValue("is_local_agent")
+    private ContextBoundValue<Boolean>  isLocalAgent;
+    @Inject
+    @ContextValue("connected.agent")
+    private ContextBoundValue<String>   connectedAgent;
+    private ScheduledExecutorService    executor;
+    private volatile ScheduledFuture<?> future;
 
-	@PostConstruct
-	public void init() {
-		executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, THREAD_NAME));
-		logger.atInfo().log("Agent ping addon has been initialized");
-	}
+    @PostConstruct
+    public void init() {
+        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, THREAD_NAME));
+        logger.atInfo().log("Agent ping addon has been initialized");
+    }
 
-	@Inject
-	@Optional
-	private void agentConnected(@EventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent connected event has been received");
-		future = executor.scheduleWithFixedDelay(() -> {
-			try {
-				supervisor.getAgent().ping();
-			} catch (final Exception e) {
-				logger.atWarning().log("Agent ping request did not succeed");
-				eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-			}
-		}, INITIAL_DELAY, MAX_DELAY, MILLISECONDS);
-		logger.atInfo().log("Agent ping scheduler has been started");
-	}
+    @Inject
+    @Optional
+    private void agentConnected(@EventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event has been received");
+        future = executor.scheduleWithFixedDelay(() -> {
+            try {
+                supervisor.getAgent().ping();
+            } catch (final Exception e) {
+                logger.atWarning().log("Agent ping request did not succeed");
+                eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+            }
+        }, INITIAL_DELAY, MAX_DELAY, MILLISECONDS);
+        logger.atInfo().log("Agent ping scheduler has been started");
+    }
 
-	@Inject
-	@Optional
-	private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-		logger.atInfo().log("Agent disconnected event has been received");
-		future.cancel(true);
-		future = null;
-		// there can be a race condition when this addon is just destroyed and the
-		// disconnected event is received simultaneously
-		if (!executor.isShutdown()) {
-			isConnected.publish(false);
-			isLocalAgent.publish(false);
-		}
-		connectedAgent.publish(null);
-	}
+    @Inject
+    @Optional
+    private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event has been received");
+        future.cancel(true);
+        future = null;
+        // there can be a race condition when this addon is just destroyed and the
+        // disconnected event is received simultaneously
+        if (!executor.isShutdown()) {
+            isConnected.publish(false);
+            isLocalAgent.publish(false);
+        }
+        connectedAgent.publish(null);
+    }
 
-	@PreDestroy
-	private void destroy() {
-		executor.shutdownNow();
-		logger.atInfo().log("Agent ping addon has been destroyed");
-	}
+    @PreDestroy
+    private void destroy() {
+        executor.shutdownNow();
+        logger.atInfo().log("Agent ping addon has been destroyed");
+    }
 
 }

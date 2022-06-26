@@ -37,58 +37,58 @@ import javafx.concurrent.Task;
 
 public final class DisconnectFromAgentHandler {
 
-	@Log
-	@Inject
-	private FluentLogger                            logger;
-	@Inject
-	private Supervisor                              supervisor;
-	@Inject
-	private IEventBroker                            eventBroker;
-	@Inject
-	@Optional
-	@ContextValue("is_connected")
-	private ContextBoundValue<Boolean>              isConnected;
-	@Inject
-	@Optional
-	@ContextValue("is_local_agent")
-	private ContextBoundValue<Boolean>              isLocalAgent;
-	@Inject
-	@Optional
-	@ContextValue("connected.agent")
-	private ContextBoundValue<String>               connectedAgent;
-	@Inject
-	@Optional
-	@ContextValue("selected.settings")
-	private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    @Log
+    @Inject
+    private FluentLogger                            logger;
+    @Inject
+    private Supervisor                              supervisor;
+    @Inject
+    private IEventBroker                            eventBroker;
+    @Inject
+    @Optional
+    @ContextValue("is_connected")
+    private ContextBoundValue<Boolean>              isConnected;
+    @Inject
+    @Optional
+    @ContextValue("is_local_agent")
+    private ContextBoundValue<Boolean>              isLocalAgent;
+    @Inject
+    @Optional
+    @ContextValue("connected.agent")
+    private ContextBoundValue<String>               connectedAgent;
+    @Inject
+    @Optional
+    @ContextValue("selected.settings")
+    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
 
-	@Execute
-	public void execute() {
-		final Task<Void> disconnectTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				try {
-					supervisor.getAgent().abort();
-				} catch (final Exception e) {
-					logger.atError().withException(e).log("Agent connection cannot be aborted");
-				}
-				return null;
-			}
+    @Execute
+    public void execute() {
+        final Task<Void> disconnectTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    supervisor.getAgent().abort();
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Agent connection cannot be aborted");
+                }
+                return null;
+            }
 
-			@Override
-			protected void succeeded() {
-				eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-				isConnected.publish(false);
-				isLocalAgent.publish(false);
-				selectedSettings.publish(null);
-				connectedAgent.publish(null);
-			}
-		};
-		CompletableFuture.runAsync(disconnectTask);
-	}
+            @Override
+            protected void succeeded() {
+                eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+                isConnected.publish(false);
+                isLocalAgent.publish(false);
+                selectedSettings.publish(null);
+                connectedAgent.publish(null);
+            }
+        };
+        CompletableFuture.runAsync(disconnectTask);
+    }
 
-	@CanExecute
-	public boolean canExecute() {
-		return isConnected.getValue();
-	}
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected.getValue();
+    }
 
 }
