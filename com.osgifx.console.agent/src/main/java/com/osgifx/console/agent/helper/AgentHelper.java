@@ -24,7 +24,6 @@ import java.util.Map;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XResultDTO;
-import com.osgifx.console.agent.provider.PackageWirings;
 
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;

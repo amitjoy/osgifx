@@ -44,7 +44,7 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
-import com.osgifx.console.agent.reflect.Reflect;
+import com.osgifx.console.agent.helper.Reflect;
 
 public class XConfigurationAdmin {
 
