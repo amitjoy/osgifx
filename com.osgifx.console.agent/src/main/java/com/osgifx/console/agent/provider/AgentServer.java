@@ -18,8 +18,19 @@ package com.osgifx.console.agent.provider;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
+import static com.osgifx.console.agent.helper.AgentHelper.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.packageNotWired;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.R7_LOGGER;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
+import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
+import static org.osgi.framework.Constants.BUNDLE_VERSION;
+import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,9 +46,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -64,9 +75,9 @@ import org.osgi.dto.DTO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -88,6 +99,7 @@ import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHeapAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
+import com.osgifx.console.agent.admin.XLogReaderAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
 import com.osgifx.console.agent.admin.XPropertyAdmin;
@@ -96,7 +108,6 @@ import com.osgifx.console.agent.admin.XThreadAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
-import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -116,6 +127,9 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.ClassloaderLeakDetector;
+import com.osgifx.console.agent.handler.OSGiEventHandler;
+import com.osgifx.console.agent.handler.OSGiLogListener;
+import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.redirector.ConsoleRedirector;
 import com.osgifx.console.agent.redirector.GogoRedirector;
@@ -150,20 +164,29 @@ public final class AgentServer implements Agent, Closeable {
     private final ServiceTracker<Object, Object>                 metatypeTracker;
     private final ServiceTracker<Object, Object>                 dmtAdminTracker;
     private final ServiceTracker<Object, Object>                 userAdminTracker;
-    private final ServiceTracker<Object, Object>                 loggerAdminTracker;
     private final ServiceTracker<Object, Object>                 eventAdminTracker;
+    private final ServiceTracker<Object, Object>                 loggerAdminTracker;
     private final ServiceTracker<Object, Object>                 configAdminTracker;
     private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
     private final ServiceTracker<Object, Object>                 felixHcExecutorTracker;
     private final ServiceTracker<Object, Object>                 httpServiceRuntimeTracker;
     private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
 
+    private ServiceTracker<Object, Object> logReaderTracker;
+
+    private Closeable              osgiLogListenerCloser;
+    private ServiceRegistration<?> osgiEventListenerServiceReg;
+
     private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
     private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
 
     public AgentServer(final BundleContext context, final ClassloaderLeakDetector leakDetector,
             final BundleStartTimeCalculator bundleStartTimeCalculator) throws Exception {
+
         requireNonNull(context, "Bundle context cannot be null");
+        requireNonNull(leakDetector, "Leak detector cannot be null");
+        requireNonNull(bundleStartTimeCalculator, "Bundle start time calculator cannot be null");
+
         this.context                   = context;
         this.leakDetector              = leakDetector;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
@@ -293,6 +316,9 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public BundleDTO installFromURL(final String location, final String url) throws Exception {
+        requireNonNull(location, "Bundle location cannot be null");
+        requireNonNull(url, "Bundle URL cannot be null");
+
         final InputStream is = new URL(url).openStream();
         final Bundle      b  = context.installBundle(location, is);
         installed.put(b.getLocation(), url);
@@ -301,6 +327,8 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public String start(final long... ids) {
+        requireNonNull(ids, "Bundle IDs cannot be null");
+
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = context.getBundle(id);
@@ -315,6 +343,8 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public String stop(final long... ids) {
+        requireNonNull(ids, "Bundle IDs cannot be null");
+
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = context.getBundle(id);
@@ -329,6 +359,8 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public String uninstall(final long... ids) {
+        requireNonNull(ids, "Bundle IDs cannot be null");
+
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = context.getBundle(id);
@@ -343,29 +375,27 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
-    public List<BundleRevisionDTO> getBundleRevisons(final long... bundleId) throws Exception {
+    public List<BundleRevisionDTO> getBundleRevisons(final long... ids) throws Exception {
+        requireNonNull(ids, "Bundle IDs cannot be null");
 
         Bundle[] bundles;
-        if (bundleId.length == 0) {
+        if (ids.length == 0) {
             bundles = context.getBundles();
         } else {
-            bundles = new Bundle[bundleId.length];
-            for (int i = 0; i < bundleId.length; i++) {
-                bundles[i] = context.getBundle(bundleId[i]);
+            bundles = new Bundle[ids.length];
+            for (int i = 0; i < ids.length; i++) {
+                bundles[i] = context.getBundle(ids[i]);
                 if (bundles[i] == null) {
-                    throw new IllegalArgumentException("Bundle " + bundleId[i] + " does not exist");
+                    throw new IllegalArgumentException("Bundle " + ids[i] + " does not exist");
                 }
             }
         }
-
         final List<BundleRevisionDTO> revisions = new ArrayList<>(bundles.length);
-
         for (final Bundle b : bundles) {
             final BundleRevision    resource = b.adapt(BundleRevision.class);
             final BundleRevisionDTO bwd      = toDTO(resource);
             revisions.add(bwd);
         }
-
         return revisions;
     }
 
@@ -381,7 +411,7 @@ public final class AgentServer implements Agent, Closeable {
         if (port == Agent.NONE) {
             return true;
         }
-        if (port <= Agent.COMMAND_SESSION) {
+        if (port <= COMMAND_SESSION) {
             try {
                 redirector = new GogoRedirector(this, context);
             } catch (final Exception e) {
@@ -408,9 +438,9 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public String execGogoCommand(final String command) throws Exception {
-        requireNonNull(command, "Command cannot be null");
+        requireNonNull(command, "Gogo command cannot be null");
 
-        redirect(Agent.COMMAND_SESSION);
+        redirect(COMMAND_SESSION);
         stdin(command);
         final PrintStream ps = redirector.getOut();
         if (ps instanceof RedirectOutput) {
@@ -532,6 +562,16 @@ public final class AgentServer implements Agent, Closeable {
             agentExtensionTracker.close();
             felixHcExecutorTracker.close();
             httpServiceRuntimeTracker.close();
+
+            if (logReaderTracker != null) {
+                logReaderTracker.close();
+            }
+            if (osgiEventListenerServiceReg != null) {
+                osgiEventListenerServiceReg.unregister();
+            }
+            if (osgiLogListenerCloser != null) {
+                osgiLogListenerCloser.close();
+            }
         } catch (final Exception e) {
             throw new IOException(e);
         }
@@ -553,6 +593,11 @@ public final class AgentServer implements Agent, Closeable {
     public void setEndpoint(final RemoteRPC<Agent, Supervisor> remoteRPC) {
         setRemote(remoteRPC.getRemote());
         this.remoteRPC = remoteRPC;
+
+        // the following can only be initialized if and only if the RPC link is
+        // established
+        osgiLogListenerCloser       = initOSGiLogging();
+        osgiEventListenerServiceReg = initOSGiEventing();
     }
 
     @Override
@@ -565,10 +610,10 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     public void refresh(final boolean async) throws InterruptedException {
-        final FrameworkWiring f = context.getBundle(0).adapt(FrameworkWiring.class);
-        if (f != null) {
+        final FrameworkWiring wiring = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkWiring.class);
+        if (wiring != null) {
             final CountDownLatch refresh = new CountDownLatch(1);
-            f.refreshBundles(null, event -> refresh.countDown());
+            wiring.refreshBundles(null, event -> refresh.countDown());
             if (async) {
                 return;
             }
@@ -583,7 +628,7 @@ public final class AgentServer implements Agent, Closeable {
                 throw new IllegalArgumentException("No manifest in bundle");
             }
             final Attributes mainAttributes = manifest.getMainAttributes();
-            final String     value          = mainAttributes.getValue(Constants.BUNDLE_SYMBOLICNAME);
+            final String     value          = mainAttributes.getValue(BUNDLE_SYMBOLICNAME);
             final Matcher    matcher        = BSN_PATTERN.matcher(value);
 
             if (!matcher.matches()) {
@@ -592,7 +637,7 @@ public final class AgentServer implements Agent, Closeable {
 
             final String bsn = matcher.group(1);
 
-            String versionString = mainAttributes.getValue(Constants.BUNDLE_VERSION);
+            String versionString = mainAttributes.getValue(BUNDLE_VERSION);
             if (versionString == null) {
                 versionString = "0";
             }
@@ -694,7 +739,7 @@ public final class AgentServer implements Agent, Closeable {
             final XDmtAdmin dmtAdmin = new XDmtAdmin(dmtAdminTracker.getService());
             return dmtAdmin.updateDmtNode(uri, value, format);
         }
-        return createResult(SKIPPED, "DMT bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(DMT));
     }
 
     @Override
@@ -705,7 +750,7 @@ public final class AgentServer implements Agent, Closeable {
             final XLoggerAdmin loggerAdmin        = new XLoggerAdmin(loggerAdminTracker.getService(), isConfigAdminWired, context);
             return loggerAdmin.updateLoggerContext(bsn, logLevels);
         }
-        return createResult(SKIPPED, "R7 Log bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(R7_LOGGER));
     }
 
     @Override
@@ -715,7 +760,7 @@ public final class AgentServer implements Agent, Closeable {
             final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
             return scrAdmin.enableComponent(id);
         }
-        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(SCR));
     }
 
     @Override
@@ -727,7 +772,7 @@ public final class AgentServer implements Agent, Closeable {
             final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
             return scrAdmin.enableComponent(name);
         }
-        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(SCR));
     }
 
     @Override
@@ -737,7 +782,7 @@ public final class AgentServer implements Agent, Closeable {
             final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
             return scrAdmin.disableComponent(id);
         }
-        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(SCR));
     }
 
     @Override
@@ -749,7 +794,7 @@ public final class AgentServer implements Agent, Closeable {
             final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
             return scrAdmin.disableComponent(name);
         }
-        return createResult(SKIPPED, "SCR bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(SCR));
     }
 
     @Override
@@ -781,7 +826,7 @@ public final class AgentServer implements Agent, Closeable {
                     metatypeTracker.getService());
             return configAdmin.deleteConfiguration(pid);
         }
-        return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(CM));
     }
 
     @Override
@@ -801,7 +846,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
             }
         }
-        return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(CM));
     }
 
     @Override
@@ -820,7 +865,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "Event could not be sent successfully");
             }
         }
-        return createResult(SKIPPED, "EventAdmin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(EVENT_ADMIN));
     }
 
     @Override
@@ -839,7 +884,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "Event could not be sent successfully");
             }
         }
-        return createResult(SKIPPED, "EventAdmin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(EVENT_ADMIN));
     }
 
     @Override
@@ -873,7 +918,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "The role cannot be created");
             }
         }
-        return createResult(SKIPPED, "User Admin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(USER_ADMIN));
     }
 
     @Override
@@ -889,7 +934,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "The role cannot be updated");
             }
         }
-        return createResult(SKIPPED, "User Admin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(USER_ADMIN));
     }
 
     @Override
@@ -905,7 +950,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "The role cannot be removed");
             }
         }
-        return createResult(SKIPPED, "User Admin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(USER_ADMIN));
     }
 
     @Override
@@ -1006,29 +1051,7 @@ public final class AgentServer implements Agent, Closeable {
 
     private long getSystemUptime() {
         final boolean isJMXWired = PackageWirings.isJmxWired(context);
-        return isJMXWired ? ManagementFactory.getRuntimeMXBean().getUptime() : 0;
-    }
-
-    public static <K, V> Map<K, V> valueOf(final Dictionary<K, V> dictionary) {
-        if (dictionary == null) {
-            return null;
-        }
-        final Map<K, V>      map  = new HashMap<>(dictionary.size());
-        final Enumeration<K> keys = dictionary.keys();
-        while (keys.hasMoreElements()) {
-            final K key = keys.nextElement();
-            map.put(key, dictionary.get(key));
-        }
-        return map;
-    }
-
-    public static XResultDTO createResult(final int result, final String response) {
-        final XResultDTO dto = new XResultDTO();
-
-        dto.result   = result;
-        dto.response = response;
-
-        return dto;
+        return isJMXWired ? ManagementFactory.getRuntimeMXBean().getUptime() : 0L;
     }
 
     private BundleDTO installBundleWithData(String location, final byte[] data, final int startLevel, final boolean shouldRefresh)
@@ -1057,54 +1080,10 @@ public final class AgentServer implements Agent, Closeable {
     private Map<String, Object> parseProperties(final List<ConfigValue> newProperties) throws Exception {
         final Map<String, Object> properties = new HashMap<>();
         for (final ConfigValue entry : newProperties) {
-            final Object convertedValue = convert(entry);
+            final Object convertedValue = AgentHelper.convert(entry);
             properties.put(entry.key, convertedValue);
         }
         return properties;
-    }
-
-    public static Object convert(final ConfigValue entry) throws Exception {
-        final Object            source = entry.value;
-        final XAttributeDefType type   = entry.type;
-        switch (type) {
-        case STRING_ARRAY:
-            return Converter.cnv(String[].class, source);
-        case STRING_LIST:
-            return Converter.cnv(new TypeReference<List<String>>() {
-            }, source);
-        case INTEGER_ARRAY:
-            return Converter.cnv(int[].class, source);
-        case INTEGER_LIST:
-            return Converter.cnv(new TypeReference<List<Integer>>() {
-            }, source);
-        case BOOLEAN_ARRAY:
-            return Converter.cnv(boolean[].class, source);
-        case BOOLEAN_LIST:
-            return Converter.cnv(new TypeReference<List<Boolean>>() {
-            }, source);
-        case DOUBLE_ARRAY:
-            return Converter.cnv(double[].class, source);
-        case DOUBLE_LIST:
-            return Converter.cnv(new TypeReference<List<Double>>() {
-            }, source);
-        case FLOAT_ARRAY:
-            return Converter.cnv(float[].class, source);
-        case FLOAT_LIST:
-            return Converter.cnv(new TypeReference<List<Float>>() {
-            }, source);
-        case CHAR_ARRAY:
-            return Converter.cnv(char[].class, source);
-        case CHAR_LIST:
-            return Converter.cnv(new TypeReference<List<Character>>() {
-            }, source);
-        case LONG_ARRAY:
-            return Converter.cnv(long[].class, source);
-        case LONG_LIST:
-            return Converter.cnv(new TypeReference<List<Long>>() {
-            }, source);
-        default:
-            return Converter.cnv(XAttributeDefType.clazz(type), source);
-        }
     }
 
     private static boolean isWindows() {
@@ -1126,7 +1105,51 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
             }
         }
-        return createResult(SKIPPED, "ConfigAdmin bundle is not installed to process this request");
+        return createResult(SKIPPED, packageNotWired(CM));
+    }
+
+    private ServiceRegistration<?> initOSGiEventing() {
+        final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+        if (isEventAdminAvailable) {
+            final Dictionary<String, Object> properties = new Hashtable<>();
+            properties.put("event.topics", "*");
+            return context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(remoteRPC.getRemote()), properties);
+        }
+        return null;
+    }
+
+    private Closeable initOSGiLogging() {
+        final boolean isLogAvailable = PackageWirings.isLogWired(context);
+        if (isLogAvailable) {
+            final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote(), bundleStartTimeCalculator);
+            return trackLogReader(logListener);
+        }
+        return null;
+    }
+
+    private Closeable trackLogReader(final OSGiLogListener logListener) {
+        logReaderTracker = new ServiceTracker<Object, Object>(context, "org.osgi.service.log.LogReaderService", null) {
+
+            @Override
+            public Object addingService(final ServiceReference<Object> reference) {
+                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                final Object  service        = super.addingService(reference);
+                if (isLogAvailable) {
+                    XLogReaderAdmin.register(service, logListener);
+                }
+                return service;
+            }
+
+            @Override
+            public void removedService(final ServiceReference<Object> reference, final Object service) {
+                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                if (isLogAvailable) {
+                    XLogReaderAdmin.unregister(service, logListener);
+                }
+            }
+        };
+        logReaderTracker.open();
+        return () -> logReaderTracker.close();
     }
 
 }
