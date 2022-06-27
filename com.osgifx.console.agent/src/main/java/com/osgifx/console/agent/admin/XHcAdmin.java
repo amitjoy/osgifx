@@ -15,6 +15,15 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static org.apache.felix.hc.api.HealthCheck.ASYNC_CRON_EXPRESSION;
+import static org.apache.felix.hc.api.HealthCheck.ASYNC_INTERVAL_IN_SEC;
+import static org.apache.felix.hc.api.HealthCheck.KEEP_NON_OK_RESULTS_STICKY_FOR_SEC;
+import static org.apache.felix.hc.api.HealthCheck.MBEAN_NAME;
+import static org.apache.felix.hc.api.HealthCheck.NAME;
+import static org.apache.felix.hc.api.HealthCheck.RESULT_CACHE_TTL_IN_MS;
+import static org.apache.felix.hc.api.HealthCheck.TAGS;
+import static org.osgi.framework.Constants.SERVICE_ID;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +39,6 @@ import org.apache.felix.hc.api.execution.HealthCheckExecutionResult;
 import org.apache.felix.hc.api.execution.HealthCheckExecutor;
 import org.apache.felix.hc.api.execution.HealthCheckSelector;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
@@ -92,17 +100,18 @@ public class XHcAdmin {
     private XHealthCheckDTO toDTO(final ServiceReference<HealthCheck> reference) {
         final XHealthCheckDTO dto = new XHealthCheckDTO();
 
-        dto.serviceID              = Long.parseLong(reference.getProperty(Constants.SERVICE_ID).toString());
-        dto.name                   = Optional.ofNullable(reference.getProperty("hc.name")).map(Object::toString).orElse(null);
-        dto.tags                   = Optional.ofNullable(reference.getProperty("hc.tags")).map(e -> cnv(new TypeReference<List<String>>() {
+        dto.serviceID              = Long.parseLong(reference.getProperty(SERVICE_ID).toString());
+        dto.name                   = Optional.ofNullable(reference.getProperty(NAME)).map(Object::toString).orElse(null);
+        dto.tags                   = Optional.ofNullable(reference.getProperty(TAGS)).map(e -> cnv(new TypeReference<List<String>>() {
                                    }, e)).orElse(null);
-        dto.mbeanName              = Optional.ofNullable(reference.getProperty("hc.mbean.name")).map(Object::toString).orElse(null);
-        dto.cronExpression         = Optional.ofNullable(reference.getProperty("hc.async.cronExpression")).map(Object::toString)
+        dto.mbeanName              = Optional.ofNullable(reference.getProperty(MBEAN_NAME)).map(Object::toString).orElse(null);
+        dto.cronExpression         = Optional.ofNullable(reference.getProperty(ASYNC_CRON_EXPRESSION)).map(Object::toString).orElse(null);
+        dto.interval               = Optional.ofNullable(reference.getProperty(ASYNC_INTERVAL_IN_SEC)).map(e -> cnv(Long.class, e))
                 .orElse(null);
-        dto.interval               = Optional.ofNullable(reference.getProperty("")).map(e -> cnv(Long.class, e)).orElse(null);
-        dto.resultTTL              = Optional.ofNullable(reference.getProperty("")).map(e -> cnv(Long.class, e)).orElse(null);
-        dto.resultCacheTTL         = Optional.ofNullable(reference.getProperty("")).map(e -> cnv(Long.class, e)).orElse(null);
-        dto.keepNonOkResultsSticky = Optional.ofNullable(reference.getProperty("")).map(e -> cnv(Long.class, e)).orElse(null);
+        dto.resultTTL              = Optional.ofNullable(reference.getProperty(RESULT_CACHE_TTL_IN_MS)).map(e -> cnv(Long.class, e))
+                .orElse(null);
+        dto.keepNonOkResultsSticky = Optional.ofNullable(reference.getProperty(KEEP_NON_OK_RESULTS_STICKY_FOR_SEC))
+                .map(e -> cnv(Long.class, e)).orElse(null);
 
         return dto;
     }
