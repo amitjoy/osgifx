@@ -35,7 +35,7 @@ public class XEventAdmin {
 
     public void postEvent(final String topic, final Map<String, Object> properties) {
         final Event event = new Event(topic, properties);
-        eventAdmin.sendEvent(event);
+        eventAdmin.postEvent(event);
     }
 
 }
