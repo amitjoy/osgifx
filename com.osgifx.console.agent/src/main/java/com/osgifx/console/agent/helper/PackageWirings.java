@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider;
+package com.osgifx.console.agent.helper;
 
 import static org.osgi.framework.namespace.PackageNamespace.PACKAGE_NAMESPACE;
 
@@ -36,7 +36,7 @@ public final class PackageWirings {
         JMX("JMX"),
         HC("Felix Healthcheck");
 
-        public String comprehensibleName;
+        String comprehensibleName;
 
         Type(final String comprehensibleName) {
             this.comprehensibleName = comprehensibleName;
