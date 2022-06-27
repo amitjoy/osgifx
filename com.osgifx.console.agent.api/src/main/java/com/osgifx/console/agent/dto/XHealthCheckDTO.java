@@ -27,7 +27,6 @@ public class XHealthCheckDTO extends DTO {
     public String       cronExpression;
     public Long         interval;
     public Long         resultTTL;
-    public Long         resultCacheTTL;
     public Long         keepNonOkResultsSticky;
     public List<String> tags;
 
