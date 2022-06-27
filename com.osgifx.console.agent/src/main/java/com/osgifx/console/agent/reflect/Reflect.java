@@ -137,19 +137,14 @@ public class Reflect {
 
         if (accessible instanceof Member) {
             final Member member = (Member) accessible;
-
             if (Modifier.isPublic(member.getModifiers()) && Modifier.isPublic(member.getDeclaringClass().getModifiers())) {
-
                 return accessible;
             }
         }
-
-        // [jOOQ #3392] The accessible flag is set to false by default, also for public
-        // members.
+        // The accessible flag is set to false by default, also for public members.
         if (!accessible.isAccessible()) {
             accessible.setAccessible(true);
         }
-
         return accessible;
     }
 
@@ -161,30 +156,24 @@ public class Reflect {
 
     static {
         Constructor<MethodHandles.Lookup> result;
-
         try {
             try {
                 Optional.class.getMethod("stream");
                 result = null;
             }
-
-            // [jOOQ/jOOR#57] [jOOQ/jOOQ#9157]
             // A JDK 9 guard that prevents "Illegal reflective access operation"
             // warnings when running the below on JDK 9+
             catch (final NoSuchMethodException e) {
                 result = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
-
                 if (!result.isAccessible()) {
                     result.setAccessible(true);
                 }
             }
         }
-
         // Can no longer access the above in JDK 9
         catch (final Throwable ignore) {
             result = null;
         }
-
         CACHED_LOOKUP_CONSTRUCTOR = result;
     }
 
@@ -360,7 +349,6 @@ public class Reflect {
             for (final Field field : t.getDeclaredFields()) {
                 if (type != object ^ Modifier.isStatic(field.getModifiers())) {
                     final String name = field.getName();
-
                     if (!result.containsKey(name)) {
                         result.put(name, field(name));
                     }
@@ -369,7 +357,6 @@ public class Reflect {
 
             t = t.getSuperclass();
         } while (t != null);
-
         return result;
     }
 
@@ -433,7 +420,6 @@ public class Reflect {
             final Method method = exactMethod(name, types);
             return on(method, object, args);
         }
-
         // If there is no exact match, try to find a method that has a "similar"
         // signature if primitive argument types are converted to their wrappers
         catch (final NoSuchMethodException e) {
@@ -462,7 +448,6 @@ public class Reflect {
         try {
             return t.getMethod(name, types);
         }
-
         // second priority: find a private method with exact signature match on
         // declaring class
         catch (final NoSuchMethodException e) {
@@ -499,7 +484,6 @@ public class Reflect {
                 return method;
             }
         }
-
         // second priority: find a non-public method with a "similar" signature on
         // declaring class
         do {
@@ -574,7 +558,6 @@ public class Reflect {
             final Constructor<?> constructor = type().getDeclaredConstructor(types);
             return on(constructor, args);
         }
-
         // If there is no exact match, try to find one that has a "similar"
         // signature if primitive argument types are converted to their wrappers
         catch (final NoSuchMethodException e) {
@@ -615,10 +598,7 @@ public class Reflect {
                                             // Actual method name matches always come first
                                             try {
                                                 return on(type, object).call(name, args).get();
-                                            }
-
-                                            // [#14] Emulate POJO behaviour on wrapped map objects
-                                            catch (final ReflectException e) {
+                                            } catch (final ReflectException e) {
                                                 if (isMap) {
                                                     final Map<String, Object> map    = (Map<String, Object>) object;
                                                     final int                 length = args == null ? 0 : args.length;
@@ -641,8 +621,7 @@ public class Reflect {
                                                     // Java 9 version
                                                     if (CACHED_LOOKUP_CONSTRUCTOR == null) {
 
-                                                        // Java 9 version for Java 8 distribution (jOOQ Open Source
-                                                        // Edition)
+                                                        // Java 9 version for Java 8 distribution
                                                         if (proxyLookup == null) {
                                                             proxyLookup = onClass(MethodHandles.class)
                                                                     .call("privateLookupIn", proxyType, MethodHandles.lookup())
@@ -846,9 +825,11 @@ public class Reflect {
             }
             if (float.class == type) {
                 return (Class<T>) Float.class;
-            } else if (char.class == type) {
+            }
+            if (char.class == type) {
                 return (Class<T>) Character.class;
-            } else if (void.class == type) {
+            }
+            if (void.class == type) {
                 return (Class<T>) Void.class;
             }
         }

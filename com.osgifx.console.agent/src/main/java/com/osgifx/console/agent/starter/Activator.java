@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
@@ -34,18 +32,12 @@ import java.util.regex.Matcher;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
-import com.osgifx.console.agent.admin.XLogReaderAdmin;
 import com.osgifx.console.agent.handler.ClassloaderLeakDetector;
-import com.osgifx.console.agent.handler.OSGiEventHandler;
-import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
-import com.osgifx.console.agent.provider.PackageWirings;
 import com.osgifx.console.supervisor.Supervisor;
 
 /**
@@ -120,20 +112,6 @@ public final class Activator extends Thread implements BundleActivator {
                         }
                     };
                     sa.setEndpoint(remoteRPC);
-                    // initialize OSGi events if available
-                    final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
-                    if (isEventAdminAvailable) {
-                        final Dictionary<String, Object> properties = new Hashtable<>();
-                        properties.put("event.topics", "*");
-                        context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(remoteRPC.getRemote()),
-                                properties);
-                    }
-                    // initialize OSGi logging if available
-                    final boolean isLogAvailable = PackageWirings.isLogWired(context);
-                    if (isLogAvailable) {
-                        final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote(), bundleStartTimeCalculator);
-                        trackLogReader(logListener);
-                    }
                     remoteRPC.run();
                 } catch (final Exception e) {
                 } catch (final Throwable t) {
@@ -156,36 +134,7 @@ public final class Activator extends Thread implements BundleActivator {
         classloaderLeakDetector.stop();
     }
 
-    private void trackLogReader(final OSGiLogListener logListener) {
-        final ServiceTracker<Object, Object> logReaderTracker = new ServiceTracker<Object, Object>(context,
-                "org.osgi.service.log.LogReaderService", null) {
-
-            @Override
-            public Object addingService(final ServiceReference<Object> reference) {
-                final boolean isLogAvailable = PackageWirings.isLogWired(context);
-                final Object  service        = super.addingService(reference);
-                if (isLogAvailable) {
-                    XLogReaderAdmin.register(service, logListener);
-                }
-                return service;
-            }
-
-            @Override
-            public void removedService(final ServiceReference<Object> reference, final Object service) {
-                final boolean isLogAvailable = PackageWirings.isLogWired(context);
-                if (isLogAvailable) {
-                    XLogReaderAdmin.unregister(service, logListener);
-                }
-            }
-        };
-        logReaderTracker.open();
-    }
-
     private Throwable close(final Closeable in) {
-        return close((AutoCloseable) in);
-    }
-
-    private Throwable close(final AutoCloseable in) {
         try {
             if (in != null) {
                 in.close();

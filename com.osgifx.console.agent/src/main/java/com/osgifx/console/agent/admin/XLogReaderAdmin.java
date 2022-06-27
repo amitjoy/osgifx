@@ -30,6 +30,7 @@ public final class XLogReaderAdmin {
     public static void register(final Object service, final OSGiLogListener logListener) {
         requireNonNull(service);
         requireNonNull(logListener);
+
         if (service instanceof LogReaderService) {
             ((LogReaderService) service).addLogListener(logListener);
         }
@@ -38,6 +39,7 @@ public final class XLogReaderAdmin {
     public static void unregister(final Object service, final OSGiLogListener logListener) {
         requireNonNull(service);
         requireNonNull(logListener);
+
         if (service instanceof LogReaderService) {
             ((LogReaderService) service).removeLogListener(logListener);
         }

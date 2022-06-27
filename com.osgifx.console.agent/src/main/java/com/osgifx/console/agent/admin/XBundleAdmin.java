@@ -18,6 +18,11 @@ package com.osgifx.console.agent.admin;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static org.osgi.framework.Constants.BUNDLE_CATEGORY;
+import static org.osgi.framework.Constants.BUNDLE_DESCRIPTION;
+import static org.osgi.framework.Constants.BUNDLE_DOCURL;
+import static org.osgi.framework.Constants.BUNDLE_VENDOR;
+import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_ID;
 import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
@@ -36,7 +41,6 @@ import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
@@ -76,12 +80,12 @@ public class XBundleAdmin {
         dto.symbolicName  = bundle.getSymbolicName();
         dto.version       = bundle.getVersion().toString();
         dto.location      = bundle.getLocation();
-        dto.category      = getHeader(bundle, Constants.BUNDLE_CATEGORY);
-        dto.isFragment    = getHeader(bundle, Constants.FRAGMENT_HOST) != null;
+        dto.category      = getHeader(bundle, BUNDLE_CATEGORY);
+        dto.isFragment    = getHeader(bundle, FRAGMENT_HOST) != null;
         dto.lastModified  = bundle.getLastModified();
-        dto.documentation = getHeader(bundle, Constants.BUNDLE_DOCURL);
-        dto.vendor        = getHeader(bundle, Constants.BUNDLE_VENDOR);
-        dto.description   = getHeader(bundle, Constants.BUNDLE_DESCRIPTION);
+        dto.documentation = getHeader(bundle, BUNDLE_DOCURL);
+        dto.vendor        = getHeader(bundle, BUNDLE_VENDOR);
+        dto.description   = getHeader(bundle, BUNDLE_DESCRIPTION);
         dto.startLevel    = bundle.adapt(BundleStartLevel.class).getStartLevel();
         // @formatter:off
 		dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()

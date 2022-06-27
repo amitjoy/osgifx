@@ -16,8 +16,12 @@
 package com.osgifx.console.agent.admin;
 
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
+import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
-import static com.osgifx.console.agent.provider.AgentServer.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.SCR;
+import static org.osgi.framework.Constants.OBJECTCLASS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +35,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.osgi.framework.Constants;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
@@ -81,7 +84,7 @@ public class XComponentAdmin {
 
     public XResultDTO enableComponent(final long id) {
         if (scr == null) {
-            return createResult(XResultDTO.SKIPPED, "Required service is unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
         final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
@@ -109,7 +112,7 @@ public class XComponentAdmin {
 
     public XResultDTO enableComponent(final String name) {
         if (scr == null) {
-            return createResult(XResultDTO.SKIPPED, "Required service is unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
         final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
@@ -132,7 +135,7 @@ public class XComponentAdmin {
 
     public XResultDTO disableComponent(final long id) {
         if (scr == null) {
-            return createResult(XResultDTO.SKIPPED, "Required service is unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
         final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
@@ -158,7 +161,7 @@ public class XComponentAdmin {
 
     public XResultDTO disableComponent(final String name) {
         if (scr == null) {
-            return createResult(XResultDTO.SKIPPED, "Required service is unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
         final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
@@ -263,7 +266,7 @@ public class XComponentAdmin {
         final Set<String> finalList = new HashSet<>();
         for (final ServiceReferenceDTO dto : services) {
             if (dto != null) {
-                final String[] objectClass = (String[]) dto.properties.get(Constants.OBJECTCLASS);
+                final String[] objectClass = (String[]) dto.properties.get(OBJECTCLASS);
                 finalList.addAll(Arrays.asList(objectClass));
             }
         }

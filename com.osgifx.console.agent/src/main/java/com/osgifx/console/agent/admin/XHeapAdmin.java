@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static com.osgifx.console.agent.Agent.HEAPDUMP_LOCATION_KEY;
+
 import java.io.File;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -29,7 +31,6 @@ import java.util.List;
 
 import javax.management.MBeanServer;
 
-import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
@@ -138,7 +139,7 @@ public final class XHeapAdmin {
     }
 
     private static File getLocation() {
-        final String externalLocation = System.getProperty(Agent.HEAPDUMP_LOCATION_KEY);
+        final String externalLocation = System.getProperty(HEAPDUMP_LOCATION_KEY);
         if (externalLocation != null) {
             final File file = new File(externalLocation);
             file.mkdirs();

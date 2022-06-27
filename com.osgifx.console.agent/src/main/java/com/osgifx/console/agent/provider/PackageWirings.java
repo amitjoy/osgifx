@@ -23,6 +23,26 @@ import org.osgi.framework.wiring.BundleWiring;
 
 public final class PackageWirings {
 
+    public enum Type {
+        SCR("SCR"),
+        CM("Config Admin"),
+        DMT("DMT Admin"),
+        USER_ADMIN("User Admin"),
+        METATYPE("Metatype"),
+        EVENT_ADMIN("Event Admin"),
+        LOG("Log"),
+        R7_LOGGER("R7 Logger"),
+        HTTP("HTTP"),
+        JMX("JMX"),
+        HC("Felix Healthcheck");
+
+        public String comprehensibleName;
+
+        Type(final String comprehensibleName) {
+            this.comprehensibleName = comprehensibleName;
+        }
+    }
+
     private PackageWirings() {
         throw new IllegalAccessError("Cannot be instantiated");
     }
