@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.XThreadDTO;
-import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.helper.PackageWirings;
 
 public class XThreadAdmin {
 
