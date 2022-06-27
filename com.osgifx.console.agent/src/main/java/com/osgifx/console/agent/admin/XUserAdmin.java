@@ -18,7 +18,9 @@ package com.osgifx.console.agent.admin;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
-import static com.osgifx.console.agent.provider.AgentServer.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.USER_ADMIN;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ import org.osgi.service.useradmin.UserAdmin;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
-import com.osgifx.console.agent.provider.AgentServer;
+import com.osgifx.console.agent.helper.AgentHelper;
 
 public class XUserAdmin {
 
@@ -66,7 +68,7 @@ public class XUserAdmin {
 
     public XResultDTO createRole(final String name, final Type type) {
         if (userAdmin == null) {
-            return createResult(SKIPPED, "UserAdmin service is not available");
+            return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final Role role = userAdmin.createRole(name, getType(type));
         if (role != null) {
@@ -78,7 +80,7 @@ public class XUserAdmin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public XResultDTO updateRole(final XRoleDTO roleDTO) {
         if (userAdmin == null) {
-            return createResult(SKIPPED, "UserAdmin service is not available");
+            return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         try {
             final Role role = getRole(roleDTO);
@@ -179,7 +181,7 @@ public class XUserAdmin {
 
     public XResultDTO removeRole(final String name) {
         if (userAdmin == null) {
-            return createResult(SKIPPED, "UserAdmin service is not available");
+            return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final boolean isRemoved = userAdmin.removeRole(name);
         return isRemoved ? createResult(SUCCESS, "The role '" + name + "' has been removed successfully")
@@ -206,14 +208,14 @@ public class XUserAdmin {
 
         roleDTO.name       = role.getName();
         roleDTO.type       = toType(role.getType());
-        roleDTO.properties = AgentServer.valueOf(role.getProperties());
+        roleDTO.properties = AgentHelper.valueOf(role.getProperties());
 
         if (roleDTO.type == Type.GROUP) {
             roleDTO.basicMembers    = toBasicMembers(role);
             roleDTO.requiredMembers = toRequiredMembers(role);
         }
         if (roleDTO.type == Type.USER) {
-            roleDTO.credentials = AgentServer.valueOf(((User) role).getCredentials());
+            roleDTO.credentials = AgentHelper.valueOf(((User) role).getCredentials());
         }
         return roleDTO;
     }

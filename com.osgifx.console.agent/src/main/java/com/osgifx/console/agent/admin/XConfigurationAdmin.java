@@ -16,8 +16,11 @@
 package com.osgifx.console.agent.admin;
 
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
+import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
-import static com.osgifx.console.agent.provider.AgentServer.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.CM;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
@@ -40,7 +43,7 @@ import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
-import com.osgifx.console.agent.provider.AgentServer;
+import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.reflect.Reflect;
 
 public class XConfigurationAdmin {
@@ -70,7 +73,7 @@ public class XConfigurationAdmin {
 
     public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
         if (configAdmin == null) {
-            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
         try {
@@ -100,7 +103,7 @@ public class XConfigurationAdmin {
 
     public XResultDTO deleteConfiguration(final String pid) {
         if (configAdmin == null) {
-            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
         try {
@@ -125,7 +128,7 @@ public class XConfigurationAdmin {
 
     public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
         if (configAdmin == null) {
-            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
+            return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
         try {
@@ -170,7 +173,7 @@ public class XConfigurationAdmin {
             return Collections.emptyMap();
         }
         final Map<String, ConfigValue> props = new HashMap<>();
-        for (final Entry<String, Object> entry : AgentServer.valueOf(config.getProperties()).entrySet()) {
+        for (final Entry<String, Object> entry : AgentHelper.valueOf(config.getProperties()).entrySet()) {
             final String      key         = entry.getKey();
             final Object      value       = entry.getValue();
             final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));

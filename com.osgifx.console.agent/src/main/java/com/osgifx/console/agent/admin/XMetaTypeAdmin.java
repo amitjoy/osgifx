@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
-import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
-import static com.osgifx.console.agent.provider.AgentServer.createResult;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
@@ -27,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,7 +43,6 @@ import com.osgifx.console.agent.dto.XAttributeDefDTO;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XObjectClassDefDTO;
-import com.osgifx.console.agent.dto.XResultDTO;
 
 public class XMetaTypeAdmin {
 
@@ -75,60 +69,6 @@ public class XMetaTypeAdmin {
             return Collections.emptyList();
         }
         return joinLists(configsWithMetatype, metatypeWithoutConfigs);
-    }
-
-    public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
-        if (configAdmin == null || metatype == null) {
-            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
-        }
-        XResultDTO result = null;
-        try {
-            String              action        = null;
-            final Configuration configuration = configAdmin.getConfiguration(pid, "?");
-            if (configuration.getProperties() == null) { // new configuration
-                action = "created";
-            } else {
-                action = "updated";
-            }
-            configuration.update(new Hashtable<>(newProperties));
-            result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been " + action);
-        } catch (final Exception e) {
-            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
-        }
-        return result;
-    }
-
-    public XResultDTO deleteConfiguration(final String pid) {
-        if (configAdmin == null || metatype == null) {
-            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
-        }
-        XResultDTO result = null;
-        try {
-            for (final Configuration configuration : configAdmin.listConfigurations(null)) {
-                if (configuration.getPid().equals(pid)) {
-                    configuration.delete();
-                    result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been deleted");
-                }
-            }
-        } catch (final Exception e) {
-            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
-        }
-        return result;
-    }
-
-    public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
-        if (configAdmin == null || metatype == null) {
-            return createResult(XResultDTO.SKIPPED, "Required services are unavailable to process the request");
-        }
-        XResultDTO result = null;
-        try {
-            final Configuration configuration = configAdmin.createFactoryConfiguration(factoryPid, "?");
-            configuration.update(new Hashtable<>(newProperties));
-            result = createResult(SUCCESS, "Configuration with factory PID '" + factoryPid + " ' has been created");
-        } catch (final Exception e) {
-            result = createResult(ERROR, "Configuration with factory PID '" + factoryPid + "' cannot be created due to " + e.getMessage());
-        }
-        return result;
     }
 
     private List<XConfigurationDTO> findConfigsWithMetatype() throws IOException, InvalidSyntaxException {
