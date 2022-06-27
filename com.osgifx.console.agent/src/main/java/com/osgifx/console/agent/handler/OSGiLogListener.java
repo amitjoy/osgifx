@@ -24,8 +24,8 @@ import org.osgi.service.log.LogListener;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.helper.Reflect;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
-import com.osgifx.console.agent.reflect.Reflect;
 import com.osgifx.console.supervisor.Supervisor;
 
 public class OSGiLogListener implements LogListener {

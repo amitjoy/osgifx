@@ -17,12 +17,12 @@ package com.osgifx.console.agent.helper;
 
 public enum OSGiCompendiumService {
 
-    SCR("Service Component Runtime"),
+    SCR("SCR"),
     CM("Config Admin"),
     METATYPE("Metatype"),
     DMT("DMT Admin"),
     USER_ADMIN("User Admin"),
-    LOGGER_ADMIN("Logger Admin"),
+    LOGGER_ADMIN("R7 Logger Admin"),
     EVENT_ADMIN("Event Admin");
 
     String comprehensibleName;

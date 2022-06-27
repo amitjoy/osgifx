@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.handler;
+package com.osgifx.console.agent.provider;
 
 import static java.lang.Long.toHexString;
 import static java.util.Objects.hash;
@@ -45,7 +45,6 @@ import org.osgi.util.tracker.BundleTracker;
 
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XBundleDTO;
-import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 
 /**
  * A support for tracing classloader leaks which occur due to improper cleanup
