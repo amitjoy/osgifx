@@ -18,6 +18,8 @@ package com.osgifx.console.agent.admin;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.osgi.framework.Constants.OBJECTCLASS;
+import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,6 @@ import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 
@@ -43,7 +44,7 @@ public class XServiceAdmin {
     public static List<XServiceDTO> get(final BundleContext context) {
         requireNonNull(context);
         try {
-            final FrameworkDTO dto = context.getBundle(Constants.SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
+            final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
             return dto.services.stream().map(s -> toDTO(s, context)).collect(toList());
         } catch (final Exception e) {
             return Collections.emptyList();
@@ -68,7 +69,7 @@ public class XServiceAdmin {
     }
 
     private static List<String> getObjectClass(final Map<String, Object> properties) {
-        final Object objectClass = properties.get(Constants.OBJECTCLASS);
+        final Object objectClass = properties.get(OBJECTCLASS);
         return Arrays.asList((String[]) objectClass);
     }
 

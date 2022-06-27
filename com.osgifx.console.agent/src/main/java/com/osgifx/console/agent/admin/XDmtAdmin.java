@@ -18,7 +18,9 @@ package com.osgifx.console.agent.admin;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
-import static com.osgifx.console.agent.provider.AgentServer.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.DMT;
 import static org.osgi.service.dmt.DmtSession.LOCK_TYPE_EXCLUSIVE;
 import static org.osgi.service.dmt.MetaNode.CMD_GET;
 import static org.osgi.service.dmt.Uri.PATH_SEPARATOR;
@@ -57,7 +59,7 @@ public final class XDmtAdmin {
 
     public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
         if (dmtAdmin == null) {
-            return createResult(SKIPPED, "DMT Admin service is not available");
+            return createResult(SKIPPED, serviceUnavailable(DMT));
         }
         DmtSession session = null;
         try {

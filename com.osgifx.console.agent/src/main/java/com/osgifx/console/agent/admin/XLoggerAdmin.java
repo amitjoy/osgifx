@@ -18,7 +18,9 @@ package com.osgifx.console.agent.admin;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
-import static com.osgifx.console.agent.provider.AgentServer.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.createResult;
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.LOGGER_ADMIN;
 import static java.util.stream.Collectors.toMap;
 import static org.osgi.service.log.Logger.ROOT_LOGGER_NAME;
 
@@ -75,7 +77,7 @@ public class XLoggerAdmin {
 
     public XResultDTO updateLoggerContext(final String bsn, final Map<String, String> logLevels) {
         if (loggerAdmin == null) {
-            return createResult(SKIPPED, "LoggerAdmin service is not available");
+            return createResult(SKIPPED, serviceUnavailable(LOGGER_ADMIN));
         }
         try {
             if (isConfigAdminWired) {
