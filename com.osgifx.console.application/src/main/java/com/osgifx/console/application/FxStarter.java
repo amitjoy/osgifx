@@ -16,11 +16,19 @@
 package com.osgifx.console.application;
 
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
+import static org.osgi.framework.Constants.SERVICE_RANKING;
+
+import java.util.Dictionary;
+import java.util.Map;
 
 import org.eclipse.e4.core.di.InjectorFactory;
+import org.eclipse.fx.core.ServiceUtils;
+import org.eclipse.fx.core.log.LoggerFactory;
+import org.eclipse.fx.ui.services.startup.StartupProgressTrackerService;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 import com.osgifx.console.application.ui.ConsoleMaskerPaneProvider;
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
@@ -32,6 +40,8 @@ public final class FxStarter implements BundleActivator {
 
     @Override
     public void start(final BundleContext context) throws Exception {
+        registerStartupTracker(context);
+
         InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
         InjectorFactory.getDefault().addBinding(ConsoleMaskerPane.class).implementedBy(ConsoleMaskerPaneProvider.class);
     }
@@ -39,6 +49,13 @@ public final class FxStarter implements BundleActivator {
     @Override
     public void stop(final BundleContext context) throws Exception {
         // nothing to implement
+    }
+
+    private void registerStartupTracker(final BundleContext context) {
+        ServiceUtils.getService(LoggerFactory.class).ifPresent(s -> {
+            final Dictionary<String, Object> props = FrameworkUtil.asDictionary(Map.of(SERVICE_RANKING, 100));
+            context.registerService(StartupProgressTrackerService.class, new FxStartupTracker(s), props);
+        });
     }
 
 }
