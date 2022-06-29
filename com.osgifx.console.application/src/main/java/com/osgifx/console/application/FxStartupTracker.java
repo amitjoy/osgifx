@@ -27,17 +27,12 @@ import org.eclipse.fx.core.app.ApplicationContext;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.eclipse.fx.ui.services.startup.StartupProgressTrackerService;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
-@Component
 public final class FxStartupTracker implements StartupProgressTrackerService {
 
-    @Reference
-    private LoggerFactory factory;
-    private FluentLogger  logger;
+    private final FluentLogger logger;
 
-    void activate() {
+    public FxStartupTracker(final LoggerFactory factory) {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
