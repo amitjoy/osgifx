@@ -44,12 +44,12 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(HTTP_ID)
-// @formatter:off
+//@formatter:off
 @EventTopics({
-	AGENT_DISCONNECTED_EVENT_TOPIC,
-	BUNDLE_ACTION_EVENT_TOPICS,
-	COMPONENT_ACTION_EVENT_TOPICS,
-	CONFIGURATION_ACTION_EVENT_TOPICS })
+    AGENT_DISCONNECTED_EVENT_TOPIC,
+    BUNDLE_ACTION_EVENT_TOPICS,
+    COMPONENT_ACTION_EVENT_TOPICS,
+    CONFIGURATION_ACTION_EVENT_TOPICS })
 // @formatter:on
 public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 

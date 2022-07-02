@@ -94,15 +94,15 @@ public final class RuntimeDataProvider implements DataProvider {
         if (id == null) {
             if (isAsync) {
                 // @formatter:off
-				final Collection<CompletableFuture<Void>> futures =
-						infoSuppliers.values()
-						             .stream()
-						             .map(s -> CompletableFuture.runAsync(s::retrieve))
-						             .toList();
-				CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-				                 .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
-				                 .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
-				// @formatter:on
+                final Collection<CompletableFuture<Void>> futures =
+                        infoSuppliers.values()
+                                     .stream()
+                                     .map(s -> CompletableFuture.runAsync(s::retrieve))
+                                     .toList();
+                // @formatter:on
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                        .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
+                        .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
             } else {
                 infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);

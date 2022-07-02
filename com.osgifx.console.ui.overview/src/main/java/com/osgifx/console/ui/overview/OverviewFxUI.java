@@ -139,14 +139,15 @@ public final class OverviewFxUI {
             uptimeTile.setDuration(LocalTime.of(uptime.hours(), uptime.minutes(), uptime.seconds()));
 
             // @formatter:off
-			runtimeInfoTile.setGraphic(createRuntimeTable(
-					runtimeInfo.frameworkBsn(),
-					runtimeInfo.frameworkVersion(),
-			        runtimeInfo.memoryInfo(),
-			        runtimeInfo.osName(),
-			        runtimeInfo.osVersion(),
-			        runtimeInfo.osArchitecture()));
-			// @formatter:on
+            runtimeInfoTile.setGraphic(
+                    createRuntimeTable(
+                            runtimeInfo.frameworkBsn(),
+                            runtimeInfo.frameworkVersion(),
+                            runtimeInfo.memoryInfo(),
+                            runtimeInfo.osName(),
+                            runtimeInfo.osVersion(),
+                            runtimeInfo.osArchitecture()));
+            // @formatter:on
         }));
         dataRetrieverTimeline.setCycleCount(INDEFINITE);
     }
@@ -325,15 +326,16 @@ public final class OverviewFxUI {
         dataTable.setFillWidth(true);
 
         // @formatter:off
-		final Map<String, String> runtimeInfo = Map.of(
-				"Framework", frameworkBsn,
-				"Framework Version", frameworkVersion,
-				"Memory Total", String.valueOf(memoryInfo.totalMemory),
-				"Memory Free", String.valueOf(memoryInfo.freeMemory),
-				"OS Name", osName,
-		        "OS Version", osVersion,
-		        "OS Architecture", osArchitecture);
-		// @formatter:on
+        final Map<String, String> runtimeInfo =
+                Map.of(
+                        "Framework", frameworkBsn,
+                        "Framework Version", frameworkVersion,
+                        "Memory Total", String.valueOf(memoryInfo.totalMemory),
+                        "Memory Free", String.valueOf(memoryInfo.freeMemory),
+                        "OS Name", osName,
+                        "OS Version", osVersion,
+                        "OS Architecture", osArchitecture);
+        // @formatter:on
 
         final Map<String, String> filteredMap = Maps.newTreeMap();
         filteredMap.putAll(runtimeInfo);

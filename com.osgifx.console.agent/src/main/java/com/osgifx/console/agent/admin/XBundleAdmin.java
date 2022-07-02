@@ -88,14 +88,14 @@ public class XBundleAdmin {
         dto.description   = getHeader(bundle, BUNDLE_DESCRIPTION);
         dto.startLevel    = bundle.adapt(BundleStartLevel.class).getStartLevel();
         // @formatter:off
-		dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()
+        dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()
                                                               .stream()
                                                               .filter(b -> b.getSymbolicName().equals(dto.symbolicName))
                                                               .map(BundleStartDuration::getStartedAfter)
                                                               .map(Duration::toMillis)
                                                               .findAny()
                                                               .orElse(-1L);
-		// @formatter:on
+        // @formatter:on
         dto.bundleRevision         = bundle.adapt(BundleRevisionDTO.class);
         dto.exportedPackages       = getExportedPackages(bundle);
         dto.importedPackages       = getImportedPackages(bundle);
