@@ -122,11 +122,10 @@ public final class LogConfigurationEditorFxController {
     }
 
     private FormRenderer createForm(final XBundleLoggerContextDTO loggerContext) {
-        // @formatter:off
-        form     = Form.of(Section.of(initGenericFields(loggerContext).toArray(new Field[0])).title("Generic Information"),
-                           Section.of(initField(loggerContext).toArray(new Field[0])).title("Logger Context Configuration"))
-                       .title("Logger Context Configuration");
-        // @formatter:on
+        form = Form
+                .of(Section.of(initGenericFields(loggerContext).toArray(new Field[0])).title("Generic Information"),
+                        Section.of(initField(loggerContext).toArray(new Field[0])).title("Logger Context Configuration"))
+                .title("Logger Context Configuration");
         final var renderer = new FormRenderer(form);
 
         GridPane.setColumnSpan(renderer, 2);
@@ -150,13 +149,13 @@ public final class LogConfigurationEditorFxController {
         final var logLevels  = logLevelsX == null ? Map.of() : logLevelsX;
 
         // @formatter:off
-		final Field<?> logLevelsField  = Field.ofStringType(LogsHelper.mapToString(logLevels))
-				                              .multiline(true)
-				                              .render(new LoggerConfigTextControl())
-				                              .label("Log Levels")
-				                              .valueDescription(KV_DESCRIPTION)
-				                              .validate(forPredicate(LogsHelper::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
-		// @formatter:on
+        final Field<?> logLevelsField = Field.ofStringType(LogsHelper.mapToString(logLevels))
+                                             .multiline(true)
+                                             .render(new LoggerConfigTextControl())
+                                             .label("Log Levels")
+                                             .valueDescription(KV_DESCRIPTION)
+                                             .validate(forPredicate(LogsHelper::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
+        // @formatter:on
         return List.of(logLevelsField);
     }
 

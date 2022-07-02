@@ -177,11 +177,10 @@ public final class ConfigurationEditorFxController {
     }
 
     private FormRenderer createForm(final XConfigurationDTO config) {
-        // @formatter:off
-        form     = Form.of(Section.of(initGenericFields(config).toArray(new Field[0])).title("Generic Properties"),
-                           Section.of(initProperties(config).toArray(new Field[0])).title("Specific Properties"))
-                       .title("Configuration Properties");
-        // @formatter:on
+        form = Form
+                .of(Section.of(initGenericFields(config).toArray(new Field[0])).title("Generic Properties"),
+                        Section.of(initProperties(config).toArray(new Field[0])).title("Specific Properties"))
+                .title("Configuration Properties");
         final var renderer = new FormRenderer(form);
 
         GridPane.setColumnSpan(renderer, 2);

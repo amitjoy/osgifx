@@ -50,14 +50,14 @@ public final class ConsoleFxHelper {
         final var wildcardMatcher          = CharMatcher.is('*');
 
         // @formatter:off
-		final var valid = alphabetLowerCaseMatcher.or(alphabetUpperCaseMatcher)
-				                                  .or(digitMatcher)
-				                                  .or(underscoreMatcher)
-				                                  .or(slashMatcher)
-				                                  .or(hyphenMatcher)
-				                                  .or(wildcardMatcher)
-				                                  .matchesAllOf(topic);
-		// @formatter:on
+        final var valid = alphabetLowerCaseMatcher.or(alphabetUpperCaseMatcher)
+                                                  .or(digitMatcher)
+                                                  .or(underscoreMatcher)
+                                                  .or(slashMatcher)
+                                                  .or(hyphenMatcher)
+                                                  .or(wildcardMatcher)
+                                                  .matchesAllOf(topic);
+        // @formatter:on
         if (!valid) {
             return false;
         }
