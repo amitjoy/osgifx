@@ -138,15 +138,19 @@ public class DeploymentPackageExporter implements Exporter {
                 return new SimpleEntry<>("deployment-package", result);
             }
         } catch (final Exception e) {
-            try {
-                IO.write(Throwables.getStackTraceAsString(e).getBytes(), new File(project.getBase(), "exception.txt"));
-            } catch (final IOException e1) {
-                project.exception(e, "Cannot write exception text file");
-            }
+            logException(e);
             project.exception(e, "Cannot create deployment package");
             throw e;
         }
         return null;
+    }
+
+    private void logException(final Exception e) {
+        try {
+            IO.write(Throwables.getStackTraceAsString(e).getBytes(), new File(project.getBase(), "exception.txt"));
+        } catch (final IOException e1) {
+            project.exception(e, "Cannot write exception text file");
+        }
     }
 
     private Collection<DeploymentPackageEntryDTO> prepareEntries(final Collection<Container> bundles, final String resourceProcessors,
