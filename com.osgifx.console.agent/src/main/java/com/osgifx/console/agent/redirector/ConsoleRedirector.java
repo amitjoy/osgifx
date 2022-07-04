@@ -19,6 +19,7 @@ import static com.osgifx.console.agent.Agent.CONSOLE;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.osgifx.console.agent.provider.AgentServer;
@@ -31,12 +32,11 @@ import com.osgifx.console.agent.provider.AgentServer;
  */
 public class ConsoleRedirector implements Redirector {
 
-    private static RedirectOutput                    stdout;
-    private static RedirectOutput                    stderr;
-    private static RedirectInput                     stdin;
-    private static CopyOnWriteArrayList<AgentServer> agents = new CopyOnWriteArrayList<>();
-    volatile boolean                                 quit   = false;
-    private final AgentServer                        agent;
+    private static RedirectOutput    stdout;
+    private static RedirectOutput    stderr;
+    private static RedirectInput     stdin;
+    private static List<AgentServer> agents = new CopyOnWriteArrayList<>();
+    private final AgentServer        agent;
 
     /**
      * Constructor.
@@ -62,7 +62,6 @@ public class ConsoleRedirector implements Redirector {
      */
     @Override
     public void close() throws IOException {
-        quit = true;
         synchronized (agents) {
             if (agents.remove(agent) && agents.isEmpty()) {
                 System.setOut(stdout.getOut());
