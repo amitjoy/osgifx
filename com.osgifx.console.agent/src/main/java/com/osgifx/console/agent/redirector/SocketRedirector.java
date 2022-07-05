@@ -30,24 +30,18 @@ import com.osgifx.console.agent.provider.AgentServer;
  */
 public class SocketRedirector implements Redirector {
 
-    //
-    // The key used by the Apache Felix shell to define the host the server
-    // socket is registered on
-    //
-
+    // The key used by the Apache Felix shell to define the host the server socket
+    // is registered on
     private static final String OSGI_SHELL_TELNET_IP = "osgi.shell.telnet.ip";
 
-    //
-    // Telnet sends some options in the beginning that need to be
-    // skipped. The IAC is the first byte that then is followed
-    // by some commands.
-    //
-
+    // Telnet sends some options in the beginning that need to be skipped. The IAC
+    // is the first byte that then is followed by some commands.
     private static final int IAC = 255;
+
     private Socket           socket;
     private PrintStream      in;
     private Thread           out;
-    private boolean          quit;
+    private volatile boolean quit;
 
     /**
      * Constructor
@@ -56,40 +50,22 @@ public class SocketRedirector implements Redirector {
      * @param port        the shell port
      */
     public SocketRedirector(final AgentServer agentServer, final int port) throws Exception {
-
-        //
         // We need a thread to read any output from the shell processor
         // which is then forwarded to the supervisor
-        //
-
         out = new Thread() {
             @Override
             public void run() {
                 try {
-
-                    //
                     // Connect to the server. We keep on trying this.
-                    //
-
                     while ((socket = findSocket(agentServer, port)) == null) {
-
                         if (isInterrupted() || quit) {
                             return;
                         }
-
                         Thread.sleep(1000);
                     }
-
-                    //
-                    // Create a printstream on the socket output (the system's
-                    // input).
-                    //
-
+                    // Create a printstream on the socket output (the system's input)
                     in = new PrintStream(socket.getOutputStream());
-
-                    //
                     // Start reading the input
-                    //
                     final InputStream out = socket.getInputStream();
 
                     final byte[] buffer = new byte[1000];
@@ -100,20 +76,13 @@ public class SocketRedirector implements Redirector {
                             for (int i = 0; i < size; i++) {
                                 int b = 0xFF & buffer[i];
 
-                                // Since we have a telnet protocol, there
-                                // are some special characters we should
-                                // ignore. We assume that all parts of the
-                                // command are in the same buffer, which is
-                                // highly likely since they are usually
-                                // tramsmitted in a single go
-
+                                // Since we have a telnet protocol, there are some special characters we should
+                                // ignore. We assume that all parts of the command are in the same buffer, which
+                                // is highly likely since they are usually tramsmitted in a single go
                                 if (b == IAC) {
-
                                     // Next is the command type
-
                                     i++;
                                     b = buffer[i];
-
                                     // DO, DONT, WILL, WONT have an extra byte
                                     if (b == 251 || b == 252 || b == 253 || b == 254) {
                                         ++i;
@@ -158,29 +127,21 @@ public class SocketRedirector implements Redirector {
         }
 
         try {
-
-            //
-            // Some Unix's use 127.0.1.1 for some unknown reason
-            // but the Gogo shell delivers at 127.0.0.1
-            //
-
+            // Some Unix's use 127.0.1.1 for some unknown reason but the Gogo shell delivers
+            // at 127.0.0.1
             final InetAddress oldStyle = InetAddress.getByName(null);
             return new Socket(oldStyle, port);
         } catch (final Exception e) {
             // ignore
         }
-
-        //
-        // Ah well, maybe they did change their mind, so let's
-        // look at localhost as well.
-        //
+        // Maybe they did change their mind, so let's look at localhost as
+        // well.
         try {
             final InetAddress localhost = InetAddress.getLocalHost();
             return new Socket(localhost, port);
         } catch (final Exception e) {
             // ignore
         }
-
         return null;
     }
 
@@ -214,7 +175,6 @@ public class SocketRedirector implements Redirector {
         if (in != null) {
             return in;
         }
-
         return System.out;
     }
 
