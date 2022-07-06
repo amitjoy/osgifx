@@ -71,11 +71,17 @@ bundles.e4.efxclipse: \
                  org.eclipse.fx.ui.workbench.renderers.fx,\
                  org.eclipse.fx.ui.workbench.services
 
+bundles.slf4j: \
+                 org.eclipse.fx.core.slf4j
+
 bundles.required: \
                  ${bundles.e4.core},\
                  ${bundles.e4.efxclipse},\
                  ${bundles.deps},\
                  ${bundles.eclipse.core},\
+                 ${bundles.slf4j},\
+                 slf4j.api,\
+                 jul.to.slf4j,\
                  com.google.guava,\
                  org.apache.commons.lang,\
                  org.eclipse.equinox.preferences,\
