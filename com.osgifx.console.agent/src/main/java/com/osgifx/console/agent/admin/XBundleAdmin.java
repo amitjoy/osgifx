@@ -86,7 +86,7 @@ public class XBundleAdmin {
         dto.documentation = getHeader(bundle, BUNDLE_DOCURL);
         dto.vendor        = getHeader(bundle, BUNDLE_VENDOR);
         dto.description   = getHeader(bundle, BUNDLE_DESCRIPTION);
-        dto.startLevel    = bundle.adapt(BundleStartLevel.class).getStartLevel();
+        dto.startLevel    = getStartLevel(bundle);
         // @formatter:off
         dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()
                                                               .stream()
@@ -113,10 +113,32 @@ public class XBundleAdmin {
         return dto;
     }
 
+    /**
+     * This has been introduced to catch any Exception that might occur while
+     * adapting a bundle instance which is not valid anymore, for example, if the
+     * bundle is recently uninstalled
+     *
+     * @param bundle the bundle to adapt
+     * @return the start level or -1 if the bundle cannot be adapted
+     */
+    private static int getStartLevel(final Bundle bundle) {
+        try {
+            return bundle.adapt(BundleStartLevel.class).getStartLevel();
+        } catch (final Exception e) {
+            return -1;
+        }
+    }
+
     private static boolean getActivationPolicyUsed(final Bundle bundle) {
         final BundleStartLevel startLevel = bundle.adapt(BundleStartLevel.class);
         if (startLevel != null) {
-            return startLevel.isActivationPolicyUsed();
+            try {
+                // In equinox, the following checks if a bundle is valid and if not, equinox
+                // throws unchecked exception (for example, if the bundle is uninstalled)
+                return startLevel.isActivationPolicyUsed();
+            } catch (final Exception e) {
+                // nothing to do
+            }
         }
         return false;
     }
@@ -124,7 +146,13 @@ public class XBundleAdmin {
     private static boolean getPeristentlyStarted(final Bundle bundle) {
         final BundleStartLevel startLevel = bundle.adapt(BundleStartLevel.class);
         if (startLevel != null) {
-            return startLevel.isPersistentlyStarted();
+            try {
+                // In equinox, the following checks if a bundle is valid and if not, equinox
+                // throws unchecked exception (for example, if the bundle is uninstalled)
+                return startLevel.isPersistentlyStarted();
+            } catch (final Exception e) {
+                // nothing to do
+            }
         }
         return false;
     }
@@ -174,9 +202,15 @@ public class XBundleAdmin {
     }
 
     private static List<XServiceInfoDTO> getUsedServices(final Bundle bundle) {
-        final List<XServiceInfoDTO> services     = new ArrayList<>();
-        final ServiceReference<?>[] usedServices = bundle.getServicesInUse();
-
+        final List<XServiceInfoDTO> services = new ArrayList<>();
+        ServiceReference<?>[]       usedServices;
+        try {
+            // In equinox, the following checks if a bundle is valid and if not, equinox
+            // throws unchecked exception (for example, if the bundle is uninstalled)
+            usedServices = bundle.getServicesInUse();
+        } catch (final Exception e) {
+            usedServices = new ServiceReference<?>[0];
+        }
         if (usedServices == null) {
             return Collections.emptyList();
         }
@@ -190,9 +224,15 @@ public class XBundleAdmin {
     }
 
     private static List<XServiceInfoDTO> getRegisteredServices(final Bundle bundle) {
-        final List<XServiceInfoDTO> services           = new ArrayList<>();
-        final ServiceReference<?>[] registeredServices = bundle.getRegisteredServices();
-
+        final List<XServiceInfoDTO> services = new ArrayList<>();
+        ServiceReference<?>[]       registeredServices;
+        try {
+            // In equinox, the following checks if a bundle is valid and if not, equinox
+            // throws unchecked exception (for example, if the bundle is uninstalled)
+            registeredServices = bundle.getRegisteredServices();
+        } catch (final Exception e) {
+            registeredServices = new ServiceReference<?>[0];
+        }
         if (registeredServices == null) {
             return Collections.emptyList();
         }
