@@ -16,7 +16,6 @@
 package com.osgifx.console.application.handler;
 
 import java.awt.Desktop;
-import java.io.File;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -27,23 +26,23 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.log.DiagnosticsAdmin;
+
 public final class OpenDiagnosticsHandler {
 
     @Log
     @Inject
-    private FluentLogger  logger;
+    private FluentLogger     logger;
     @Inject
     @OSGiBundle
-    private BundleContext context;
+    private BundleContext    context;
+    @Inject
+    private DiagnosticsAdmin diagnosticsAdmin;
 
     @Execute
     public void execute() {
-        var area = context.getProperty("osgi.instance.area.default");
-        // remove the prefix
-        final var prefix = "file:";
-        area = area.substring(area.indexOf(prefix) + prefix.length());
         try {
-            Desktop.getDesktop().open(new File(area, "./log/log.txt"));
+            Desktop.getDesktop().open(diagnosticsAdmin.getLogFilesDirectory());
         } catch (final IOException e) {
             logger.atError().withException(e).log("Cannot open diagnostics file");
         }

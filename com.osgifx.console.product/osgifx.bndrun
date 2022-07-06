@@ -10,6 +10,8 @@ default.startlevel                :   10
 # components to be ready before application startup
 startlevels                       :   com.osgifx.console.agent;startlevel=1,\
                                       org.apache.felix.scr;startlevel=2,\
+                                      com.osgifx.console.logging;startlevel=2,\
+                                      org.eclipse.fx.core.slf4j;startlevel=3,\
                                       org.eclipse.fx.ui.controls;startlevel=3
 
 -runstartlevel                    :   begin = ${default.startlevel}, step = -1, order = sortbynameversion
@@ -119,6 +121,7 @@ install.order                     :   \
 	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)';startlevel=10,\
 	org.apache.felix.gogo.runtime;version='[1.1.0,1.1.1)';startlevel=10,\
 	org.apache.felix.gogo.shell;version='[1.1.0,1.1.1)';startlevel=10,\
+	org.apache.felix.metatype;version='[1.2.4,1.2.5)';startlevel=10,\
 	org.apache.felix.scr;version='[2.2.2,2.2.3)';startlevel=10,\
 	org.apache.sling.commons.johnzon;version='[1.2.14,1.2.15)';startlevel=10,\
 	org.eclipse.core.commands;version='[3.10.200,3.10.201)';startlevel=10,\
@@ -155,6 +158,7 @@ install.order                     :   \
 	org.eclipse.fx.core.di;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.fx.core.di.context;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.fx.core.fxml;version='[3.8.0,3.8.1)';startlevel=10,\
+	org.eclipse.fx.core.slf4j;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.fx.osgi.util;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.fx.ui.animation;version='[3.8.0,3.8.1)';startlevel=10,\
 	org.eclipse.fx.ui.controls;version='[3.8.0,3.8.1)';startlevel=10,\
