@@ -1,1 +1,15 @@
 -buildpath          : ${bundles.required}
+-privatepackage     : \
+                      org.slf4j.bridge,\
+                      org.slf4j.event,\
+                      org.slf4j,\
+                      org.slf4j.spi,\
+                      org.slf4j.helpers,\
+                      org.slf4j.impl,\
+                      org.slf4j.simple,\
+                      com.osgifx.console.log*
+Export-Package      : \
+                      org.slf4j,\
+                      org.slf4j.event,\
+                      org.slf4j.helpers,\
+                      org.slf4j.spi
