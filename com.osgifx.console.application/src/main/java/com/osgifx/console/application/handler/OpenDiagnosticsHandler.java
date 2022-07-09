@@ -43,8 +43,9 @@ public final class OpenDiagnosticsHandler {
     public void execute() {
         try {
             Desktop.getDesktop().open(diagnosticsAdmin.getLogFilesDirectory());
+            logger.atInfo().log("Diagnostics directory has been opened");
         } catch (final IOException e) {
-            logger.atError().withException(e).log("Cannot open diagnostics file");
+            logger.atError().withException(e).log("Cannot open diagnostics directory");
         }
     }
 
