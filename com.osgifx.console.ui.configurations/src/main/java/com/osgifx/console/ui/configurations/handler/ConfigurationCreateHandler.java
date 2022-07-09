@@ -96,10 +96,11 @@ public final class ConfigurationCreateHandler {
                             logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
                         } else {
                             threadSync.asyncExec(() -> Fx.showErrorNotification("New Configuration",
-                                    "Configuration - '" + effectivePID + "' cannot be created"));
+                                    "Configuration - '" + effectivePID + "' could not be created"));
+                            logger.atWarning().log("Configuration - '%s' could not be created", effectivePID);
                         }
                     } catch (final Exception e) {
-                        logger.atError().withException(e).log("Configuration cannot be created");
+                        logger.atError().withException(e).log("Configuration could not be created");
                         threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
                     }
                     return null;

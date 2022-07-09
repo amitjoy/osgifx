@@ -62,6 +62,10 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
     private Form            form;
     private final Converter converter = Converters.standardConverter();
 
+    private static final String TIME_FORMAT      = "hhmmss";
+    private static final String DATE_FORMAT      = "CCYYMMDD";
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:SS'Z'";
+
     public void init(final XDmtNodeDTO dmtNode) {
         final var formRenderer = createForm(dmtNode);
         if (formRenderer == null) {
@@ -158,17 +162,17 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
                 } catch (final Exception ex) {
                     return false;
                 }
-            }, "DMT date must be in the format of CCYYMMDD")).required(true);
+            }, "DMT date must be in the format of '" + DATE_FORMAT + "'")).required(true);
             break;
         case DATE_TIME:
             valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
                 try {
-                    LocalDateTime.parse(v, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:SS'Z'"));
+                    LocalDateTime.parse(v, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
                     return true;
                 } catch (final Exception ex) {
                     return false;
                 }
-            }, "DMT time must be in the format of hhmmss")).required(true);
+            }, "DMT date time must be in the format of '" + DATE_TIME_FORMAT + "'")).required(true);
             break;
         case TIME:
             valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
@@ -178,7 +182,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
                 } catch (final Exception ex) {
                     return false;
                 }
-            }, "DMT time must be in the format of hhmmss")).required(true);
+            }, "DMT time must be in the format of '" + TIME_FORMAT + "'")).required(true);
             break;
         default:
             break;

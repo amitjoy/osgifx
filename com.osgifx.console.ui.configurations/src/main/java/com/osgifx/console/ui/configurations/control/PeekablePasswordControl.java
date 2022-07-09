@@ -49,9 +49,6 @@ public class PeekablePasswordControl extends SimpleControl<PasswordField> {
      */
     protected StringBinding obfuscatedUserInputBinding;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void initializeParts() {
         super.initializeParts();
@@ -68,19 +65,14 @@ public class PeekablePasswordControl extends SimpleControl<PasswordField> {
         editableField.setPromptText(field.placeholderProperty().getValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void layoutParts() {
         super.layoutParts();
 
         readOnlyLabel.getStyleClass().add("read-only-label");
-
         readOnlyLabel.setPrefHeight(26);
 
         stack.getChildren().addAll(editableField, readOnlyLabel);
-
         stack.setAlignment(Pos.CENTER_LEFT);
 
         final var labelDescription = field.getLabelDescription();
@@ -117,9 +109,6 @@ public class PeekablePasswordControl extends SimpleControl<PasswordField> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setupBindings() {
         super.setupBindings();
@@ -135,9 +124,6 @@ public class PeekablePasswordControl extends SimpleControl<PasswordField> {
         editableField.managedProperty().bind(editableField.visibleProperty());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setupValueChangedListeners() {
         super.setupValueChangedListeners();
