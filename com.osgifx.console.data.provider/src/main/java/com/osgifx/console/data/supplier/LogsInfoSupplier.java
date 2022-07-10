@@ -21,6 +21,9 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 import static javafx.collections.FXCollections.observableArrayList;
 
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.Event;
@@ -41,15 +44,23 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
     public static final String LOGS_ID = "logs";
 
     @Reference
+    private LoggerFactory     factory;
+    @Reference
     private Supervisor        supervisor;
     @Reference
     private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
 
     private final ObservableList<XLogEntryDTO> logs = observableArrayList();
 
+    @Activate
+    void init() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
+
     @Override
     public void retrieve() {
-        // nothing to retrieve manually
+        logger.atInfo().log("Skipped log events info retrieval as it will be pushed by remote runtime agent");
     }
 
     @Override

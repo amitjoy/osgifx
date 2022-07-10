@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -53,11 +55,14 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     public static final String EVENTS_ID = "events";
 
-    private Configuration     configuration;
+    @Reference
+    private LoggerFactory     factory;
     @Reference
     private Supervisor        supervisor;
     @Reference
     private ThreadSynchronize threadSync;
+    private FluentLogger      logger;
+    private Configuration     configuration;
 
     private final ObservableList<XEventDTO> events = observableArrayList();
 
@@ -65,11 +70,12 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     @Modified
     void init(final Configuration configuration) {
         this.configuration = configuration;
+        logger             = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
     @Override
     public void retrieve() {
-        // nothing to retrieve manually
+        logger.atInfo().log("Skipped events info retrieval as it will be pushed by remote runtime agent");
     }
 
     @Override

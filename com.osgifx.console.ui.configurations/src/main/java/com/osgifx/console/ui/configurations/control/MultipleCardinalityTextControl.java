@@ -100,7 +100,6 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
         super.layoutParts();
 
         readOnlyLabel.getStyleClass().add("read-only-label");
-
         readOnlyLabel.setPrefHeight(26);
 
         editableArea.getStyleClass().add("simple-textarea");
@@ -114,7 +113,6 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
         }
 
         stack.getChildren().addAll(editableField, editableArea, readOnlyLabel);
-
         stack.setAlignment(Pos.CENTER_LEFT);
 
         final var labelDescription = field.getLabelDescription();
