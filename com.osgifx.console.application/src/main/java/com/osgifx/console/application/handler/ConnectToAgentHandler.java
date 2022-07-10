@@ -207,6 +207,7 @@ public final class ConnectToAgentHandler {
 
     private void removeCurrentSelection() {
         selectedSettings.publish(null);
+        logger.atDebug().log("Current selection has been removed");
     }
 
     @Inject

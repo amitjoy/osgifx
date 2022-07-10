@@ -252,7 +252,7 @@ public final class HealthCheckFxController {
                         hcResults.stream().map(this::formatResult).forEach(f -> content.getPanes().add(f));
                     });
                 } catch (final Exception e) {
-                    e.printStackTrace();
+                    logger.atError().withException(e).log("The results could not be added to the output area");
                 }
             }
 

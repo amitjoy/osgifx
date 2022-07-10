@@ -165,7 +165,7 @@ public final class DmtFxController {
         }
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atError().log("Agent is not connected");
+            logger.atError().log("Remote agent is not connected");
             return;
         }
         final var dto          = result.get();

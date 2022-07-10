@@ -8,10 +8,7 @@ import static org.slf4j.simple.SimpleLogger.LOG_LEVEL_INFO;
 import static org.slf4j.simple.SimpleLogger.LOG_LEVEL_TRACE;
 import static org.slf4j.simple.SimpleLogger.LOG_LEVEL_WARN;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
+import com.google.common.base.Throwables;
 import com.osgifx.console.logging.PasswordHelper;
 
 public final class LogEntryHelper {
@@ -45,21 +42,14 @@ public final class LogEntryHelper {
         final long   time;
         final String threadName;
 
-        // @formatter:off
-        SimpleLogEntry(
-                final String name,
-                final long bundleId,
-                final int level,
-                final String message,
-                final Throwable exception) {
-        // @formatter:on
+        SimpleLogEntry(final String name, final long bundleId, final int level, final String message, final Throwable exception) {
 
             this.name     = name;
             this.level    = level;
             this.bundleId = bundleId;
 
             this.message   = applyMasking(message);
-            this.exception = extractStackTrace(exception);
+            this.exception = Throwables.getStackTraceAsString(exception);
 
             time       = System.currentTimeMillis();
             threadName = Thread.currentThread().getName();
@@ -92,18 +82,6 @@ public final class LogEntryHelper {
                 return "AUDIT";
             default:
                 throw new IllegalStateException("Unrecognized level [" + level + "]");
-            }
-        }
-
-        private static String extractStackTrace(final Throwable throwable) {
-            if (throwable == null) {
-                return "";
-            }
-            try (final var stringWriter = new StringWriter(); final var printWriter = new PrintWriter(stringWriter)) {
-                throwable.printStackTrace(printWriter);
-                return stringWriter.toString();
-            } catch (final IOException e) {
-                return "extractStackTrace failed: throwable.message=" + throwable.getMessage();
             }
         }
     }

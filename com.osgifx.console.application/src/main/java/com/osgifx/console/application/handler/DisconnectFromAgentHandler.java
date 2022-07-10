@@ -68,6 +68,7 @@ public final class DisconnectFromAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisor.getAgent().abort();
+                    logger.atInfo().log("Agent connection has been successfully aborted");
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Agent connection cannot be aborted");
                 }
@@ -77,10 +78,14 @@ public final class DisconnectFromAgentHandler {
             @Override
             protected void succeeded() {
                 eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+                logger.atInfo().log("Agent disconnected event has been successfully sent");
+
                 isConnected.publish(false);
                 isLocalAgent.publish(false);
                 selectedSettings.publish(null);
                 connectedAgent.publish(null);
+
+                logger.atInfo().log("Application specific context values have been reset");
             }
         };
         CompletableFuture.runAsync(disconnectTask);

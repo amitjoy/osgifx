@@ -131,7 +131,7 @@ public final class GogoFxController {
             history.add(command);
             historyPointer = history.size();
             input.clear();
-            logger.atDebug().log("Task for command '%s' has been succeeded", command);
+            logger.atInfo().log("Task for command '%s' has been succeeded", command);
         });
         CompletableFuture.runAsync(task);
     }
