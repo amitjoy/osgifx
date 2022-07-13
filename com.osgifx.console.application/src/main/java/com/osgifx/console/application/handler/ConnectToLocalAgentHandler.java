@@ -62,14 +62,17 @@ public final class ConnectToLocalAgentHandler {
     @ContextValue("connected.agent")
     private ContextBoundValue<String>  connectedAgent;
     @Inject
+    @Optional
     @Named("local.agent.host")
     private String                     localAgentHost;
     @Inject
     @Adapt
+    @Optional
     @Named("local.agent.port")
     private int                        localAgentPort;
     @Inject
     @Adapt
+    @Optional
     @Named("local.agent.timeout")
     private int                        localAgentTimeout;
     private ProgressDialog             progressDialog;
