@@ -177,7 +177,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
         case TIME:
             valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
                 try {
-                    LocalTime.parse(v, DateTimeFormatter.ofPattern("hhmmss"));
+                    LocalTime.parse(v, DateTimeFormatter.ofPattern(TIME_FORMAT));
                     return true;
                 } catch (final Exception ex) {
                     return false;
