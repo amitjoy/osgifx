@@ -21,6 +21,7 @@ import static javafx.scene.paint.Color.TRANSPARENT;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.aries.component.dsl.OSGi;
 import org.eclipse.fx.ui.workbench.fx.DefaultJFXApp;
 import org.osgi.framework.FrameworkUtil;
 
@@ -99,8 +100,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 
     private void registerHostServices() {
         final var hostServices = getHostServices();
-        final var context      = FrameworkUtil.getBundle(getClass()).getBundleContext();
-        context.registerService(HostServices.class, hostServices, null);
+        OSGi.register(HostServices.class, hostServices, null);
     }
 
     private void showFxConsoleStage() {
