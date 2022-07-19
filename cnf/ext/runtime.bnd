@@ -82,6 +82,7 @@ bundles.required: \
                  ${bundles.slf4j},\
                  slf4j.api,\
                  jul.to.slf4j,\
+                 org.apache.aries.component-dsl.component-dsl,\
                  com.google.guava,\
                  org.apache.commons.lang,\
                  org.eclipse.equinox.preferences,\
