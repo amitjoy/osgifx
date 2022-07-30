@@ -33,11 +33,11 @@ public @interface Configuration {
     /**
      * We use var/log/java as relative path to folder where we have been started.
      */
-    @AttributeDefinition(name = "Log files folder", description = "Folder for log files, may be absolute or relative to JVM starting path", required = false)
+    @AttributeDefinition(name = "Log files folder", description = "Folder for log files, maybe absolute or relative to JVM starting path", required = false)
     String root() default "./${storage}/log";
 
-    @AttributeDefinition(name = "Max log file size", description = "Maximum filesize of a single logfile in MiB", required = false)
-    int maxLogSizeMb() default 5;
+    @AttributeDefinition(name = "Max log file size", description = "Maximum filesize of a single logfile in MB", required = false)
+    int maxLogSizeInMB() default 5;
 
     @AttributeDefinition(name = "Max retained log files", description = "Maximum number of retained log files", required = false)
     int maxRetainedLogs() default 10;
@@ -62,13 +62,11 @@ public @interface Configuration {
      * 2019-06-10T19:16:37.314+0000   30 DEBUG [main,a.b.c.d.E] some message [sref=[javax.servlet.Servlet]]
      * 2019-06-12T23:17:37.982+0200   32 INFO  [FelixDispatchQueue,Events.Bundle] BundleEvent STARTED [bundle=a.b.c.d]
      * </pre>
-     *
-     * @return format as described
      */
     @AttributeDefinition(name = "Format of log messages", description = "Format of log entries to write", required = false)
     String format() default "%tY-%<tm-%<tdT%<tH:%<tM:%<tS.%<tL%<tz %4s %-5s [%s,%s] %s%s%n%s";
 
-    @AttributeDefinition(name = "Log level", description = "The minimum level to log out to the files", required = false)
+    @AttributeDefinition(name = "Log level", description = "The minimum level to log to the files", required = false)
     LogLevel level() default LogLevel.DEBUG;
 
     @AttributeDefinition(name = "Buffer enabled", description = "Buffer log messages before flushing to disk", required = false)
