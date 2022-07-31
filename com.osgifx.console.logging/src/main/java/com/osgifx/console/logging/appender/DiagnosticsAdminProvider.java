@@ -286,7 +286,7 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     private void logMessageConsumerWorker() {
         try {
             while (true) {
-                final var limit            = configuration.maxLogSizeMb() * 1024L * 1024L;
+                final var limit            = configuration.maxLogSizeInMB() * 1024 * 1024;
                 var       fileLimitReached = false;
 
                 // (Re-)create a new recent log.txt
@@ -330,6 +330,7 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
                 }
             }
         } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
             logger.atWarning().log("Worker thread '%s' was interrupted!", THREAD_NAME, e);
         } catch (final Exception e) {
             logger.atError().log("Exception in worker thread '%s' occurred!", THREAD_NAME, e);
@@ -424,6 +425,7 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
             try {
                 return Integer.parseInt(matcher.group("nr"));
             } catch (final NumberFormatException nfe) {
+                // nothing to do
             }
         }
         return -1;
