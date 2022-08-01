@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 
 public final class PasswordHelper {
 
-    private static final Pattern PASSWORD_PATTERN     =                                                                 //
-            Pattern.compile("([\"\']?)(password)([\"\']?)( *[=:] *)([\"\']?)[^\'\"}, ]*([\"\'}, ]?)", CASE_INSENSITIVE);
+    private static final Pattern PASSWORD_PATTERN     = Pattern
+            .compile("([\"\']?)(password)([\"\']?)( *[=:] *)([\"\']?)[^\'\"}, ]*([\"\'}, ]?)", CASE_INSENSITIVE);
     private static final String  PASSWORD_REPLACEMENT = "$1$2$3$4$5*****$6";
 
     private PasswordHelper() {
