@@ -9,7 +9,7 @@ import com.osgifx.console.logging.forwarder.Slf4jLoggerFactory;
  * This class bridges between SLF4j by implementing a getSingleton() method on
  * the class with this name.
  */
-public class StaticLoggerBinder implements LoggerFactoryBinder {
+class StaticLoggerBinder implements LoggerFactoryBinder {
 
     /**
      * Declare the version of the SLF4J API this implementation is compiled against.
