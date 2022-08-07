@@ -32,22 +32,19 @@ import static org.slf4j.spi.LocationAwareLogger.INFO_INT;
 import static org.slf4j.spi.LocationAwareLogger.TRACE_INT;
 import static org.slf4j.spi.LocationAwareLogger.WARN_INT;
 
-import java.io.PrintStream;
-
 import org.slf4j.event.LoggingEvent;
-import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.simple.LogEntryHelper.SimpleLogEntry;
 
 public class SimpleLogger extends MarkerIgnoringBase {
 
-    private static final long serialVersionUID = -632788891211436180L;
+    private static final long serialVersionUID = 8730968637749950758L;
 
     public static final int LOG_LEVEL_TRACE = TRACE_INT;
     public static final int LOG_LEVEL_DEBUG = DEBUG_INT;
-    public static final int LOG_LEVEL_INFO = INFO_INT;
-    public static final int LOG_LEVEL_WARN = WARN_INT;
+    public static final int LOG_LEVEL_INFO  = INFO_INT;
+    public static final int LOG_LEVEL_WARN  = WARN_INT;
     public static final int LOG_LEVEL_ERROR = ERROR_INT;
 
     public static final int LOG_LEVEL_AUDIT = MIN_VALUE;
@@ -71,32 +68,29 @@ public class SimpleLogger extends MarkerIgnoringBase {
      * SimpleLogger instances.
      */
     SimpleLogger(final String name, final long bundleId) {
-        this.name = name;
-        this.bundleId = bundleId;
+        this.name       = name;
+        this.bundleId   = bundleId;
         currentLogLevel = LOG_LEVEL_INFO;
     }
 
     /**
-     * This is our internal implementation for logging regular
-     * (non-parameterized) log messages.
+     * This is our internal implementation for logging regular (non-parameterized)
+     * log messages.
      *
-     * @param level
-     *            One of the LOG_LEVEL_XXX constants defining the log level
-     * @param message
-     *            The message itself
-     * @param t
-     *            The exception whose stack trace should be logged
+     * @param level   One of the LOG_LEVEL_XXX constants defining the log level
+     * @param message The message itself
+     * @param t       The exception whose stack trace should be logged
      */
     private void log(final int level, final String message, final Throwable t) {
         if (!isLevelEnabled(level)) {
             return;
         }
-        final SimpleLogEntry logEntry = new SimpleLogEntry(name, bundleId, level, message, t);
+        final var logEntry = new SimpleLogEntry(name, bundleId, level, message, t);
         write(logEntry);
     }
 
     private void write(final SimpleLogEntry entry) {
-        final PrintStream targetStream = new OutputChoice(SYS_OUT).getTargetPrintStream();
+        final var targetStream = new OutputChoice(SYS_OUT).getTargetPrintStream();
         targetStream.print(LogEntryHelper.createLogMessage(entry));
         targetStream.flush();
     }
@@ -113,7 +107,7 @@ public class SimpleLogger extends MarkerIgnoringBase {
         if (!isLevelEnabled(level)) {
             return;
         }
-        final FormattingTuple tp = MessageFormatter.format(format, arg1, arg2);
+        final var tp = MessageFormatter.format(format, arg1, arg2);
         log(level, tp.getMessage(), tp.getThrowable());
     }
 
@@ -122,14 +116,13 @@ public class SimpleLogger extends MarkerIgnoringBase {
      *
      * @param level
      * @param format
-     * @param arguments
-     *            a list of 3 ore more arguments
+     * @param arguments a list of 3 ore more arguments
      */
     private void formatAndLog(final int level, final String format, final Object... arguments) {
         if (!isLevelEnabled(level)) {
             return;
         }
-        final FormattingTuple tp = MessageFormatter.arrayFormat(format, arguments);
+        final var tp = MessageFormatter.arrayFormat(format, arguments);
         log(level, tp.getMessage(), tp.getThrowable());
     }
 
@@ -152,8 +145,8 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * A simple implementation which logs messages of level TRACE according to
-     * the format outlined above.
+     * A simple implementation which logs messages of level TRACE according to the
+     * format outlined above.
      */
     @Override
     public void trace(final String msg) {
@@ -200,8 +193,8 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * A simple implementation which logs messages of level DEBUG according to
-     * the format outlined above.
+     * A simple implementation which logs messages of level DEBUG according to the
+     * format outlined above.
      */
     @Override
     public void debug(final String msg) {
@@ -248,8 +241,8 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * A simple implementation which logs messages of level INFO according to
-     * the format outlined above.
+     * A simple implementation which logs messages of level INFO according to the
+     * format outlined above.
      */
     @Override
     public void info(final String msg) {
@@ -296,8 +289,8 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * A simple implementation which always logs messages of level WARN
-     * according to the format outlined above.
+     * A simple implementation which always logs messages of level WARN according to
+     * the format outlined above.
      */
     @Override
     public void warn(final String msg) {
@@ -344,8 +337,8 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * A simple implementation which always logs messages of level ERROR
-     * according to the format outlined above.
+     * A simple implementation which always logs messages of level ERROR according
+     * to the format outlined above.
      */
     @Override
     public void error(final String msg) {
@@ -386,8 +379,8 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     /**
-     * A simple implementation which always logs messages of level AUDIT
-     * according to the format outlined above.
+     * A simple implementation which always logs messages of level AUDIT according
+     * to the format outlined above.
      */
     public void audit(final String msg) {
         log(LOG_LEVEL_AUDIT, msg, null);
@@ -423,13 +416,12 @@ public class SimpleLogger extends MarkerIgnoringBase {
     }
 
     public void log(final LoggingEvent event) {
-        final int levelInt = event.getLevel().toInt();
+        final var levelInt = event.getLevel().toInt();
 
         if (!isLevelEnabled(levelInt)) {
             return;
         }
-        final FormattingTuple tp = MessageFormatter.arrayFormat(event.getMessage(), event.getArgumentArray(),
-                event.getThrowable());
+        final var tp = MessageFormatter.arrayFormat(event.getMessage(), event.getArgumentArray(), event.getThrowable());
         log(levelInt, tp.getMessage(), event.getThrowable());
     }
 
