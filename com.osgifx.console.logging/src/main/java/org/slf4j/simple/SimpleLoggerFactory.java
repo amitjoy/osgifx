@@ -36,8 +36,6 @@ import org.slf4j.ILoggerFactory;
 /**
  * An implementation of {@link ILoggerFactory} which always returns
  * {@link SimpleLogger} instances.
- *
- * @author Ceki G&uuml;lc&uuml;
  */
 public class SimpleLoggerFactory implements ILoggerFactory {
 
@@ -53,14 +51,13 @@ public class SimpleLoggerFactory implements ILoggerFactory {
      */
     @Override
     public SimpleLogger getLogger(final String name) {
-        final SimpleLogger simpleLogger = loggerMap.get(name);
+        final var simpleLogger = loggerMap.get(name);
         if (simpleLogger != null) {
             return simpleLogger;
-        } else {
-            final SimpleLogger newInstance = new SimpleLogger(name, getBundleId(name));
-            final SimpleLogger oldInstance = loggerMap.putIfAbsent(name, newInstance);
-            return oldInstance == null ? newInstance : oldInstance;
         }
+        final var newInstance = new SimpleLogger(name, getBundleId(name));
+        final var oldInstance = loggerMap.putIfAbsent(name, newInstance);
+        return oldInstance == null ? newInstance : oldInstance;
     }
 
     /**
@@ -77,32 +74,36 @@ public class SimpleLoggerFactory implements ILoggerFactory {
     }
 
     private long getBundleId(final String name) {
-        final BundleContext context = getBundleContext();
+        final var context = getBundleContext();
         // context can be null if the bundle activator start method execution is not yet
-        // finished. This can primarily happen during tests but not in the container as the
+        // finished. This can primarily happen during tests but not in the container as
+        // the
         // start level of the log forwarder bundle has been kept at top so that it is
-        // started before all others. Otherwise when any other bundle using slf4j packages
-        // is started before this bundle, we will not be able to retrieve the bundle ID to
+        // started before all others. Otherwise when any other bundle using slf4j
+        // packages
+        // is started before this bundle, we will not be able to retrieve the bundle ID
+        // to
         // add to the log messages.
         if (context == null) {
             return -1L;
         }
-        final Bundle[] bundles = context.getBundles();
-        // we assume that the logger name will always be the fully qualified class name (in QIVICON for sure)
+        final var bundles = context.getBundles();
+        // we assume that the logger name will always be the fully qualified class name
         for (final Bundle b : bundles) {
             try {
-                final BundleWiring wiring = b.adapt(BundleWiring.class);
+                final var wiring = b.adapt(BundleWiring.class);
                 // wiring can be null for non-started bundles
                 // actually for those whose Activator#start(..) ain't yet finished
                 if (wiring == null) {
                     continue;
                 }
-                final ClassLoader cl = wiring.getClassLoader();
+                final var cl = wiring.getClassLoader();
                 // classloader can be null for fragments
                 if (cl == null) {
                     continue;
                 }
-                // if the class can be loaded by the classloader, the class belongs to the bundle 'b'
+                // if the class can be loaded by the classloader, the class belongs to the
+                // bundle 'b'
                 cl.loadClass(name);
                 return b.getBundleId();
             } catch (final ClassNotFoundException e) {
@@ -113,7 +114,7 @@ public class SimpleLoggerFactory implements ILoggerFactory {
     }
 
     private BundleContext getBundleContext() {
-        final Bundle bundle = FrameworkUtil.getBundle(getClass());
+        final var bundle = FrameworkUtil.getBundle(getClass());
         // bundle can only be null during tests
         if (bundle == null) {
             return null;
