@@ -27,7 +27,8 @@ package org.slf4j.impl;
 import org.slf4j.helpers.BasicMDCAdapter;
 import org.slf4j.spi.MDCAdapter;
 
-public class StaticMDCBinder {
+class StaticMDCBinder {
+
     public static final StaticMDCBinder SINGLETON;
     static {
         SINGLETON = new StaticMDCBinder();
