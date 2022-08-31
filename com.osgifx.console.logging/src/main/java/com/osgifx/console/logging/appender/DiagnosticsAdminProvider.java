@@ -94,7 +94,7 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     private static final Comparator<String> STRING_WITH_NUMBER = Comparator.comparing(DiagnosticsAdminProvider::getNumberInLogFileName);
 
     // Use a named thread
-    private static final String           THREAD_NAME              = "rolling-log-files";
+    private static final String           THREAD_NAME              = "rolling-logger";
     private final BlockingQueue<LogEntry> logEntryQueue            = new LinkedBlockingQueue<>(MAX_QUEUE_LENGTH);
     private Thread                        workerThread;
     private Writer                        outputWriter;
