@@ -30,50 +30,50 @@ org.osgi:org.osgi.service.component:1.5.0
 
 # Equinox
 
-org.eclipse.platform:org.eclipse.equinox.app:1.6.100
-org.eclipse.platform:org.eclipse.equinox.bidi:1.4.100
-org.eclipse.platform:org.eclipse.equinox.common:3.16.100
+org.eclipse.platform:org.eclipse.equinox.app:1.6.200
+org.eclipse.platform:org.eclipse.equinox.bidi:1.4.200
+org.eclipse.platform:org.eclipse.equinox.common:3.16.200
 org.eclipse.platform:org.eclipse.equinox.concurrent:1.2.100
 org.eclipse.platform:org.eclipse.equinox.console:1.4.500
 org.eclipse.platform:org.eclipse.equinox.ds:1.6.200
 org.eclipse.platform:org.eclipse.equinox.event:1.6.100
 org.eclipse.platform:org.eclipse.equinox.launcher:1.6.400
-org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx:1.2.500
-org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.500
-org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.500
-org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.500
-org.eclipse.platform:org.eclipse.equinox.preferences:3.10.1
-org.eclipse.platform:org.eclipse.equinox.registry:3.11.100
-org.eclipse.platform:org.eclipse.osgi:3.18.0
-org.eclipse.platform:org.eclipse.osgi.services:3.10.200
+org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx:1.2.600
+org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.600
+org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.600
+org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.600
+org.eclipse.platform:org.eclipse.equinox.preferences:3.10.100
+org.eclipse.platform:org.eclipse.equinox.registry:3.11.200
+org.eclipse.platform:org.eclipse.osgi:3.18.100
+org.eclipse.platform:org.eclipse.osgi.services:3.11.0
 
 # Eclipse e4
 
-org.eclipse.platform:org.eclipse.e4.core.commands:1.0.100
-org.eclipse.platform:org.eclipse.e4.core.contexts:1.10.0
-org.eclipse.platform:org.eclipse.e4.core.di:1.8.200
-org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.7.100
-org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.17.100
-org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.16.300
-org.eclipse.platform:org.eclipse.e4.core.services:2.3.200
+org.eclipse.platform:org.eclipse.e4.core.commands:1.0.200
+org.eclipse.platform:org.eclipse.e4.core.contexts:1.11.0
+org.eclipse.platform:org.eclipse.e4.core.di:1.8.300
+org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.7.200
+org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.17.200
+org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.16.400
+org.eclipse.platform:org.eclipse.e4.core.services:2.3.300
 org.eclipse.platform:org.eclipse.e4.emf.xpath:0.3.0
 org.eclipse.platform:org.eclipse.e4.ui.di:1.4.0
-org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.2.100
+org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.2.200
 org.eclipse.platform:org.eclipse.e4.ui.services:1.5.0
-org.eclipse.platform:org.eclipse.e4.ui.workbench:1.13.100
+org.eclipse.platform:org.eclipse.e4.ui.workbench:1.13.200
 
 # Eclipse Platform
 
 org.eclipse.platform:org.eclipse.core.commands:3.10.200
-org.eclipse.platform:org.eclipse.core.contenttype:3.8.100
-org.eclipse.platform:org.eclipse.core.databinding:1.11.0
+org.eclipse.platform:org.eclipse.core.contenttype:3.8.200
+org.eclipse.platform:org.eclipse.core.databinding:1.11.100
 org.eclipse.platform:org.eclipse.core.databinding.beans:1.8.0
 org.eclipse.platform:org.eclipse.core.databinding.observable:1.12.0
 org.eclipse.platform:org.eclipse.core.databinding.property:1.9.0
 org.eclipse.platform:org.eclipse.core.filebuffers:3.7.200
-org.eclipse.platform:org.eclipse.core.filesystem:1.9.400
-org.eclipse.platform:org.eclipse.core.jobs:3.13.0
-org.eclipse.platform:org.eclipse.core.net:1.3.1200
-org.eclipse.platform:org.eclipse.core.resources:3.17.0
-org.eclipse.platform:org.eclipse.core.runtime:3.25.0
+org.eclipse.platform:org.eclipse.core.filesystem:1.9.500
+org.eclipse.platform:org.eclipse.core.jobs:3.13.100
+org.eclipse.platform:org.eclipse.core.net:1.4.0
+org.eclipse.platform:org.eclipse.core.resources:3.18.0
+org.eclipse.platform:org.eclipse.core.runtime:3.26.0
 org.eclipse.platform:org.eclipse.core.variables:3.5.100

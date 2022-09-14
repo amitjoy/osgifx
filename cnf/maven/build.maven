@@ -65,7 +65,7 @@ org.awaitility:awaitility:4.2.0
 # TilesFx
 
 eu.hansolo:tilesfx:17.1.15
-eu.hansolo:toolbox:17.0.31
+eu.hansolo:toolbox:17.0.33
 eu.hansolo:toolboxfx:17.0.31
 
 # FormsFx
@@ -81,7 +81,7 @@ org.jgrapht:jgrapht-io:1.5.1
 
 eu.lestard:advanced-bindings:0.4.0
 
-# slf4j
+# SLF4J
 
 org.slf4j:slf4j-api:1.7.36
 org.slf4j:jul-to-slf4j:1.7.36
