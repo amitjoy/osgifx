@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1658214251797">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1663279096217">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="license" value="http://www.eclipse.org/legal/epl-2.0, https://www.gnu.org/software/classpath/license.html"/>
@@ -444,12 +444,12 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.osgi"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.18.0.v20220516-2155" type="Version"/>
+      <attribute name="version" value="3.18.100.v20220817-1601" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.google.gson"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.9.0" type="Version"/>
+      <attribute name="version" value="2.9.1" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.google.guava"/>
@@ -464,75 +464,75 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.agent"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.application"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.data.provider"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.launcher"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.logging"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.smartgraph"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.supervisor"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.batchinstall"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.extension"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.util"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.formsfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.tilesfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.toolbox"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.toolboxfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="controlsfx"/>
@@ -553,6 +553,11 @@
       <attribute name="osgi.identity" value="javax.xml.jre"/>
       <attribute name="type" value="osgi.bundle"/>
       <attribute name="version" value="1.3.4.202204150819" type="Version"/>
+    </capability>
+    <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value="org.apache.aries.component-dsl.component-dsl"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="1.2.2" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.commons.commons-io"/>
@@ -600,11 +605,6 @@
       <attribute name="version" value="0.9.10" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
-      <attribute name="osgi.identity" value="org.apache.felix.eventadmin"/>
-      <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.6.2" type="Version"/>
-    </capability>
-    <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.felix.gogo.command"/>
       <attribute name="type" value="osgi.bundle"/>
       <attribute name="version" value="1.0.2.v20170914-1324" type="Version"/>
@@ -643,7 +643,7 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.core.contenttype"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.8.100.v20210910-0640" type="Version"/>
+      <attribute name="version" value="3.8.200.v20220817-1539" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.core.databinding.observable"/>
@@ -665,51 +665,51 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.core.jobs"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.13.0.v20220512-1935" type="Version"/>
+      <attribute name="version" value="3.13.100.v20220817-1539" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.core.runtime"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.25.0.v20220506-1157" type="Version"/>
+      <attribute name="version" value="3.26.0.v20220813-0916" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.e4.core.commands"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.0.100.v20211204-1536" type="Version"/>
+      <attribute name="version" value="1.0.200.v20220629-1225" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.e4.core.contexts"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.10.0.v20220430-0424" type="Version"/>
+      <attribute name="version" value="1.11.0.v20220716-0839" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.e4.core.di"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.8.200.v20220512-1957" type="Version"/>
+      <attribute name="version" value="1.8.300.v20220817-1539" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.e4.core.di.annotations"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.7.100.v20210910-0640" type="Version"/>
+      <attribute name="version" value="1.7.200.v20220613-1008" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.e4.core.di.extensions"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="0.17.100.v20210910-0640" type="Version"/>
+      <attribute name="version" value="0.17.200.v20220613-1008" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.e4.core.di.extensions.supplier"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="0.16.300.v20220503-2248" type="Version"/>
+      <attribute name="version" value="0.16.400.v20220613-1047" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.e4.core.services"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.3.200.v20220513-1235" type="Version"/>
+      <attribute name="version" value="2.3.300.v20220613-1047" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.e4.emf.xpath"/>
@@ -725,7 +725,7 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.e4.ui.model.workbench"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.100.v20220331-0744" type="Version"/>
+      <attribute name="version" value="2.2.200.v20220817-1444" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
@@ -767,13 +767,13 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.equinox.app"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.6.100.v20211021-1418" type="Version"/>
+      <attribute name="version" value="1.6.200.v20220720-2012" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.equinox.common"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.16.100.v20220315-2327" type="Version"/>
+      <attribute name="version" value="3.16.200.v20220817-1601" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.equinox.console"/>
@@ -789,13 +789,13 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.equinox.preferences"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.10.1.v20220615-0632" type="Version"/>
+      <attribute name="version" value="3.10.100.v20220710-1223" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="org.eclipse.equinox.registry"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.11.100.v20211021-1418" type="Version"/>
+      <attribute name="version" value="3.11.200.v20220817-1601" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.fx.core"/>
@@ -918,7 +918,7 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.osgi.services"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="3.10.200.v20210723-0643" type="Version"/>
+      <attribute name="version" value="3.8.0.v20190206-2147" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.osgi.service.component"/>
@@ -944,115 +944,115 @@
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.overview"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.bundles"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.packages"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.services"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.components"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.configurations"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.events"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.logs"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.properties"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.threads"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.graph"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.gogo"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.terminal"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.heap"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.leaks"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.http"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.roles"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.dmt"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.healthchecks"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="x-friends" value="org.eclipse.core.runtime"/>
@@ -3194,25 +3194,25 @@
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson"/>
-      <attribute name="version" value="2.9.0" type="Version"/>
+      <attribute name="version" value="2.9.1" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson.annotations"/>
-      <attribute name="version" value="2.9.0" type="Version"/>
+      <attribute name="version" value="2.9.1" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson.reflect"/>
-      <attribute name="version" value="2.9.0" type="Version"/>
+      <attribute name="version" value="2.9.1" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson.stream"/>
-      <attribute name="version" value="2.9.0" type="Version"/>
+      <attribute name="version" value="2.9.1" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="x-internal" value="true"/>
@@ -3633,6 +3633,13 @@
       <attribute name="version" value="0.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="eu.hansolo.toolbox.evt"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="eu.hansolo.toolbox.evtbus"/>
+      <attribute name="version" value="0.0.0" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
       <directive name="uses" value="eu.hansolo.toolbox.evt,eu.hansolo.toolbox.evt.type"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
@@ -3887,6 +3894,19 @@
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.apache.xmlcommons"/>
       <attribute name="version" value="1.3.4" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.apache.aries.component.dsl.function,org.osgi.framework"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.apache.aries.component.dsl"/>
+      <attribute name="version" value="1.3.0" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.apache.aries.component.dsl.function"/>
+      <attribute name="version" value="1.3.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
@@ -4198,13 +4218,6 @@
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.osgi.service.deploymentadmin.spi"/>
       <attribute name="version" value="1.0.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.osgi.framework"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.osgi.service.event"/>
-      <attribute name="version" value="1.4.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="org.apache.felix.service.command,org.osgi.framework"/>
@@ -5889,6 +5902,13 @@
       <attribute name="version" value="1.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.osgi.framework"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.event"/>
+      <attribute name="version" value="1.4.0" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javax.servlet,javax.servlet.http"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
@@ -5979,11 +5999,11 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.18.0.v20220516-2155" type="Version"/>
+      <attribute name="bundle-version" value="3.18.100.v20220817-1601" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.osgi,system.bundle" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.9.0" type="Version"/>
+      <attribute name="bundle-version" value="2.9.1" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.google.gson"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -5995,62 +6015,62 @@
       <attribute name="osgi.wiring.bundle" value="com.ibm.icu.base"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.agent"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.application"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.data.provider"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.launcher"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.logging"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.smartgraph"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.supervisor"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.batchinstall"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.extension"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.util"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.formsfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.tilesfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.toolbox"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.toolboxfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6068,6 +6088,10 @@
     <capability namespace="osgi.wiring.bundle">
       <attribute name="bundle-version" value="1.3.4.202204150819" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="javax.xml.jre"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="1.2.2" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.apache.aries.component-dsl.component-dsl"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="bundle-version" value="2.11.0" type="Version"/>
@@ -6106,10 +6130,6 @@
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.deploymentadmin"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.6.2" type="Version"/>
-      <attribute name="osgi.wiring.bundle" value="org.apache.felix.eventadmin"/>
-    </capability>
-    <capability namespace="osgi.wiring.bundle">
       <attribute name="bundle-version" value="1.0.2.v20170914-1324" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.gogo.command"/>
     </capability>
@@ -6139,7 +6159,7 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.8.100.v20210910-0640" type="Version"/>
+      <attribute name="bundle-version" value="3.8.200.v20220817-1539" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.core.contenttype"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6157,43 +6177,43 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.13.0.v20220512-1935" type="Version"/>
+      <attribute name="bundle-version" value="3.13.100.v20220817-1539" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.core.jobs"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.25.0.v20220506-1157" type="Version"/>
+      <attribute name="bundle-version" value="3.26.0.v20220813-0916" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.core.runtime"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="1.0.100.v20211204-1536" type="Version"/>
+      <attribute name="bundle-version" value="1.0.200.v20220629-1225" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.commands"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.10.0.v20220430-0424" type="Version"/>
+      <attribute name="bundle-version" value="1.11.0.v20220716-0839" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.contexts"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.8.200.v20220512-1957" type="Version"/>
+      <attribute name="bundle-version" value="1.8.300.v20220817-1539" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.di"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.7.100.v20210910-0640" type="Version"/>
+      <attribute name="bundle-version" value="1.7.200.v20220613-1008" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.di.annotations"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="0.17.100.v20210910-0640" type="Version"/>
+      <attribute name="bundle-version" value="0.17.200.v20220613-1008" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.di.extensions"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="0.16.300.v20220503-2248" type="Version"/>
+      <attribute name="bundle-version" value="0.16.400.v20220613-1047" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.di.extensions.supplier"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.3.200.v20220513-1235" type="Version"/>
+      <attribute name="bundle-version" value="2.3.300.v20220613-1047" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.core.services"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6206,7 +6226,7 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.100.v20220331-0744" type="Version"/>
+      <attribute name="bundle-version" value="2.2.200.v20220817-1444" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.e4.ui.model.workbench"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6241,12 +6261,12 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="1.6.100.v20211021-1418" type="Version"/>
+      <attribute name="bundle-version" value="1.6.200.v20220720-2012" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.equinox.app"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.16.100.v20220315-2327" type="Version"/>
+      <attribute name="bundle-version" value="3.16.200.v20220817-1601" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.equinox.common"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6259,12 +6279,12 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.10.1.v20220615-0632" type="Version"/>
+      <attribute name="bundle-version" value="3.10.100.v20220710-1223" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.equinox.preferences"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.11.100.v20211021-1418" type="Version"/>
+      <attribute name="bundle-version" value="3.11.200.v20220817-1601" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.equinox.registry"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6363,7 +6383,7 @@
       <attribute name="osgi.wiring.bundle" value="org.eclipse.jdt.annotation"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="3.10.200.v20210723-0643" type="Version"/>
+      <attribute name="bundle-version" value="3.8.0.v20190206-2147" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.eclipse.osgi.services"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6384,97 +6404,97 @@
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.overview"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.bundles"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.packages"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.services"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.components"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.configurations"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.events"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.logs"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.properties"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.threads"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.graph"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.gogo"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.terminal"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.heap"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.leaks"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.http"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.roles"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.dmt"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.healthchecks"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6483,11 +6503,11 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.18.0.v20220516-2155" type="Version"/>
+      <attribute name="bundle-version" value="3.18.100.v20220817-1601" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.osgi,system.bundle" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.9.0" type="Version"/>
+      <attribute name="bundle-version" value="2.9.1" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.google.gson"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6499,62 +6519,62 @@
       <attribute name="osgi.wiring.host" value="com.ibm.icu.base"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.agent"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.application"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.data.provider"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.launcher"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.logging"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.smartgraph"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.supervisor"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.batchinstall"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.extension"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207130624" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.util"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.formsfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.tilesfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.toolbox"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.toolboxfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6572,6 +6592,10 @@
     <capability namespace="osgi.wiring.host">
       <attribute name="bundle-version" value="1.3.4.202204150819" type="Version"/>
       <attribute name="osgi.wiring.host" value="javax.xml.jre"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="1.2.2" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.apache.aries.component-dsl.component-dsl"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="bundle-version" value="2.11.0" type="Version"/>
@@ -6610,10 +6634,6 @@
       <attribute name="osgi.wiring.host" value="org.apache.felix.deploymentadmin"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.6.2" type="Version"/>
-      <attribute name="osgi.wiring.host" value="org.apache.felix.eventadmin"/>
-    </capability>
-    <capability namespace="osgi.wiring.host">
       <attribute name="bundle-version" value="1.0.2.v20170914-1324" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.apache.felix.gogo.command"/>
     </capability>
@@ -6643,7 +6663,7 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.8.100.v20210910-0640" type="Version"/>
+      <attribute name="bundle-version" value="3.8.200.v20220817-1539" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.core.contenttype"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6661,43 +6681,43 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.13.0.v20220512-1935" type="Version"/>
+      <attribute name="bundle-version" value="3.13.100.v20220817-1539" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.core.jobs"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.25.0.v20220506-1157" type="Version"/>
+      <attribute name="bundle-version" value="3.26.0.v20220813-0916" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.core.runtime"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="1.0.100.v20211204-1536" type="Version"/>
+      <attribute name="bundle-version" value="1.0.200.v20220629-1225" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.commands"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.10.0.v20220430-0424" type="Version"/>
+      <attribute name="bundle-version" value="1.11.0.v20220716-0839" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.contexts"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.8.200.v20220512-1957" type="Version"/>
+      <attribute name="bundle-version" value="1.8.300.v20220817-1539" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.di"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.7.100.v20210910-0640" type="Version"/>
+      <attribute name="bundle-version" value="1.7.200.v20220613-1008" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.di.annotations"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="0.17.100.v20210910-0640" type="Version"/>
+      <attribute name="bundle-version" value="0.17.200.v20220613-1008" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.di.extensions"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="0.16.300.v20220503-2248" type="Version"/>
+      <attribute name="bundle-version" value="0.16.400.v20220613-1047" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.di.extensions.supplier"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.3.200.v20220513-1235" type="Version"/>
+      <attribute name="bundle-version" value="2.3.300.v20220613-1047" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.core.services"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6710,7 +6730,7 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.100.v20220331-0744" type="Version"/>
+      <attribute name="bundle-version" value="2.2.200.v20220817-1444" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.e4.ui.model.workbench"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6745,12 +6765,12 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="1.6.100.v20211021-1418" type="Version"/>
+      <attribute name="bundle-version" value="1.6.200.v20220720-2012" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.equinox.app"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.16.100.v20220315-2327" type="Version"/>
+      <attribute name="bundle-version" value="3.16.200.v20220817-1601" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.equinox.common"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6763,12 +6783,12 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.10.1.v20220615-0632" type="Version"/>
+      <attribute name="bundle-version" value="3.10.100.v20220710-1223" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.equinox.preferences"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="3.11.100.v20211021-1418" type="Version"/>
+      <attribute name="bundle-version" value="3.11.200.v20220817-1601" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.equinox.registry"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6867,7 +6887,7 @@
       <attribute name="osgi.wiring.host" value="org.eclipse.jdt.annotation"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="3.10.200.v20210723-0643" type="Version"/>
+      <attribute name="bundle-version" value="3.8.0.v20190206-2147" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.eclipse.osgi.services"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6888,97 +6908,97 @@
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.overview"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.bundles"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.packages"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.services"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.components"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.configurations"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.events"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.logs"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.properties"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.threads"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.graph"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.gogo"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.terminal"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.heap"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.leaks"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.http"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.roles"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.dmt"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202207150738" type="Version"/>
+      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.healthchecks"/>
     </capability>
     <capability namespace="eclipse.platform">
@@ -7022,10 +7042,6 @@
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
       <attribute name="activator" value="org.apache.felix.deploymentadmin.Activator"/>
-    </capability>
-    <capability namespace="equinox.module.data">
-      <directive name="effective" value="information"/>
-      <attribute name="activator" value="org.apache.felix.eventadmin.impl.Activator"/>
     </capability>
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
@@ -7129,10 +7145,10 @@
       <attribute name="activator" value="org.eclipse.core.internal.registry.osgi.Activator"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="size" value="42737" type="Long"/>
+      <attribute name="size" value="42704" type="Long"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
       <attribute name="url" value="com.osgifx.console.runtime/com.osgifx.console.runtime-0.0.0.jar"/>
-      <attribute name="osgi.content" value="C81D7F0881091F152B51E1EDBFBB61A60CD4B33BC6757DEF4386FAAD0461B979"/>
+      <attribute name="osgi.content" value="7D16D451E0855B3D73B11427397327EC46C7A9468E8F16DD0CDC3EF35154757D"/>
     </capability>
     <capability namespace="osgi.contract">
       <directive name="uses" value="javax.json,javax.json.spi,javax.json.stream"/>
@@ -7183,23 +7199,23 @@
       <attribute name="version" value="1.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.implementation">
-      <directive name="uses" value="org.osgi.service.event"/>
-      <attribute name="osgi.implementation" value="osgi.event"/>
-      <attribute name="version" value="1.4.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.implementation">
       <directive name="uses" value="org.osgi.service.metatype"/>
       <attribute name="osgi.implementation" value="osgi.metatype"/>
       <attribute name="version" value="1.4.0" type="Version"/>
     </capability>
+    <capability namespace="osgi.implementation">
+      <directive name="uses" value="org.osgi.service.event"/>
+      <attribute name="osgi.implementation" value="osgi.event"/>
+      <attribute name="version" value="1.4.0" type="Version"/>
+    </capability>
     <capability namespace="osgi.native">
-      <attribute name="osgi.native.osversion" value="12.4.0" type="Version"/>
+      <attribute name="osgi.native.osversion" value="12.5.1" type="Version"/>
       <attribute name="osgi.native.osname" value="MacOSX,Mac OS X"/>
       <attribute name="osgi.native.processor" value="x86-64,amd64,em64t,x86_64"/>
       <attribute name="osgi.native.language" value="en_IN"/>
     </capability>
     <capability namespace="osgi.native">
-      <attribute name="osgi.native.osversion" value="12.4.0" type="Version"/>
+      <attribute name="osgi.native.osversion" value="12.5.1" type="Version"/>
       <attribute name="osgi.native.osname" value="MacOSX,Mac OS X"/>
       <attribute name="osgi.native.processor" value="x86-64,amd64,em64t,x86_64"/>
       <attribute name="osgi.native.language" value="en"/>
@@ -7346,10 +7362,6 @@
       <attribute name="objectClass" value="org.apache.felix.cm.PersistenceManager" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
-      <directive name="uses" value="org.osgi.service.event"/>
-      <attribute name="objectClass" value="org.osgi.service.event.EventAdmin" type="List&lt;String&gt;"/>
-    </capability>
-    <capability namespace="osgi.service">
       <directive name="effective" value="active"/>
       <attribute name="objectClass" value="org.apache.felix.service.threadio.ThreadIO"/>
     </capability>
@@ -7366,6 +7378,10 @@
       <attribute name="objectClass" value="org.osgi.service.component.runtime.ServiceComponentRuntime" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
+      <directive name="uses" value="org.osgi.service.event"/>
+      <attribute name="objectClass" value="org.osgi.service.event.EventAdmin" type="List&lt;String&gt;"/>
+    </capability>
+    <capability namespace="osgi.service">
       <directive name="uses" value="com.osgifx.console.ui.configurations.converter"/>
       <attribute name="objectClass" value="com.osgifx.console.ui.configurations.converter.ConfigurationManager" type="List&lt;String&gt;"/>
     </capability>
@@ -7380,6 +7396,14 @@
     <capability namespace="osgi.service">
       <directive name="uses" value="com.osgifx.console.ui.terminal"/>
       <attribute name="objectClass" value="com.osgifx.console.ui.terminal.TerminalHistory" type="List&lt;String&gt;"/>
+    </capability>
+    <capability namespace="osgi.serviceloader">
+      <directive name="register" value="org.eclipse.osgi.launch.EquinoxFactory"/>
+      <attribute name="osgi.serviceloader" value="org.osgi.framework.connect.ConnectFrameworkFactory"/>
+    </capability>
+    <capability namespace="osgi.serviceloader">
+      <directive name="register" value="org.eclipse.osgi.launch.EquinoxFactory"/>
+      <attribute name="osgi.serviceloader" value="org.osgi.framework.launch.FrameworkFactory"/>
     </capability>
     <capability namespace="osgi.unresolvable"/>
     <requirement namespace="osgi.unresolvable">
