@@ -42,7 +42,7 @@ import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog.ArtifactDTO;
 import com.osgifx.console.util.fx.FxDialog;
 
 @Component(service = ArtifactInstaller.class)
-public class ArtifactInstaller {
+public final class ArtifactInstaller {
 
     private static final int DEFAULT_START_LEVEL = 10;
 

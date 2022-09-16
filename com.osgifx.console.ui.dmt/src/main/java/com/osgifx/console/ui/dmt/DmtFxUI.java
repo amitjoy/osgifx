@@ -26,42 +26,41 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.framework.BundleContext;
+import org.eclipse.fx.ui.di.FXMLBuilder;
+import org.eclipse.fx.ui.di.FXMLBuilder.Data;
+import org.eclipse.fx.ui.di.FXMLLoader;
+import org.eclipse.fx.ui.di.FXMLLoaderFactory;
 
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 
+@SuppressWarnings("deprecation")
 public final class DmtFxUI {
 
     @Log
     @Inject
     private FluentLogger      logger;
     @Inject
-    @OSGiBundle
-    private BundleContext     context;
-    @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
     private BorderPane        parentNode;
     @Inject
-    @LocalInstance
-    private FXMLLoader        fxmlLoader;
+    @FXMLLoader
+    private FXMLLoaderFactory fxmlLoader;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
     private ConsoleMaskerPane progressPane;
+    private DmtFxController   fxController;
 
     @PostConstruct
     public void postConstruct() {
@@ -92,20 +91,28 @@ public final class DmtFxUI {
 
     private void createControls() {
         progressPane.setVisible(true);
+        loadContent();
+    }
+
+    private void loadContent() {
         final Task<Void> task = new Task<>() {
 
-            Node tabContent;
+            Data<Node, DmtFxController> loadedData;
 
             @Override
             protected Void call() throws Exception {
-                tabContent = Fx.loadFXML(fxmlLoader, context, "/fxml/tab-content.fxml");
+                loadedData = loadFXML("/fxml/tab-content.fxml");
+                if (loadedData == null) {
+                    return null;
+                }
+                fxController = loadedData.getController();
                 return null;
             }
 
             @Override
             protected void succeeded() {
                 parentNode.getChildren().clear();
-                parentNode.setCenter(tabContent);
+                parentNode.setCenter(loadedData.getNode());
                 initStatusBar(parentNode);
                 progressPane.setVisible(false);
             }
@@ -119,8 +126,7 @@ public final class DmtFxUI {
     private void initStatusBar(final BorderPane parent) {
         if (isConnected) {
             final var node = Fx.initStatusBarButton(() -> {
-                final var controller = (DmtFxController) fxmlLoader.getController();
-                controller.updateModel();
+                fxController.updateModel();
             }, "Refresh", "REFRESH");
             statusBar.clearAllInRight();
             statusBar.addToRight(node);
@@ -128,6 +134,15 @@ public final class DmtFxUI {
             statusBar.clearAllInRight();
         }
         statusBar.addTo(parent);
+    }
+
+    private Data<Node, DmtFxController> loadFXML(final String resourceName) {
+        final FXMLBuilder<Node> builder = fxmlLoader.loadBundleRelative(resourceName);
+        try {
+            return builder.loadWithController();
+        } catch (final Exception e) {
+            return null;
+        }
     }
 
 }
