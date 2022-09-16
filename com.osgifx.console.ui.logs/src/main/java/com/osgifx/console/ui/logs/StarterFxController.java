@@ -21,14 +21,12 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import javax.inject.Inject;
 
 import org.controlsfx.control.SegmentedButton;
-import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.ui.di.FXMLBuilder;
 import org.eclipse.fx.ui.di.FXMLLoader;
 import org.eclipse.fx.ui.di.FXMLLoaderFactory;
 import org.osgi.annotation.bundle.Requirement;
-import org.osgi.framework.BundleContext;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -53,9 +51,6 @@ public final class StarterFxController {
     private ToggleButton      configurationsViewButton;
     @FXML
     private SegmentedButton   logsActionTypeButton;
-    @Inject
-    @OSGiBundle
-    private BundleContext     context;
 
     @FXML
     public void initialize() {
