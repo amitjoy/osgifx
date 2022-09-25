@@ -28,7 +28,8 @@ public class RedirectInput extends InputStream {
 
     private InputStream  org;
     private final byte[] ring = new byte[65536];
-    private int          in, out;
+    private int          in;
+    private int          out;
 
     /**
      * Create a redirector input stream with an original input stream
