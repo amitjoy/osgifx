@@ -25,6 +25,7 @@ public class NullRedirector implements Redirector {
 
     @Override
     public void close() throws IOException {
+        // nothing to do
     }
 
     @Override
@@ -34,6 +35,7 @@ public class NullRedirector implements Redirector {
 
     @Override
     public void stdin(final String s) {
+        // nothing to do
     }
 
     @Override
