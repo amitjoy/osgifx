@@ -127,6 +127,7 @@ public class GogoRedirector implements Redirector {
                 try {
                     return proxy(method.getReturnType(), result);
                 } catch (final Exception e) {
+                    // nothing to handle
                 }
             }
             return result;
