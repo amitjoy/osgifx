@@ -49,9 +49,13 @@ public class ConsoleRedirector implements Redirector {
             if (!agents.contains(agent)) {
                 agents.add(agent);
                 if (agents.size() == 1) {
-                    System.setOut(stdout = new RedirectOutput(agents, System.out, false));
-                    System.setErr(stderr = new RedirectOutput(agents, System.err, true));
-                    System.setIn(stdin = new RedirectInput(System.in));
+                    stdout = new RedirectOutput(agents, System.out, false);
+                    stderr = new RedirectOutput(agents, System.err, true);
+                    stdin  = new RedirectInput(System.in);
+
+                    System.setOut(stdout);
+                    System.setErr(stderr);
+                    System.setIn(stdin);
                 }
             }
         }
