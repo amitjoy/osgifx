@@ -38,11 +38,6 @@ public class ConsoleRedirector implements Redirector {
     private static List<AgentServer> agents = new CopyOnWriteArrayList<>();
     private final AgentServer        agent;
 
-    /**
-     * Constructor.
-     *
-     * @param agent the agent we're redirecting for
-     */
     public ConsoleRedirector(final AgentServer agent) throws IOException {
         this.agent = agent;
         synchronized (agents) {
@@ -61,9 +56,6 @@ public class ConsoleRedirector implements Redirector {
         }
     }
 
-    /**
-     * Clean up
-     */
     @Override
     public void close() throws IOException {
         synchronized (agents) {
