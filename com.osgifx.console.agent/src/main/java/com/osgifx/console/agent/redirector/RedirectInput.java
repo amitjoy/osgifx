@@ -36,7 +36,7 @@ public class RedirectInput extends InputStream {
      *
      * @param in the original
      */
-    public RedirectInput(final InputStream in) throws IOException {
+    public RedirectInput(final InputStream in) {
         org = in;
     }
 
@@ -47,7 +47,7 @@ public class RedirectInput extends InputStream {
     }
 
     /**
-     * Get the original inputstream, potentially null
+     * Get the original input stream, potentially null
      *
      * @return null or the original input stream
      */
@@ -60,7 +60,7 @@ public class RedirectInput extends InputStream {
      *
      * @param s the string
      */
-    public synchronized void add(final String s) throws IOException {
+    public synchronized void add(final String s) {
         final byte[] bytes = s.getBytes();
         for (final byte element : bytes) {
             write(element);
@@ -100,6 +100,7 @@ public class RedirectInput extends InputStream {
                 try {
                     ring.wait(400);
                 } catch (final InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return -1;
                 }
             }
