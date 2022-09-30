@@ -60,7 +60,7 @@ public class RedirectInput extends InputStream {
      *
      * @param s the string
      */
-    public synchronized void add(final String s) {
+    public synchronized void add(final String s) throws IOException {
         final byte[] bytes = s.getBytes();
         for (final byte element : bytes) {
             write(element);
