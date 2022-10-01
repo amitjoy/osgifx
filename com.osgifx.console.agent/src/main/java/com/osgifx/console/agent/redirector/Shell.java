@@ -57,7 +57,7 @@ public class Shell extends RedirectInput {
 
     @Override
     public void close() {
-
+        // nothing to do
     }
 
     @Override
