@@ -349,9 +349,7 @@ public class Reflect {
             for (final Field field : t.getDeclaredFields()) {
                 if (type != object ^ Modifier.isStatic(field.getModifiers())) {
                     final String name = field.getName();
-                    if (!result.containsKey(name)) {
-                        result.put(name, field(name));
-                    }
+                    result.computeIfAbsent(name, key -> field(name));
                 }
             }
 
