@@ -19,8 +19,28 @@ import java.util.List;
 
 public enum XAttributeDefType {
 
-    STRING, STRING_ARRAY, STRING_LIST, INTEGER, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE, DOUBLE_ARRAY,
-    DOUBLE_LIST, FLOAT, FLOAT_ARRAY, FLOAT_LIST, CHAR, CHAR_ARRAY, CHAR_LIST, LONG, LONG_ARRAY, LONG_LIST, PASSWORD;
+    STRING,
+    STRING_ARRAY,
+    STRING_LIST,
+    INTEGER,
+    INTEGER_ARRAY,
+    INTEGER_LIST,
+    BOOLEAN,
+    BOOLEAN_ARRAY,
+    BOOLEAN_LIST,
+    DOUBLE,
+    DOUBLE_ARRAY,
+    DOUBLE_LIST,
+    FLOAT,
+    FLOAT_ARRAY,
+    FLOAT_LIST,
+    CHAR,
+    CHAR_ARRAY,
+    CHAR_LIST,
+    LONG,
+    LONG_ARRAY,
+    LONG_LIST,
+    PASSWORD;
 
     public static XAttributeDefType getType(final Object value) {
         final Class<?> clazz = value.getClass();
