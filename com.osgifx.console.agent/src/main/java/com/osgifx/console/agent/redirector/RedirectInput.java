@@ -28,14 +28,15 @@ public class RedirectInput extends InputStream {
 
     private InputStream  org;
     private final byte[] ring = new byte[65536];
-    private int          in, out;
+    private int          in;
+    private int          out;
 
     /**
      * Create a redirector input stream with an original input stream
      *
      * @param in the original
      */
-    public RedirectInput(final InputStream in) throws IOException {
+    public RedirectInput(final InputStream in) {
         org = in;
     }
 
@@ -46,7 +47,7 @@ public class RedirectInput extends InputStream {
     }
 
     /**
-     * Get the original inputstream, potentially null
+     * Get the original input stream, potentially null
      *
      * @return null or the original input stream
      */
@@ -99,6 +100,7 @@ public class RedirectInput extends InputStream {
                 try {
                     ring.wait(400);
                 } catch (final InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return -1;
                 }
             }
