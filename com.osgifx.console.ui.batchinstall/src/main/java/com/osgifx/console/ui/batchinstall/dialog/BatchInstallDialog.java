@@ -17,6 +17,8 @@ package com.osgifx.console.ui.batchinstall.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialogController.ARTIFACTS_DIRECTORY;
+import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
+import static javafx.scene.control.ButtonType.CANCEL;
 
 import java.io.File;
 import java.util.List;
@@ -34,7 +36,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.image.ImageView;
@@ -58,8 +59,8 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
                 .setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '" + ARTIFACTS_DIRECTORY + "' directory");
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
 
-        final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
-        dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);
+        final var installButtonType = new ButtonType("Install", OK_DONE);
+        dialogPane.getButtonTypes().addAll(installButtonType, CANCEL);
 
         final var dialogContent = Fx.loadFXML(loader, context, "/fxml/batch-install-dialog.fxml");
         dialogPane.setContent(dialogContent);
@@ -76,7 +77,7 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
         dialogPane.lookupButton(installButtonType).disableProperty().bind(isItemSelected);
         setResultConverter(dialogButton -> {
             final var data = dialogButton == null ? null : dialogButton.getButtonData();
-            return data == ButtonData.OK_DONE ? controller.getSelectedArtifacts() : null;
+            return data == OK_DONE ? controller.getSelectedArtifacts() : null;
         });
     }
 
