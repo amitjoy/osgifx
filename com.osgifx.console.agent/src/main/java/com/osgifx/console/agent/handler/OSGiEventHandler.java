@@ -28,7 +28,7 @@ import com.osgifx.console.supervisor.Supervisor;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 
-public class OSGiEventHandler implements EventHandler {
+public final class OSGiEventHandler implements EventHandler {
 
     private final Supervisor supervisor;
 
