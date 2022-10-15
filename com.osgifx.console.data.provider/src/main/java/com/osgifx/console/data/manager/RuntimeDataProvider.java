@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.data.manager;
 
+import static com.osgifx.console.data.manager.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
@@ -27,7 +28,6 @@ import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
 import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
 import static com.osgifx.console.data.supplier.RolesInfoSupplier.ROLES_ID;
-import static com.osgifx.console.data.supplier.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
@@ -65,7 +65,6 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.data.provider.PackageDTO;
-import com.osgifx.console.data.supplier.RuntimeInfoSupplier;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.ObservableList;
