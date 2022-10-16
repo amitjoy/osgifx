@@ -43,6 +43,7 @@ public final class DefaultTheme extends AbstractTheme {
 
     @Override
     public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
+        // required for bnd, otherwise, it will report that unbind method is missing
         super.unregisterStylesheet(stylesheet);
     }
 
