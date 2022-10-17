@@ -33,6 +33,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.ObservableList;

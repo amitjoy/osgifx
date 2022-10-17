@@ -40,6 +40,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
+import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.supervisor.Supervisor;
 
