@@ -28,7 +28,7 @@ import com.osgifx.console.agent.helper.Reflect;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.supervisor.Supervisor;
 
-public class OSGiLogListener implements LogListener {
+public final class OSGiLogListener implements LogListener {
 
     private final Supervisor                supervisor;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;

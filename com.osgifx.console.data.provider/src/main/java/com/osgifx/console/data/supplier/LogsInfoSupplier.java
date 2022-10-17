@@ -31,6 +31,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.osgifx.console.agent.dto.XLogEntryDTO;
+import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 

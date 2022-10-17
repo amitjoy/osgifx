@@ -42,6 +42,10 @@ public final class XHeapAdmin {
     private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
     private static volatile Object hotspotMBean;
 
+    private XHeapAdmin() {
+        throw new IllegalAccessError("Cannot be instantiated");
+    }
+
     public static XHeapUsageDTO init() {
         final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
         try {

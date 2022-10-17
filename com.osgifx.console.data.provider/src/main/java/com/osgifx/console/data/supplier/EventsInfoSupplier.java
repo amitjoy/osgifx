@@ -37,6 +37,7 @@ import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 
