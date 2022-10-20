@@ -42,10 +42,13 @@ import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.helper.AgentHelper;
 
-public class XUserAdmin {
+import jakarta.inject.Inject;
+
+public final class XUserAdmin {
 
     private final UserAdmin userAdmin;
 
+    @Inject
     public XUserAdmin(final Object userAdmin) {
         this.userAdmin = (UserAdmin) userAdmin;
     }

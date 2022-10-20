@@ -35,13 +35,18 @@ import org.osgi.framework.dto.ServiceReferenceDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 
-public class XServiceAdmin {
+import jakarta.inject.Inject;
 
-    private XServiceAdmin() {
-        throw new IllegalAccessError("Cannot be instantiated");
+public final class XServiceAdmin {
+
+    private final BundleContext context;
+
+    @Inject
+    public XServiceAdmin(final BundleContext context) {
+        this.context = context;
     }
 
-    public static List<XServiceDTO> get(final BundleContext context) {
+    public List<XServiceDTO> get() {
         requireNonNull(context);
         try {
             final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
@@ -51,7 +56,7 @@ public class XServiceAdmin {
         }
     }
 
-    private static XServiceDTO toDTO(final ServiceReferenceDTO refDTO, final BundleContext context) {
+    private XServiceDTO toDTO(final ServiceReferenceDTO refDTO, final BundleContext context) {
         final XServiceDTO dto = new XServiceDTO();
 
         final XBundleInfoDTO bundleInfo = new XBundleInfoDTO();
@@ -68,19 +73,19 @@ public class XServiceAdmin {
         return dto;
     }
 
-    private static List<String> getObjectClass(final Map<String, Object> properties) {
+    private List<String> getObjectClass(final Map<String, Object> properties) {
         final Object objectClass = properties.get(OBJECTCLASS);
         return Arrays.asList((String[]) objectClass);
     }
 
-    private static String arrayToString(final Object value) {
+    private String arrayToString(final Object value) {
         if (value instanceof String[]) {
             return Arrays.asList((String[]) value).toString();
         }
         return value.toString();
     }
 
-    private static List<XBundleInfoDTO> getUsingBundles(final long[] usingBundles, final BundleContext context) {
+    private List<XBundleInfoDTO> getUsingBundles(final long[] usingBundles, final BundleContext context) {
         final List<XBundleInfoDTO> bundles = new ArrayList<>();
         for (final long id : usingBundles) {
             final String bsn = bsn(id, context);
@@ -94,7 +99,7 @@ public class XServiceAdmin {
         return bundles;
     }
 
-    private static String bsn(final long id, final BundleContext context) {
+    private String bsn(final long id, final BundleContext context) {
         for (final Bundle b : context.getBundles()) {
             if (b.getBundleId() == id) {
                 return b.getSymbolicName();

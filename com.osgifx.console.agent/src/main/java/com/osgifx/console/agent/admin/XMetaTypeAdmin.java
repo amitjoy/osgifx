@@ -44,12 +44,15 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 
-public class XMetaTypeAdmin {
+import jakarta.inject.Inject;
+
+public final class XMetaTypeAdmin {
 
     private final BundleContext      context;
     private final MetaTypeService    metatype;
     private final ConfigurationAdmin configAdmin;
 
+    @Inject
     public XMetaTypeAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
         this.context     = requireNonNull(context);
         this.configAdmin = (ConfigurationAdmin) configAdmin;

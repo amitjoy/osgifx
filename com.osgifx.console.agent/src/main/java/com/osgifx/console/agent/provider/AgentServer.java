@@ -20,12 +20,12 @@ import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.packageNotWired;
-import static com.osgifx.console.agent.helper.PackageWirings.Type.CM;
-import static com.osgifx.console.agent.helper.PackageWirings.Type.DMT;
-import static com.osgifx.console.agent.helper.PackageWirings.Type.EVENT_ADMIN;
-import static com.osgifx.console.agent.helper.PackageWirings.Type.R7_LOGGER;
-import static com.osgifx.console.agent.helper.PackageWirings.Type.SCR;
-import static com.osgifx.console.agent.helper.PackageWirings.Type.USER_ADMIN;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.R7_LOGGER;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
 import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
@@ -45,16 +45,12 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Attributes;
@@ -75,7 +71,6 @@ import org.osgi.dto.DTO;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
@@ -129,7 +124,6 @@ import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.OSGiEventHandler;
 import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.helper.AgentHelper;
-import com.osgifx.console.agent.helper.PackageWirings;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.redirector.ConsoleRedirector;
 import com.osgifx.console.agent.redirector.GogoRedirector;
@@ -142,8 +136,8 @@ import com.osgifx.console.supervisor.Supervisor;
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
+import eu.lestard.easydi.EasyDI;
 
-@SuppressWarnings("rawtypes")
 public final class AgentServer implements Agent, Closeable {
 
     private static final long          RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
@@ -151,130 +145,25 @@ public final class AgentServer implements Agent, Closeable {
     private static final AtomicInteger sequence         = new AtomicInteger(1000);
     private static final Pattern       BSN_PATTERN      = Pattern.compile("\\s*([^;\\s]+).*");
 
-    private Supervisor                   remote;
-    private BundleContext                context;
-    private final Map<String, String>    installed  = new HashMap<>();
     public volatile boolean              quit;
-    private Redirector                   redirector = new NullRedirector();
+    private Supervisor                   remote;
     private RemoteRPC<Agent, Supervisor> remoteRPC;
-    private ClassloaderLeakDetector      leakDetector;
-    private BundleStartTimeCalculator    bundleStartTimeCalculator;
-
-    private final ServiceTracker<Object, Object>                 scrTracker;
-    private final ServiceTracker<Object, Object>                 metatypeTracker;
-    private final ServiceTracker<Object, Object>                 dmtAdminTracker;
-    private final ServiceTracker<Object, Object>                 userAdminTracker;
-    private final ServiceTracker<Object, Object>                 eventAdminTracker;
-    private final ServiceTracker<Object, Object>                 loggerAdminTracker;
-    private final ServiceTracker<Object, Object>                 configAdminTracker;
-    private final ServiceTracker<Object, Object>                 gogoCommandsTracker;
-    private final ServiceTracker<Object, Object>                 felixHcExecutorTracker;
-    private final ServiceTracker<Object, Object>                 httpServiceRuntimeTracker;
-    private final ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
+    private final Map<String, String>    installed  = new HashMap<>();
+    private Redirector                   redirector = new NullRedirector();
 
     private ServiceTracker<Object, Object> logReaderTracker;
 
     private Closeable              osgiLogListenerCloser;
     private ServiceRegistration<?> osgiEventListenerServiceReg;
 
-    private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
-    private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
+    private final EasyDI di;
 
-    public AgentServer(final BundleContext context, final ClassloaderLeakDetector leakDetector,
-            final BundleStartTimeCalculator bundleStartTimeCalculator) throws Exception {
+    public AgentServer(final EasyDI di) {
+        this.di = di;
+    }
 
-        requireNonNull(context, "Bundle context cannot be null");
-        requireNonNull(leakDetector, "Leak detector cannot be null");
-        requireNonNull(bundleStartTimeCalculator, "Bundle start time calculator cannot be null");
-
-        this.context                   = context;
-        this.leakDetector              = leakDetector;
-        this.bundleStartTimeCalculator = bundleStartTimeCalculator;
-
-        final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
-
-        metatypeTracker           = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
-        dmtAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
-        userAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
-        loggerAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.log.admin.LoggerAdmin", null);
-        eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
-        configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
-        felixHcExecutorTracker    = new ServiceTracker<>(context, "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
-        scrTracker                = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
-        httpServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime", null);
-        agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
-
-                                      @Override
-                                      @SuppressWarnings("unchecked")
-                                      public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
-                                          final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
-                                          if (name == null) {
-                                              return null;
-                                          }
-                                          final AgentExtension tracked = super.addingService(reference);
-                                          agentExtensions.put(name.toString(), tracked);
-                                          return tracked;
-                                      }
-
-                                      @Override
-                                      public void modifiedService(final ServiceReference<AgentExtension> reference,
-                                              final AgentExtension service) {
-                                          removedService(reference, service);
-                                          addingService(reference);
-                                      }
-
-                                      @Override
-                                      public void removedService(final ServiceReference<AgentExtension> reference,
-                                              final AgentExtension service) {
-                                          final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
-                                          if (name == null) {
-                                              return;
-                                          }
-                                          agentExtensions.remove(name);
-                                      }
-                                  };
-        gogoCommandsTracker       = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
-                                      @Override
-                                      public Object addingService(final ServiceReference<Object> reference) {
-                                          final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                          final String[] functions = adapt(reference.getProperty("osgi.command.function"));
-                                          addCommand(scope, functions);
-                                          return super.addingService(reference);
-                                      }
-
-                                      @Override
-                                      public void removedService(final ServiceReference<Object> reference, final Object service) {
-                                          final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                          final String[] functions = adapt(reference.getProperty("osgi.command.function"));
-                                          removeCommand(scope, functions);
-                                      }
-
-                                      private String[] adapt(final Object value) {
-                                          if (value instanceof String[]) {
-                                              return (String[]) value;
-                                          }
-                                          return new String[] { value.toString() };
-                                      }
-
-                                      private void addCommand(final String scope, final String... commands) {
-                                          Stream.of(commands).forEach(cmd -> gogoCommands.add(scope + ":" + cmd));
-                                      }
-
-                                      private void removeCommand(final String scope, final String... commands) {
-                                          Stream.of(commands).forEach(cmd -> gogoCommands.remove(scope + ":" + cmd));
-                                      }
-                                  };
-        scrTracker.open();
-        metatypeTracker.open();
-        dmtAdminTracker.open();
-        userAdminTracker.open();
-        loggerAdminTracker.open();
-        eventAdminTracker.open();
-        configAdminTracker.open();
-        gogoCommandsTracker.open();
-        agentExtensionTracker.open();
-        felixHcExecutorTracker.open();
-        httpServiceRuntimeTracker.open();
+    public BundleContext getContext() {
+        return di.getInstance(BundleContext.class);
     }
 
     @Override
@@ -320,7 +209,7 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(url, "Bundle URL cannot be null");
 
         final InputStream is = new URL(url).openStream();
-        final Bundle      b  = context.installBundle(location, is);
+        final Bundle      b  = di.getInstance(BundleContext.class).installBundle(location, is);
         installed.put(b.getLocation(), url);
         return toDTO(b);
     }
@@ -331,7 +220,7 @@ public final class AgentServer implements Agent, Closeable {
 
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
-            final Bundle bundle = context.getBundle(id);
+            final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
             try {
                 bundle.start();
             } catch (final BundleException e) {
@@ -347,7 +236,7 @@ public final class AgentServer implements Agent, Closeable {
 
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
-            final Bundle bundle = context.getBundle(id);
+            final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
             try {
                 bundle.stop();
             } catch (final BundleException e) {
@@ -363,7 +252,7 @@ public final class AgentServer implements Agent, Closeable {
 
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
-            final Bundle bundle = context.getBundle(id);
+            final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
             try {
                 bundle.uninstall();
                 installed.remove(bundle.getLocation());
@@ -380,11 +269,11 @@ public final class AgentServer implements Agent, Closeable {
 
         Bundle[] bundles;
         if (ids.length == 0) {
-            bundles = context.getBundles();
+            bundles = di.getInstance(BundleContext.class).getBundles();
         } else {
             bundles = new Bundle[ids.length];
             for (int i = 0; i < ids.length; i++) {
-                bundles[i] = context.getBundle(ids[i]);
+                bundles[i] = di.getInstance(BundleContext.class).getBundle(ids[i]);
                 if (bundles[i] == null) {
                     throw new IllegalArgumentException("Bundle " + ids[i] + " does not exist");
                 }
@@ -413,7 +302,7 @@ public final class AgentServer implements Agent, Closeable {
         }
         if (port <= COMMAND_SESSION) {
             try {
-                redirector = new GogoRedirector(this, context);
+                redirector = new GogoRedirector(this, di.getInstance(BundleContext.class));
             } catch (final Exception e) {
                 throw new IllegalStateException("Gogo is not present in this framework", e);
             }
@@ -551,18 +440,6 @@ public final class AgentServer implements Agent, Closeable {
         try {
             cleanup(-2);
 
-            scrTracker.close();
-            metatypeTracker.close();
-            dmtAdminTracker.close();
-            userAdminTracker.close();
-            loggerAdminTracker.close();
-            eventAdminTracker.close();
-            configAdminTracker.close();
-            gogoCommandsTracker.close();
-            agentExtensionTracker.close();
-            felixHcExecutorTracker.close();
-            httpServiceRuntimeTracker.close();
-
             if (logReaderTracker != null) {
                 logReaderTracker.close();
             }
@@ -605,12 +482,8 @@ public final class AgentServer implements Agent, Closeable {
         return true;
     }
 
-    public BundleContext getContext() {
-        return context;
-    }
-
     public void refresh(final boolean async) throws InterruptedException {
-        final FrameworkWiring wiring = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkWiring.class);
+        final FrameworkWiring wiring = di.getInstance(BundleContext.class).getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkWiring.class);
         if (wiring != null) {
             final CountDownLatch refresh = new CountDownLatch(1);
             wiring.refreshBundles(null, event -> refresh.countDown());
@@ -649,7 +522,7 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     private Set<Bundle> findBundles(final String bsn, final Version version) {
-        return Stream.of(context.getBundles()).filter(b -> bsn.equals(b.getSymbolicName()))
+        return Stream.of(di.getInstance(BundleContext.class).getBundles()).filter(b -> bsn.equals(b.getSymbolicName()))
                 .filter(b -> version == null || version.equals(b.getVersion())).collect(Collectors.toSet());
     }
 
@@ -669,61 +542,55 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public List<XBundleDTO> getAllBundles() {
-        return XBundleAdmin.get(context, bundleStartTimeCalculator);
+        return di.getInstance(XBundleAdmin.class).get();
     }
 
     @Override
     public List<XComponentDTO> getAllComponents() {
-        final boolean isScrAvailable = PackageWirings.isScrWired(context);
+        final boolean isScrAvailable = di.getInstance(PackageWirings.class).isScrWired();
         if (isScrAvailable) {
-            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
-            return scrAdmin.getComponents();
+            return di.getInstance(XComponentAdmin.class).getComponents();
         }
         return Collections.emptyList();
     }
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
-        final boolean isMetatypeAvailable    = PackageWirings.isMetatypeWired(context);
+        final boolean isConfigAdminAvailable = di.getInstance(PackageWirings.class).isConfigAdminWired();
+        final boolean isMetatypeAvailable    = di.getInstance(PackageWirings.class).isMetatypeWired();
 
         final List<XConfigurationDTO> configs = new ArrayList<>();
         if (isConfigAdminAvailable) {
-            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
-                    metatypeTracker.getService());
-            configs.addAll(configAdmin.getConfigurations());
+            configs.addAll(di.getInstance(XConfigurationAdmin.class).getConfigurations());
         }
         if (isMetatypeAvailable) {
-            final XMetaTypeAdmin metatypeAdmin = new XMetaTypeAdmin(context, configAdminTracker.getService(), metatypeTracker.getService());
-            configs.addAll(metatypeAdmin.getConfigurations());
+            configs.addAll(di.getInstance(XMetaTypeAdmin.class).getConfigurations());
         }
         return configs;
     }
 
     @Override
     public List<XPropertyDTO> getAllProperties() {
-        return XPropertyAdmin.get(context);
+        return di.getInstance(XPropertyAdmin.class).get();
     }
 
     @Override
     public List<XServiceDTO> getAllServices() {
-        return XServiceAdmin.get(context);
+        return di.getInstance(XServiceAdmin.class).get();
     }
 
     @Override
     public List<XThreadDTO> getAllThreads() {
-        final XThreadAdmin threadAdmin = new XThreadAdmin(context);
-        return threadAdmin.get();
+        return di.getInstance(XThreadAdmin.class).get();
     }
 
     @Override
     public XDmtNodeDTO readDmtNode(final String rootURI) {
         requireNonNull(rootURI, "DMT node root URI cannot be null");
 
-        final boolean isDmtAdminAvailable = PackageWirings.isDmtAdminWired(context);
+        final boolean isDmtAdminAvailable = di.getInstance(PackageWirings.class).isDmtAdminWired();
         if (isDmtAdminAvailable) {
-            final XDmtAdmin dmtAdmin = new XDmtAdmin(dmtAdminTracker.getService());
-            return dmtAdmin.readDmtNode(rootURI);
+            return di.getInstance(XDmtAdmin.class).readDmtNode(rootURI);
         }
         return null;
     }
@@ -734,31 +601,27 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(value, "DMT value cannot be null");
         requireNonNull(format, "DMT value type cannot be null");
 
-        final boolean isDmtAdminAvailable = PackageWirings.isDmtAdminWired(context);
+        final boolean isDmtAdminAvailable = di.getInstance(PackageWirings.class).isDmtAdminWired();
         if (isDmtAdminAvailable) {
-            final XDmtAdmin dmtAdmin = new XDmtAdmin(dmtAdminTracker.getService());
-            return dmtAdmin.updateDmtNode(uri, value, format);
+            return di.getInstance(XDmtAdmin.class).updateDmtNode(uri, value, format);
         }
         return createResult(SKIPPED, packageNotWired(DMT));
     }
 
     @Override
     public XResultDTO updateBundleLoggerContext(final String bsn, final Map<String, String> logLevels) {
-        final boolean isR7LogAvailable = PackageWirings.isR7LoggerAdminWired(context);
+        final boolean isR7LogAvailable = di.getInstance(PackageWirings.class).isR7LoggerAdminWired();
         if (isR7LogAvailable) {
-            final boolean      isConfigAdminWired = PackageWirings.isConfigAdminWired(context);
-            final XLoggerAdmin loggerAdmin        = new XLoggerAdmin(loggerAdminTracker.getService(), isConfigAdminWired, context);
-            return loggerAdmin.updateLoggerContext(bsn, logLevels);
+            return di.getInstance(XLoggerAdmin.class).updateLoggerContext(bsn, logLevels);
         }
         return createResult(SKIPPED, packageNotWired(R7_LOGGER));
     }
 
     @Override
     public XResultDTO enableComponentById(final long id) {
-        final boolean isScrAvailable = PackageWirings.isScrWired(context);
+        final boolean isScrAvailable = di.getInstance(PackageWirings.class).isScrWired();
         if (isScrAvailable) {
-            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
-            return scrAdmin.enableComponent(id);
+            return di.getInstance(XComponentAdmin.class).enableComponent(id);
         }
         return createResult(SKIPPED, packageNotWired(SCR));
     }
@@ -767,20 +630,18 @@ public final class AgentServer implements Agent, Closeable {
     public XResultDTO enableComponentByName(final String name) {
         requireNonNull(name, "Component name cannot be null");
 
-        final boolean isScrAvailable = PackageWirings.isScrWired(context);
+        final boolean isScrAvailable = di.getInstance(PackageWirings.class).isScrWired();
         if (isScrAvailable) {
-            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
-            return scrAdmin.enableComponent(name);
+            return di.getInstance(XComponentAdmin.class).enableComponent(name);
         }
         return createResult(SKIPPED, packageNotWired(SCR));
     }
 
     @Override
     public XResultDTO disableComponentById(final long id) {
-        final boolean isScrAvailable = PackageWirings.isScrWired(getContext());
+        final boolean isScrAvailable = di.getInstance(PackageWirings.class).isScrWired();
         if (isScrAvailable) {
-            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
-            return scrAdmin.disableComponent(id);
+            return di.getInstance(XComponentAdmin.class).disableComponent(id);
         }
         return createResult(SKIPPED, packageNotWired(SCR));
     }
@@ -789,10 +650,9 @@ public final class AgentServer implements Agent, Closeable {
     public XResultDTO disableComponentByName(final String name) {
         requireNonNull(name, "Component name cannot be null");
 
-        final boolean isScrAvailable = PackageWirings.isScrWired(getContext());
+        final boolean isScrAvailable = di.getInstance(PackageWirings.class).isScrWired();
         if (isScrAvailable) {
-            final XComponentAdmin scrAdmin = new XComponentAdmin(scrTracker.getService());
-            return scrAdmin.disableComponent(name);
+            return di.getInstance(XComponentAdmin.class).disableComponent(name);
         }
         return createResult(SKIPPED, packageNotWired(SCR));
     }
@@ -820,11 +680,9 @@ public final class AgentServer implements Agent, Closeable {
     public XResultDTO deleteConfiguration(final String pid) {
         requireNonNull(pid, "Configuration PID cannot be null");
 
-        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(getContext());
+        final boolean isConfigAdminAvailable = di.getInstance(PackageWirings.class).isConfigAdminWired();
         if (isConfigAdminAvailable) {
-            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
-                    metatypeTracker.getService());
-            return configAdmin.deleteConfiguration(pid);
+            return di.getInstance(XConfigurationAdmin.class).deleteConfiguration(pid);
         }
         return createResult(SKIPPED, packageNotWired(CM));
     }
@@ -834,14 +692,12 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(factoryPid, "Configuration factory PID cannot be null");
         requireNonNull(newProperties, "Configuration properties cannot be null");
 
-        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
+        final boolean isConfigAdminAvailable = di.getInstance(PackageWirings.class).isConfigAdminWired();
 
         if (isConfigAdminAvailable) {
-            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
-                    metatypeTracker.getService());
             try {
                 final Map<String, Object> finalProperties = parseProperties(newProperties);
-                return configAdmin.createFactoryConfiguration(factoryPid, finalProperties);
+                return di.getInstance(XConfigurationAdmin.class).createFactoryConfiguration(factoryPid, finalProperties);
             } catch (final Exception e) {
                 return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
             }
@@ -854,12 +710,11 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(topic, "Event topic cannot be null");
         requireNonNull(properties, "Event properties cannot be null");
 
-        final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+        final boolean isEventAdminAvailable = di.getInstance(PackageWirings.class).isEventAdminWired();
         if (isEventAdminAvailable) {
-            final XEventAdmin eventAdmin = new XEventAdmin(eventAdminTracker.getService());
             try {
                 final Map<String, Object> finalProperties = parseProperties(properties);
-                eventAdmin.sendEvent(topic, finalProperties);
+                di.getInstance(XEventAdmin.class).sendEvent(topic, finalProperties);
                 return createResult(SUCCESS, "Event has been sent successfully");
             } catch (final Exception e) {
                 return createResult(ERROR, "Event could not be sent successfully");
@@ -873,12 +728,11 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(topic, "Event topic cannot be null");
         requireNonNull(properties, "Event properties cannot be null");
 
-        final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+        final boolean isEventAdminAvailable = di.getInstance(PackageWirings.class).isEventAdminWired();
         if (isEventAdminAvailable) {
-            final XEventAdmin eventAdmin = new XEventAdmin(eventAdminTracker.getService());
             try {
                 final Map<String, Object> finalProperties = parseProperties(properties);
-                eventAdmin.postEvent(topic, finalProperties);
+                di.getInstance(XEventAdmin.class).postEvent(topic, finalProperties);
                 return createResult(SUCCESS, "Event has been sent successfully");
             } catch (final Exception e) {
                 return createResult(ERROR, "Event could not be sent successfully");
@@ -900,7 +754,9 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Set<String> getGogoCommands() {
+        final Set<String> gogoCommands = di.getInstance(Set.class);
         return new HashSet<>(gogoCommands);
     }
 
@@ -909,11 +765,10 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(name, "Role name cannot be null");
         requireNonNull(type, "Role type name cannot be null");
 
-        final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+        final boolean isUserAdminAvailable = di.getInstance(PackageWirings.class).isUserAdminWired();
         if (isUserAdminAvailable) {
             try {
-                final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
-                return userAdmin.createRole(name, type);
+                return di.getInstance(XUserAdmin.class).createRole(name, type);
             } catch (final Exception e) {
                 return createResult(ERROR, "The role cannot be created");
             }
@@ -925,11 +780,10 @@ public final class AgentServer implements Agent, Closeable {
     public XResultDTO updateRole(final XRoleDTO dto) {
         requireNonNull(dto, "New role information cannot be null");
 
-        final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+        final boolean isUserAdminAvailable = di.getInstance(PackageWirings.class).isUserAdminWired();
         if (isUserAdminAvailable) {
             try {
-                final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
-                return userAdmin.updateRole(dto);
+                return di.getInstance(XUserAdmin.class).updateRole(dto);
             } catch (final Exception e) {
                 return createResult(ERROR, "The role cannot be updated");
             }
@@ -941,11 +795,10 @@ public final class AgentServer implements Agent, Closeable {
     public XResultDTO removeRole(final String name) {
         requireNonNull(name, "Role name cannot be null");
 
-        final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+        final boolean isUserAdminAvailable = di.getInstance(PackageWirings.class).isUserAdminWired();
         if (isUserAdminAvailable) {
             try {
-                final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
-                return userAdmin.removeRole(name);
+                return di.getInstance(XUserAdmin.class).removeRole(name);
             } catch (final Exception e) {
                 return createResult(ERROR, "The role cannot be removed");
             }
@@ -955,49 +808,47 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public List<XRoleDTO> getAllRoles() {
-        final boolean isUserAdminAvailable = PackageWirings.isUserAdminWired(context);
+        final boolean isUserAdminAvailable = di.getInstance(PackageWirings.class).isUserAdminWired();
         if (isUserAdminAvailable) {
-            final XUserAdmin userAdmin = new XUserAdmin(userAdminTracker.getService());
-            return userAdmin.getRoles();
+            return di.getInstance(XUserAdmin.class).getRoles();
         }
         return Collections.emptyList();
     }
 
     @Override
     public List<XBundleLoggerContextDTO> getBundleLoggerContexts() {
-        final boolean isR7LogAvailable = PackageWirings.isR7LoggerAdminWired(context);
+        final boolean isR7LogAvailable = di.getInstance(PackageWirings.class).isR7LoggerAdminWired();
         if (isR7LogAvailable) {
-            final boolean      isConfigAdminWired = PackageWirings.isConfigAdminWired(context);
-            final XLoggerAdmin loggerAdmin        = new XLoggerAdmin(loggerAdminTracker.getService(), isConfigAdminWired, context);
-            return loggerAdmin.getLoggerContexts();
+            return di.getInstance(XLoggerAdmin.class).getLoggerContexts();
         }
         return Collections.emptyList();
     }
 
     @Override
     public List<XHealthCheckDTO> getAllHealthChecks() {
-        final boolean isFelixHcAvailable = PackageWirings.isFelixHcWired(context);
+        final boolean isFelixHcAvailable = di.getInstance(PackageWirings.class).isFelixHcWired();
         if (isFelixHcAvailable) {
-            final XHcAdmin hcAdmin = new XHcAdmin(context, felixHcExecutorTracker.getService());
-            return hcAdmin.getHealthchecks();
+            return di.getInstance(XHcAdmin.class).getHealthchecks();
         }
         return Collections.emptyList();
     }
 
     @Override
     public List<XHealthCheckResultDTO> executeHealthChecks(final List<String> tags, final List<String> names) {
-        final boolean isFelixHcAvailable = PackageWirings.isFelixHcWired(context);
+        final boolean isFelixHcAvailable = di.getInstance(PackageWirings.class).isFelixHcWired();
         if (isFelixHcAvailable) {
-            final XHcAdmin hcAdmin = new XHcAdmin(context, felixHcExecutorTracker.getService());
-            return hcAdmin.executeHealthChecks(tags, names);
+            return di.getInstance(XHcAdmin.class).executeHealthChecks(tags, names);
         }
         return Collections.emptyList();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> executeExtension(final String name, final Map<String, Object> context) {
         requireNonNull(name, "Agent extension name cannot be null");
         requireNonNull(context, "Agent extension execution context cannot be null");
+
+        final Map<String, AgentExtension<DTO, DTO>> agentExtensions = di.getInstance(Map.class);
 
         if (!agentExtensions.containsKey(name)) {
             throw new RuntimeException("Agent extension with name '" + name + "' doesn't exist");
@@ -1015,27 +866,22 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public Set<XBundleDTO> getClassloaderLeaks() {
-        return leakDetector.getSuspiciousBundles();
+        return di.getInstance(ClassloaderLeakDetector.class).getSuspiciousBundles();
     }
 
     @Override
     public List<XHttpComponentDTO> getHttpComponents() {
-        final boolean isHttpServiceRuntimeWired = PackageWirings.isHttpServiceRuntimeWired(context);
+        final boolean isHttpServiceRuntimeWired = di.getInstance(PackageWirings.class).isHttpServiceRuntimeWired();
         if (isHttpServiceRuntimeWired) {
-            final Object service = httpServiceRuntimeTracker.getService();
-            if (service == null) {
-                return Collections.emptyList();
-            }
-            final XHttpAdmin httpAdmin = new XHttpAdmin(service);
-            return httpAdmin.runtime();
+            return di.getInstance(XHttpAdmin.class).runtime();
         }
         return Collections.emptyList();
     }
 
     @Override
     public XHeapUsageDTO getHeapUsage() {
-        final boolean isJMXWired = PackageWirings.isJmxWired(context);
-        return isJMXWired ? XHeapAdmin.init() : null;
+        final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
+        return isJMXWired ? di.getInstance(XHeapAdmin.class).init() : null;
     }
 
     @Override
@@ -1045,12 +891,12 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public XHeapdumpDTO heapdump() throws Exception {
-        final boolean isJMXWired = PackageWirings.isJmxWired(context);
-        return isJMXWired ? XHeapAdmin.heapdump() : null;
+        final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
+        return isJMXWired ? di.getInstance(XHeapAdmin.class).heapdump() : null;
     }
 
     private long getSystemUptime() {
-        final boolean isJMXWired = PackageWirings.isJmxWired(context);
+        final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
         return isJMXWired ? ManagementFactory.getRuntimeMXBean().getUptime() : 0L;
     }
 
@@ -1063,9 +909,9 @@ public final class AgentServer implements Agent, Closeable {
             location = getLocation(data);
         }
         try (InputStream stream = new ByteArrayInputStream(data)) {
-            installedBundle = context.getBundle(location);
+            installedBundle = di.getInstance(BundleContext.class).getBundle(location);
             if (installedBundle == null) {
-                installedBundle = context.installBundle(location, stream);
+                installedBundle = di.getInstance(BundleContext.class).installBundle(location, stream);
                 installedBundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
             } else {
                 installedBundle.update(stream);
@@ -1095,12 +941,10 @@ public final class AgentServer implements Agent, Closeable {
         requireNonNull(pid, "Configuration PID cannot be null");
         requireNonNull(newProperties, "Configuration properties cannot be null");
 
-        final boolean isConfigAdminAvailable = PackageWirings.isConfigAdminWired(context);
+        final boolean isConfigAdminAvailable = di.getInstance(PackageWirings.class).isConfigAdminWired();
         if (isConfigAdminAvailable) {
-            final XConfigurationAdmin configAdmin = new XConfigurationAdmin(context, configAdminTracker.getService(),
-                    metatypeTracker.getService());
             try {
-                return configAdmin.createOrUpdateConfiguration(pid, newProperties);
+                return di.getInstance(XConfigurationAdmin.class).createOrUpdateConfiguration(pid, newProperties);
             } catch (final Exception e) {
                 return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
             }
@@ -1109,42 +953,40 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     private ServiceRegistration<?> initOSGiEventing() {
-        final boolean isEventAdminAvailable = PackageWirings.isEventAdminWired(context);
+        final boolean isEventAdminAvailable = di.getInstance(PackageWirings.class).isEventAdminWired();
         if (isEventAdminAvailable) {
-            final Dictionary<String, Object> properties = new Hashtable<>();
-            properties.put("event.topics", "*");
-            return context.registerService("org.osgi.service.event.EventHandler", new OSGiEventHandler(remoteRPC.getRemote()), properties);
+            return di.getInstance(OSGiEventHandler.class).register();
         }
         return null;
     }
 
     private Closeable initOSGiLogging() {
-        final boolean isLogAvailable = PackageWirings.isLogWired(context);
+        final boolean isLogAvailable = di.getInstance(PackageWirings.class).isLogWired();
         if (isLogAvailable) {
-            final OSGiLogListener logListener = new OSGiLogListener(remoteRPC.getRemote(), bundleStartTimeCalculator);
-            return trackLogReader(logListener);
+            return trackLogReader(di.getInstance(OSGiLogListener.class));
         }
         return null;
     }
 
     private Closeable trackLogReader(final OSGiLogListener logListener) {
-        logReaderTracker = new ServiceTracker<Object, Object>(context, "org.osgi.service.log.LogReaderService", null) {
+        logReaderTracker = new ServiceTracker<Object, Object>(di.getInstance(BundleContext.class), "org.osgi.service.log.LogReaderService",
+                null) {
 
             @Override
             public Object addingService(final ServiceReference<Object> reference) {
-                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                final boolean isLogAvailable = di.getInstance(PackageWirings.class).isLogWired();
                 final Object  service        = super.addingService(reference);
                 if (isLogAvailable) {
-                    XLogReaderAdmin.register(service, logListener);
+                    di.getInstance(XLogReaderAdmin.class).register(service, logListener);
                 }
                 return service;
             }
 
             @Override
             public void removedService(final ServiceReference<Object> reference, final Object service) {
-                final boolean isLogAvailable = PackageWirings.isLogWired(context);
+                final boolean isLogAvailable = di.getInstance(PackageWirings.class).isLogWired();
                 if (isLogAvailable) {
-                    XLogReaderAdmin.unregister(service, logListener);
+                    di.getInstance(XLogReaderAdmin.class).unregister(service, logListener);
                 }
             }
         };

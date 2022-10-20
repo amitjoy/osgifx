@@ -28,11 +28,14 @@ import com.osgifx.console.agent.helper.Reflect;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.supervisor.Supervisor;
 
+import jakarta.inject.Inject;
+
 public final class OSGiLogListener implements LogListener {
 
     private final Supervisor                supervisor;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
+    @Inject
     public OSGiLogListener(final Supervisor supervisor, final BundleStartTimeCalculator bundleStartTimeCalculator) {
         this.supervisor                = supervisor;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;

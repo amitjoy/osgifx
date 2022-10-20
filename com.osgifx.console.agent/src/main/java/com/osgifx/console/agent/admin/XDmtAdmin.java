@@ -39,12 +39,15 @@ import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 
+import jakarta.inject.Inject;
+
 public final class XDmtAdmin {
 
     private XDmtNodeDTO parent;
 
     private final DmtAdmin dmtAdmin;
 
+    @Inject
     public XDmtAdmin(final Object dmtAdmin) {
         this.dmtAdmin = (DmtAdmin) dmtAdmin;
     }

@@ -43,17 +43,21 @@ import org.osgi.service.log.admin.LoggerContext;
 
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.provider.PackageWirings;
 
-public class XLoggerAdmin {
+import jakarta.inject.Inject;
+
+public final class XLoggerAdmin {
 
     private final BundleContext context;
     private final LoggerAdmin   loggerAdmin;
     private final boolean       isConfigAdminWired;
 
-    public XLoggerAdmin(final Object loggerAdmin, final boolean isConfigAdminWired, final BundleContext context) {
-        this.context            = context;
-        this.loggerAdmin        = (LoggerAdmin) loggerAdmin;
-        this.isConfigAdminWired = isConfigAdminWired;
+    @Inject
+    public XLoggerAdmin(final Object loggerAdmin, final PackageWirings packageWirings, final BundleContext context) {
+        this.context       = context;
+        this.loggerAdmin   = (LoggerAdmin) loggerAdmin;
+        isConfigAdminWired = packageWirings.isConfigAdminWired();
     }
 
     public List<XBundleLoggerContextDTO> getLoggerContexts() {
