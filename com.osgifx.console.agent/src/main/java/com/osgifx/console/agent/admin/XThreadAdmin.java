@@ -24,17 +24,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.osgi.framework.BundleContext;
-
 import com.osgifx.console.agent.dto.XThreadDTO;
-import com.osgifx.console.agent.helper.PackageWirings;
+import com.osgifx.console.agent.provider.PackageWirings;
 
-public class XThreadAdmin {
+import jakarta.inject.Inject;
 
-    private final BundleContext bundleContext;
+public final class XThreadAdmin {
 
-    public XThreadAdmin(final BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
+    private final PackageWirings wirings;
+
+    @Inject
+    public XThreadAdmin(final PackageWirings wirings) {
+        this.wirings = wirings;
     }
 
     public List<XThreadDTO> get() {
@@ -63,7 +64,7 @@ public class XThreadAdmin {
     }
 
     private boolean isDeadlocked(final long id) {
-        final boolean isJMXWired = PackageWirings.isJmxWired(bundleContext);
+        final boolean isJMXWired = wirings.isJmxWired();
         if (isJMXWired) {
             final ThreadMXBean bean      = ManagementFactory.getThreadMXBean();
             final long[]       deadlocks = bean.findDeadlockedThreads();

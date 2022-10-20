@@ -32,13 +32,18 @@ import org.osgi.framework.dto.FrameworkDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO.XPropertyType;
 
-public class XPropertyAdmin {
+import jakarta.inject.Inject;
 
-    private XPropertyAdmin() {
-        throw new IllegalAccessError("Cannot be instantiated");
+public final class XPropertyAdmin {
+
+    private final BundleContext context;
+
+    @Inject
+    public XPropertyAdmin(final BundleContext context) {
+        this.context = context;
     }
 
-    public static List<XPropertyDTO> get(final BundleContext context) {
+    public List<XPropertyDTO> get() {
         try {
             final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
             return prepareProperties(dto.properties);
@@ -47,7 +52,7 @@ public class XPropertyAdmin {
         }
     }
 
-    private static List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {
+    private List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {
         final Map<String, XPropertyDTO> allProperties = new HashMap<>();
         for (final Entry<String, Object> property : properties.entrySet()) {
             final String       key   = property.getKey();
@@ -66,7 +71,7 @@ public class XPropertyAdmin {
         return allProperties.values().stream().collect(Collectors.toList());
     }
 
-    private static XPropertyDTO createPropertyDTO(final String name, final String value, final XPropertyType type) {
+    private XPropertyDTO createPropertyDTO(final String name, final String value, final XPropertyType type) {
         final XPropertyDTO dto = new XPropertyDTO();
         dto.name  = name;
         dto.value = value;

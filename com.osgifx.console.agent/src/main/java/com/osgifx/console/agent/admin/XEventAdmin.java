@@ -20,10 +20,13 @@ import java.util.Map;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
-public class XEventAdmin {
+import jakarta.inject.Inject;
+
+public final class XEventAdmin {
 
     private final EventAdmin eventAdmin;
 
+    @Inject
     public XEventAdmin(final Object eventAdmin) {
         this.eventAdmin = (EventAdmin) eventAdmin;
     }

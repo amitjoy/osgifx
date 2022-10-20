@@ -32,15 +32,21 @@ import org.osgi.service.http.runtime.dto.ServletDTO;
 
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 
-public class XHttpAdmin {
+import jakarta.inject.Inject;
+
+public final class XHttpAdmin {
 
     private final HttpServiceRuntime httpServiceRuntime;
 
+    @Inject
     public XHttpAdmin(final Object httpServiceRuntime) {
         this.httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntime;
     }
 
     public List<XHttpComponentDTO> runtime() {
+        if (httpServiceRuntime == null) {
+            return Collections.emptyList();
+        }
         try {
             final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
             return initHttpComponents(runtime);

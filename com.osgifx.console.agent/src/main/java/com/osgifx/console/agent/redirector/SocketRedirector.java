@@ -28,7 +28,7 @@ import com.osgifx.console.agent.provider.AgentServer;
  * A redirector that will open a connection to a socket, assuming there is a
  * shell running there.
  */
-public class SocketRedirector implements Redirector {
+public final class SocketRedirector implements Redirector {
 
     // The key used by the Apache Felix shell to define the host the server socket
     // is registered on

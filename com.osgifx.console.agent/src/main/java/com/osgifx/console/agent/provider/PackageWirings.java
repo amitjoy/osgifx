@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.helper;
+package com.osgifx.console.agent.provider;
 
 import static org.osgi.framework.namespace.PackageNamespace.PACKAGE_NAMESPACE;
 
@@ -21,6 +21,10 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
 public final class PackageWirings {
 
     public enum Type {
@@ -36,18 +40,21 @@ public final class PackageWirings {
         JMX("JMX"),
         HC("Felix Healthcheck");
 
-        String comprehensibleName;
+        public String comprehensibleName;
 
         Type(final String comprehensibleName) {
             this.comprehensibleName = comprehensibleName;
         }
     }
 
-    private PackageWirings() {
-        throw new IllegalAccessError("Cannot be instantiated");
+    private final BundleContext context;
+
+    @Inject
+    public PackageWirings(final BundleContext context) {
+        this.context = context;
     }
 
-    public static boolean isWired(final String packageName, final BundleContext context) {
+    public boolean isWired(final String packageName) {
         final BundleWiring wiring = context.getBundle().adapt(BundleWiring.class);
         for (final BundleWire wire : wiring.getRequiredWires(PACKAGE_NAMESPACE)) {
             final String       pkgName        = (String) wire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
@@ -59,48 +66,48 @@ public final class PackageWirings {
         return false;
     }
 
-    public static boolean isScrWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.component.runtime", context);
+    public boolean isScrWired() {
+        return isWired("org.osgi.service.component.runtime");
     }
 
-    public static boolean isConfigAdminWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.cm", context);
+    public boolean isConfigAdminWired() {
+        return isWired("org.osgi.service.cm");
     }
 
-    public static boolean isDmtAdminWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.dmt", context);
+    public boolean isDmtAdminWired() {
+        return isWired("org.osgi.service.dmt");
     }
 
-    public static boolean isUserAdminWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.useradmin", context);
+    public boolean isUserAdminWired() {
+        return isWired("org.osgi.service.useradmin");
     }
 
-    public static boolean isMetatypeWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.metatype", context);
+    public boolean isMetatypeWired() {
+        return isWired("org.osgi.service.metatype");
     }
 
-    public static boolean isEventAdminWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.event", context);
+    public boolean isEventAdminWired() {
+        return isWired("org.osgi.service.event");
     }
 
-    public static boolean isLogWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.log", context);
+    public boolean isLogWired() {
+        return isWired("org.osgi.service.log");
     }
 
-    public static boolean isR7LoggerAdminWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.log.admin", context);
+    public boolean isR7LoggerAdminWired() {
+        return isWired("org.osgi.service.log.admin");
     }
 
-    public static boolean isHttpServiceRuntimeWired(final BundleContext context) {
-        return PackageWirings.isWired("org.osgi.service.http.runtime", context);
+    public boolean isHttpServiceRuntimeWired() {
+        return isWired("org.osgi.service.http.runtime");
     }
 
-    public static boolean isJmxWired(final BundleContext context) {
-        return PackageWirings.isWired("javax.management", context);
+    public boolean isJmxWired() {
+        return isWired("javax.management");
     }
 
-    public static boolean isFelixHcWired(final BundleContext context) {
-        return PackageWirings.isWired("org.apache.felix.hc.api", context);
+    public boolean isFelixHcWired() {
+        return isWired("org.apache.felix.hc.api");
     }
 
 }
