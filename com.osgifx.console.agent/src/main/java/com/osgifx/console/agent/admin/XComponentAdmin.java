@@ -52,10 +52,13 @@ import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import com.osgifx.console.agent.helper.Reflect;
 
-public class XComponentAdmin {
+import jakarta.inject.Inject;
+
+public final class XComponentAdmin {
 
     private final ServiceComponentRuntime scr;
 
+    @Inject
     public XComponentAdmin(final Object scr) {
         this.scr = (ServiceComponentRuntime) scr;
     }

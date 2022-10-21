@@ -34,9 +34,9 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.di.Module;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.provider.AgentServer;
-import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -47,21 +47,14 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private ServerSocket              server;
-    private BundleContext             context;
-    private ClassloaderLeakDetector   classloaderLeakDetector;
-    private BundleStartTimeCalculator bundleStartTimeCalculator;
-    private final List<AgentServer>   agents = new CopyOnWriteArrayList<>();
+    private Module                  module;
+    private ServerSocket            server;
+    private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
 
     @Override
     public void start(final BundleContext context) throws Exception {
-        this.context = context;
-
-        bundleStartTimeCalculator = new BundleStartTimeCalculator(context.getBundle().getBundleId());
-        classloaderLeakDetector   = new ClassloaderLeakDetector(bundleStartTimeCalculator);
-        classloaderLeakDetector.start(context);
-
-        context.addBundleListener(bundleStartTimeCalculator);
+        module = new Module(context);
+        module.di().getInstance(ClassloaderLeakDetector.class).start();
 
         // Get the specified port in the framework properties
         String port = context.getProperty(AGENT_SERVER_PORT_KEY);
@@ -101,16 +94,24 @@ public final class Activator extends Thread implements BundleActivator {
                     // timeout to get interrupts
                     socket.setSoTimeout(1000);
 
+                    module.start();
+
                     // create a new agent, and link it up.
-                    final AgentServer sa = new AgentServer(context, classloaderLeakDetector, bundleStartTimeCalculator);
+                    final AgentServer sa = new AgentServer(module.di());
                     agents.add(sa);
+
                     final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class, sa, socket) {
                         @Override
                         public void close() throws IOException {
                             agents.remove(sa);
+                            module.stop();
                             super.close();
                         }
                     };
+                    module.bindInstance(AgentServer.class, sa);
+                    module.bindInstance(RemoteRPC.class, remoteRPC);
+                    module.bindInstance(Supervisor.class, remoteRPC.getRemote());
+
                     sa.setEndpoint(remoteRPC);
                     remoteRPC.run();
                 } catch (final Exception e) {
@@ -131,7 +132,7 @@ public final class Activator extends Thread implements BundleActivator {
         interrupt();
         close(server);
         agents.forEach(this::close);
-        classloaderLeakDetector.stop();
+        module.di().getInstance(ClassloaderLeakDetector.class).stop();
     }
 
     private Throwable close(final Closeable in) {

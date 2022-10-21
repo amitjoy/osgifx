@@ -49,12 +49,14 @@ import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
+import jakarta.inject.Inject;
 
-public class XHcAdmin {
+public final class XHcAdmin {
 
     private final BundleContext       context;
     private final HealthCheckExecutor felixHcExecutor;
 
+    @Inject
     public XHcAdmin(final BundleContext context, final Object felixHcExecutor) {
         this.context         = context;
         this.felixHcExecutor = (HealthCheckExecutor) felixHcExecutor;

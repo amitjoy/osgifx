@@ -40,7 +40,7 @@ import com.osgifx.console.agent.provider.AgentServer;
  * Gogo API classes and we will use proxies to use them. This leaves the Gogo
  * API unconstrained.
  */
-public class GogoRedirector implements Redirector {
+public final class GogoRedirector implements Redirector {
 
     private AgentServer                                        agentServer;
     private ServiceTracker<CommandProcessor, CommandProcessor> tracker;

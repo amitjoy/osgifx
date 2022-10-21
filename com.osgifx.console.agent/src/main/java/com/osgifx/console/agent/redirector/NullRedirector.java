@@ -21,7 +21,7 @@ import java.io.PrintStream;
 /**
  * This is a null redirector. That is, it just does nothing.
  */
-public class NullRedirector implements Redirector {
+public final class NullRedirector implements Redirector {
 
     @Override
     public void close() throws IOException {

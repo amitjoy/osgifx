@@ -23,11 +23,7 @@ import com.osgifx.console.agent.handler.OSGiLogListener;
 
 public final class XLogReaderAdmin {
 
-    private XLogReaderAdmin() {
-        throw new IllegalAccessError("Cannot be instantiated");
-    }
-
-    public static void register(final Object service, final OSGiLogListener logListener) {
+    public void register(final Object service, final OSGiLogListener logListener) {
         requireNonNull(service);
         requireNonNull(logListener);
 
@@ -36,7 +32,7 @@ public final class XLogReaderAdmin {
         }
     }
 
-    public static void unregister(final Object service, final OSGiLogListener logListener) {
+    public void unregister(final Object service, final OSGiLogListener logListener) {
         requireNonNull(service);
         requireNonNull(logListener);
 

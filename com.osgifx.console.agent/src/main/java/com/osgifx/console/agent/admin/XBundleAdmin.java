@@ -57,16 +57,23 @@ import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator.BundleStartDuration;
 
-public class XBundleAdmin {
+import jakarta.inject.Inject;
 
-    private XBundleAdmin() {
-        throw new IllegalAccessError("Cannot be instantiated");
+public final class XBundleAdmin {
+
+    private final BundleContext             context;
+    private final BundleStartTimeCalculator bundleStartTimeCalculator;
+
+    @Inject
+    public XBundleAdmin(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+        this.context                   = requireNonNull(context);
+        this.bundleStartTimeCalculator = requireNonNull(bundleStartTimeCalculator);
     }
 
-    public static List<XBundleDTO> get(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+    public List<XBundleDTO> get() {
         requireNonNull(context);
         try {
-            return Stream.of(context.getBundles()).map(b -> XBundleAdmin.toDTO(b, bundleStartTimeCalculator)).collect(toList());
+            return Stream.of(context.getBundles()).map(b -> toDTO(b, bundleStartTimeCalculator)).collect(toList());
         } catch (final Exception e) {
             return Collections.emptyList();
         }
