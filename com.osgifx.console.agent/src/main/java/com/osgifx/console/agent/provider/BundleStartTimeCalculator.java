@@ -28,9 +28,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.SynchronousBundleListener;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
 public final class BundleStartTimeCalculator implements SynchronousBundleListener {
 
     public static final class BundleStartDuration {
@@ -62,8 +67,10 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
     private final Clock                clock             = Clock.systemUTC();
     private final long                 ourBundleId;
 
-    public BundleStartTimeCalculator(final long ourBundleId) {
-        this.ourBundleId = ourBundleId;
+    @Inject
+    public BundleStartTimeCalculator(final BundleContext bundleContext) {
+        ourBundleId = bundleContext.getBundle().getBundleId();
+        bundleContext.addBundleListener(this);
     }
 
     @Override

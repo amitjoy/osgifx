@@ -30,7 +30,7 @@ import com.osgifx.console.agent.provider.AgentServer;
  * fields and this can only be done if the security allows it. It also requires
  * that if we have multiple agents we need to share the redirecting.
  */
-public class ConsoleRedirector implements Redirector {
+public final class ConsoleRedirector implements Redirector {
 
     private static RedirectOutput    stdout;
     private static RedirectOutput    stderr;

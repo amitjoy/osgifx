@@ -15,10 +15,14 @@
  ******************************************************************************/
 package com.osgifx.console.agent.handler;
 
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -27,13 +31,23 @@ import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
+import jakarta.inject.Inject;
 
 public final class OSGiEventHandler implements EventHandler {
 
-    private final Supervisor supervisor;
+    private final Supervisor    supervisor;
+    private final BundleContext context;
 
-    public OSGiEventHandler(final Supervisor supervisor) {
+    @Inject
+    public OSGiEventHandler(final BundleContext context, final Supervisor supervisor) {
+        this.context    = context;
         this.supervisor = supervisor;
+    }
+
+    public ServiceRegistration<?> register() {
+        final Dictionary<String, Object> properties = new Hashtable<>();
+        properties.put("event.topics", "*");
+        return context.registerService(EventHandler.class, this, properties);
     }
 
     @Override

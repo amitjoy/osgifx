@@ -46,12 +46,15 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.helper.Reflect;
 
-public class XConfigurationAdmin {
+import jakarta.inject.Inject;
+
+public final class XConfigurationAdmin {
 
     private final BundleContext      context;
     private final Object             metatype;
     private final ConfigurationAdmin configAdmin;
 
+    @Inject
     public XConfigurationAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
         this.context     = requireNonNull(context);
         this.metatype    = metatype;

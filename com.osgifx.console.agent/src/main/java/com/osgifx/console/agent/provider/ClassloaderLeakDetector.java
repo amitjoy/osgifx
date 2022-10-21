@@ -46,6 +46,9 @@ import org.osgi.util.tracker.BundleTracker;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XBundleDTO;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 /**
  * A support for tracing classloader leaks which occur due to improper cleanup
  * in bundles.
@@ -90,24 +93,25 @@ import com.osgifx.console.agent.dto.XBundleDTO;
  * referent and then enqueue the reference, but it will not nullify the
  * referent.
  */
+@Singleton
 public final class ClassloaderLeakDetector implements Runnable {
 
     private final Set<Reference<?>>           refs        = ConcurrentHashMap.newKeySet();
     private final ReferenceQueue<ClassLoader> queue       = new ReferenceQueue<>();
     private final Map<Long, BundleInfo>       bundleInfos = new ConcurrentHashMap<>();
 
-    private BundleContext                   context;
+    private final BundleContext             context;
     private Thread                          referencePoller;
     private BundleTracker<Bundle>           bundleTracker;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
-    public ClassloaderLeakDetector(final BundleStartTimeCalculator bundleStartTimeCalculator) {
+    @Inject
+    public ClassloaderLeakDetector(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+        this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
     }
 
-    public void start(final BundleContext context) {
-        this.context = context;
-
+    public void start() {
         bundleTracker = new LeakDetectorBundleTracker(context);
         bundleTracker.open();
 

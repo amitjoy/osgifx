@@ -42,11 +42,7 @@ public final class XHeapAdmin {
     private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
     private static volatile Object hotspotMBean;
 
-    private XHeapAdmin() {
-        throw new IllegalAccessError("Cannot be instantiated");
-    }
-
-    public static XHeapUsageDTO init() {
+    public XHeapUsageDTO init() {
         final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
         try {
             final MemoryMXBean                 memoryMBean      = ManagementFactory.getMemoryMXBean();
@@ -97,7 +93,7 @@ public final class XHeapAdmin {
         return beans.toArray(new XGarbageCollectorMXBean[0]);
     }
 
-    public static XHeapdumpDTO heapdump() {
+    public XHeapdumpDTO heapdump() {
         final File   location = getLocation();
         final String fileName = "heapdump_fx_" + System.currentTimeMillis() + ".hprof";
         final File   heapdump = new File(location, fileName);
