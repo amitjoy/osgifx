@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,12 +51,6 @@ import jakarta.inject.Singleton;
 /**
  * A support for tracing classloader leaks which occur due to improper cleanup
  * in bundles.
- *
- * <p>
- * This registers a Felix Configuration Printer which dumps out a list of
- * suspected classloaders which are not getting garbage collected. Apart from
- * that, consumer can also use {@link #reportWith(Consumer)} to report the
- * suspected classloaders when required.
  *
  * <p>
  * To detect if a classloader leak exists, the {@link #start(BundleContext)}
