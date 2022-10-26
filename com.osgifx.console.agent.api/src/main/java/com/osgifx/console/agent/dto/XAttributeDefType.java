@@ -160,23 +160,23 @@ public enum XAttributeDefType {
 
     public static Class<?> clazz(final XAttributeDefType type) {
         switch (type) {
-        case STRING:
-        case PASSWORD:
-            return String.class;
-        case INTEGER:
-            return Integer.class;
-        case BOOLEAN:
-            return Boolean.class;
-        case DOUBLE:
-            return Double.class;
-        case FLOAT:
-            return Float.class;
-        case CHAR:
-            return Character.class;
-        case LONG:
-            return Long.class;
-        default:
-            return null;
+            case STRING:
+            case PASSWORD:
+                return String.class;
+            case INTEGER:
+                return Integer.class;
+            case BOOLEAN:
+                return Boolean.class;
+            case DOUBLE:
+                return Double.class;
+            case FLOAT:
+                return Float.class;
+            case CHAR:
+                return Character.class;
+            case LONG:
+                return Long.class;
+            default:
+                return null;
         }
     }
 

@@ -104,10 +104,10 @@ public interface Agent {
      * the specified byte array instance. Otherwise, a new bundle gets installed
      * with the specified byte array instance.
      *
-     * @param location   The bundle location (if set to {@code null}, the existing
-     *                   bundle location is used)
-     * @param data       The byte array instance from which this bundle will be read
-     *                   (cannot be {@code null})
+     * @param location The bundle location (if set to {@code null}, the existing
+     *            bundle location is used)
+     * @param data The byte array instance from which this bundle will be read
+     *            (cannot be {@code null})
      * @param startLevel the start level of the bundle
      * @return A Bundle DTO (cannot be {@code null})
      * @throws Exception if the bundle cannot be installed or updated
@@ -122,8 +122,8 @@ public interface Agent {
      * instances. Otherwise, new bundles get installed with the specified byte array
      * instances.
      *
-     * @param data       The byte array instances from which the bundle will be read
-     *                   (cannot be {@code null})
+     * @param data The byte array instances from which the bundle will be read
+     *            (cannot be {@code null})
      * @param startLevel the start level of the bundles
      * @return the detailed information about the operation whether it succeeded or
      *         failed
@@ -139,7 +139,7 @@ public interface Agent {
      * </p>
      *
      * @param location the bundle location
-     * @param url      url of the bundle that can retrieved using url.openStream()
+     * @param url url of the bundle that can retrieved using url.openStream()
      * @return A bundle DTO
      */
     BundleDTO installFromURL(String location, String url) throws Exception;
@@ -287,8 +287,8 @@ public interface Agent {
     /**
      * Update the specified DMT leaf node with the specified value
      *
-     * @param uri    the DMT node URI
-     * @param value  the value to set
+     * @param uri the DMT node URI
+     * @param value the value to set
      * @param format the format to use
      */
     XResultDTO updateDmtNode(String uri, Object value, DmtDataType format);
@@ -296,8 +296,8 @@ public interface Agent {
     /**
      * Updates the logger context of the specified bundle
      *
-     * @param bsn       the bundle symbolic name denoting the name of the logger
-     *                  context
+     * @param bsn the bundle symbolic name denoting the name of the logger
+     *            context
      * @param logLevels the log levels to update
      * @return the detailed information about the operation whether it succeeded or
      *         failed
@@ -360,7 +360,7 @@ public interface Agent {
      * Note that, this is only possible if the remote runtime has ConfigAdmin (CM)
      * bundle installed.
      *
-     * @param pid           the configuration PID to update
+     * @param pid the configuration PID to update
      * @param newProperties the new properties to associate
      * @return the detailed information about the operation whether it succeeded or
      *         failed
@@ -387,7 +387,7 @@ public interface Agent {
      * Note that, this is only possible if the remote runtime has ConfigAdmin (CM)
      * bundle installed.
      *
-     * @param factoryPid    the Configuration Factory PID
+     * @param factoryPid the Configuration Factory PID
      * @param newProperties the new properties to associate
      * @return the detailed information about the operation whether it succeeded or
      *         failed
@@ -398,7 +398,7 @@ public interface Agent {
      * Publish event synchronously (the method does not return until the event is
      * processed)
      *
-     * @param topic      topic of the event to be published
+     * @param topic topic of the event to be published
      * @param properties data to be published with the event
      * @return the detailed information about the operation whether it succeeded or
      *         failed
@@ -408,7 +408,7 @@ public interface Agent {
     /**
      * Publish event asynchronously ((this method returns immediately))
      *
-     * @param topic      topic of the event to be published
+     * @param topic topic of the event to be published
      * @param properties data to be published with the event
      * @return the detailed information about the operation whether it succeeded or
      *         failed
@@ -441,7 +441,7 @@ public interface Agent {
      * @return the detailed information about the operation whether it succeeded or
      *         failed
      * @throws NullPointerException if the {@code name} or {@code type} is
-     *                              {@code null}
+     *             {@code null}
      */
     XResultDTO createRole(String name, XRoleDTO.Type type);
 
@@ -483,7 +483,7 @@ public interface Agent {
     /**
      * Executes the specified healthchecks
      *
-     * @param tags  the tags to execute (can be {@code null})
+     * @param tags the tags to execute (can be {@code null})
      * @param names the names to execute (can be {@code null})
      * @return the list of results (can be empty)
      */
@@ -496,10 +496,10 @@ public interface Agent {
      * implements {@link AgentExtension} and the service must provide a readable
      * name in its {@code agent.extension.name} service property.
      *
-     * @param name    the name of the extension
+     * @param name the name of the extension
      * @param context the context for the extension to be provided for execution
-     *                (note that, the map should be compliant with
-     *                {@code OSGi DTO specification}
+     *            (note that, the map should be compliant with
+     *            {@code OSGi DTO specification}
      * @return the value in compliance with {@code OSGi DTO specification}
      * @see AgentExtension
      * @see AgentExtensionName

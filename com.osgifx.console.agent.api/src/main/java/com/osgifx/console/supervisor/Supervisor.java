@@ -53,8 +53,8 @@ public interface Supervisor {
      * Connects to the specific host and port using the provided timeout in
      * connection
      *
-     * @param host    the host name
-     * @param port    the port address
+     * @param host the host name
+     * @param port the port address
      * @param timeout the timeout in milliseconds
      *
      * @throws Exception if any issue occurs during connection

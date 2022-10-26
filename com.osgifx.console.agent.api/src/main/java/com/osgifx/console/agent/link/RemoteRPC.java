@@ -130,33 +130,34 @@ public class RemoteRPC<L, R> extends Thread implements Closeable {
             return null;
         }
         if (endpoint == null) {
-            endpoint = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass }, (target, method, args) -> {
-                final Object hash = new Object();
-                try {
-                    if (method.getDeclaringClass() == Object.class) {
-                        return method.invoke(hash, args);
-                    }
-                    int msgId;
-                    try {
-                        msgId = send(id.getAndIncrement(), method, args);
-                        if (method.getReturnType() == void.class) {
-                            promises.remove(msgId);
-                            return null;
+            endpoint = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
+                    (target, method, args) -> {
+                        final Object hash = new Object();
+                        try {
+                            if (method.getDeclaringClass() == Object.class) {
+                                return method.invoke(hash, args);
+                            }
+                            int msgId;
+                            try {
+                                msgId = send(id.getAndIncrement(), method, args);
+                                if (method.getReturnType() == void.class) {
+                                    promises.remove(msgId);
+                                    return null;
+                                }
+                            } catch (final Exception e1) {
+                                terminate();
+                                return null;
+                            }
+                            return waitForResult(msgId, method.getGenericReturnType());
+                        } catch (final InvocationTargetException e2) {
+                            throw Exceptions.unrollCause(e2, InvocationTargetException.class);
+                        } catch (final InterruptedException e3) {
+                            interrupt();
+                            throw e3;
+                        } catch (final Exception e4) {
+                            throw e4;
                         }
-                    } catch (final Exception e1) {
-                        terminate();
-                        return null;
-                    }
-                    return waitForResult(msgId, method.getGenericReturnType());
-                } catch (final InvocationTargetException e2) {
-                    throw Exceptions.unrollCause(e2, InvocationTargetException.class);
-                } catch (final InterruptedException e3) {
-                    interrupt();
-                    throw e3;
-                } catch (final Exception e4) {
-                    throw e4;
-                }
-            });
+                    });
         }
         return endpoint;
     }
