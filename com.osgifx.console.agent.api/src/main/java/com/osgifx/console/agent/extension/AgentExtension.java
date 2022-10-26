@@ -34,7 +34,7 @@ public interface AgentExtension<C extends DTO, R extends DTO> {
      * Returns the result compliant with {@code OSGi DTO specification}
      *
      * @param context the context for the extension (also to be compliant with
-     *                {@code OSGi DTO specification})
+     *            {@code OSGi DTO specification})
      * @return the result in compliance with {@code OSGi DTO specification}
      */
     R execute(C context);

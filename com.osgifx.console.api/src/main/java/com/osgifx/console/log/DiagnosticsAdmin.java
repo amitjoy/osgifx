@@ -47,9 +47,9 @@ public interface DiagnosticsAdmin {
      * Fills the given output-stream with content of a requested log file. If
      * unsuccessful, does not write to the stream.
      *
-     * @param logFileName  file name of a log file without path, with extension
+     * @param logFileName file name of a log file without path, with extension
      * @param outputstream stream where content of the requested log file is written
-     *                     to
+     *            to
      */
     void getLogFileContent(final String logFileName, final OutputStream outputstream);
 

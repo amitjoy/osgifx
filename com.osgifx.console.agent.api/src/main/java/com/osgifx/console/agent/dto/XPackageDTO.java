@@ -24,7 +24,8 @@ public class XPackageDTO extends DTO {
     public XpackageType type;
 
     public enum XpackageType {
-        EXPORT, IMPORT
+        EXPORT,
+        IMPORT
     }
 
 }
