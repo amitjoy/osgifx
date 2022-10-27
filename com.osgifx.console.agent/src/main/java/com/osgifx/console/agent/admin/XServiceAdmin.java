@@ -66,7 +66,8 @@ public final class XServiceAdmin {
         dto.id                = refDTO.id;
         dto.bundleId          = bundleInfo.id;
         dto.registeringBundle = bundleInfo.symbolicName;
-        dto.properties        = refDTO.properties.entrySet().stream().collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
+        dto.properties        = refDTO.properties.entrySet().stream()
+                .collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
         dto.usingBundles      = getUsingBundles(refDTO.usingBundles, context);
         dto.types             = getObjectClass(refDTO.properties);
 

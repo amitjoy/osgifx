@@ -69,43 +69,43 @@ public final class AgentHelper {
         final Object            source = entry.value;
         final XAttributeDefType type   = entry.type;
         switch (type) {
-        case STRING_ARRAY:
-            return Converter.cnv(String[].class, source);
-        case STRING_LIST:
-            return Converter.cnv(new TypeReference<List<String>>() {
-            }, source);
-        case INTEGER_ARRAY:
-            return Converter.cnv(int[].class, source);
-        case INTEGER_LIST:
-            return Converter.cnv(new TypeReference<List<Integer>>() {
-            }, source);
-        case BOOLEAN_ARRAY:
-            return Converter.cnv(boolean[].class, source);
-        case BOOLEAN_LIST:
-            return Converter.cnv(new TypeReference<List<Boolean>>() {
-            }, source);
-        case DOUBLE_ARRAY:
-            return Converter.cnv(double[].class, source);
-        case DOUBLE_LIST:
-            return Converter.cnv(new TypeReference<List<Double>>() {
-            }, source);
-        case FLOAT_ARRAY:
-            return Converter.cnv(float[].class, source);
-        case FLOAT_LIST:
-            return Converter.cnv(new TypeReference<List<Float>>() {
-            }, source);
-        case CHAR_ARRAY:
-            return Converter.cnv(char[].class, source);
-        case CHAR_LIST:
-            return Converter.cnv(new TypeReference<List<Character>>() {
-            }, source);
-        case LONG_ARRAY:
-            return Converter.cnv(long[].class, source);
-        case LONG_LIST:
-            return Converter.cnv(new TypeReference<List<Long>>() {
-            }, source);
-        default:
-            return Converter.cnv(XAttributeDefType.clazz(type), source);
+            case STRING_ARRAY:
+                return Converter.cnv(String[].class, source);
+            case STRING_LIST:
+                return Converter.cnv(new TypeReference<List<String>>() {
+                }, source);
+            case INTEGER_ARRAY:
+                return Converter.cnv(int[].class, source);
+            case INTEGER_LIST:
+                return Converter.cnv(new TypeReference<List<Integer>>() {
+                }, source);
+            case BOOLEAN_ARRAY:
+                return Converter.cnv(boolean[].class, source);
+            case BOOLEAN_LIST:
+                return Converter.cnv(new TypeReference<List<Boolean>>() {
+                }, source);
+            case DOUBLE_ARRAY:
+                return Converter.cnv(double[].class, source);
+            case DOUBLE_LIST:
+                return Converter.cnv(new TypeReference<List<Double>>() {
+                }, source);
+            case FLOAT_ARRAY:
+                return Converter.cnv(float[].class, source);
+            case FLOAT_LIST:
+                return Converter.cnv(new TypeReference<List<Float>>() {
+                }, source);
+            case CHAR_ARRAY:
+                return Converter.cnv(char[].class, source);
+            case CHAR_LIST:
+                return Converter.cnv(new TypeReference<List<Character>>() {
+                }, source);
+            case LONG_ARRAY:
+                return Converter.cnv(long[].class, source);
+            case LONG_LIST:
+                return Converter.cnv(new TypeReference<List<Long>>() {
+                }, source);
+            default:
+                return Converter.cnv(XAttributeDefType.clazz(type), source);
         }
     }
 
