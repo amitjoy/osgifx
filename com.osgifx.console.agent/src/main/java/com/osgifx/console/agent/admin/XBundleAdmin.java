@@ -252,7 +252,8 @@ public final class XBundleAdmin {
         return services;
     }
 
-    private static List<XServiceInfoDTO> prepareServiceInfo(final ServiceReference<?> service, final List<String> objectClazz) {
+    private static List<XServiceInfoDTO> prepareServiceInfo(final ServiceReference<?> service,
+                                                            final List<String> objectClazz) {
         final List<XServiceInfoDTO> serviceInfos = new ArrayList<>();
         for (final String clz : objectClazz) {
             final XServiceInfoDTO dto = new XServiceInfoDTO();
@@ -371,20 +372,20 @@ public final class XBundleAdmin {
 
     private static String findState(final int state) {
         switch (state) {
-        case Bundle.ACTIVE:
-            return "ACTIVE";
-        case Bundle.INSTALLED:
-            return "INSTALLED";
-        case Bundle.RESOLVED:
-            return "RESOLVED";
-        case Bundle.STARTING:
-            return "STARTING";
-        case Bundle.STOPPING:
-            return "STOPPING";
-        case Bundle.UNINSTALLED:
-            return "UNINSTALLED";
-        default:
-            break;
+            case Bundle.ACTIVE:
+                return "ACTIVE";
+            case Bundle.INSTALLED:
+                return "INSTALLED";
+            case Bundle.RESOLVED:
+                return "RESOLVED";
+            case Bundle.STARTING:
+                return "STARTING";
+            case Bundle.STOPPING:
+                return "STOPPING";
+            case Bundle.UNINSTALLED:
+                return "UNINSTALLED";
+            default:
+                break;
         }
         return null;
     }

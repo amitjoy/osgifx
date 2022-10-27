@@ -116,11 +116,14 @@ public final class XMetaTypeAdmin {
         return configAdmin.listConfigurations("(service.pid=" + pid + ")") != null;
     }
 
-    private boolean checkFactoryConfigurationExistence(final String factoryPid) throws IOException, InvalidSyntaxException {
+    private boolean checkFactoryConfigurationExistence(final String factoryPid)
+            throws IOException, InvalidSyntaxException {
         return configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")") != null;
     }
 
-    private XConfigurationDTO toConfigDTO(final Configuration configuration, final String metatypePID, final XObjectClassDefDTO ocd) {
+    private XConfigurationDTO toConfigDTO(final Configuration configuration,
+                                          final String metatypePID,
+                                          final XObjectClassDefDTO ocd) {
         final XConfigurationDTO dto = new XConfigurationDTO();
 
         dto.ocd         = ocd;
@@ -156,7 +159,9 @@ public final class XMetaTypeAdmin {
         return null;
     }
 
-    private XObjectClassDefDTO toOcdDTO(final String ocdId, final MetaTypeInformation metatypeInfo, final ConfigurationType type) {
+    private XObjectClassDefDTO toOcdDTO(final String ocdId,
+                                        final MetaTypeInformation metatypeInfo,
+                                        final ConfigurationType type) {
         final ObjectClassDefinition ocd = metatypeInfo.getObjectClassDefinition(ocdId, null);
         final XObjectClassDefDTO    dto = new XObjectClassDefDTO();
 
@@ -184,7 +189,9 @@ public final class XMetaTypeAdmin {
         return dto;
     }
 
-    public static boolean hasMetatype(final BundleContext context, final Object metatypeService, final Configuration config) {
+    public static boolean hasMetatype(final BundleContext context,
+                                      final Object metatypeService,
+                                      final Configuration config) {
         final MetaTypeService metatype = (MetaTypeService) metatypeService;
         for (final Bundle bundle : context.getBundles()) {
             final MetaTypeInformation metatypeInfo = metatype.getMetaTypeInformation(bundle);
@@ -212,71 +219,72 @@ public final class XMetaTypeAdmin {
 
     private static XAttributeDefType defType(final int defType, final int cardinality) {
         switch (defType) {
-        case AttributeDefinition.STRING:
-            if (cardinality > 0) {
-                return XAttributeDefType.STRING_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.STRING_LIST;
-            }
-            return XAttributeDefType.STRING;
-        case AttributeDefinition.LONG:
-            if (cardinality > 0) {
-                return XAttributeDefType.LONG_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.LONG_LIST;
-            }
-            return XAttributeDefType.LONG;
-        case AttributeDefinition.INTEGER:
-            if (cardinality > 0) {
-                return XAttributeDefType.INTEGER_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.INTEGER_LIST;
-            }
-            return XAttributeDefType.INTEGER;
-        case AttributeDefinition.CHARACTER:
-            if (cardinality > 0) {
-                return XAttributeDefType.CHAR_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.CHAR_LIST;
-            }
-            return XAttributeDefType.CHAR;
-        case AttributeDefinition.DOUBLE:
-            if (cardinality > 0) {
-                return XAttributeDefType.DOUBLE_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.DOUBLE_LIST;
-            }
-            return XAttributeDefType.DOUBLE;
-        case AttributeDefinition.FLOAT:
-            if (cardinality > 0) {
-                return XAttributeDefType.FLOAT_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.FLOAT_LIST;
-            }
-            return XAttributeDefType.FLOAT;
-        case AttributeDefinition.BOOLEAN:
-            if (cardinality > 0) {
-                return XAttributeDefType.BOOLEAN_ARRAY;
-            }
-            if (cardinality < 0) {
-                return XAttributeDefType.BOOLEAN_LIST;
-            }
-            return XAttributeDefType.BOOLEAN;
-        case AttributeDefinition.PASSWORD:
-            return XAttributeDefType.PASSWORD;
-        default:
-            return XAttributeDefType.STRING;
+            case AttributeDefinition.STRING:
+                if (cardinality > 0) {
+                    return XAttributeDefType.STRING_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.STRING_LIST;
+                }
+                return XAttributeDefType.STRING;
+            case AttributeDefinition.LONG:
+                if (cardinality > 0) {
+                    return XAttributeDefType.LONG_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.LONG_LIST;
+                }
+                return XAttributeDefType.LONG;
+            case AttributeDefinition.INTEGER:
+                if (cardinality > 0) {
+                    return XAttributeDefType.INTEGER_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.INTEGER_LIST;
+                }
+                return XAttributeDefType.INTEGER;
+            case AttributeDefinition.CHARACTER:
+                if (cardinality > 0) {
+                    return XAttributeDefType.CHAR_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.CHAR_LIST;
+                }
+                return XAttributeDefType.CHAR;
+            case AttributeDefinition.DOUBLE:
+                if (cardinality > 0) {
+                    return XAttributeDefType.DOUBLE_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.DOUBLE_LIST;
+                }
+                return XAttributeDefType.DOUBLE;
+            case AttributeDefinition.FLOAT:
+                if (cardinality > 0) {
+                    return XAttributeDefType.FLOAT_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.FLOAT_LIST;
+                }
+                return XAttributeDefType.FLOAT;
+            case AttributeDefinition.BOOLEAN:
+                if (cardinality > 0) {
+                    return XAttributeDefType.BOOLEAN_ARRAY;
+                }
+                if (cardinality < 0) {
+                    return XAttributeDefType.BOOLEAN_LIST;
+                }
+                return XAttributeDefType.BOOLEAN;
+            case AttributeDefinition.PASSWORD:
+                return XAttributeDefType.PASSWORD;
+            default:
+                return XAttributeDefType.STRING;
         }
     }
 
     private enum ConfigurationType {
-        SINGLETON, FACTORY
+        SINGLETON,
+        FACTORY
     }
 
 }

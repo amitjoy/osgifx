@@ -483,7 +483,8 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     public void refresh(final boolean async) throws InterruptedException {
-        final FrameworkWiring wiring = di.getInstance(BundleContext.class).getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkWiring.class);
+        final FrameworkWiring wiring = di.getInstance(BundleContext.class).getBundle(SYSTEM_BUNDLE_ID)
+                .adapt(FrameworkWiring.class);
         if (wiring != null) {
             final CountDownLatch refresh = new CountDownLatch(1);
             wiring.refreshBundles(null, event -> refresh.countDown());
@@ -530,13 +531,14 @@ public final class AgentServer implements Agent, Closeable {
         final Map.Entry<String, Version> entry   = getIdentity(data);
         final Set<Bundle>                bundles = findBundles(entry.getKey(), null);
         switch (bundles.size()) {
-        case 0:
-            return "manual:" + entry.getKey();
-        case 1:
-            return bundles.iterator().next().getLocation();
-        default:
-            throw new IllegalArgumentException(
-                    "No location specified but there are multiple bundles with the same bsn " + entry.getKey() + ": " + bundles);
+            case 0:
+                return "manual:" + entry.getKey();
+            case 1:
+                return bundles.iterator().next().getLocation();
+            default:
+                throw new IllegalArgumentException(
+                        "No location specified but there are multiple bundles with the same bsn " + entry.getKey()
+                                + ": " + bundles);
         }
     }
 
@@ -665,7 +667,8 @@ public final class AgentServer implements Agent, Closeable {
             final Map<String, Object> finalProperties = parseProperties(newProperties);
             return createOrUpdateConfig(pid, finalProperties);
         } catch (final Exception e) {
-            return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
+            return createResult(ERROR,
+                    "One or more configuration properties cannot be converted to the requested type");
         }
     }
 
@@ -697,7 +700,8 @@ public final class AgentServer implements Agent, Closeable {
         if (isConfigAdminAvailable) {
             try {
                 final Map<String, Object> finalProperties = parseProperties(newProperties);
-                return di.getInstance(XConfigurationAdmin.class).createFactoryConfiguration(factoryPid, finalProperties);
+                return di.getInstance(XConfigurationAdmin.class).createFactoryConfiguration(factoryPid,
+                        finalProperties);
             } catch (final Exception e) {
                 return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
             }
@@ -900,7 +904,10 @@ public final class AgentServer implements Agent, Closeable {
         return isJMXWired ? ManagementFactory.getRuntimeMXBean().getUptime() : 0L;
     }
 
-    private BundleDTO installBundleWithData(String location, final byte[] data, final int startLevel, final boolean shouldRefresh)
+    private BundleDTO installBundleWithData(String location,
+                                            final byte[] data,
+                                            final int startLevel,
+                                            final boolean shouldRefresh)
             throws IOException, BundleException, InterruptedException {
         requireNonNull(data);
 
@@ -946,7 +953,8 @@ public final class AgentServer implements Agent, Closeable {
             try {
                 return di.getInstance(XConfigurationAdmin.class).createOrUpdateConfiguration(pid, newProperties);
             } catch (final Exception e) {
-                return createResult(ERROR, "One or more configuration properties cannot be converted to the requested type");
+                return createResult(ERROR,
+                        "One or more configuration properties cannot be converted to the requested type");
             }
         }
         return createResult(SKIPPED, packageNotWired(CM));
@@ -969,8 +977,8 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     private Closeable trackLogReader(final OSGiLogListener logListener) {
-        logReaderTracker = new ServiceTracker<Object, Object>(di.getInstance(BundleContext.class), "org.osgi.service.log.LogReaderService",
-                null) {
+        logReaderTracker = new ServiceTracker<Object, Object>(di.getInstance(BundleContext.class),
+                "org.osgi.service.log.LogReaderService", null) {
 
             @Override
             public Object addingService(final ServiceReference<Object> reference) {

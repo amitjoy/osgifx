@@ -241,17 +241,18 @@ public final class XUserAdmin {
 
     private Type toType(final int type) {
         switch (type) {
-        case 1:
-            return Type.USER;
-        case 2:
-            return Type.GROUP;
-        default:
-            return Type.DEFAULT;
+            case 1:
+                return Type.USER;
+            case 2:
+                return Type.GROUP;
+            default:
+                return Type.DEFAULT;
         }
     }
 
     private List<XRoleDTO> mergeMembers(final List<XRoleDTO> basicMembers, final List<XRoleDTO> requiredMembers) {
-        return Stream.of(basicMembers, requiredMembers).filter(Objects::nonNull).flatMap(Collection::stream).collect(toList());
+        return Stream.of(basicMembers, requiredMembers).filter(Objects::nonNull).flatMap(Collection::stream)
+                .collect(toList());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
