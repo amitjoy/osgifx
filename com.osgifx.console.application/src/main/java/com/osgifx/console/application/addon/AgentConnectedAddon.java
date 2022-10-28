@@ -73,7 +73,8 @@ public final class AgentConnectedAddon {
         final var header = "Retrieving information from " + agent + " agent";
 
         final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(dataRetrievalTask);
-        progressDialog = FxDialog.showProgressDialog(header, dataRetrievalTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
+        progressDialog = FxDialog.showProgressDialog(header, dataRetrievalTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
 }

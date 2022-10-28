@@ -43,7 +43,9 @@ import javafx.stage.StageStyle;
 public final class ConnectToAgentDialog extends Dialog<ButtonType> {
 
     public enum ActionType {
-        CONNECT, ADD_CONNECTION, REMOVE_CONNECTION
+        CONNECT,
+        ADD_CONNECTION,
+        REMOVE_CONNECTION
     }
 
     @Inject

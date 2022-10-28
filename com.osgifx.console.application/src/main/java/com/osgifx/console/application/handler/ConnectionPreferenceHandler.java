@@ -51,10 +51,10 @@ public final class ConnectionPreferenceHandler {
 
     @Execute
     public void execute( //
-            @Named("host") final String host, //
-            @Named("port") final String port, //
-            @Named("timeout") final String timeout, //
-            @Named("type") final String type) {
+                        @Named("host") final String host, //
+                        @Named("port") final String port, //
+                        @Named("timeout") final String timeout, //
+                        @Named("type") final String type) {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
@@ -76,8 +76,9 @@ public final class ConnectionPreferenceHandler {
 
     private List<ConnectionSettingDTO> getStoredValues() {
         final var                  gson        = new Gson();
-        List<ConnectionSettingDTO> connections = gson.fromJson(settings.getValue(), new TypeToken<List<ConnectionSettingDTO>>() {
-                                               }.getType());
+        List<ConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
+                new TypeToken<List<ConnectionSettingDTO>>() {
+                                                       }.getType());
         if (connections == null) {
             connections = Lists.newArrayList();
         }

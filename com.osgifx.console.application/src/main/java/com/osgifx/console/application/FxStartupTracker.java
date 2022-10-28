@@ -44,10 +44,12 @@ public final class FxStartupTracker implements StartupProgressTrackerService {
     @Override
     public void stateReached(final ProgressState state) {
         if (state == JAVAFX_INITIALIZED) {
-            logger.atInfo().log("[StartUp] The JavaFX subsystem has been initialized. This state reached on JavaFX event thread");
+            logger.atInfo().log(
+                    "[StartUp] The JavaFX subsystem has been initialized. This state reached on JavaFX event thread");
         }
         if (state == JAVAFX_INITIALIZED_LAUNCHER_THREAD) {
-            logger.atInfo().log("[StartUp] The JavaFX subsystem has been initialized. This state reached on launcher thread.");
+            logger.atInfo()
+                    .log("[StartUp] The JavaFX subsystem has been initialized. This state reached on launcher thread.");
         }
         if (state == DI_SYSTEM_INITIALIZED) {
             logger.atInfo().log("[StartUp] The DI-System has been initialized");
