@@ -68,7 +68,8 @@ public final class BundleStartHandler {
                         eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
                     } else {
                         logger.atError().log(error);
-                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error, getClass().getClassLoader()));
+                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error,
+                                getClass().getClassLoader()));
                     }
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);

@@ -117,7 +117,8 @@ public class PeekablePasswordControl extends SimpleControl<PasswordField> {
         readOnlyLabel.visibleProperty().bind(field.editableProperty().not());
 
         editableField.textProperty().bindBidirectional(field.userInputProperty());
-        obfuscatedUserInputBinding = Bindings.createStringBinding(() -> obfuscate(field.getUserInput()), field.userInputProperty());
+        obfuscatedUserInputBinding = Bindings.createStringBinding(() -> obfuscate(field.getUserInput()),
+                field.userInputProperty());
         readOnlyLabel.textProperty().bind(obfuscatedUserInputBinding);
         fieldLabel.textProperty().bind(field.labelProperty());
         editableField.promptTextProperty().bind(field.placeholderProperty());

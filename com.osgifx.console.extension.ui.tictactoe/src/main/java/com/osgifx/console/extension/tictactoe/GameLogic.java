@@ -28,7 +28,9 @@ import javafx.beans.property.SimpleObjectProperty;
 public final class GameLogic {
 
     public enum States {
-        EMPTY, X, O
+        EMPTY,
+        X,
+        O
     }
 
     private States                       currentTurn;

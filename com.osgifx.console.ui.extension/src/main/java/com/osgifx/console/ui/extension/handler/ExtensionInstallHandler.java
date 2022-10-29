@@ -65,7 +65,8 @@ public final class ExtensionInstallHandler {
                         logger.atInfo().log("Extension '%s' has been successfuly installed/updated", dp.getName());
                         return null;
                     } catch (final Exception e) {
-                        logger.atError().withException(e).log("Cannot install extension '%s'", deploymentPackage.getName());
+                        logger.atError().withException(e).log("Cannot install extension '%s'",
+                                deploymentPackage.getName());
                         threadSync.asyncExec(() -> {
                             progressDialog.close();
                             FxDialog.showExceptionDialog(e, getClass().getClassLoader());
@@ -78,18 +79,19 @@ public final class ExtensionInstallHandler {
                 protected void succeeded() {
                     threadSync.asyncExec(progressDialog::close);
                     FxDialog.showInfoDialog("Extension Installation",
-                            "The application must be restarted, therefore, will be shut down right away", getClass().getClassLoader(),
-                            btn -> workbench.restart());
+                            "The application must be restarted, therefore, will be shut down right away",
+                            getClass().getClassLoader(), btn -> workbench.restart());
                 }
             };
 
             final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
-            progressDialog = FxDialog.showProgressDialog("Extension Installation", task, getClass().getClassLoader(), () -> {
-                final var isCancelled = deploymentAdmin.cancel();
-                if (isCancelled) {
-                    taskFuture.cancel(true);
-                }
-            });
+            progressDialog = FxDialog.showProgressDialog("Extension Installation", task, getClass().getClassLoader(),
+                    () -> {
+                        final var isCancelled = deploymentAdmin.cancel();
+                        if (isCancelled) {
+                            taskFuture.cancel(true);
+                        }
+                    });
         }
     }
 

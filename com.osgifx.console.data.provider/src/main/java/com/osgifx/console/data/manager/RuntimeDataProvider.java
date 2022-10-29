@@ -101,15 +101,16 @@ public final class RuntimeDataProvider implements DataProvider {
                 // @formatter:on
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                         .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
-                        .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
+                        .thenRunAsync(() -> logger.atInfo()
+                                .log("All runtime informations have been retrieved successfully (async)"));
             } else {
                 infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
                 logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
             }
         } else if (isAsync) {
-            CompletableFuture.runAsync(() -> retrieve(id))
-                    .thenRunAsync(() -> logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id));
+            CompletableFuture.runAsync(() -> retrieve(id)).thenRunAsync(() -> logger.atInfo()
+                    .log("Runtime information of '%s' has been retrieved successfully (async)", id));
         } else {
             retrieve(id);
             logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
@@ -218,7 +219,8 @@ public final class RuntimeDataProvider implements DataProvider {
     }
 
     private ObservableList<?> getData(final String id) {
-        return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply).orElse(observableArrayList());
+        return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply)
+                .orElse(observableArrayList());
     }
 
     private void retrieve(final String id) {

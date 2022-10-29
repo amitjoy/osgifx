@@ -61,7 +61,8 @@ class ResourceImpl implements Resource, Comparable<Resource> {
 
     @Override
     public List<Capability> getCapabilities(final String namespace) {
-        final var caps = namespace != null ? capabilityMap != null ? capabilityMap.get(namespace) : null : allCapabilities;
+        final var caps = namespace != null ? capabilityMap != null ? capabilityMap.get(namespace) : null
+                : allCapabilities;
         return caps != null ? caps : Collections.emptyList();
     }
 
@@ -84,7 +85,8 @@ class ResourceImpl implements Resource, Comparable<Resource> {
 
     @Override
     public List<Requirement> getRequirements(final String namespace) {
-        final var reqs = namespace != null ? requirementMap != null ? requirementMap.get(namespace) : null : allRequirements;
+        final var reqs = namespace != null ? requirementMap != null ? requirementMap.get(namespace) : null
+                : allRequirements;
         return reqs != null ? reqs : Collections.emptyList();
     }
 

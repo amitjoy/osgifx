@@ -174,8 +174,10 @@ public final class Fx {
         list.setContextMenu(menu);
     }
 
-    public static <S, T> void addCellFactory(final TableColumn<S, T> column, final Predicate<S> predicate, final Color match,
-            final Color noMatch) {
+    public static <S, T> void addCellFactory(final TableColumn<S, T> column,
+                                             final Predicate<S> predicate,
+                                             final Color match,
+                                             final Color noMatch) {
         column.setCellFactory(c -> new TableCell<>() {
             @Override
             protected void updateItem(final T item, final boolean empty) {

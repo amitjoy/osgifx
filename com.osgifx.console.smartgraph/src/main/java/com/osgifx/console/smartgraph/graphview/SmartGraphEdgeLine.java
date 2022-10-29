@@ -43,7 +43,8 @@ public class SmartGraphEdgeLine<E, V> extends Line implements SmartGraphEdgeBase
     private final SmartStyleProxy styleProxy;
 
     @SuppressWarnings("rawtypes")
-    public SmartGraphEdgeLine(final Edge<E, V> edge, final SmartGraphVertexNode inbound, final SmartGraphVertexNode outbound) {
+    public SmartGraphEdgeLine(final Edge<E, V> edge, final SmartGraphVertexNode inbound,
+            final SmartGraphVertexNode outbound) {
         if (inbound == null || outbound == null) {
             throw new IllegalArgumentException("Cannot connect null vertices.");
         }
@@ -81,8 +82,10 @@ public class SmartGraphEdgeLine<E, V> extends Line implements SmartGraphEdgeBase
     @Override
     public void attachLabel(final SmartLabel label) {
         this.attachedLabel = label;
-        label.xProperty().bind(startXProperty().add(endXProperty()).divide(2).subtract(label.getLayoutBounds().getWidth() / 2));
-        label.yProperty().bind(startYProperty().add(endYProperty()).divide(2).add(label.getLayoutBounds().getHeight() / 1.5));
+        label.xProperty()
+                .bind(startXProperty().add(endXProperty()).divide(2).subtract(label.getLayoutBounds().getWidth() / 2));
+        label.yProperty()
+                .bind(startYProperty().add(endYProperty()).divide(2).add(label.getLayoutBounds().getHeight() / 1.5));
     }
 
     @Override
@@ -107,8 +110,8 @@ public class SmartGraphEdgeLine<E, V> extends Line implements SmartGraphEdgeBase
         final var rotation = new Rotate();
         rotation.pivotXProperty().bind(translateXProperty());
         rotation.pivotYProperty().bind(translateYProperty());
-        rotation.angleProperty().bind(UtilitiesBindings
-                .toDegrees(UtilitiesBindings.atan2(endYProperty().subtract(startYProperty()), endXProperty().subtract(startXProperty()))));
+        rotation.angleProperty().bind(UtilitiesBindings.toDegrees(UtilitiesBindings
+                .atan2(endYProperty().subtract(startYProperty()), endXProperty().subtract(startXProperty()))));
 
         arrow.getTransforms().add(rotation);
 

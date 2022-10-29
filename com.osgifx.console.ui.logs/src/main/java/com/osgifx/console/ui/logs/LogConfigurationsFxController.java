@@ -78,10 +78,12 @@ public final class LogConfigurationsFxController {
     }
 
     private void createControls() {
-        final var expandedNode   = Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-log-configurations.fxml");
+        final var expandedNode   = Fx.loadFXML(loader, context,
+                "/fxml/expander-column-content-for-log-configurations.fxml");
         final var controller     = (LogConfigurationEditorFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XBundleLoggerContextDTO>(current -> {
-                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                     if (previouslyExpanded != null
+                                             && current.getValue() == previouslyExpanded.getValue()) {
                                          return expandedNode;
                                      }
                                      if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
@@ -97,7 +99,8 @@ public final class LogConfigurationsFxController {
         nameColumn.setPrefWidth(650);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-        final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>("Has Custom Log Levels?");
+        final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>(
+                "Has Custom Log Levels?");
 
         hasCustomLogLevelsColumn.setPrefWidth(250);
         hasCustomLogLevelsColumn.setCellValueFactory(c -> new SimpleBooleanProperty(!c.getValue().logLevels.isEmpty()));

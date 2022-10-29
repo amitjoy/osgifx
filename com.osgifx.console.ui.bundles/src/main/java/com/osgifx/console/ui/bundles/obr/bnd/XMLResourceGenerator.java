@@ -54,7 +54,8 @@ public class XMLResourceGenerator {
             if (compress) {
                 out = new GZIPOutputStream(out);
             }
-            try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8); var pw = new PrintWriter(writer)) {
+            try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+                    var pw = new PrintWriter(writer)) {
                 pw.printf("<?xml version='1.0' encoding='UTF-8'?>%n");
                 repository.print(indent, pw);
             }

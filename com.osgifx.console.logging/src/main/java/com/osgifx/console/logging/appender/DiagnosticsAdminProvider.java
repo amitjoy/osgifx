@@ -91,7 +91,8 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     private static final Pattern LOG_FILE_NAMES_ALL_PATTERN = Pattern
             .compile("(" + LOG_FILE_NAMES_GZIP + ")|(" + LOG_FILE_NAMES_LOG_TXT + ")");
 
-    private static final Comparator<String> STRING_WITH_NUMBER = Comparator.comparing(DiagnosticsAdminProvider::getNumberInLogFileName);
+    private static final Comparator<String> STRING_WITH_NUMBER = Comparator
+            .comparing(DiagnosticsAdminProvider::getNumberInLogFileName);
 
     // Use a named thread
     private static final String           THREAD_NAME              = "rolling-logger";
@@ -141,7 +142,7 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
      * format, etc. In order to not miss any log messages, we adjust the values but
      * keep the logListener and consumer worker running.
      *
-     * @param context       bundle context
+     * @param context bundle context
      * @param configuration new/changed configuration
      */
     @Modified
@@ -190,7 +191,8 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     public Collection<File> getLogFiles() {
         requireNonNull(root, "root log files folder not properly configured!");
         return Stream.of(root.listFiles((dir, name) -> LOG_FILE_NAMES_ALL_PATTERN.matcher(name).matches()))
-                .sorted(Comparator.comparingLong(File::lastModified).reversed().thenComparing(compareStringWithNumber(File::getName)))
+                .sorted(Comparator.comparingLong(File::lastModified).reversed()
+                        .thenComparing(compareStringWithNumber(File::getName)))
                 .toList();
     }
 
@@ -198,7 +200,8 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     public void getLogFileContent(final String logFileName, final OutputStream outputstream) {
         requireNonNull(logFileName, "Requested log file name must not be null!");
         // Match file via requested filename
-        final var requestedFileOpt = getLogFiles().stream().filter(file -> file.getName().equals(logFileName)).findAny();
+        final var requestedFileOpt = getLogFiles().stream().filter(file -> file.getName().equals(logFileName))
+                .findAny();
         if (!requestedFileOpt.isPresent()) {
             logger.atError().log("Requested log file '%s' could not be found", logFileName);
             return;
@@ -249,7 +252,8 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
         final var storage   = substring.substring(substring.lastIndexOf('/') + 1);
 
         final Map<String, String> substitutors = Map.of("storage", storage);
-        return substitutors.entrySet().stream().reduce(input, (s, e) -> s.replace("${" + e.getKey() + "}", e.getValue()), (s, s2) -> s);
+        return substitutors.entrySet().stream().reduce(input,
+                (s, e) -> s.replace("${" + e.getKey() + "}", e.getValue()), (s, s2) -> s);
     }
 
     private void setupRootFolder(final String rootFolder) {
@@ -341,8 +345,9 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     private final String createLogMessage(final LogEntry entry) {
         // reuse the string builder
         formatBuilder.setLength(0);
-        return formatter.format(configuration.format(), entry.getTime(), entry.getBundle() != null ? entry.getBundle().getBundleId() : null,
-                entry.getLogLevel().name(), entry.getThreadInfo(), entry.getLoggerName(), entry.getMessage(),
+        return formatter.format(configuration.format(), entry.getTime(),
+                entry.getBundle() != null ? entry.getBundle().getBundleId() : null, entry.getLogLevel().name(),
+                entry.getThreadInfo(), entry.getLoggerName(), entry.getMessage(),
                 entry.getServiceReference() != null ? " [sref=" + entry.getServiceReference() + "]" : "",
                 extractStackTrace(entry.getException())).toString();
     }
@@ -380,7 +385,8 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
         Stream.of(root.listFiles((dir, name) -> LOG_FILE_NAMES_GZIP_PATTERN.matcher(name).matches()))
                 // Sorted inversely to return file name with highest number first, but respect
                 // log10.txt.gz > log2.txt.gz
-                .sorted((a, b) -> Integer.compare(getNumberInLogFileName(b.getName()), getNumberInLogFileName(a.getName())))
+                .sorted((a, b) -> Integer.compare(getNumberInLogFileName(b.getName()),
+                        getNumberInLogFileName(a.getName())))
                 .forEachOrdered(compressedLogFile -> {
                     final var number = getNumberInLogFileName(compressedLogFile.getName());
                     // We subtract 2, because one for the 0-based index, second for log.txt which is
@@ -403,9 +409,11 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
 
     private void moveLogFile(final File compressedLogFile, final int number) {
         final var targetFile = new File(root, "log" + (number + 1) + ".txt.gz");
-        logger.atDebug().log("Renaming '%s' to '%s'", compressedLogFile.getAbsolutePath(), targetFile.getAbsolutePath());
+        logger.atDebug().log("Renaming '%s' to '%s'", compressedLogFile.getAbsolutePath(),
+                targetFile.getAbsolutePath());
         if (!compressedLogFile.renameTo(targetFile)) {
-            logger.atError().log("Renaming of '%s' to '%s' failed!", compressedLogFile.getAbsolutePath(), targetFile.getAbsolutePath());
+            logger.atError().log("Renaming of '%s' to '%s' failed!", compressedLogFile.getAbsolutePath(),
+                    targetFile.getAbsolutePath());
         }
     }
 
@@ -414,7 +422,7 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
      * yields {@code 10}. Negative numbers are not supported.
      *
      * @param filename file name to be checked for a contained number, may not be
-     *                 {@code null}
+     *            {@code null}
      * @return the number contained in the string, or {@code -1} if no number could
      *         be obtained
      */
@@ -434,9 +442,9 @@ public class DiagnosticsAdminProvider implements LogListener, DiagnosticsAdmin {
     /**
      * Compress a given file into the given output file.
      *
-     * @param input  plain-text input file handle
+     * @param input plain-text input file handle
      * @param output resulting output file handle, e.g.
-     *               {@code new File(root, "log0.txt.gz")}
+     *            {@code new File(root, "log0.txt.gz")}
      *
      * @throws IOException in case something went wrong
      */

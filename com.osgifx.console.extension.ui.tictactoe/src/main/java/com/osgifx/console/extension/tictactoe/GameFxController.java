@@ -64,9 +64,9 @@ public final class GameFxController {
         winLabel.setId("winLabel");
 
         winLabel.visibleProperty().bind(gameLogic.winnerProperty().isNotNull());
-        winLabel.textProperty()
-                .bind(Bindings.when(gameLogic.winnerProperty().isEqualTo(States.EMPTY).or(gameLogic.winnerProperty().isNull())).then("Tie")
-                        .otherwise(Bindings.concat("Winner: ", gameLogic.winnerProperty())));
+        winLabel.textProperty().bind(Bindings
+                .when(gameLogic.winnerProperty().isEqualTo(States.EMPTY).or(gameLogic.winnerProperty().isNull()))
+                .then("Tie").otherwise(Bindings.concat("Winner: ", gameLogic.winnerProperty())));
 
         stackPane.getChildren().add(gridView);
         stackPane.getChildren().add(winLabel);

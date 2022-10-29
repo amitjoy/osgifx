@@ -56,8 +56,8 @@ public final class BatchInstallDialogController {
                     setGraphic(null);
                 } else {
                     setText(artifact.file().getName());
-                    setGraphic(new ImageView(this.getClass()
-                            .getResource(artifact.isConfiguration() ? "/graphic/images/config.png" : "/graphic/images/bundle.png")
+                    setGraphic(new ImageView(this.getClass().getResource(
+                            artifact.isConfiguration() ? "/graphic/images/config.png" : "/graphic/images/bundle.png")
                             .toString()));
                 }
             }

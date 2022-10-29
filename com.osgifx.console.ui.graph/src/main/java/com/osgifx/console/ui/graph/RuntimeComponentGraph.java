@@ -62,8 +62,7 @@ public final class RuntimeComponentGraph {
         init();
     }
 
-    public List<GraphPath<ComponentVertex, DefaultEdge>> getAllServiceComponentsThatAreRequiredBy(
-            final Collection<XComponentDTO> components) {
+    public List<GraphPath<ComponentVertex, DefaultEdge>> getAllServiceComponentsThatAreRequiredBy(final Collection<XComponentDTO> components) {
         if (components.isEmpty()) {
             return List.of();
         }
@@ -71,7 +70,8 @@ public final class RuntimeComponentGraph {
         for (final XComponentDTO component : components) {
             final var componentVertex = toVertex(component);
             if (requirerGraph.containsVertex(componentVertex)) {
-                final var vertex = requirerGraph.vertexSet().stream().filter(componentVertex::equals).findAny().orElse(null);
+                final var vertex = requirerGraph.vertexSet().stream().filter(componentVertex::equals).findAny()
+                        .orElse(null);
                 vertices.add(vertex);
             }
         }
@@ -117,7 +117,8 @@ public final class RuntimeComponentGraph {
         return graph;
     }
 
-    private void prepareEdges(final List<XComponentDTO> components, final List<Entry<XComponentDTO, XComponentDTO>> edges) {
+    private void prepareEdges(final List<XComponentDTO> components,
+                              final List<Entry<XComponentDTO, XComponentDTO>> edges) {
         for (final XComponentDTO sourceComponent : components) {
             final var boundServices         = sourceComponent.satisfiedReferences;
             final var componentNameProperty = "component.name";

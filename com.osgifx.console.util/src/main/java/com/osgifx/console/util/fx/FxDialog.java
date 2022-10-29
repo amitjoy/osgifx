@@ -40,8 +40,10 @@ public final class FxDialog {
         return showDialog(AlertType.INFORMATION, "", header, content, cssResLoader, null);
     }
 
-    public static Alert showInfoDialog(final String header, final String content, final ClassLoader cssResLoader,
-            final Consumer<ButtonType> actionOk) {
+    public static Alert showInfoDialog(final String header,
+                                       final String content,
+                                       final ClassLoader cssResLoader,
+                                       final Consumer<ButtonType> actionOk) {
         return showDialog(AlertType.INFORMATION, "", header, content, cssResLoader, actionOk);
     }
 
@@ -53,8 +55,10 @@ public final class FxDialog {
         return showDialog(AlertType.ERROR, "", header, content, cssResLoader, null);
     }
 
-    public static Alert showConfirmationDialog(final String header, final String content, final ClassLoader cssResLoader,
-            final Consumer<ButtonType> action) {
+    public static Alert showConfirmationDialog(final String header,
+                                               final String content,
+                                               final ClassLoader cssResLoader,
+                                               final Consumer<ButtonType> action) {
         return showDialog(AlertType.CONFIRMATION, "", header, content, cssResLoader, action);
     }
 
@@ -66,8 +70,10 @@ public final class FxDialog {
         return dialog;
     }
 
-    public static ProgressDialog showProgressDialog(final String header, final Task<?> task, final ClassLoader cssResLoader,
-            final Runnable cancellationRunnable) {
+    public static ProgressDialog showProgressDialog(final String header,
+                                                    final Task<?> task,
+                                                    final ClassLoader cssResLoader,
+                                                    final Runnable cancellationRunnable) {
         final var progressDialog = new ProgressDialog(task);
 
         progressDialog.setHeaderText(header);
@@ -88,8 +94,13 @@ public final class FxDialog {
         return progressDialog;
     }
 
-    public static ChoiceDialog<String> showChoiceDialog(final String header, final ClassLoader resLoader, final String graphicPath,
-            final Consumer<String> actionOk, final Runnable actionCancel, final String defaultChoice, final String... choices) {
+    public static ChoiceDialog<String> showChoiceDialog(final String header,
+                                                        final ClassLoader resLoader,
+                                                        final String graphicPath,
+                                                        final Consumer<String> actionOk,
+                                                        final Runnable actionCancel,
+                                                        final String defaultChoice,
+                                                        final String... choices) {
         final var choiceDialog = new ChoiceDialog<>(defaultChoice, choices);
 
         choiceDialog.setHeaderText(header);
@@ -106,8 +117,12 @@ public final class FxDialog {
         return choiceDialog;
     }
 
-    public static Alert showDialog(final AlertType type, final String title, final String header, final String content,
-            final ClassLoader cssResLoader, final Consumer<ButtonType> action) {
+    public static Alert showDialog(final AlertType type,
+                                   final String title,
+                                   final String header,
+                                   final String content,
+                                   final ClassLoader cssResLoader,
+                                   final Consumer<ButtonType> action) {
 
         final var alert = new Alert(type);
         alert.initStyle(StageStyle.UNDECORATED);
