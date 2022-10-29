@@ -56,7 +56,8 @@ public final class HeapMonitorFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent) {
         logger.atInfo().log("Agent connected event received");
         createControls(parent);
         memoryViewPane.init();
@@ -64,7 +65,8 @@ public final class HeapMonitorFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, final BorderPane parent) {
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data,
+                                                final BorderPane parent) {
         logger.atInfo().log("Agent disconnected event received");
         memoryViewPane.stopUpdates();
         createControls(parent);

@@ -81,10 +81,12 @@ public final class LogsViewFxController {
     }
 
     private void createControls() {
-        final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content-for-logs.fxml");
+        final var expandedNode   = (GridPane) Fx.loadFXML(loader, context,
+                "/fxml/expander-column-content-for-logs.fxml");
         final var controller     = (LogDetailsFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XLogEntryDTO>(current -> {
-                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                     if (previouslyExpanded != null
+                                             && current.getValue() == previouslyExpanded.getValue()) {
                                          return expandedNode;
                                      }
                                      if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {

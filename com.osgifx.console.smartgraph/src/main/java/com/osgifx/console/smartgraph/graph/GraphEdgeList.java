@@ -86,7 +86,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
     }
 
     @Override
-    public Vertex<V> opposite(final Vertex<V> v, final Edge<E, V> e) throws InvalidVertexException, InvalidEdgeException {
+    public Vertex<V> opposite(final Vertex<V> v, final Edge<E, V> e)
+            throws InvalidVertexException, InvalidEdgeException {
         checkVertex(v);
         final var edge = checkEdge(e);
 
@@ -248,7 +249,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public String toString() {
-        final var sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:\n", numVertices(), numEdges()));
+        final var sb = new StringBuilder(
+                String.format("Graph with %d vertices and %d edges:\n", numVertices(), numEdges()));
 
         sb.append("--- Vertices: \n");
         for (final Vertex<V> v : vertices.values()) {
@@ -313,8 +315,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
         @Override
         public String toString() {
-            return "Edge{{" + element + "}, vertexOutbound=" + vertexOutbound.toString() + ", vertexInbound=" + vertexInbound.toString()
-                    + '}';
+            return "Edge{{" + element + "}, vertexOutbound=" + vertexOutbound.toString() + ", vertexInbound="
+                    + vertexInbound.toString() + '}';
         }
     }
 

@@ -36,11 +36,16 @@ public class AgentSupervisor<S, A> {
     protected int                port;
     protected int                timeout;
 
-    protected void connect(final Class<A> agent, final S supervisor, final String host, final int port) throws Exception {
+    protected void connect(final Class<A> agent, final S supervisor, final String host, final int port)
+            throws Exception {
         connect(agent, supervisor, host, port, -1);
     }
 
-    protected void connect(final Class<A> agent, final S supervisor, final String host, final int port, final int timeout)
+    protected void connect(final Class<A> agent,
+                           final S supervisor,
+                           final String host,
+                           final int port,
+                           final int timeout)
             throws Exception {
         if (timeout < -1) {
             throw new IllegalArgumentException("timeout cannot be less than -1");

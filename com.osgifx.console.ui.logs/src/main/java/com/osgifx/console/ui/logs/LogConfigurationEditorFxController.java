@@ -122,9 +122,8 @@ public final class LogConfigurationEditorFxController {
     }
 
     private FormRenderer createForm(final XBundleLoggerContextDTO loggerContext) {
-        form = Form
-                .of(Section.of(initGenericFields(loggerContext).toArray(new Field[0])).title("Generic Information"),
-                        Section.of(initField(loggerContext).toArray(new Field[0])).title("Logger Context Configuration"))
+        form = Form.of(Section.of(initGenericFields(loggerContext).toArray(new Field[0])).title("Generic Information"),
+                Section.of(initField(loggerContext).toArray(new Field[0])).title("Logger Context Configuration"))
                 .title("Logger Context Configuration");
         final var renderer = new FormRenderer(form);
 
@@ -137,9 +136,11 @@ public final class LogConfigurationEditorFxController {
     }
 
     private List<Field<?>> initGenericFields(final XBundleLoggerContextDTO loggerContext) {
-        final var      rootLogLevel      = Optional.ofNullable(loggerContext.rootLogLevel).map(LogLevel::name).orElse("<NOT SET>");
+        final var      rootLogLevel      = Optional.ofNullable(loggerContext.rootLogLevel).map(LogLevel::name)
+                .orElse("<NOT SET>");
         final Field<?> nameField         = Field.ofStringType(loggerContext.name).label("Name").editable(false);
-        final Field<?> rootLogLevelField = Field.ofStringType(rootLogLevel).label("Global Root Log Level").editable(false);
+        final Field<?> rootLogLevelField = Field.ofStringType(rootLogLevel).label("Global Root Log Level")
+                .editable(false);
 
         return Lists.newArrayList(nameField, rootLogLevelField);
     }

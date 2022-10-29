@@ -32,16 +32,19 @@ public interface SmartPlacementStrategy {
      * to place individual vertices.
      *
      *
-     * @param <V>      Generic type for element stored at vertices.
-     * @param <E>      Generic type for element stored at edges.
-     * @param width    Width of the area in which to place the vertices.
-     * @param height   Height of the area in which to place the vertices.
+     * @param <V> Generic type for element stored at vertices.
+     * @param <E> Generic type for element stored at edges.
+     * @param width Width of the area in which to place the vertices.
+     * @param height Height of the area in which to place the vertices.
      * @param theGraph Reference to the {@link Graph} containing the graph model.
-     *                 Can use methods to check for additional information
-     *                 pertaining the model.
+     *            Can use methods to check for additional information
+     *            pertaining the model.
      *
      * @param vertices Collection of {@link SmartGraphVertex} to place.
      *
      */
-    <V, E> void place(double width, double height, Graph<V, E> theGraph, Collection<? extends SmartGraphVertex<V>> vertices);
+    <V, E> void place(double width,
+                      double height,
+                      Graph<V, E> theGraph,
+                      Collection<? extends SmartGraphVertex<V>> vertices);
 }

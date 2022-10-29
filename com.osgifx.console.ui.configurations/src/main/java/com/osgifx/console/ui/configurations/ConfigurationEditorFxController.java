@@ -122,7 +122,8 @@ public final class ConfigurationEditorFxController {
             }
             if (config.isFactory) {
                 final var ocdFactoryPid = ocd.factoryPid;
-                logger.atInfo().log("Factory configuration create request has been sent for factory PID '%s'", ocdFactoryPid);
+                logger.atInfo().log("Factory configuration create request has been sent for factory PID '%s'",
+                        ocdFactoryPid);
                 createFactoryConfiguration(ocdFactoryPid, properties);
                 return;
             }
@@ -134,7 +135,8 @@ public final class ConfigurationEditorFxController {
         final BooleanProperty isPersisted              = new SimpleBooleanProperty(config.isPersisted);
         final var             isPersistedConfigBinding = new When(isPersisted).then(true).otherwise(false);
 
-        saveConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()).and(isPersistedConfigBinding));
+        saveConfigButton.disableProperty()
+                .bind(form.changedProperty().not().or(form.validProperty().not()).and(isPersistedConfigBinding));
     }
 
     private void deleteConfiguration(final String pid) {
@@ -159,7 +161,8 @@ public final class ConfigurationEditorFxController {
             logger.atWarning().log(result.response);
         } else {
             logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Factory Configuration Creation Error", result.response, getClass().getClassLoader());
+            FxDialog.showErrorDialog("Factory Configuration Creation Error", result.response,
+                    getClass().getClassLoader());
         }
     }
 
@@ -172,7 +175,8 @@ public final class ConfigurationEditorFxController {
             logger.atWarning().log(result.response);
         } else {
             logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Configuration Creation/Updation Error", result.response, getClass().getClassLoader());
+            FxDialog.showErrorDialog("Configuration Creation/Updation Error", result.response,
+                    getClass().getClassLoader());
         }
     }
 
@@ -239,8 +243,8 @@ public final class ConfigurationEditorFxController {
         final List<Field<?>> genericFields = Lists.newArrayList(pidField, factoryPidField, locationField);
 
         if (config.ocd != null) {
-            final Field<?> descLocationField = Field.ofStringType(config.ocd.descriptorLocation).label("Descriptor Location")
-                    .editable(false);
+            final Field<?> descLocationField = Field.ofStringType(config.ocd.descriptorLocation)
+                    .label("Descriptor Location").editable(false);
             genericFields.add(descLocationField);
         }
         return genericFields;
@@ -256,165 +260,189 @@ public final class ConfigurationEditorFxController {
         final var defaultVal = ad.defaultValue;
         final var id         = ad.id;
 
-        return initFieldFromType(id, currentValue, defaultVal, type, options, true).label(id).labelDescription(ad.description);
+        return initFieldFromType(id, currentValue, defaultVal, type, options, true).label(id)
+                .labelDescription(ad.description);
     }
 
-    private Field<?> initFieldFromType(final String key, final ConfigValue configValue, final List<String> defaultValue,
-            final XAttributeDefType adType, final List<String> options, final boolean hasOCD) {
+    private Field<?> initFieldFromType(final String key,
+                                       final ConfigValue configValue,
+                                       final List<String> defaultValue,
+                                       final XAttributeDefType adType,
+                                       final List<String> options,
+                                       final boolean hasOCD) {
         final var currentValue = configValue != null ? configValue.value : null;
         Field<?>  field        = null;
         switch (adType) {
-        case LONG, INTEGER:
-            if (options != null && !options.isEmpty()) {
-                String effectiveValue;
-                if (currentValue != null) {
-                    effectiveValue = converter.convert(currentValue, String.class);
-                } else {
-                    effectiveValue = converter.convert(defaultValue, String.class);
+            case LONG, INTEGER:
+                if (options != null && !options.isEmpty()) {
+                    String effectiveValue;
+                    if (currentValue != null) {
+                        effectiveValue = converter.convert(currentValue, String.class);
+                    } else {
+                        effectiveValue = converter.convert(defaultValue, String.class);
+                    }
+                    final var selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Double>>() {
+                    }), selection);
+                    break;
                 }
-                final var selection = options.indexOf(effectiveValue);
-                field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Double>>() {
-                }), selection);
-                break;
-            }
-            if (currentValue != null) {
-                field = Field.ofIntegerType(converter.convert(currentValue, int.class));
-            } else {
-                field = Field.ofIntegerType(converter.convert(defaultValue, int.class));
-            }
-            break;
-        case FLOAT, DOUBLE:
-            if (options != null && !options.isEmpty()) {
-                String effectiveValue;
                 if (currentValue != null) {
-                    effectiveValue = converter.convert(currentValue, String.class);
+                    field = Field.ofIntegerType(converter.convert(currentValue, int.class));
                 } else {
-                    effectiveValue = converter.convert(defaultValue, String.class);
+                    field = Field.ofIntegerType(converter.convert(defaultValue, int.class));
                 }
-                final var selection = options.indexOf(effectiveValue);
-                field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Double>>() {
-                }), selection);
                 break;
-            }
-            if (currentValue != null) {
-                field = Field.ofDoubleType(converter.convert(currentValue, double.class));
-            } else {
-                field = Field.ofDoubleType(converter.convert(defaultValue, double.class));
-            }
-            break;
-        case BOOLEAN:
-            if (options != null && !options.isEmpty()) {
-                String effectiveValue;
+            case FLOAT, DOUBLE:
+                if (options != null && !options.isEmpty()) {
+                    String effectiveValue;
+                    if (currentValue != null) {
+                        effectiveValue = converter.convert(currentValue, String.class);
+                    } else {
+                        effectiveValue = converter.convert(defaultValue, String.class);
+                    }
+                    final var selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Double>>() {
+                    }), selection);
+                    break;
+                }
                 if (currentValue != null) {
-                    effectiveValue = converter.convert(currentValue, String.class);
+                    field = Field.ofDoubleType(converter.convert(currentValue, double.class));
                 } else {
-                    effectiveValue = converter.convert(defaultValue, String.class);
+                    field = Field.ofDoubleType(converter.convert(defaultValue, double.class));
                 }
-                final var selection = options.indexOf(effectiveValue);
-                field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Boolean>>() {
-                }), selection);
                 break;
-            }
-            if (currentValue != null) {
-                field = Field.ofBooleanType(converter.convert(currentValue, boolean.class));
-            } else {
-                field = Field.ofBooleanType(converter.convert(defaultValue, boolean.class));
-            }
-            break;
-        case PASSWORD:
-            if (currentValue != null) {
-                field = Field.ofPasswordType(converter.convert(currentValue, String.class)).render(new PeekablePasswordControl());
-            } else {
-                field = Field.ofPasswordType(converter.convert(defaultValue, String.class)).render(new PeekablePasswordControl());
-            }
-            break;
-        case CHAR:
-            if (options != null && !options.isEmpty()) {
-                String effectiveValue;
+            case BOOLEAN:
+                if (options != null && !options.isEmpty()) {
+                    String effectiveValue;
+                    if (currentValue != null) {
+                        effectiveValue = converter.convert(currentValue, String.class);
+                    } else {
+                        effectiveValue = converter.convert(defaultValue, String.class);
+                    }
+                    final var selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<Boolean>>() {
+                    }), selection);
+                    break;
+                }
+                if (currentValue != null) {
+                    field = Field.ofBooleanType(converter.convert(currentValue, boolean.class));
+                } else {
+                    field = Field.ofBooleanType(converter.convert(defaultValue, boolean.class));
+                }
+                break;
+            case PASSWORD:
+                if (currentValue != null) {
+                    field = Field.ofPasswordType(converter.convert(currentValue, String.class))
+                            .render(new PeekablePasswordControl());
+                } else {
+                    field = Field.ofPasswordType(converter.convert(defaultValue, String.class))
+                            .render(new PeekablePasswordControl());
+                }
+                break;
+            case CHAR:
+                if (options != null && !options.isEmpty()) {
+                    String effectiveValue;
+                    if (currentValue != null) {
+                        final char c = converter.convert(currentValue, char.class);
+                        effectiveValue = Character.toString(c);
+                    } else {
+                        final char c = converter.convert(defaultValue, char.class);
+                        effectiveValue = Character.toString(c);
+                    }
+                    final var selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
+                    }), selection);
+                    break;
+                }
                 if (currentValue != null) {
                     final char c = converter.convert(currentValue, char.class);
-                    effectiveValue = Character.toString(c);
+                    field = Field.ofStringType(Character.toString(c))
+                            .validate(StringLengthValidator.exactly(1, "Length must be 1"));
                 } else {
                     final char c = converter.convert(defaultValue, char.class);
-                    effectiveValue = Character.toString(c);
+                    field = Field.ofStringType(Character.toString(c))
+                            .validate(StringLengthValidator.exactly(1, "Length must be 1"));
                 }
-                final var selection = options.indexOf(effectiveValue);
-                field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
-                }), selection);
                 break;
-            }
-            if (currentValue != null) {
-                final char c = converter.convert(currentValue, char.class);
-                field = Field.ofStringType(Character.toString(c)).validate(StringLengthValidator.exactly(1, "Length must be 1"));
-            } else {
-                final char c = converter.convert(defaultValue, char.class);
-                field = Field.ofStringType(Character.toString(c)).validate(StringLengthValidator.exactly(1, "Length must be 1"));
-            }
-            break;
-        case BOOLEAN_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, boolean.class, XAttributeDefType.BOOLEAN_ARRAY);
-            break;
-        case BOOLEAN_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, Boolean.class, XAttributeDefType.BOOLEAN_LIST);
-            break;
-        case DOUBLE_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, double.class, XAttributeDefType.DOUBLE_ARRAY);
-            break;
-        case DOUBLE_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, Double.class, XAttributeDefType.DOUBLE_LIST);
-            break;
-        case LONG_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, long.class, XAttributeDefType.LONG_ARRAY);
-            break;
-        case LONG_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, Long.class, XAttributeDefType.LONG_LIST);
-            break;
-        case INTEGER_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, int.class, XAttributeDefType.INTEGER_ARRAY);
-            break;
-        case INTEGER_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, Integer.class, XAttributeDefType.INTEGER_LIST);
-            break;
-        case FLOAT_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, float.class, XAttributeDefType.FLOAT_ARRAY);
-            break;
-        case FLOAT_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, Float.class, XAttributeDefType.FLOAT_LIST);
-            break;
-        case CHAR_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, CHAR_ARRAY);
-            break;
-        case CHAR_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, Character.class, XAttributeDefType.CHAR_LIST);
-            break;
-        case STRING_ARRAY:
-            field = processArray(key, currentValue, defaultValue, options, hasOCD, String.class, XAttributeDefType.STRING_ARRAY);
-            break;
-        case STRING_LIST:
-            field = processList(key, currentValue, defaultValue, options, hasOCD, String.class, XAttributeDefType.STRING_LIST);
-            break;
-        case STRING:
-        default:
-            if (options != null && !options.isEmpty()) {
-                String effectiveValue;
+            case BOOLEAN_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, boolean.class,
+                        XAttributeDefType.BOOLEAN_ARRAY);
+                break;
+            case BOOLEAN_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Boolean.class,
+                        XAttributeDefType.BOOLEAN_LIST);
+                break;
+            case DOUBLE_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, double.class,
+                        XAttributeDefType.DOUBLE_ARRAY);
+                break;
+            case DOUBLE_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Double.class,
+                        XAttributeDefType.DOUBLE_LIST);
+                break;
+            case LONG_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, long.class,
+                        XAttributeDefType.LONG_ARRAY);
+                break;
+            case LONG_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Long.class,
+                        XAttributeDefType.LONG_LIST);
+                break;
+            case INTEGER_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, int.class,
+                        XAttributeDefType.INTEGER_ARRAY);
+                break;
+            case INTEGER_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Integer.class,
+                        XAttributeDefType.INTEGER_LIST);
+                break;
+            case FLOAT_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, float.class,
+                        XAttributeDefType.FLOAT_ARRAY);
+                break;
+            case FLOAT_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Float.class,
+                        XAttributeDefType.FLOAT_LIST);
+                break;
+            case CHAR_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, CHAR_ARRAY);
+                break;
+            case CHAR_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, Character.class,
+                        XAttributeDefType.CHAR_LIST);
+                break;
+            case STRING_ARRAY:
+                field = processArray(key, currentValue, defaultValue, options, hasOCD, String.class,
+                        XAttributeDefType.STRING_ARRAY);
+                break;
+            case STRING_LIST:
+                field = processList(key, currentValue, defaultValue, options, hasOCD, String.class,
+                        XAttributeDefType.STRING_LIST);
+                break;
+            case STRING:
+            default:
+                if (options != null && !options.isEmpty()) {
+                    String effectiveValue;
+                    if (currentValue != null) {
+                        effectiveValue = converter.convert(currentValue, String.class);
+                    } else {
+                        effectiveValue = converter.convert(defaultValue, String.class);
+                    }
+                    final var selection = options.indexOf(effectiveValue);
+                    field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
+                    }), selection);
+                    break;
+                }
                 if (currentValue != null) {
-                    effectiveValue = converter.convert(currentValue, String.class);
+                    final var convertedValue = converter.convert(currentValue, String.class);
+                    field = Field.ofStringType(converter.convert(currentValue, String.class))
+                            .multiline(convertedValue.length() > 100);
                 } else {
-                    effectiveValue = converter.convert(defaultValue, String.class);
+                    final var convertedValue = converter.convert(defaultValue, String.class);
+                    field = Field.ofStringType(converter.convert(defaultValue, String.class))
+                            .multiline(convertedValue.length() > 100);
                 }
-                final var selection = options.indexOf(effectiveValue);
-                field = Field.ofSingleSelectionType(converter.convert(options, new TypeReference<List<String>>() {
-                }), selection);
                 break;
-            }
-            if (currentValue != null) {
-                final var convertedValue = converter.convert(currentValue, String.class);
-                field = Field.ofStringType(converter.convert(currentValue, String.class)).multiline(convertedValue.length() > 100);
-            } else {
-                final var convertedValue = converter.convert(defaultValue, String.class);
-                field = Field.ofStringType(converter.convert(defaultValue, String.class)).multiline(convertedValue.length() > 100);
-            }
-            break;
         }
         if (field == null) {
             field = Field.ofStringType("");
@@ -422,8 +450,13 @@ public final class ConfigurationEditorFxController {
         return field;
     }
 
-    private <T> Field<?> processArray(final String key, final Object currentValue, final List<String> defaultValue,
-            final List<String> options, final boolean hasOCD, final Class<T> clazz, final XAttributeDefType adType) {
+    private <T> Field<?> processArray(final String key,
+                                      final Object currentValue,
+                                      final List<String> defaultValue,
+                                      final List<String> options,
+                                      final boolean hasOCD,
+                                      final Class<T> clazz,
+                                      final XAttributeDefType adType) {
         final Field<?> field;
         if (hasOCD) {
             T[] effectiveValue;
@@ -462,8 +495,13 @@ public final class ConfigurationEditorFxController {
         return (Class<? extends T[]>) Array.newInstance(clazz, 0).getClass();
     }
 
-    private <T> Field<?> processList(final String key, final Object currentValue, final List<String> defaultValue,
-            final List<String> options, final boolean hasOCD, final Class<T> clazz, final XAttributeDefType adType) {
+    private <T> Field<?> processList(final String key,
+                                     final Object currentValue,
+                                     final List<String> defaultValue,
+                                     final List<String> options,
+                                     final boolean hasOCD,
+                                     final Class<T> clazz,
+                                     final XAttributeDefType adType) {
         Field<?> field;
         if (hasOCD) {
             List<T> effectiveValue;

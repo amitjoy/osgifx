@@ -91,7 +91,8 @@ public final class Table {
     private StringBuilder printLine(final int[] columnWidths) {
         final var builder = new StringBuilder();
         for (var i = 0; i < columnWidths.length; i++) {
-            final var line = String.join("", Collections.nCopies(columnWidths[i] + verticalSep.length() + 1, HORIZONTAL_SEP));
+            final var line = String.join("",
+                    Collections.nCopies(columnWidths[i] + verticalSep.length() + 1, HORIZONTAL_SEP));
             builder.append(joinSep + line + (i == columnWidths.length - 1 ? joinSep : ""));
         }
         builder.append(System.lineSeparator());

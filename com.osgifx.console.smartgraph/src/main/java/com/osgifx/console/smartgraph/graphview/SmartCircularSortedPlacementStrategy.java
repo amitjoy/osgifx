@@ -31,8 +31,10 @@ import javafx.geometry.Point2D;
 public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrategy {
 
     @Override
-    public <V, E> void place(final double width, final double height, final Graph<V, E> theGraph,
-            final Collection<? extends SmartGraphVertex<V>> vertices) {
+    public <V, E> void place(final double width,
+                             final double height,
+                             final Graph<V, E> theGraph,
+                             final Collection<? extends SmartGraphVertex<V>> vertices) {
 
         final var    center         = new Point2D(width / 2, height / 2);
         final var    N              = vertices.size();
@@ -58,6 +60,7 @@ public class SmartCircularSortedPlacementStrategy implements SmartPlacementStrat
     }
 
     protected <V> Collection<? extends SmartGraphVertex<V>> sort(final Collection<? extends SmartGraphVertex<V>> vertices) {
-        return vertices.stream().sorted(Comparator.comparing(v -> v.getUnderlyingVertex().element().toString().toLowerCase())).toList();
+        return vertices.stream()
+                .sorted(Comparator.comparing(v -> v.getUnderlyingVertex().element().toString().toLowerCase())).toList();
     }
 }

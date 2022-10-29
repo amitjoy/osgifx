@@ -47,7 +47,8 @@ import javafx.stage.StageStyle;
 public final class PropertiesConfigurationDialog extends Dialog<String> {
 
     public enum ConfigurationType {
-        PROPERTIES, CREDENTIALS
+        PROPERTIES,
+        CREDENTIALS
     }
 
     private ConfigurationType          type;
@@ -137,7 +138,8 @@ public final class PropertiesConfigurationDialog extends Dialog<String> {
 
             if (type == ConfigurationType.PROPERTIES) {
                 txtValue = TextFields.createClearableTextField();
-                ((CustomTextField) txtValue).setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+                ((CustomTextField) txtValue)
+                        .setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
                 ((CustomTextField) txtValue).setPromptText("Value");
                 ((CustomTextField) txtValue).setText(propValue != null ? propValue : "");
             } else {

@@ -57,7 +57,9 @@ public final class FxBundleGraph {
         return graph;
     }
 
-    private boolean containsEdge(final Collection<Edge<String, BundleVertex>> edges, final BundleVertex source, final BundleVertex target) {
+    private boolean containsEdge(final Collection<Edge<String, BundleVertex>> edges,
+                                 final BundleVertex source,
+                                 final BundleVertex target) {
         var isEdgeFound = false;
         for (final Edge<String, BundleVertex> edge : edges) {
             var isEdgeSourceFound = false;

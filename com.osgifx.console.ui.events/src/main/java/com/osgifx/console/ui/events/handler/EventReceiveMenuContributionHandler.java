@@ -185,7 +185,8 @@ public final class EventReceiveMenuContributionHandler {
         try {
             final var configuration = configAdmin.getConfiguration(PID, "?");
             if (!topics.isEmpty()) {
-                final Dictionary<String, String[]> properties = FrameworkUtil.asDictionary(Map.of("topics", topics.toArray(new String[0])));
+                final Dictionary<String, String[]> properties = FrameworkUtil
+                        .asDictionary(Map.of("topics", topics.toArray(new String[0])));
                 configuration.update(properties);
             } else {
                 configuration.delete();
@@ -197,7 +198,8 @@ public final class EventReceiveMenuContributionHandler {
     }
 
     private enum Type {
-        START, STOP
+        START,
+        STOP
     }
 
 }

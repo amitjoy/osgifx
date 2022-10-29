@@ -63,7 +63,8 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setHeaderText("Receive Events from Topics");
         dialogPane.getStylesheets().add(getClass().getClassLoader().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(getClass().getClassLoader().getResource("/graphic/images/event-receive.png").toString()));
+        dialogPane.setGraphic(
+                new ImageView(getClass().getClassLoader().getResource("/graphic/images/event-receive.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         final var lbMessage = new Label("");
@@ -138,8 +139,8 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
             textTopic = (CustomTextField) TextFields.createClearableTextField();
             textTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
             textTopic.setPromptText("Event Topic");
-            validationSupport.registerValidator(textTopic,
-                    Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
+            validationSupport.registerValidator(textTopic, Validator
+                    .createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
             btnAddField    = new Button();
             btnRemoveField = new Button();

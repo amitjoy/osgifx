@@ -34,7 +34,7 @@ public class UtilitiesJavaFX {
      * <br>
      * Obtained from: http://fxexperience.com/2016/01/node-picking-in-javafx/
      *
-     * @param node   parent node
+     * @param node parent node
      * @param sceneX x-coordinate of picking point
      * @param sceneY y-coordinate of picking point
      *

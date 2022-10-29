@@ -142,8 +142,10 @@ public final class RoleEditorFxController {
     }
 
     private FormRenderer createForm(final XRoleDTO role) {
-        form = Form.of(Section.of(initGenericFields(role).toArray(new Field[0])).title("Generic Configuration"),
-                Section.of(initFields(role).toArray(new Field[0])).title("Specific Configuration")).title("Role Configuration");
+        form = Form
+                .of(Section.of(initGenericFields(role).toArray(new Field[0])).title("Generic Configuration"),
+                        Section.of(initFields(role).toArray(new Field[0])).title("Specific Configuration"))
+                .title("Role Configuration");
         final var renderer = new FormRenderer(form);
 
         GridPane.setColumnSpan(renderer, 2);
@@ -168,12 +170,12 @@ public final class RoleEditorFxController {
         final var props = properties == null ? Map.of() : properties;
         final var creds = credentials == null ? Map.of() : credentials;
 
-        final Field<?> propertiesField = Field.ofStringType(RolesHelper.mapToString(props)).multiline(true).label("Properties")
-                .render(new RolesConfigTextControl(PROPERTIES)).valueDescription(KV_DESCRIPTION)
+        final Field<?> propertiesField = Field.ofStringType(RolesHelper.mapToString(props)).multiline(true)
+                .label("Properties").render(new RolesConfigTextControl(PROPERTIES)).valueDescription(KV_DESCRIPTION)
                 .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 
-        final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds)).multiline(true).label("Credentials")
-                .render(new RolesConfigTextControl(CREDENTIALS)).valueDescription(KV_DESCRIPTION)
+        final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds)).multiline(true)
+                .label("Credentials").render(new RolesConfigTextControl(CREDENTIALS)).valueDescription(KV_DESCRIPTION)
                 .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
 
         if (role.type == Type.GROUP) {

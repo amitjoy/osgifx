@@ -92,28 +92,30 @@ public final class ValueConverter {
     public Object convert(final Object value, final XAttributeDefType target) {
         final Class<?> clazz = XAttributeDefType.clazz(target);
         return switch (target) {
-        case STRING_ARRAY -> converter.convert(value).defaultValue(new String[0]).to(String[].class);
-        case STRING_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<String>>() {
-        });
-        case INTEGER_ARRAY -> converter.convert(value).defaultValue(new int[0]).to(int[].class);
-        case INTEGER_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Integer>>() {
-        });
-        case BOOLEAN_ARRAY -> converter.convert(value).defaultValue(new boolean[0]).to(boolean[].class);
-        case BOOLEAN_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Boolean>>() {
-        });
-        case DOUBLE_ARRAY -> converter.convert(value).defaultValue(new double[0]).to(double[].class);
-        case DOUBLE_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Double>>() {
-        });
-        case FLOAT_ARRAY -> converter.convert(value).defaultValue(new float[0]).to(float[].class);
-        case FLOAT_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Float>>() {
-        });
-        case CHAR_ARRAY -> converter.convert(value).defaultValue(new char[0]).to(char[].class);
-        case CHAR_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Character>>() {
-        });
-        case LONG_ARRAY -> converter.convert(value).defaultValue(new long[0]).to(long[].class);
-        case LONG_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Long>>() {
-        });
-        default -> converter.convert(value).defaultValue(clazz == String.class ? "" : null).to(clazz);
+            case STRING_ARRAY -> converter.convert(value).defaultValue(new String[0]).to(String[].class);
+            case STRING_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<String>>() {
+            });
+            case INTEGER_ARRAY -> converter.convert(value).defaultValue(new int[0]).to(int[].class);
+            case INTEGER_LIST -> converter.convert(value).defaultValue(List.of())
+                    .to(new TypeReference<List<Integer>>() {
+                    });
+            case BOOLEAN_ARRAY -> converter.convert(value).defaultValue(new boolean[0]).to(boolean[].class);
+            case BOOLEAN_LIST -> converter.convert(value).defaultValue(List.of())
+                    .to(new TypeReference<List<Boolean>>() {
+                    });
+            case DOUBLE_ARRAY -> converter.convert(value).defaultValue(new double[0]).to(double[].class);
+            case DOUBLE_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Double>>() {
+            });
+            case FLOAT_ARRAY -> converter.convert(value).defaultValue(new float[0]).to(float[].class);
+            case FLOAT_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Float>>() {
+            });
+            case CHAR_ARRAY -> converter.convert(value).defaultValue(new char[0]).to(char[].class);
+            case CHAR_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Character>>() {
+            });
+            case LONG_ARRAY -> converter.convert(value).defaultValue(new long[0]).to(long[].class);
+            case LONG_LIST -> converter.convert(value).defaultValue(List.of()).to(new TypeReference<List<Long>>() {
+            });
+            default -> converter.convert(value).defaultValue(clazz == String.class ? "" : null).to(clazz);
         };
     }
 

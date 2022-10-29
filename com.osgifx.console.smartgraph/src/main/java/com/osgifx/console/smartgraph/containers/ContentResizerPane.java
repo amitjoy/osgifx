@@ -36,11 +36,12 @@ public class ContentResizerPane extends Pane {
         final var scale = new Scale(1, 1);
         content.getTransforms().add(scale);
 
-        resizeFActor.addListener((final ObservableValue<? extends Number> observable, final Number oldValue, final Number newValue) -> {
-            scale.setX(newValue.doubleValue());
-            scale.setY(newValue.doubleValue());
-            requestLayout();
-        });
+        resizeFActor.addListener(
+                (final ObservableValue<? extends Number> observable, final Number oldValue, final Number newValue) -> {
+                    scale.setX(newValue.doubleValue());
+                    scale.setY(newValue.doubleValue());
+                    requestLayout();
+                });
     }
 
     @Override

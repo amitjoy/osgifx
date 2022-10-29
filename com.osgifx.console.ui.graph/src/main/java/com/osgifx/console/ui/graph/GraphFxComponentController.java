@@ -208,8 +208,8 @@ public final class GraphFxComponentController implements GraphController {
             if (filter == null || filter.isBlank()) {
                 filteredComponentsList.setPredicate(s -> true);
             } else {
-                filteredComponentsList
-                        .setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s.name, e)));
+                filteredComponentsList.setPredicate(
+                        s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s.name, e)));
             }
         });
         return filteredComponentsList;
@@ -231,7 +231,8 @@ public final class GraphFxComponentController implements GraphController {
                 progressPane.setVisible(true);
 
                 if (selection == 0) {
-                    logger.atInfo().log("Generating all graph paths for service components that are required by '%s'", selectedComponents);
+                    logger.atInfo().log("Generating all graph paths for service components that are required by '%s'",
+                            selectedComponents);
                     final Collection<GraphPath<ComponentVertex, DefaultEdge>> dependencies = runtimeGraph
                             .getAllServiceComponentsThatAreRequiredBy(selectedComponents);
                     fxGraph = new FxComponentGraph(dependencies);

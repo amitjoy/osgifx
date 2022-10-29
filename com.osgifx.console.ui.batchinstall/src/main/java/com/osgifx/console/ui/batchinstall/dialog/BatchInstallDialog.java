@@ -55,8 +55,8 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
         initStyle(StageStyle.UNDECORATED);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-        dialogPane
-                .setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '" + ARTIFACTS_DIRECTORY + "' directory");
+        dialogPane.setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '"
+                + ARTIFACTS_DIRECTORY + "' directory");
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
 
         final var installButtonType = new ButtonType("Install", OK_DONE);

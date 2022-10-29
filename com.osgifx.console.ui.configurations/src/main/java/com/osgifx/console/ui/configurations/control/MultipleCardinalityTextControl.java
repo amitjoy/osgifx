@@ -177,8 +177,8 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
             readOnlyLabel.setPrefHeight(newValue ? 80 : 26);
         });
 
-        field.errorMessagesProperty()
-                .addListener((observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
+        field.errorMessagesProperty().addListener(
+                (observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
 
         editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
         editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));

@@ -121,7 +121,8 @@ public final class HeapMonitorPane extends BorderPane {
         if (agent != null && agent.getHeapUsage() != null) {
             for (final XMemoryPoolMXBean mpBean : agent.getHeapUsage().memoryPoolBeans) {
                 if ("HEAP".equals(mpBean.type)) {
-                    final var memoryUsageChart = new HeapMonitorChart(mpBean.name, getMemoryUsagedByMemoryPoolBean(mpBean), now);
+                    final var memoryUsageChart = new HeapMonitorChart(mpBean.name,
+                            getMemoryUsagedByMemoryPoolBean(mpBean), now);
                     addToList(memoryUsageChart, vBoxChildren);
                 }
             }
@@ -212,8 +213,8 @@ public final class HeapMonitorPane extends BorderPane {
         borderPane.setRight(createRightPane());
         borderPane.setPadding(new Insets(5, 5, 5, 5));
 
-        final var border = new Border(
-                new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT, new Insets(5)));
+        final var border = new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
+                BorderWidths.DEFAULT, new Insets(5)));
         borderPane.setBorder(border);
         return borderPane;
     }
@@ -238,23 +239,23 @@ public final class HeapMonitorPane extends BorderPane {
         startStopBtn.setMaxWidth(Double.MAX_VALUE);
         startStopBtn.setOnAction(e -> {
             switch (animation.getStatus()) {
-            case RUNNING:
-                animation.pause();
+                case RUNNING:
+                    animation.pause();
 
-                garbageCollectBtn.setDisable(true);
-                heapDumpBtn.setDisable(true);
-                startStopBtn.setText("Start");
+                    garbageCollectBtn.setDisable(true);
+                    heapDumpBtn.setDisable(true);
+                    startStopBtn.setText("Start");
 
-                break;
-            case PAUSED, STOPPED:
-            default:
-                animation.play();
+                    break;
+                case PAUSED, STOPPED:
+                default:
+                    animation.play();
 
-                garbageCollectBtn.setDisable(false);
-                heapDumpBtn.setDisable(false);
-                startStopBtn.setText("Stop");
+                    garbageCollectBtn.setDisable(false);
+                    heapDumpBtn.setDisable(false);
+                    startStopBtn.setText("Stop");
 
-                break;
+                    break;
             }
         });
 
@@ -287,7 +288,8 @@ public final class HeapMonitorPane extends BorderPane {
                     "File: " + heapdump.location + ", size: " + formatByteSize(heapdump.size)));
         } catch (final Exception e) {
             threadSync.asyncExec(() -> {
-                final var message = Optional.ofNullable(e.getMessage()).orElse("Heapdump cannot be created due to runtime errors");
+                final var message = Optional.ofNullable(e.getMessage())
+                        .orElse("Heapdump cannot be created due to runtime errors");
                 Fx.showErrorNotification("Heapdump Processing Error", message);
             });
         }

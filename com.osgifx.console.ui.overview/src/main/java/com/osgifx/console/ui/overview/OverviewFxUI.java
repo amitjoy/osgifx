@@ -156,14 +156,15 @@ public final class OverviewFxUI {
         if (!isConnected) {
             return new OverviewInfo();
         }
-        final var frameworkBsn         = dataProvider.bundles().stream().findFirst().map(b -> b.symbolicName).orElse("");
+        final var frameworkBsn         = dataProvider.bundles().stream().findFirst().map(b -> b.symbolicName)
+                .orElse("");
         final var frameworkVersion     = dataProvider.bundles().stream().findFirst().map(b -> b.version).orElse("");
-        final var osName               = dataProvider.properties().stream().filter(p -> "os.name".equals(p.name)).map(p -> p.value)
-                .map(Object::toString).findAny().orElse("");
-        final var osVersion            = dataProvider.properties().stream().filter(p -> "os.version".equals(p.name)).map(p -> p.value)
-                .map(Object::toString).findAny().orElse("");
-        final var osArchitecture       = dataProvider.properties().stream().filter(p -> "os.arch".equals(p.name)).map(p -> p.value)
-                .map(Object::toString).findAny().orElse("");
+        final var osName               = dataProvider.properties().stream().filter(p -> "os.name".equals(p.name))
+                .map(p -> p.value).map(Object::toString).findAny().orElse("");
+        final var osVersion            = dataProvider.properties().stream().filter(p -> "os.version".equals(p.name))
+                .map(p -> p.value).map(Object::toString).findAny().orElse("");
+        final var osArchitecture       = dataProvider.properties().stream().filter(p -> "os.arch".equals(p.name))
+                .map(p -> p.value).map(Object::toString).findAny().orElse("");
         final var noOfThreads          = dataProvider.threads().size();
         final var noOfInstalledBundles = dataProvider.bundles().size();
         final var noOfServices         = dataProvider.services().size();
@@ -171,8 +172,8 @@ public final class OverviewFxUI {
         final var memoryInfo           = requireNonNullElse(dataProvider.memory(), new XMemoryInfoDTO());
         final var uptime               = toUptimeEntry(memoryInfo.uptime);
 
-        return new OverviewInfo(frameworkBsn, frameworkVersion, osName, osVersion, osArchitecture, noOfThreads, noOfInstalledBundles,
-                noOfServices, noOfComponents, memoryInfo, uptime);
+        return new OverviewInfo(frameworkBsn, frameworkVersion, osName, osVersion, osArchitecture, noOfThreads,
+                noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -302,8 +303,12 @@ public final class OverviewFxUI {
         statusBar.addTo(parent);
     }
 
-    private Node createRuntimeTable(final String frameworkBsn, final String frameworkVersion, final XMemoryInfoDTO memoryInfo,
-            final String osName, final String osVersion, final String osArchitecture) {
+    private Node createRuntimeTable(final String frameworkBsn,
+                                    final String frameworkVersion,
+                                    final XMemoryInfoDTO memoryInfo,
+                                    final String osName,
+                                    final String osVersion,
+                                    final String osArchitecture) {
         final var name = new Label("");
         name.setTextFill(Tile.FOREGROUND);
         name.setAlignment(Pos.CENTER_LEFT);
@@ -378,8 +383,10 @@ public final class OverviewFxUI {
     private UptimeDTO toUptimeEntry(final long uptime) {
         final var days    = (int) TimeUnit.MILLISECONDS.toDays(uptime);
         final var hours   = (int) TimeUnit.MILLISECONDS.toHours(uptime) - days * 24;
-        final var minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(uptime) - TimeUnit.MILLISECONDS.toHours(uptime) * 60);
-        final var seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(uptime) - TimeUnit.MILLISECONDS.toMinutes(uptime) * 60);
+        final var minutes = (int) (TimeUnit.MILLISECONDS.toMinutes(uptime)
+                - TimeUnit.MILLISECONDS.toHours(uptime) * 60);
+        final var seconds = (int) (TimeUnit.MILLISECONDS.toSeconds(uptime)
+                - TimeUnit.MILLISECONDS.toMinutes(uptime) * 60);
 
         return new UptimeDTO(days, hours, minutes, seconds);
     }
@@ -387,8 +394,9 @@ public final class OverviewFxUI {
     private record UptimeDTO(int days, int hours, int minutes, int seconds) {
     }
 
-    private record OverviewInfo(String frameworkBsn, String frameworkVersion, String osName, String osVersion, String osArchitecture,
-            int noOfThreads, int noOfInstalledBundles, int noOfServices, int noOfComponents, XMemoryInfoDTO memoryInfo, UptimeDTO uptime) {
+    private record OverviewInfo(String frameworkBsn, String frameworkVersion, String osName, String osVersion,
+            String osArchitecture, int noOfThreads, int noOfInstalledBundles, int noOfServices, int noOfComponents,
+            XMemoryInfoDTO memoryInfo, UptimeDTO uptime) {
         public OverviewInfo() {
             this("", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
         }
@@ -397,8 +405,8 @@ public final class OverviewFxUI {
     @Inject
     @Optional
     private void updateOnAgentConnectedEvent( //
-            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent) {
+                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+                                             final BorderPane parent) {
         logger.atInfo().log("Agent connected event received");
         dataRetrieverTimeline.play();
         parent.setBottom(null);
@@ -408,8 +416,8 @@ public final class OverviewFxUI {
     @Inject
     @Optional
     private void updateOnAgentDisconnectedEvent( //
-            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent) {
+                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+                                                final BorderPane parent) {
         logger.atInfo().log("Agent disconnected event received");
         dataRetrieverTimeline.stop();
         createTiles(parent);
@@ -423,8 +431,8 @@ public final class OverviewFxUI {
     @Inject
     @Optional
     private void updateOnDataRetrivedEvent( //
-            @UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data, //
-            final BorderPane parent) {
+                                           @UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data, //
+                                           final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
         createTiles(parent);
     }

@@ -79,8 +79,9 @@ public final class FxComponentGraph {
         return graph;
     }
 
-    private boolean containsEdge(final Collection<Edge<String, ComponentVertex>> edges, final ComponentVertex source,
-            final ComponentVertex target) {
+    private boolean containsEdge(final Collection<Edge<String, ComponentVertex>> edges,
+                                 final ComponentVertex source,
+                                 final ComponentVertex target) {
         var isEdgeFound = false;
         for (final Edge<String, ComponentVertex> edge : edges) {
             var isEdgeSourceFound = false;
