@@ -78,20 +78,20 @@ public final class OSGiLogListener implements LogListener {
 
     private String getLevel(final int level) {
         switch (level) {
-        case 0:
-            return "AUDIT";
-        case 1:
-            return "ERROR";
-        case 2:
-            return "WARN";
-        case 3:
-            return "INFO";
-        case 4:
-            return "DEBUG";
-        case 5:
-            return "TRACE";
-        default:
-            return "INFO";
+            case 0:
+                return "AUDIT";
+            case 1:
+                return "ERROR";
+            case 2:
+                return "WARN";
+            case 3:
+                return "INFO";
+            case 4:
+                return "DEBUG";
+            case 5:
+                return "TRACE";
+            default:
+                return "INFO";
         }
     }
 

@@ -96,7 +96,8 @@ public final class BatchInstallHandler {
                 }
                 return null;
             });
-            progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(), () -> taskFuture.cancel(true));
+            progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(),
+                    () -> taskFuture.cancel(true));
         }
     }
 

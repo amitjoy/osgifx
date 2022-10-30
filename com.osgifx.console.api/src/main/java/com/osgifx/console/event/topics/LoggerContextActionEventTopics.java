@@ -22,7 +22,9 @@ public final class LoggerContextActionEventTopics {
     }
 
     public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX = "osgi/fx/console/logger/";
-    public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPICS       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX + "*";
-    public static final String LOGGER_CONTEXT_UPDATED_EVENT_TOPIC       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX + "updated";
+    public static final String LOGGER_CONTEXT_ACTION_EVENT_TOPICS       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX
+            + "*";
+    public static final String LOGGER_CONTEXT_UPDATED_EVENT_TOPIC       = LOGGER_CONTEXT_ACTION_EVENT_TOPIC_PREFIX
+            + "updated";
 
 }

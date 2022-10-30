@@ -76,7 +76,8 @@ public final class SendEventDialog extends Dialog<EventDTO> {
     private final ValueConverter    converter         = new ValueConverter();
     private final ValidationSupport validationSupport = new ValidationSupport();
 
-    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries = Maps.newHashMap();
+    private final Map<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries = Maps
+            .newHashMap();
 
     public void init() {
         final var dialogPane = getDialogPane();
@@ -188,7 +189,8 @@ public final class SendEventDialog extends Dialog<EventDTO> {
             btnAddField    = new Button();
             btnRemoveField = new Button();
 
-            final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
+            final ObservableList<XAttributeDefType> options  = FXCollections
+                    .observableArrayList(XAttributeDefType.values());
             final var                               comboBox = new ComboBox<>(options);
 
             final var type = comboBox.getValue();
@@ -226,8 +228,8 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
             getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 
-            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(txtKey::getText,
-                    () -> getValue(node), comboBox::getValue);
+            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(
+                    txtKey::getText, () -> getValue(node), comboBox::getValue);
             entries.put(this, tuple);
         }
 
@@ -240,52 +242,53 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                 txtField = null;
             }
             switch (type) {
-            case LONG, INTEGER:
-                final var captionAsInt = switch (type) {
-                case LONG -> "Long Number";
-                case INTEGER -> "Integer Number";
-                default -> null;
-                };
-                txtField.setPromptText(captionAsInt);
-                txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                    if (!newValue.matches("\\d*")) {
-                        txtField.setText(newValue.replaceAll("[^\\d]", ""));
-                    }
-                });
-                break;
-            case BOOLEAN:
-                return new ToggleSwitch();
-            case DOUBLE, FLOAT:
-                final var captionAsDouble = "Decimal Number";
-                txtField.setPromptText(captionAsDouble);
-                final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
-                final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                        (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches() ? change
-                                : null));
-                txtField.setTextFormatter(doubleFormatter);
-                break;
-            case CHAR:
-                final var valueCaptionAsChar = "Character Value";
-                txtField.setPromptText(valueCaptionAsChar);
-                final TextFormatter<?> charFormatter = new TextFormatter<>(
-                        (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
-                txtField.setTextFormatter(charFormatter);
-                break;
-            case STRING:
-                final var valueCaptionAsStr = "String Value";
-                txtField.setPromptText(valueCaptionAsStr);
-                break;
-            case PASSWORD:
-                final var valueCaptionAsPwd = "Password Value";
-                final var pwdField = (CustomPasswordField) TextFields.createClearablePasswordField();
-                pwdField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
-                pwdField.setPromptText(valueCaptionAsPwd);
-                return pwdField;
-            case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST,
-                    FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
-                final var valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
-                txtField.setPromptText(valueCaptionAsMultipleCardinality);
-                break;
+                case LONG, INTEGER:
+                    final var captionAsInt = switch (type) {
+                        case LONG -> "Long Number";
+                        case INTEGER -> "Integer Number";
+                        default -> null;
+                    };
+                    txtField.setPromptText(captionAsInt);
+                    txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                        if (!newValue.matches("\\d*")) {
+                            txtField.setText(newValue.replaceAll("[^\\d]", ""));
+                        }
+                    });
+                    break;
+                case BOOLEAN:
+                    return new ToggleSwitch();
+                case DOUBLE, FLOAT:
+                    final var captionAsDouble = "Decimal Number";
+                    txtField.setPromptText(captionAsDouble);
+                    final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
+                    final TextFormatter<?> doubleFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText())
+                                    .matches() ? change : null));
+                    txtField.setTextFormatter(doubleFormatter);
+                    break;
+                case CHAR:
+                    final var valueCaptionAsChar = "Character Value";
+                    txtField.setPromptText(valueCaptionAsChar);
+                    final TextFormatter<?> charFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1
+                                    ? change
+                                    : null));
+                    txtField.setTextFormatter(charFormatter);
+                    break;
+                case STRING:
+                    final var valueCaptionAsStr = "String Value";
+                    txtField.setPromptText(valueCaptionAsStr);
+                    break;
+                case PASSWORD:
+                    final var valueCaptionAsPwd = "Password Value";
+                    final var pwdField = (CustomPasswordField) TextFields.createClearablePasswordField();
+                    pwdField.setLeft(new ImageView(getClass().getResource("/graphic/icons/kv.png").toExternalForm()));
+                    pwdField.setPromptText(valueCaptionAsPwd);
+                    return pwdField;
+                case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
+                    final var valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
+                    txtField.setPromptText(valueCaptionAsMultipleCardinality);
+                    break;
             }
             return txtField;
         }

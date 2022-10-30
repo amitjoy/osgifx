@@ -30,8 +30,8 @@ public class UtilitiesPoint2D {
     /**
      * Rotate a point around a pivot point by a specific degrees amount
      *
-     * @param point         point to rotate
-     * @param pivot         pivot point
+     * @param point point to rotate
+     * @param pivot pivot point
      * @param angle_degrees rotation degrees
      * @return rotated point
      */
@@ -45,7 +45,8 @@ public class UtilitiesPoint2D {
         final var result = point.subtract(pivot);
 
         // rotate point
-        final var rotatedOrigin = new Point2D(result.getX() * cos - result.getY() * sin, result.getX() * sin + result.getY() * cos);
+        final var rotatedOrigin = new Point2D(result.getX() * cos - result.getY() * sin,
+                result.getX() * sin + result.getY() * cos);
 
         return rotatedOrigin.add(pivot);
     }
@@ -53,16 +54,19 @@ public class UtilitiesPoint2D {
     /**
      * Computes the vector of the attractive force between two nodes.
      *
-     * @param from        Coordinates of the first node
-     * @param to          Coordinates of the second node
+     * @param from Coordinates of the first node
+     * @param to Coordinates of the second node
      * @param globalCount Global number of nodes
-     * @param force       Force factor to be used
-     * @param scale       Scale factor to be used
+     * @param force Force factor to be used
+     * @param scale Scale factor to be used
      *
      * @return Computed force vector
      */
-    public static Point2D attractiveForce(final Point2D from, final Point2D to, final int globalCount, final double force,
-            final double scale) {
+    public static Point2D attractiveForce(final Point2D from,
+                                          final Point2D to,
+                                          final int globalCount,
+                                          final double force,
+                                          final double scale) {
 
         final var distance = from.distance(to);
 
@@ -76,7 +80,7 @@ public class UtilitiesPoint2D {
      * Computes the value of the scalar attractive force function based on the given
      * distance of a group of nodes.
      *
-     * @param distance    Distance between two nodes
+     * @param distance Distance between two nodes
      * @param globalCount Global number of nodes
      * @return Computed attractive force
      */
@@ -96,8 +100,8 @@ public class UtilitiesPoint2D {
     /**
      * Computes the vector of the repelling force between two node.
      *
-     * @param from  Coordinates of the first node
-     * @param to    Coordinates of the second node
+     * @param from Coordinates of the first node
+     * @param to Coordinates of the second node
      * @param scale Scale factor to be used
      * @return Computed force vector
      */

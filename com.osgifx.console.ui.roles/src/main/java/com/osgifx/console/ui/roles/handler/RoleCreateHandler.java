@@ -83,8 +83,8 @@ public final class RoleCreateHandler {
 
                         if (response.result == XResultDTO.SUCCESS) {
                             eventBroker.post(ROLE_CREATED_EVENT_TOPIC, name);
-                            threadSync.asyncExec(
-                                    () -> Fx.showSuccessNotification("New Role", "Role - '" + name + "' has been successfully created"));
+                            threadSync.asyncExec(() -> Fx.showSuccessNotification("New Role",
+                                    "Role - '" + name + "' has been successfully created"));
                             logger.atInfo().log("Role - '%s' has been successfully created", name);
                         } else {
                             threadSync.asyncExec(() -> Fx.showErrorNotification("New Role", response.response));

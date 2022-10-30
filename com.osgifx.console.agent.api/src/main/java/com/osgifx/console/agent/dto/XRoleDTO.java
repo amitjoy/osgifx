@@ -23,7 +23,9 @@ import org.osgi.dto.DTO;
 public class XRoleDTO extends DTO {
 
     public enum Type {
-        USER, GROUP, DEFAULT
+        USER,
+        GROUP,
+        DEFAULT
     }
 
     public Type                type;

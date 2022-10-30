@@ -84,20 +84,21 @@ public final class SendEventHandler {
                             return null;
                         }
                         switch (result.result) {
-                        case XResultDTO.SUCCESS:
-                            threadSync.asyncExec(() -> Fx.showSuccessNotification("Send Event", result.response));
-                            logger.atInfo().log("Event sent successfully to '%s'", topic);
-                            break;
-                        case XResultDTO.ERROR:
-                            threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
-                            logger.atError().log("Event could not be sent to '%s'", topic);
-                            break;
-                        case XResultDTO.SKIPPED:
-                            threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
-                            logger.atError().log("Event could not be sent to '%s' because %s", topic, result.response);
-                            break;
-                        default:
-                            break;
+                            case XResultDTO.SUCCESS:
+                                threadSync.asyncExec(() -> Fx.showSuccessNotification("Send Event", result.response));
+                                logger.atInfo().log("Event sent successfully to '%s'", topic);
+                                break;
+                            case XResultDTO.ERROR:
+                                threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
+                                logger.atError().log("Event could not be sent to '%s'", topic);
+                                break;
+                            case XResultDTO.SKIPPED:
+                                threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
+                                logger.atError().log("Event could not be sent to '%s' because %s", topic,
+                                        result.response);
+                                break;
+                            default:
+                                break;
                         }
                     } catch (final Exception e) {
                         logger.atError().withException(e).log("Event could not be sent");

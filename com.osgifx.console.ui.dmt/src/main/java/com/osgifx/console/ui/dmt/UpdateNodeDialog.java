@@ -82,11 +82,14 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
         dialogPane.getButtonTypes().addAll(updateButtonType, ButtonType.CANCEL);
 
         dialogPane.setContent(formRenderer);
-        getDialogPane().lookupButton(updateButtonType).disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
+        getDialogPane().lookupButton(updateButtonType).disableProperty()
+                .bind(form.changedProperty().not().or(form.validProperty().not()));
 
         setResultConverter(dialogButton -> {
             try {
-                return dialogButton == updateButtonType ? new UpdateDialogDTO(dmtNode.uri, getValue(valueField), dmtNode.format) : null;
+                return dialogButton == updateButtonType
+                        ? new UpdateDialogDTO(dmtNode.uri, getValue(valueField), dmtNode.format)
+                        : null;
             } catch (final Exception e) {
                 logger.atError().withException(e).log("DMT node cannot be updated");
                 throw e;
@@ -125,67 +128,67 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
     private Field<?> initNode(final XDmtNodeDTO dmtNode) {
         Field<?> valueField = null;
         switch (dmtNode.format) {
-        case STRING:
-            valueField = Field.ofStringType(dmtNode.value).required(true);
-            break;
-        case BOOLEAN:
-            valueField = Field.ofBooleanType(convert(dmtNode.value, boolean.class));
-            break;
-        case FLOAT:
-            valueField = Field.ofDoubleType(convert(dmtNode.value, double.class)).required(true);
-            break;
-        case LONG, INTEGER:
-            valueField = Field.ofIntegerType(convert(dmtNode.value, int.class)).required(true);
-            break;
-        case NULL:
-            // no need to handle as the value will remain null
-            break;
-        case BINARY:
-            // no need to handle as we are dealing with byte array
-            break;
-        case XML:
-            valueField = Field.ofStringType(dmtNode.value).multiline(true).required(true);
-            break;
-        case BASE64:
-            // no need to handle as we are dealing with byte array
-            break;
-        case DATE:
-            valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
-                try {
-                    final var baseYear              = Year.now().minusYears(40).getValue();
-                    final var originalDateFormatter = new DateTimeFormatterBuilder().appendValueReduced(YEAR, 2, 2, baseYear)
-                            .appendPattern("MMdd").toFormatter();
-                    final var date                  = LocalDate.parse(v, originalDateFormatter);
+            case STRING:
+                valueField = Field.ofStringType(dmtNode.value).required(true);
+                break;
+            case BOOLEAN:
+                valueField = Field.ofBooleanType(convert(dmtNode.value, boolean.class));
+                break;
+            case FLOAT:
+                valueField = Field.ofDoubleType(convert(dmtNode.value, double.class)).required(true);
+                break;
+            case LONG, INTEGER:
+                valueField = Field.ofIntegerType(convert(dmtNode.value, int.class)).required(true);
+                break;
+            case NULL:
+                // no need to handle as the value will remain null
+                break;
+            case BINARY:
+                // no need to handle as we are dealing with byte array
+                break;
+            case XML:
+                valueField = Field.ofStringType(dmtNode.value).multiline(true).required(true);
+                break;
+            case BASE64:
+                // no need to handle as we are dealing with byte array
+                break;
+            case DATE:
+                valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
+                    try {
+                        final var baseYear              = Year.now().minusYears(40).getValue();
+                        final var originalDateFormatter = new DateTimeFormatterBuilder()
+                                .appendValueReduced(YEAR, 2, 2, baseYear).appendPattern("MMdd").toFormatter();
+                        final var date                  = LocalDate.parse(v, originalDateFormatter);
 
-                    date.format(DateTimeFormatter.BASIC_ISO_DATE);
-                    return true;
-                } catch (final Exception ex) {
-                    return false;
-                }
-            }, "DMT date must be in the format of '" + DATE_FORMAT + "'")).required(true);
-            break;
-        case DATE_TIME:
-            valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
-                try {
-                    LocalDateTime.parse(v, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
-                    return true;
-                } catch (final Exception ex) {
-                    return false;
-                }
-            }, "DMT date time must be in the format of '" + DATE_TIME_FORMAT + "'")).required(true);
-            break;
-        case TIME:
-            valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
-                try {
-                    LocalTime.parse(v, DateTimeFormatter.ofPattern(TIME_FORMAT));
-                    return true;
-                } catch (final Exception ex) {
-                    return false;
-                }
-            }, "DMT time must be in the format of '" + TIME_FORMAT + "'")).required(true);
-            break;
-        default:
-            break;
+                        date.format(DateTimeFormatter.BASIC_ISO_DATE);
+                        return true;
+                    } catch (final Exception ex) {
+                        return false;
+                    }
+                }, "DMT date must be in the format of '" + DATE_FORMAT + "'")).required(true);
+                break;
+            case DATE_TIME:
+                valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
+                    try {
+                        LocalDateTime.parse(v, DateTimeFormatter.ofPattern(DATE_TIME_FORMAT));
+                        return true;
+                    } catch (final Exception ex) {
+                        return false;
+                    }
+                }, "DMT date time must be in the format of '" + DATE_TIME_FORMAT + "'")).required(true);
+                break;
+            case TIME:
+                valueField = Field.ofStringType(dmtNode.value).validate(CustomValidator.forPredicate(v -> {
+                    try {
+                        LocalTime.parse(v, DateTimeFormatter.ofPattern(TIME_FORMAT));
+                        return true;
+                    } catch (final Exception ex) {
+                        return false;
+                    }
+                }, "DMT time must be in the format of '" + TIME_FORMAT + "'")).required(true);
+                break;
+            default:
+                break;
         }
         if (valueField != null) {
             return valueField.label("Value");

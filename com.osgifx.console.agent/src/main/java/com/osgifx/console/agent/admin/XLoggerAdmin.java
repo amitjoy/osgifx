@@ -96,16 +96,19 @@ public final class XLoggerAdmin {
     private XResultDTO updateLoggerContextNonPersistently(final String bsn, final Map<String, String> logLevels) {
         final Map<String, LogLevel> levels = toLogLevels(logLevels);
         loggerAdmin.getLoggerContext(bsn).setLogLevels(levels);
-        return createResult(SUCCESS, "The logger context '" + bsn + "' has been updated (non-persistently) successfully");
+        return createResult(SUCCESS,
+                "The logger context '" + bsn + "' has been updated (non-persistently) successfully");
     }
 
-    private XResultDTO updateLoggerContextPersistently(final String bsn, final Map<String, String> logLevels) throws Exception {
+    private XResultDTO updateLoggerContextPersistently(final String bsn, final Map<String, String> logLevels)
+            throws Exception {
         final Map<String, LogLevel> levels           = toLogLevels(logLevels);
         final String                pid              = "org.osgi.service.log.admin|" + bsn;
         final Map<String, Object>   configProperties = levels.entrySet().stream()
                 .collect(toMap(Map.Entry::getKey, e -> e.getValue().name()));
 
-        final ServiceReference<ConfigurationAdmin> serviceReference = context.getServiceReference(ConfigurationAdmin.class);
+        final ServiceReference<ConfigurationAdmin> serviceReference = context
+                .getServiceReference(ConfigurationAdmin.class);
         final ConfigurationAdmin                   service          = context.getService(serviceReference);
         final Configuration                        configuration    = service.getConfiguration(pid, "?");
 

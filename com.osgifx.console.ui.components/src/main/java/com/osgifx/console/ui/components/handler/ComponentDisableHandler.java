@@ -73,8 +73,8 @@ public final class ComponentDisableHandler {
                         logger.atWarning().log(result.response);
                     } else {
                         logger.atError().log(result.response);
-                        threadSync.asyncExec(
-                                () -> FxDialog.showErrorDialog("Component Disable Error", result.response, getClass().getClassLoader()));
+                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Component Disable Error", result.response,
+                                getClass().getClassLoader()));
                     }
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Service component with ID '%s' cannot be disabled", id);

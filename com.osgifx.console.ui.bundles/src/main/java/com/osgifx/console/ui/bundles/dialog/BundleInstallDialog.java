@@ -47,7 +47,8 @@ public final class BundleInstallDialog extends Dialog<BundleInstallDTO> {
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Remote Bundle Install");
-        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));
+        dialogPane.setGraphic(
+                new ImageView(this.getClass().getResource("/graphic/images/remote-install.png").toString()));
 
         final var installButtonType = new ButtonType("Install", ButtonData.OK_DONE);
         dialogPane.getButtonTypes().addAll(installButtonType, ButtonType.CANCEL);

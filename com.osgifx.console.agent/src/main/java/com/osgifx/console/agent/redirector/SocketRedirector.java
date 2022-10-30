@@ -47,7 +47,7 @@ public final class SocketRedirector implements Redirector {
      * Constructor
      *
      * @param agentServer the agent we're working for
-     * @param port        the shell port
+     * @param port the shell port
      */
     public SocketRedirector(final AgentServer agentServer, final int port) throws Exception {
         // We need a thread to read any output from the shell processor

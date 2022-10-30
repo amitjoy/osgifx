@@ -94,7 +94,8 @@ public final class LoggerFacadeController implements BundleActivator {
         StaticLoggerController.setLogService(logService);
         cleanupStaleLoggerReferencesExecutor = Executors
                 .newSingleThreadScheduledExecutor(r -> new Thread(r, CLEANUP_STALE_LOGGER_REFERENCES_THREAD_NAME));
-        cleanupStaleLoggerReferencesExecutor.scheduleAtFixedRate(StaticLoggerController::purgeStaleLoggerReferences, 10, 10, MINUTES);
+        cleanupStaleLoggerReferencesExecutor.scheduleAtFixedRate(StaticLoggerController::purgeStaleLoggerReferences, 10,
+                10, MINUTES);
     }
 
 }

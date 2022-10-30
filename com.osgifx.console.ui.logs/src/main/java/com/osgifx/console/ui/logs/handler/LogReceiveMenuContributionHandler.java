@@ -148,7 +148,8 @@ public final class LogReceiveMenuContributionHandler {
     }
 
     private enum Type {
-        START, STOP
+        START,
+        STOP
     }
 
 }

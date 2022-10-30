@@ -78,9 +78,9 @@ public final class HttpFxUI {
     @Inject
     @Optional
     private void updateControlsOnEvent( //
-            @UIEventTopic(CONFIGURATION_ACTION_EVENT_TOPICS) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                       @UIEventTopic(CONFIGURATION_ACTION_EVENT_TOPICS) final String data, //
+                                       final BorderPane parent, //
+                                       @LocalInstance final FXMLLoader loader) {
         logger.atDebug().log("Configuration action event received");
         createControls(parent, loader);
     }
@@ -88,9 +88,9 @@ public final class HttpFxUI {
     @Inject
     @Optional
     private void updateOnAgentConnectedEvent( //
-            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+                                             final BorderPane parent, //
+                                             @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");
         createControls(parent, loader);
     }
@@ -98,9 +98,9 @@ public final class HttpFxUI {
     @Inject
     @Optional
     private void updateOnAgentDisconnectedEvent( //
-            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+                                                final BorderPane parent, //
+                                                @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
         createControls(parent, loader);
     }

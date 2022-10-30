@@ -53,15 +53,17 @@ public final class GogoRedirector implements Redirector {
      * Create a redirector
      *
      * @param agentServer the server
-     * @param context     the context, needed to get the
+     * @param context the context, needed to get the
      */
     public GogoRedirector(final AgentServer agentServer, final BundleContext context) {
         this.agentServer = agentServer;
-        tracker          = new ServiceTracker<CommandProcessor, CommandProcessor>(context, CommandProcessor.class.getName(), null) {
+        tracker          = new ServiceTracker<CommandProcessor, CommandProcessor>(context,
+                CommandProcessor.class.getName(), null) {
 
                              @Override
                              public CommandProcessor addingService(final ServiceReference<CommandProcessor> reference) {
-                                 final CommandProcessor cp = proxy(CommandProcessor.class, super.addingService(reference));
+                                 final CommandProcessor cp = proxy(CommandProcessor.class,
+                                         super.addingService(reference));
                                  if (processor == null) {
                                      openSession(cp);
                                  }
@@ -70,7 +72,7 @@ public final class GogoRedirector implements Redirector {
 
                              @Override
                              public void removedService(final ServiceReference<CommandProcessor> reference,
-                                     final CommandProcessor service) {
+                                                        final CommandProcessor service) {
                                  super.removedService(reference, service);
                                  if (service == processor) {
                                      closeSession();
@@ -123,7 +125,8 @@ public final class GogoRedirector implements Redirector {
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[] { clazz }, (proxy, method, args) -> {
             final Method targetMethod = targetClass.getMethod(method.getName(), method.getParameterTypes());
             final Object result       = targetMethod.invoke(target, args);
-            if (result != null && method.getReturnType().isInterface() && targetMethod.getReturnType() != method.getReturnType()) {
+            if (result != null && method.getReturnType().isInterface()
+                    && targetMethod.getReturnType() != method.getReturnType()) {
                 try {
                     return proxy(method.getReturnType(), result);
                 } catch (final Exception e) {

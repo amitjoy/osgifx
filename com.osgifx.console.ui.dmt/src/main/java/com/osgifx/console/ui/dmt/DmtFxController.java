@@ -172,22 +172,23 @@ public final class DmtFxController {
         final var updateResult = agent.updateDmtNode(dto.uri(), dto.value(), dto.format());
         logger.atInfo().log("DMT node '%s' update request processed", node.uri);
         switch (updateResult.result) {
-        case XResultDTO.SUCCESS:
-            logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
-            threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", node.uri + "has been updated successfully updated"));
-            eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
-            logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
-            break;
-        case XResultDTO.ERROR:
-            logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
-            threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", updateResult.response));
-            break;
-        case XResultDTO.SKIPPED:
-            logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
-            threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", updateResult.response));
-            break;
-        default:
-            break;
+            case XResultDTO.SUCCESS:
+                logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update",
+                        node.uri + "has been updated successfully updated"));
+                eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
+                logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
+                break;
+            case XResultDTO.ERROR:
+                logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
+                threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", updateResult.response));
+                break;
+            case XResultDTO.SKIPPED:
+                logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", updateResult.response));
+                break;
+            default:
+                break;
         }
     }
 

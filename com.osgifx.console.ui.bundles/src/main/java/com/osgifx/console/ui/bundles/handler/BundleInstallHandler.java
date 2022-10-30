@@ -97,7 +97,8 @@ public final class BundleInstallHandler {
                                 bundle.symbolicName + " successfully installed/updated"));
                     } catch (final Exception e) {
                         logger.atError().withException(e).log("Bundle cannot be installed or updated");
-                        threadSync.asyncExec(() -> Fx.showErrorNotification("Remote Bundle Install", "Bundle cannot be installed/updated"));
+                        threadSync.asyncExec(() -> Fx.showErrorNotification("Remote Bundle Install",
+                                "Bundle cannot be installed/updated"));
                     }
                     return null;
                 }

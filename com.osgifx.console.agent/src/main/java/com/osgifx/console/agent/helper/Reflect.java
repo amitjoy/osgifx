@@ -56,9 +56,9 @@ public class Reflect {
      * This is the same as calling
      * <code>onClass(Class.forName(name, classLoader))</code>
      *
-     * @param name        A fully qualified class name.
+     * @param name A fully qualified class name.
      * @param classLoader The class loader in whose context the class should be
-     *                    loaded.
+     *            loaded.
      * @return A wrapped class object, to be used for further reflection.
      * @throws ReflectException If any reflection exception occurred.
      * @see #onClass(Class)
@@ -114,7 +114,8 @@ public class Reflect {
 
         if (accessible instanceof Member) {
             final Member member = (Member) accessible;
-            if (Modifier.isPublic(member.getModifiers()) && Modifier.isPublic(member.getDeclaringClass().getModifiers())) {
+            if (Modifier.isPublic(member.getModifiers())
+                    && Modifier.isPublic(member.getDeclaringClass().getModifiers())) {
                 return accessible;
             }
         }
@@ -212,7 +213,7 @@ public class Reflect {
      * ... and <a href=
      * "http://pveentjer.blogspot.co.at/2017/01/final-static-boolean-jit.html">http://pveentjer.blogspot.co.at/2017/01/final-static-boolean-jit.html</a>
      *
-     * @param name  The field name
+     * @param name The field name
      * @param value The new field value
      * @return The same wrapped object, to be used for further reflection.
      * @throws ReflectException If any reflection exception occurred.
@@ -257,7 +258,7 @@ public class Reflect {
      * @see #field(String)
      */
     public <T> T get(final String name) throws ReflectException {
-        return field(name).<T>get();
+        return field(name).<T> get();
     }
 
     /**
@@ -471,16 +472,17 @@ public class Reflect {
             t = t.getSuperclass();
         } while (t != null);
 
-        throw new NoSuchMethodException(
-                "No similar method " + name + " with params " + Arrays.toString(types) + " could be found on type " + type() + ".");
+        throw new NoSuchMethodException("No similar method " + name + " with params " + Arrays.toString(types)
+                + " could be found on type " + type() + ".");
     }
 
     /**
      * Determines if a method has a "similar" signature, especially if wrapping
      * primitive argument types would result in an exactly matching signature.
      */
-    private boolean isSimilarSignature(final Method possiblyMatchingMethod, final String desiredMethodName,
-            final Class<?>[] desiredParamTypes) {
+    private boolean isSimilarSignature(final Method possiblyMatchingMethod,
+                                       final String desiredMethodName,
+                                       final Class<?>[] desiredParamTypes) {
         return possiblyMatchingMethod.getName().equals(desiredMethodName)
                 && match(possiblyMatchingMethod.getParameterTypes(), desiredParamTypes);
     }
@@ -561,7 +563,7 @@ public class Reflect {
      * Create a pro(tom i, , aram) -> rface type that is implemented by the proxy
      *
      * @param additionalInterfaces Additional interfaces that are implemented by the
-     *                             proxy
+     *            proxy
      * @return A proxy for the wrapped object
      */
     @SuppressWarnings("unchecked")
@@ -599,8 +601,9 @@ public class Reflect {
                                                         // Java 9 version for Java 8 distribution
                                                         if (proxyLookup == null) {
                                                             proxyLookup = onClass(MethodHandles.class)
-                                                                    .call("privateLookupIn", proxyType, MethodHandles.lookup())
-                                                                    .call("in", proxyType).<Lookup>get();
+                                                                    .call("privateLookupIn", proxyType,
+                                                                            MethodHandles.lookup())
+                                                                    .call("in", proxyType).<Lookup> get();
                                                         }
                                                     } else {
                                                         proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);

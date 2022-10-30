@@ -68,7 +68,8 @@ public final class BundleUninstallHandler {
                         eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
                     } else {
                         logger.atError().log(error);
-                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Uninstall Error", error, getClass().getClassLoader()));
+                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Uninstall Error", error,
+                                getClass().getClassLoader()));
                     }
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);

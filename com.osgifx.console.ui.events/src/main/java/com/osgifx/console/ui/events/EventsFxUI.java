@@ -85,27 +85,27 @@ public final class EventsFxUI {
     @Inject
     @Optional
     private void updateOnEventReceiveStarted( //
-            @UIEventTopic(EVENT_RECEIVE_STARTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                             @UIEventTopic(EVENT_RECEIVE_STARTED_EVENT_TOPIC) final String data, //
+                                             final BorderPane parent, //
+                                             @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
     }
 
     @Inject
     @Optional
     private void updateOnEventReceiveStopped( //
-            @UIEventTopic(EVENT_RECEIVE_STOPPED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                             @UIEventTopic(EVENT_RECEIVE_STOPPED_EVENT_TOPIC) final String data, //
+                                             final BorderPane parent, //
+                                             @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
     }
 
     @Inject
     @Optional
     private void updateOnAgentConnectedEvent( //
-            @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+                                             final BorderPane parent, //
+                                             @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");
         createControls(parent, loader);
     }
@@ -113,9 +113,9 @@ public final class EventsFxUI {
     @Inject
     @Optional
     private void updateOnAgentDisconnectedEvent( //
-            @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-            final BorderPane parent, //
-            @LocalInstance final FXMLLoader loader) {
+                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+                                                final BorderPane parent, //
+                                                @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
         createControls(parent, loader);
     }

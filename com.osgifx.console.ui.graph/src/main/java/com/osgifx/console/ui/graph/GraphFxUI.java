@@ -112,8 +112,8 @@ public final class GraphFxUI {
     private void createControls() {
         initStatusBar();
         if (loadedController == null) {
-            threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type", getClass().getClassLoader(),
-                    "/graphic/images/graph.png", strType -> {
+            threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type",
+                    getClass().getClassLoader(), "/graphic/images/graph.png", strType -> {
                         final Task<Void> task = new Task<>() {
                             @Override
                             protected Void call() throws Exception {

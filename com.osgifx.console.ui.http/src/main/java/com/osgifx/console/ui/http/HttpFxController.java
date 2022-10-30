@@ -81,7 +81,8 @@ public final class HttpFxController {
         final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
         final var controller     = (HttpDetailsFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XHttpComponentDTO>(current -> {
-                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                     if (previouslyExpanded != null
+                                             && current.getValue() == previouslyExpanded.getValue()) {
                                          return expandedNode;
                                      }
                                      if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {

@@ -99,7 +99,8 @@ public final class ClassloaderLeakDetector implements Runnable {
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
     @Inject
-    public ClassloaderLeakDetector(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+    public ClassloaderLeakDetector(final BundleContext context,
+            final BundleStartTimeCalculator bundleStartTimeCalculator) {
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
     }
@@ -180,7 +181,8 @@ public final class ClassloaderLeakDetector implements Runnable {
     }
 
     public Set<XBundleDTO> getSuspiciousBundles() {
-        final Set<Long>        activeBundleIds   = Stream.of(context.getBundles()).map(Bundle::getBundleId).collect(toSet());
+        final Set<Long>        activeBundleIds   = Stream.of(context.getBundles()).map(Bundle::getBundleId)
+                .collect(toSet());
         final List<BundleInfo> suspiciousBundles = new ArrayList<>(bundleInfos.values());
         // filter out ACTIVE bundles that have only one classloader created for them
         suspiciousBundles.removeIf(bi -> bi.hasSingleInstance() && activeBundleIds.contains(bi.bundleId));

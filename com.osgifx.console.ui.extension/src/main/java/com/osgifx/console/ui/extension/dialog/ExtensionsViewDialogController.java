@@ -92,7 +92,8 @@ public final class ExtensionsViewDialogController {
                         extensions.addAll(Stream.of(existingExtensions).map(this::toDTO).toList());
 
                         // show information about the restart of the application
-                        FxDialog.showInfoDialog(header, "The application must be restarted, therefore, will be shut down right away",
+                        FxDialog.showInfoDialog(header,
+                                "The application must be restarted, therefore, will be shut down right away",
                                 getClass().getClassLoader(), btn -> workbench.restart());
                     });
                 }

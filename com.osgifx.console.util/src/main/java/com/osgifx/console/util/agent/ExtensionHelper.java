@@ -14,11 +14,15 @@ public final class ExtensionHelper {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
-    public static <R extends DTO> R executeExtension(final Agent agent, final String name, final DTO context, final Class<R> resultType) {
+    public static <R extends DTO> R executeExtension(final Agent agent,
+                                                     final String name,
+                                                     final DTO context,
+                                                     final Class<R> resultType) {
         try {
             final var                 converter        = Converters.standardConverter();
-            final Map<String, Object> properties       = converter.convert(context).to(new TypeReference<Map<String, Object>>() {
-                                                       });
+            final Map<String, Object> properties       = converter.convert(context)
+                    .to(new TypeReference<Map<String, Object>>() {
+                                                               });
             final var                 executeExtension = agent.executeExtension(name, properties);
             return converter.convert(executeExtension).to(resultType);
         } catch (final Exception e) {
