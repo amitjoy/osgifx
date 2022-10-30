@@ -54,7 +54,10 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
     private ClassLoader                classLoader;
     private final List<PropertiesForm> entries = Lists.newArrayList();
 
-    public void init(final String key, final XAttributeDefType targetType, final String textInput, final ClassLoader classLoader) {
+    public void init(final String key,
+                     final XAttributeDefType targetType,
+                     final String textInput,
+                     final ClassLoader classLoader) {
         this.classLoader = classLoader;
         final var dialogPane = getDialogPane();
 
@@ -177,44 +180,46 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             }
             if (txtField != null) {
                 switch (type) {
-                case LONG_ARRAY, LONG_LIST, INTEGER_ARRAY, INTEGER_LIST:
-                    final var valueCaptionAsInt = switch (type) {
-                    case LONG_ARRAY, LONG_LIST -> "Long Number";
-                    case INTEGER_ARRAY, INTEGER_LIST -> "Integer Number";
-                    default -> "";
-                    };
-                    txtField.setPromptText(valueCaptionAsInt);
-                    txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                        if (!newValue.matches("\\d*")) {
-                            txtField.setText(newValue.replaceAll("[^\\d]", ""));
-                        }
-                    });
-                    break;
-                case BOOLEAN_ARRAY, BOOLEAN_LIST:
-                    final var toggleSwitch = new ToggleSwitch();
-                    toggleSwitch.setSelected(Boolean.parseBoolean(initValue));
-                    return toggleSwitch;
-                case DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST:
-                    final var valueCaptionAsDouble = "Decimal Number";
-                    txtField.setPromptText(valueCaptionAsDouble);
-                    final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
-                    final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches() ? change
-                                    : null));
-                    txtField.setTextFormatter(doubleFormatter);
-                    break;
-                case CHAR_ARRAY, CHAR_LIST:
-                    final var valueCaptionAsChar = "Character Value";
-                    txtField.setPromptText(valueCaptionAsChar);
-                    final TextFormatter<?> charFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
-                    txtField.setTextFormatter(charFormatter);
-                    break;
-                case STRING_ARRAY, STRING_LIST:
-                default:
-                    final var valueCaptionAsStr = "String Value";
-                    txtField.setPromptText(valueCaptionAsStr);
-                    break;
+                    case LONG_ARRAY, LONG_LIST, INTEGER_ARRAY, INTEGER_LIST:
+                        final var valueCaptionAsInt = switch (type) {
+                            case LONG_ARRAY, LONG_LIST -> "Long Number";
+                            case INTEGER_ARRAY, INTEGER_LIST -> "Integer Number";
+                            default -> "";
+                        };
+                        txtField.setPromptText(valueCaptionAsInt);
+                        txtField.textProperty()
+                                .addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                                    if (!newValue.matches("\\d*")) {
+                                        txtField.setText(newValue.replaceAll("[^\\d]", ""));
+                                    }
+                                });
+                        break;
+                    case BOOLEAN_ARRAY, BOOLEAN_LIST:
+                        final var toggleSwitch = new ToggleSwitch();
+                        toggleSwitch.setSelected(Boolean.parseBoolean(initValue));
+                        return toggleSwitch;
+                    case DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST:
+                        final var valueCaptionAsDouble = "Decimal Number";
+                        txtField.setPromptText(valueCaptionAsDouble);
+                        final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
+                        final TextFormatter<?> doubleFormatter = new TextFormatter<>(
+                                (UnaryOperator<TextFormatter.Change>) change -> (pattern
+                                        .matcher(change.getControlNewText()).matches() ? change : null));
+                        txtField.setTextFormatter(doubleFormatter);
+                        break;
+                    case CHAR_ARRAY, CHAR_LIST:
+                        final var valueCaptionAsChar = "Character Value";
+                        txtField.setPromptText(valueCaptionAsChar);
+                        final TextFormatter<?> charFormatter = new TextFormatter<>(
+                                (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText()
+                                        .length() == 1 ? change : null));
+                        txtField.setTextFormatter(charFormatter);
+                        break;
+                    case STRING_ARRAY, STRING_LIST:
+                    default:
+                        final var valueCaptionAsStr = "String Value";
+                        txtField.setPromptText(valueCaptionAsStr);
+                        break;
                 }
             }
             return txtField;

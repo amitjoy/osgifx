@@ -44,10 +44,10 @@ public interface DataProvider {
     /**
      * Retrieves information from the remote runtime
      *
-     * @param id      the identifier to execute a specific information, otherwise,
-     *                set to {@code null} to retrieve all informations
+     * @param id the identifier to execute a specific information, otherwise,
+     *            set to {@code null} to retrieve all informations
      * @param isAsync set to {@code true} if the information needs to be retrieved
-     *                asynchronously
+     *            asynchronously
      */
     void retrieveInfo(String id, boolean isAsync);
 

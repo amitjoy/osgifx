@@ -54,7 +54,7 @@ final class StaticLoggerController {
      * Retrieve a {@link Logger} instance depending on given bundle and logger name.
      *
      * @param bundle bundle that wants to log
-     * @param name   name of the logger
+     * @param name name of the logger
      * @return a newly created or existing {@link Logger} instance
      */
     static Logger createLogger(final Bundle bundle, final String name) {
@@ -153,7 +153,8 @@ final class StaticLoggerController {
     }
 
     private static Stream<Slf4jLoggerFacade> getLoggerFacades() {
-        return loggerFacades.values().stream().flatMap(c -> c.values().stream()).map(WeakReference::get).filter(Objects::nonNull);
+        return loggerFacades.values().stream().flatMap(c -> c.values().stream()).map(WeakReference::get)
+                .filter(Objects::nonNull);
     }
 
     private static Stream<Slf4jLoggerFacade> getLoggerFacadesForBundle(final Bundle bundle) {
@@ -167,8 +168,8 @@ final class StaticLoggerController {
     static void purgeStaleLoggerReferences() {
         lock.lock();
         try {
-            loggerFacades.values().stream().forEach(
-                    bundleMap -> bundleMap.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().get() == null));
+            loggerFacades.values().stream().forEach(bundleMap -> bundleMap.entrySet()
+                    .removeIf(entry -> entry.getValue() == null || entry.getValue().get() == null));
             loggerFacades.entrySet().removeIf(entry -> entry.getValue().isEmpty());
         } finally {
             lock.unlock();

@@ -88,7 +88,10 @@ public final class XDmtAdmin {
         }
     }
 
-    private XResultDTO updateNode(final DmtSession session, final String uri, final Object value, final DmtDataType format)
+    private XResultDTO updateNode(final DmtSession session,
+                                  final String uri,
+                                  final Object value,
+                                  final DmtDataType format)
             throws DmtException {
         session.setNodeValue(uri, convertValue(value, format));
         return createResult(SUCCESS, "DMT node has been successfully updated");
@@ -96,25 +99,25 @@ public final class XDmtAdmin {
 
     private DmtData convertValue(final Object value, final DmtDataType format) {
         switch (format) {
-        case BOOLEAN:
-            return new DmtData(Boolean.parseBoolean(value.toString()));
-        case FLOAT:
-            return new DmtData(Float.parseFloat(value.toString()));
-        case INTEGER:
-            return new DmtData(Integer.parseInt(value.toString()));
-        case LONG:
-            return new DmtData(Long.parseLong(value.toString()));
-        case STRING:
-        case DATE:
-        case DATE_TIME:
-        case XML:
-        case TIME:
-            return new DmtData(value.toString());
-        case BASE64:
-        case BINARY:
-        case NULL:
-        default:
-            return null;
+            case BOOLEAN:
+                return new DmtData(Boolean.parseBoolean(value.toString()));
+            case FLOAT:
+                return new DmtData(Float.parseFloat(value.toString()));
+            case INTEGER:
+                return new DmtData(Integer.parseInt(value.toString()));
+            case LONG:
+                return new DmtData(Long.parseLong(value.toString()));
+            case STRING:
+            case DATE:
+            case DATE_TIME:
+            case XML:
+            case TIME:
+                return new DmtData(value.toString());
+            case BASE64:
+            case BINARY:
+            case NULL:
+            default:
+                return null;
         }
     }
 
@@ -140,7 +143,10 @@ public final class XDmtAdmin {
         }
     }
 
-    private XDmtNodeDTO createNode(final DmtSession session, final String uri, final XDmtNodeDTO parent, final boolean isRoot)
+    private XDmtNodeDTO createNode(final DmtSession session,
+                                   final String uri,
+                                   final XDmtNodeDTO parent,
+                                   final boolean isRoot)
             throws DmtException {
         final List<String> data = extractData(session, uri, isRoot);
         final XDmtNodeDTO  node = new XDmtNodeDTO();

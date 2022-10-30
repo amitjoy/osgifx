@@ -85,15 +85,15 @@ public class TypedAttribute {
         for (var i = 0; i < v.length(); i++) {
             final var c = v.charAt(i);
             switch (c) {
-            case '\\':
-                sb.append("\\\\");
-                break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
 
-            case ',':
-                sb.append("\\,");
-            default:
-                sb.append(c);
-                break;
+                case ',':
+                    sb.append("\\,");
+                default:
+                    sb.append(c);
+                    break;
             }
         }
         return sb.toString();

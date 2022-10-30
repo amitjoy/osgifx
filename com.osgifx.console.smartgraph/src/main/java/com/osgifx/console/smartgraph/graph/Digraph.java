@@ -74,13 +74,13 @@ public interface Digraph<V, E> extends Graph<V, E> {
      * <code>outbound &lt;-- inbound</code>, they are not considered adjacent.
      *
      * @param outbound outbound vertex
-     * @param inbound  inbound vertex
+     * @param inbound inbound vertex
      *
      * @return true if they are adjacent, false otherwise.
      *
      * @exception InvalidVertexException if <code>outbound</code> or
-     *                                   <code>inbound</code> are invalid vertices
-     *                                   for the graph
+     *                <code>inbound</code> are invalid vertices
+     *                for the graph
      */
     @Override
     boolean areAdjacent(Vertex<V> outbound, Vertex<V> inbound) throws InvalidVertexException;
@@ -89,49 +89,51 @@ public interface Digraph<V, E> extends Graph<V, E> {
      * Inserts a new edge with a given element between two existing vertices and
      * return its (the edge's) reference.
      *
-     * @param outbound    outbound vertex
-     * @param inbound     inbound vertex
+     * @param outbound outbound vertex
+     * @param inbound inbound vertex
      * @param edgeElement the element to store in the new edge
      *
      * @return the reference for the newly created edge
      *
      * @exception InvalidVertexException if <code>outbound</code> or
-     *                                   <code>inbound</code> are invalid vertices
-     *                                   for the graph
+     *                <code>inbound</code> are invalid vertices
+     *                for the graph
      *
-     * @exception InvalidEdgeException   if there already exists an edge containing
-     *                                   <code>edgeElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object)}
-     *                                   method.
+     * @exception InvalidEdgeException if there already exists an edge containing
+     *                <code>edgeElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object)}
+     *                method.
      */
     @Override
-    Edge<E, V> insertEdge(Vertex<V> outbound, Vertex<V> inbound, E edgeElement) throws InvalidVertexException, InvalidEdgeException;
+    Edge<E, V> insertEdge(Vertex<V> outbound, Vertex<V> inbound, E edgeElement)
+            throws InvalidVertexException, InvalidEdgeException;
 
     /**
      * Inserts a new edge with a given element between two existing vertices and
      * return its (the edge's) reference.
      *
      * @param outboundElement outbound vertex's stored element
-     * @param inboundElement  inbound vertex's stored element
-     * @param edgeElement     element to store in the new edge
+     * @param inboundElement inbound vertex's stored element
+     * @param edgeElement element to store in the new edge
      *
      * @return the reference for the newly created edge
      *
      * @exception InvalidVertexException if <code>outboundElement</code> or
-     *                                   <code>inboundElement</code> are not found
-     *                                   in any vertices of the graph according to
-     *                                   the equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     *                <code>inboundElement</code> are not found
+     *                in any vertices of the graph according to
+     *                the equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      *
-     * @exception InvalidEdgeException   if there already exists an edge containing
-     *                                   <code>edgeElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     * @exception InvalidEdgeException if there already exists an edge containing
+     *                <code>edgeElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      */
     @Override
-    Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement) throws InvalidVertexException, InvalidEdgeException;
+    Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement)
+            throws InvalidVertexException, InvalidEdgeException;
 
 }

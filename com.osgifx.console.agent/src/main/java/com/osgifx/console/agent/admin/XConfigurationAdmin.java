@@ -90,7 +90,8 @@ public final class XConfigurationAdmin {
             executeUpdate(configuration, newProperties);
             result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been " + action);
         } catch (final Exception e) {
-            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
+            result = createResult(ERROR,
+                    "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
         }
         return result;
     }
@@ -124,7 +125,8 @@ public final class XConfigurationAdmin {
                 result = createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
             }
         } catch (final Exception e) {
-            result = createResult(ERROR, "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
+            result = createResult(ERROR,
+                    "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
         }
         return result;
     }
@@ -139,7 +141,8 @@ public final class XConfigurationAdmin {
             configuration.update(new Hashtable<>(newProperties));
             result = createResult(SUCCESS, "Configuration with factory PID '" + factoryPid + " ' has been created");
         } catch (final Exception e) {
-            result = createResult(ERROR, "Configuration with factory PID '" + factoryPid + "' cannot be created due to " + e.getMessage());
+            result = createResult(ERROR,
+                    "Configuration with factory PID '" + factoryPid + "' cannot be created due to " + e.getMessage());
         }
         return result;
     }
@@ -151,7 +154,8 @@ public final class XConfigurationAdmin {
             return dtos;
         }
         for (final Configuration config : configs) {
-            final boolean hasMetatype = metatype == null ? false : XMetaTypeAdmin.hasMetatype(context, metatype, config);
+            final boolean hasMetatype = metatype == null ? false
+                    : XMetaTypeAdmin.hasMetatype(context, metatype, config);
             if (!hasMetatype) {
                 dtos.add(toConfigDTO(config));
             }

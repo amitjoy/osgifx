@@ -87,7 +87,7 @@ public interface Graph<V, E> {
      * @return opposite vertex along <code>e</code>
      *
      * @exception InvalidVertexException if the vertex is invalid for the graph
-     * @exception InvalidEdgeException   if the edge is invalid for the graph
+     * @exception InvalidEdgeException if the edge is invalid for the graph
      */
     Vertex<V> opposite(Vertex<V> v, Edge<E, V> e) throws InvalidVertexException, InvalidEdgeException;
 
@@ -101,7 +101,7 @@ public interface Graph<V, E> {
      * @return true if they are adjacent, false otherwise.
      *
      * @exception InvalidVertexException if <code>u</code> or <code>v</code> are
-     *                                   invalid vertices for the graph
+     *                invalid vertices for the graph
      */
     boolean areAdjacent(Vertex<V> u, Vertex<V> v) throws InvalidVertexException;
 
@@ -113,10 +113,10 @@ public interface Graph<V, E> {
      * @return the reference of the newly created vertex
      *
      * @exception InvalidVertexException if there already exists a vertex containing
-     *                                   <code>vElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     *                <code>vElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      * 
      */
     Vertex<V> insertVertex(V vElement) throws InvalidVertexException;
@@ -125,20 +125,20 @@ public interface Graph<V, E> {
      * Inserts a new edge with a given element between two existing vertices and
      * return its (the edge's) reference.
      *
-     * @param u           a vertex
-     * @param v           another vertex
+     * @param u a vertex
+     * @param v another vertex
      * @param edgeElement the element to store in the new edge
      *
      * @return the reference for the newly created edge
      *
      * @exception InvalidVertexException if <code>u</code> or <code>v</code> are
-     *                                   invalid vertices for the graph
+     *                invalid vertices for the graph
      *
-     * @exception InvalidEdgeException   if there already exists an edge containing
-     *                                   <code>edgeElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     * @exception InvalidEdgeException if there already exists an edge containing
+     *                <code>edgeElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      */
     Edge<E, V> insertEdge(Vertex<V> u, Vertex<V> v, E edgeElement) throws InvalidVertexException, InvalidEdgeException;
 
@@ -146,24 +146,24 @@ public interface Graph<V, E> {
      * Inserts a new edge with a given element between two existing vertices and
      * return its (the edge's) reference.
      *
-     * @param vElement1   a vertex's stored element
-     * @param vElement2   another vertex's stored element
+     * @param vElement1 a vertex's stored element
+     * @param vElement2 another vertex's stored element
      * @param edgeElement the element to store in the new edge
      *
      * @return the reference for the newly created edge
      *
      * @exception InvalidVertexException if <code>vElement1</code> or
-     *                                   <code>vElement2</code> are not found in any
-     *                                   vertices of the graph according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     *                <code>vElement2</code> are not found in any
+     *                vertices of the graph according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      *
-     * @exception InvalidEdgeException   if there already exists an edge containing
-     *                                   <code>edgeElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     * @exception InvalidEdgeException if there already exists an edge containing
+     *                <code>edgeElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      */
     Edge<E, V> insertEdge(V vElement1, V vElement2, E edgeElement) throws InvalidVertexException, InvalidEdgeException;
 
@@ -176,7 +176,7 @@ public interface Graph<V, E> {
      * @return element stored at the removed vertex
      *
      * @exception InvalidVertexException if <code>v</code> is an invalid vertex for
-     *                                   the graph
+     *                the graph
      */
     V removeVertex(Vertex<V> v) throws InvalidVertexException;
 
@@ -188,7 +188,7 @@ public interface Graph<V, E> {
      * @return element stored at the removed edge
      *
      * @exception InvalidEdgeException if <code>e</code> is an invalid edge for the
-     *                                 graph.
+     *                graph.
      */
     E removeEdge(Edge<E, V> e) throws InvalidEdgeException;
 
@@ -196,18 +196,18 @@ public interface Graph<V, E> {
      * Replaces the element of a given vertex with a new element and returns the
      * previous element stored at <code>v</code>.
      *
-     * @param v          vertex to replace its element
+     * @param v vertex to replace its element
      * @param newElement new element to store in <code>v</code>
      *
      * @return previous element previously stored in <code>v</code>
      *
      * @exception InvalidVertexException if the vertex <code>v</code> is invalid for
-     *                                   the graph, or; if there already exists
-     *                                   another vertex containing the element
-     *                                   <code>newElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object) }
-     *                                   method.
+     *                the graph, or; if there already exists
+     *                another vertex containing the element
+     *                <code>newElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object) }
+     *                method.
      */
     V replace(Vertex<V> v, V newElement) throws InvalidVertexException;
 
@@ -215,18 +215,18 @@ public interface Graph<V, E> {
      * Replaces the element of a given edge with a new element and returns the
      * previous element stored at <code>e</code>.
      *
-     * @param e          edge to replace its element
+     * @param e edge to replace its element
      * @param newElement new element to store in <code>e</code>
      *
      * @return previous element previously stored in <code>e</code>
      *
      * @exception InvalidVertexException if the edge <code>e</code> is invalid for
-     *                                   the graph, or; if there already exists
-     *                                   another edge containing the element
-     *                                   <code>newElement</code> according to the
-     *                                   equality of
-     *                                   {@link Object#equals(java.lang.Object)}
-     *                                   method.
+     *                the graph, or; if there already exists
+     *                another edge containing the element
+     *                <code>newElement</code> according to the
+     *                equality of
+     *                {@link Object#equals(java.lang.Object)}
+     *                method.
      */
     E replace(Edge<E, V> e, E newElement) throws InvalidEdgeException;
 }

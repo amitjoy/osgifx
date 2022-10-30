@@ -83,7 +83,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         dialogPane.setHeaderText("Create New Configuration for OSGi Configuration Admin");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/configuration.png").toString()));
+        dialogPane
+                .setGraphic(new ImageView(this.getClass().getResource("/graphic/images/configuration.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         final var txtPid = (CustomTextField) TextFields.createClearableTextField();
@@ -143,7 +144,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         });
     }
 
-    private ConfigurationDTO getInput(final CustomTextField txtPid, final CustomTextField txtFactoryPid) throws Exception {
+    private ConfigurationDTO getInput(final CustomTextField txtPid, final CustomTextField txtFactoryPid)
+            throws Exception {
         final List<ConfigValue> properties = Lists.newArrayList();
         for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : configurationEntries
                 .entrySet()) {
@@ -185,7 +187,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
             btnAddField    = new Button();
             btnRemoveField = new Button();
 
-            final ObservableList<XAttributeDefType> options  = FXCollections.observableArrayList(XAttributeDefType.values());
+            final ObservableList<XAttributeDefType> options  = FXCollections
+                    .observableArrayList(XAttributeDefType.values());
             final var                               comboBox = new ComboBox<>(options);
 
             final var type = comboBox.getValue();
@@ -223,8 +226,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
             getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 
-            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(txtKey::getText,
-                    () -> getValue(node), comboBox::getValue);
+            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(
+                    txtKey::getText, () -> getValue(node), comboBox::getValue);
             configurationEntries.put(this, tuple);
         }
 
@@ -237,51 +240,52 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                 txtField = null;
             }
             switch (type) {
-            case LONG, INTEGER:
-                final var captionAsInt = switch (type) {
-                case LONG -> "Long Number";
-                case INTEGER -> "Integer Number";
-                default -> null;
-                };
-                txtField.setPromptText(captionAsInt);
-                txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                    if (!newValue.matches("\\d*")) {
-                        txtField.setText(newValue.replaceAll("[^\\d]", ""));
-                    }
-                });
-                break;
-            case BOOLEAN:
-                return new ToggleSwitch();
-            case DOUBLE, FLOAT:
-                final var captionAsDouble = "Decimal Number";
-                txtField.setPromptText(captionAsDouble);
-                final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
-                final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                        (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText()).matches() ? change
-                                : null));
-                txtField.setTextFormatter(doubleFormatter);
-                break;
-            case CHAR:
-                final var valueCaptionAsChar = "Character Value";
-                txtField.setPromptText(valueCaptionAsChar);
-                final TextFormatter<?> charFormatter = new TextFormatter<>(
-                        (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1 ? change : null));
-                txtField.setTextFormatter(charFormatter);
-                break;
-            case STRING:
-                final var valueCaptionAsStr = "String Value";
-                txtField.setPromptText(valueCaptionAsStr);
-                break;
-            case PASSWORD:
-                final var valueCaptionAsPwd = "Password Value";
-                final var pwdField = new PeekablePasswordField();
-                pwdField.setPromptText(valueCaptionAsPwd);
-                return pwdField;
-            case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST,
-                    FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
-                final var valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
-                txtField.setPromptText(valueCaptionAsMultipleCardinality);
-                break;
+                case LONG, INTEGER:
+                    final var captionAsInt = switch (type) {
+                        case LONG -> "Long Number";
+                        case INTEGER -> "Integer Number";
+                        default -> null;
+                    };
+                    txtField.setPromptText(captionAsInt);
+                    txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                        if (!newValue.matches("\\d*")) {
+                            txtField.setText(newValue.replaceAll("[^\\d]", ""));
+                        }
+                    });
+                    break;
+                case BOOLEAN:
+                    return new ToggleSwitch();
+                case DOUBLE, FLOAT:
+                    final var captionAsDouble = "Decimal Number";
+                    txtField.setPromptText(captionAsDouble);
+                    final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
+                    final TextFormatter<?> doubleFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText())
+                                    .matches() ? change : null));
+                    txtField.setTextFormatter(doubleFormatter);
+                    break;
+                case CHAR:
+                    final var valueCaptionAsChar = "Character Value";
+                    txtField.setPromptText(valueCaptionAsChar);
+                    final TextFormatter<?> charFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1
+                                    ? change
+                                    : null));
+                    txtField.setTextFormatter(charFormatter);
+                    break;
+                case STRING:
+                    final var valueCaptionAsStr = "String Value";
+                    txtField.setPromptText(valueCaptionAsStr);
+                    break;
+                case PASSWORD:
+                    final var valueCaptionAsPwd = "Password Value";
+                    final var pwdField = new PeekablePasswordField();
+                    pwdField.setPromptText(valueCaptionAsPwd);
+                    return pwdField;
+                case STRING_ARRAY, STRING_LIST, INTEGER_ARRAY, INTEGER_LIST, BOOLEAN_ARRAY, BOOLEAN_LIST, DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST, CHAR_ARRAY, CHAR_LIST, LONG_ARRAY, LONG_LIST:
+                    final var valueCaptionAsMultipleCardinality = "Multiple Cardinality Value";
+                    txtField.setPromptText(valueCaptionAsMultipleCardinality);
+                    break;
             }
             return txtField;
         }

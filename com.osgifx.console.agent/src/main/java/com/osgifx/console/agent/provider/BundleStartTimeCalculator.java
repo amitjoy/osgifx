@@ -85,18 +85,19 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
 
         synchronized (bundleToStartTime) {
             switch (event.getType()) {
-            case STARTING:
-                bundleToStartTime.put(bundle.getBundleId(), new StartTime(bundle.getSymbolicName(), clock.millis()));
-                break;
-            case STARTED:
-                final StartTime startTime = bundleToStartTime.get(bundle.getBundleId());
-                if (startTime == null) {
-                    return;
-                }
-                startTime.started(clock.millis());
-                break;
-            default:
-                break;
+                case STARTING:
+                    bundleToStartTime.put(bundle.getBundleId(),
+                            new StartTime(bundle.getSymbolicName(), clock.millis()));
+                    break;
+                case STARTED:
+                    final StartTime startTime = bundleToStartTime.get(bundle.getBundleId());
+                    if (startTime == null) {
+                        return;
+                    }
+                    startTime.started(clock.millis());
+                    break;
+                default:
+                    break;
             }
         }
     }

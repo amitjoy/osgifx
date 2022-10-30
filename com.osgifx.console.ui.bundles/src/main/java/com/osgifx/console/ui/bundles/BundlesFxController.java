@@ -82,7 +82,8 @@ public final class BundlesFxController {
         final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
         final var controller     = (BundleDetailsFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XBundleDTO>(current -> {
-                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                     if (previouslyExpanded != null
+                                             && current.getValue() == previouslyExpanded.getValue()) {
                                          return expandedNode;
                                      }
                                      if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {

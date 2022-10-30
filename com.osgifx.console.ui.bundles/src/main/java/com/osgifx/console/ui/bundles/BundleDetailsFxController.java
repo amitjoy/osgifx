@@ -190,11 +190,13 @@ public final class BundleDetailsFxController {
         importedPackagesTable.setItems(FXCollections.observableArrayList(bundle.importedPackages));
 
         wiredBundlesAsProviderIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
-        wiredBundlesAsProviderBsnTableColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        wiredBundlesAsProviderBsnTableColumn
+                .setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
         wiredBundlesAsProviderTable.setItems(FXCollections.observableArrayList(bundle.wiredBundlesAsProvider));
 
         wiredBundlesAsRequirerIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
-        wiredBundlesAsRequirerBsnTableColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
+        wiredBundlesAsRequirerBsnTableColumn
+                .setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
         wiredBundlesAsRequirerTable.setItems(FXCollections.observableArrayList(bundle.wiredBundlesAsRequirer));
 
         registeredServicesIdTableColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
@@ -239,8 +241,8 @@ public final class BundleDetailsFxController {
 
     private void initFragment(final XBundleDTO bundle) {
         startBundleButton.setDisable(bundle.isFragment || "ACTIVE".equals(bundle.state));
-        stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state) || "INSTALLED".equals(bundle.state)
-                || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
+        stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state)
+                || "INSTALLED".equals(bundle.state) || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         uninstallBundleButton.setDisable(AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         fragmentLabel.setSelected(bundle.isFragment);
     }

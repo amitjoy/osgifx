@@ -121,10 +121,14 @@ public final class Module {
         loggerAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.log.admin.LoggerAdmin", null);
         eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
         configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
-        felixHcExecutorTracker    = new ServiceTracker<>(context, "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
-        scrTracker                = new ServiceTracker<>(context, "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
-        httpServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime", null);
-        agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class, null) {
+        felixHcExecutorTracker    = new ServiceTracker<>(context,
+                "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
+        scrTracker                = new ServiceTracker<>(context,
+                "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
+        httpServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime",
+                null);
+        agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class,
+                null) {
 
                                       @Override
                                       @SuppressWarnings("unchecked")
@@ -140,14 +144,14 @@ public final class Module {
 
                                       @Override
                                       public void modifiedService(final ServiceReference<AgentExtension> reference,
-                                              final AgentExtension service) {
+                                                                  final AgentExtension service) {
                                           removedService(reference, service);
                                           addingService(reference);
                                       }
 
                                       @Override
                                       public void removedService(final ServiceReference<AgentExtension> reference,
-                                              final AgentExtension service) {
+                                                                 final AgentExtension service) {
                                           final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
                                           if (name == null) {
                                               return;
@@ -158,16 +162,21 @@ public final class Module {
         gogoCommandsTracker       = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
                                       @Override
                                       public Object addingService(final ServiceReference<Object> reference) {
-                                          final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                          final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                          final String   scope     = String
+                                                  .valueOf(reference.getProperty("osgi.command.scope"));
+                                          final String[] functions = adapt(
+                                                  reference.getProperty("osgi.command.function"));
                                           addCommand(scope, functions);
                                           return super.addingService(reference);
                                       }
 
                                       @Override
-                                      public void removedService(final ServiceReference<Object> reference, final Object service) {
-                                          final String   scope     = String.valueOf(reference.getProperty("osgi.command.scope"));
-                                          final String[] functions = adapt(reference.getProperty("osgi.command.function"));
+                                      public void removedService(final ServiceReference<Object> reference,
+                                                                 final Object service) {
+                                          final String   scope     = String
+                                                  .valueOf(reference.getProperty("osgi.command.scope"));
+                                          final String[] functions = adapt(
+                                                  reference.getProperty("osgi.command.function"));
                                           removeCommand(scope, functions);
                                       }
 

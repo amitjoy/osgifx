@@ -30,7 +30,8 @@ public class Version implements Comparable<Version> {
     public static final String  VERSION_STRING = "(\\d{1,10})(\\.(\\d{1,10})(\\.(\\d{1,10})(\\.(" + TOKEN + "))?)?)?";
     public static final Pattern VERSION        = Pattern.compile(VERSION_STRING);
     public static final Version LOWEST         = new Version();
-    public static final Version HIGHEST        = new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, HIGHESTCHAR);
+    public static final Version HIGHEST        = new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE,
+            HIGHESTCHAR);
 
     public static final Version emptyVersion = LOWEST;
     public static final Version ONE          = new Version(1, 0, 0);
@@ -134,12 +135,12 @@ public class Version implements Comparable<Version> {
         }
 
         switch (cmp) {
-        case 0:
-            return 0;
-        case 1:
-            return 1;
-        case 2:
-            return -1;
+            case 0:
+                return 0;
+            case 1:
+                return 1;
+            case 2:
+                return -1;
         }
         return qualifier.compareTo(o.qualifier);
     }
@@ -185,14 +186,14 @@ public class Version implements Comparable<Version> {
 
     public int get(final int i) {
         switch (i) {
-        case 0:
-            return major;
-        case 1:
-            return minor;
-        case 2:
-            return micro;
-        default:
-            throw new IllegalArgumentException("Version can only get 0 (major), 1 (minor), or 2 (micro)");
+            case 0:
+                return major;
+            case 1:
+                return minor;
+            case 2:
+                return micro;
+            default:
+                throw new IllegalArgumentException("Version can only get 0 (major), 1 (minor), or 2 (micro)");
         }
     }
 

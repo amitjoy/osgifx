@@ -84,7 +84,8 @@ public final class ConfigurationsFxController {
         final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
         final var controller     = (ConfigurationEditorFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XConfigurationDTO>(current -> {
-                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                     if (previouslyExpanded != null
+                                             && current.getValue() == previouslyExpanded.getValue()) {
                                          return expandedNode;
                                      }
                                      if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {
@@ -97,8 +98,8 @@ public final class ConfigurationsFxController {
 
         final var pidColumn = new TableColumn<XConfigurationDTO, String>("PID/Factory PID");
         pidColumn.setPrefWidth(580);
-        pidColumn.setCellValueFactory(
-                new DTOCellValueFactory<>("pid", String.class, s -> "Not created yet but property descriptor available"));
+        pidColumn.setCellValueFactory(new DTOCellValueFactory<>("pid", String.class,
+                s -> "Not created yet but property descriptor available"));
         Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);
 
         final var nameColumn = new TableColumn<XConfigurationDTO, String>("Name");
@@ -108,7 +109,8 @@ public final class ConfigurationsFxController {
 
         final var locationColumn = new TableColumn<XConfigurationDTO, String>("Location");
         locationColumn.setPrefWidth(150);
-        locationColumn.setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No bound location"));
+        locationColumn
+                .setCellValueFactory(new DTOCellValueFactory<>("location", String.class, s -> "No bound location"));
 
         final var isFactoryColumn = new TableColumn<XConfigurationDTO, String>("Is Factory?");
         isFactoryColumn.setPrefWidth(100);

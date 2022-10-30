@@ -31,7 +31,8 @@ import com.google.common.collect.Maps;
 class CapReq {
 
     enum MODE {
-        Capability, Requirement
+        Capability,
+        Requirement
     }
 
     private final MODE                mode;
@@ -103,7 +104,8 @@ class CapReq {
     }
 
     private boolean equalsNative(final CapReq other) {
-        if (mode != other.mode || !Objects.equals(namespace, other.getNamespace()) || !Objects.equals(attributes, other.getAttributes())
+        if (mode != other.mode || !Objects.equals(namespace, other.getNamespace())
+                || !Objects.equals(attributes, other.getAttributes())
                 || !Objects.equals(directives, other.getDirectives())) {
             return false;
         }

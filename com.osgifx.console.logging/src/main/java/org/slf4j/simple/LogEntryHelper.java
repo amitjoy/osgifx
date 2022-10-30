@@ -42,7 +42,8 @@ public final class LogEntryHelper {
         final long   time;
         final String threadName;
 
-        SimpleLogEntry(final String name, final long bundleId, final int level, final String message, final Throwable exception) {
+        SimpleLogEntry(final String name, final long bundleId, final int level, final String message,
+                final Throwable exception) {
 
             this.name     = name;
             this.level    = level;
@@ -68,20 +69,20 @@ public final class LogEntryHelper {
 
         public String logLevel() {
             switch (level) {
-            case LOG_LEVEL_TRACE:
-                return "TRACE";
-            case LOG_LEVEL_DEBUG:
-                return "DEBUG";
-            case LOG_LEVEL_INFO:
-                return "INFO";
-            case LOG_LEVEL_WARN:
-                return "WARN";
-            case LOG_LEVEL_ERROR:
-                return "ERROR";
-            case LOG_LEVEL_AUDIT:
-                return "AUDIT";
-            default:
-                throw new IllegalStateException("Unrecognized level [" + level + "]");
+                case LOG_LEVEL_TRACE:
+                    return "TRACE";
+                case LOG_LEVEL_DEBUG:
+                    return "DEBUG";
+                case LOG_LEVEL_INFO:
+                    return "INFO";
+                case LOG_LEVEL_WARN:
+                    return "WARN";
+                case LOG_LEVEL_ERROR:
+                    return "ERROR";
+                case LOG_LEVEL_AUDIT:
+                    return "AUDIT";
+                default:
+                    throw new IllegalStateException("Unrecognized level [" + level + "]");
             }
         }
     }

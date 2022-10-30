@@ -24,7 +24,8 @@ public class XPropertyDTO extends DTO {
     public XPropertyType type;
 
     public enum XPropertyType {
-        FRAMEWORK, SYSTEM
+        FRAMEWORK,
+        SYSTEM
     }
 
 }

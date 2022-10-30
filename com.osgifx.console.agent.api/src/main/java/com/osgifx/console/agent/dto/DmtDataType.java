@@ -16,5 +16,16 @@
 package com.osgifx.console.agent.dto;
 
 public enum DmtDataType {
-    BASE64, BINARY, BOOLEAN, DATE, FLOAT, INTEGER, NULL, STRING, TIME, XML, LONG, DATE_TIME
+    BASE64,
+    BINARY,
+    BOOLEAN,
+    DATE,
+    FLOAT,
+    INTEGER,
+    NULL,
+    STRING,
+    TIME,
+    XML,
+    LONG,
+    DATE_TIME
 }

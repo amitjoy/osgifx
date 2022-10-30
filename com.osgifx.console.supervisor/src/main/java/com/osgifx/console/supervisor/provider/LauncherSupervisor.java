@@ -140,7 +140,8 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     @Override
     public void onOSGiEvent(final XEventDTO event) {
-        eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics())).forEach(listener -> listener.onEvent(event));
+        eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics()))
+                .forEach(listener -> listener.onEvent(event));
     }
 
     @Override

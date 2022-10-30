@@ -81,7 +81,8 @@ public final class ComponentsFxController {
         final var expandedNode   = (GridPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
         final var controller     = (ComponentDetailsFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XComponentDTO>(current -> {
-                                     if (previouslyExpanded != null && current.getValue() == previouslyExpanded.getValue()) {
+                                     if (previouslyExpanded != null
+                                             && current.getValue() == previouslyExpanded.getValue()) {
                                          return expandedNode;
                                      }
                                      if (previouslyExpanded != null && previouslyExpanded.isExpanded()) {

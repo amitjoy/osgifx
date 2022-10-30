@@ -79,7 +79,8 @@ public final class GenerateObrHandler {
         final var xmlResourceGenerator = new XMLResourceGenerator();
         final var name                 = connectedAgent.replace(":", "_") + "_" + LocalDateTime.now() + ".xml";
         final var outputFile           = new File(location, name);
-        try (final var buffer = new ByteArrayOutputStream(); OutputStream fileStream = new FileOutputStream(outputFile)) {
+        try (final var buffer = new ByteArrayOutputStream();
+                OutputStream fileStream = new FileOutputStream(outputFile)) {
             xmlResourceGenerator.resources(resources);
             xmlResourceGenerator.save(fileStream);
             Fx.showSuccessNotification("OBR Generation", "Successfully generated");

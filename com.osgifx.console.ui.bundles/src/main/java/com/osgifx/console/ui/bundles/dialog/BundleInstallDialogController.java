@@ -86,8 +86,8 @@ public final class BundleInstallDialogController {
         try {
             level = Integer.parseInt(sl);
         } catch (final Exception e) {
-            logger.atError().withException(e).log("Start level value cannot be parsed. Fall back to default start level - %s",
-                    DEFAULT_START_LEVEL);
+            logger.atError().withException(e).log(
+                    "Start level value cannot be parsed. Fall back to default start level - %s", DEFAULT_START_LEVEL);
         }
         return new BundleInstallDTO(bundle, startBundleToggle.isSelected(), level);
     }

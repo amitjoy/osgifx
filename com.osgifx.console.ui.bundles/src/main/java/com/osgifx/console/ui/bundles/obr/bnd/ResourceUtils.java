@@ -137,7 +137,9 @@ public class ResourceUtils {
 
     public interface IdentityCapability extends Capability {
         public enum Type {
-            bundle(IdentityNamespace.TYPE_BUNDLE), fragment(IdentityNamespace.TYPE_FRAGMENT), unknown(IdentityNamespace.TYPE_UNKNOWN);
+            bundle(IdentityNamespace.TYPE_BUNDLE),
+            fragment(IdentityNamespace.TYPE_FRAGMENT),
+            unknown(IdentityNamespace.TYPE_UNKNOWN);
 
             private final String s;
 
@@ -193,7 +195,9 @@ public class ResourceUtils {
         return resource.getCapabilities(namespace).stream();
     }
 
-    private static <T extends Capability> Stream<T> capabilityStream(final Resource resource, final String namespace, final Class<T> type) {
+    private static <T extends Capability> Stream<T> capabilityStream(final Resource resource,
+                                                                     final String namespace,
+                                                                     final Class<T> type) {
         return capabilityStream(resource, namespace).map(c -> as(c, type));
     }
 
@@ -202,7 +206,8 @@ public class ResourceUtils {
     }
 
     public static Optional<URI> getURI(final Resource resource) {
-        return capabilityStream(resource, CONTENT_NAMESPACE, ContentCapability.class).findFirst().map(ContentCapability::url);
+        return capabilityStream(resource, CONTENT_NAMESPACE, ContentCapability.class).findFirst()
+                .map(ContentCapability::url);
     }
 
     public static List<ContentCapability> getContentCapabilities(final Resource resource) {
@@ -210,12 +215,14 @@ public class ResourceUtils {
     }
 
     public static IdentityCapability getIdentityCapability(final Resource resource) {
-        return capabilityStream(resource, IdentityNamespace.IDENTITY_NAMESPACE, IdentityCapability.class).findFirst().orElse(null);
+        return capabilityStream(resource, IdentityNamespace.IDENTITY_NAMESPACE, IdentityCapability.class).findFirst()
+                .orElse(null);
     }
 
     public static String getIdentityVersion(final Resource resource) {
         return capabilityStream(resource, IdentityNamespace.IDENTITY_NAMESPACE, IdentityCapability.class).findFirst()
-                .map(c -> c.getAttributes().get(IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE)).map(Object::toString).orElse(null);
+                .map(c -> c.getAttributes().get(IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE)).map(Object::toString)
+                .orElse(null);
     }
 
     public static BundleCap getBundleCapability(final Resource resource) {
@@ -288,26 +295,26 @@ public class ResourceUtils {
 
     public static String getVersionAttributeForNamespace(final String namespace) {
         switch (namespace) {
-        case IdentityNamespace.IDENTITY_NAMESPACE:
-            return IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-        case BundleNamespace.BUNDLE_NAMESPACE:
-        case HostNamespace.HOST_NAMESPACE:
-            return AbstractWiringNamespace.CAPABILITY_BUNDLE_VERSION_ATTRIBUTE;
-        case PackageNamespace.PACKAGE_NAMESPACE:
-            return PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-        case ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE:
-            return ExecutionEnvironmentNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-        case NativeNamespace.NATIVE_NAMESPACE:
-            return NativeNamespace.CAPABILITY_OSVERSION_ATTRIBUTE;
-        case ExtenderNamespace.EXTENDER_NAMESPACE:
-            return ExtenderNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-        case ContractNamespace.CONTRACT_NAMESPACE:
-            return ContractNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-        case ImplementationNamespace.IMPLEMENTATION_NAMESPACE:
-            return ImplementationNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-        case ServiceNamespace.SERVICE_NAMESPACE:
-        default:
-            return null;
+            case IdentityNamespace.IDENTITY_NAMESPACE:
+                return IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case BundleNamespace.BUNDLE_NAMESPACE:
+            case HostNamespace.HOST_NAMESPACE:
+                return AbstractWiringNamespace.CAPABILITY_BUNDLE_VERSION_ATTRIBUTE;
+            case PackageNamespace.PACKAGE_NAMESPACE:
+                return PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE:
+                return ExecutionEnvironmentNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case NativeNamespace.NATIVE_NAMESPACE:
+                return NativeNamespace.CAPABILITY_OSVERSION_ATTRIBUTE;
+            case ExtenderNamespace.EXTENDER_NAMESPACE:
+                return ExtenderNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ContractNamespace.CONTRACT_NAMESPACE:
+                return ContractNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ImplementationNamespace.IMPLEMENTATION_NAMESPACE:
+                return ImplementationNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ServiceNamespace.SERVICE_NAMESPACE:
+            default:
+                return null;
         }
     }
 
@@ -327,8 +334,11 @@ public class ResourceUtils {
                         : get(method, req.getAttributes(), req.getDirectives(), args));
     }
 
-    private static Object get(final Method method, final Map<String, Object> attrs, final Map<String, String> directives,
-            final Object[] args) throws Exception {
+    private static Object get(final Method method,
+                              final Map<String, Object> attrs,
+                              final Map<String, String> directives,
+                              final Object[] args)
+            throws Exception {
         final var name = method.getName().replace('_', '.');
 
         Object value;
@@ -412,14 +422,16 @@ public class ResourceUtils {
     }
 
     public static Map<URI, String> getLocations(final Resource resource) {
-        return capabilityStream(resource, CONTENT_NAMESPACE, ContentCapability.class).filter(c -> Objects.nonNull(c.url()))
+        return capabilityStream(resource, CONTENT_NAMESPACE, ContentCapability.class)
+                .filter(c -> Objects.nonNull(c.url()))
                 .collect(Collector.of(HashMap::new, (m, c) -> m.put(c.url(), c.osgi_content()), (m1, m2) -> {
                     m1.putAll(m2);
                     return m1;
                 }));
     }
 
-    public static List<Capability> findProviders(final Requirement requirement, final Collection<? extends Capability> capabilities) {
+    public static List<Capability> findProviders(final Requirement requirement,
+                                                 final Collection<? extends Capability> capabilities) {
         return capabilities.stream().filter(c -> matches(requirement, c)).collect(toList());
     }
 
@@ -428,7 +440,8 @@ public class ResourceUtils {
         if (identity == null) {
             return false;
         }
-        return IdentityNamespace.TYPE_FRAGMENT.equals(identity.getAttributes().get(IdentityNamespace.CAPABILITY_TYPE_ATTRIBUTE));
+        return IdentityNamespace.TYPE_FRAGMENT
+                .equals(identity.getAttributes().get(IdentityNamespace.CAPABILITY_TYPE_ATTRIBUTE));
     }
 
     public static String stripDirective(final String name) {

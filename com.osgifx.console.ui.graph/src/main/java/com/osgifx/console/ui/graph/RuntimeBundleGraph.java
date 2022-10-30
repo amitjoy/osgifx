@@ -75,7 +75,7 @@ public final class RuntimeBundleGraph {
     }
 
     public Collection<GraphPath<BundleVertex, DefaultEdge>> getDirectedPaths(final Collection<XBundleDTO> bundles,
-            final Strategy strategy) {
+                                                                             final Strategy strategy) {
         if (bundles.isEmpty()) {
             return List.of();
         }
@@ -98,7 +98,8 @@ public final class RuntimeBundleGraph {
     }
 
     private Map<String, XBundleDTO> processBundles(final List<XBundleDTO> bundles) {
-        return bundles.stream().collect(toMap(b -> VERTEX_ID_FUNCTION.apply(b.symbolicName, b.id), Functions.identity()));
+        return bundles.stream()
+                .collect(toMap(b -> VERTEX_ID_FUNCTION.apply(b.symbolicName, b.id), Functions.identity()));
     }
 
     private Graph<BundleVertex, DefaultEdge> buildGraph(final List<XBundleDTO> bundles, final Strategy strategy) {
@@ -108,8 +109,10 @@ public final class RuntimeBundleGraph {
         return graph;
     }
 
-    private void prepareGraph(final XBundleDTO bundle, final Graph<BundleVertex, DefaultEdge> graph, final Strategy strategy,
-            final Set<String> processedBundles) {
+    private void prepareGraph(final XBundleDTO bundle,
+                              final Graph<BundleVertex, DefaultEdge> graph,
+                              final Strategy strategy,
+                              final Set<String> processedBundles) {
         final List<XBundleInfoDTO> vertexBundles;
         if (strategy == Strategy.REQUIRER) {
             vertexBundles = bundle.wiredBundlesAsRequirer;
@@ -140,7 +143,8 @@ public final class RuntimeBundleGraph {
     }
 
     private enum Strategy {
-        PROVIDER, REQUIRER
+        PROVIDER,
+        REQUIRER
     }
 
 }

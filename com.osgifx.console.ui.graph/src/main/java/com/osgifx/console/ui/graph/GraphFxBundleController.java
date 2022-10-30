@@ -152,7 +152,8 @@ public final class GraphFxBundleController implements GraphController {
                 return;
             }
             exportToDOT(location);
-            threadSync.asyncExec(() -> Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported"));
+            threadSync.asyncExec(
+                    () -> Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported"));
         });
         final var menu = new ContextMenu();
         menu.getItems().add(item);
@@ -197,8 +198,8 @@ public final class GraphFxBundleController implements GraphController {
             if (filter == null || filter.isBlank()) {
                 filteredBundlesList.setPredicate(s -> true);
             } else {
-                filteredBundlesList
-                        .setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s.symbolicName, e)));
+                filteredBundlesList.setPredicate(s -> Stream.of(filter.split("\\|"))
+                        .anyMatch(e -> StringUtils.containsIgnoreCase(s.symbolicName, e)));
             }
         });
         return filteredBundlesList;
@@ -221,7 +222,8 @@ public final class GraphFxBundleController implements GraphController {
 
                 final Collection<GraphPath<BundleVertex, DefaultEdge>> dependencies;
                 if (selection == 0) {
-                    logger.atInfo().log("Generating all graph paths for bundles that are required by '%s'", selectedBundles);
+                    logger.atInfo().log("Generating all graph paths for bundles that are required by '%s'",
+                            selectedBundles);
                     dependencies = runtimeGraph.getAllBundlesThatAreRequiredBy(selectedBundles);
                 } else {
                     logger.atInfo().log("Generating all graph paths for bundles that require '%s'", selectedBundles);

@@ -87,7 +87,9 @@ public class DeploymentPackageExporter implements Exporter {
     }
 
     @Override
-    public Entry<String, aQute.bnd.osgi.Resource> export(final String type, final Project project, final Map<String, String> options)
+    public Entry<String, aQute.bnd.osgi.Resource> export(final String type,
+                                                         final Project project,
+                                                         final Map<String, String> options)
             throws Exception {
         this.project = project;
         try {
@@ -153,8 +155,10 @@ public class DeploymentPackageExporter implements Exporter {
         }
     }
 
-    private Collection<DeploymentPackageEntryDTO> prepareEntries(final Collection<Container> bundles, final String resourceProcessors,
-            final String resources) throws Exception {
+    private Collection<DeploymentPackageEntryDTO> prepareEntries(final Collection<Container> bundles,
+                                                                 final String resourceProcessors,
+                                                                 final String resources)
+            throws Exception {
         final List<DeploymentPackageEntryDTO> entries = Lists.newArrayList();
 
         final var resBundles            = prepareBundles(bundles);
@@ -211,12 +215,14 @@ public class DeploymentPackageExporter implements Exporter {
         return result;
     }
 
-    private List<DeploymentPackageResourceProcessorDTO> prepareResourceProcessors(final String resourceProcessors) throws Exception {
+    private List<DeploymentPackageResourceProcessorDTO> prepareResourceProcessors(final String resourceProcessors)
+            throws Exception {
         if (resourceProcessors == null) {
             return List.of();
         }
         final List<DeploymentPackageResourceProcessorDTO> res = Lists.newArrayList();
-        final var                                         map = Splitter.on(PATTERN).withKeyValueSeparator('=').split(resourceProcessors);
+        final var                                         map = Splitter.on(PATTERN).withKeyValueSeparator('=')
+                .split(resourceProcessors);
 
         for (final Entry<String, String> entry : map.entrySet()) {
             final var name = entry.getKey();

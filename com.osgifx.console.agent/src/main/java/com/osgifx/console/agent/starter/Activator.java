@@ -65,8 +65,8 @@ public final class Activator extends Thread implements BundleActivator {
         // Check if it matches the specification of host:port
         final Matcher m = PORT_PATTERN.matcher(port);
         if (!m.matches()) {
-            throw new IllegalArgumentException(
-                    "Invalid port specification in property '" + AGENT_SERVER_PORT_KEY + "', expects [<host>:]<port> : " + port);
+            throw new IllegalArgumentException("Invalid port specification in property '" + AGENT_SERVER_PORT_KEY
+                    + "', expects [<host>:]<port> : " + port);
         }
 
         // if the host is not set, use localhost
@@ -100,7 +100,8 @@ public final class Activator extends Thread implements BundleActivator {
                     final AgentServer sa = new AgentServer(module.di());
                     agents.add(sa);
 
-                    final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class, sa, socket) {
+                    final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class,
+                            sa, socket) {
                         @Override
                         public void close() throws IOException {
                             agents.remove(sa);

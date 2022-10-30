@@ -54,7 +54,8 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         dialogPane.setHeaderText("Add Connection Settings");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
+        dialogPane.setGraphic(
+                new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         final var txtHostname = (CustomTextField) TextFields.createClearableTextField();
@@ -111,7 +112,8 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             final var requiredNumberFormat = "'%s' should be a valid integer number";
             validationSupport.registerValidator(txtHostname,
                     Validator.createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
-            validationSupport.registerValidator(txtPort, Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
+            validationSupport.registerValidator(txtPort,
+                    Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
             validationSupport.registerValidator(txtPort, Validator.createPredicateValidator(value -> {
                 try {
                     final var port = Integer.parseInt(value.toString());
@@ -120,7 +122,8 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                     return false;
                 }
             }, String.format(requiredPortFormat, portCaption)));
-            validationSupport.registerValidator(txtTimeout, Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
+            validationSupport.registerValidator(txtTimeout,
+                    Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
             validationSupport.registerValidator(txtTimeout, Validator.createPredicateValidator(value -> {
                 try {
                     Integer.parseInt(value.toString());

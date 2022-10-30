@@ -32,9 +32,9 @@ public final class PasswordHelper {
     /**
      * Masks the specified string in the region between start and end index
      *
-     * @param strText  the string to be masked
-     * @param start    the start index for masking
-     * @param end      the end index for masking
+     * @param strText the string to be masked
+     * @param start the start index for masking
+     * @param end the end index for masking
      * @param maskChar the masking character
      *
      * @return the masked output

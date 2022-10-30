@@ -28,8 +28,10 @@ import com.osgifx.console.smartgraph.graph.Graph;
 public class SmartRandomPlacementStrategy implements SmartPlacementStrategy {
 
     @Override
-    public <V, E> void place(final double width, final double height, final Graph<V, E> theGraph,
-            final Collection<? extends SmartGraphVertex<V>> vertices) {
+    public <V, E> void place(final double width,
+                             final double height,
+                             final Graph<V, E> theGraph,
+                             final Collection<? extends SmartGraphVertex<V>> vertices) {
 
         final var rand = new Random();
 

@@ -108,7 +108,9 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         e4Application.jfxStart(e4Application.getApplicationContext(), this, initStage);
     }
 
-    private void showSplash(final Stage initStage, final Task<?> task, final InitCompletionHandler initCompletionHandler) {
+    private void showSplash(final Stage initStage,
+                            final Task<?> task,
+                            final InitCompletionHandler initCompletionHandler) {
         progressText.textProperty().bind(task.messageProperty());
         loadProgress.progressProperty().bind(task.progressProperty());
         task.stateProperty().addListener((observableValue, oldState, newState) -> {

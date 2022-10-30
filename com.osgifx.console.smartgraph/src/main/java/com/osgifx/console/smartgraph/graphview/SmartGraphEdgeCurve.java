@@ -56,13 +56,14 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
     private final SmartStyleProxy styleProxy;
 
     @SuppressWarnings("rawtypes")
-    public SmartGraphEdgeCurve(final Edge<E, V> edge, final SmartGraphVertexNode inbound, final SmartGraphVertexNode outbound) {
+    public SmartGraphEdgeCurve(final Edge<E, V> edge, final SmartGraphVertexNode inbound,
+            final SmartGraphVertexNode outbound) {
         this(edge, inbound, outbound, 0);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public SmartGraphEdgeCurve(final Edge<E, V> edge, final SmartGraphVertexNode inbound, final SmartGraphVertexNode outbound,
-            final int edgeIndex) {
+    public SmartGraphEdgeCurve(final Edge<E, V> edge, final SmartGraphVertexNode inbound,
+            final SmartGraphVertexNode outbound, final int edgeIndex) {
         this.inbound  = inbound;
         this.outbound = outbound;
 
@@ -167,8 +168,10 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
     @Override
     public void attachLabel(final SmartLabel label) {
         this.attachedLabel = label;
-        label.xProperty().bind(controlX1Property().add(controlX2Property()).divide(2).subtract(label.getLayoutBounds().getWidth() / 2));
-        label.yProperty().bind(controlY1Property().add(controlY2Property()).divide(2).add(label.getLayoutBounds().getHeight() / 2));
+        label.xProperty().bind(controlX1Property().add(controlX2Property()).divide(2)
+                .subtract(label.getLayoutBounds().getWidth() / 2));
+        label.yProperty().bind(
+                controlY1Property().add(controlY2Property()).divide(2).add(label.getLayoutBounds().getHeight() / 2));
     }
 
     @Override
@@ -193,8 +196,8 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
         final var rotation = new Rotate();
         rotation.pivotXProperty().bind(translateXProperty());
         rotation.pivotYProperty().bind(translateYProperty());
-        rotation.angleProperty().bind(UtilitiesBindings.toDegrees(
-                UtilitiesBindings.atan2(endYProperty().subtract(controlY2Property()), endXProperty().subtract(controlX2Property()))));
+        rotation.angleProperty().bind(UtilitiesBindings.toDegrees(UtilitiesBindings
+                .atan2(endYProperty().subtract(controlY2Property()), endXProperty().subtract(controlX2Property()))));
 
         arrow.getTransforms().add(rotation);
 

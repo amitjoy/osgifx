@@ -201,7 +201,8 @@ public final class HealthCheckFxController {
             if (filter == null || filter.isBlank()) {
                 filteredMetadataList.setPredicate(s -> true);
             } else {
-                filteredMetadataList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s, e)));
+                filteredMetadataList.setPredicate(
+                        s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s, e)));
             }
             searchText.requestFocus();
         });
@@ -257,8 +258,10 @@ public final class HealthCheckFxController {
             }
 
             private TitledPane formatResult(final XHealthCheckResultDTO result) {
-                final var form = Form.of(Section.of(initGenericFields(result).toArray(new Field[0])).title("Generic Properties"),
-                        Section.of(initResultEntryFields(result).toArray(new Field[0])).title("Results: ")).title("Result");
+                final var form = Form
+                        .of(Section.of(initGenericFields(result).toArray(new Field[0])).title("Generic Properties"),
+                                Section.of(initResultEntryFields(result).toArray(new Field[0])).title("Results: "))
+                        .title("Result");
 
                 final var renderer = new FormRenderer(form);
 
@@ -276,9 +279,10 @@ public final class HealthCheckFxController {
             }
 
             private List<Field<?>> initGenericFields(final XHealthCheckResultDTO result) {
-                final Field<?> elapsedTimeField = Field.ofStringType(String.valueOf(result.elapsedTime) + " ms").label("Elapsed Time")
+                final Field<?> elapsedTimeField = Field.ofStringType(String.valueOf(result.elapsedTime) + " ms")
+                        .label("Elapsed Time").editable(false);
+                final Field<?> timeoutField     = Field.ofBooleanType(result.isTimedOut).label("Timeout")
                         .editable(false);
-                final Field<?> timeoutField     = Field.ofBooleanType(result.isTimedOut).label("Timeout").editable(false);
 
                 return List.of(elapsedTimeField, timeoutField);
             }
@@ -290,14 +294,17 @@ public final class HealthCheckFxController {
                 for (final ResultDTO entry : result.results) {
                     i++;
                     final Field<?> separatorField = Field.ofStringType("").label("Result " + i).editable(false);
-                    final Field<?> statusField    = Field.ofStringType(Strings.nullToEmpty(entry.status)).label("Status").editable(false);
-                    final Field<?> messageField   = Field.ofStringType(Strings.nullToEmpty(entry.message)).label("Message").editable(false);
-                    final Field<?> logLevelField  = Field.ofStringType(Strings.nullToEmpty(entry.logLevel)).label("Log Level")
-                            .editable(false);
-                    final Field<?> exceptionField = Field.ofStringType(Strings.nullToEmpty(entry.exception)).label("Exception")
-                            .multiline(true).editable(false);
+                    final Field<?> statusField    = Field.ofStringType(Strings.nullToEmpty(entry.status))
+                            .label("Status").editable(false);
+                    final Field<?> messageField   = Field.ofStringType(Strings.nullToEmpty(entry.message))
+                            .label("Message").editable(false);
+                    final Field<?> logLevelField  = Field.ofStringType(Strings.nullToEmpty(entry.logLevel))
+                            .label("Log Level").editable(false);
+                    final Field<?> exceptionField = Field.ofStringType(Strings.nullToEmpty(entry.exception))
+                            .label("Exception").multiline(true).editable(false);
 
-                    allResultFields.addAll(List.of(separatorField, statusField, messageField, logLevelField, exceptionField));
+                    allResultFields
+                            .addAll(List.of(separatorField, statusField, messageField, logLevelField, exceptionField));
                 }
                 return allResultFields;
             }

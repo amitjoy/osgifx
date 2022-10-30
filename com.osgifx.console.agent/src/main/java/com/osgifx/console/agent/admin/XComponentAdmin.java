@@ -70,7 +70,8 @@ public final class XComponentAdmin {
         final List<XComponentDTO> dtos = new ArrayList<>();
         try {
             for (final ComponentDescriptionDTO compDescDTO : scr.getComponentDescriptionDTOs()) {
-                final Collection<ComponentConfigurationDTO> compConfDTOs = scr.getComponentConfigurationDTOs(compDescDTO);
+                final Collection<ComponentConfigurationDTO> compConfDTOs = scr
+                        .getComponentConfigurationDTOs(compDescDTO);
                 if (compConfDTOs.isEmpty()) {
                     // this is for use cases when a component doesn't have any
                     // configuration yet as it is probably disabled
@@ -103,7 +104,8 @@ public final class XComponentAdmin {
                         builder.append(e.getMessage()).append(System.lineSeparator());
                     }
                     final String response = builder.toString();
-                    return response.isEmpty() ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully enabled")
+                    return response.isEmpty()
+                            ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully enabled")
                             : createResult(ERROR, response);
                 }
             }
@@ -129,7 +131,8 @@ public final class XComponentAdmin {
                     builder.append(e.getMessage()).append(System.lineSeparator());
                 }
                 final String response = builder.toString();
-                return response.isEmpty() ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully enabled")
+                return response.isEmpty()
+                        ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully enabled")
                         : createResult(ERROR, response);
             }
         }
@@ -154,7 +157,8 @@ public final class XComponentAdmin {
                         builder.append(e.getMessage()).append(System.lineSeparator());
                     }
                     final String response = builder.toString();
-                    return response.isEmpty() ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully disabled")
+                    return response.isEmpty()
+                            ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully disabled")
                             : createResult(ERROR, response);
                 }
             }
@@ -178,14 +182,16 @@ public final class XComponentAdmin {
                     builder.append(e.getMessage()).append(System.lineSeparator());
                 }
                 final String response = builder.toString();
-                return response.isEmpty() ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully disabled")
+                return response.isEmpty()
+                        ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully disabled")
                         : createResult(ERROR, response);
             }
         }
         return createResult(SUCCESS, "Component with name '" + name + "' has not been found");
     }
 
-    private XComponentDTO toDTO(final ComponentConfigurationDTO compConfDTO, final ComponentDescriptionDTO compDescDTO) {
+    private XComponentDTO toDTO(final ComponentConfigurationDTO compConfDTO,
+                                final ComponentDescriptionDTO compDescDTO) {
         final XComponentDTO  dto      = new XComponentDTO();
         final XBundleInfoDTO bInfoDTO = new XBundleInfoDTO();
 
@@ -204,7 +210,8 @@ public final class XComponentAdmin {
         dto.serviceInterfaces   = Stream.of(compDescDTO.serviceInterfaces).collect(Collectors.toList());
         dto.configurationPid    = Stream.of(compDescDTO.configurationPid).collect(Collectors.toList());
         dto.properties          = Optional.ofNullable(compConfDTO)
-                .map(a -> a.properties.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> arrayToString(e.getValue()))))
+                .map(a -> a.properties.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> arrayToString(e.getValue()))))
                 .orElse(Collections.emptyMap());
         dto.references          = Stream.of(compDescDTO.references).map(this::toRef).collect(Collectors.toList());
 
@@ -214,30 +221,29 @@ public final class XComponentAdmin {
         dto.activate              = compDescDTO.activate;
         dto.deactivate            = compDescDTO.deactivate;
         dto.modified              = compDescDTO.modified;
-        dto.satisfiedReferences   = Stream
-                .of(Optional.ofNullable(compConfDTO).map(a -> a.satisfiedReferences).orElse(new SatisfiedReferenceDTO[0])).map(this::toXS)
-                .collect(Collectors.toList());
-        dto.unsatisfiedReferences = Stream
-                .of(Optional.ofNullable(compConfDTO).map(a -> a.unsatisfiedReferences).orElse(new UnsatisfiedReferenceDTO[0]))
-                .map(this::toXUS).collect(Collectors.toList());
+        dto.satisfiedReferences   = Stream.of(
+                Optional.ofNullable(compConfDTO).map(a -> a.satisfiedReferences).orElse(new SatisfiedReferenceDTO[0]))
+                .map(this::toXS).collect(Collectors.toList());
+        dto.unsatisfiedReferences = Stream.of(Optional.ofNullable(compConfDTO).map(a -> a.unsatisfiedReferences)
+                .orElse(new UnsatisfiedReferenceDTO[0])).map(this::toXUS).collect(Collectors.toList());
 
         return dto;
     }
 
     private static String mapToState(final int state) {
         switch (state) {
-        case ComponentConfigurationDTO.ACTIVE:
-            return "ACTIVE";
-        case ComponentConfigurationDTO.SATISFIED:
-            return "SATISFIED";
-        case ComponentConfigurationDTO.UNSATISFIED_REFERENCE:
-            return "UNSATISFIED_REFERENCE";
-        case ComponentConfigurationDTO.UNSATISFIED_CONFIGURATION:
-            return "UNSATISFIED_CONFIGURATION";
-        case 16: // ComponentConfigurationDTO.FAILED_ACTIVATION OSGi R7
-            return "FAILED_ACTIVATION";
-        default:
-            return "<NO-MATCH>";
+            case ComponentConfigurationDTO.ACTIVE:
+                return "ACTIVE";
+            case ComponentConfigurationDTO.SATISFIED:
+                return "SATISFIED";
+            case ComponentConfigurationDTO.UNSATISFIED_REFERENCE:
+                return "UNSATISFIED_REFERENCE";
+            case ComponentConfigurationDTO.UNSATISFIED_CONFIGURATION:
+                return "UNSATISFIED_CONFIGURATION";
+            case 16: // ComponentConfigurationDTO.FAILED_ACTIVATION OSGi R7
+                return "FAILED_ACTIVATION";
+            default:
+                return "<NO-MATCH>";
         }
     }
 
