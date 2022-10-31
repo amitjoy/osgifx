@@ -34,6 +34,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
+import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -62,7 +63,7 @@ public final class ConnectToAgentHandler {
     private IEclipseContext                         context;
     @Inject
     private IEventBroker                            eventBroker;
-    @Inject
+    @Service(dynamic = true)
     private Supervisor                              supervisor;
     @Inject
     private CommandService                          commandService;

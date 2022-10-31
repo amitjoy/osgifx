@@ -27,6 +27,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
+import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -40,7 +41,7 @@ public final class DisconnectFromAgentHandler {
     @Log
     @Inject
     private FluentLogger                            logger;
-    @Inject
+    @Service(dynamic = true)
     private Supervisor                              supervisor;
     @Inject
     private IEventBroker                            eventBroker;

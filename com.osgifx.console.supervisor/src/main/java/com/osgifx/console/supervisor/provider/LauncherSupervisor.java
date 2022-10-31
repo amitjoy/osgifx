@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
@@ -31,6 +32,7 @@ import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
+@SatisfyingConditionTarget("rpc-agent")
 public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
 
     private Appendable stdout;
