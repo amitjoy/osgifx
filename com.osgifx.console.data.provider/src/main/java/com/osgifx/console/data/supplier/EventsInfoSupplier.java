@@ -20,6 +20,8 @@ import static com.osgifx.console.data.supplier.EventsInfoSupplier.PID;
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.CLEAR_EVENTS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
 import java.util.Collection;
 import java.util.Set;
@@ -57,13 +59,13 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     public static final String EVENTS_ID = "events";
 
     @Reference
-    private LoggerFactory     factory;
+    private LoggerFactory       factory;
     @Reference
-    private Supervisor        supervisor;
-    @Reference
-    private ThreadSynchronize threadSync;
-    private FluentLogger      logger;
-    private Configuration     configuration;
+    private ThreadSynchronize   threadSync;
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile Supervisor supervisor;
+    private FluentLogger        logger;
+    private Configuration       configuration;
 
     private final ObservableList<XEventDTO> events = observableArrayList();
 

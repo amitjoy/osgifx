@@ -1,5 +1,5 @@
 Bundle-SymbolicName : ${p}; singleton:=true
--privatepackage     : com.osgifx.console.ui.snaphsot
+-privatepackage     : com.osgifx.console.ui.snaphsot*
 -includeresource    : \
                       plugin.xml = _plugin.xml,\
 					  fragment.e4xmi = fragment.e4xmi,\
