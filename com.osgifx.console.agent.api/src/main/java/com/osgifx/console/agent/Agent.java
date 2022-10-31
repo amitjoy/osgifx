@@ -73,6 +73,13 @@ public interface Agent {
     String HEAPDUMP_LOCATION_KEY = "osgi.fx.agent.heapdump.location";
 
     /**
+     * The property key to set the snapshot location. If not set, the default
+     * location will be set to the {@code snapshots} directory inside the current
+     * working directory of the remote OSGi runtime.
+     */
+    String SNAPSHOT_LOCATION_KEY = "osgi.fx.agent.snapshot.location";
+
+    /**
      * The property key to enable agent logs
      */
     String TRACE_LOG_KEY = "osgi.fx.agent.logs.enabled";
