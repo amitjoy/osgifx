@@ -42,6 +42,7 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.extension.AgentExtensionName;
@@ -541,6 +542,13 @@ public interface Agent {
      * @return the heap dump information
      */
     XHeapdumpDTO heapdump() throws Exception;
+
+    /**
+     * Captures a snapshot in the remote machine
+     *
+     * @return the snapshot information
+     */
+    XSnapshotDTO snapshot() throws Exception;
 
     /**
      * Performs a garbage collection
