@@ -150,8 +150,14 @@ For ease of development, you can use the OSGi.fx workspace to further develop yo
 
 #### Project Import for Development
 
-1. Install `Bndtools` from Eclipse Marketplace
-2. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
+1. Install Java 17 JDK Distribution (including JavaFX) in your machine (Currently I am using [ZuluFX](https://www.azul.com/downloads/?version=java-17-lts&package=jdk-fx) that includes JavaFX modules already)
+2. Set the newly installed JDK 17 to your `JAVA_HOME`
+3. Install `Eclipse IDE for RCP/RAP Developers` and make sure your Eclipse installation uses the currently installed JDK to start with
+4. Install `Bndtools` and `e(fx)clipse` from Eclipse Marketplace
+5. Go to `Java` -> `Compiler` in Eclipse Preferences and set `Compiler Compliance Level` to `17`
+6. Go to `Java` -> `Installed JREs` and select the newly installed JDK with JavaFX modules
+7. Go to `Java` -> `Installed JREs` -> `Execution Environments` and select `JavaSE-17` and choose the recently installed Java 17 JRE that includes JavaFX modules
+8. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
 
 --------------------------------------------------------------------------------------------------------------
 
