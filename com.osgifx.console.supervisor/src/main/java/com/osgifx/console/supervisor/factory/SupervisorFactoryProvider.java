@@ -15,16 +15,14 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.factory;
 
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
-import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.aries.component.dsl.OSGi;
+import org.apache.aries.component.dsl.OSGiResult;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.condition.Condition;
@@ -36,32 +34,27 @@ import com.osgifx.console.supervisor.snapshot.SnapshotSupervisor;
 @Component
 public final class SupervisorFactoryProvider implements SupervisorFactory {
 
+    private final Map<SupervisorType, OSGiResult> registrations = Maps.newHashMap();
+
     @Activate
     private BundleContext context;
 
-    private final Map<SupervisorType, ServiceRegistration<Condition>> registrations = Maps.newHashMap();
-
     @Override
     public void createSupervisor(final SupervisorType type) {
-        String conditionIdValue = null;
-
-        if (type == SOCKET_RPC) {
-            conditionIdValue = LauncherSupervisor.CONDITION_ID_VALUE;
-        } else if (type == SNAPSHOT) {
-            conditionIdValue = SnapshotSupervisor.CONDITION_ID_VALUE;
-        }
-
-        final var conditionValue = conditionIdValue; // required for lambda
-        registrations.computeIfAbsent(type, key -> context.registerService(Condition.class, INSTANCE,
-                new Hashtable<>(Map.of(CONDITION_ID, conditionValue))));
+        final var conditionIdValue = switch (type) {
+            case SOCKET_RPC -> LauncherSupervisor.CONDITION_ID_VALUE;
+            case SNAPSHOT -> SnapshotSupervisor.CONDITION_ID_VALUE;
+        };
+        registrations.computeIfAbsent(type,
+                key -> OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionIdValue)).run(context));
     }
 
     @Override
     public void removeSupervisor(final SupervisorType type) {
-        if (registrations.containsKey(type)) {
-            final var registration = registrations.remove(type);
-            registration.unregister();
-        }
+        registrations.computeIfPresent(type, (k, v) -> {
+            v.close();
+            return null;
+        });
     }
 
 }
