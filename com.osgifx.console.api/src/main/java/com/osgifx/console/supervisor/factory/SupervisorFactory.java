@@ -21,8 +21,8 @@ import com.osgifx.console.supervisor.Supervisor;
 
 /**
  * The {@link SupervisorFactory} service is the application access point to the
- * {@link Supervisor} functionality. It is used to create/remove alarm
- * {@link Supervisor} instances pretty easily.
+ * {@link Supervisor} functionality. It is used to create/remove {@link Supervisor}
+ * instances pretty easily.
  *
  * <p>
  * Access to this service requires the

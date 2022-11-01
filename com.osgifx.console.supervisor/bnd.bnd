@@ -1,7 +1,8 @@
 -buildpath          : ${bundles.required},\
                       biz.aQute.remote.agent;packages=*,\
                       com.google.gson,\
-                      com.osgifx.console.agent.api;version=snapshot;packages=*
+                      com.osgifx.console.agent.api;version=snapshot;packages=*,\
+                      org.apache.aries.component-dsl.component-dsl
 -includepackage     : com.osgifx.console.supervisor.*
 -privatepackage     : com.osgifx.console.agent.*
 -conditionalpackage : aQute.*, com.osgifx.console.agent.link
