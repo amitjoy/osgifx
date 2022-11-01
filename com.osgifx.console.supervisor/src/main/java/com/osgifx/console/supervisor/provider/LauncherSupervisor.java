@@ -32,7 +32,7 @@ import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
-@SatisfyingConditionTarget("rpc-agent")
+@SatisfyingConditionTarget("(osgi.condition.id=rpc-agent)")
 public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
 
     private Appendable stdout;
@@ -41,6 +41,10 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
     private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
+
+    void activate() {
+        System.out.println("DDDDD");
+    }
 
     @Override
     public boolean stdout(final String out) throws Exception {
