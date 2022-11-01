@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_aSCt8Fm3Ee2Z-OHK22Yziw" featurename="children" parentElementId="com.osgifx.console.application.menu.extensions">
+    <elements xsi:type="menu:Menu" xmi:id="_aSCt8Vm3Ee2Z-OHK22Yziw" elementId="com.osgifx.console.application.menu.snapshot" label="Snapshot">
+      <children xsi:type="menu:DirectMenuItem" xmi:id="_aSCt8lm3Ee2Z-OHK22Yziw" elementId="com.osgifx.console.application.directmenuitem.snapshot.import" label="Import" iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/import.png" tooltip="Import Snapshot" contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotImportHandler"/>
+      <children xsi:type="menu:DirectMenuItem" xmi:id="_aSCt81m3Ee2Z-OHK22Yziw" elementId="com.osgifx.console.application.directmenuitem.snapshot.capture" label="Capture" iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/capture.png" tooltip="Capture Snapshot" contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotCaptureHandler"/>
+    </elements>
+  </fragments>
+</fragment:ModelFragments>

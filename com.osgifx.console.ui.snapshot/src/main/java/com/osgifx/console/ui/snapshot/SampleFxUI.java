@@ -1,4 +1,4 @@
-package com.osgifx.console.ui.snaphsot;
+package com.osgifx.console.ui.snapshot;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;

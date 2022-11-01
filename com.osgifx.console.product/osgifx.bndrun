@@ -53,7 +53,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.packages',\
                                       bnd.identity;id='com.osgifx.console.ui.properties',\
                                       bnd.identity;id='com.osgifx.console.ui.services',\
-                                      bnd.identity;id='com.osgifx.console.ui.snaphsot',\
+                                      bnd.identity;id='com.osgifx.console.ui.snapshot',\
                                       bnd.identity;id='com.osgifx.console.ui.terminal',\
                                       bnd.identity;id='com.osgifx.console.ui.threads',\
                                       bnd.identity;id='com.osgifx.console.ui.roles',\
@@ -100,7 +100,7 @@ install.order                     :   \
 	com.osgifx.console.supervisor;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.batchinstall;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.extension;version=snapshot;startlevel=10,\
-	com.osgifx.console.ui.snaphsot;version=snapshot;startlevel=10,\
+	com.osgifx.console.ui.snapshot;version=snapshot;startlevel=10,\
 	com.osgifx.console.util;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=10,\
