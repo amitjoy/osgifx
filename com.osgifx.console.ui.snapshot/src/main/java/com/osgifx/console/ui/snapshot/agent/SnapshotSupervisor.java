@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.snaphsot.agent;
+package com.osgifx.console.ui.snapshot.agent;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;

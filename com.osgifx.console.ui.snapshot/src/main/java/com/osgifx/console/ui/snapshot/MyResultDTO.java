@@ -1,4 +1,4 @@
-package com.osgifx.console.ui.snaphsot;
+package com.osgifx.console.ui.snapshot;
 
 import org.osgi.dto.DTO;
 
