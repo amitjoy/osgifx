@@ -32,7 +32,6 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.adapter.Adapt;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
-import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -50,7 +49,8 @@ public final class ConnectToLocalAgentHandler {
     private ThreadSynchronize          threadSync;
     @Inject
     private IEventBroker               eventBroker;
-    @Service(dynamic = true)
+    @Inject
+    @Optional
     private Supervisor                 supervisor;
     @Inject
     @ContextValue("is_connected")

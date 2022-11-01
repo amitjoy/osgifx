@@ -56,6 +56,7 @@ public final class GameFxUI {
     @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     private ConsoleMaskerPane progressPane;
