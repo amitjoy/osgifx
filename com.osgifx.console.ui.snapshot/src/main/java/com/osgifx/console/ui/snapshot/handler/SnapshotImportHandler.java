@@ -15,43 +15,71 @@
  ******************************************************************************/
 package com.osgifx.console.ui.snapshot.handler;
 
-import java.awt.Desktop;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.util.concurrent.CompletableFuture;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.log.DiagnosticsAdmin;
+import com.osgifx.console.util.fx.FxDialog;
+
+import javafx.concurrent.Task;
+import javafx.stage.FileChooser;
 
 public final class SnapshotImportHandler {
 
     @Log
     @Inject
-    private FluentLogger     logger;
+    private FluentLogger      logger;
     @Inject
-    @OSGiBundle
-    private BundleContext    context;
+    private IWorkbench        workbench;
     @Inject
-    private DiagnosticsAdmin diagnosticsAdmin;
-
-    @PostConstruct
-    public void init() {
-        System.out.println("ABC");
-    }
+    private ThreadSynchronize threadSync;
+    private ProgressDialog    progressDialog;
 
     @Execute
     public void execute() {
-        try {
-            Desktop.getDesktop().open(diagnosticsAdmin.getLogFilesDirectory());
-            logger.atInfo().log("Diagnostics directory has been opened");
-        } catch (final IOException e) {
-            logger.atError().withException(e).log("Cannot open diagnostics directory");
+        final var bundleChooser = new FileChooser();
+        bundleChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Snapshots (.json)", "*.json"));
+        final var snapshot = bundleChooser.showOpenDialog(null);
+
+        if (snapshot != null) {
+            final Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try (var is = new FileInputStream(snapshot)) {
+                        logger.atInfo().log("Extension '%s' has been successfuly installed/updated");
+                        return null;
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Cannot install extension '%s'", snapshot.getName());
+                        threadSync.asyncExec(() -> {
+                            progressDialog.close();
+                            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                        });
+                        throw e;
+                    }
+                }
+
+                @Override
+                protected void succeeded() {
+                    threadSync.asyncExec(progressDialog::close);
+                    FxDialog.showInfoDialog("Extension Installation",
+                            "The application must be restarted, therefore, will be shut down right away",
+                            getClass().getClassLoader(), btn -> workbench.restart());
+                }
+            };
+
+            final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
+            progressDialog = FxDialog.showProgressDialog("Extension Installation", task, getClass().getClassLoader(),
+                    () -> {
+                        taskFuture.cancel(true);
+                    });
         }
     }
 
