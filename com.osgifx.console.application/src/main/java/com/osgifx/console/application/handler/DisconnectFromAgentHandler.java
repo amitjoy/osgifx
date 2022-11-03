@@ -18,6 +18,7 @@ package com.osgifx.console.application.handler;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -27,12 +28,13 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
-import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.supervisor.factory.SupervisorFactory;
+import com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType;
 
 import javafx.concurrent.Task;
 
@@ -41,7 +43,8 @@ public final class DisconnectFromAgentHandler {
     @Log
     @Inject
     private FluentLogger                            logger;
-    @Service(dynamic = true)
+    @Inject
+    @Optional
     private Supervisor                              supervisor;
     @Inject
     private IEventBroker                            eventBroker;
@@ -61,6 +64,8 @@ public final class DisconnectFromAgentHandler {
     @Optional
     @ContextValue("selected.settings")
     private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    @Inject
+    private SupervisorFactory                       supervisorFactory;
 
     @Execute
     public void execute() {
@@ -69,6 +74,7 @@ public final class DisconnectFromAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisor.getAgent().abort();
+                    Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
                     logger.atInfo().log("Agent connection has been successfully aborted");
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Agent connection cannot be aborted");

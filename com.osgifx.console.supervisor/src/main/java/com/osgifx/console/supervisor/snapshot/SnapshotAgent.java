@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.snapshot.agent;
+package com.osgifx.console.supervisor.snapshot;
 
 import java.util.Collection;
 import java.util.List;

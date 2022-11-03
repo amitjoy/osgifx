@@ -16,6 +16,7 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +37,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
@@ -76,6 +78,8 @@ public final class ConnectToLocalAgentHandler {
     @Optional
     @Named("local.agent.timeout")
     private int                        localAgentTimeout;
+    @Inject
+    private SupervisorFactory          supervisorFactory;
     private ProgressDialog             progressDialog;
 
     @Execute
@@ -84,6 +88,7 @@ public final class ConnectToLocalAgentHandler {
             @Override
             protected Void call() throws Exception {
                 try {
+                    supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to Local Agent on " + localAgentPort);
                     supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
                     logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost,

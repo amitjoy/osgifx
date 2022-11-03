@@ -53,7 +53,7 @@ public final class ExtensionInstallHandler {
     @Execute
     public void execute() {
         final var bundleChooser = new FileChooser();
-        bundleChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Deployment Packages", "*.dp"));
+        bundleChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Deployment Packages (.dp)", "*.dp"));
         final var deploymentPackage = bundleChooser.showOpenDialog(null);
 
         if (deploymentPackage != null) {

@@ -15,38 +15,39 @@
  ******************************************************************************/
 package com.osgifx.console.ui.snapshot.handler;
 
-import java.awt.Desktop;
-import java.io.IOException;
-
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.log.DiagnosticsAdmin;
+import com.osgifx.console.supervisor.Supervisor;
 
 public final class SnapshotCaptureHandler {
 
     @Log
     @Inject
-    private FluentLogger     logger;
+    private FluentLogger      logger;
     @Inject
-    @OSGiBundle
-    private BundleContext    context;
+    private IEclipseContext   context;
     @Inject
-    private DiagnosticsAdmin diagnosticsAdmin;
+    private IEventBroker      eventBroker;
+    @Inject
+    private Supervisor        supervisor;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private ThreadSynchronize threadSync;
 
     @Execute
     public void execute() {
-        try {
-            Desktop.getDesktop().open(diagnosticsAdmin.getLogFilesDirectory());
-            logger.atInfo().log("Diagnostics directory has been opened");
-        } catch (final IOException e) {
-            logger.atError().withException(e).log("Cannot open diagnostics directory");
-        }
+        // TODO
+        System.out.println("A");
     }
 
 }
