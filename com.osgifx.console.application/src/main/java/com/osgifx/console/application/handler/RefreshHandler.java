@@ -37,6 +37,10 @@ public final class RefreshHandler {
     @Optional
     @Named("is_connected")
     private boolean      isConnected;
+    @Inject
+    @Optional
+    @Named("is_snapshot_agent")
+    private boolean      isSnapshotAgent;
 
     @Execute
     public void execute() {
@@ -47,7 +51,7 @@ public final class RefreshHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
 }

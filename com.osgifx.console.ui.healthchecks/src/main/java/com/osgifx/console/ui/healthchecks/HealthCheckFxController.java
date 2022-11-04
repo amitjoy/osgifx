@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
 import org.controlsfx.control.CheckListView;
@@ -100,6 +101,9 @@ public final class HealthCheckFxController {
     private ThreadSynchronize     threadSync;
     @Inject
     private EventBus              eventBus;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean               isSnapshotAgent;
     private MaskerPane            progressPane;
     private ExecutorService       executor;
     private Future<?>             hcExecFuture;
@@ -149,6 +153,7 @@ public final class HealthCheckFxController {
     private void initButtons() {
         nameHcButton.setOnMouseClicked(e -> initNames());
         tagHcButton.setOnMouseClicked(e -> initTags());
+        executeHcButton.setDisable(isSnapshotAgent);
     }
 
     private void initNames() {

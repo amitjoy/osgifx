@@ -36,6 +36,9 @@ public final class ClearEventsTableHandler {
     @Inject
     @Named("is_connected")
     private boolean      isConnected;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean      isSnapshotAgent;
 
     @Execute
     public void execute() {
@@ -45,7 +48,7 @@ public final class ClearEventsTableHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
 }

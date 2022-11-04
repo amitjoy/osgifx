@@ -80,6 +80,9 @@ public final class EventReceiveMenuContributionHandler {
     @Named("is_connected")
     private boolean                        isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean                        isSnapshotAgent;
+    @Inject
     @OSGiBundle
     private BundleContext                  bundleContext;
     @Inject
@@ -143,7 +146,7 @@ public final class EventReceiveMenuContributionHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
     private void prepareMenu(final List<MMenuElement> items, final boolean value) {

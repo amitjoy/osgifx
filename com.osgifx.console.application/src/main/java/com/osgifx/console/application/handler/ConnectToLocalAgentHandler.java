@@ -16,6 +16,8 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +38,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
@@ -50,6 +53,7 @@ public final class ConnectToLocalAgentHandler {
     @Inject
     private IEventBroker               eventBroker;
     @Inject
+    @Optional
     private Supervisor                 supervisor;
     @Inject
     @ContextValue("is_connected")
@@ -58,6 +62,10 @@ public final class ConnectToLocalAgentHandler {
     @Optional
     @ContextValue("is_local_agent")
     private ContextBoundValue<Boolean> isLocalAgent;
+    @Inject
+    @Optional
+    @ContextValue("is_snapshot_agent")
+    private ContextBoundValue<Boolean> isSnapshotAgent;
     @Inject
     @ContextValue("connected.agent")
     private ContextBoundValue<String>  connectedAgent;
@@ -75,6 +83,8 @@ public final class ConnectToLocalAgentHandler {
     @Optional
     @Named("local.agent.timeout")
     private int                        localAgentTimeout;
+    @Inject
+    private SupervisorFactory          supervisorFactory;
     private ProgressDialog             progressDialog;
 
     @Execute
@@ -83,6 +93,8 @@ public final class ConnectToLocalAgentHandler {
             @Override
             protected Void call() throws Exception {
                 try {
+                    supervisorFactory.removeSupervisor(SNAPSHOT);
+                    supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to Local Agent on " + localAgentPort);
                     supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
                     logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost,
@@ -114,6 +126,7 @@ public final class ConnectToLocalAgentHandler {
                 connectedAgent.publish(connection);
                 isConnected.publish(true);
                 isLocalAgent.publish(true);
+                isSnapshotAgent.publish(false);
             }
         };
 

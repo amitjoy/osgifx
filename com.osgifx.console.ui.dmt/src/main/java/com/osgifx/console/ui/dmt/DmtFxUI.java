@@ -125,9 +125,7 @@ public final class DmtFxUI {
 
     private void initStatusBar(final BorderPane parent) {
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(() -> {
-                fxController.updateModel();
-            }, "Refresh", "REFRESH");
+            final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
             statusBar.clearAllInRight();
             statusBar.addToRight(node);
         } else {

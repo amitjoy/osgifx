@@ -35,13 +35,13 @@
     <bindings xmi:id="_y5S60AJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.keybinding.connect.agent.local" keySequence="M1+L" command="_LFMTkAJzEe2rVexxjfx5Hw"/>
   </bindingTables>
   <rootContext xmi:id="_1NNJoMNmEeynHblGyo61Iw" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="Windows and Dialogs" description="Windows and Dialogs"/>
-  <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.preference" commandName="Connection Preference Command">
+  <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.preference" commandName="Connection Preference">
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
     <parameters xmi:id="_ciGqICVrEeyVo_nfbAX0Bg" elementId="timeout" name="Timeout" optional="false"/>
     <parameters xmi:id="_bwGcQCWpEeyVo_nfbAX0Bg" elementId="type" name="Type" optional="false"/>
   </commands>
-  <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View Command" description="Refreshes the views by retrieving the current state of the remote runtime"/>
+  <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View" description="Refreshes the views by retrieving the current state of the remote runtime"/>
   <commands xmi:id="_LFMTkAJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.command.connect.agent.local" commandName="Connect to Local Agent" description="Establishes connection to the local agent"/>
   <commands xmi:id="_skZnAMT2EeynHblGyo61Iw" elementId="com.osgifx.console.application.command.connect.agent.remote" commandName="Connect to Remote Agent" description="Establishes connection to the remote agent"/>
   <commands xmi:id="_fg9JYMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.command.disconnect.agent" commandName="Disconnect from Remote Agent" description="Disconnects from the remote agent"/>

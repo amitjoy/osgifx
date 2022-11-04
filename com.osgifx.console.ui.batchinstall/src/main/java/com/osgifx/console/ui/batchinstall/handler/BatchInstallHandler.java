@@ -55,6 +55,9 @@ public final class BatchInstallHandler {
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
     private ProgressDialog    progressDialog;
 
     @Execute
@@ -103,7 +106,7 @@ public final class BatchInstallHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
     @Inject

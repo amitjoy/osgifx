@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
@@ -149,6 +150,9 @@ public final class BundleDetailsFxController {
     private FluentLogger                               logger;
     @Inject
     private CommandService                             commandService;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean                                    isSnapshotAgent;
     private Converter                                  converter;
 
     @FXML
@@ -240,10 +244,10 @@ public final class BundleDetailsFxController {
     }
 
     private void initFragment(final XBundleDTO bundle) {
-        startBundleButton.setDisable(bundle.isFragment || "ACTIVE".equals(bundle.state));
-        stopBundleButton.setDisable(bundle.isFragment || "RESOLVED".equals(bundle.state)
+        startBundleButton.setDisable(isSnapshotAgent || bundle.isFragment || "ACTIVE".equals(bundle.state));
+        stopBundleButton.setDisable(isSnapshotAgent || bundle.isFragment || "RESOLVED".equals(bundle.state)
                 || "INSTALLED".equals(bundle.state) || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
-        uninstallBundleButton.setDisable(AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
+        uninstallBundleButton.setDisable(isSnapshotAgent || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         fragmentLabel.setSelected(bundle.isFragment);
     }
 

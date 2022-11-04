@@ -99,6 +99,7 @@ import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
 import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
+import com.osgifx.console.agent.admin.XSnapshotAdmin;
 import com.osgifx.console.agent.admin.XThreadAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.dto.ConfigValue;
@@ -119,6 +120,7 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.OSGiEventHandler;
@@ -897,6 +899,11 @@ public final class AgentServer implements Agent, Closeable {
     public XHeapdumpDTO heapdump() throws Exception {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
         return isJMXWired ? di.getInstance(XHeapAdmin.class).heapdump() : null;
+    }
+
+    @Override
+    public XSnapshotDTO snapshot() throws Exception {
+        return di.getInstance(XSnapshotAdmin.class).snapshot();
     }
 
     private long getSystemUptime() {

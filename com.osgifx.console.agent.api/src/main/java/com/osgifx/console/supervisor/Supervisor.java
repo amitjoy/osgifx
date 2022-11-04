@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -25,6 +27,7 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
  * agent, not the initiator. I.e. this is not the interface the initiator will
  * use to control the session.
  */
+@ProviderType
 public interface Supervisor {
 
     /** The topic where an event will be sent after the agent gets connected */

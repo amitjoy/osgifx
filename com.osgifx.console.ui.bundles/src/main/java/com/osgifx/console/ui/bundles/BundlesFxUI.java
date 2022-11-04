@@ -76,8 +76,7 @@ public final class BundlesFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentConnectedEvent( //
-                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
                                              final BorderPane parent, //
                                              @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");
@@ -86,8 +85,7 @@ public final class BundlesFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentDisconnectedEvent( //
-                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
                                                 final BorderPane parent, //
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
