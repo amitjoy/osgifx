@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.heap;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
@@ -24,9 +23,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.ThreadSynchronize;
 
 import com.google.common.collect.Lists;
+import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
@@ -76,6 +77,7 @@ public final class HeapMonitorPane extends BorderPane {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     private ThreadSynchronize threadSync;
@@ -93,7 +95,7 @@ public final class HeapMonitorPane extends BorderPane {
         scrollPane.setFitToWidth(true);
         setCenter(scrollPane);
 
-        final var frame = new KeyFrame(Duration.millis(1_000), (final var actionEvent) -> updateHeapInformation());
+        final var frame = new KeyFrame(Duration.millis(1_000d), (final var actionEvent) -> updateHeapInformation());
 
         animation = new Timeline();
         animation.getKeyFrames().add(frame);
@@ -106,8 +108,8 @@ public final class HeapMonitorPane extends BorderPane {
         final var now          = System.currentTimeMillis();
 
         final Supplier<XMemoryUsage> supplier = () -> {
-            final var agent = supervisor.getAgent();
-            if (agent == null || agent.getHeapUsage() == null) {
+            Agent agent;
+            if (supervisor == null || (agent = supervisor.getAgent()) == null || agent.getHeapUsage() == null) {
                 return new XMemoryUsage();
             }
             return agent.getHeapUsage().memoryUsage;
@@ -291,7 +293,7 @@ public final class HeapMonitorPane extends BorderPane {
                     "File: " + heapdump.location + ", size: " + formatByteSize(heapdump.size)));
         } catch (final Exception e) {
             threadSync.asyncExec(() -> {
-                final var message = Optional.ofNullable(e.getMessage())
+                final var message = java.util.Optional.ofNullable(e.getMessage())
                         .orElse("Heapdump cannot be created due to runtime errors");
                 Fx.showErrorNotification("Heapdump Processing Error", message);
             });

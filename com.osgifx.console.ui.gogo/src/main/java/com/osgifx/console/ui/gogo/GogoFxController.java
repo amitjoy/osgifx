@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.textfield.TextFields;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -51,6 +52,7 @@ public final class GogoFxController {
     @Inject
     private GogoConsoleHistory history;
     @Inject
+    @Optional
     private Supervisor         supervisor;
     @Inject
     @Named("is_snapshot_agent")
@@ -61,9 +63,9 @@ public final class GogoFxController {
     @FXML
     public void initialize() {
         historyPointer = 0;
-        agent          = supervisor.getAgent();
         Set<String> gogoCommands;
-        if (agent == null || (gogoCommands = agent.getGogoCommands()) == null) {
+        if (supervisor == null || (agent = supervisor.getAgent()) == null
+                || (gogoCommands = agent.getGogoCommands()) == null) {
             logger.atWarning().log("Agent is not connected");
             return;
         }

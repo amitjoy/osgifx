@@ -55,6 +55,9 @@ public final class RolesFxUI {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
     private ConsoleMaskerPane progressPane;
@@ -122,7 +125,9 @@ public final class RolesFxUI {
         if (isConnected) {
             final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
             statusBar.clearAllInRight();
-            statusBar.addToRight(node);
+            if (!isSnapshotAgent) {
+                statusBar.addToRight(node);
+            }
         } else {
             statusBar.clearAllInRight();
         }
