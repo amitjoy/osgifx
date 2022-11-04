@@ -65,6 +65,9 @@ public final class LogConfigurationEditorFxController {
     @Named("is_connected")
     private boolean                 isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean                 isSnapshotAgent;
+    @Inject
     private Supervisor              supervisor;
     @Inject
     private EventBroker             eventBroker;
@@ -152,6 +155,7 @@ public final class LogConfigurationEditorFxController {
         // @formatter:off
         final Field<?> logLevelsField = Field.ofStringType(LogsHelper.mapToString(logLevels))
                                              .multiline(true)
+                                             .editable(!isSnapshotAgent)
                                              .render(new LoggerConfigTextControl())
                                              .label("Log Levels")
                                              .valueDescription(KV_DESCRIPTION)
