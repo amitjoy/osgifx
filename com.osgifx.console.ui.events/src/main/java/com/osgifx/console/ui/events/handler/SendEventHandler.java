@@ -50,6 +50,9 @@ public final class SendEventHandler {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
     private EventManager      eventManager;
 
     @Execute
@@ -113,7 +116,7 @@ public final class SendEventHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
 }

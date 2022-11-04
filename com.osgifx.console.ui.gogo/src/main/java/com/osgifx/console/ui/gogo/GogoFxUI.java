@@ -61,9 +61,8 @@ public final class GogoFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentConnectedEvent( //
-                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-                                             final BorderPane parent, //
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");
         createControls(parent, loader);
@@ -71,9 +70,8 @@ public final class GogoFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentDisconnectedEvent( //
-                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-                                                final BorderPane parent, //
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data,
+                                                final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
         createControls(parent, loader);

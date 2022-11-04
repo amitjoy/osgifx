@@ -18,6 +18,7 @@ package com.osgifx.console.application.handler;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -32,6 +33,8 @@ import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.supervisor.factory.SupervisorFactory;
+import com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType;
 
 import javafx.concurrent.Task;
 
@@ -41,6 +44,7 @@ public final class DisconnectFromAgentHandler {
     @Inject
     private FluentLogger                            logger;
     @Inject
+    @Optional
     private Supervisor                              supervisor;
     @Inject
     private IEventBroker                            eventBroker;
@@ -60,6 +64,8 @@ public final class DisconnectFromAgentHandler {
     @Optional
     @ContextValue("selected.settings")
     private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    @Inject
+    private SupervisorFactory                       supervisorFactory;
 
     @Execute
     public void execute() {
@@ -68,6 +74,7 @@ public final class DisconnectFromAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisor.getAgent().abort();
+                    Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
                     logger.atInfo().log("Agent connection has been successfully aborted");
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Agent connection cannot be aborted");

@@ -20,6 +20,8 @@ import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACT
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_PACKAGES_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
 import java.util.List;
 import java.util.Map;
@@ -55,14 +57,14 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
     public static final String PACKAGES_ID = "packages";
 
     @Reference
-    private LoggerFactory     factory;
+    private LoggerFactory       factory;
     @Reference
-    private EventAdmin        eventAdmin;
+    private EventAdmin          eventAdmin;
     @Reference
-    private Supervisor        supervisor;
-    @Reference
-    private ThreadSynchronize threadSync;
-    private FluentLogger      logger;
+    private ThreadSynchronize   threadSync;
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile Supervisor supervisor;
+    private FluentLogger        logger;
 
     private final ObservableList<PackageDTO> packages = observableArrayList();
 

@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -81,6 +82,9 @@ public final class ConfigurationEditorFxController {
     private Button                 saveConfigButton;
     @FXML
     private Button                 deleteConfigButton;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean                isSnapshotAgent;
     private Form                   form;
     private FormRenderer           formRenderer;
     private Map<Field<?>, Integer> typeMappings;
@@ -107,7 +111,8 @@ public final class ConfigurationEditorFxController {
         final var pid = config.pid;
         final var ocd = config.ocd;
 
-        deleteConfigButton.setDisable(config.properties == null || config.isFactory || config.pid == null);
+        deleteConfigButton
+                .setDisable(isSnapshotAgent || config.properties == null || config.isFactory || config.pid == null);
         deleteConfigButton.setOnAction(event -> {
             logger.atInfo().log("Configuration delete request has been sent for PID '%s'", pid);
             deleteConfiguration(pid);
@@ -130,13 +135,16 @@ public final class ConfigurationEditorFxController {
             logger.atInfo().log("Configuration create request has been sent for PID '%s'", effectivePID);
             createOrUpdateConfiguration(effectivePID, properties);
         });
+        cancelButton.setDisable(isSnapshotAgent);
         cancelButton.setOnAction(e -> form.reset());
 
+        final BooleanProperty isSnapshot               = new SimpleBooleanProperty(isSnapshotAgent);
         final BooleanProperty isPersisted              = new SimpleBooleanProperty(config.isPersisted);
         final var             isPersistedConfigBinding = new When(isPersisted).then(true).otherwise(false);
+        final var             isSnapshotBinding        = new When(isSnapshot).then(true).otherwise(false);
 
-        saveConfigButton.disableProperty()
-                .bind(form.changedProperty().not().or(form.validProperty().not()).and(isPersistedConfigBinding));
+        saveConfigButton.disableProperty().bind(isSnapshotBinding
+                .or(form.changedProperty().not().or(form.validProperty().not()).and(isPersistedConfigBinding)));
     }
 
     private void deleteConfiguration(final String pid) {
@@ -251,7 +259,7 @@ public final class ConfigurationEditorFxController {
     }
 
     private Field<?> toFxField(final XAttributeDefDTO ad, final XConfigurationDTO config) {
-        return fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(true);
+        return fromAdTypeToFieldType(ad, getValue(config, ad.id)).editable(!isSnapshotAgent);
     }
 
     private Field<?> fromAdTypeToFieldType(final XAttributeDefDTO ad, final ConfigValue currentValue) {

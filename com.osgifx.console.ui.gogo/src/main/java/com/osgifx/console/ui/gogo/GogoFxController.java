@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.controlsfx.control.textfield.TextFields;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -48,9 +49,12 @@ public final class GogoFxController {
     @FXML
     private TextArea           output;
     @Inject
+    private GogoConsoleHistory history;
+    @Inject
     private Supervisor         supervisor;
     @Inject
-    private GogoConsoleHistory history;
+    @Named("is_snapshot_agent")
+    private boolean            isSnapshotAgent;
     private Agent              agent;
     private int                historyPointer;
 
@@ -113,11 +117,15 @@ public final class GogoFxController {
             protected String call() throws Exception {
                 String outputText;
                 try {
-                    if (agent == null || (outputText = agent.execGogoCommand(command)) == null) {
+                    if (isSnapshotAgent) {
+                        logger.atWarning().log("No command execution in snapshot agent mode");
+                        outputText = "You cannot execute command in snapshot agent mode";
+                    } else if (agent == null || (outputText = agent.execGogoCommand(command)) == null) {
                         logger.atWarning().log("Agent is not connected");
                         outputText = "Agent is not connected";
+                    } else {
+                        logger.atInfo().log("Command '%s' has been successfully executed", command);
                     }
-                    logger.atInfo().log("Command '%s' has been successfully executed", command);
                 } catch (final Exception e) {
                     logger.atInfo().withException(e).log("Command '%s' cannot be executed properly", command);
                     outputText = Throwables.getStackTraceAsString(e);

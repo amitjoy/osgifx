@@ -48,6 +48,7 @@ public final class AgentPingAddon {
     @Inject
     private FluentLogger                logger;
     @Inject
+    @Optional
     private Supervisor                  supervisor;
     @Inject
     private IEventBroker                eventBroker;

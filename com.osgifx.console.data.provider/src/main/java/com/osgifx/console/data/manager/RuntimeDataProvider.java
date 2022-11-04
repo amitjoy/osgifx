@@ -33,7 +33,9 @@ import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
 import java.util.Collection;
 import java.util.Map;
@@ -74,11 +76,11 @@ import javafx.collections.ObservableList;
 public final class RuntimeDataProvider implements DataProvider {
 
     @Reference
-    private LoggerFactory factory;
+    private LoggerFactory       factory;
     @Reference
-    private EventAdmin    eventAdmin;
-    @Reference
-    private Supervisor    supervisor;
+    private EventAdmin          eventAdmin;
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile Supervisor supervisor;
 
     private FluentLogger                           logger;
     private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newConcurrentMap();

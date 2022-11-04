@@ -21,8 +21,8 @@ import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.framework.dto.BundleDTO;
 
+import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
@@ -36,26 +36,26 @@ import javafx.scene.control.TableView;
 public final class PackageDetailsFxController {
 
     @FXML
-    private Label                          nameLabel;
+    private Label                           nameLabel;
     @FXML
-    private Label                          versionLabel;
+    private Label                           versionLabel;
     @FXML
-    private ToggleSwitch                   duplicateLabel;
+    private ToggleSwitch                    duplicateLabel;
     @FXML
-    private TableView<BundleDTO>           exportersTable;
+    private TableView<XBundleDTO>           exportersTable;
     @FXML
-    private TableColumn<BundleDTO, String> exportersTableIdColumn;
+    private TableColumn<XBundleDTO, String> exportersTableIdColumn;
     @FXML
-    private TableColumn<BundleDTO, String> exportersTableBsnColumn;
+    private TableColumn<XBundleDTO, String> exportersTableBsnColumn;
     @FXML
-    private TableView<BundleDTO>           importersTable;
+    private TableView<XBundleDTO>           importersTable;
     @FXML
-    private TableColumn<BundleDTO, String> importersTableIdColumn;
+    private TableColumn<XBundleDTO, String> importersTableIdColumn;
     @FXML
-    private TableColumn<BundleDTO, String> importersTableBsnColumn;
+    private TableColumn<XBundleDTO, String> importersTableBsnColumn;
     @Log
     @Inject
-    private FluentLogger                   logger;
+    private FluentLogger                    logger;
 
     @FXML
     public void initialize() {

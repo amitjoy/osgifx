@@ -13,7 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.supervisor.provider;
+package com.osgifx.console.supervisor.rpc;
+
+import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
+import static org.osgi.service.condition.Condition.CONDITION_ID;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
@@ -31,7 +35,10 @@ import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
+@SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
 public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
+
+    public static final String CONDITION_ID_VALUE = "rpc-agent";
 
     private Appendable stdout;
     private Appendable stderr;

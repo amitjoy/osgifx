@@ -16,6 +16,8 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -43,6 +45,7 @@ import com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType;
 import com.osgifx.console.application.dialog.ConnectionDialog;
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -63,6 +66,7 @@ public final class ConnectToAgentHandler {
     @Inject
     private IEventBroker                            eventBroker;
     @Inject
+    @Optional
     private Supervisor                              supervisor;
     @Inject
     private CommandService                          commandService;
@@ -77,6 +81,8 @@ public final class ConnectToAgentHandler {
     @Inject
     @ContextValue("selected.settings")
     private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    @Inject
+    private SupervisorFactory                       supervisorFactory;
     private ProgressDialog                          progressDialog;
 
     @Execute
@@ -160,6 +166,8 @@ public final class ConnectToAgentHandler {
             @Override
             protected Void call() throws Exception {
                 try {
+                    supervisorFactory.removeSupervisor(SNAPSHOT);
+                    supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to " + settings.host + ":" + settings.port);
                     supervisor.connect(settings.host, settings.port, settings.timeout);
                     logger.atInfo().log("Successfully connected to %s", settings);

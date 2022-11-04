@@ -19,6 +19,8 @@ import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.CLEAR_LOGS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -45,12 +47,12 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
     public static final String LOGS_ID = "logs";
 
     @Reference
-    private LoggerFactory     factory;
+    private LoggerFactory       factory;
     @Reference
-    private Supervisor        supervisor;
-    @Reference
-    private ThreadSynchronize threadSync;
-    private FluentLogger      logger;
+    private ThreadSynchronize   threadSync;
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile Supervisor supervisor;
+    private FluentLogger        logger;
 
     private final ObservableList<XLogEntryDTO> logs = observableArrayList();
 

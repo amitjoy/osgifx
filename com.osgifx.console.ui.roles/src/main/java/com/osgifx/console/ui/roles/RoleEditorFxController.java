@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -77,6 +78,9 @@ public final class RoleEditorFxController {
     private Button       saveRoleButton;
     @FXML
     private Button       deleteRoleButton;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean      isSnapshotAgent;
     private Form         form;
     private FormRenderer formRenderer;
 
@@ -172,22 +176,24 @@ public final class RoleEditorFxController {
 
         final Field<?> propertiesField = Field.ofStringType(RolesHelper.mapToString(props)).multiline(true)
                 .label("Properties").render(new RolesConfigTextControl(PROPERTIES)).valueDescription(KV_DESCRIPTION)
-                .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
+                .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE))
+                .editable(!isSnapshotAgent);
 
         final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds)).multiline(true)
                 .label("Credentials").render(new RolesConfigTextControl(CREDENTIALS)).valueDescription(KV_DESCRIPTION)
-                .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE));
+                .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE))
+                .editable(!isSnapshotAgent);
 
         if (role.type == Type.GROUP) {
             final var allExistingRoles = getAllExistingRoles(role);
 
             final Field<?> basicMembersField = Field
                     .ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.basicMembers))
-                    .render(new SimpleCheckBoxControl<>()).label("Basic Members");
+                    .render(new SimpleCheckBoxControl<>()).label("Basic Members").editable(!isSnapshotAgent);
 
             final Field<?> requiredMembersField = Field
                     .ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.requiredMembers))
-                    .render(new SimpleCheckBoxControl<>()).label("Required Members");
+                    .render(new SimpleCheckBoxControl<>()).label("Required Members").editable(!isSnapshotAgent);
 
             return List.of(propertiesField, credentialsField, basicMembersField, requiredMembersField);
         }
