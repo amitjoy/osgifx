@@ -112,7 +112,7 @@ public final class BundleInstallHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
 }

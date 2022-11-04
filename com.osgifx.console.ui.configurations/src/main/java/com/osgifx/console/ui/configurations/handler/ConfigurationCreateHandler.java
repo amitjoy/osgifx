@@ -54,6 +54,9 @@ public final class ConfigurationCreateHandler {
     @Named("is_connected")
     private boolean              isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean              isSnapshotAgent;
+    @Inject
     private ConfigurationManager configManager;
 
     @Execute
@@ -112,7 +115,7 @@ public final class ConfigurationCreateHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
 }

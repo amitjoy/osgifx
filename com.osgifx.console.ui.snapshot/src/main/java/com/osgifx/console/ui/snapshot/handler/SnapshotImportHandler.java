@@ -25,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
 import org.controlsfx.dialog.ProgressDialog;
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -109,6 +110,11 @@ public final class SnapshotImportHandler {
                 taskFuture.cancel(true);
             });
         }
+    }
+
+    @CanExecute
+    public boolean canExecute() {
+        return !isConnected.getValue();
     }
 
 }
