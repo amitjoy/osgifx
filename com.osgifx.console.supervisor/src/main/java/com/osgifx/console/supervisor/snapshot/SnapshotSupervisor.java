@@ -18,6 +18,10 @@ package com.osgifx.console.supervisor.snapshot;
 import static com.osgifx.console.supervisor.snapshot.SnapshotSupervisor.CONDITION_ID_VALUE;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 
+import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.lang.NotImplementedException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 
@@ -29,69 +33,64 @@ import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
-@SatisfyingConditionTarget(CONDITION_ID + "=" + CONDITION_ID_VALUE)
+@SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
 public final class SnapshotSupervisor implements Supervisor {
 
     public static final String CONDITION_ID_VALUE = "snapshot-agent";
 
+    private final AtomicReference<Agent> agent = new AtomicReference<>();
+
     @Override
     public boolean stdout(final String out) throws Exception {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean stderr(final String out) throws Exception {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public void connect(final String host, final int port, final int timeout) throws Exception {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public void onOSGiEvent(final XEventDTO event) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public void logged(final XLogEntryDTO event) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public void addOSGiEventListener(final EventListener eventListener) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public void removeOSGiEventListener(final EventListener eventListener) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public void addOSGiLogListener(final LogEntryListener logEntryListener) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
-        // TODO Auto-generated method stub
-
+        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
     }
 
     @Override
     public Agent getAgent() {
-        // TODO Auto-generated method stub
-        return null;
+        if (agent.get() == null) {
+            agent.set(new SnapshotAgent(new File("/Users/amit/Downloads/osgi_fx_1667510230893.json")));
+        }
+        return agent.get();
     }
 
 }

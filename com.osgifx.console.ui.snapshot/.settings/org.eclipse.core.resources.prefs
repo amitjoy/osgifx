@@ -1,11 +1,6 @@
 eclipse.preferences.version=1
-encoding//css/style.css=UTF-8
 encoding//fxml/tab-content.fxml=UTF-8
 encoding//graphic/icons/extension.png=UTF-8
-encoding//src/main/java/com/osgifx/console/ui/snapshot/MyContextDTO.java=UTF-8
-encoding//src/main/java/com/osgifx/console/ui/snapshot/MyResultDTO.java=UTF-8
-encoding//src/main/java/com/osgifx/console/ui/snapshot/SampleFxController.java=UTF-8
-encoding//src/main/java/com/osgifx/console/ui/snapshot/SampleFxUI.java=UTF-8
 encoding/<project>=UTF-8
 encoding/_plugin.xml=UTF-8
 encoding/bnd.bnd=UTF-8

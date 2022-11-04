@@ -404,8 +404,7 @@ public final class OverviewFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentConnectedEvent( //
-                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data,
                                              final BorderPane parent) {
         logger.atInfo().log("Agent connected event received");
         dataRetrieverTimeline.play();
@@ -415,8 +414,7 @@ public final class OverviewFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentDisconnectedEvent( //
-                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data,
                                                 final BorderPane parent) {
         logger.atInfo().log("Agent disconnected event received");
         dataRetrieverTimeline.stop();
@@ -430,8 +428,7 @@ public final class OverviewFxUI {
      */
     @Inject
     @Optional
-    private void updateOnDataRetrivedEvent( //
-                                           @UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data, //
+    private void updateOnDataRetrivedEvent(@UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data,
                                            final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
         createTiles(parent);

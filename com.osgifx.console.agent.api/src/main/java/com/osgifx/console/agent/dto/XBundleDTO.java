@@ -18,11 +18,12 @@ package com.osgifx.console.agent.dto;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.framework.dto.BundleDTO;
+import org.osgi.dto.DTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
-public class XBundleDTO extends BundleDTO {
+public class XBundleDTO extends DTO {
 
+    public long                  id;
     public String                state;
     public String                location;
     public String                category;
@@ -31,8 +32,10 @@ public class XBundleDTO extends BundleDTO {
     public long                  lastModified;
     public String                documentation;
     public String                vendor;
+    public String                version;
     public String                description;
     public int                   startLevel;
+    public String                symbolicName;
     public long                  startDurationInMillis;
     public BundleRevisionDTO     bundleRevision;
     public List<XPackageDTO>     exportedPackages;
