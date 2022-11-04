@@ -34,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.Subscription;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.event.EventBus;
@@ -96,6 +97,7 @@ public final class HealthCheckFxController {
     @Inject
     private DataProvider          dataProvider;
     @Inject
+    @Optional
     private Supervisor            supervisor;
     @Inject
     private ThreadSynchronize     threadSync;

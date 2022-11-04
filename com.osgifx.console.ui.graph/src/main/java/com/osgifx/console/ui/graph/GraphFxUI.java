@@ -74,6 +74,9 @@ public final class GraphFxUI {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
     private EPartService      partService;
     @Inject
     private DataProvider      dataProvider;
@@ -158,7 +161,9 @@ public final class GraphFxUI {
                 loadedController.updateModel();
             }, "Refresh", "REFRESH");
             statusBar.clearAllInRight();
-            statusBar.addToRight(node);
+            if (!isSnapshotAgent) {
+                statusBar.addToRight(node);
+            }
         } else {
             statusBar.clearAllInRight();
         }
