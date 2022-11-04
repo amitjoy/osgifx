@@ -243,6 +243,7 @@ bin_test/
 **/cnf/cache/*
 **/target/*
 **/.osgifx-ws/*
+**/snapshots/*
 **/fxartifacts/*
 **/heapdumps/*
 **/exception.txt

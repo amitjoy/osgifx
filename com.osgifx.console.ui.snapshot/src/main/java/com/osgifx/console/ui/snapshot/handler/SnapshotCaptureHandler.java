@@ -15,17 +15,24 @@
  ******************************************************************************/
 package com.osgifx.console.ui.snapshot.handler;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.util.fx.Fx;
+import com.osgifx.console.util.fx.FxDialog;
+
+import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 
 public final class SnapshotCaptureHandler {
 
@@ -33,21 +40,45 @@ public final class SnapshotCaptureHandler {
     @Inject
     private FluentLogger      logger;
     @Inject
-    private IEclipseContext   context;
-    @Inject
-    private IEventBroker      eventBroker;
-    @Inject
     private Supervisor        supervisor;
+    @Inject
+    private ThreadSynchronize threadSync;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
-    @Inject
-    private ThreadSynchronize threadSync;
+    private ProgressDialog    progressDialog;
 
     @Execute
     public void execute() {
-        // TODO
-        System.out.println("A");
+        final Task<XSnapshotDTO> snapshotTask = new Task<>() {
+            @Override
+            protected XSnapshotDTO call() throws Exception {
+                try {
+                    updateMessage("Capturing snapshot");
+                    return supervisor.getAgent().snapshot();
+                } catch (final InterruptedException e) {
+                    logger.atInfo().log("Snapshot task interrupted");
+                    threadSync.asyncExec(progressDialog::close);
+                    throw e;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot capture snapshot");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+        snapshotTask.valueProperty().addListener((ChangeListener<XSnapshotDTO>) (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("Snapshot Successfully Captured",
+                        "File: " + newValue.location));
+            }
+        });
+        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(snapshotTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", snapshotTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
 }

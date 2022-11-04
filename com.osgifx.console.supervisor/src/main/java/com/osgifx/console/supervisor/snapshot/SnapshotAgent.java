@@ -15,18 +15,23 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.snapshot;
 
+import java.io.File;
+import java.io.FileReader;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
-import org.osgi.service.component.annotations.Component;
 
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
+import com.osgifx.console.agent.dto.SnapshotDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -46,295 +51,257 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
-@Component
 public final class SnapshotAgent implements Agent {
+
+    private SnapshotDTO snapshotDTO;
+
+    public SnapshotAgent(final File snapshot) {
+        final var gson = new Gson();
+        try {
+            final var reader = new JsonReader(new FileReader(snapshot));
+            snapshotDTO = gson.fromJson(reader, SnapshotDTO.class);
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public BundleDTO installWithData(final String location, final byte[] data, final int startLevel) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO installWithMultipleData(final Collection<byte[]> data, final int startLevel) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public BundleDTO installFromURL(final String location, final String url) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String start(final long... id) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String stop(final long... id) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String uninstall(final long... id) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public List<BundleRevisionDTO> getBundleRevisons(final long... bundleId) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public boolean redirect(final int port) throws Exception {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean stdin(final String s) throws Exception {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public String execGogoCommand(final String command) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public String execCliCommand(final String command) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void abort() throws Exception {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean ping() {
-        // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override
     public List<XBundleDTO> getAllBundles() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.bundles;
     }
 
     @Override
     public List<XComponentDTO> getAllComponents() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.components;
     }
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.configuations;
     }
 
     @Override
     public List<XPropertyDTO> getAllProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.properties;
     }
 
     @Override
     public List<XServiceDTO> getAllServices() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.services;
     }
 
     @Override
     public List<XThreadDTO> getAllThreads() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.threads;
     }
 
     @Override
     public XDmtNodeDTO readDmtNode(final String rootURI) {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.dmtNodes;
     }
 
     @Override
     public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO updateBundleLoggerContext(final String bsn, final Map<String, String> logLevels) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO enableComponentByName(final String name) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO enableComponentById(final long id) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO disableComponentByName(final String name) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO disableComponentById(final long id) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Map<String, XResultDTO> createOrUpdateConfigurations(final Map<String, Map<String, Object>> configurations) {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
     public XResultDTO createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO deleteConfiguration(final String pid) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO createFactoryConfiguration(final String factoryPid, final List<ConfigValue> newProperties) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XMemoryInfoDTO getMemoryInfo() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.memoryInfo;
     }
 
     @Override
     public Set<String> getGogoCommands() {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public XResultDTO createRole(final String name, final Type type) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO updateRole(final XRoleDTO dto) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XResultDTO removeRole(final String name) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public List<XRoleDTO> getAllRoles() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.roles;
     }
 
     @Override
     public List<XHealthCheckDTO> getAllHealthChecks() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.healthChecks;
     }
 
     @Override
     public List<XHealthCheckResultDTO> executeHealthChecks(final List<String> tags, final List<String> names) {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public Map<String, Object> executeExtension(final String name, final Map<String, Object> context) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Set<XBundleDTO> getClassloaderLeaks() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.classloaderLeaks;
     }
 
     @Override
     public List<XHttpComponentDTO> getHttpComponents() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.httpComponents;
     }
 
     @Override
     public List<XBundleLoggerContextDTO> getBundleLoggerContexts() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.bundleLoggerContexts;
     }
 
     @Override
     public XHeapUsageDTO getHeapUsage() {
-        // TODO Auto-generated method stub
-        return null;
+        return snapshotDTO.heapUsage;
     }
 
     @Override
     public XHeapdumpDTO heapdump() throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public XSnapshotDTO snapshot() throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void gc() {
-        // TODO Auto-generated method stub
-
+        // nothing to do
     }
 
 }
