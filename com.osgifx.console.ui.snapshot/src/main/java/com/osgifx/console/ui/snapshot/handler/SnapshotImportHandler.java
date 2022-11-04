@@ -19,7 +19,11 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -34,6 +38,8 @@ import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
@@ -43,6 +49,8 @@ import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 
 public final class SnapshotImportHandler {
+
+    private static final String PID = "com.osgifx.console.snapshot";
 
     @Log
     @Inject
@@ -54,6 +62,8 @@ public final class SnapshotImportHandler {
     private IEventBroker               eventBroker;
     @Inject
     private ThreadSynchronize          threadSync;
+    @Inject
+    private ConfigurationAdmin         configAdmin;
     @Inject
     @Optional
     @ContextValue("is_connected")
@@ -77,13 +87,14 @@ public final class SnapshotImportHandler {
         final var snapshot = bundleChooser.showOpenDialog(null);
 
         if (snapshot != null) {
-            final Task<Void> task = new Task<>() {
+            final Task<File> task = new Task<>() {
                 @Override
-                protected Void call() throws Exception {
+                protected File call() throws Exception {
                     try (var is = new FileInputStream(snapshot)) {
+                        updateSnapshotLocation(snapshot.getAbsolutePath());
                         supervisorFactory.removeSupervisor(SOCKET_RPC);
                         supervisorFactory.createSupervisor(SNAPSHOT);
-                        return null;
+                        return snapshot;
                     } catch (final Exception e) {
                         logger.atError().withException(e).log("Cannot import snapshot '%s'", snapshot.getName());
                         threadSync.asyncExec(() -> {
@@ -93,17 +104,16 @@ public final class SnapshotImportHandler {
                         throw e;
                     }
                 }
-
-                @Override
-                protected void succeeded() {
-                    isConnected.publish(true);
-                    isSnapshotAgent.publish(true);
-                    connectedAgent.publish("Snapshot Agent");
-                    eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, "");
-                    threadSync.asyncExec(progressDialog::close);
-                    logger.atInfo().log("Snapshot has been successfully imported");
-                }
             };
+
+            task.setOnSucceeded(t -> {
+                isConnected.publish(true);
+                isSnapshotAgent.publish(true);
+                connectedAgent.publish("Snapshot Agent: " + task.getValue().getName());
+                eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, "");
+                threadSync.asyncExec(progressDialog::close);
+                logger.atInfo().log("Snapshot has been successfully imported");
+            });
 
             final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
             progressDialog = FxDialog.showProgressDialog("Import Snapshot", task, getClass().getClassLoader(), () -> {
@@ -115,6 +125,17 @@ public final class SnapshotImportHandler {
     @CanExecute
     public boolean canExecute() {
         return !isConnected.getValue();
+    }
+
+    private void updateSnapshotLocation(final String snapshot) {
+        try {
+            final var                        configuration = configAdmin.getConfiguration(PID, "?");
+            final Dictionary<String, String> properties    = FrameworkUtil.asDictionary(Map.of("location", snapshot));
+            configuration.updateIfDifferent(properties);
+        } catch (final IOException e) {
+            logger.atError().withException(e).log("Cannot rretrieve configuration '%s'", PID);
+        }
+
     }
 
 }
