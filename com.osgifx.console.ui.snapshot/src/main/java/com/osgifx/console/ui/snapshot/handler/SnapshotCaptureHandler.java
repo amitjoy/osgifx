@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.dialog.ProgressDialog;
+import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -46,6 +47,9 @@ public final class SnapshotCaptureHandler {
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
     private ProgressDialog    progressDialog;
 
     @Execute
@@ -79,6 +83,11 @@ public final class SnapshotCaptureHandler {
         final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(snapshotTask);
         progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", snapshotTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
+    }
+
+    @CanExecute
+    public boolean canExecute() {
+        return isConnected && !isSnapshotAgent;
     }
 
 }

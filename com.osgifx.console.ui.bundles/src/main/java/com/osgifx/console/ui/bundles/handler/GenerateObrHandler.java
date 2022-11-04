@@ -51,6 +51,9 @@ public final class GenerateObrHandler {
     @Named("is_connected")
     private boolean      isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean      isSnapshotAgent;
+    @Inject
     @Optional
     @Named("connected.agent")
     private String       connectedAgent;
@@ -67,7 +70,7 @@ public final class GenerateObrHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected;
+        return isConnected && !isSnapshotAgent;
     }
 
     private void exportOBR(final File location) {
