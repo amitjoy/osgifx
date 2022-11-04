@@ -58,7 +58,7 @@ public final class SnapshotCaptureHandler {
             @Override
             protected XSnapshotDTO call() throws Exception {
                 try {
-                    updateMessage("Capturing snapshot");
+                    updateMessage("Capturing snapshot of the remote runtime");
                     return supervisor.getAgent().snapshot();
                 } catch (final InterruptedException e) {
                     logger.atInfo().log("Snapshot task interrupted");
