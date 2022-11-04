@@ -21,7 +21,6 @@ import static com.osgifx.console.supervisor.factory.SupervisorFactory.Supervisor
 
 import java.io.FileInputStream;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -63,6 +62,10 @@ public final class SnapshotImportHandler {
     @ContextValue("connected.agent")
     private ContextBoundValue<String>  connectedAgent;
     @Inject
+    @Optional
+    @ContextValue("is_snapshot_agent")
+    private ContextBoundValue<Boolean> isSnapshotAgent;
+    @Inject
     private SupervisorFactory          supervisorFactory;
     private ProgressDialog             progressDialog;
 
@@ -79,7 +82,6 @@ public final class SnapshotImportHandler {
                     try (var is = new FileInputStream(snapshot)) {
                         supervisorFactory.removeSupervisor(SOCKET_RPC);
                         supervisorFactory.createSupervisor(SNAPSHOT);
-                        TimeUnit.SECONDS.sleep(4);
                         return null;
                     } catch (final Exception e) {
                         logger.atError().withException(e).log("Cannot import snapshot '%s'", snapshot.getName());
@@ -94,6 +96,7 @@ public final class SnapshotImportHandler {
                 @Override
                 protected void succeeded() {
                     isConnected.publish(true);
+                    isSnapshotAgent.publish(true);
                     connectedAgent.publish("Snapshot Agent");
                     eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, "");
                     threadSync.asyncExec(progressDialog::close);

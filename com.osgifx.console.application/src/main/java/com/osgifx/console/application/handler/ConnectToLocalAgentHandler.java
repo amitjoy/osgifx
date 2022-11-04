@@ -63,6 +63,10 @@ public final class ConnectToLocalAgentHandler {
     @ContextValue("is_local_agent")
     private ContextBoundValue<Boolean> isLocalAgent;
     @Inject
+    @Optional
+    @ContextValue("is_snapshot_agent")
+    private ContextBoundValue<Boolean> isSnapshotAgent;
+    @Inject
     @ContextValue("connected.agent")
     private ContextBoundValue<String>  connectedAgent;
     @Inject
@@ -122,6 +126,7 @@ public final class ConnectToLocalAgentHandler {
                 connectedAgent.publish(connection);
                 isConnected.publish(true);
                 isLocalAgent.publish(true);
+                isSnapshotAgent.publish(false);
             }
         };
 

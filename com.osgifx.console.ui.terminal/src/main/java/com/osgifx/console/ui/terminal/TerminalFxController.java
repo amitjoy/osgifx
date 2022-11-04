@@ -20,6 +20,7 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -49,6 +50,9 @@ public final class TerminalFxController {
     private Supervisor      supervisor;
     @Inject
     private TerminalHistory history;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean         isSnapshotAgent;
     private Agent           agent;
     private int             historyPointer;
 
@@ -109,11 +113,15 @@ public final class TerminalFxController {
             protected String call() throws Exception {
                 String outputText;
                 try {
-                    if (agent == null || (outputText = agent.execCliCommand(command)) == null) {
+                    if (isSnapshotAgent) {
+                        logger.atWarning().log("No command execution in snapshot agent mode");
+                        outputText = "You cannot execute command in snapshot agent mode";
+                    } else if (agent == null || (outputText = agent.execCliCommand(command)) == null) {
                         logger.atWarning().log("Agent is not connected");
                         outputText = "Agent is not connected";
+                    } else {
+                        logger.atInfo().log("Command '%s' has been successfully executed", command);
                     }
-                    logger.atInfo().log("Command '%s' has been successfully executed", command);
                 } catch (final Exception e) {
                     logger.atInfo().withException(e).log("Command '%s' cannot be executed properly", command);
                     outputText = Throwables.getStackTraceAsString(e);
