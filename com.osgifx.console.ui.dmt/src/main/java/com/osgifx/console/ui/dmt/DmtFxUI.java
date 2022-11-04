@@ -59,6 +59,9 @@ public final class DmtFxUI {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
     private ConsoleMaskerPane progressPane;
     private DmtFxController   fxController;
 
@@ -127,7 +130,9 @@ public final class DmtFxUI {
         if (isConnected) {
             final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
             statusBar.clearAllInRight();
-            statusBar.addToRight(node);
+            if (!isSnapshotAgent) {
+                statusBar.addToRight(node);
+            }
         } else {
             statusBar.clearAllInRight();
         }

@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
@@ -47,6 +48,7 @@ public final class TerminalFxController {
     @FXML
     private TextArea        output;
     @Inject
+    @Optional
     private Supervisor      supervisor;
     @Inject
     private TerminalHistory history;
@@ -59,8 +61,7 @@ public final class TerminalFxController {
     @FXML
     public void initialize() {
         historyPointer = 0;
-        agent          = supervisor.getAgent();
-        if (agent == null) {
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
             logger.atWarning().log("Agent is not connected");
             return;
         }
