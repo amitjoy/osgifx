@@ -5,7 +5,7 @@
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   http:www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -84,27 +84,24 @@ public final class EventsFxUI {
 
     @Inject
     @Optional
-    private void updateOnEventReceiveStarted( //
-                                             @UIEventTopic(EVENT_RECEIVE_STARTED_EVENT_TOPIC) final String data, //
-                                             final BorderPane parent, //
+    private void updateOnEventReceiveStarted(@UIEventTopic(EVENT_RECEIVE_STARTED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
     }
 
     @Inject
     @Optional
-    private void updateOnEventReceiveStopped( //
-                                             @UIEventTopic(EVENT_RECEIVE_STOPPED_EVENT_TOPIC) final String data, //
-                                             final BorderPane parent, //
+    private void updateOnEventReceiveStopped(@UIEventTopic(EVENT_RECEIVE_STOPPED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
     }
 
     @Inject
     @Optional
-    private void updateOnAgentConnectedEvent( //
-                                             @UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data, //
-                                             final BorderPane parent, //
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");
         createControls(parent, loader);
@@ -112,9 +109,8 @@ public final class EventsFxUI {
 
     @Inject
     @Optional
-    private void updateOnAgentDisconnectedEvent( //
-                                                @UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data, //
-                                                final BorderPane parent, //
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data,
+                                                final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
         createControls(parent, loader);
