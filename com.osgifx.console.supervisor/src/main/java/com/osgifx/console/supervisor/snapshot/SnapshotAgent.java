@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.snapshot;
 
-import java.io.File;
+import static com.osgifx.console.supervisor.snapshot.SnapshotAgent.PID;
+
 import java.io.FileReader;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +26,9 @@ import java.util.Set;
 
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -51,14 +55,26 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
+@Component(service = { SnapshotAgent.class, Agent.class }, configurationPid = PID)
 public final class SnapshotAgent implements Agent {
 
-    private SnapshotDTO snapshotDTO;
+    public static final String PID = "com.osgifx.console.snapshot";
 
-    public SnapshotAgent(final File snapshot) {
+    @interface Configuration {
+        String location();
+    }
+
+    private volatile SnapshotDTO snapshotDTO;
+
+    @Activate
+    @Modified
+    void init(final Configuration configuration) {
+        if (configuration.location() == null) {
+            return;
+        }
         final var gson = new Gson();
         try {
-            final var reader = new JsonReader(new FileReader(snapshot));
+            final var reader = new JsonReader(new FileReader(configuration.location()));
             snapshotDTO = gson.fromJson(reader, SnapshotDTO.class);
         } catch (final Exception e) {
             throw new RuntimeException(e);

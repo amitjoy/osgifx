@@ -18,11 +18,13 @@ package com.osgifx.console.supervisor.snapshot;
 import static com.osgifx.console.supervisor.snapshot.SnapshotSupervisor.CONDITION_ID_VALUE;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 
-import java.io.File;
-import java.util.concurrent.atomic.AtomicReference;
+import java.io.IOException;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 
 import com.osgifx.console.agent.Agent;
@@ -38,7 +40,17 @@ public final class SnapshotSupervisor implements Supervisor {
 
     public static final String CONDITION_ID_VALUE = "snapshot-agent";
 
-    private final AtomicReference<Agent> agent = new AtomicReference<>();
+    @Reference
+    private SnapshotAgent agent;
+
+    @Reference
+    private ConfigurationAdmin configAdmin;
+
+    @Deactivate
+    void deactivate() throws IOException {
+        final var configuration = configAdmin.getConfiguration(SnapshotAgent.PID, "?");
+        configuration.delete();
+    }
 
     @Override
     public boolean stdout(final String out) throws Exception {
@@ -87,10 +99,7 @@ public final class SnapshotSupervisor implements Supervisor {
 
     @Override
     public Agent getAgent() {
-        if (agent.get() == null) {
-            agent.set(new SnapshotAgent(new File("/Users/amit/Downloads/osgi_fx_1667510230893.json")));
-        }
-        return agent.get();
+        return agent;
     }
 
 }
