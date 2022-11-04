@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
@@ -124,6 +125,9 @@ public final class ComponentDetailsFxController {
     private BundleContext                                 context;
     @Inject
     private CommandService                                commandService;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean                                       isSnapshotAgent;
     private TableRowDataFeatures<XReferenceDTO>           previouslyExpanded;
     private AtomicBoolean                                 areReferenceTableNodesLoader;
 
@@ -186,8 +190,8 @@ public final class ComponentDetailsFxController {
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
-        enableComponentButton.setDisable(!"DISABLED".equals(component.state));
-        disableComponentButton.setDisable("DISABLED".equals(component.state));
+        enableComponentButton.setDisable(isSnapshotAgent || !"DISABLED".equals(component.state));
+        disableComponentButton.setDisable(isSnapshotAgent || "DISABLED".equals(component.state));
     }
 
     private void createReferenceExpandedTable(final XComponentDTO component) {

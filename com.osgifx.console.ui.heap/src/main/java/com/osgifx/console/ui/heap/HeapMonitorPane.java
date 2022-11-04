@@ -79,6 +79,9 @@ public final class HeapMonitorPane extends BorderPane {
     private Supervisor        supervisor;
     @Inject
     private ThreadSynchronize threadSync;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
 
     @PostConstruct
     public void init() {
@@ -235,7 +238,7 @@ public final class HeapMonitorPane extends BorderPane {
         heapDumpBtn.setOnAction(e -> heapDump());
 
         final var startStopBtn = new Button("Start");
-        startStopBtn.setDisable(!isConnected);
+        startStopBtn.setDisable(!isConnected || isSnapshotAgent);
         startStopBtn.setMaxWidth(Double.MAX_VALUE);
         startStopBtn.setOnAction(e -> {
             switch (animation.getStatus()) {

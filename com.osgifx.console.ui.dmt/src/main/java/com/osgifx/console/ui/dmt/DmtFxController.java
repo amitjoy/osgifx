@@ -75,6 +75,9 @@ public final class DmtFxController {
     private DataProvider      dataProvider;
     @Inject
     private Supervisor        supervisor;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
 
     private final Map<FilterableTreeItem<String>, XDmtNodeDTO> items = Maps.newHashMap();
 
@@ -135,16 +138,18 @@ public final class DmtFxController {
     }
 
     private void addDoubleClickEvent() {
-        dmtTree.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getClickCount() == 2) {
-                final var item = dmtTree.getSelectionModel().getSelectedItem();
-                final var node = items.get(item);
-                if (node != null && !node.children.isEmpty()) {
-                    return;
+        if (!isSnapshotAgent) {
+            dmtTree.setOnMouseClicked(mouseEvent -> {
+                if (mouseEvent.getClickCount() == 2) {
+                    final var item = dmtTree.getSelectionModel().getSelectedItem();
+                    final var node = items.get(item);
+                    if (node != null && !node.children.isEmpty()) {
+                        return;
+                    }
+                    showDialog(node);
                 }
-                showDialog(node);
-            }
-        });
+            });
+        }
     }
 
     private void showDialog(final XDmtNodeDTO node) {

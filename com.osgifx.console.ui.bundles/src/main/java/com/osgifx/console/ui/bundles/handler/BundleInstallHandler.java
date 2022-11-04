@@ -53,6 +53,9 @@ public final class BundleInstallHandler {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
     private ThreadSynchronize threadSync;
 
     @Execute
