@@ -218,7 +218,8 @@ public final class ConfigurationEditorFxController {
             final var value       = entry.getValue();
             final var attrDefType = value.type;
 
-            final Field<?> field = initFieldFromType(key, value, null, attrDefType, null, false).label(key);
+            final Field<?> field = initFieldFromType(key, value, null, attrDefType, null, false).label(key)
+                    .editable(!isSnapshotAgent);
 
             if (uneditableProperties.contains(field.getLabel())) {
                 continue;
