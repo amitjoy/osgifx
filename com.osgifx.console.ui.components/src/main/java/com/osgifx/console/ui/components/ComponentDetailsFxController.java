@@ -49,6 +49,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 
 public final class ComponentDetailsFxController {
@@ -75,7 +76,7 @@ public final class ComponentDetailsFxController {
     @FXML
     private Label                                         policyLabel;
     @FXML
-    private Label                                         failureLabel;
+    private TextArea                                      failureText;
     @FXML
     private Label                                         activateLabel;
     @FXML
@@ -148,7 +149,7 @@ public final class ComponentDetailsFxController {
         scopeLabel.setText(component.scope);
         classLabel.setText(component.implementationClass);
         policyLabel.setText(component.configurationPolicy);
-        failureLabel.setText(component.failure);
+        failureText.setText(component.failure);
         activateLabel.setText(component.activate);
         deactivateLabel.setText(component.deactivate);
         modifiedLabel.setText(component.modified);
