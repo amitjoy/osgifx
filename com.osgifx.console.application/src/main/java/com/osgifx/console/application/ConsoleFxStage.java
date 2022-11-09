@@ -23,6 +23,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.eclipse.fx.ui.workbench.fx.DefaultJFXApp;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 
 import javafx.animation.FadeTransition;
@@ -46,13 +48,18 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 
     private static final String SPLASH_IMAGE = "/graphic/images/splash.png";
 
-    private VBox        splashLayout;
-    private ProgressBar loadProgress;
-    private Label       progressText;
-    private Stage       initStage;
+    private Stage        initStage;
+    private VBox         splashLayout;
+    private ProgressBar  loadProgress;
+    private Label        progressText;
+    private final Bundle applicationBundle;
 
     private static final double SPLASH_WIDTH  = 695d;
     private static final double SPLASH_HEIGHT = 227d;
+
+    public ConsoleFxStage() {
+        applicationBundle = FrameworkUtil.getBundle(getClass());
+    }
 
     @Override
     public void init() throws Exception {
@@ -73,8 +80,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
     }
 
     private void loadCustomFont() {
-        final var bundle = FrameworkUtil.getBundle(getClass());
-        Font.loadFont(bundle.getResource("/font/Gill Sans SemiBold.ttf").toExternalForm(), 11);
+        Font.loadFont(applicationBundle.getResource("/font/Gill Sans SemiBold.ttf").toExternalForm(), 11);
     }
 
     @Override
@@ -95,12 +101,12 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         };
         showSplash(initStage, friendTask, this::showFxConsoleStage);
         CompletableFuture.runAsync(friendTask);
-        registerHostServices();
+        registerHostServices(applicationBundle.getBundleContext());
     }
 
-    private void registerHostServices() {
+    private void registerHostServices(final BundleContext context) {
         final var hostServices = getHostServices();
-        OSGi.register(HostServices.class, hostServices, null);
+        OSGi.register(HostServices.class, hostServices, null).run(context);
     }
 
     private void showFxConsoleStage() {
