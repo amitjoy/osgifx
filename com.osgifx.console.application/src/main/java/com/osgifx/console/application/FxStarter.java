@@ -15,20 +15,20 @@
  ******************************************************************************/
 package com.osgifx.console.application;
 
+import static org.apache.aries.component.dsl.OSGi.register;
+import static org.apache.aries.component.dsl.OSGi.service;
+import static org.apache.aries.component.dsl.OSGi.serviceReferences;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 import static org.osgi.framework.Constants.SERVICE_RANKING;
 
-import java.util.Dictionary;
 import java.util.Map;
 
 import org.eclipse.e4.core.di.InjectorFactory;
-import org.eclipse.fx.core.ServiceUtils;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.eclipse.fx.ui.services.startup.StartupProgressTrackerService;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 import com.osgifx.console.application.ui.ConsoleMaskerPaneProvider;
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
@@ -52,10 +52,8 @@ public final class FxStarter implements BundleActivator {
     }
 
     private void registerStartupTracker(final BundleContext context) {
-        ServiceUtils.getService(LoggerFactory.class).ifPresent(s -> {
-            final Dictionary<String, Object> props = FrameworkUtil.asDictionary(Map.of(SERVICE_RANKING, 100));
-            context.registerService(StartupProgressTrackerService.class, new FxStartupTracker(s), props);
-        });
+        service(serviceReferences(LoggerFactory.class)).map(s -> register(StartupProgressTrackerService.class,
+                new FxStartupTracker(s), Map.of(SERVICE_RANKING, 100))).run(context);
     }
 
 }
