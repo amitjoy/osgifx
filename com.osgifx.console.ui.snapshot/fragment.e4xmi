@@ -9,7 +9,7 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gahNdlw7Ee2vapz13RE2Vg" featurename="commands" parentElementId="com.osgifx.console.application">
     <elements xsi:type="commands:Command" xmi:id="_gahNeFw7Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.command.snapshot.import" commandName="Import Snapshot" description="Imports already captured snapshot"/>
   </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_hbr6EFw8Ee2vapz13RE2Vg" featurename="children" parentElementId="com.osgifx.console.application.menu.extensions">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_hbr6EFw8Ee2vapz13RE2Vg" featurename="children" parentElementId="com.osgifx.console.application.menu.extensions" positionInList="after:com.osgifx.console.application.menu.connection">
     <elements xsi:type="menu:Menu" xmi:id="_hbr6EVw8Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.menu.snapshot" label="Snapshot">
       <children xsi:type="menu:HandledMenuItem" xmi:id="_gahNf1w7Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.handledmenuitem.import" label="Import" iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/import.png" tooltip="Imports snapshot of the remote runtime" command="_gahNeFw7Ee2vapz13RE2Vg"/>
       <children xsi:type="menu:DirectMenuItem" xmi:id="_4VOg0FxAEe2vapz13RE2Vg" elementId="com.osgifx.console.ui.snapshot.directmenuitem.capture" label="Capture" iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/capture.png" tooltip="Captures snapshot of the remote runtime" contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotCaptureHandler"/>
