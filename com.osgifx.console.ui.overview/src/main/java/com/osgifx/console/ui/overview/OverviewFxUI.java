@@ -35,8 +35,10 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.ui.workbench.renderers.base.widget.WWindow;
 
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -65,6 +67,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Stop;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public final class OverviewFxUI {
@@ -75,6 +78,8 @@ public final class OverviewFxUI {
     @Log
     @Inject
     private FluentLogger     logger;
+    @Inject
+    private MWindow          window;
     @Inject
     private ConsoleStatusBar statusBar;
     @Inject
@@ -96,6 +101,7 @@ public final class OverviewFxUI {
 
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
+        disableApplicationResizing();
         retrieveRuntimeInfo();
         createTiles(parent);
         createPeriodicTaskToSetRuntimeInfo();
@@ -432,6 +438,11 @@ public final class OverviewFxUI {
                                            final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
         createTiles(parent);
+    }
+
+    public void disableApplicationResizing() {
+        final var stage = (Stage) ((WWindow<?>) window.getWidget()).getWidget();
+        stage.setResizable(false);
     }
 
 }
