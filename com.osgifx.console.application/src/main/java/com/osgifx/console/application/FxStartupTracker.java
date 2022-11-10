@@ -30,9 +30,10 @@ import org.eclipse.fx.ui.services.startup.StartupProgressTrackerService;
 
 public final class FxStartupTracker implements StartupProgressTrackerService {
 
-    private final FluentLogger logger;
+    private LoggerFactory factory;
+    private FluentLogger  logger;
 
-    public FxStartupTracker(final LoggerFactory factory) {
+    public void init() {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
