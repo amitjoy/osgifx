@@ -90,7 +90,8 @@ bundles.required: \
                  javax.inject,\
                  com.osgifx.console.util;version=snapshot,\
                  eu.hansolo.tilesfx,\
-                 com.osgifx.console.wrapper.formsfx
+                 com.osgifx.console.wrapper.formsfx,\
+                 org.apache.felix.dependencymanager
                 
 bundles.configurations: \
                  org.apache.felix.configadmin,\

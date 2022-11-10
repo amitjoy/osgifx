@@ -15,20 +15,19 @@
  ******************************************************************************/
 package com.osgifx.console.application;
 
-import static org.apache.aries.component.dsl.OSGi.register;
-import static org.apache.aries.component.dsl.OSGi.service;
-import static org.apache.aries.component.dsl.OSGi.serviceReferences;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 import static org.osgi.framework.Constants.SERVICE_RANKING;
 
 import java.util.Map;
 
+import org.apache.felix.dm.DependencyActivatorBase;
+import org.apache.felix.dm.DependencyManager;
 import org.eclipse.e4.core.di.InjectorFactory;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.eclipse.fx.ui.services.startup.StartupProgressTrackerService;
 import org.osgi.annotation.bundle.Header;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 import com.osgifx.console.application.ui.ConsoleMaskerPaneProvider;
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
@@ -36,24 +35,24 @@ import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
-public final class FxStarter implements BundleActivator {
+public final class FxStarter extends DependencyActivatorBase {
 
     @Override
-    public void start(final BundleContext context) throws Exception {
-        registerStartupTracker(context);
+    public void init(final BundleContext context, final DependencyManager manager) throws Exception {
+        // @formatter:off
+        manager.add(createComponent()
+                      .setInterface(
+                              StartupProgressTrackerService.class,
+                              FrameworkUtil.asDictionary(Map.of(SERVICE_RANKING, 100)))
+                      .setImplementation(FxStartupTracker.class)
+                      .setCallbacks("init", null, null, null)
+               .add(createServiceDependency()
+                      .setService(LoggerFactory.class)
+                      .setRequired(true)));
+        // @formatter:on
 
         InjectorFactory.getDefault().addBinding(ConsoleStatusBar.class).implementedBy(ConsoleStatusBarProvider.class);
         InjectorFactory.getDefault().addBinding(ConsoleMaskerPane.class).implementedBy(ConsoleMaskerPaneProvider.class);
-    }
-
-    @Override
-    public void stop(final BundleContext context) throws Exception {
-        // nothing to implement
-    }
-
-    private void registerStartupTracker(final BundleContext context) {
-        service(serviceReferences(LoggerFactory.class)).map(s -> register(StartupProgressTrackerService.class,
-                new FxStartupTracker(s), Map.of(SERVICE_RANKING, 100))).run(context);
     }
 
 }
