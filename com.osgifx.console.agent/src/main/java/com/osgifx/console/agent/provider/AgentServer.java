@@ -102,6 +102,7 @@ import com.osgifx.console.agent.admin.XServiceAdmin;
 import com.osgifx.console.agent.admin.XSnapshotAdmin;
 import com.osgifx.console.agent.admin.XThreadAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
+import com.osgifx.console.agent.di.DI;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -138,7 +139,6 @@ import com.osgifx.console.supervisor.Supervisor;
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
-import eu.lestard.easydi.EasyDI;
 
 public final class AgentServer implements Agent, Closeable {
 
@@ -158,9 +158,9 @@ public final class AgentServer implements Agent, Closeable {
     private Closeable              osgiLogListenerCloser;
     private ServiceRegistration<?> osgiEventListenerServiceReg;
 
-    private final EasyDI di;
+    private final DI di;
 
-    public AgentServer(final EasyDI di) {
+    public AgentServer(final DI di) {
         this.di = di;
     }
 

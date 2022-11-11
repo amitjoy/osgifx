@@ -1,0 +1,4 @@
+javac.source          : 1.8
+javac.target          : ${javac.source}
+javac.compliance      : ${javac.source}
+-noimportjava         : true
