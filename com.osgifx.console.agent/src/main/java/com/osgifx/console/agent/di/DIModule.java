@@ -40,12 +40,10 @@ import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.provider.PackageWirings;
 
-import eu.lestard.easydi.EasyDI;
-
 @SuppressWarnings("rawtypes")
-public final class Module {
+public final class DIModule {
 
-    private final EasyDI        di;
+    private final DI            di;
     private final BundleContext context;
 
     private ServiceTracker<Object, Object>                 scrTracker;
@@ -63,11 +61,11 @@ public final class Module {
     private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
     private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
 
-    public Module(final BundleContext context) {
-        di           = new EasyDI();
+    public DIModule(final BundleContext context) {
+        di           = new DI();
         this.context = context;
 
-        di.bindInstance(EasyDI.class, di);
+        di.bindInstance(DI.class, di);
         di.bindInstance(BundleContext.class, context);
     }
 
@@ -104,7 +102,7 @@ public final class Module {
         httpServiceRuntimeTracker.close();
     }
 
-    public EasyDI di() {
+    public DI di() {
         return di;
     }
 

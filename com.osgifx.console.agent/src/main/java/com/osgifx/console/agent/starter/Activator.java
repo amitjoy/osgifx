@@ -34,7 +34,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.Agent;
-import com.osgifx.console.agent.di.Module;
+import com.osgifx.console.agent.di.DIModule;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
@@ -47,13 +47,13 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private Module                  module;
+    private DIModule                module;
     private ServerSocket            server;
     private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
 
     @Override
     public void start(final BundleContext context) throws Exception {
-        module = new Module(context);
+        module = new DIModule(context);
         module.di().getInstance(ClassloaderLeakDetector.class).start();
 
         // Get the specified port in the framework properties
