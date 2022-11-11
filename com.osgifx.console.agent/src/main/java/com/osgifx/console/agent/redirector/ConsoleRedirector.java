@@ -32,13 +32,13 @@ import com.osgifx.console.agent.provider.AgentServer;
  */
 public final class ConsoleRedirector implements Redirector {
 
-    private static RedirectOutput    stdout;
-    private static RedirectOutput    stderr;
-    private static RedirectInput     stdin;
-    private static List<AgentServer> agents = new CopyOnWriteArrayList<>();
-    private final AgentServer        agent;
+    private static RedirectOutput          stdout;
+    private static RedirectOutput          stderr;
+    private static RedirectInput           stdin;
+    private static final List<AgentServer> agents = new CopyOnWriteArrayList<>();
+    private final AgentServer              agent;
 
-    public ConsoleRedirector(final AgentServer agent) throws IOException {
+    public ConsoleRedirector(final AgentServer agent) {
         this.agent = agent;
         synchronized (agents) {
             if (!agents.contains(agent)) {

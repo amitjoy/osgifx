@@ -46,7 +46,7 @@ public final class GogoRedirector implements Redirector {
     private ServiceTracker<CommandProcessor, CommandProcessor> tracker;
     private CommandProcessor                                   processor;
     private CommandSession                                     session;
-    private Shell                                              stdin;
+    private final Shell                                        stdin;
     private RedirectOutput                                     stdout;
 
     /**
@@ -57,9 +57,9 @@ public final class GogoRedirector implements Redirector {
      */
     public GogoRedirector(final AgentServer agentServer, final BundleContext context) {
         this.agentServer = agentServer;
-        tracker          = new ServiceTracker<CommandProcessor, CommandProcessor>(context,
-                CommandProcessor.class.getName(), null) {
-
+        stdin            = new Shell();
+        tracker          = new ServiceTracker<CommandProcessor, CommandProcessor>(context, CommandProcessor.class,
+                null) {
                              @Override
                              public CommandProcessor addingService(final ServiceReference<CommandProcessor> reference) {
                                  final CommandProcessor cp = proxy(CommandProcessor.class,
@@ -87,21 +87,19 @@ public final class GogoRedirector implements Redirector {
         tracker.open();
     }
 
-    void closeSession() {
+    private void closeSession() {
         if (session != null) {
             session.close();
             processor = null;
         }
     }
 
-    synchronized void openSession(final CommandProcessor replacement) {
+    private synchronized void openSession(final CommandProcessor replacement) {
         processor = replacement;
         final List<AgentServer> agents = Arrays.asList(agentServer);
         stdout  = new RedirectOutput(agents, null, false);
-        stdin   = new Shell();
         session = processor.createSession(stdin, stdout, stdout);
         stdin.open(session);
-
     }
 
     /*
@@ -110,18 +108,13 @@ public final class GogoRedirector implements Redirector {
      * framework side and we can't force Gogo to import our classes (nor should we).
      */
     @SuppressWarnings("unchecked")
-    <T> T proxy(final Class<T> clazz, final Object target) {
+    private <T> T proxy(final Class<T> clazz, final Object target) {
         final Class<?> targetClass = target.getClass();
 
-        //
-        // We could also be in the same class space, in that case we
-        // can just return the value
-        //
-
+        // We could also be in the same class space, in that case we can just return the value
         if (targetClass == clazz) {
             return clazz.cast(target);
         }
-
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class<?>[] { clazz }, (proxy, method, args) -> {
             final Method targetMethod = targetClass.getMethod(method.getName(), method.getParameterTypes());
             final Object result       = targetMethod.invoke(target, args);
