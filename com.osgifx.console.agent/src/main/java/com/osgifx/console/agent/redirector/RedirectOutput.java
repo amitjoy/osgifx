@@ -31,22 +31,26 @@ import com.osgifx.console.agent.provider.AgentServer;
  */
 public class RedirectOutput extends PrintStream {
 
-    static Timer                        timer      = new Timer();
-    private final List<AgentServer>     agents;
-    private final PrintStream           out;
-    private StringBuilder               sb         = new StringBuilder();
-    private final boolean               err;
-    private static ThreadLocal<Boolean> onStack    = new ThreadLocal<>();
-    private TimerTask                   active;
-    private String                      lastOutput = "";
+    private static Timer                      timer      = new Timer();
+    private final List<AgentServer>           agents;
+    private final PrintStream                 out;
+    private StringBuilder                     sb         = new StringBuilder();
+    private final boolean                     err;
+    private static final ThreadLocal<Boolean> onStack    = new ThreadLocal<>();
+    private TimerTask                         active;
+    private String                            lastOutput = "";
 
     /**
      * If we do not have an original, we create a null stream because the
      * PrintStream requires this.
      */
-    static class NullOutputStream extends OutputStream {
+    private static class NullOutputStream extends OutputStream {
         @Override
-        public void write(final int arg0) throws IOException {
+        public void write(final int off) throws IOException {
+        }
+
+        @Override
+        public void write(final byte[] b, final int off, final int len) throws IOException {
         }
     }
 
@@ -68,12 +72,12 @@ public class RedirectOutput extends PrintStream {
     }
 
     @Override
-    public void write(final byte b[]) {
+    public void write(final byte[] b) {
         write(b, 0, b.length);
     }
 
     @Override
-    public void write(final byte b[], final int off, final int len) {
+    public void write(final byte[] b, final int off, final int len) {
         if ((off | len | b.length - (len + off) | off + len) < 0) {
             throw new IndexOutOfBoundsException();
         }
@@ -85,7 +89,6 @@ public class RedirectOutput extends PrintStream {
                 sb.append(new String(b, off, len)); // default encoding!
                 flushConditional();
             } catch (final Exception e) {
-                // e.printStackTrace();
             } finally {
                 onStack.remove();
             }
@@ -99,9 +102,7 @@ public class RedirectOutput extends PrintStream {
             if (active != null) {
                 return;
             }
-
             active = new TimerTask() {
-
                 @Override
                 public void run() {
                     synchronized (RedirectOutput.this) {
@@ -109,7 +110,6 @@ public class RedirectOutput extends PrintStream {
                     }
                     flush();
                 }
-
             };
             timer.schedule(active, 300);
         }
@@ -122,18 +122,14 @@ public class RedirectOutput extends PrintStream {
             if (sb.length() == 0) {
                 return;
             }
-
             output = sb.toString();
             sb     = new StringBuilder();
         }
-
         setLastOutput(output);
-
         for (final AgentServer agent : agents) {
             if (agent.quit) {
                 continue;
             }
-
             try {
                 if (err) {
                     agent.getSupervisor().stderr(output);
@@ -146,11 +142,9 @@ public class RedirectOutput extends PrintStream {
                 try {
                     agent.close();
                 } catch (final IOException e) {
-                    // e.printStackTrace();
                 }
             }
         }
-
         super.flush();
     }
 
@@ -170,7 +164,6 @@ public class RedirectOutput extends PrintStream {
     private void setLastOutput(String out) {
         if (!"".equals(out) && out != null) {
             out = out.replaceAll("^>.*$", "");
-
             if (!"".equals(out) && !out.startsWith("true")) {
                 lastOutput = out;
             }

@@ -18,9 +18,6 @@ package com.osgifx.console.agent.redirector;
 import java.io.Closeable;
 import java.io.PrintStream;
 
-/**
- * API def for a redirector.
- */
 public interface Redirector extends Closeable {
 
     /**
