@@ -10,20 +10,19 @@ javac.compliance      : ${javac.source}
 -buildpath            : \
                         biz.aQute.remote.agent;packages=*,\
                         com.osgifx.console.agent.api;version=snapshot;packages=*,\
-                        eu.lestard:easy-di;packages=*,\
-                        jakarta.inject.jakarta.inject-api,\
+                        com.osgifx.console.agent.di;packages=*,\
                         org.apache.commons.exec,\
                         org.apache.felix.healthcheck.api,\
                         org.osgi.service.log,\
                         org.slf4j.api
 -privatepackage       : \
                         com.osgifx.console.agent.*,\
-                        com.osgifx.console.supervisor,\
-                        jakarta.inject
+                        com.osgifx.console.supervisor
 -conditionalpackage   : \
                         aQute.*,\
                         com.osgifx.console.agent.link,\
-                        eu.lestard.*,\
+                        com.osgifx.console.agent.di,\
+                        jakarta.inject,\
                         org.apache.commons.exec.*
 Import-Package        : \
                         com.sun.management;'resolution:'=optional,\
