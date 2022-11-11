@@ -34,7 +34,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.Agent;
-import com.osgifx.console.agent.di.DIModule;
+import com.osgifx.console.agent.di.module.DIModule;
 import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;

@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.di;
+package com.osgifx.console.agent.di.module;
 
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +37,7 @@ import com.osgifx.console.agent.admin.XHttpAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
+import com.osgifx.console.agent.di.DI;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.provider.PackageWirings;
 
