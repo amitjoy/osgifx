@@ -75,8 +75,12 @@ public final class XMetaTypeAdmin {
     }
 
     private List<XConfigurationDTO> findConfigsWithMetatype() throws IOException, InvalidSyntaxException {
+        final Configuration[] allExistingConfigurations = configAdmin.listConfigurations(null);
+        if (allExistingConfigurations == null) {
+            return Collections.emptyList();
+        }
         final List<XConfigurationDTO> dtos = new ArrayList<>();
-        for (final Configuration config : configAdmin.listConfigurations(null)) {
+        for (final Configuration config : allExistingConfigurations) {
             final boolean hasMetatype = hasMetatype(context, metatype, config);
             if (hasMetatype) {
                 dtos.add(toConfigDTO(config, null, toOCD(config)));
