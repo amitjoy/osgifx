@@ -43,6 +43,7 @@ public final class BundleStartHandler {
     @Inject
     private IEventBroker      eventBroker;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     @Optional
