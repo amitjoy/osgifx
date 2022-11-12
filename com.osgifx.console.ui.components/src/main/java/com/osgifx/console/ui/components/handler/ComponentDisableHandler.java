@@ -46,6 +46,7 @@ public final class ComponentDisableHandler {
     @Inject
     private IEventBroker      eventBroker;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     private ThreadSynchronize threadSync;

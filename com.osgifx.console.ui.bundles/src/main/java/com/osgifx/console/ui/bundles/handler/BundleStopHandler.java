@@ -43,6 +43,7 @@ public final class BundleStopHandler {
     @Inject
     private IEventBroker      eventBroker;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     private ThreadSynchronize threadSync;
