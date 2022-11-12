@@ -26,6 +26,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -47,6 +48,7 @@ public final class RoleCreateHandler {
     @Inject
     private IEclipseContext   context;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     private ThreadSynchronize threadSync;
