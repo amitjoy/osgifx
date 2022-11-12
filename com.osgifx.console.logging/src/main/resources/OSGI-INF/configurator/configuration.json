@@ -1,5 +1,0 @@
-{
-	"org.osgi.service.log.admin": {
-		"ROOT": "DEBUG"
-	}
-}
