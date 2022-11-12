@@ -77,3 +77,9 @@ org.eclipse.platform:org.eclipse.core.net:1.4.0
 org.eclipse.platform:org.eclipse.core.resources:3.18.0
 org.eclipse.platform:org.eclipse.core.runtime:3.26.0
 org.eclipse.platform:org.eclipse.core.variables:3.5.100
+
+# OSGi Logging
+
+org.slf4j:slf4j-api:1.7.36
+org.apache.sling:org.apache.sling.commons.log:5.4.2
+org.apache.sling:org.apache.sling.commons.logservice:1.1.0
