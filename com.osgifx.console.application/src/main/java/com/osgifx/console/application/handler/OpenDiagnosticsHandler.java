@@ -16,6 +16,7 @@
 package com.osgifx.console.application.handler;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -26,23 +27,20 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.log.DiagnosticsAdmin;
-
 public final class OpenDiagnosticsHandler {
 
     @Log
     @Inject
-    private FluentLogger     logger;
+    private FluentLogger  logger;
     @Inject
     @OSGiBundle
-    private BundleContext    context;
-    @Inject
-    private DiagnosticsAdmin diagnosticsAdmin;
+    private BundleContext context;
 
     @Execute
     public void execute() {
         try {
-            Desktop.getDesktop().open(diagnosticsAdmin.getLogFilesDirectory());
+            Desktop.getDesktop()
+                    .open(new File(context.getProperty("org.apache.sling.commons.log.file")).getParentFile());
             logger.atInfo().log("Diagnostics directory has been opened");
         } catch (final IOException e) {
             logger.atError().withException(e).log("Cannot open diagnostics directory");

@@ -80,8 +80,6 @@ bundles.required: \
                  ${bundles.deps},\
                  ${bundles.eclipse.core},\
                  ${bundles.slf4j},\
-                 slf4j.api,\
-                 jul.to.slf4j,\
                  org.apache.aries.component-dsl.component-dsl,\
                  com.google.guava,\
                  org.apache.commons.lang,\
