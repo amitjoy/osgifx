@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -69,6 +70,7 @@ public final class RoleEditorFxController {
     @FXML
     private BorderPane   rootPanel;
     @Inject
+    @Optional
     private Supervisor   supervisor;
     @Inject
     private EventBroker  eventBroker;

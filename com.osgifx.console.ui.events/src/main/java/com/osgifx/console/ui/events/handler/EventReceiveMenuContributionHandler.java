@@ -66,6 +66,7 @@ public final class EventReceiveMenuContributionHandler {
     @Inject
     private FluentLogger                   logger;
     @Inject
+    @Optional
     private Supervisor                     supervisor;
     @Inject
     private ConfigurationAdmin             configAdmin;
