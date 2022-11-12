@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -41,6 +42,7 @@ public final class SnapshotCaptureHandler {
     @Inject
     private FluentLogger      logger;
     @Inject
+    @Optional
     private Supervisor        supervisor;
     @Inject
     private ThreadSynchronize threadSync;
