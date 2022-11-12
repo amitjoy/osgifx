@@ -22,11 +22,11 @@ import static com.osgifx.console.event.topics.LoggerContextActionEventTopics.LOG
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -68,6 +68,7 @@ public final class LogConfigurationEditorFxController {
     @Named("is_snapshot_agent")
     private boolean                 isSnapshotAgent;
     @Inject
+    @Optional
     private Supervisor              supervisor;
     @Inject
     private EventBroker             eventBroker;
@@ -139,7 +140,7 @@ public final class LogConfigurationEditorFxController {
     }
 
     private List<Field<?>> initGenericFields(final XBundleLoggerContextDTO loggerContext) {
-        final var      rootLogLevel      = Optional.ofNullable(loggerContext.rootLogLevel).map(LogLevel::name)
+        final var      rootLogLevel      = java.util.Optional.ofNullable(loggerContext.rootLogLevel).map(LogLevel::name)
                 .orElse("<NOT SET>");
         final Field<?> nameField         = Field.ofStringType(loggerContext.name).label("Name").editable(false);
         final Field<?> rootLogLevelField = Field.ofStringType(rootLogLevel).label("Global Root Log Level")

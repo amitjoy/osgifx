@@ -25,12 +25,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -73,6 +73,7 @@ public final class ConfigurationEditorFxController {
     @FXML
     private BorderPane             rootPanel;
     @Inject
+    @Optional
     private Supervisor             supervisor;
     @Inject
     private EventBroker            eventBroker;
@@ -241,9 +242,9 @@ public final class ConfigurationEditorFxController {
     }
 
     private List<Field<?>> initGenericFields(final XConfigurationDTO config) {
-        final var pid        = Optional.ofNullable(config.pid).orElse("No PID associated");
-        final var factoryPID = Optional.ofNullable(config.factoryPid).orElse("No Factory PID associated");
-        final var location   = Optional.ofNullable(config.location).orElse("No location bound");
+        final var pid        = java.util.Optional.ofNullable(config.pid).orElse("No PID associated");
+        final var factoryPID = java.util.Optional.ofNullable(config.factoryPid).orElse("No Factory PID associated");
+        final var location   = java.util.Optional.ofNullable(config.location).orElse("No location bound");
 
         final Field<?> pidField        = Field.ofStringType(pid).label("PID").editable(false);
         final Field<?> factoryPidField = Field.ofStringType(factoryPID).label("Factory PID").editable(false);

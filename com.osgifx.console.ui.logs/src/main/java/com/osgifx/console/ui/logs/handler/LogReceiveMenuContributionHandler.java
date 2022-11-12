@@ -27,6 +27,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.AboutToShow;
@@ -55,6 +56,7 @@ public final class LogReceiveMenuContributionHandler {
     @OSGiBundle
     private BundleContext    context;
     @Inject
+    @Optional
     private Supervisor       supervisor;
     @Inject
     private IEventBroker     eventBroker;
