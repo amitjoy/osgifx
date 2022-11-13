@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1667204166284">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1668298636124">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="license" value="http://www.eclipse.org/legal/epl-2.0, https://www.gnu.org/software/classpath/license.html"/>
@@ -68,203 +68,203 @@
       <attribute name="osgi.identity" value="controlsfx"/>
       <attribute name="description" value="High quality UI controls and other tools to complement the core JavaFX distribution"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="version" value="11.1.3.SNAPSHOT" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans,javafx.beans.property,javafx.beans.value,javafx.collections,javafx.concurrent,javafx.css,javafx.event,javafx.geometry,javafx.scene,javafx.scene.control,javafx.scene.image,javafx.scene.input,javafx.scene.layout,javafx.scene.paint,javafx.scene.shape,javafx.stage,javafx.util,org.controlsfx.control.action,org.controlsfx.property.editor"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
-      <attribute name="bnd.hashes" value="247951873,519758101,-1342782192,56485629,2040900987,-1693666715,1513619585,264360299,1458366241,-1146703412,304878699,-715003371,382196200,-1648741890,382765867,-698859302,-988753330,2048374450,-1395056734,1827506324,-1288188583,1472283204,-1843532409,-927116646,-1827932419,-44282524,-1696159181,556582849,-2028851885,-17000581,768620307,1877557190,1663081897,2071315656,2112249188,1446897495,-1760981314,1269590693,1001404048,1332274807,2289459,2403779,-231859094,883991646,-1854235203,-1619155297,-656591085,715007064,704052161,2111267012,-2050667446,68067,-1070923652,-767142231,-66259295,1811366071,1287513032,-1672482954,191361851,1965687765,1838197039,-1423290801" type="List&lt;Long&gt;"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
+      <attribute name="bnd.hashes" value="247951873,519758101,-1342782192,-212845417,56485629,2040900987,-1693666715,1513619585,264360299,1458366241,-1146703412,304878699,-715003371,382196200,-1648741890,382765867,-698859302,-988753330,2048374450,-1395056734,1827506324,-1288188583,1472283204,-1843532409,-927116646,-1827932419,-44282524,-1696159181,556582849,-2028851885,-17000581,768620307,1877557190,1663081897,2071315656,2112249188,1446897495,-1760981314,1269590693,1001404048,1332274807,2289459,2403779,-231859094,883991646,-1854235203,-1619155297,-656591085,715007064,704052161,2111267012,-2050667446,68067,-1070923652,-767142231,-66259295,1811366071,1287513032,-1672482954,191361851,1965687765,1838197039,-1423290801" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans,javafx.beans.property,javafx.collections,javafx.event,javafx.scene,javafx.scene.control,javafx.scene.input,org.controlsfx.control"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.action"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1955883606,-1069576110,-1065573943,-2092721370,-1057262152,-349778923,-1929437861,700703611,-1052591109,19368142,237329500,-955695674,666272083" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.scene.image,javafx.scene.media,javafx.scene.paint,org.controlsfx.control"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.cell"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="-1679415765,-1812191197,-276849159" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.collections,javafx.geometry,javafx.scene"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.decoration"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1182766288,-1762961381,-1757084264,92495479" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.collections,javafx.event,javafx.geometry,javafx.scene,javafx.scene.control,javafx.scene.layout,javafx.scene.paint,javafx.scene.text,javafx.util,javafx.util.converter"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.spreadsheet"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="-1666810076,1030115320,2104342424,439854729,2228070,1496385568,382162775,-2074191178,-1904610130,-2028202306,1776044846,1063681823,2109660891,794950846,-677160917,1942629323,-1533060692,-170675970,-654206585,84393531,1857409064,-1522726197,-1828168328,1410308376,-1234646215,420400907,1064241032,1686327842,-1569308534,2078441369,2121771460,1776614513,903503822,-449557972" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.collections,javafx.collections.transformation,javafx.scene,javafx.scene.control,javafx.scene.layout,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.table"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1498820704,-668629362,-1469620042,763519308,769059001,1895597947,1548945606,312926067,1140509430,-1396850327,-1190863618" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.table.model"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="562319791,252044452,-1714803777,-1621293640,-1096825324" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.beans.value,javafx.collections,javafx.event,javafx.scene,javafx.scene.control,javafx.util,org.controlsfx.control.tableview2.event"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1498820704,-1792894451,-2030353636,-1718025202,2121771460,480377631" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.scene,javafx.scene.control,org.controlsfx.control.action,org.controlsfx.control.tableview2"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.actions"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1519335381,-87686639" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.collections,javafx.scene.control,javafx.scene.control.cell,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.cell"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="576194427,2119869867" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans,javafx.event"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.event"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="753977826" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.scene.layout,org.controlsfx.control.tableview2,org.controlsfx.control.tableview2.filter.filtermenubutton"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.filtereditor"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1881977637,37936005" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.filtermenubutton"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="2098682665" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.parser"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="-1911543745" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.util,org.controlsfx.control.tableview2,org.controlsfx.control.tableview2.filter.parser"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.popupfilter"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1834065700,418093773,-556570219" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.event,javafx.scene,javafx.scene.control,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.textfield"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1956599375,-992777446,487517858,364607738,-2065585394,717765436,-832358810" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.collections,javafx.concurrent,javafx.scene,javafx.scene.control,javafx.scene.text,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.dialog"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="-1852145798,-1878171082,1682364457,1121040983,449677013,453024386,1778096214,-1752330767,1347277299,955867637,2192718,-2090613229,-1703530101,700599187" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.scene.paint,org.controlsfx.tools"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.glyphfont"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="68907276,-1457787660,-1211790469,1654813912,386280601" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.value,javafx.collections,org.controlsfx.control,org.controlsfx.property.editor"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.property"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="-940901947,-703104532" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.value,javafx.scene,javafx.util,org.controlsfx.control"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.property.editor"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1380954969,-2129789820,-1823701145,-223304570,672604769,-1643503594,1031107301,-2003121651,997934018" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.value,javafx.scene,javafx.scene.control,javafx.scene.layout,javafx.scene.paint,javafx.stage,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.tools"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1995530316,135157722,306626868,2122155795,-914448220,1731897767,1093702420,1939328147,82059409,-1013057931,-757178378,1425553363" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.event,javafx.scene.control,org.controlsfx.validation.decoration"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.validation"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="1542944541,-1510357604,-55847164,1705887022,890913302,-1103805194,894184242" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.scene,javafx.scene.control,org.controlsfx.control.decoration,org.controlsfx.validation"/>
       <attribute name="bundle-symbolic-name" value="controlsfx"/>
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.validation.decoration"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
       <attribute name="bnd.hashes" value="-1905513109,324921460,-324033295,1981264656,-1387622871" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="controlsfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.host" value="controlsfx"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="size" value="1378380" type="Long"/>
+      <attribute name="size" value="1393273" type="Long"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
-      <attribute name="url" value="controlsfx/controlsfx-11.1.2.jar"/>
-      <attribute name="osgi.content" value="C3A7CBD0D5D2548B59B98E2E281F73FD6A9583CA24E2812D238CE8EBAA562A41"/>
+      <attribute name="url" value="controlsfx/controlsfx-11.1.3.jar"/>
+      <attribute name="osgi.content" value="E2B98562430AA4616ED7DA142D8B2B0C181059E08A92C9E552C754FEE096C813"/>
     </capability>
     <requirement namespace="osgi.wiring.package">
       <directive name="filter" value="(osgi.wiring.package=com.sun.javafx.event)"/>
@@ -277,6 +277,90 @@
     <requirement namespace="osgi.wiring.package">
       <directive name="filter" value="(osgi.wiring.package=com.sun.javafx.scene.control.behavior)"/>
       <attribute name="osgi.wiring.package" value="com.sun.javafx.scene.control.behavior"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.beans)"/>
+      <attribute name="osgi.wiring.package" value="java.beans"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.io)"/>
+      <attribute name="osgi.wiring.package" value="java.io"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.lang)"/>
+      <attribute name="osgi.wiring.package" value="java.lang"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.lang.annotation)"/>
+      <attribute name="osgi.wiring.package" value="java.lang.annotation"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.lang.invoke)"/>
+      <attribute name="osgi.wiring.package" value="java.lang.invoke"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.lang.ref)"/>
+      <attribute name="osgi.wiring.package" value="java.lang.ref"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.lang.reflect)"/>
+      <attribute name="osgi.wiring.package" value="java.lang.reflect"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.math)"/>
+      <attribute name="osgi.wiring.package" value="java.math"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.net)"/>
+      <attribute name="osgi.wiring.package" value="java.net"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.nio.file)"/>
+      <attribute name="osgi.wiring.package" value="java.nio.file"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.security)"/>
+      <attribute name="osgi.wiring.package" value="java.security"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.text)"/>
+      <attribute name="osgi.wiring.package" value="java.text"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.time)"/>
+      <attribute name="osgi.wiring.package" value="java.time"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.time.format)"/>
+      <attribute name="osgi.wiring.package" value="java.time.format"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util)"/>
+      <attribute name="osgi.wiring.package" value="java.util"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util.concurrent)"/>
+      <attribute name="osgi.wiring.package" value="java.util.concurrent"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util.concurrent.atomic)"/>
+      <attribute name="osgi.wiring.package" value="java.util.concurrent.atomic"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util.function)"/>
+      <attribute name="osgi.wiring.package" value="java.util.function"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util.logging)"/>
+      <attribute name="osgi.wiring.package" value="java.util.logging"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util.regex)"/>
+      <attribute name="osgi.wiring.package" value="java.util.regex"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(osgi.wiring.package=java.util.stream)"/>
+      <attribute name="osgi.wiring.package" value="java.util.stream"/>
     </requirement>
     <requirement namespace="osgi.wiring.package">
       <directive name="filter" value="(osgi.wiring.package=javafx.animation)"/>
@@ -449,7 +533,7 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.google.gson"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.9.1" type="Version"/>
+      <attribute name="version" value="2.10.0" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.google.guava"/>
@@ -464,80 +548,81 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.agent"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.application"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.data.provider"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.launcher"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
-    </capability>
-    <capability namespace="osgi.identity">
-      <attribute name="osgi.identity" value="com.osgifx.console.logging"/>
-      <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.smartgraph"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.supervisor"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.batchinstall"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.extension"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
+    </capability>
+    <capability namespace="osgi.identity">
+      <directive name="singleton" value="true"/>
+      <attribute name="osgi.identity" value="com.osgifx.console.ui.snapshot"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.util"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.formsfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.tilesfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.toolbox"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="com.osgifx.console.wrapper.toolboxfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="controlsfx"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="version" value="11.1.3.SNAPSHOT" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="javax.annotation"/>
@@ -577,17 +662,17 @@
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.felix.cm.json"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.0.6" type="Version"/>
+      <attribute name="version" value="1.0.8" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.felix.configadmin"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.9.24" type="Version"/>
+      <attribute name="version" value="1.9.26" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.felix.configurator"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.0.14" type="Version"/>
+      <attribute name="version" value="1.0.16" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.felix.converter"/>
@@ -620,19 +705,24 @@
       <attribute name="version" value="1.1.0.v20180713-1646" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
-      <attribute name="osgi.identity" value="org.apache.felix.metatype"/>
-      <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="1.2.4" type="Version"/>
-    </capability>
-    <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.felix.scr"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2" type="Version"/>
+      <attribute name="version" value="2.2.4" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.apache.sling.commons.johnzon"/>
       <attribute name="type" value="osgi.bundle"/>
       <attribute name="version" value="1.2.14" type="Version"/>
+    </capability>
+    <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value="org.apache.sling.commons.log"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="5.4.2" type="Version"/>
+    </capability>
+    <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value="org.apache.sling.commons.logservice"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="1.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <attribute name="osgi.identity" value="org.eclipse.core.commands"/>
@@ -941,118 +1031,123 @@
       <attribute name="version" value="1.2.0.202109301733" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
+      <attribute name="osgi.identity" value="slf4j.api"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="1.7.36" type="Version"/>
+    </capability>
+    <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.overview"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.bundles"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.packages"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.services"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.components"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.configurations"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.events"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.logs"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.properties"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.threads"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.graph"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.gogo"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.terminal"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.heap"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.leaks"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.http"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.roles"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.dmt"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.identity">
       <directive name="singleton" value="true"/>
       <attribute name="osgi.identity" value="com.osgifx.console.ui.healthchecks"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="version" value="2.2.3.202211130013" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="x-friends" value="org.eclipse.core.runtime"/>
@@ -3194,25 +3289,25 @@
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson"/>
-      <attribute name="version" value="2.9.1" type="Version"/>
+      <attribute name="version" value="2.10.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson.annotations"/>
-      <attribute name="version" value="2.9.1" type="Version"/>
+      <attribute name="version" value="2.10.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson.reflect"/>
-      <attribute name="version" value="2.9.1" type="Version"/>
+      <attribute name="version" value="2.10.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.google.gson.stream"/>
-      <attribute name="version" value="2.9.1" type="Version"/>
+      <attribute name="version" value="2.10.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="x-internal" value="true"/>
@@ -3385,14 +3480,14 @@
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.osgifx.console.agent"/>
-      <attribute name="version" value="3.0.0" type="Version"/>
+      <attribute name="version" value="3.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="org.osgi.dto,org.osgi.framework.dto,org.osgi.framework.wiring.dto,org.osgi.service.log"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.osgifx.console.agent.dto"/>
-      <attribute name="version" value="3.0.0" type="Version"/>
+      <attribute name="version" value="4.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="org.osgi.dto"/>
@@ -3416,40 +3511,6 @@
       <attribute name="version" value="1.2.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.slf4j.spi"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.slf4j"/>
-      <attribute name="version" value="1.7.36" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.slf4j,org.slf4j.helpers"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.slf4j.event"/>
-      <attribute name="version" value="1.7.36" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.slf4j,org.slf4j.event,org.slf4j.spi"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.slf4j.helpers"/>
-      <attribute name="version" value="1.7.36" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.slf4j"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.slf4j.spi"/>
-      <attribute name="version" value="1.7.36" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="com.osgifx.console.log"/>
-      <attribute name="version" value="0.0.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
       <directive name="uses" value="com.osgifx.console.smartgraph.graphview,javafx.beans.property,javafx.scene,javafx.scene.layout"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
@@ -3470,11 +3531,17 @@
       <attribute name="version" value="1.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="com.osgifx.console.supervisor.factory"/>
+      <attribute name="version" value="1.0.0" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
       <directive name="uses" value="com.osgifx.console.agent,com.osgifx.console.agent.dto"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="com.osgifx.console.supervisor"/>
-      <attribute name="version" value="1.0.0" type="Version"/>
+      <attribute name="version" value="1.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="com.osgifx.console.agent,org.osgi.dto"/>
@@ -3711,159 +3778,159 @@
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans,javafx.beans.property,javafx.collections,javafx.event,javafx.scene,javafx.scene.control,javafx.scene.input,org.controlsfx.control"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.action"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.scene.image,javafx.scene.media,javafx.scene.paint,org.controlsfx.control"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.cell"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.collections,javafx.geometry,javafx.scene"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.decoration"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.collections,javafx.event,javafx.geometry,javafx.scene,javafx.scene.control,javafx.scene.layout,javafx.scene.paint,javafx.scene.text,javafx.util,javafx.util.converter"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.spreadsheet"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.collections,javafx.collections.transformation,javafx.scene,javafx.scene.control,javafx.scene.layout,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.table"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.table.model"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.beans.value,javafx.collections,javafx.event,javafx.scene,javafx.scene.control,javafx.util,org.controlsfx.control.tableview2.event"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.scene,javafx.scene.control,org.controlsfx.control.action,org.controlsfx.control.tableview2"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.actions"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.collections,javafx.scene.control,javafx.scene.control.cell,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.cell"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans,javafx.event"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.event"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.scene.layout,org.controlsfx.control.tableview2,org.controlsfx.control.tableview2.filter.filtermenubutton"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.filtereditor"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.filtermenubutton"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.parser"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.util,org.controlsfx.control.tableview2,org.controlsfx.control.tableview2.filter.parser"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.tableview2.filter.popupfilter"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.event,javafx.scene,javafx.scene.control,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.control.textfield"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.collections,javafx.concurrent,javafx.scene,javafx.scene.control,javafx.scene.text,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.dialog"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.scene.control,javafx.scene.paint,org.controlsfx.tools"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.glyphfont"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.value,javafx.collections,org.controlsfx.control,org.controlsfx.property.editor"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.property"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.value,javafx.scene,javafx.util,org.controlsfx.control"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.property.editor"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.value,javafx.scene,javafx.scene.control,javafx.scene.layout,javafx.scene.paint,javafx.stage,javafx.util"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.tools"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.beans.property,javafx.event,javafx.scene.control,org.controlsfx.validation.decoration"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.validation"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <directive name="uses" value="javafx.scene,javafx.scene.control,org.controlsfx.control.decoration,org.controlsfx.validation"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.controlsfx.validation.decoration"/>
-      <attribute name="version" value="11.1.2" type="Version"/>
+      <attribute name="version" value="11.1.3" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
@@ -4263,20 +4330,6 @@
       <attribute name="version" value="1.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.osgi.framework,org.osgi.service.metatype"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.felix.metatype"/>
-      <attribute name="version" value="1.2.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
-      <directive name="uses" value="org.osgi.framework"/>
-      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
-      <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.osgi.service.metatype"/>
-      <attribute name="version" value="1.4.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.wiring.package">
       <directive name="uses" value="org.osgi.service.component"/>
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
@@ -4329,6 +4382,432 @@
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.apache.johnzon.core.util"/>
       <attribute name="version" value="1.2.14" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.classic.turbo,ch.qos.logback.core,ch.qos.logback.core.pattern,ch.qos.logback.core.spi,ch.qos.logback.core.status,org.slf4j,org.slf4j.event,org.slf4j.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core.boolex"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.boolex"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.db.names"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.db.script"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core.pattern"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.encoder"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.classic.spi,ch.qos.logback.core.filter,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.filter"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.helpers"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core.html,ch.qos.logback.core.pattern"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.html"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.classic.spi,ch.qos.logback.core,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,javax.management"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.jmx"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core.joran,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.joran"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.joran.action,ch.qos.logback.core.joran.spi,org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.joran.action"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.classic.spi,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.jul"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.layout"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.log4j"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.classic.spi,ch.qos.logback.core,ch.qos.logback.core.boolex,ch.qos.logback.core.helpers,ch.qos.logback.core.joran.spi,ch.qos.logback.core.net,ch.qos.logback.core.net.ssl,ch.qos.logback.core.pattern,ch.qos.logback.core.spi,javax.net,javax.net.ssl"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.net"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.net,ch.qos.logback.classic.spi,ch.qos.logback.core.net,ch.qos.logback.core.net.server,ch.qos.logback.core.net.ssl,ch.qos.logback.core.spi,javax.net"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.net.server"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core,ch.qos.logback.core.pattern,org.slf4j"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.pattern"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core.pattern.color"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.pattern.color"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.selector"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.selector.servlet"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.servlet"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic.spi,ch.qos.logback.core,ch.qos.logback.core.joran.action,ch.qos.logback.core.joran.event,ch.qos.logback.core.joran.spi,ch.qos.logback.core.sift,org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.sift"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.classic.turbo,ch.qos.logback.core,ch.qos.logback.core.spi,org.slf4j"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.spi"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.core.spi,org.slf4j"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.turbo"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.classic,ch.qos.logback.classic.selector,ch.qos.logback.classic.spi,ch.qos.logback.core.joran.spi,ch.qos.logback.core.status,org.slf4j.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.classic.util"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.encoder,ch.qos.logback.core.filter,ch.qos.logback.core.helpers,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,ch.qos.logback.core.status,ch.qos.logback.core.util"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.boolex"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.encoder"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.boolex,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.filter"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.helpers"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.spi,ch.qos.logback.core.util"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.hook"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.pattern"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.html"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran.event,ch.qos.logback.core.joran.spi,ch.qos.logback.core.joran.util.beans,ch.qos.logback.core.spi,org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.joran.spi,ch.qos.logback.core.joran.util,ch.qos.logback.core.joran.util.beans,ch.qos.logback.core.spi,ch.qos.logback.core.util,org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.action"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.joran.action,ch.qos.logback.core.joran.event,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.conditional"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,ch.qos.logback.core.status,org.xml.sax,org.xml.sax.helpers"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.event"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,javax.xml.stream,javax.xml.stream.events"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.event.stax"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.node"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran.action,ch.qos.logback.core.joran.event,ch.qos.logback.core.spi,ch.qos.logback.core.status,org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.spi"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran.spi,ch.qos.logback.core.joran.util.beans,ch.qos.logback.core.spi,ch.qos.logback.core.util"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.util"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.joran.util.beans"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.layout"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.boolex,ch.qos.logback.core.helpers,ch.qos.logback.core.net.ssl,ch.qos.logback.core.pattern,ch.qos.logback.core.sift,ch.qos.logback.core.spi,ch.qos.logback.core.util,javax.net"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.net"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.net.ssl,ch.qos.logback.core.spi,javax.net"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.net.server"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,javax.net,javax.net.ssl"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.net.ssl"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.encoder,ch.qos.logback.core.spi,ch.qos.logback.core.status"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.pattern"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.pattern"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.pattern.color"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.pattern,ch.qos.logback.core.pattern.util,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.pattern.parser"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.pattern.util"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.property"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.read"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.status"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.recovery"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran.spi,ch.qos.logback.core.rolling.helper,ch.qos.logback.core.spi,ch.qos.logback.core.util"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.rolling"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.pattern,ch.qos.logback.core.rolling,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.rolling.helper"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.joran,ch.qos.logback.core.joran.event,ch.qos.logback.core.joran.spi,ch.qos.logback.core.spi,ch.qos.logback.core.util"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.sift"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.filter,ch.qos.logback.core.helpers,ch.qos.logback.core.status"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.spi"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.status"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.subst"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="ch.qos.logback.core,ch.qos.logback.core.rolling,ch.qos.logback.core.rolling.helper,ch.qos.logback.core.spi,ch.qos.logback.core.status,javax.naming"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="ch.qos.logback.core.util"/>
+      <attribute name="version" value="1.2.10" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.slf4j,org.slf4j.spi"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.slf4j.impl"/>
+      <attribute name="version" value="1.7.32" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.xml.sax"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.apache.sling.commons.log.logback"/>
+      <attribute name="version" value="1.0.1" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.apache.sling.commons.log.logback.webconsole"/>
+      <attribute name="version" value="1.0.1" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
@@ -5943,6 +6422,13 @@
       <attribute name="version" value="1.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.osgi.framework"/>
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.metatype"/>
+      <attribute name="version" value="1.4.0" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.package" value="org.osgi.service.provisioning"/>
@@ -5993,6 +6479,30 @@
       <attribute name="osgi.wiring.package" value="org.osgi.util.promise"/>
       <attribute name="version" value="1.2.0" type="Version"/>
     </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.slf4j"/>
+      <attribute name="version" value="1.7.36" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.slf4j.spi"/>
+      <attribute name="version" value="1.7.36" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.slf4j.helpers"/>
+      <attribute name="version" value="1.7.36" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
+      <attribute name="bundle-version" value="0.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.slf4j.event"/>
+      <attribute name="version" value="1.7.36" type="Version"/>
+    </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.runtime"/>
@@ -6003,7 +6513,7 @@
       <attribute name="osgi.wiring.bundle" value="org.eclipse.osgi,system.bundle" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.9.1" type="Version"/>
+      <attribute name="bundle-version" value="2.10.0" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.google.gson"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6015,66 +6525,67 @@
       <attribute name="osgi.wiring.bundle" value="com.ibm.icu.base"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.agent"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.application"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.data.provider"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.launcher"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
-      <attribute name="osgi.wiring.bundle" value="com.osgifx.console.logging"/>
-    </capability>
-    <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.smartgraph"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.supervisor"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.batchinstall"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.extension"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <directive name="singleton" value="true"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.snapshot"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.util"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.formsfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.tilesfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.toolbox"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.wrapper.toolboxfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="controlsfx"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6106,15 +6617,15 @@
       <attribute name="osgi.wiring.bundle" value="org.apache.commons.lang"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.0.6" type="Version"/>
+      <attribute name="bundle-version" value="1.0.8" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.cm.json"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.9.24" type="Version"/>
+      <attribute name="bundle-version" value="1.9.26" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.configadmin"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.0.14" type="Version"/>
+      <attribute name="bundle-version" value="1.0.16" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.configurator"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
@@ -6142,16 +6653,20 @@
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.gogo.shell"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="1.2.4" type="Version"/>
-      <attribute name="osgi.wiring.bundle" value="org.apache.felix.metatype"/>
-    </capability>
-    <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="2.2.2" type="Version"/>
+      <attribute name="bundle-version" value="2.2.4" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.apache.felix.scr"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="bundle-version" value="1.2.14" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.apache.sling.commons.johnzon"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="5.4.2" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.apache.sling.commons.log"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="1.1.0" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.apache.sling.commons.logservice"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <attribute name="bundle-version" value="3.10.200.v20220512-0851" type="Version"/>
@@ -6403,98 +6918,102 @@
       <attribute name="osgi.wiring.bundle" value="org.osgi.util.promise"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="1.7.36" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="slf4j.api"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.overview"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.bundles"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.packages"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.services"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.components"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.configurations"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.events"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.logs"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.properties"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.threads"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.graph"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.gogo"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.terminal"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.heap"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.leaks"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.http"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.roles"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.dmt"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="com.osgifx.console.ui.healthchecks"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6507,7 +7026,7 @@
       <attribute name="osgi.wiring.host" value="org.eclipse.osgi,system.bundle" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.9.1" type="Version"/>
+      <attribute name="bundle-version" value="2.10.0" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.google.gson"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6519,66 +7038,67 @@
       <attribute name="osgi.wiring.host" value="com.ibm.icu.base"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.agent"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.application"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.data.provider"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.launcher"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
-      <attribute name="osgi.wiring.host" value="com.osgifx.console.logging"/>
-    </capability>
-    <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.smartgraph"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.supervisor"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.batchinstall"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.extension"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <directive name="singleton" value="true"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
+      <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.snapshot"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.util"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.formsfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.tilesfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.toolbox"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.wrapper.toolboxfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="11.1.2.SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="11.1.3.SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.host" value="controlsfx"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6610,15 +7130,15 @@
       <attribute name="osgi.wiring.host" value="org.apache.commons.lang"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.0.6" type="Version"/>
+      <attribute name="bundle-version" value="1.0.8" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.apache.felix.cm.json"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.9.24" type="Version"/>
+      <attribute name="bundle-version" value="1.9.26" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.apache.felix.configadmin"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.0.14" type="Version"/>
+      <attribute name="bundle-version" value="1.0.16" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.apache.felix.configurator"/>
     </capability>
     <capability namespace="osgi.wiring.host">
@@ -6646,16 +7166,20 @@
       <attribute name="osgi.wiring.host" value="org.apache.felix.gogo.shell"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="1.2.4" type="Version"/>
-      <attribute name="osgi.wiring.host" value="org.apache.felix.metatype"/>
-    </capability>
-    <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="2.2.2" type="Version"/>
+      <attribute name="bundle-version" value="2.2.4" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.apache.felix.scr"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="bundle-version" value="1.2.14" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.apache.sling.commons.johnzon"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="5.4.2" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.apache.sling.commons.log"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="1.1.0" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.apache.sling.commons.logservice"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <attribute name="bundle-version" value="3.10.200.v20220512-0851" type="Version"/>
@@ -6907,98 +7431,102 @@
       <attribute name="osgi.wiring.host" value="org.osgi.util.promise"/>
     </capability>
     <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="1.7.36" type="Version"/>
+      <attribute name="osgi.wiring.host" value="slf4j.api"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.overview"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.bundles"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.packages"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.services"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.components"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.configurations"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.events"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.logs"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.properties"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.threads"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.graph"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.gogo"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.terminal"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.heap"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.leaks"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.http"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.roles"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.dmt"/>
     </capability>
     <capability namespace="osgi.wiring.host">
       <directive name="singleton" value="true"/>
-      <attribute name="bundle-version" value="2.2.2.202209141658" type="Version"/>
+      <attribute name="bundle-version" value="2.2.3.202211130013" type="Version"/>
       <attribute name="osgi.wiring.host" value="com.osgifx.console.ui.healthchecks"/>
     </capability>
     <capability namespace="eclipse.platform">
@@ -7022,10 +7550,6 @@
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
       <attribute name="activator" value="com.osgifx.console.application.FxStarter"/>
-    </capability>
-    <capability namespace="equinox.module.data">
-      <directive name="effective" value="information"/>
-      <attribute name="activator" value="com.osgifx.console.logging.forwarder.LoggerFacadeController"/>
     </capability>
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
@@ -7057,11 +7581,15 @@
     </capability>
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
-      <attribute name="activator" value="org.apache.felix.metatype.internal.Activator"/>
+      <attribute name="activator" value="org.apache.felix.scr.impl.Activator"/>
     </capability>
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
-      <attribute name="activator" value="org.apache.felix.scr.impl.Activator"/>
+      <attribute name="activator" value="org.apache.sling.commons.log.logback.internal.Activator"/>
+    </capability>
+    <capability namespace="equinox.module.data">
+      <directive name="effective" value="information"/>
+      <attribute name="activator" value="org.apache.sling.commons.logservice.internal.Activator"/>
     </capability>
     <capability namespace="equinox.module.data">
       <directive name="effective" value="information"/>
@@ -7145,10 +7673,10 @@
       <attribute name="activator" value="org.eclipse.core.internal.registry.osgi.Activator"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="size" value="42704" type="Long"/>
+      <attribute name="size" value="45189" type="Long"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
       <attribute name="url" value="com.osgifx.console.runtime/com.osgifx.console.runtime-0.0.0.jar"/>
-      <attribute name="osgi.content" value="7D16D451E0855B3D73B11427397327EC46C7A9468E8F16DD0CDC3EF35154757D"/>
+      <attribute name="osgi.content" value="94AD017E59085F24279D486F151D418AB0C5609EDC271EC63119CA1793EAA324"/>
     </capability>
     <capability namespace="osgi.contract">
       <directive name="uses" value="javax.json,javax.json.spi,javax.json.stream"/>
@@ -7184,11 +7712,6 @@
       <attribute name="version" value="1.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.extender">
-      <directive name="uses" value="org.osgi.service.metatype"/>
-      <attribute name="osgi.extender" value="osgi.metatype"/>
-      <attribute name="version" value="1.4.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.extender">
       <directive name="uses" value="org.osgi.service.component"/>
       <attribute name="osgi.extender" value="osgi.component"/>
       <attribute name="version" value="1.5.0" type="Version"/>
@@ -7199,23 +7722,18 @@
       <attribute name="version" value="1.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.implementation">
-      <directive name="uses" value="org.osgi.service.metatype"/>
-      <attribute name="osgi.implementation" value="osgi.metatype"/>
-      <attribute name="version" value="1.4.0" type="Version"/>
-    </capability>
-    <capability namespace="osgi.implementation">
       <directive name="uses" value="org.osgi.service.event"/>
       <attribute name="osgi.implementation" value="osgi.event"/>
       <attribute name="version" value="1.4.0" type="Version"/>
     </capability>
     <capability namespace="osgi.native">
-      <attribute name="osgi.native.osversion" value="12.5.1" type="Version"/>
+      <attribute name="osgi.native.osversion" value="13.0.0" type="Version"/>
       <attribute name="osgi.native.osname" value="MacOSX,Mac OS X"/>
       <attribute name="osgi.native.processor" value="x86-64,amd64,em64t,x86_64"/>
       <attribute name="osgi.native.language" value="en_IN"/>
     </capability>
     <capability namespace="osgi.native">
-      <attribute name="osgi.native.osversion" value="12.5.1" type="Version"/>
+      <attribute name="osgi.native.osversion" value="13.0.0" type="Version"/>
       <attribute name="osgi.native.osname" value="MacOSX,Mac OS X"/>
       <attribute name="osgi.native.processor" value="x86-64,amd64,em64t,x86_64"/>
       <attribute name="osgi.native.language" value="en"/>
@@ -7319,35 +7837,35 @@
       <attribute name="objectClass" value="org.eclipse.fx.ui.services.theme.Theme" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
+      <directive name="uses" value="com.osgifx.console.data.manager,com.osgifx.console.supervisor,org.osgi.service.event"/>
+      <attribute name="objectClass" value="com.osgifx.console.data.manager.RuntimeInfoSupplier,com.osgifx.console.supervisor.EventListener,org.osgi.service.event.EventHandler" type="List&lt;String&gt;"/>
+    </capability>
+    <capability namespace="osgi.service">
+      <directive name="uses" value="com.osgifx.console.data.manager,com.osgifx.console.supervisor,org.osgi.service.event"/>
+      <attribute name="objectClass" value="com.osgifx.console.data.manager.RuntimeInfoSupplier,com.osgifx.console.supervisor.LogEntryListener,org.osgi.service.event.EventHandler" type="List&lt;String&gt;"/>
+    </capability>
+    <capability namespace="osgi.service">
+      <directive name="uses" value="com.osgifx.console.data.manager,org.osgi.service.event"/>
+      <attribute name="objectClass" value="com.osgifx.console.data.manager.RuntimeInfoSupplier,org.osgi.service.event.EventHandler" type="List&lt;String&gt;"/>
+    </capability>
+    <capability namespace="osgi.service">
       <directive name="uses" value="com.osgifx.console.data.provider"/>
       <attribute name="objectClass" value="com.osgifx.console.data.provider.DataProvider" type="List&lt;String&gt;"/>
-    </capability>
-    <capability namespace="osgi.service">
-      <directive name="uses" value="com.osgifx.console.data.supplier,com.osgifx.console.supervisor,org.osgi.service.event"/>
-      <attribute name="objectClass" value="com.osgifx.console.data.supplier.RuntimeInfoSupplier,com.osgifx.console.supervisor.EventListener,org.osgi.service.event.EventHandler" type="List&lt;String&gt;"/>
-    </capability>
-    <capability namespace="osgi.service">
-      <directive name="uses" value="com.osgifx.console.data.supplier,com.osgifx.console.supervisor,org.osgi.service.event"/>
-      <attribute name="objectClass" value="com.osgifx.console.data.supplier.RuntimeInfoSupplier,com.osgifx.console.supervisor.LogEntryListener,org.osgi.service.event.EventHandler" type="List&lt;String&gt;"/>
-    </capability>
-    <capability namespace="osgi.service">
-      <directive name="uses" value="com.osgifx.console.data.supplier,org.osgi.service.event"/>
-      <attribute name="objectClass" value="com.osgifx.console.data.supplier.RuntimeInfoSupplier,org.osgi.service.event.EventHandler" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
       <attribute name="objectClass" value="java.lang.Runnable" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
-      <directive name="uses" value="com.osgifx.console.log,org.osgi.service.log"/>
-      <attribute name="objectClass" value="com.osgifx.console.log.DiagnosticsAdmin,org.osgi.service.log.LogListener" type="List&lt;String&gt;"/>
-    </capability>
-    <capability namespace="osgi.service">
-      <directive name="uses" value="org.eclipse.fx.core"/>
-      <attribute name="objectClass" value="org.eclipse.fx.core.ExceptionHandler" type="List&lt;String&gt;"/>
+      <directive name="uses" value="com.osgifx.console.agent,com.osgifx.console.supervisor.snapshot"/>
+      <attribute name="objectClass" value="com.osgifx.console.agent.Agent,com.osgifx.console.supervisor.snapshot.SnapshotAgent" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
       <directive name="uses" value="com.osgifx.console.supervisor"/>
       <attribute name="objectClass" value="com.osgifx.console.supervisor.Supervisor" type="List&lt;String&gt;"/>
+    </capability>
+    <capability namespace="osgi.service">
+      <directive name="uses" value="com.osgifx.console.supervisor.factory"/>
+      <attribute name="objectClass" value="com.osgifx.console.supervisor.factory.SupervisorFactory" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
       <directive name="uses" value="com.osgifx.console.ui.batchinstall.dialog"/>
@@ -7368,10 +7886,6 @@
     <capability namespace="osgi.service">
       <directive name="effective" value="active"/>
       <attribute name="objectClass" value="org.apache.felix.service.command.CommandProcessor"/>
-    </capability>
-    <capability namespace="osgi.service">
-      <directive name="uses" value="org.osgi.service.metatype"/>
-      <attribute name="objectClass" value="org.osgi.service.metatype.MetaTypeService" type="List&lt;String&gt;"/>
     </capability>
     <capability namespace="osgi.service">
       <directive name="uses" value="org.osgi.service.component.runtime"/>
