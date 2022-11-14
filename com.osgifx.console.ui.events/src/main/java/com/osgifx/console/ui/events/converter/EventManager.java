@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.converter;
 
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
+
 import java.util.List;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -22,6 +25,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
@@ -30,29 +34,28 @@ import com.osgifx.console.supervisor.Supervisor;
 public final class EventManager {
 
     @Reference
-    private Supervisor supervisor;
-
-    @Reference
-    private LoggerFactory factory;
-    private FluentLogger  logger;
+    private LoggerFactory       factory;
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile Supervisor supervisor;
+    private FluentLogger        logger;
 
     void activate() {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
     public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Remote agent cannot be connected");
+        Agent agent = null;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atWarning().log("Agent is not connected");
             return null;
         }
         return agent.sendEvent(topic, properties);
     }
 
     public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Remote agent cannot be connected");
+        Agent agent = null;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atWarning().log("Agent is not connected");
             return null;
         }
         return agent.postEvent(topic, properties);
