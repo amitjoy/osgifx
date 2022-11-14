@@ -26,7 +26,8 @@ startlevels                       :   com.osgifx.console.agent;startlevel=1,\
 
 -runproperties.product            :   eclipse.product=com.osgifx.console.application.product
 -runproperties.name               :   launch.name=OSGi.fx
--runproperties.logging            :   org.apache.sling.commons.log.file=${storage.directory}/logs/osgifx.log
+-runproperties.logging            :   org.apache.sling.commons.log.file=${storage.directory}/logs/fx.log,\
+                                      org.apache.sling.commons.log.pattern="{0,date,yyyy-MM-dd'T'HH:mm:ss.SSSXXX}     {4}     [{2}]  [{3}]  {5}"
 
 # Ramanujan's Number
 port                              :   1729
