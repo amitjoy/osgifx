@@ -18,6 +18,8 @@ package com.osgifx.console.ui.batchinstall.dialog;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +39,7 @@ import org.osgi.service.component.annotations.Reference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.osgifx.console.agent.Agent;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog.ArtifactDTO;
 import com.osgifx.console.util.fx.FxDialog;
@@ -47,12 +50,12 @@ public final class ArtifactInstaller {
     private static final int DEFAULT_START_LEVEL = 10;
 
     @Reference
-    private LoggerFactory     factory;
+    private LoggerFactory       factory;
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile Supervisor supervisor;
     @Reference
-    private Supervisor        supervisor;
-    @Reference
-    private ThreadSynchronize threadSync;
-    private FluentLogger      logger;
+    private ThreadSynchronize   threadSync;
+    private FluentLogger        logger;
 
     @Activate
     void activate() {
@@ -60,8 +63,8 @@ public final class ArtifactInstaller {
     }
 
     public String installArtifacts(final List<ArtifactDTO> artifacts) {
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
+        Agent agent = null;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
             logger.atWarning().log("Agent is not connected");
             return null;
         }
