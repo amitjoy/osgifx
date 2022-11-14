@@ -73,6 +73,10 @@ public final class LogReceiveMenuContributionHandler {
 
     @PostConstruct
     public void init() {
+        if (supervisor == null || supervisor.getAgent() == null) {
+            logger.atInfo().log("Agent is not connected");
+            return;
+        }
         final var currentState = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
         if (currentState) {
             supervisor.addOSGiLogListener(logEntryListener);
