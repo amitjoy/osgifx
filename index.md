@@ -129,8 +129,7 @@ To use the agent in the OSGi environment, you need to install `com.osgifx.consol
 
 #### Batch Install
 
-You can also install multiple bundles and create multiple configurations in one go. For that, you need to create `fxartifacts` directory in your home folder and keep all bundles and configuration JSON files in it. Then you can choose `Batch Install` from the `Actions` menu
-and it will list only the JARs and JSON files from the directory. You can then choose from the list which JARs to install and which configurations to create.
+You can also install multiple bundles and create multiple configurations in one go. For that, you have to select the directory after clicking on `Batch Install` from the `Actions` menu. Note that, you should keep all bundles and configuration JSON files in the selected directory. The `Batch Install` will list only the JARs and JSON files from the directory. You can then choose from the list which JARs to install and which configurations to create.
 
 Note that, the configuration JSON files need to comply with [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html)
 
