@@ -35,8 +35,6 @@ import javafx.scene.image.ImageView;
 
 public final class BatchInstallDialogController {
 
-    public static final String ARTIFACTS_DIRECTORY = "./fxartifacts";
-
     @Log
     @Inject
     private FluentLogger                   logger;
@@ -62,11 +60,9 @@ public final class BatchInstallDialogController {
                 }
             }
         });
-        initArtifacts();
     }
 
-    public void initArtifacts() {
-        final var         directory = new File(ARTIFACTS_DIRECTORY);
+    public void initArtifacts(final File directory) {
         List<ArtifactDTO> artifacts;
         if (directory.exists()) {
             final var files = FileUtils.listFiles(directory, new String[] { "jar", "json" }, false);
