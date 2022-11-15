@@ -38,6 +38,7 @@ import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
+import javafx.stage.DirectoryChooser;
 
 public final class BatchInstallHandler {
 
@@ -62,45 +63,50 @@ public final class BatchInstallHandler {
 
     @Execute
     public void execute() {
-        final var dialog = new BatchInstallDialog();
+        final var directoryChooser = new DirectoryChooser();
+        final var directory        = directoryChooser.showDialog(null);
 
-        ContextInjectionFactory.inject(dialog, context);
-        logger.atDebug().log("Injected batch install dialog to eclipse context");
-        dialog.init();
+        if (directory != null) {
+            final var dialog = new BatchInstallDialog();
 
-        dialog.traverseDirectoryForFiles();
-        final var selectedFeatures = dialog.showAndWait();
-        if (selectedFeatures.isPresent()) {
-            final Task<String> batchTask = new Task<>() {
-                @Override
-                protected String call() throws Exception {
-                    return installer.installArtifacts(selectedFeatures.get());
-                }
-            };
-            batchTask.setOnSucceeded(t -> {
-                final var result = batchTask.getValue();
-                if (result != null) {
-                    if (!result.isEmpty()) {
+            ContextInjectionFactory.inject(dialog, context);
+            logger.atDebug().log("Injected batch install dialog to eclipse context");
+            dialog.init(directory);
+
+            dialog.traverseDirectoryForFiles();
+            final var selectedFeatures = dialog.showAndWait();
+            if (selectedFeatures.isPresent()) {
+                final Task<String> batchTask = new Task<>() {
+                    @Override
+                    protected String call() throws Exception {
+                        return installer.installArtifacts(selectedFeatures.get());
+                    }
+                };
+                batchTask.setOnSucceeded(t -> {
+                    final var result = batchTask.getValue();
+                    if (result != null) {
+                        if (!result.isEmpty()) {
+                            threadSync.asyncExec(() -> {
+                                progressDialog.close();
+                                FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
+                            });
+                        } else {
+                            threadSync.asyncExec(progressDialog::close);
+                        }
+                    }
+                });
+                final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(batchTask).exceptionally(e -> {
+                    if (progressDialog != null) {
                         threadSync.asyncExec(() -> {
                             progressDialog.close();
-                            FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
+                            FxDialog.showExceptionDialog(e, BatchInstallHandler.class.getClassLoader());
                         });
-                    } else {
-                        threadSync.asyncExec(progressDialog::close);
                     }
-                }
-            });
-            final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(batchTask).exceptionally(e -> {
-                if (progressDialog != null) {
-                    threadSync.asyncExec(() -> {
-                        progressDialog.close();
-                        FxDialog.showExceptionDialog(e, BatchInstallHandler.class.getClassLoader());
-                    });
-                }
-                return null;
-            });
-            progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(),
-                    () -> taskFuture.cancel(true));
+                    return null;
+                });
+                progressDialog = FxDialog.showProgressDialog(HEADER, batchTask, getClass().getClassLoader(),
+                        () -> taskFuture.cancel(true));
+            }
         }
     }
 
