@@ -122,9 +122,13 @@ public final class HeapMonitorPane extends BorderPane {
         separator.setPrefHeight(2);
         vBoxChildren.add(separator);
 
-        final var agent = supervisor.getAgent();
-        if (agent != null && agent.getHeapUsage() != null) {
-            for (final XMemoryPoolMXBean mpBean : agent.getHeapUsage().memoryPoolBeans) {
+        Agent agent = null;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            return box;
+        }
+        final var heapUsage = agent.getHeapUsage();
+        if (heapUsage != null) {
+            for (final XMemoryPoolMXBean mpBean : heapUsage.memoryPoolBeans) {
                 if ("HEAP".equals(mpBean.type)) {
                     final var memoryUsageChart = new HeapMonitorChart(mpBean.name,
                             getMemoryUsagedByMemoryPoolBean(mpBean), now);
