@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.batchinstall.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
-import static com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialogController.ARTIFACTS_DIRECTORY;
 import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 import static javafx.scene.control.ButtonType.CANCEL;
 
@@ -49,14 +48,16 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
     @Inject
     @OSGiBundle
     private BundleContext context;
+    private File          directory;
 
-    public void init() {
+    public void init(final File directory) {
+        this.directory = directory;
+
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-        dialogPane.setHeaderText("Install Bundles (JAR) and Configurations (Configurator JSON) from '"
-                + ARTIFACTS_DIRECTORY + "' directory");
+        dialogPane.setHeaderText(directory.getAbsolutePath());
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/directory.png").toString()));
 
         final var installButtonType = new ButtonType("Install", OK_DONE);
@@ -68,6 +69,8 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
         final var controller              = (BatchInstallDialogController) loader.getController();
         final var targetItemsProperty     = controller.targetItemsProperty();
         final var targetItemsListProperty = new SimpleListProperty<ArtifactDTO>();
+
+        controller.initArtifacts(directory);
 
         targetItemsListProperty.bind(targetItemsProperty);
         final BooleanProperty isItemSelected = new SimpleBooleanProperty();
@@ -83,7 +86,7 @@ public final class BatchInstallDialog extends Dialog<List<ArtifactDTO>> {
 
     public void traverseDirectoryForFiles() {
         final var controller = (BatchInstallDialogController) loader.getController();
-        controller.initArtifacts();
+        controller.initArtifacts(directory);
     }
 
     public static record ArtifactDTO(File file, boolean isConfiguration) {
