@@ -20,8 +20,10 @@ import static org.osgi.service.condition.Condition.CONDITION_ID;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
@@ -38,13 +40,22 @@ import com.osgifx.console.supervisor.Supervisor;
 @SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
 public final class SnapshotSupervisor implements Supervisor {
 
-    public static final String CONDITION_ID_VALUE = "snapshot-agent";
+    public static final String  CONDITION_ID_VALUE  = "snapshot-agent";
+    private static final String NOT_IMPLEMENTED_LOG = "Snapshot supervisor doesn't require this functionality";
 
     @Reference
     private SnapshotAgent agent;
+    @Reference
+    private LoggerFactory factory;
+    private FluentLogger  logger;
 
     @Reference
     private ConfigurationAdmin configAdmin;
+
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
     @Deactivate
     void deactivate() throws IOException {
@@ -64,37 +75,37 @@ public final class SnapshotSupervisor implements Supervisor {
 
     @Override
     public void connect(final String host, final int port, final int timeout) throws Exception {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
     public void onOSGiEvent(final XEventDTO event) {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
     public void logged(final XLogEntryDTO event) {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
     public void addOSGiEventListener(final EventListener eventListener) {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
     public void removeOSGiEventListener(final EventListener eventListener) {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
     public void addOSGiLogListener(final LogEntryListener logEntryListener) {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
     public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
-        throw new NotImplementedException("Snapshot supervisor doesn't require this functionality");
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 
     @Override
