@@ -15,13 +15,14 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static com.osgifx.console.agent.Agent.HEAPDUMP_LOCATION_KEY;
+import static com.osgifx.console.agent.Agent.SNAPSHOT_LOCATION_KEY;
 
 import java.io.File;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.SnapshotDTO;
 import com.osgifx.console.agent.dto.XSnapshotDTO;
+import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.provider.AgentServer;
 
 import aQute.lib.json.Encoder;
@@ -41,7 +42,7 @@ public final class XSnapshotAdmin {
 
     public XSnapshotDTO snapshot() {
         final File   location     = getLocation();
-        final String fileName     = "osgi_fx_" + System.currentTimeMillis() + ".json";
+        final String fileName     = AgentHelper.prepareFilenameFor("json");
         final File   snapshotFile = new File(location, fileName);
 
         final SnapshotDTO dto = new SnapshotDTO();
@@ -77,7 +78,7 @@ public final class XSnapshotAdmin {
     }
 
     private static File getLocation() {
-        final String externalLocation = System.getProperty(HEAPDUMP_LOCATION_KEY);
+        final String externalLocation = System.getProperty(SNAPSHOT_LOCATION_KEY);
         if (externalLocation != null) {
             final File file = new File(externalLocation);
             file.mkdirs();

@@ -36,10 +36,12 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 import com.osgifx.console.agent.dto.XHeapdumpDTO;
+import com.osgifx.console.agent.helper.AgentHelper;
 
 public final class XHeapAdmin {
 
-    private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
+    private static final String HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
+
     private static volatile Object hotspotMBean;
 
     public XHeapUsageDTO init() {
@@ -95,7 +97,7 @@ public final class XHeapAdmin {
 
     public XHeapdumpDTO heapdump() {
         final File   location = getLocation();
-        final String fileName = "heapdump_fx_" + System.currentTimeMillis() + ".hprof";
+        final String fileName = AgentHelper.prepareFilenameFor("hprof");
         final File   heapdump = new File(location, fileName);
 
         initHotspotMBean();

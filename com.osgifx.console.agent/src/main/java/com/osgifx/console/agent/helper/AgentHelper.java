@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.helper;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -30,6 +32,11 @@ import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 
 public final class AgentHelper {
+
+    private static final String            FILE_NAME_PREFIX            = "OSGi.fx";
+    private static final String            FILE_NAME_SEPARATOR         = "_";
+    private static final DateTimeFormatter FILE_NAME_DATE_TIME_PATTERN = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
     private AgentHelper() {
         throw new IllegalAccessError("Cannot be instantiated");
@@ -107,6 +114,11 @@ public final class AgentHelper {
             default:
                 return Converter.cnv(XAttributeDefType.clazz(type), source);
         }
+    }
+
+    public static String prepareFilenameFor(final String extension) {
+        return FILE_NAME_PREFIX + FILE_NAME_SEPARATOR + LocalDateTime.now().format(FILE_NAME_DATE_TIME_PATTERN) + "."
+                + extension;
     }
 
 }
