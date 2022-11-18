@@ -1,5 +1,2 @@
 com.osgifx:com.osgifx.console.agent.api:${baseline.version}
 com.osgifx:com.osgifx.console.agent:${baseline.version}
-com.osgifx:com.osgifx.console.api:${baseline.version}
-com.osgifx:com.osgifx.console.smartgraph:${baseline.version}
-com.osgifx:com.osgifx.console.util:${baseline.version}
