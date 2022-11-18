@@ -1,4 +1,3 @@
--baseline           : *
 -buildpath.base.api : 
 -buildpath          : biz.aQute.remote.agent;packages=*
 Require-Capability  : compile

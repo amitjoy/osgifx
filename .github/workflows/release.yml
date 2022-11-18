@@ -32,8 +32,8 @@ jobs:
          run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
-      # -  name: Publish Agent JAR to GitHub Packages Registry
-      #    run: ./gradlew :com.osgifx.console.agent:release --info
+      # -  name: Publish Agent API and Implementation Bundles to Maven Central
+      #    run: ./scripts/release.sh
       -  name: Publish OSGi.fx to npmjs Registry using jDeploy
          run: npx jdeploy publish
          env:

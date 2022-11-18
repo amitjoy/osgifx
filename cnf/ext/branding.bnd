@@ -1,5 +1,7 @@
 Bundle-Vendor                         =         OSGi.fx
-Bundle-License                        =         https://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-License                        =         http://opensource.org/licenses/apache2.0.php; \
+                                                   link="http://www.apache.org/licenses/LICENSE-2.0"; \
+                                                   description="Apache License, Version 2.0"
 Bundle-DocURL                         =         https://osgifx.com
 Bundle-UpdateLocation                 =         https://www.jdeploy.com/~osgifx
 Bundle-Copyright                      =         Copyright (c) Amit Kumar Mondal 2021-${tstamp;yyyy}. All Rights Reserved.
@@ -9,8 +11,8 @@ Bundle-Developers                     =         amit.kumar.mondal; \
                                                    name="Amit Kumar Mondal"; \
                                                    organization="Deutsche Telekom AG"; \
                                                    organizationURL="https://www.telekom.de/"; \
-                                                   roles="architect,developer"; \
+                                                   roles="architect,developer,engineer"; \
                                                    timezone="Europe/Berlin"
 Bundle-SCM                            =         url=https://github.com/amitjoy/osgifx.git, \
                                                 connection=scm:git:https://github.com/amitjoy/osgifx.git, \
-                                                developerConnection=scm:git:git@github.com:amitjoy/osgifx.git
+                                                developerConnection=scm:git:git@github.com/amitjoy/osgifx.git

@@ -21,15 +21,13 @@ testbin                               =         ${testbin.directory}
 target-dir                            =         target
 
 maven.central.url                     =         https://repo.maven.apache.org/maven2/
-github.packages.url                   =         https://maven.pkg.github.com
-github.osgifx.packages.url            =         ${github.packages.url}/amitjoy/osgifx
-sonatype.url                          =         https://oss.sonatype.org
+sonatype.url                          =         https://s01.oss.sonatype.org/
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
 sonatype.url.staging                  =         ${sonatype.url}/service/local/staging/deploy/maven2/
 
-usr                                   =         ${env;GITHUB_ACTOR;}
-pwd                                   =         ${env;GITHUB_TOKEN;}
--connection-settings                  =         ${if;${pwd};server;-dummy};id=${github.packages.url};username=${usr};password=${pwd}, -bnd
+usr                                   =         ${env;SONATYPE_USERNAME;}
+pwd                                   =         ${env;SONATYPE_PASSWORD;}
+-connection-settings                  =         ${if;${pwd};server;-dummy};id=${sonatype.url};username=${usr};password=${pwd}, -bnd
 
 efxclipse.version                     =         3.8.0
 efxclipse.url                         =         http://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
@@ -41,15 +39,18 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
 
--pom                                  =         version=${if;${def;-snapshot};${versionmask;===;${@version}}-${def;-snapshot};${versionmask;===s;${@version}}}
--groupid                              =         com.osgifx
 -releaserepo                          =         Release
 -baselinerepo                         =         Release
 -diffignore                           =         Bundle-Version
 
-OSGifx-Version                        =         ${cat;${.}/app.version}
-Bundle-Version                        =         ${OSGifx-Version}.${tstamp}
-baseline.version                      =         ${cat;${.}/baseline.version}
+OSGifx-Version                        =         ${cat;${.}/version/app.version}
+Bundle-Version                        =         ${OSGifx-Version}
+baseline.version                      =         ${cat;${.}/version/baseline.version}
+
+is.snapshot                           =         ${endswith;${trim;${OSGifx-Version}};SNAPSHOT}
+-snapshot                             =         ${if;${is.snapshot};${tstamp};}
+-pom                                  =         version=${if;${is.snapshot};${replacestring;${trim;${OSGifx-Version}};\.SNAPSHOT;-SNAPSHOT};${trim;${OSGifx-Version}}}
+-groupid                              =         com.osgifx
 
 Git-Descriptor                        =         ${system-allow-fail;git describe --dirty --always --abbrev=9}
 Git-SHA                               =         ${system-allow-fail;git rev-list -1 --no-abbrev-commit HEAD}
@@ -72,8 +73,8 @@ Git-SHA                               =         ${system-allow-fail;git rev-list
 
 -plugin.3.Release                     =         \
 		    aQute.bnd.repository.maven.provider.MavenBndRepository;\
-		          snapshotUrl         =         ${github.osgifx.packages.url};\
-		          releaseUrl          =         ${github.osgifx.packages.url};\
+		          snapshotUrl         =         ${sonatype.url.snapshot};\
+		          releaseUrl          =         ${sonatype.url.staging};\
 		          name                =         Release;\
 		          index               =         ${.}/maven/release.maven
 
