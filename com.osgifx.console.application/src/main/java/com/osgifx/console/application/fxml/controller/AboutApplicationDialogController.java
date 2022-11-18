@@ -69,9 +69,9 @@ public final class AboutApplicationDialogController {
         jfxApplication.getHostServices().showDocument(eclipseWebLink);
     }
 
-    public String replace(final String input) {
+    private String replace(final String input) {
         final var headers       = bundleContext.getBundle().getHeaders();
-        final var appVersion    = headers.get("OSGifx-Version");
+        final var appVersion    = prepareVersion();
         final var appLink       = headers.get(BUNDLE_DOCURL);
         final var javaVersion   = Runtime.version().toString();
         final var javafxVersion = String.valueOf(SystemUtils.getMajorFXVersion());
@@ -81,6 +81,11 @@ public final class AboutApplicationDialogController {
 
         return substitutors.entrySet().stream().reduce(input, (s, e) -> s.replace("(" + e.getKey() + ")", e.getValue()),
                 (s, s2) -> s);
+    }
+
+    private String prepareVersion() {
+        final var version = bundleContext.getBundle().getVersion();
+        return version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
     }
 
 }
