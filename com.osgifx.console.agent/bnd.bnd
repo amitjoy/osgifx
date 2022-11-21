@@ -1,3 +1,5 @@
+Bundle-Name           : OSGi.fx Remote Agent
+Bundle-Description    : The agent bundle enables communication between OSGi.fx and remote OSGi runtimes
 javac.source          : 1.8
 javac.target          : ${javac.source}
 javac.compliance      : ${javac.source}
