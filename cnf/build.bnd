@@ -25,9 +25,11 @@ sonatype.url                          =         https://s01.oss.sonatype.org
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
 sonatype.url.staging                  =         ${sonatype.url}/service/local/staging/deploy/maven2/
 
-usr                                   =         ${env;SONATYPE_USERNAME;}
-pwd                                   =         ${env;SONATYPE_PASSWORD;}
--connection-settings                  =         ${if;${pwd};server;-dummy};id=${sonatype.url};username=${usr};password=${pwd}, -bnd
+-connection-settings                  =         server;\
+                                                  id=${sonatype.url};\
+                                                  username=${env;SONATYPE_USERNAME;};\
+                                                  password=${env;SONATYPE_PASSWORD;},\
+                                                -bnd
 
 efxclipse.version                     =         3.8.0
 efxclipse.url                         =         http://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
@@ -40,11 +42,8 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -noextraheaders                       =         true
 
 -baselinerepo                         =         Release
--diffignore                           =         Bundle-Version
-
 -releaserepo                          =         Release
--maven-release                        =         sign;passphrase=${env;GNUPG_PASSPHRASE}
-gpg                                   =         gpg --pinentry-mode loopback
+-diffignore                           =         Bundle-Version
 
 OSGifx-Version                        =         ${cat;${.}/version/app.version}
 Bundle-Version                        =         ${trim;${OSGifx-Version}}
