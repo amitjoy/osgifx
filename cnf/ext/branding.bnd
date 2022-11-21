@@ -10,7 +10,7 @@ Bundle-Developers                     =         amit.kumar.mondal; \
                                                    email=${Bundle-ContactAddress}; \
                                                    name="Amit Kumar Mondal"; \
                                                    organization="Deutsche Telekom AG"; \
-                                                   organizationURL="https://www.telekom.de/"; \
+                                                   organizationUrl="https://www.telekom.de/"; \
                                                    roles="architect,developer,engineer"; \
                                                    timezone="Europe/Berlin"
 Bundle-SCM                            =         url=https://github.com/amitjoy/osgifx.git, \
