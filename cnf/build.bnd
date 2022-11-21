@@ -39,9 +39,12 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
 
--releaserepo                          =         Release
 -baselinerepo                         =         Release
 -diffignore                           =         Bundle-Version
+
+-releaserepo                          =         Release
+-maven-release                        =         sign;passphrase=${env;GNUPG_PASSPHRASE}
+gpg                                   =         gpg --pinentry-mode loopback
 
 OSGifx-Version                        =         ${cat;${.}/version/app.version}
 Bundle-Version                        =         ${OSGifx-Version}
