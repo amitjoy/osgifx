@@ -12,5 +12,5 @@ echo "🏁 Committing Changes"
 git add .
 git commit -m "🏁 REL v$version_without_snapshot Preparation"
 
-echo "🏁 Creating Tag: v$c"
+echo "🏁 Creating Tag: v$version_without_snapshot"
 git tag v$version_without_snapshot
