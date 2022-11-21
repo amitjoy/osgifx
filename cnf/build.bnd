@@ -47,7 +47,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 gpg                                   =         gpg --pinentry-mode loopback
 
 OSGifx-Version                        =         ${cat;${.}/version/app.version}
-Bundle-Version                        =         ${OSGifx-Version}
+Bundle-Version                        =         ${trim;${OSGifx-Version}}
 baseline.version                      =         ${cat;${.}/version/baseline.version}
 
 is.snapshot                           =         ${endswith;${trim;${OSGifx-Version}};SNAPSHOT}
