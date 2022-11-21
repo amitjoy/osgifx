@@ -21,7 +21,7 @@ testbin                               =         ${testbin.directory}
 target-dir                            =         target
 
 maven.central.url                     =         https://repo.maven.apache.org/maven2/
-sonatype.url                          =         https://s01.oss.sonatype.org/
+sonatype.url                          =         https://s01.oss.sonatype.org
 sonatype.url.snapshot                 =         ${sonatype.url}/content/repositories/snapshots/
 sonatype.url.staging                  =         ${sonatype.url}/service/local/staging/deploy/maven2/
 
