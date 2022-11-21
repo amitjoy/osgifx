@@ -41,7 +41,7 @@ bin.testbin.directory                 =         ${if;${is;${driver};gradle};targ
 -builderignore                        =         ${bin.testbin.directory}
 -noextraheaders                       =         true
 
--baselinerepo                         =         Release
+-baselinerepo                         =         Baseline
 -releaserepo                          =         Release
 -diffignore                           =         Bundle-Version
 
@@ -78,14 +78,22 @@ Git-SHA                               =         ${system-allow-fail;git rev-list
 		          snapshotUrl         =         ${sonatype.url.snapshot};\
 		          releaseUrl          =         ${sonatype.url.staging};\
 		          name                =         Release;\
-		          index               =         ${.}/maven/release.maven
+		          noupdateOnRelease   =         true
 
--plugin.4.efxclipse                   =         \
+-plugin.4.Baseline                    =         \
+		    aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		          snapshotUrl         =         ${sonatype.url.snapshot};\
+		          releaseUrl          =         ${maven.central.url};\
+		          readOnly            =         true;\
+		          name                =         Baseline;\
+		          index               =         ${.}/maven/baseline.maven
+
+-plugin.5.efxclipse                   =         \
 		    aQute.bnd.repository.osgi.OSGiRepository;\
 		          locations           =         ${efxclipse.url};\
 		          name                =         e(fx)clipse
 
--plugin.5.Local                       =         \
+-plugin.6.Local                       =         \
             aQute.bnd.deployer.repository.LocalIndexedRepo; \
                   name                =         Local; \
                   pretty              =         true; \
