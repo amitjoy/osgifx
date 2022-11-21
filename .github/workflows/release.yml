@@ -2,6 +2,12 @@ name: Release
 on:
    push:
       tags: v*.*.*
+
+env:
+   LC_ALL: en_US.UTF-8
+   SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+   SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+
 jobs:
    release:
       runs-on: ubuntu-latest
@@ -26,8 +32,6 @@ jobs:
          run: |
             git config user.name "GitHub Actions Bot"
             git config user.email "<>"
-      -  name: Import GnuPG Key
-         run: cat <(echo -e "${{ secrets.GNUPG_PRIVATE_KEY }}") | gpg --batch --import
       -  name: Build Workspace using Gradle
          run: ./gradlew build --max-workers=5 --parallel
       -  name: Build Executable JAR
@@ -36,10 +40,6 @@ jobs:
          run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
       -  name: Publish Agent API and Implementation Bundles to Maven Central
          run: ./scripts/release.sh
-         env:
-            SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-            SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-            GNUPG_PASSPHRASE: ${{ secrets.GNUPG_PASSPHRASE }}
       -  name: Publish OSGi.fx to npmjs Registry using jDeploy
          run: npx jdeploy publish
          env:
