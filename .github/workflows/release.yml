@@ -26,14 +26,20 @@ jobs:
          run: |
             git config user.name "GitHub Actions Bot"
             git config user.email "<>"
+      -  name: Import GnuPG Key
+         run: cat <(echo -e "${{ secrets.GNUPG_PRIVATE_KEY }}") | gpg --batch --import
       -  name: Build Workspace using Gradle
          run: ./gradlew build --max-workers=5 --parallel
       -  name: Build Executable JAR
          run: ./gradlew :com.osgifx.console.product:export.osgifx
       -  name: Copy Executable JAR to Distribution Project
          run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
-      # -  name: Publish Agent JAR to GitHub Packages Registry
-      #    run: ./gradlew :com.osgifx.console.agent:release --info
+      -  name: Publish Agent API and Implementation Bundles to Maven Central
+         run: ./scripts/release.sh
+         env:
+            SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+            SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+            GNUPG_PASSPHRASE: ${{ secrets.GNUPG_PASSPHRASE }}
       -  name: Publish OSGi.fx to npmjs Registry using jDeploy
          run: npx jdeploy publish
          env:
