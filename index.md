@@ -95,6 +95,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Device Management Tree (DMT) Traversal and Update   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Manage User Admin Roles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Execute Felix Healthchecks   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Capture/Read Snapshot   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 
 #### Tools and Technologies
 
@@ -114,7 +115,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 * The application is distributed through [jdeploy](https://www.jdeploy.com) enabling developers to distribute native applications effortlessly
 * Note that, the required VM will directly be downloaded while installing the application using `jdeploy`
 * Also note that, if the auto-update feature is enabled, every new version will be automatically downloaded while starting the application
-* Due to the update of the application, the application might not work expectedly as the old bundle cache still exists. That's why, make sure to delete the existing OSGi storage area located in `~/.osgifx-ws`
+* Due to the update of the application, the application might not work expectedly as the old bundle cache (OSGi storage) still exists. That's why, make sure to delete the existing OSGi storage area located in `~/.osgifx-ws`
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -149,7 +150,7 @@ For ease of development, you can use the OSGi.fx workspace to further develop yo
 
 #### Project Import for Development
 
-1. Install Java 17 JDK Distribution (including JavaFX) in your machine (Currently I am using [ZuluFX](https://www.azul.com/downloads/?version=java-17-lts&package=jdk-fx) that includes JavaFX modules already)
+1. Install Java 17 JDK Distribution (including JavaFX modules) in your machine (Currently I am using [Zulu Distribution](https://www.azul.com/downloads/?version=java-17-lts&package=jdk-fx) that includes JavaFX modules already)
 2. Set the newly installed JDK 17 to your `JAVA_HOME`
 3. Install `Eclipse IDE for RCP/RAP Developers` and make sure your Eclipse installation uses the currently installed JDK to start with
 4. Install `Bndtools` and `e(fx)clipse` from Eclipse Marketplace
