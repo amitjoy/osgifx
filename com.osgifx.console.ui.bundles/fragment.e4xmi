@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ASCII"?>
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack">
     <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.bundles" accessibilityPhrase="" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.BundlesFxUI" label="Bundles" iconURI="platform:/plugin/com.osgifx.console.ui.bundles/graphic/icons/bundles.png" tooltip="Shows all installed bundles in the remote framework" closeable="true"/>
   </fragments>
@@ -27,5 +27,8 @@
   </fragments>
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_VmcXgM78EeyLr9jX3JzBRQ" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
     <elements xsi:type="menu:DirectMenuItem" xmi:id="_VmcXgc78EeyLr9jX3JzBRQ" elementId="com.osgifx.console.application.directmenuitem.obr" label="Generate OBR" iconURI="platform:/plugin/com.osgifx.console.ui.bundles/graphic/icons/obr.png" tooltip="Generates OBR XML from the connected runtime resources" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.handler.GenerateObrHandler"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_cBJPIGpBEe21Cs8uJesKFQ" featurename="addons" parentElementId="com.osgifx.console.application">
+    <elements xsi:type="application:Addon" xmi:id="_cBJPIWpBEe21Cs8uJesKFQ" elementId="com.osgifx.console.ui.bundles.addon.dragndrop" contributionURI="bundleclass://com.osgifx.console.ui.bundles/com.osgifx.console.ui.bundles.addon.DragAndDropAddon"/>
   </fragments>
 </fragment:ModelFragments>
