@@ -50,10 +50,9 @@ public final class ConnectionPreferenceHandler {
     }
 
     @Execute
-    public void execute( //
-                        @Named("host") final String host, //
-                        @Named("port") final String port, //
-                        @Named("timeout") final String timeout, //
+    public void execute(@Named("host") final String host,
+                        @Named("port") final String port,
+                        @Named("timeout") final String timeout,
                         @Named("type") final String type) {
 
         final var gson        = new Gson();
