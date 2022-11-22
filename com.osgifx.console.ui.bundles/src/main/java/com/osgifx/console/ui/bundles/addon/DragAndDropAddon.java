@@ -66,7 +66,7 @@ public final class DragAndDropAddon {
 
     @Inject
     @Optional
-    public void onActivate(@EventTopic(UIEvents.UILifeCycle.ACTIVATE) final Event event) {
+    public void onActivate(@EventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) final Event event) {
         try {
             final var window = (MWindow) modelService.find("com.osgifx.console.window.main", application);
             final var stage  = (Stage) ((WWindow<?>) window.getWidget()).getWidget();
