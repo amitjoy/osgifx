@@ -7,4 +7,4 @@ theme: jekyll-theme-minimal
 jdeploy:
   url: https://www.jdeploy.com/~osgifx
 agent:
-  url: https://github.com/amitjoy/osgifx/packages/
+  url: https://search.maven.org/search?q=g:com.osgifx%20AND%20a:com.osgifx.console.agent
