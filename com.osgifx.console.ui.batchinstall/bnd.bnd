@@ -10,6 +10,6 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       org.apache.commons.commons-io,\
                       org.apache.felix.cm.json,\
                       org.eclipse.osgi;version=latest,\
-                      org.apache.sling.commons.johnzon
+                      org.glassfish.jakarta.json
 -privatepackage     : com.osgifx.console.ui.batchinstall.*
 Import-Package      : org.controlsfx.control, *
