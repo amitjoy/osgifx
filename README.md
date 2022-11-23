@@ -22,14 +22,20 @@
 
 ### Tools and Technologies
 
-|                      	|                                             	|
-|----------------------	|---------------------------------------------	|
-| Java (Application)    | 17                                         	|
-| Java (Agent)          | 1.8                                         	|
-| Rich Client Platform 	| JavaFX 17                                    	|
+|                      	|                                             	    |
+|----------------------	|---------------------------------------------	    |
+| Java (Application)    | 17                                         	    |
+| Java (Agent)          | 1.8                                         	    |
+| Rich Client Platform 	| JavaFX 17                                    	    |
 | Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
-| UI Libraries         	| ControlsFX, TilesFX, FormsFX                   |
-| Tools                	| Bndtools 6.3.1                                 |
+| UI Libraries         	| ControlsFX, TilesFX, FormsFX                       |
+| Tools                	| Bndtools 6.3.1                                     |
+
+------------------------------------------------------------------------------------------------------------
+
+### Latest Version
+
+The latest released version: 2.2.7 (Check [Project Website](https://osgifx.com) to download)
 
 ------------------------------------------------------------------------------------------------------------
 
