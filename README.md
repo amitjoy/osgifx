@@ -17,46 +17,6 @@
 <img src="screenshots/3.png" />
 <img src="screenshots/4.png" />
 <img src="screenshots/5.png" />
-<p align="center">
-	<details>
-		<summary><h2>Click here for more screenshots</h2></summary>
-		<img src="screenshots/6.png" />
-		<img src="screenshots/7.png" />
-		<img src="screenshots/8.png" />
-		<img src="screenshots/9.png" />
-		<img src="screenshots/10.png" />
-		<img src="screenshots/11.png" />
-		<img src="screenshots/12.png" />
-		<img src="screenshots/13.png" />
-		<img src="screenshots/14.png" />
-		<img src="screenshots/15.png" />
-		<img src="screenshots/16.png" />
-		<img src="screenshots/17.png" />
-		<img src="screenshots/18.png" />
-		<img src="screenshots/19.png" />
-		<img src="screenshots/20.png" />
-		<img src="screenshots/21.png" />
-		<img src="screenshots/22.png" />
-		<img src="screenshots/23.png" />
-		<img src="screenshots/24.png" />
-		<img src="screenshots/25.png" />
-		<img src="screenshots/26.png" />
-		<img src="screenshots/27.png" />
-		<img src="screenshots/28.png" />
-		<img src="screenshots/29.png" />
-		<img src="screenshots/30.png" />
-		<img src="screenshots/31.png" />
-		<img src="screenshots/32.png" />
-		<img src="screenshots/33.png" />
-		<img src="screenshots/34.png" />
-		<img src="screenshots/35.png" />
-		<img src="screenshots/36.png" />
-		<img src="screenshots/37.png" />
-		<img src="screenshots/38.png" />
-		<img src="screenshots/39.png" />
-		<img src="screenshots/40.png" />
-	</details>
-</p>
 
 ------------------------------------------------------------------------------------------------------------
 
