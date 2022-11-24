@@ -35,7 +35,6 @@ import com.google.gson.stream.JsonReader;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
-import com.osgifx.console.agent.dto.SnapshotDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -44,7 +43,6 @@ import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
-import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
@@ -52,8 +50,8 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.dto.XServiceDTO;
-import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.dto.SnapshotDTO;
 
 @Component(service = { SnapshotAgent.class, Agent.class }, configurationPid = PID)
 public final class SnapshotAgent implements Agent {
@@ -306,12 +304,7 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
-    public XHeapdumpDTO heapdump() throws Exception {
-        return null;
-    }
-
-    @Override
-    public XSnapshotDTO snapshot() throws Exception {
+    public byte[] heapdump() throws Exception {
         return null;
     }
 
