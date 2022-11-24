@@ -11,7 +11,7 @@
       <children xsi:type="menu:Menu" xmi:id="_THNOECBqEey33dbookdebQ" elementId="com.osgifx.console.application.menu.extensions.list" label="View">
         <children xsi:type="menu:DynamicMenuContribution" xmi:id="__cOGkCEsEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.extensions.list" label="" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ExtensionListMenuContributionHandler"/>
       </children>
-      <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.actions" label="Actions">
+      <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.actions" label="Action">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_sk720MNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.handledmenuitem.refresh" label="Refresh Views" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/refresh.png" tooltip="Refreshes the views by retrieving the current state of the remote runtime" command="_IPypwMNnEeynHblGyo61Iw"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_zHSQ0CCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.help" label="Help">
