@@ -255,7 +255,7 @@ public final class HeapMonitorPane extends BorderPane {
         garbageCollectBtn.setOnAction(e -> performGC());
 
         final var heapDumpBtn = new Button("Heap Dump");
-        heapDumpBtn.setDisable(true);
+        heapDumpBtn.setDisable(!isConnected || isSnapshotAgent);
         heapDumpBtn.setMaxWidth(Double.MAX_VALUE);
         heapDumpBtn.setOnAction(e -> heapDump());
 
@@ -266,20 +266,14 @@ public final class HeapMonitorPane extends BorderPane {
             switch (animation.getStatus()) {
                 case RUNNING:
                     animation.pause();
-
                     garbageCollectBtn.setDisable(true);
-                    heapDumpBtn.setDisable(true);
                     startStopBtn.setText("Start");
-
                     break;
                 case PAUSED, STOPPED:
                 default:
                     animation.play();
-
                     garbageCollectBtn.setDisable(false);
-                    heapDumpBtn.setDisable(false);
                     startStopBtn.setText("Stop");
-
                     break;
             }
         });
