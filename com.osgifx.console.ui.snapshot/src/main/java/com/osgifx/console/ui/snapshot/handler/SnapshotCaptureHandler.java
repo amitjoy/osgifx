@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.ui.snapshot.handler;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
@@ -28,13 +31,17 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.agent.dto.XSnapshotDTO;
+import com.google.gson.Gson;
+import com.osgifx.console.agent.Agent;
+import com.osgifx.console.dto.SnapshotDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
+import com.osgifx.console.util.io.IO;
 
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
+import javafx.stage.DirectoryChooser;
 
 public final class SnapshotCaptureHandler {
 
@@ -56,16 +63,17 @@ public final class SnapshotCaptureHandler {
 
     @Execute
     public void execute() {
-        final Task<XSnapshotDTO> snapshotTask = new Task<>() {
+        final var directoryChooser = new DirectoryChooser();
+        final var location         = directoryChooser.showDialog(null);
+        if (location == null) {
+            return;
+        }
+        final Task<String> snapshotTask = new Task<>() {
             @Override
-            protected XSnapshotDTO call() throws Exception {
+            protected String call() throws Exception {
                 try {
                     updateMessage("Capturing snapshot of the remote runtime");
-                    return supervisor.getAgent().snapshot();
-                } catch (final InterruptedException e) {
-                    logger.atInfo().log("Snapshot task interrupted");
-                    threadSync.asyncExec(progressDialog::close);
-                    throw e;
+                    return snapshot();
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot capture snapshot");
                     threadSync.asyncExec(() -> {
@@ -76,15 +84,51 @@ public final class SnapshotCaptureHandler {
                 }
             }
         };
-        snapshotTask.valueProperty().addListener((ChangeListener<XSnapshotDTO>) (obs, oldValue, newValue) -> {
+        snapshotTask.valueProperty().addListener((ChangeListener<String>) (obs, oldValue, newValue) -> {
             if (newValue != null) {
-                threadSync.asyncExec(() -> Fx.showSuccessNotification("Snapshot Successfully Captured",
-                        "File: " + newValue.location));
+                threadSync.asyncExec(() -> {
+                    try {
+                        final var jsonSnapshot = new File(location, IO.prepareFilenameFor("json"));
+                        Files.write(jsonSnapshot.toPath(), newValue.getBytes());
+                        Fx.showSuccessNotification("Snapshot Successfully Captured", jsonSnapshot.getAbsolutePath());
+                    } catch (final IOException e) {
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    }
+                });
             }
         });
         final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(snapshotTask);
         progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", snapshotTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
+    }
+
+    private String snapshot() {
+        Agent agent = null;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            return null;
+        }
+        final var dto = new SnapshotDTO();
+
+        dto.bundles              = agent.getAllBundles();
+        dto.components           = agent.getAllComponents();
+        dto.configuations        = agent.getAllConfigurations();
+        dto.properties           = agent.getAllProperties();
+        dto.services             = agent.getAllServices();
+        dto.threads              = agent.getAllThreads();
+        dto.dmtNodes             = agent.readDmtNode(".");
+        dto.memoryInfo           = agent.getMemoryInfo();
+        dto.roles                = agent.getAllRoles();
+        dto.healthChecks         = agent.getAllHealthChecks();
+        dto.classloaderLeaks     = agent.getClassloaderLeaks();
+        dto.httpComponents       = agent.getHttpComponents();
+        dto.bundleLoggerContexts = agent.getBundleLoggerContexts();
+        dto.heapUsage            = agent.getHeapUsage();
+
+        try {
+            return new Gson().toJson(dto);
+        } catch (final Exception e) {
+            return null;
+        }
     }
 
     @CanExecute

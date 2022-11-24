@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static com.osgifx.console.agent.Agent.HEAPDUMP_LOCATION_KEY;
-
 import java.io.File;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -25,6 +23,7 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,8 +34,6 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
-import com.osgifx.console.agent.dto.XHeapdumpDTO;
-import com.osgifx.console.agent.helper.AgentHelper;
 
 public final class XHeapAdmin {
 
@@ -95,27 +92,24 @@ public final class XHeapAdmin {
         return beans.toArray(new XGarbageCollectorMXBean[0]);
     }
 
-    public XHeapdumpDTO heapdump() {
-        final File   location = getLocation();
-        final String fileName = AgentHelper.prepareFilenameFor("hprof");
-        final File   heapdump = new File(location, fileName);
+    public byte[] heapdump() {
+        final File location = new File(System.getProperty("user.dir"));
+        final File heapdump = new File(location, "" + System.currentTimeMillis() + ".hprof");
 
         initHotspotMBean();
         try {
             final Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
             final Method   m     = clazz.getMethod("dumpHeap", String.class, boolean.class);
             m.invoke(hotspotMBean, heapdump.getAbsolutePath(), true);
+
+            return Files.readAllBytes(heapdump.toPath());
         } catch (final RuntimeException re) {
             throw re;
         } catch (final Exception exp) {
             throw new RuntimeException(exp);
+        } finally {
+            heapdump.delete();
         }
-        final XHeapdumpDTO dto = new XHeapdumpDTO();
-
-        dto.size     = heapdump.length();
-        dto.location = heapdump.getAbsolutePath();
-
-        return dto;
     }
 
     private static void initHotspotMBean() {
@@ -138,18 +132,6 @@ public final class XHeapAdmin {
         } catch (final Exception exp) {
             throw new RuntimeException(exp);
         }
-    }
-
-    private static File getLocation() {
-        final String externalLocation = System.getProperty(HEAPDUMP_LOCATION_KEY);
-        if (externalLocation != null) {
-            final File file = new File(externalLocation);
-            file.mkdirs();
-            return file;
-        }
-        final File file = new File("./heapdumps");
-        file.mkdirs();
-        return file;
     }
 
 }
