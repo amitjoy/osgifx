@@ -5,6 +5,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  css = css,\
 					  fxml = fxml,\
 					  graphic = graphic
--buildpath          : ${bundles.required}
-
-Private-Package: com.osgifx.console.ui.heap
+-buildpath          : \
+                      ${bundles.required},\
+                      org.apache.commons.commons-io
+-privatepackage     : com.osgifx.console.ui.heap

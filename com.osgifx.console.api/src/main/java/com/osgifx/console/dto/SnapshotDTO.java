@@ -13,12 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.dto;
+package com.osgifx.console.dto;
 
 import java.util.List;
 import java.util.Set;
 
 import org.osgi.dto.DTO;
+
+import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XDmtNodeDTO;
+import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.dto.XMemoryInfoDTO;
+import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.dto.XThreadDTO;
 
 public class SnapshotDTO extends DTO {
     public List<XBundleDTO>              bundles;
