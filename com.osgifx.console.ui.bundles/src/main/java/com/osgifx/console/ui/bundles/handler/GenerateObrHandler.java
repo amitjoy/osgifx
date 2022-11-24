@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.time.LocalDateTime;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,6 +36,7 @@ import com.osgifx.console.ui.bundles.obr.bnd.ResourceBuilder;
 import com.osgifx.console.ui.bundles.obr.bnd.XMLResourceGenerator;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
+import com.osgifx.console.util.io.IO;
 
 import javafx.stage.DirectoryChooser;
 
@@ -80,13 +80,12 @@ public final class GenerateObrHandler {
             return;
         }
         final var xmlResourceGenerator = new XMLResourceGenerator();
-        final var name                 = connectedAgent.replace(":", "_") + "_" + LocalDateTime.now() + ".xml";
-        final var outputFile           = new File(location, name);
+        final var outputFile           = new File(location, IO.prepareFilenameFor("xml"));
         try (final var buffer = new ByteArrayOutputStream();
                 OutputStream fileStream = new FileOutputStream(outputFile)) {
             xmlResourceGenerator.resources(resources);
             xmlResourceGenerator.save(fileStream);
-            Fx.showSuccessNotification("OBR Generation", "Successfully generated");
+            Fx.showSuccessNotification("OBR Successfully Generated", outputFile.getAbsolutePath());
             logger.atInfo().log("OBR XML has been successfully generated - '%s'", outputFile);
         } catch (final Exception e) {
             FxDialog.showExceptionDialog(e, getClass().getClassLoader());

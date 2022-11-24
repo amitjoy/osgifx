@@ -15,16 +15,23 @@
  ******************************************************************************/
 package com.osgifx.console.ui.heap;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
+import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Lists;
 import com.osgifx.console.agent.Agent;
@@ -33,13 +40,17 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
+import com.osgifx.console.util.fx.FxDialog;
+import com.osgifx.console.util.io.IO;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -59,6 +70,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 
 @Creatable
@@ -73,6 +85,9 @@ public final class HeapMonitorPane extends BorderPane {
 
     private Timeline animation;
 
+    @Log
+    @Inject
+    private FluentLogger      logger;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
@@ -84,6 +99,7 @@ public final class HeapMonitorPane extends BorderPane {
     @Inject
     @Named("is_snapshot_agent")
     private boolean           isSnapshotAgent;
+    private ProgressDialog    progressDialog;
 
     @PostConstruct
     public void init() {
@@ -287,21 +303,46 @@ public final class HeapMonitorPane extends BorderPane {
         if (!isConnected) {
             return;
         }
-        try {
-            final var agent    = supervisor.getAgent();
-            final var heapdump = agent.heapdump();
-            if (heapdump == null) {
-                return;
-            }
-            threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Successfully Created",
-                    "File: " + heapdump.location + ", size: " + formatByteSize(heapdump.size)));
-        } catch (final Exception e) {
-            threadSync.asyncExec(() -> {
-                final var message = java.util.Optional.ofNullable(e.getMessage())
-                        .orElse("Heapdump cannot be created due to runtime errors");
-                Fx.showErrorNotification("Heapdump Processing Error", message);
-            });
+        final var directoryChooser = new DirectoryChooser();
+        final var location         = directoryChooser.showDialog(null);
+        if (location == null) {
+            return;
         }
+        final var agent = supervisor.getAgent();
+
+        final Task<byte[]> heapdumpTask = new Task<>() {
+            @Override
+            protected byte[] call() throws Exception {
+                try {
+                    updateMessage("Capturing heapdump of the remote runtime");
+                    return agent.heapdump();
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot capture heapdump");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+        heapdumpTask.valueProperty().addListener((ChangeListener<byte[]>) (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                threadSync.asyncExec(() -> {
+                    try {
+                        final var heapdumpFile = new File(location, IO.prepareFilenameFor("hprof"));
+                        FileUtils.writeByteArrayToFile(heapdumpFile, newValue);
+                        threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Successfully Captured",
+                                heapdumpFile.getAbsolutePath()));
+                    } catch (final IOException e) {
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    }
+                });
+            }
+        });
+        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(heapdumpTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", heapdumpTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
     private Pane createLeftPane() {

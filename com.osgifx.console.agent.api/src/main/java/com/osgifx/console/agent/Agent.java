@@ -35,14 +35,12 @@ import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
-import com.osgifx.console.agent.dto.XHeapdumpDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
-import com.osgifx.console.agent.dto.XSnapshotDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.extension.AgentExtensionName;
@@ -64,20 +62,6 @@ public interface Agent {
      * The property key to set the agent's port.
      */
     String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
-
-    /**
-     * The property key to set the heapdump location. If not set, the default
-     * location will be set to the {@code heapdumps} directory inside the current
-     * working directory of the remote OSGi runtime.
-     */
-    String HEAPDUMP_LOCATION_KEY = "osgi.fx.agent.heapdump.location";
-
-    /**
-     * The property key to set the snapshot location. If not set, the default
-     * location will be set to the {@code snapshots} directory inside the current
-     * working directory of the remote OSGi runtime.
-     */
-    String SNAPSHOT_LOCATION_KEY = "osgi.fx.agent.snapshot.location";
 
     /**
      * The property key to enable agent logs
@@ -548,14 +532,7 @@ public interface Agent {
      *
      * @return the heap dump information
      */
-    XHeapdumpDTO heapdump() throws Exception;
-
-    /**
-     * Captures a snapshot in the remote machine
-     *
-     * @return the snapshot information
-     */
-    XSnapshotDTO snapshot() throws Exception;
+    byte[] heapdump() throws Exception;
 
     /**
      * Performs a garbage collection
