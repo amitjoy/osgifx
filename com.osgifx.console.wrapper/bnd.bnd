@@ -5,5 +5,4 @@
              eu.hansolo.toolboxfx,\
              eu.lestard:advanced-bindings,\
              jar/grid-0.3.0.jar;version=file,\
-             com.dlsc.formsfx:formsfx-core,\
-             io.github.stevenjdh:simple-ssl;packages=*
+             com.dlsc.formsfx:formsfx-core

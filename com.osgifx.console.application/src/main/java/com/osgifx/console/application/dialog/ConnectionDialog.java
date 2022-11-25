@@ -112,8 +112,8 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         final var hostnameCaption           = "Hostname";
         final var portCaption               = "Port (between 1 to 65536)";
         final var timeoutCaption            = "Timeout in millis";
-        final var trustStoreCaption         = "JKS Truststore Location";
-        final var trustStorePasswordCaption = "JKS Truststore Password";
+        final var trustStoreCaption         = "Truststore Location";
+        final var trustStorePasswordCaption = "Truststore Password";
 
         hostname.setPromptText(hostnameCaption);
         port.setPromptText(portCaption);

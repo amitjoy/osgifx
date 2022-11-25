@@ -58,7 +58,7 @@ public final class ConnectionSettingsDialogController {
         hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
-        trustStoreColumn.setCellValueFactory(new DTOCellValueFactory<>("trustStore", String.class));
+        trustStoreColumn.setCellValueFactory(new DTOCellValueFactory<>("trustStorePath", String.class));
 
         connectionTable.setItems(connectionsProvider.getConnections());
         connectionTable.getSelectionModel().selectedItemProperty()

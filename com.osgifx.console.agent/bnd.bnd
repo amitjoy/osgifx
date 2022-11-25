@@ -4,7 +4,7 @@ javac.source          : 1.8
 javac.target          : ${javac.source}
 javac.compliance      : ${javac.source}
 -noimportjava         : true
--sources              : false 
+-sources              : false
 -buildpath.osgi       : \
                         osgi.annotation,\
                         osgi.cmpn;version='6.0.0',\

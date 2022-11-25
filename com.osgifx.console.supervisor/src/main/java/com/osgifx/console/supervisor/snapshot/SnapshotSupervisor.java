@@ -74,7 +74,12 @@ public final class SnapshotSupervisor implements Supervisor {
     }
 
     @Override
-    public void connect(final String host, final int port, final int timeout) throws Exception {
+    public void connect(final String host,
+                        final int port,
+                        final int timeout,
+                        final String trustStore,
+                        final String trustStorePassword)
+            throws Exception {
         logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 

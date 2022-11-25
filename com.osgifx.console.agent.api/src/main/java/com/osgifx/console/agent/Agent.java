@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLContext;
+
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
@@ -62,6 +64,16 @@ public interface Agent {
      * The property key to set the agent's port.
      */
     String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
+
+    /**
+     * The property key to enable secure agent communication.
+     */
+    String AGENT_SECURE_COMMUNICATION_KEY = "osgi.fx.agent.secure";
+
+    /**
+     * The property key for the custom {@link SSLContext} enabling secure agent communication.
+     */
+    String AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY = "osgi.fx.agent.secure.sslcontext.filter";
 
     /**
      * The property key to enable agent logs
