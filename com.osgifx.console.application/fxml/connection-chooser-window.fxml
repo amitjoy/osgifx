@@ -27,7 +27,6 @@
           <TableColumn fx:id="portColumn" editable="false" prefWidth="112.0" text="Port" />
           <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="118.0" text="Timeout" />
           <TableColumn fx:id="trustStoreColumn" editable="false" minWidth="0.0" prefWidth="150.0" text="Truststore" />
-          <TableColumn fx:id="trustStoreTypeColumn" editable="false" minWidth="0.0" prefWidth="130.0" text="Truststore Type" />
         </columns>
         <placeholder>
         	<Label text="No connections configured" />
