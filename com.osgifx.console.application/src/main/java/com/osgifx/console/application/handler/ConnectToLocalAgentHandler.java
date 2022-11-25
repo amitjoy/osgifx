@@ -96,7 +96,7 @@ public final class ConnectToLocalAgentHandler {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
                     supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to Local Agent on " + localAgentPort);
-                    supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout);
+                    supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout, null, null);
                     logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost,
                             localAgentPort);
                     return null;

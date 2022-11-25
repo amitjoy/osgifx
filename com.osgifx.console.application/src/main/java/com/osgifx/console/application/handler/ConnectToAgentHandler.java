@@ -169,7 +169,8 @@ public final class ConnectToAgentHandler {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
                     supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to " + settings.host + ":" + settings.port);
-                    supervisor.connect(settings.host, settings.port, settings.timeout);
+                    supervisor.connect(settings.host, settings.port, settings.timeout, settings.trustStorePath,
+                            settings.trustStorePassword);
                     logger.atInfo().log("Successfully connected to %s", settings);
                     return null;
                 } catch (final InterruptedException e) {
@@ -209,6 +210,8 @@ public final class ConnectToAgentHandler {
         properties.put("port", dto.port);
         properties.put("timeout", dto.timeout);
         properties.put("type", type);
+        properties.put("truststore", dto.trustStorePath);
+        properties.put("truststorePassword", dto.trustStorePassword);
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }

@@ -1,4 +1,0 @@
-Export-Package: io.github.stevenjdh.*
-Import-Package: \
-                !com.fasterxml.*,\
-                *
