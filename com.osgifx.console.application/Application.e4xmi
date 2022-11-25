@@ -38,6 +38,8 @@
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
     <parameters xmi:id="_ciGqICVrEeyVo_nfbAX0Bg" elementId="timeout" name="Timeout" optional="false"/>
     <parameters xmi:id="_bwGcQCWpEeyVo_nfbAX0Bg" elementId="type" name="Type" optional="false"/>
+    <parameters xmi:id="_VQZVsGxSEe21Cs8uJesKFQ" elementId="truststore" name="Truststore"/>
+    <parameters xmi:id="_Z-KFUGxSEe21Cs8uJesKFQ" elementId="truststorePassword" name="Truststore Password"/>
   </commands>
   <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View" description="Refreshes the views by retrieving the current state of the remote runtime"/>
   <commands xmi:id="_LFMTkAJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.command.connect.agent.local" commandName="Connect to Local Agent" description="Establishes connection to the local agent"/>

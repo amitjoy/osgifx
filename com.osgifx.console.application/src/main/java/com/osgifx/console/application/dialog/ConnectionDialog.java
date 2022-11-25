@@ -19,6 +19,7 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import javax.inject.Inject;
 
+import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
@@ -37,6 +38,8 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
 
 public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
@@ -58,14 +61,21 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-        final var txtHostname = (CustomTextField) TextFields.createClearableTextField();
-        txtHostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
+        final var hostname = (CustomTextField) TextFields.createClearableTextField();
+        hostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
 
-        final var txtPort = (CustomTextField) TextFields.createClearableTextField();
-        txtPort.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        final var port = (CustomTextField) TextFields.createClearableTextField();
+        port.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
 
-        final var txtTimeout = (CustomTextField) TextFields.createClearableTextField();
-        txtTimeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
+        final var timeout = (CustomTextField) TextFields.createClearableTextField();
+        timeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
+
+        final var trustStore = (CustomTextField) TextFields.createClearableTextField();
+        trustStore.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
+
+        final var trustStorePassword = (CustomPasswordField) TextFields.createClearablePasswordField();
+        trustStorePassword
+                .setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -75,9 +85,11 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         final var content = new VBox(10);
 
         content.getChildren().add(lbMessage);
-        content.getChildren().add(txtHostname);
-        content.getChildren().add(txtPort);
-        content.getChildren().add(txtTimeout);
+        content.getChildren().add(hostname);
+        content.getChildren().add(port);
+        content.getChildren().add(timeout);
+        content.getChildren().add(trustStore);
+        content.getChildren().add(trustStorePassword);
 
         dialogPane.setContent(content);
 
@@ -97,34 +109,50 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var hostnameCaption = "Hostname";
-        final var portCaption     = "Port (between 1 to 65536)";
-        final var timeoutCaption  = "Timeout in millis";
+        final var hostnameCaption           = "Hostname";
+        final var portCaption               = "Port (between 1 to 65536)";
+        final var timeoutCaption            = "Timeout in millis";
+        final var trustStoreCaption         = "JKS Truststore Location";
+        final var trustStorePasswordCaption = "JKS Truststore Password";
 
-        txtHostname.setPromptText(hostnameCaption);
-        txtPort.setPromptText(portCaption);
-        txtTimeout.setPromptText(timeoutCaption);
+        hostname.setPromptText(hostnameCaption);
+        port.setPromptText(portCaption);
+        timeout.setPromptText(timeoutCaption);
+        trustStore.setPromptText(trustStoreCaption);
+        trustStorePassword.setPromptText(trustStorePasswordCaption);
+
+        trustStore.setEditable(false);
+        trustStore.setOnMouseClicked(event -> {
+            final var trustStoreChooser = new FileChooser();
+            trustStoreChooser.getExtensionFilters()
+                    .add(new ExtensionFilter("Java Keystore Files (.keystore, .jks)", "*.keystore", "*.jks"));
+            final var jksTrustStore = trustStoreChooser.showOpenDialog(null);
+            if (jksTrustStore != null) {
+                trustStore.setText(jksTrustStore.getName());
+                trustStore.setAccessibleText(jksTrustStore.getAbsolutePath());
+            }
+        });
 
         final var validationSupport = new ValidationSupport();
         threadSync.asyncExec(() -> {
             final var requiredFormat       = "'%s' is required";
             final var requiredPortFormat   = "'%s' should be a valid port number";
             final var requiredNumberFormat = "'%s' should be a valid integer number";
-            validationSupport.registerValidator(txtHostname,
+            validationSupport.registerValidator(hostname,
                     Validator.createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
-            validationSupport.registerValidator(txtPort,
+            validationSupport.registerValidator(port,
                     Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
-            validationSupport.registerValidator(txtPort, Validator.createPredicateValidator(value -> {
+            validationSupport.registerValidator(port, Validator.createPredicateValidator(value -> {
                 try {
-                    final var port = Integer.parseInt(value.toString());
-                    return port > 0 && port < 65536;
+                    final var parsedPort = Integer.parseInt(value.toString());
+                    return parsedPort > 0 && parsedPort < 65536;
                 } catch (final Exception e) {
                     return false;
                 }
             }, String.format(requiredPortFormat, portCaption)));
-            validationSupport.registerValidator(txtTimeout,
+            validationSupport.registerValidator(timeout,
                     Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
-            validationSupport.registerValidator(txtTimeout, Validator.createPredicateValidator(value -> {
+            validationSupport.registerValidator(timeout, Validator.createPredicateValidator(value -> {
                 try {
                     Integer.parseInt(value.toString());
                     return true;
@@ -136,8 +164,9 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         setResultConverter(dialogButton -> {
             try {
                 return dialogButton == saveButtonType
-                        ? new ConnectionSettingDTO(txtHostname.getText(), Integer.parseInt(txtPort.getText()),
-                                Integer.parseInt(txtTimeout.getText()))
+                        ? new ConnectionSettingDTO(hostname.getText(), Integer.parseInt(port.getText()),
+                                Integer.parseInt(timeout.getText()), trustStore.getAccessibleText(),
+                                trustStorePassword.getText())
                         : null;
             } catch (final Exception e) {
                 logger.atError().withException(e).log("Connection settings cannot be added due to validation problem");

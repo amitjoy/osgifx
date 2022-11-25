@@ -61,7 +61,7 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setPrefHeight(180);
-        dialogPane.setPrefWidth(680);
+        dialogPane.setPrefWidth(550);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Connect to Remote Agent");

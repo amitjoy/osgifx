@@ -44,8 +44,6 @@ public final class ConnectionSettingsDialogController {
     private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
     @FXML
     private TableColumn<ConnectionSettingDTO, String>  trustStoreColumn;
-    @FXML
-    private TableColumn<ConnectionSettingDTO, String>  trustStoreTypeColumn;
     @Log
     @Inject
     private FluentLogger                               logger;
@@ -61,7 +59,6 @@ public final class ConnectionSettingsDialogController {
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
         trustStoreColumn.setCellValueFactory(new DTOCellValueFactory<>("trustStore", String.class));
-        trustStoreTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("trustStoreType", String.class));
 
         connectionTable.setItems(connectionsProvider.getConnections());
         connectionTable.getSelectionModel().selectedItemProperty()
