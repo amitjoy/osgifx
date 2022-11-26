@@ -56,13 +56,15 @@ public interface Supervisor {
      * Connects to the specific host and port using the provided timeout in
      * connection
      *
-     * @param host the host name
+     * @param host the host name (cannot be {@code null})
      * @param port the port address
      * @param timeout the timeout in milliseconds
+     * @param trustStore jks truststore for secure communication (can be {@code null})
+     * @param trustStorePassword jks truststore password for secure communication (can be {@code null})
      *
      * @throws Exception if any issue occurs during connection
      */
-    void connect(String host, int port, int timeout) throws Exception;
+    void connect(String host, int port, int timeout, String trustStore, String trustStorePassword) throws Exception;
 
     /**
      * Callback method for OSGi Event Admin Events

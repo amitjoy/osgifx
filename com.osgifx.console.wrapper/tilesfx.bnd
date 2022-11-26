@@ -1,6 +1,6 @@
 Export-Package: eu.hansolo.tilesfx.*
 Import-Package: \
-	eu.hansolo.fx.countries;'resolution:'=optional,\
-	eu.hansolo.fx.countries.flag;'resolution:'=optional,\
-	eu.hansolo.fx.countries.tools;'resolution:'=optional,\
-	*
+                eu.hansolo.fx.countries;'resolution:'=optional,\
+                eu.hansolo.fx.countries.flag;'resolution:'=optional,\
+                eu.hansolo.fx.countries.tools;'resolution:'=optional,\
+                *

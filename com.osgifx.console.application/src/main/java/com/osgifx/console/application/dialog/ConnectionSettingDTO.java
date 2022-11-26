@@ -17,25 +17,32 @@ package com.osgifx.console.application.dialog;
 
 import java.util.Objects;
 
+import com.google.common.base.MoreObjects;
+
 public final class ConnectionSettingDTO {
 
     public String host;
     public int    port;
     public int    timeout;
+    public String trustStorePath;
+    public String trustStorePassword;
 
     public ConnectionSettingDTO() {
         // needed for GSON
     }
 
-    public ConnectionSettingDTO(final String host, final int port, final int timeout) {
-        this.host    = host;
-        this.port    = port;
-        this.timeout = timeout;
+    public ConnectionSettingDTO(final String host, final int port, final int timeout, final String trustStorePath,
+            final String trustStorePassword) {
+        this.host               = host;
+        this.port               = port;
+        this.timeout            = timeout;
+        this.trustStorePath     = trustStorePath;
+        this.trustStorePassword = trustStorePassword;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(host, port, timeout);
+        return Objects.hash(host, port, timeout, trustStorePassword, trustStorePath);
     }
 
     @Override
@@ -47,12 +54,15 @@ public final class ConnectionSettingDTO {
             return false;
         }
         final var other = (ConnectionSettingDTO) obj;
-        return Objects.equals(host, other.host) && port == other.port && timeout == other.timeout;
+        return Objects.equals(host, other.host) && port == other.port && timeout == other.timeout
+                && Objects.equals(trustStorePassword, other.trustStorePassword)
+                && Objects.equals(trustStorePath, other.trustStorePath);
     }
 
     @Override
     public String toString() {
-        return "ConnectionSettingDTO [host=" + host + ", port=" + port + ", timeout=" + timeout + "]";
+        return MoreObjects.toStringHelper(getClass()).add("host", host).add("port", port).add("timeout", timeout)
+                .add("trustStorePath", trustStorePath).toString();
     }
 
 }

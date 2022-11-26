@@ -15,12 +15,16 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.rpc;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.net.ssl.SSLSocketFactory;
 
 import com.osgifx.console.agent.link.RemoteRPC;
 
@@ -38,31 +42,46 @@ public class AgentSupervisor<S, A> {
 
     protected void connect(final Class<A> agent, final S supervisor, final String host, final int port)
             throws Exception {
-        connect(agent, supervisor, host, port, -1);
+        connect(agent, supervisor, host, port, -1, null, null);
     }
 
     protected void connect(final Class<A> agent,
                            final S supervisor,
                            final String host,
                            final int port,
-                           final int timeout)
+                           final int timeout,
+                           final String trustStore,
+                           final String trustStorePassword)
             throws Exception {
         if (timeout < -1) {
             throw new IllegalArgumentException("timeout cannot be less than -1");
         }
+        requireNonNull(supervisor, "'supervisor' cannot be null");
+        requireNonNull(host, "'host' cannot be null");
+
         var retryTimeout = timeout;
         this.host    = host;
         this.port    = port;
         this.timeout = timeout;
+
         while (true) {
             try {
-                final var socket = new Socket();
+                SSLSocketFactory sf = null;
+                if (trustStore != null && trustStorePassword != null) {
+                    System.setProperty("javax.net.ssl.trustStore", trustStore);
+                    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+                    System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+
+                    sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                }
+                final var socket = sf == null ? new Socket() : sf.createSocket();
                 socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
                 remoteRPC = new RemoteRPC<>(agent, supervisor, socket);
                 this.setAgent(remoteRPC);
                 remoteRPC.open();
                 return;
             } catch (final ConnectException e) {
+                clearSSLProperties();
                 if (retryTimeout == 0) {
                     throw e;
                 }
@@ -80,6 +99,7 @@ public class AgentSupervisor<S, A> {
     }
 
     public void close() throws IOException {
+        clearSSLProperties();
         if (quit.getAndSet(true)) {
             return;
         }
@@ -109,6 +129,12 @@ public class AgentSupervisor<S, A> {
 
     public boolean isOpen() {
         return remoteRPC.isOpen();
+    }
+
+    private void clearSSLProperties() {
+        System.clearProperty("javax.net.ssl.trustStore");
+        System.clearProperty("javax.net.ssl.trustStorePassword");
+        System.clearProperty("javax.net.ssl.trustStoreType");
     }
 
 }
