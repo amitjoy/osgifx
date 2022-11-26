@@ -183,8 +183,13 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     }
 
     @Override
-    public void connect(final String host, final int port, final int timeout) throws Exception {
-        super.connect(Agent.class, this, host, port, timeout);
+    public void connect(final String host,
+                        final int port,
+                        final int timeout,
+                        final String trustStore,
+                        final String trustStorePassword)
+            throws Exception {
+        super.connect(Agent.class, this, host, port, timeout, trustStore, trustStorePassword);
     }
 
     private static boolean matchTopic(final String receivedEventTopic, final Collection<String> listenerTopics) {

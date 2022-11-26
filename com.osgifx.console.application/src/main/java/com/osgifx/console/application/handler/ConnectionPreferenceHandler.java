@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.preferences.Preference;
@@ -53,11 +54,14 @@ public final class ConnectionPreferenceHandler {
     public void execute(@Named("host") final String host,
                         @Named("port") final String port,
                         @Named("timeout") final String timeout,
-                        @Named("type") final String type) {
+                        @Named("type") final String type,
+                        @Named("truststore") @Optional final String truststore,
+                        @Named("truststorePassword") @Optional final String truststorePassword) {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new ConnectionSettingDTO(host, Integer.parseInt(port), Integer.parseInt(timeout));
+        final var dto         = new ConnectionSettingDTO(host, Integer.parseInt(port), Integer.parseInt(timeout),
+                truststore, truststorePassword);
 
         if ("ADD".equals(type)) {
             connections.add(dto);
