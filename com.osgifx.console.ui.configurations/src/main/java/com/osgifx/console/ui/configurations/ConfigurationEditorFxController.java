@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -39,15 +40,18 @@ import org.osgi.util.converter.TypeReference;
 import com.dlsc.formsfx.model.structure.DataField;
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
+import com.dlsc.formsfx.model.structure.Group;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefDTO;
 import com.osgifx.console.agent.dto.XAttributeDefType;
+import com.osgifx.console.agent.dto.XComponentReferenceFilterDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.supervisor.Supervisor;
@@ -190,10 +194,8 @@ public final class ConfigurationEditorFxController {
     }
 
     private FormRenderer createForm(final XConfigurationDTO config) {
-        form = Form
-                .of(Section.of(initGenericFields(config).toArray(new Field[0])).title("Generic Properties"),
-                        Section.of(initProperties(config).toArray(new Field[0])).title("Specific Properties"))
-                .title("Configuration Properties");
+        final var formGroups = createGroups(config);
+        form = Form.of(formGroups.toArray(new Group[0])).title("Configuration Properties");
         final var renderer = new FormRenderer(form);
 
         GridPane.setColumnSpan(renderer, 2);
@@ -202,6 +204,40 @@ public final class ConfigurationEditorFxController {
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
         return renderer;
+    }
+
+    private List<Group> createGroups(final XConfigurationDTO config) {
+        final List<Group> formGroups              = Lists.newArrayList();
+        final Group       genericPropertiesGroup  = Section.of(initGenericFields(config).toArray(new Field[0]))
+                .title("Generic Properties");
+        final Group       specificPropertiesGroup = Section.of(initProperties(config).toArray(new Field[0]))
+                .title("Specific Properties");
+
+        formGroups.add(genericPropertiesGroup);
+        formGroups.add(specificPropertiesGroup);
+
+        final Map<String, List<XComponentReferenceFilterDTO>> componentReferenceFilters = config.componentReferenceFilters
+                .stream().collect(Collectors.groupingBy(x -> x.componentName));
+
+        for (final Entry<String, List<XComponentReferenceFilterDTO>> entry : componentReferenceFilters.entrySet()) {
+            final var   componentName  = entry.getKey();
+            final Group refFilterGroup = Section
+                    .of(initComponentReferencesGroup(entry.getValue()).toArray(new Field[0]))
+                    .title("Component References - " + componentName);
+            formGroups.add(refFilterGroup);
+        }
+        return formGroups;
+    }
+
+    private List<Field<?>> initComponentReferencesGroup(final List<XComponentReferenceFilterDTO> refFilters) {
+        final List<Field<?>> fields = Lists.newArrayList();
+        for (final XComponentReferenceFilterDTO refFilter : refFilters) {
+            final Field<?> targetKeyField = Field.ofStringType(Strings.nullToEmpty(refFilter.targetFilter))
+                    .label(refFilter.targetKey);
+            fields.add(targetKeyField);
+            typeMappings.put(targetKeyField, XAttributeDefType.STRING.ordinal());
+        }
+        return fields;
     }
 
     private List<Field<?>> initProperties(final XConfigurationDTO config) {
@@ -546,7 +582,10 @@ public final class ConfigurationEditorFxController {
                 if (!df.isEditable()) {
                     continue;
                 }
-                final var    type         = XAttributeDefType.values()[typeMappings.get(field)];
+                final var type = XAttributeDefType.values()[typeMappings.get(field)];
+                if (df.getLabel().endsWith(".target") && df.getValue().toString().isBlank()) {
+                    continue;
+                }
                 final Object currentValue = df.getValue();
                 final var    configValue  = convertToRequestedType(currentValue, type);
                 properties.add(ConfigValue.create(field.getLabel(), configValue, type));

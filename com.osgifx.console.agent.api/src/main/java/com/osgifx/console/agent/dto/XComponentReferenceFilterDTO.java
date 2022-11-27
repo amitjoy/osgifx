@@ -15,20 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.agent.dto;
 
-import java.util.List;
-import java.util.Map;
-
 import org.osgi.dto.DTO;
 
-public class XConfigurationDTO extends DTO {
+public class XComponentReferenceFilterDTO extends DTO {
 
-    public String                             pid;
-    public String                             factoryPid;
-    public String                             location;
-    public boolean                            isFactory;
-    public boolean                            isPersisted;
-    public XObjectClassDefDTO                 ocd;
-    public Map<String, ConfigValue>           properties;
-    public List<XComponentReferenceFilterDTO> componentReferenceFilters;
+    public String componentName;
+    public String targetKey;
+    public String targetFilter;
 
 }

@@ -74,8 +74,8 @@ public final class DIModule {
         initServiceTrackers();
 
         di.bindProvider(XComponentAdmin.class, () -> new XComponentAdmin(scrTracker.getService()));
-        di.bindProvider(XConfigurationAdmin.class,
-                () -> new XConfigurationAdmin(context, configAdminTracker.getService(), metatypeTracker.getService()));
+        di.bindProvider(XConfigurationAdmin.class, () -> new XConfigurationAdmin(context,
+                configAdminTracker.getService(), metatypeTracker.getService(), di.getInstance(XComponentAdmin.class)));
         di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(dmtAdminTracker.getService()));
         di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(eventAdminTracker.getService()));
         di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, felixHcExecutorTracker.getService()));
