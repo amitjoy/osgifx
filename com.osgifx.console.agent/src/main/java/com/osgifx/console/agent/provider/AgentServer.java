@@ -567,6 +567,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isMetatypeAvailable) {
             configs.addAll(di.getInstance(XMetaTypeAdmin.class).getConfigurations());
         }
+        configs.forEach(c -> di.getInstance(XConfigurationAdmin.class).setComponentReferenceFilters(c));
         return configs;
     }
 

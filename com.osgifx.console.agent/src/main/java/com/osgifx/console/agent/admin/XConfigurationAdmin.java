@@ -41,8 +41,12 @@ import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
+import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XComponentReferenceFilterDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
+import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.helper.Reflect;
 
@@ -53,12 +57,15 @@ public final class XConfigurationAdmin {
     private final BundleContext      context;
     private final Object             metatype;
     private final ConfigurationAdmin configAdmin;
+    private final XComponentAdmin    componentAdmin;
 
     @Inject
-    public XConfigurationAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
-        this.context     = requireNonNull(context);
-        this.metatype    = metatype;
-        this.configAdmin = (ConfigurationAdmin) configAdmin;
+    public XConfigurationAdmin(final BundleContext context, final Object configAdmin, final Object metatype,
+            final XComponentAdmin componentAdmin) {
+        this.context        = requireNonNull(context);
+        this.metatype       = metatype;
+        this.configAdmin    = (ConfigurationAdmin) configAdmin;
+        this.componentAdmin = componentAdmin;
     }
 
     public List<XConfigurationDTO> getConfigurations() {
@@ -94,15 +101,6 @@ public final class XConfigurationAdmin {
                     "Configuration with PID '" + pid + "' cannot be processed due to " + e.getMessage());
         }
         return result;
-    }
-
-    private void executeUpdate(final Configuration configuration, final Map<String, Object> newProperties) {
-        final Dictionary<String, Object> properties = new Hashtable<>(newProperties);
-        try {
-            Reflect.on(configuration).call("updateIfDifferent", properties).get();
-        } catch (final Exception e) {
-            Reflect.on(configuration).call("update", properties).get();
-        }
     }
 
     public XResultDTO deleteConfiguration(final String pid) {
@@ -147,6 +145,85 @@ public final class XConfigurationAdmin {
         return result;
     }
 
+    public static Map<String, ConfigValue> prepareConfiguration(final Configuration config) {
+        if (config == null) {
+            return Collections.emptyMap();
+        }
+        final Map<String, ConfigValue> props = new HashMap<>();
+        for (final Entry<String, Object> entry : AgentHelper.valueOf(config.getProperties()).entrySet()) {
+            final String      key         = entry.getKey();
+            final Object      value       = entry.getValue();
+            final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));
+            props.put(key, configValue);
+        }
+        return props;
+    }
+
+    public void setComponentReferenceFilters(final XConfigurationDTO configuration) {
+        final List<XComponentReferenceFilterDTO> componentReferenceFilters = new ArrayList<>();
+        final List<XComponentDTO>                components                = componentAdmin.getComponents();
+        for (final XComponentDTO component : components) {
+            if (!matchPID(component, configuration)) {
+                continue;
+            }
+            final List<XComponentReferenceFilterDTO> satisfiedReferenceFilters   = findSatisfiedReferenceFilters(
+                    component, configuration);
+            final List<XComponentReferenceFilterDTO> unsatisfiedReferenceFilters = findUnsatisfiedReferenceFilters(
+                    component, configuration);
+            componentReferenceFilters.addAll(satisfiedReferenceFilters);
+            componentReferenceFilters.addAll(unsatisfiedReferenceFilters);
+        }
+        configuration.componentReferenceFilters = componentReferenceFilters;
+    }
+
+    private boolean matchPID(final XComponentDTO component, final XConfigurationDTO configuration) {
+        final boolean hasFactoryPID = component.configurationPid.contains(configuration.factoryPid);
+        final boolean hasConfigPID  = component.configurationPid.contains(configuration.pid);
+
+        return hasConfigPID || hasFactoryPID;
+    }
+
+    private List<XComponentReferenceFilterDTO> findUnsatisfiedReferenceFilters(final XComponentDTO component,
+                                                                               final XConfigurationDTO configuration) {
+        final List<XComponentReferenceFilterDTO> satisfiedReferenceFilters = new ArrayList<>();
+        for (final XSatisfiedReferenceDTO satisfiedReference : component.satisfiedReferences) {
+            satisfiedReferenceFilters.add(toComponentRefFilter(component.name, satisfiedReference.name, configuration));
+        }
+        return satisfiedReferenceFilters;
+    }
+
+    private List<XComponentReferenceFilterDTO> findSatisfiedReferenceFilters(final XComponentDTO component,
+                                                                             final XConfigurationDTO configuration) {
+        final List<XComponentReferenceFilterDTO> unsatisfiedReferenceFilters = new ArrayList<>();
+        for (final XUnsatisfiedReferenceDTO unsatisfiedReference : component.unsatisfiedReferences) {
+            unsatisfiedReferenceFilters
+                    .add(toComponentRefFilter(component.name, unsatisfiedReference.name, configuration));
+        }
+        return unsatisfiedReferenceFilters;
+    }
+
+    private XComponentReferenceFilterDTO toComponentRefFilter(final String componentName,
+                                                              final String refName,
+                                                              final XConfigurationDTO configuration) {
+        final XComponentReferenceFilterDTO dto = new XComponentReferenceFilterDTO();
+
+        dto.componentName = componentName;
+        dto.targetKey     = refName + ".target";
+        dto.targetFilter  = Optional.ofNullable(configuration.properties.remove(dto.targetKey)).map(k -> k.value)
+                .map(String.class::cast).orElse(null);
+
+        return dto;
+    }
+
+    private void executeUpdate(final Configuration configuration, final Map<String, Object> newProperties) {
+        final Dictionary<String, Object> properties = new Hashtable<>(newProperties);
+        try {
+            Reflect.on(configuration).call("updateIfDifferent", properties).get();
+        } catch (final Exception e) {
+            Reflect.on(configuration).call("update", properties).get();
+        }
+    }
+
     private List<XConfigurationDTO> findConfigsWithoutMetatype() throws IOException, InvalidSyntaxException {
         final List<XConfigurationDTO> dtos    = new ArrayList<>();
         final Configuration[]         configs = configAdmin.listConfigurations(null);
@@ -173,20 +250,6 @@ public final class XConfigurationAdmin {
         dto.isPersisted = true;
 
         return dto;
-    }
-
-    public static Map<String, ConfigValue> prepareConfiguration(final Configuration config) {
-        if (config == null) {
-            return Collections.emptyMap();
-        }
-        final Map<String, ConfigValue> props = new HashMap<>();
-        for (final Entry<String, Object> entry : AgentHelper.valueOf(config.getProperties()).entrySet()) {
-            final String      key         = entry.getKey();
-            final Object      value       = entry.getValue();
-            final ConfigValue configValue = ConfigValue.create(key, value, XAttributeDefType.getType(value));
-            props.put(key, configValue);
-        }
-        return props;
     }
 
 }
