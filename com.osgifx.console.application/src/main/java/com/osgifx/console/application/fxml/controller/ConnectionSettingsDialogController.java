@@ -37,6 +37,8 @@ public final class ConnectionSettingsDialogController {
     @FXML
     private TableView<ConnectionSettingDTO>            connectionTable;
     @FXML
+    private TableColumn<ConnectionSettingDTO, String>  nameColumn;
+    @FXML
     private TableColumn<ConnectionSettingDTO, String>  hostColumn;
     @FXML
     private TableColumn<ConnectionSettingDTO, Integer> portColumn;
@@ -55,6 +57,7 @@ public final class ConnectionSettingsDialogController {
 
     @FXML
     public void initialize() {
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
         hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));

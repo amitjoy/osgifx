@@ -23,6 +23,7 @@
    <children>
       <TableView fx:id="connectionTable" layoutY="69.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columns>
+          <TableColumn fx:id="nameColumn" editable="false" prefWidth="125.0" text="Name" />
           <TableColumn fx:id="hostColumn" editable="false" prefWidth="139.0" text="Host" />
           <TableColumn fx:id="portColumn" editable="false" prefWidth="112.0" text="Port" />
           <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="118.0" text="Timeout" />
