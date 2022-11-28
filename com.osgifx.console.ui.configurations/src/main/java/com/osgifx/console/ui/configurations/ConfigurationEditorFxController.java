@@ -216,6 +216,10 @@ public final class ConfigurationEditorFxController {
         formGroups.add(genericPropertiesGroup);
         formGroups.add(specificPropertiesGroup);
 
+        if (config.componentReferenceFilters == null) {
+            return formGroups;
+        }
+
         final Map<String, List<XComponentReferenceFilterDTO>> componentReferenceFilters = config.componentReferenceFilters
                 .stream().collect(Collectors.groupingBy(x -> x.componentName));
 
