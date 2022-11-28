@@ -51,7 +51,8 @@ public final class ConnectionPreferenceHandler {
     }
 
     @Execute
-    public void execute(@Named("host") final String host,
+    public void execute(@Named("name") final String name,
+                        @Named("host") final String host,
                         @Named("port") final String port,
                         @Named("timeout") final String timeout,
                         @Named("type") final String type,
@@ -60,7 +61,7 @@ public final class ConnectionPreferenceHandler {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new ConnectionSettingDTO(host, Integer.parseInt(port), Integer.parseInt(timeout),
+        final var dto         = new ConnectionSettingDTO(name, host, Integer.parseInt(port), Integer.parseInt(timeout),
                 truststore, truststorePassword);
 
         if ("ADD".equals(type)) {

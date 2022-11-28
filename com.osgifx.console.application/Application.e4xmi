@@ -34,6 +34,7 @@
   </bindingTables>
   <rootContext xmi:id="_1NNJoMNmEeynHblGyo61Iw" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="Windows and Dialogs" description="Windows and Dialogs"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.preference" commandName="Connection Preference">
+    <parameters xmi:id="_hoaR4G7cEe2jJYc4TDMqiA" elementId="name" name="Name" optional="false"/>
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
     <parameters xmi:id="_ciGqICVrEeyVo_nfbAX0Bg" elementId="timeout" name="Timeout" optional="false"/>

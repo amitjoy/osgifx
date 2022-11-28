@@ -206,6 +206,7 @@ public final class ConnectToAgentHandler {
     private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
         final Map<String, Object> properties = Maps.newHashMap();
 
+        properties.put("name", dto.name);
         properties.put("host", dto.host);
         properties.put("port", dto.port);
         properties.put("timeout", dto.timeout);
