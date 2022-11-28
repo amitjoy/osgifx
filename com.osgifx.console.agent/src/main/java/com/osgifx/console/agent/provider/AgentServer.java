@@ -559,6 +559,7 @@ public final class AgentServer implements Agent, Closeable {
     public List<XConfigurationDTO> getAllConfigurations() {
         final boolean isConfigAdminAvailable = di.getInstance(PackageWirings.class).isConfigAdminWired();
         final boolean isMetatypeAvailable    = di.getInstance(PackageWirings.class).isMetatypeWired();
+        final boolean isScrAvailable         = di.getInstance(PackageWirings.class).isScrWired();
 
         final List<XConfigurationDTO> configs = new ArrayList<>();
         if (isConfigAdminAvailable) {
@@ -567,7 +568,9 @@ public final class AgentServer implements Agent, Closeable {
         if (isMetatypeAvailable) {
             configs.addAll(di.getInstance(XMetaTypeAdmin.class).getConfigurations());
         }
-        configs.forEach(c -> di.getInstance(XConfigurationAdmin.class).setComponentReferenceFilters(c));
+        if (isScrAvailable) {
+            configs.forEach(c -> di.getInstance(XConfigurationAdmin.class).setComponentReferenceFilters(c));
+        }
         return configs;
     }
 
