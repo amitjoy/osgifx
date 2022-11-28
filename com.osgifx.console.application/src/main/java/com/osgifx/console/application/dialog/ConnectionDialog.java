@@ -61,6 +61,9 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
+        final var name = (CustomTextField) TextFields.createClearableTextField();
+        name.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
+
         final var hostname = (CustomTextField) TextFields.createClearableTextField();
         hostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
 
@@ -85,6 +88,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         final var content = new VBox(10);
 
         content.getChildren().add(lbMessage);
+        content.getChildren().add(name);
         content.getChildren().add(hostname);
         content.getChildren().add(port);
         content.getChildren().add(timeout);
@@ -109,12 +113,14 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var hostnameCaption           = "Hostname";
+        final var nameCaption               = "Name";
+        final var hostnameCaption           = "Host";
         final var portCaption               = "Port (between 1 to 65536)";
         final var timeoutCaption            = "Timeout in millis";
         final var trustStoreCaption         = "Truststore Location";
         final var trustStorePasswordCaption = "Truststore Password";
 
+        name.setPromptText(nameCaption);
         hostname.setPromptText(hostnameCaption);
         port.setPromptText(portCaption);
         timeout.setPromptText(timeoutCaption);
@@ -138,6 +144,9 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             final var requiredFormat       = "'%s' is required";
             final var requiredPortFormat   = "'%s' should be a valid port number";
             final var requiredNumberFormat = "'%s' should be a valid integer number";
+
+            validationSupport.registerValidator(name,
+                    Validator.createEmptyValidator(String.format(requiredFormat, nameCaption)));
             validationSupport.registerValidator(hostname,
                     Validator.createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
             validationSupport.registerValidator(port,
@@ -164,7 +173,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         setResultConverter(dialogButton -> {
             try {
                 return dialogButton == saveButtonType
-                        ? new ConnectionSettingDTO(hostname.getText(), Integer.parseInt(port.getText()),
+                        ? new ConnectionSettingDTO(name.getText(), hostname.getText(), Integer.parseInt(port.getText()),
                                 Integer.parseInt(timeout.getText()), trustStore.getAccessibleText(),
                                 trustStorePassword.getText())
                         : null;
