@@ -15,9 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations;
 
+import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +28,7 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -37,6 +40,7 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
@@ -63,6 +67,7 @@ public final class ConfigurationsFxController {
     private boolean                                 isConnected;
     @Inject
     private DataProvider                            dataProvider;
+    private FilteredList<XConfigurationDTO>         filteredList;
     private TableRowDataFeatures<XConfigurationDTO> previouslyExpanded;
 
     @FXML
@@ -122,8 +127,17 @@ public final class ConfigurationsFxController {
         table.getColumns().add(locationColumn);
         table.getColumns().add(isFactoryColumn);
 
-        table.setItems(dataProvider.configurations());
+        filteredList = new FilteredList<>(dataProvider.configurations());
+        table.setItems(filteredList);
+
         TableFilter.forTableView(table).lazy(true).apply();
+    }
+
+    @Inject
+    @org.eclipse.e4.core.di.annotations.Optional
+    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final Predicate<XConfigurationDTO> filter) {
+        logger.atInfo().log("Update filter event received");
+        filteredList.setPredicate(filter);
     }
 
 }
