@@ -34,6 +34,7 @@ org.osgi:org.osgi.namespace.service:1.0.0
 org.osgi:org.osgi.namespace.unresolvable:1.0.0
 org.osgi:org.osgi.service.application:1.1.0
 org.osgi:org.osgi.service.async:1.0.0
+org.osgi:org.osgi.service.cdi:1.0.1
 org.osgi:org.osgi.service.cm:1.6.1
 org.osgi:org.osgi.service.component.annotations:1.5.0
 org.osgi:org.osgi.service.configurator:1.0.1
@@ -43,6 +44,7 @@ org.osgi:org.osgi.service.dmt:2.0.2
 org.osgi:org.osgi.service.event:1.4.1
 org.osgi:org.osgi.service.http:1.2.2
 org.osgi:org.osgi.service.http.whiteboard:1.1.1
+org.osgi:org.osgi.service.jaxrs:1.0.1
 org.osgi:org.osgi.service.log:1.5.0
 org.osgi:org.osgi.service.metatype:1.4.1
 org.osgi:org.osgi.service.metatype.annotations:1.4.1

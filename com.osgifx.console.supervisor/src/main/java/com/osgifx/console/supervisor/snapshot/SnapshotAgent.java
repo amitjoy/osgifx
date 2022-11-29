@@ -35,6 +35,7 @@ import com.google.gson.stream.JsonReader;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
+import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -301,6 +302,11 @@ public final class SnapshotAgent implements Agent {
     @Override
     public XHeapUsageDTO getHeapUsage() {
         return snapshotDTO.heapUsage;
+    }
+
+    @Override
+    public RuntimeDTO getRuntimeDTO() {
+        return snapshotDTO.runtime;
     }
 
     @Override

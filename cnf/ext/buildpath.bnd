@@ -10,6 +10,7 @@
                                                 org.osgi.namespace.unresolvable,\
                                                 org.osgi.service.application,\
                                                 org.osgi.service.async,\
+                                                org.osgi.service.cdi,\
                                                 org.osgi.service.cm,\
                                                 org.osgi.service.component,\
                                                 org.osgi.service.component.annotations,\
@@ -19,6 +20,7 @@
                                                 org.osgi.service.event,\
                                                 org.osgi.service.http,\
                                                 org.osgi.service.http.whiteboard,\
+                                                org.osgi.service.jaxrs,\
                                                 org.osgi.service.metatype,\
                                                 org.osgi.service.metatype.annotations,\
                                                 org.osgi.service.useradmin,\

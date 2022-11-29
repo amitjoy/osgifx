@@ -10,3 +10,8 @@
 -privatepackage     : com.osgifx.console.agent.*
 -conditionalpackage : aQute.*, com.osgifx.console.agent.link
 -fixupmessages      : 'split', 'private'
+Export-Package      : org.osgi.service.cdi,\
+                      org.osgi.service.cdi.runtime.dto,\
+                      org.osgi.service.cdi.runtime.dto.template,\
+                      org.osgi.service.http.runtime.dto,\
+                      org.osgi.service.jaxrs.runtime.dto
