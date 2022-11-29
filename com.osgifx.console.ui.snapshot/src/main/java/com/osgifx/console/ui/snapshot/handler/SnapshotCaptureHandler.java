@@ -123,6 +123,7 @@ public final class SnapshotCaptureHandler {
         dto.httpComponents       = agent.getHttpComponents();
         dto.bundleLoggerContexts = agent.getBundleLoggerContexts();
         dto.heapUsage            = agent.getHeapUsage();
+        dto.runtime              = agent.getRuntimeDTO();
 
         try {
             return new Gson().toJson(dto);

@@ -17,6 +17,7 @@ package com.osgifx.console.data.provider;
 
 import org.osgi.annotation.versioning.ProviderType;
 
+import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -164,5 +165,12 @@ public interface DataProvider {
      * @return the DMT node information
      */
     XDmtNodeDTO readDmtNode(String rootURI);
+
+    /**
+     * Returns the runtime DTOs together
+     *
+     * @return the runtime DTOs together
+     */
+    RuntimeDTO readRuntimeDTO();
 
 }

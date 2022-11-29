@@ -37,6 +37,7 @@ public final class PackageWirings {
         LOG("Log"),
         R7_LOGGER("R7 Logger"),
         HTTP("HTTP"),
+        JAX_RS("JAX-RS"),
         JMX("JMX"),
         HC("Felix Healthcheck");
 
@@ -100,6 +101,14 @@ public final class PackageWirings {
 
     public boolean isHttpServiceRuntimeWired() {
         return isWired("org.osgi.service.http.runtime");
+    }
+
+    public boolean isJaxRsWired() {
+        return isWired("org.osgi.service.jaxrs.runtime");
+    }
+
+    public boolean isCDIWired() {
+        return isWired("org.osgi.service.cdi.runtime");
     }
 
     public boolean isJmxWired() {
