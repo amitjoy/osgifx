@@ -31,6 +31,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
+import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
@@ -56,7 +57,9 @@ public final class DIModule {
     private ServiceTracker<Object, Object>                 configAdminTracker;
     private ServiceTracker<Object, Object>                 gogoCommandsTracker;
     private ServiceTracker<Object, Object>                 felixHcExecutorTracker;
+    private ServiceTracker<Object, Object>                 cdiServiceRuntimeTracker;
     private ServiceTracker<Object, Object>                 httpServiceRuntimeTracker;
+    private ServiceTracker<Object, Object>                 jaxrsServiceRuntimeTracker;
     private ServiceTracker<AgentExtension, AgentExtension> agentExtensionTracker;
 
     private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
@@ -77,6 +80,10 @@ public final class DIModule {
         di.bindProvider(XConfigurationAdmin.class, () -> new XConfigurationAdmin(context,
                 configAdminTracker.getService(), metatypeTracker.getService(), di.getInstance(XComponentAdmin.class)));
         di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(dmtAdminTracker.getService()));
+        di.bindProvider(XDtoAdmin.class,
+                () -> new XDtoAdmin(context, scrTracker.getService(), jaxrsServiceRuntimeTracker.getService(),
+                        httpServiceRuntimeTracker.getService(), cdiServiceRuntimeTracker.getService(),
+                        di.getInstance(PackageWirings.class)));
         di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(eventAdminTracker.getService()));
         di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, felixHcExecutorTracker.getService()));
         di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(httpServiceRuntimeTracker.getService()));
@@ -100,7 +107,9 @@ public final class DIModule {
         gogoCommandsTracker.close();
         agentExtensionTracker.close();
         felixHcExecutorTracker.close();
+        cdiServiceRuntimeTracker.close();
         httpServiceRuntimeTracker.close();
+        jaxrsServiceRuntimeTracker.close();
     }
 
     public DI di() {
@@ -114,86 +123,90 @@ public final class DIModule {
     private void initServiceTrackers() throws InvalidSyntaxException {
         final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
-        metatypeTracker           = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
-        dmtAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
-        userAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
-        loggerAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.log.admin.LoggerAdmin", null);
-        eventAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
-        configAdminTracker        = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
-        felixHcExecutorTracker    = new ServiceTracker<>(context,
+        metatypeTracker            = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
+        dmtAdminTracker            = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
+        userAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
+        loggerAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.log.admin.LoggerAdmin", null);
+        eventAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
+        configAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
+        felixHcExecutorTracker     = new ServiceTracker<>(context,
                 "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
-        scrTracker                = new ServiceTracker<>(context,
+        scrTracker                 = new ServiceTracker<>(context,
                 "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
-        httpServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime",
+        cdiServiceRuntimeTracker   = new ServiceTracker<>(context, "org.osgi.service.cdi.runtime.CDIComponentRuntime",
                 null);
-        agentExtensionTracker     = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class,
+        httpServiceRuntimeTracker  = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime",
+                null);
+        jaxrsServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime",
+                null);
+        agentExtensionTracker      = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class,
                 null) {
 
-                                      @Override
-                                      @SuppressWarnings("unchecked")
-                                      public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
-                                          final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
-                                          if (name == null) {
-                                              return null;
-                                          }
-                                          final AgentExtension tracked = super.addingService(reference);
-                                          agentExtensions.put(name.toString(), tracked);
-                                          return tracked;
-                                      }
+                                       @Override
+                                       @SuppressWarnings("unchecked")
+                                       public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
+                                           final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
+                                           if (name == null) {
+                                               return null;
+                                           }
+                                           final AgentExtension tracked = super.addingService(reference);
+                                           agentExtensions.put(name.toString(), tracked);
+                                           return tracked;
+                                       }
 
-                                      @Override
-                                      public void modifiedService(final ServiceReference<AgentExtension> reference,
+                                       @Override
+                                       public void modifiedService(final ServiceReference<AgentExtension> reference,
+                                                                   final AgentExtension service) {
+                                           removedService(reference, service);
+                                           addingService(reference);
+                                       }
+
+                                       @Override
+                                       public void removedService(final ServiceReference<AgentExtension> reference,
                                                                   final AgentExtension service) {
-                                          removedService(reference, service);
-                                          addingService(reference);
-                                      }
+                                           final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
+                                           if (name == null) {
+                                               return;
+                                           }
+                                           agentExtensions.remove(name);
+                                       }
+                                   };
+        gogoCommandsTracker        = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
+                                       @Override
+                                       public Object addingService(final ServiceReference<Object> reference) {
+                                           final String   scope     = String
+                                                   .valueOf(reference.getProperty("osgi.command.scope"));
+                                           final String[] functions = adapt(
+                                                   reference.getProperty("osgi.command.function"));
+                                           addCommand(scope, functions);
+                                           return super.addingService(reference);
+                                       }
 
-                                      @Override
-                                      public void removedService(final ServiceReference<AgentExtension> reference,
-                                                                 final AgentExtension service) {
-                                          final Object name = reference.getProperty(AgentExtension.PROPERTY_KEY);
-                                          if (name == null) {
-                                              return;
-                                          }
-                                          agentExtensions.remove(name);
-                                      }
-                                  };
-        gogoCommandsTracker       = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
-                                      @Override
-                                      public Object addingService(final ServiceReference<Object> reference) {
-                                          final String   scope     = String
-                                                  .valueOf(reference.getProperty("osgi.command.scope"));
-                                          final String[] functions = adapt(
-                                                  reference.getProperty("osgi.command.function"));
-                                          addCommand(scope, functions);
-                                          return super.addingService(reference);
-                                      }
+                                       @Override
+                                       public void removedService(final ServiceReference<Object> reference,
+                                                                  final Object service) {
+                                           final String   scope     = String
+                                                   .valueOf(reference.getProperty("osgi.command.scope"));
+                                           final String[] functions = adapt(
+                                                   reference.getProperty("osgi.command.function"));
+                                           removeCommand(scope, functions);
+                                       }
 
-                                      @Override
-                                      public void removedService(final ServiceReference<Object> reference,
-                                                                 final Object service) {
-                                          final String   scope     = String
-                                                  .valueOf(reference.getProperty("osgi.command.scope"));
-                                          final String[] functions = adapt(
-                                                  reference.getProperty("osgi.command.function"));
-                                          removeCommand(scope, functions);
-                                      }
+                                       private String[] adapt(final Object value) {
+                                           if (value instanceof String[]) {
+                                               return (String[]) value;
+                                           }
+                                           return new String[] { value.toString() };
+                                       }
 
-                                      private String[] adapt(final Object value) {
-                                          if (value instanceof String[]) {
-                                              return (String[]) value;
-                                          }
-                                          return new String[] { value.toString() };
-                                      }
+                                       private void addCommand(final String scope, final String... commands) {
+                                           Stream.of(commands).forEach(cmd -> gogoCommands.add(scope + ":" + cmd));
+                                       }
 
-                                      private void addCommand(final String scope, final String... commands) {
-                                          Stream.of(commands).forEach(cmd -> gogoCommands.add(scope + ":" + cmd));
-                                      }
-
-                                      private void removeCommand(final String scope, final String... commands) {
-                                          Stream.of(commands).forEach(cmd -> gogoCommands.remove(scope + ":" + cmd));
-                                      }
-                                  };
+                                       private void removeCommand(final String scope, final String... commands) {
+                                           Stream.of(commands).forEach(cmd -> gogoCommands.remove(scope + ":" + cmd));
+                                       }
+                                   };
 
         scrTracker.open();
         metatypeTracker.open();
@@ -205,7 +218,9 @@ public final class DIModule {
         gogoCommandsTracker.open();
         agentExtensionTracker.open();
         felixHcExecutorTracker.open();
+        cdiServiceRuntimeTracker.open();
         httpServiceRuntimeTracker.open();
+        jaxrsServiceRuntimeTracker.open();
     }
 
 }

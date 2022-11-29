@@ -1,0 +1,11 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+-includeresource    : \
+                      plugin.xml = _plugin.xml,\
+					  fragment.e4xmi = fragment.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic
+-buildpath          : \
+                      ${bundles.required},\
+                      com.google.gson
+-privatepackage     : com.osgifx.console.ui.dto

@@ -29,6 +29,7 @@ import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
+import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -538,6 +539,13 @@ public interface Agent {
      * @return the heap usage information
      */
     XHeapUsageDTO getHeapUsage();
+
+    /**
+     * Returns the runtime DTOs
+     *
+     * @return the runtime DTOs
+     */
+    RuntimeDTO getRuntimeDTO();
 
     /**
      * Performs a heap dump in the remote machine

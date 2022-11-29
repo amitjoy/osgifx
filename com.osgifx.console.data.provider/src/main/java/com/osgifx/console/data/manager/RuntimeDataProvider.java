@@ -51,6 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.EventAdmin;
 
 import com.google.common.collect.Maps;
+import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -207,6 +208,16 @@ public final class RuntimeDataProvider implements DataProvider {
             return null;
         }
         return agent.readDmtNode(rootURI);
+    }
+
+    @Override
+    public RuntimeDTO readRuntimeDTO() {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return null;
+        }
+        return agent.getRuntimeDTO();
     }
 
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
