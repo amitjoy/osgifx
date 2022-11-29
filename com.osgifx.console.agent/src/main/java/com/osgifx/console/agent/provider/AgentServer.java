@@ -90,6 +90,7 @@ import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
+import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHeapAdmin;
@@ -104,6 +105,7 @@ import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.di.DI;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.DmtDataType;
+import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -889,6 +891,11 @@ public final class AgentServer implements Agent, Closeable {
     public XHeapUsageDTO getHeapUsage() {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
         return isJMXWired ? di.getInstance(XHeapAdmin.class).init() : null;
+    }
+
+    @Override
+    public RuntimeDTO getRuntimeDTO() {
+        return di.getInstance(XDtoAdmin.class).runtime();
     }
 
     @Override

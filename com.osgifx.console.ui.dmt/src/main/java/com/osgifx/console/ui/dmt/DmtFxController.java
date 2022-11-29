@@ -96,7 +96,7 @@ public final class DmtFxController {
     }
 
     public void updateModel() {
-        threadSync.asyncExec(() -> initTree());
+        threadSync.asyncExec(this::initTree);
         logger.atInfo().log("DMT data model has been updated");
     }
 
@@ -110,7 +110,7 @@ public final class DmtFxController {
         addSearchBinding(rootItem);
         dmtTree.setRoot(rootItem);
         dmtTree.setShowRoot(false);
-        initTree(dmtNode, rootItem);
+        initDmtTree(dmtNode, rootItem);
         expandTreeView(rootItem);
     }
 
@@ -123,7 +123,7 @@ public final class DmtFxController {
         }, searchBox.textProperty()));
     }
 
-    private void initTree(final XDmtNodeDTO dmtNode, final FilterableTreeItem<String> parent) {
+    private void initDmtTree(final XDmtNodeDTO dmtNode, final FilterableTreeItem<String> parent) {
         var node = parent;
         if (!ROOT_DMT_NODE.equals(dmtNode.uri)) {
             node = new FilterableTreeItem<>(initItemText(dmtNode));
@@ -133,7 +133,7 @@ public final class DmtFxController {
         }
         if (!dmtNode.children.isEmpty()) {
             for (final XDmtNodeDTO child : dmtNode.children) {
-                initTree(child, node);
+                initDmtTree(child, node);
             }
         }
     }
@@ -202,7 +202,8 @@ public final class DmtFxController {
         final Map<String, String> properties = Maps.newHashMap();
 
         properties.computeIfAbsent("value", e -> node.value);
-        properties.computeIfAbsent("format", e -> java.util.Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
+        properties.computeIfAbsent("format",
+                e -> java.util.Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
 
         final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
         final var result             = new StringBuilder(node.uri);

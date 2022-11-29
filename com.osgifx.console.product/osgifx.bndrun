@@ -63,6 +63,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.terminal',\
                                       bnd.identity;id='com.osgifx.console.ui.threads',\
                                       bnd.identity;id='com.osgifx.console.ui.roles',\
+                                      bnd.identity;id='com.osgifx.console.ui.dto',\
                                       \
                                       ${requirement.product}
 
@@ -87,6 +88,7 @@ install.order                     :   \
                                       com.osgifx.console.ui.leaks,\
                                       com.osgifx.console.ui.http,\
                                       com.osgifx.console.ui.roles,\
+                                      com.osgifx.console.ui.dto,\
                                       com.osgifx.console.ui.dmt,\
                                       com.osgifx.console.ui.healthchecks
 

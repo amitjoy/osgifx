@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.osgi.dto.DTO;
 
+import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -49,5 +50,6 @@ public class SnapshotDTO extends DTO {
     public List<XHttpComponentDTO>       httpComponents;
     public List<XBundleLoggerContextDTO> bundleLoggerContexts;
     public XHeapUsageDTO                 heapUsage;
+    public RuntimeDTO                    runtime;
 
 }
