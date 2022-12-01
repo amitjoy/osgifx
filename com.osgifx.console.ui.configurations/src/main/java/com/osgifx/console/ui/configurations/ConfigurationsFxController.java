@@ -37,6 +37,7 @@ import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
@@ -134,10 +135,11 @@ public final class ConfigurationsFxController {
     }
 
     @Inject
+    @SuppressWarnings("unchecked")
     @org.eclipse.e4.core.di.annotations.Optional
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final Predicate<XConfigurationDTO> filter) {
+    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
-        filteredList.setPredicate(filter);
+        filteredList.setPredicate((Predicate<? super XConfigurationDTO>) filter.predicate);
     }
 
 }
