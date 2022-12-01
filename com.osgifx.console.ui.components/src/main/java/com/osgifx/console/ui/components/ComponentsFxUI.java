@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.components;
 
+import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_BUNDLE_FILTER_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
@@ -26,6 +27,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
@@ -34,6 +36,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -59,6 +62,8 @@ public final class ComponentsFxUI {
     private boolean           isSnapshotAgent;
     @Inject
     private ConsoleStatusBar  statusBar;
+    @Inject
+    private IEventBroker      eventBroker;
     @Inject
     private ConsoleMaskerPane progressPane;
     @Inject
@@ -95,6 +100,18 @@ public final class ComponentsFxUI {
         createControls(parent, loader);
     }
 
+    @Inject
+    @Optional
+    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter,
+                                     final BorderPane parent) {
+        logger.atInfo().log("Update filter event received");
+        if (filter.predicate != null) {
+            initSearchFilterResetButton(parent);
+        } else {
+            initStatusBar(parent);
+        }
+    }
+
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
         progressPane.setVisible(true);
         final Task<Void> task = new Task<>() {
@@ -125,6 +142,20 @@ public final class ComponentsFxUI {
         if (isConnected) {
             final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
             statusBar.clearAllInRight();
+            if (!isSnapshotAgent) {
+                statusBar.addToRight(node);
+            }
+        } else {
+            statusBar.clearAllInRight();
+        }
+        statusBar.addTo(parent);
+    }
+
+    private void initSearchFilterResetButton(final BorderPane parent) {
+        if (isConnected) {
+            final var node = Fx.initStatusBarButton(
+                    () -> eventBroker.post(UPDATE_BUNDLE_FILTER_EVENT_TOPIC, new SearchFilterDTO()),
+                    "Reset Search Filter", "CLOSE");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }

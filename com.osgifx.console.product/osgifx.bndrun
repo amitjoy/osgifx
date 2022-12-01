@@ -43,6 +43,7 @@ port                              :   1729
                                       \
                                       bnd.identity;id='com.osgifx.console.ui.bundles',\
                                       bnd.identity;id='com.osgifx.console.ui.batchinstall',\
+                                      bnd.identity;id='com.osgifx.console.ui.search',\
                                       bnd.identity;id='com.osgifx.console.ui.components',\
                                       bnd.identity;id='com.osgifx.console.ui.configurations',\
                                       bnd.identity;id='com.osgifx.console.ui.dmt',\
@@ -107,6 +108,7 @@ install.order                     :   \
 	com.osgifx.console.supervisor;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.batchinstall;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.extension;version=snapshot;startlevel=10,\
+	com.osgifx.console.ui.search;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.snapshot;version=snapshot;startlevel=10,\
 	com.osgifx.console.util;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=10,\
