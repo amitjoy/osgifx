@@ -37,6 +37,7 @@ import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
@@ -136,9 +137,10 @@ public final class BundlesFxController {
 
     @Inject
     @Optional
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final Predicate<XBundleDTO> filter) {
+    @SuppressWarnings("unchecked")
+    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
-        filteredList.setPredicate(filter);
+        filteredList.setPredicate((Predicate<XBundleDTO>) filter.predicate);
     }
 
 }
