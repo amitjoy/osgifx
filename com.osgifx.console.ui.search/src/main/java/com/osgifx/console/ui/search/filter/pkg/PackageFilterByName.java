@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
-import com.osgifx.console.agent.dto.XPackageDTO;
+import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
 import com.osgifx.console.ui.search.filter.SearchOperation;
@@ -35,8 +35,7 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class PackageFilterByName implements SearchFilter {
 
     @Override
-    public Predicate<XPackageDTO> predicate(final String input, final SearchOperation searchOperation)
-            throws Exception {
+    public Predicate<PackageDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
         return switch (searchOperation) {
             case EQUALS_TO -> pkg -> StringUtils.equalsIgnoreCase(pkg.name, input.strip());
             case CONTAINS -> pkg -> StringUtils.containsIgnoreCase(pkg.name, input.strip());
