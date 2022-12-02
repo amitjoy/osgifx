@@ -145,7 +145,7 @@ public final class SearchDialog extends Dialog<FilterDTO> {
                                       final SearchFilter filter,
                                       final SearchOperation operation,
                                       final String userInput) {
-        return "Search for '" + component + "' having '" + filter + "' that '" + operation + "' -> " + userInput;
+        return "Search for '" + component + "' having '" + filter + "' that '" + operation + "' " + userInput;
     }
 
 }
