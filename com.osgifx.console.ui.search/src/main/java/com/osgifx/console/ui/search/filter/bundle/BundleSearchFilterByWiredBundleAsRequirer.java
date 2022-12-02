@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -37,15 +38,11 @@ public final class BundleSearchFilterByWiredBundleAsRequirer implements SearchFi
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> {
                 final var wiredBundlesAsRequirer = bundle.wiredBundlesAsRequirer;
-                return wiredBundlesAsRequirer.stream().anyMatch(p -> p.symbolicName.equals(input.trim()));
+                return wiredBundlesAsRequirer.stream()
+                        .anyMatch(b -> StringUtils.equalsIgnoreCase(b.symbolicName, input.strip()));
             };
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Wired Bundle as Requirer";
     }
 
     @Override
@@ -56,6 +53,16 @@ public final class BundleSearchFilterByWiredBundleAsRequirer implements SearchFi
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Symbolic Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Wired Bundle as Requirer";
     }
 
 }

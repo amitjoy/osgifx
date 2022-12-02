@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -36,14 +37,9 @@ public final class ComponentSearchFilterByRegisteringBundle implements SearchFil
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> component -> component.registeringBundle.equalsIgnoreCase(input.trim());
+            case EQUALS_TO -> component -> StringUtils.equalsIgnoreCase(component.registeringBundle, input.strip());
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Component Registering Bundle";
     }
 
     @Override
@@ -54,6 +50,16 @@ public final class ComponentSearchFilterByRegisteringBundle implements SearchFil
     @Override
     public SearchComponent component() {
         return COMPONENTS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Symbolic Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Registering Bundle";
     }
 
 }

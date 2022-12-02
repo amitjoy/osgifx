@@ -37,18 +37,13 @@ public final class ServiceSearchFilterByID implements SearchFilter {
     @Override
     public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
-        final var serviceId = Long.parseLong(input.trim());
+        final var serviceId = Long.parseLong(input.strip());
         return switch (searchOperation) {
             case EQUALS_TO -> service -> service.id == serviceId;
             case IS_GREATER_THAN -> service -> service.id > serviceId;
             case IS_LESS_THAN -> service -> service.id < serviceId;
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Service ID";
     }
 
     @Override
@@ -59,6 +54,16 @@ public final class ServiceSearchFilterByID implements SearchFilter {
     @Override
     public SearchComponent component() {
         return SERVICES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Service ID Number";
+    }
+
+    @Override
+    public String toString() {
+        return "ID";
     }
 
 }

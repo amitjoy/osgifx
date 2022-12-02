@@ -36,7 +36,7 @@ public final class BundleSearchFilterByRevision implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var parsedInput = Integer.parseInt(input);
+        final var parsedInput = Integer.parseInt(input.strip());
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> bundle.revisions == parsedInput;
             case IS_GREATER_THAN -> bundle -> bundle.revisions > parsedInput;
@@ -46,18 +46,23 @@ public final class BundleSearchFilterByRevision implements SearchFilter {
     }
 
     @Override
-    public String toString() {
-        return "Revision";
-    }
-
-    @Override
     public Collection<SearchOperation> supportedOperations() {
         return List.of(EQUALS_TO, IS_GREATER_THAN, IS_LESS_THAN);
     }
 
     @Override
+    public String placeholder() {
+        return "Revision Number";
+    }
+
+    @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String toString() {
+        return "Revision";
     }
 
 }
