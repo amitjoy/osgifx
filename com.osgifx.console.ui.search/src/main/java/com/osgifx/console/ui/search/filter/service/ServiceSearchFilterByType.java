@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -37,15 +38,12 @@ public final class ServiceSearchFilterByType implements SearchFilter {
     public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> service -> service.types.stream().anyMatch(s -> s.equalsIgnoreCase(input.trim()));
-            case CONTAINS -> service -> service.types.stream().anyMatch(s -> s.contains(input.trim()));
+            case EQUALS_TO -> service -> service.types.stream()
+                    .anyMatch(s -> StringUtils.equalsIgnoreCase(s, input.strip()));
+            case CONTAINS -> service -> service.types.stream()
+                    .anyMatch(s -> StringUtils.containsIgnoreCase(s, input.strip()));
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Object Class";
     }
 
     @Override
@@ -56,6 +54,16 @@ public final class ServiceSearchFilterByType implements SearchFilter {
     @Override
     public SearchComponent component() {
         return SERVICES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Fully Qualified Type Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Type";
     }
 
 }

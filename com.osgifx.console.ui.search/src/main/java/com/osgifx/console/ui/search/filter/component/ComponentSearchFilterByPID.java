@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -38,16 +39,11 @@ public final class ComponentSearchFilterByPID implements SearchFilter {
             throws Exception {
         return switch (searchOperation) {
             case EQUALS_TO -> component -> component.configurationPid.stream()
-                    .anyMatch(pid -> pid.equalsIgnoreCase(input.trim()));
+                    .anyMatch(pid -> StringUtils.equalsIgnoreCase(pid, input.strip()));
             case CONTAINS -> component -> component.configurationPid.stream()
-                    .anyMatch(pid -> pid.contains(input.trim()));
+                    .anyMatch(pid -> StringUtils.containsIgnoreCase(pid, input.strip()));
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Configuration PID";
     }
 
     @Override
@@ -58,6 +54,16 @@ public final class ComponentSearchFilterByPID implements SearchFilter {
     @Override
     public SearchComponent component() {
         return COMPONENTS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Configuration PID (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "PID";
     }
 
 }

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -37,14 +38,9 @@ public final class ComponentSearchFilterByReference implements SearchFilter {
             throws Exception {
         return switch (searchOperation) {
             case EQUALS_TO -> component -> component.references.stream()
-                    .anyMatch(ref -> ref.interfaceName.equalsIgnoreCase(input.trim()));
+                    .anyMatch(ref -> StringUtils.equalsIgnoreCase(ref.name, input.strip()));
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Property";
     }
 
     @Override
@@ -55,6 +51,16 @@ public final class ComponentSearchFilterByReference implements SearchFilter {
     @Override
     public SearchComponent component() {
         return COMPONENTS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Fully Qualified Reference Interface Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Reference";
     }
 
 }

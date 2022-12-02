@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -36,14 +37,10 @@ public final class ComponentSearchFilterByServiceInterface implements SearchFilt
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> component -> component.configurationPolicy.equalsIgnoreCase(input.trim());
+            case EQUALS_TO -> component -> component.serviceInterfaces.stream()
+                    .anyMatch(i -> StringUtils.equalsIgnoreCase(i, input.strip()));
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Configuration Policy";
     }
 
     @Override
@@ -54,6 +51,16 @@ public final class ComponentSearchFilterByServiceInterface implements SearchFilt
     @Override
     public SearchComponent component() {
         return COMPONENTS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Fully Qualified Interface Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Service Interface";
     }
 
 }

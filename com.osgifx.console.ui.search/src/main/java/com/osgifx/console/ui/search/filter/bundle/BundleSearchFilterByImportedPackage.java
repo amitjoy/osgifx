@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -37,15 +38,10 @@ public final class BundleSearchFilterByImportedPackage implements SearchFilter {
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> {
                 final var importedPackages = bundle.importedPackages;
-                return importedPackages.stream().anyMatch(p -> p.name.equals(input.trim()));
+                return importedPackages.stream().anyMatch(p -> StringUtils.equalsIgnoreCase(p.name, input.strip()));
             };
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Imported Package";
     }
 
     @Override
@@ -56,6 +52,16 @@ public final class BundleSearchFilterByImportedPackage implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Package Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Imported Package";
     }
 
 }

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -37,15 +38,10 @@ public final class ConfigurationSearchFilterByFactoryPID implements SearchFilter
     public Predicate<XConfigurationDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> conf -> conf.factoryPid.equalsIgnoreCase(input.trim());
-            case CONTAINS -> conf -> conf.factoryPid.contains(input.trim());
+            case EQUALS_TO -> conf -> StringUtils.equalsIgnoreCase(conf.factoryPid, input.strip());
+            case CONTAINS -> conf -> StringUtils.containsIgnoreCase(conf.factoryPid, input.strip());
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Factory PID";
     }
 
     @Override
@@ -56,6 +52,16 @@ public final class ConfigurationSearchFilterByFactoryPID implements SearchFilter
     @Override
     public SearchComponent component() {
         return CONFIGURATIONS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Factory PID (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Factory PID";
     }
 
 }
