@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XPackageDTO;
@@ -37,15 +38,10 @@ public final class PackageFilterByName implements SearchFilter {
     public Predicate<XPackageDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> pkg -> pkg.name.equalsIgnoreCase(input.trim());
-            case CONTAINS -> pkg -> pkg.name.contains(input.trim());
+            case EQUALS_TO -> pkg -> StringUtils.equalsIgnoreCase(pkg.name, input.strip());
+            case CONTAINS -> pkg -> StringUtils.containsIgnoreCase(pkg.name, input.strip());
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Package Name";
     }
 
     @Override
@@ -56,6 +52,16 @@ public final class PackageFilterByName implements SearchFilter {
     @Override
     public SearchComponent component() {
         return PACKAGES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Package Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Name";
     }
 
 }

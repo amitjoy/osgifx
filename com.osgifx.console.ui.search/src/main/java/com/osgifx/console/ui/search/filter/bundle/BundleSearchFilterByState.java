@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -35,14 +36,9 @@ public final class BundleSearchFilterByState implements SearchFilter {
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> bundle -> bundle.state.equalsIgnoreCase(input.trim());
+            case EQUALS_TO -> bundle -> StringUtils.equalsIgnoreCase(bundle.state, input.strip());
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "State";
     }
 
     @Override
@@ -53,6 +49,16 @@ public final class BundleSearchFilterByState implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Bundle State Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "State";
     }
 
 }

@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -34,7 +35,7 @@ public final class BundleSearchFilterByManifestHeader implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var split = input.trim().split("=");
+        final var split = input.strip().split("=");
         if (split.length != 2) {
             throw new RuntimeException("Input format for Key Value pairs should be separated by =");
         }
@@ -42,17 +43,12 @@ public final class BundleSearchFilterByManifestHeader implements SearchFilter {
             case EQUALS_TO -> bundle -> {
                 final var manifestHeaders = bundle.manifestHeaders;
                 if (manifestHeaders.containsKey(split[0])) {
-                    return manifestHeaders.get(split[0]).equalsIgnoreCase(split[1]);
+                    return StringUtils.equals(manifestHeaders.get(split[0]), split[1]);
                 }
                 return false;
             };
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Manifest Header";
     }
 
     @Override
@@ -63,6 +59,16 @@ public final class BundleSearchFilterByManifestHeader implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "HeaderName=HeaderValue Format (Case-Sensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Manifest Header";
     }
 
 }

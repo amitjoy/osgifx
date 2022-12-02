@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -35,24 +36,19 @@ public final class ComponentSearchFilterByProperty implements SearchFilter {
     @Override
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
-        final var split = input.trim().split("=");
+        final var split = input.strip().split("=");
         if (split.length != 2) {
             throw new RuntimeException("Input format for Key Value pairs should be separated by =");
         }
         return switch (searchOperation) {
             case EQUALS_TO -> component -> {
                 if (component.properties.containsKey(split[0])) {
-                    return component.properties.get(split[0]).equalsIgnoreCase(split[1]);
+                    return StringUtils.equals(component.properties.get(split[0]), split[1]);
                 }
                 return false;
             };
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Component Property";
     }
 
     @Override
@@ -63,6 +59,16 @@ public final class ComponentSearchFilterByProperty implements SearchFilter {
     @Override
     public SearchComponent component() {
         return COMPONENTS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "PropertyName=PropertyValue Format (Case-Sensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Property";
     }
 
 }

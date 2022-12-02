@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -37,15 +38,10 @@ public final class BundleSearchFilterByUsedService implements SearchFilter {
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> {
                 final var usedServices = bundle.usedServices;
-                return usedServices.stream().anyMatch(s -> s.objectClass.equals(input.trim()));
+                return usedServices.stream().anyMatch(s -> StringUtils.equalsIgnoreCase(s.objectClass, input.strip()));
             };
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Used Service";
     }
 
     @Override
@@ -56,6 +52,16 @@ public final class BundleSearchFilterByUsedService implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Fully Qualified Class Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Used Service";
     }
 
 }

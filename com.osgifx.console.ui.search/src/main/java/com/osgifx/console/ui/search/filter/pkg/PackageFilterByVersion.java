@@ -38,7 +38,7 @@ public final class PackageFilterByVersion implements SearchFilter {
     @Override
     public Predicate<XPackageDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
-        final var version = new Version(input.trim());
+        final var version = new Version(input.strip());
 
         return switch (searchOperation) {
             case EQUALS_TO -> pkg -> {
@@ -58,11 +58,6 @@ public final class PackageFilterByVersion implements SearchFilter {
     }
 
     @Override
-    public String toString() {
-        return "Version";
-    }
-
-    @Override
     public Collection<SearchOperation> supportedOperations() {
         return List.of(EQUALS_TO, IS_GREATER_THAN, IS_LESS_THAN);
     }
@@ -70,6 +65,16 @@ public final class PackageFilterByVersion implements SearchFilter {
     @Override
     public SearchComponent component() {
         return PACKAGES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Conformant Version Format";
+    }
+
+    @Override
+    public String toString() {
+        return "Version";
     }
 
 }

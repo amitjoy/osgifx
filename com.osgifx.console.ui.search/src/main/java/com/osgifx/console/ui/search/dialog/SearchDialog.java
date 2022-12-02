@@ -125,8 +125,8 @@ public final class SearchDialog extends Dialog<FilterDTO> {
         searchFilterTypeField.selectionProperty().addListener((options, oldValue, newValue) -> {
             final var list = newValue.supportedOperations().stream().toList();
             operationTypeField.items(list);
+            userInputField.placeholder(newValue.placeholder());
         });
-
         return renderer;
     }
 

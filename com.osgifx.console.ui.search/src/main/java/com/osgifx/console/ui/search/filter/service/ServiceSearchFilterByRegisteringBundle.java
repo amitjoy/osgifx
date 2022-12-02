@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -36,14 +37,9 @@ public final class ServiceSearchFilterByRegisteringBundle implements SearchFilte
     public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
         return switch (searchOperation) {
-            case EQUALS_TO -> service -> service.registeringBundle.equalsIgnoreCase(input.trim());
+            case EQUALS_TO -> service -> StringUtils.equalsIgnoreCase(service.registeringBundle, input.strip());
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Service Registering Bundle";
     }
 
     @Override
@@ -54,6 +50,16 @@ public final class ServiceSearchFilterByRegisteringBundle implements SearchFilte
     @Override
     public SearchComponent component() {
         return SERVICES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Symbolic Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Registering Bundle";
     }
 
 }

@@ -35,17 +35,12 @@ public final class BundleSearchFilterByStartDuration implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var bStartDuration = Long.parseLong(input.trim());
+        final var bStartDuration = Long.parseLong(input.strip());
         return switch (searchOperation) {
             case IS_GREATER_THAN -> bundle -> bundle.startDurationInMillis > bStartDuration;
             case IS_LESS_THAN -> bundle -> bundle.startDurationInMillis < bStartDuration;
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Start Duration";
     }
 
     @Override
@@ -56,6 +51,16 @@ public final class BundleSearchFilterByStartDuration implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Start Duration in Milliseconds";
+    }
+
+    @Override
+    public String toString() {
+        return "Start Duration";
     }
 
 }

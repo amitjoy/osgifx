@@ -36,18 +36,13 @@ public final class BundleSearchFilterByID implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var bId = Long.parseLong(input.trim());
+        final var bId = Long.parseLong(input.strip());
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> bundle.id == bId;
             case IS_GREATER_THAN -> bundle -> bundle.id > bId;
             case IS_LESS_THAN -> bundle -> bundle.id < bId;
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Bundle ID";
     }
 
     @Override
@@ -58,6 +53,16 @@ public final class BundleSearchFilterByID implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Bundle ID Number";
+    }
+
+    @Override
+    public String toString() {
+        return "ID";
     }
 
 }
