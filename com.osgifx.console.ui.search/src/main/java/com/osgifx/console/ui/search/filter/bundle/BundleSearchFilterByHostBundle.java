@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
@@ -37,15 +38,11 @@ public final class BundleSearchFilterByHostBundle implements SearchFilter {
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> bundle.hostBundles.stream()
-                    .anyMatch(h -> h.symbolicName.equalsIgnoreCase(input.trim()));
-            case CONTAINS -> bundle -> bundle.hostBundles.stream().anyMatch(h -> h.symbolicName.contains(input.trim()));
+                    .anyMatch(h -> StringUtils.equalsIgnoreCase(h.symbolicName, input.strip()));
+            case CONTAINS -> bundle -> bundle.hostBundles.stream()
+                    .anyMatch(h -> StringUtils.containsIgnoreCase(h.symbolicName, input.strip()));
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Host Bundle";
     }
 
     @Override
@@ -56,6 +53,16 @@ public final class BundleSearchFilterByHostBundle implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Symbolic Name (Case-Insensitive)";
+    }
+
+    @Override
+    public String toString() {
+        return "Host Bundle";
     }
 
 }

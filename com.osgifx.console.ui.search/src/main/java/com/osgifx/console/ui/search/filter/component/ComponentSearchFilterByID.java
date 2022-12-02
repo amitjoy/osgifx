@@ -37,18 +37,13 @@ public final class ComponentSearchFilterByID implements SearchFilter {
     @Override
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation)
             throws Exception {
-        final var cId = Long.parseLong(input.trim());
+        final var cId = Long.parseLong(input.strip());
         return switch (searchOperation) {
             case EQUALS_TO -> component -> component.id == cId;
             case IS_GREATER_THAN -> component -> component.id > cId;
             case IS_LESS_THAN -> component -> component.id < cId;
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Component ID";
     }
 
     @Override
@@ -59,6 +54,16 @@ public final class ComponentSearchFilterByID implements SearchFilter {
     @Override
     public SearchComponent component() {
         return COMPONENTS;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Component ID Number";
+    }
+
+    @Override
+    public String toString() {
+        return "ID";
     }
 
 }

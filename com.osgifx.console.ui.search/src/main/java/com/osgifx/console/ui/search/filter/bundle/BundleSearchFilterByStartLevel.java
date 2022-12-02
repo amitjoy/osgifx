@@ -36,18 +36,13 @@ public final class BundleSearchFilterByStartLevel implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var bStartLevel = Integer.parseInt(input.trim());
+        final var bStartLevel = Integer.parseInt(input.strip());
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> bundle.startLevel == bStartLevel;
             case IS_GREATER_THAN -> bundle -> bundle.startLevel > bStartLevel;
             case IS_LESS_THAN -> bundle -> bundle.startLevel < bStartLevel;
             default -> throw new RuntimeException("does not match any matching case");
         };
-    }
-
-    @Override
-    public String toString() {
-        return "Start Level";
     }
 
     @Override
@@ -58,6 +53,16 @@ public final class BundleSearchFilterByStartLevel implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Start Level Number";
+    }
+
+    @Override
+    public String toString() {
+        return "Start Level";
     }
 
 }

@@ -37,7 +37,7 @@ public final class BundleSearchFilterByVersion implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var version = new Version(input.trim());
+        final var version = new Version(input.strip());
 
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> {
@@ -57,11 +57,6 @@ public final class BundleSearchFilterByVersion implements SearchFilter {
     }
 
     @Override
-    public String toString() {
-        return "Version";
-    }
-
-    @Override
     public Collection<SearchOperation> supportedOperations() {
         return List.of(EQUALS_TO, IS_GREATER_THAN, IS_LESS_THAN);
     }
@@ -69,6 +64,16 @@ public final class BundleSearchFilterByVersion implements SearchFilter {
     @Override
     public SearchComponent component() {
         return BUNDLES;
+    }
+
+    @Override
+    public String placeholder() {
+        return "Conformant Bundle Version";
+    }
+
+    @Override
+    public String toString() {
+        return "Version";
     }
 
 }

@@ -27,6 +27,8 @@ public interface SearchFilter {
 
     SearchComponent component();
 
+    String placeholder();
+
     SearchFilter DUMMY = new SearchFilter() {
 
         @Override
@@ -42,6 +44,11 @@ public interface SearchFilter {
         @Override
         public SearchComponent component() {
             return SearchComponent.DUMMY;
+        }
+
+        @Override
+        public String placeholder() {
+            return null;
         }
     };
 
