@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.services;
 
-import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_BUNDLE_FILTER_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_SERVICE_FILTER_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
@@ -40,10 +40,12 @@ import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
+import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
 public final class ServicesFxUI {
@@ -102,11 +104,11 @@ public final class ServicesFxUI {
 
     @Inject
     @Optional
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter,
+    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_SERVICE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter,
                                      final BorderPane parent) {
         logger.atInfo().log("Update filter event received");
         if (filter.predicate != null) {
-            initSearchFilterResetButton(parent);
+            initSearchFilterResetButton(parent, filter.description);
         } else {
             initStatusBar(parent);
         }
@@ -151,11 +153,16 @@ public final class ServicesFxUI {
         statusBar.addTo(parent);
     }
 
-    private void initSearchFilterResetButton(final BorderPane parent) {
+    private void initSearchFilterResetButton(final BorderPane parent, final String description) {
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(
-                    () -> eventBroker.post(UPDATE_BUNDLE_FILTER_EVENT_TOPIC, new SearchFilterDTO()),
-                    "Reset Search Filter", "CLOSE");
+            final var node = Fx.initStatusBarButton(() -> {
+                FxDialog.showConfirmationDialog("Reset Applied Search Filter?", description,
+                        getClass().getClassLoader(), btn -> {
+                            if (btn == ButtonType.OK) {
+                                eventBroker.post(UPDATE_SERVICE_FILTER_EVENT_TOPIC, new SearchFilterDTO());
+                            }
+                        });
+            }, "Reset Search Filter", "CLOSE");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
