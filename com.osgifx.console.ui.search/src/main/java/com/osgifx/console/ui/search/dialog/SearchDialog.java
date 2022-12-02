@@ -77,7 +77,10 @@ public final class SearchDialog extends Dialog<FilterDTO> {
 
         formRenderer = createForm();
         dialogPane.setContent(formRenderer);
-        dialogPane.lookupButton(ButtonType.OK).disableProperty().bind(userInputField.valueProperty().isEmpty());
+        dialogPane.lookupButton(ButtonType.OK).disableProperty()
+                .bind(userInputField.valueProperty().isEmpty()
+                        .or(operationTypeField.selectionProperty().isNull().or(actorTypeField.selectionProperty()
+                                .isNull().or(searchFilterTypeField.selectionProperty().isNull()))));
 
         setResultConverter(dialogButton -> {
             final var data = dialogButton == null ? null : dialogButton.getButtonData();
