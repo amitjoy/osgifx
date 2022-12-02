@@ -208,10 +208,20 @@ public final class Fx {
     }
 
     public static Node initStatusBarButton(final Runnable job, final String tooltip, final String fontawesomeGlyphID) {
+        return initStatusBarButton(job, tooltip, fontawesomeGlyphID, null);
+    }
+
+    public static Node initStatusBarButton(final Runnable job,
+                                           final String tooltip,
+                                           final String fontawesomeGlyphID,
+                                           final Color color) {
         final var glyphIcon = fontawesomeGlyphID != null ? fontawesomeGlyphID : "GEAR";
         final var glyph     = new Glyph("FontAwesome", glyphIcon);
         glyph.useGradientEffect();
         glyph.useHoverEffect();
+        if (color != null) {
+            glyph.color(color);
+        }
 
         final var button = new Button("", glyph);
         if (job != null) {

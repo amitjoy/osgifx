@@ -18,6 +18,7 @@ package com.osgifx.console.ui.bundles;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_BUNDLE_FILTER_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static javafx.geometry.Orientation.VERTICAL;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -46,7 +47,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 
 public final class BundlesFxUI {
 
@@ -155,15 +158,14 @@ public final class BundlesFxUI {
 
     private void initSearchFilterResetButton(final BorderPane parent, final String description) {
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(() -> {
-                FxDialog.showConfirmationDialog("Reset Applied Search Filter?", description,
-                        getClass().getClassLoader(), btn -> {
-                            if (btn == ButtonType.OK) {
-                                eventBroker.post(UPDATE_BUNDLE_FILTER_EVENT_TOPIC, new SearchFilterDTO());
-                            }
-                        });
-            }, "Reset Search Filter", "CLOSE");
+            final var node = Fx.initStatusBarButton(() -> FxDialog.showConfirmationDialog("Reset Search Filter?",
+                    description, getClass().getClassLoader(), btn -> {
+                        if (btn == ButtonType.OK) {
+                            eventBroker.post(UPDATE_BUNDLE_FILTER_EVENT_TOPIC, new SearchFilterDTO());
+                        }
+                    }), "Reset Search Filter", "CLOSE", Color.RED);
             if (!isSnapshotAgent) {
+                statusBar.addToRight(new Separator(VERTICAL));
                 statusBar.addToRight(node);
             }
         } else {
