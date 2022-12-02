@@ -86,7 +86,7 @@ public final class SearchHandler {
                     eventBroker.post(UPDATE_SERVICE_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 case PACKAGES:
-                    partService.showPart("packages", ACTIVATE);
+                    partService.showPart("com.osgifx.console.application.tab.packages", ACTIVATE);
                     eventBroker.post(UPDATE_PACKAGE_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 default:
