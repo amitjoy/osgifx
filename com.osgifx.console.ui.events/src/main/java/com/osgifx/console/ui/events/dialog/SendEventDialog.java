@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -50,7 +49,6 @@ import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -242,29 +240,63 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                 txtField = null;
             }
             switch (type) {
-                case LONG, INTEGER:
-                    final var captionAsInt = switch (type) {
-                        case LONG -> "Long Number";
-                        case INTEGER -> "Integer Number";
-                        default -> null;
-                    };
-                    txtField.setPromptText(captionAsInt);
-                    txtField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                        if (!newValue.matches("\\d*")) {
-                            txtField.setText(newValue.replaceAll("[^\\d]", ""));
-                        }
-                    });
+                case LONG:
+                    final var captionAsLong = "Long Number";
+                    txtField.setPromptText(captionAsLong);
+                    final TextFormatter<?> longFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> {
+                                try {
+                                    Long.parseLong(change.getControlNewText());
+                                    return change;
+                                } catch (final Exception e) {
+                                    return null;
+                                }
+                            });
+                    txtField.setTextFormatter(longFormatter);
+                    break;
+                case INTEGER:
+                    final var captionAsInteger = "Integer Number";
+                    txtField.setPromptText(captionAsInteger);
+                    final TextFormatter<?> integerFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> {
+                                try {
+                                    Integer.parseInt(change.getControlNewText());
+                                    return change;
+                                } catch (final Exception e) {
+                                    return null;
+                                }
+                            });
+                    txtField.setTextFormatter(integerFormatter);
                     break;
                 case BOOLEAN:
                     return new ToggleSwitch();
-                case DOUBLE, FLOAT:
+                case DOUBLE:
                     final var captionAsDouble = "Decimal Number";
                     txtField.setPromptText(captionAsDouble);
-                    final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
                     final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText())
-                                    .matches() ? change : null));
+                            (UnaryOperator<TextFormatter.Change>) change -> {
+                                try {
+                                    Double.parseDouble(change.getControlNewText());
+                                    return change;
+                                } catch (final Exception e) {
+                                    return null;
+                                }
+                            });
                     txtField.setTextFormatter(doubleFormatter);
+                    break;
+                case FLOAT:
+                    final var captionAsFloat = "Decimal Number";
+                    txtField.setPromptText(captionAsFloat);
+                    final TextFormatter<?> floatFormatter = new TextFormatter<>(
+                            (UnaryOperator<TextFormatter.Change>) change -> {
+                                try {
+                                    Float.parseFloat(change.getControlNewText());
+                                    return change;
+                                } catch (final Exception e) {
+                                    return null;
+                                }
+                            });
+                    txtField.setTextFormatter(floatFormatter);
                     break;
                 case CHAR:
                     final var valueCaptionAsChar = "Character Value";
