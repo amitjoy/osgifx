@@ -9,7 +9,7 @@
   <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kjyHVHHQEe2mhojlX7UC4w" featurename="commands" parentElementId="com.osgifx.console.application">
     <elements xsi:type="commands:Command" xmi:id="_kjyHVXHQEe2mhojlX7UC4w" elementId="com.osgifx.console.ui.search.command" commandName="Search Command" description="Performs search"/>
   </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kjyHVnHQEe2mhojlX7UC4w" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_kjyHVnHQEe2mhojlX7UC4w" featurename="children" parentElementId="com.osgifx.console.application.menu.actions" positionInList="first:com.osgifx.console.application.menu.actions">
     <elements xsi:type="menu:HandledMenuItem" xmi:id="_kjyHV3HQEe2mhojlX7UC4w" elementId="com.osgifx.console.ui.handledmenuitem.search" label="Search" iconURI="platform:/plugin/com.osgifx.console.ui.search/graphic/icons/search.png" tooltip="Search" command="_kjyHVXHQEe2mhojlX7UC4w"/>
   </fragments>
 </fragment:ModelFragments>
