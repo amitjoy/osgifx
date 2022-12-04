@@ -138,7 +138,7 @@ public final class BundlesFxController {
     @Inject
     @Optional
     @SuppressWarnings("unchecked")
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
+    public void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<XBundleDTO>) filter.predicate);
     }

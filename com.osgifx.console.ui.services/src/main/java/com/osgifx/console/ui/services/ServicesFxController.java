@@ -133,7 +133,7 @@ public final class ServicesFxController {
     @Inject
     @Optional
     @SuppressWarnings("unchecked")
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_SERVICE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
+    public void onFilterUpdateEvent(@UIEventTopic(UPDATE_SERVICE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super XServiceDTO>) filter.predicate);
     }
