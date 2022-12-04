@@ -137,7 +137,7 @@ public final class ConfigurationsFxController {
     @Inject
     @SuppressWarnings("unchecked")
     @org.eclipse.e4.core.di.annotations.Optional
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
+    public void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super XConfigurationDTO>) filter.predicate);
     }

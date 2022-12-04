@@ -130,7 +130,7 @@ public final class ComponentsFxController {
     @Inject
     @Optional
     @SuppressWarnings("unchecked")
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_COMPONENT_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
+    public void onFilterUpdateEvent(@UIEventTopic(UPDATE_COMPONENT_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super XComponentDTO>) filter.predicate);
     }
