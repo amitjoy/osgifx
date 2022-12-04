@@ -73,6 +73,7 @@ public final class PackagesFxUI {
     private ConsoleMaskerPane progressPane;
     @Inject
     private DataProvider      dataProvider;
+    private SearchFilterDTO   searchFilter;
 
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -110,6 +111,7 @@ public final class PackagesFxUI {
     private void onFilterUpdateEvent(@UIEventTopic(UPDATE_PACKAGE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter,
                                      final BorderPane parent) {
         logger.atInfo().log("Update filter event received");
+        searchFilter = filter;
         if (filter.predicate != null) {
             initSearchFilterResetButton(parent, filter.description);
         } else {
@@ -126,6 +128,10 @@ public final class PackagesFxUI {
             @Override
             protected Void call() throws Exception {
                 tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+                final var controller = (PackagesFxController) loader.getController();
+                if (searchFilter != null) {
+                    controller.onFilterUpdateEvent(searchFilter);
+                }
                 return null;
             }
 
