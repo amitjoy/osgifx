@@ -26,8 +26,8 @@ import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.R7_LOGGER;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
-import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toCollection;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
@@ -66,6 +66,7 @@ import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.OS;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.osgi.dto.DTO;
 import org.osgi.framework.Bundle;
@@ -344,14 +345,17 @@ public final class AgentServer implements Agent, Closeable {
     public String execCliCommand(final String command) {
         requireNonNull(command, "CLI command cannot be null");
 
-        String cmd;
-        if (isWindows()) {
-            cmd = "cmd.exe /C " + command;
-        } else {
-            cmd = command;
+        final List<String> commandEntries = new ArrayList<>();
+        if (OS.isFamilyWindows()) {
+            commandEntries.add("cmd.exe");
+            commandEntries.add("/C");
         }
+        parseCommand(command, commandEntries);
         try {
-            final CommandLine                 cmdLine       = CommandLine.parse(cmd);
+            final CommandLine cmdLine = CommandLine.parse(commandEntries.get(0));
+            for (int i = 1; i < commandEntries.size(); i++) {
+                cmdLine.addArgument(commandEntries.get(i));
+            }
             final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
             final ExecuteWatchdog             watchdog      = new ExecuteWatchdog(WATCHDOG_TIMEOUT);
             final Executor                    executor      = new DefaultExecutor();
@@ -369,6 +373,15 @@ public final class AgentServer implements Agent, Closeable {
             Thread.currentThread().interrupt();
             return Exceptions.toString(e);
         }
+    }
+
+    private List<String> parseCommand(String command, final List<String> commandEntries) {
+        command = command.trim();
+        if (command.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final String[] entry = command.split(" ");
+        return Stream.of(entry).filter(e -> !e.isEmpty()).map(String::trim).collect(toCollection(() -> commandEntries));
     }
 
     public void setSupervisor(final Supervisor remote) {
@@ -947,11 +960,6 @@ public final class AgentServer implements Agent, Closeable {
             properties.put(entry.key, convertedValue);
         }
         return properties;
-    }
-
-    private static boolean isWindows() {
-        final String os = System.getProperty("os.name", "generic").toLowerCase(ENGLISH);
-        return os.contains("win");
     }
 
     private XResultDTO createOrUpdateConfig(final String pid, final Map<String, Object> newProperties) {
