@@ -130,7 +130,7 @@ public final class PackagesFxController {
     @Inject
     @Optional
     @SuppressWarnings("unchecked")
-    private void onFilterUpdateEvent(@UIEventTopic(UPDATE_PACKAGE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
+    public void onFilterUpdateEvent(@UIEventTopic(UPDATE_PACKAGE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super PackageDTO>) filter.predicate);
     }
