@@ -17,6 +17,7 @@
 <img src="screenshots/3.png" />
 <img src="screenshots/4.png" />
 <img src="screenshots/5.png" />
+<img src="screenshots/6.png" />
 
 ------------------------------------------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@
 
 ### Latest Version
 
-The latest released version: 2.2.7 (Check [Project Website](https://osgifx.com) to download)
+The latest released version: 2.2.8 (Check [Project Website](https://osgifx.com) to download)
 
 ------------------------------------------------------------------------------------------------------------
 
