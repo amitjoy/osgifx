@@ -101,11 +101,9 @@ public class VersionRange {
         if (Version.HIGHEST.equals(v)) {
             return Version.HIGHEST;
         }
-
         if (Version.LOWEST.equals(v)) {
             return Version.LOWEST;
         }
-
         return v;
     }
 
@@ -126,7 +124,6 @@ public class VersionRange {
         if (high == Version.HIGHEST) {
             return low.toString();
         }
-
         final var sb = new StringBuilder();
         sb.append(start);
         sb.append(low);
@@ -155,7 +152,6 @@ public class VersionRange {
         } else if (v.compareTo(low) <= 0) {
             return false;
         }
-
         if (includeHigh()) {
             if (v.compareTo(high) > 0) {
                 return false;
@@ -163,7 +159,6 @@ public class VersionRange {
         } else if (v.compareTo(high) >= 0) {
             return false;
         }
-
         return true;
     }
 
@@ -219,7 +214,6 @@ public class VersionRange {
     /**
      * Intersect two version ranges
      */
-
     public VersionRange intersect(final VersionRange other) {
         Version lower;
         var     start = this.start;
@@ -252,7 +246,6 @@ public class VersionRange {
         if (!isVersionRange(version)) {
             return null;
         }
-
         return new VersionRange(version);
     }
 
@@ -260,7 +253,6 @@ public class VersionRange {
         if (Version.isVersion(version)) {
             return new VersionRange(new Version(version), Version.HIGHEST);
         }
-
         if (isVersionRange(version)) {
             return new VersionRange(version);
         }
@@ -279,7 +271,6 @@ public class VersionRange {
         if (version == null) {
             return new VersionRange(Version.LOWEST, Version.HIGHEST);
         }
-
         if (Version.isVersion(version)) {
             return new VersionRange(new Version(version), Version.HIGHEST);
         }

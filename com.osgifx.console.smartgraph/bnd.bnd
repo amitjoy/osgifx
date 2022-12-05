@@ -1,1 +1,3 @@
--buildpath: com.google.guava
+-buildpath: \
+            com.google.guava,\
+            org.apache.commons.lang3
