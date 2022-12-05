@@ -18,6 +18,7 @@ package com.osgifx.console.ui.bundles.obr.bnd;
 import java.util.Collection;
 
 public class TypedAttribute {
+
     public final String value;
     public final String type;
 
@@ -41,14 +42,12 @@ public class TypedAttribute {
                 if (subType == null) {
                     subType = getType(v);
                 }
-
                 sb.append(del).append(escape(v.toString()));
                 del = ",";
             }
             if (subType == null) {
                 subType = "String";
             }
-
             return new TypedAttribute("List<" + subType + ">", sb.toString());
         }
 
@@ -57,7 +56,6 @@ public class TypedAttribute {
             if (array.length == 0) {
                 return null;
             }
-
             final var sb      = new StringBuilder();
             var       del     = "";
             String    subType = null;
@@ -66,7 +64,6 @@ public class TypedAttribute {
                 if (subType == null) {
                     subType = getType(v);
                 }
-
                 sb.append(del).append(escape(v.toString()));
                 del = ",";
             }
@@ -88,7 +85,6 @@ public class TypedAttribute {
                 case '\\':
                     sb.append("\\\\");
                     break;
-
                 case ',':
                     sb.append("\\,");
                 default:
@@ -109,7 +105,6 @@ public class TypedAttribute {
         if (value instanceof Version || value instanceof org.osgi.framework.Version) {
             return "Version";
         }
-
         return "String";
     }
 }

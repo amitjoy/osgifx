@@ -157,9 +157,7 @@ public final class GraphFxUI {
 
     private void initStatusBar() {
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(() -> {
-                loadedController.updateModel();
-            }, "Refresh", "REFRESH");
+            final var node = Fx.initStatusBarButton(() -> loadedController.updateModel(), "Refresh", "REFRESH");
             statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);

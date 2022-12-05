@@ -67,12 +67,10 @@ public class UtilitiesPoint2D {
                                           final int globalCount,
                                           final double force,
                                           final double scale) {
-
         final var distance = from.distance(to);
+        final var vec      = to.subtract(from).normalize();
+        final var factor   = attractiveFunction(distance, globalCount, force, scale);
 
-        final var vec = to.subtract(from).normalize();
-
-        final var factor = attractiveFunction(distance, globalCount, force, scale);
         return vec.multiply(factor);
     }
 
@@ -88,13 +86,7 @@ public class UtilitiesPoint2D {
         if (distance < 1) {
             distance = 1;
         }
-
-        // the attractive strenght grows logarithmically with distance
-
-        // return force * Math.log(distance / scale) * (1.0 / (1.0 * numVertices));
-        // return force * Math.log(distance / numVertices) * (1 / scale);
-
-        return force * Math.log(distance / scale) * 0.1;// * (1.0 / (1.0 * numVertices));
+        return force * Math.log(distance / scale) * 0.1;
     }
 
     /**
@@ -107,10 +99,8 @@ public class UtilitiesPoint2D {
      */
     public static Point2D repellingForce(final Point2D from, final Point2D to, final double scale) {
         final var distance = from.distance(to);
-
-        final var vec = to.subtract(from).normalize();
-
-        final var factor = -repellingFunction(distance, scale);
+        final var vec      = to.subtract(from).normalize();
+        final var factor   = -repellingFunction(distance, scale);
 
         return vec.multiply(factor);
     }
