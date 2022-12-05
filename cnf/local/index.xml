@@ -4140,55 +4140,55 @@
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.enum"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.enum"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.enums"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.enums"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.builder"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.builder"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.time"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.time"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.exception"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.exception"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.mutable"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.mutable"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.text"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.text"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.reflect"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.reflect"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.math"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.math"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
