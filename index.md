@@ -12,6 +12,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 <img src="screenshots/3.png" />
 <img src="screenshots/4.png" />
 <img src="screenshots/5.png" />
+<img src="screenshots/6.png" />
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -56,6 +57,9 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 | Manage User Admin Roles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Execute Felix Healthchecks   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
 | Capture/Read Snapshot   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Display OSGi Runtime DTOs   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Advanced Search   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+
 
 #### Tools and Technologies
 
