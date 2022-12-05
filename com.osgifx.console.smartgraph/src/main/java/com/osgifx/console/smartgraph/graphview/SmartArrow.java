@@ -33,7 +33,6 @@ public class SmartArrow extends Path implements SmartStylableNode {
      * @param size determines the size of the arrow (side of the triangle in pixels)
      */
     public SmartArrow(final double size) {
-
         /* Create this arrow shape */
         getElements().add(new MoveTo(0, 0));
         getElements().add(new LineTo(-size, size));

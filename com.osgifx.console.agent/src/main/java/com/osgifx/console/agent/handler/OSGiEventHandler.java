@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.handler;
 
+import static org.osgi.service.event.EventConstants.EVENT_TOPIC;
+
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -46,7 +48,7 @@ public final class OSGiEventHandler implements EventHandler {
 
     public ServiceRegistration<?> register() {
         final Dictionary<String, Object> properties = new Hashtable<>();
-        properties.put("event.topics", "*");
+        properties.put(EVENT_TOPIC, "*");
         return context.registerService(EventHandler.class, this, properties);
     }
 

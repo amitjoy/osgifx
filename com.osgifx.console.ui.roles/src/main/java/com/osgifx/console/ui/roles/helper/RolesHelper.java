@@ -21,7 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
-public class RolesHelper {
+public final class RolesHelper {
 
     private RolesHelper() {
         throw new IllegalAccessError("Cannot be instantiated");

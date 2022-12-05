@@ -18,9 +18,11 @@ package com.osgifx.console.data.provider;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osgi.dto.DTO;
+
 import com.osgifx.console.agent.dto.XBundleDTO;
 
-public final class PackageDTO {
+public final class PackageDTO extends DTO {
 
     public String           name;
     public String           version;
