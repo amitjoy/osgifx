@@ -38,6 +38,8 @@ port                              :   1729
                                       \
                                       bnd.identity;id='com.osgifx.console.application',\
                                       bnd.identity;id='com.osgifx.console.launcher',\
+                                      \
+                                      bnd.identity;id='org.apache.felix.metatype',\
                                       bnd.identity;id='org.apache.sling.commons.log',\
                                       bnd.identity;id='org.apache.sling.commons.logservice',\
                                       \
@@ -132,6 +134,7 @@ install.order                     :   \
 	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)';startlevel=10,\
 	org.apache.felix.gogo.runtime;version='[1.1.0,1.1.1)';startlevel=10,\
 	org.apache.felix.gogo.shell;version='[1.1.0,1.1.1)';startlevel=10,\
+	org.apache.felix.metatype;version='[1.2.4,1.2.5)';startlevel=10,\
 	org.apache.felix.scr;version='[2.2.4,2.2.5)';startlevel=10,\
 	org.apache.sling.commons.log;version='[5.4.2,5.4.3)';startlevel=10,\
 	org.apache.sling.commons.logservice;version='[1.1.0,1.1.1)';startlevel=10,\
