@@ -19,7 +19,7 @@ import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.C
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
