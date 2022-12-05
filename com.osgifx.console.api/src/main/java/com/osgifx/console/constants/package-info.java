@@ -13,5 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+/**
+ * Not used for runtime
+ */
 @org.osgi.annotation.bundle.Export
 package com.osgifx.console.constants;

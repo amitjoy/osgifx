@@ -43,13 +43,10 @@ public class ResourceBuilder {
         if (builder == null) {
             return this;
         }
-
         if (built) {
             throw new IllegalStateException("Resource already built");
         }
-
         addCapability0(builder);
-
         return this;
     }
 

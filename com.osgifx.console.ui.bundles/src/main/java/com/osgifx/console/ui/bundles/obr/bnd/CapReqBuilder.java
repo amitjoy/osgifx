@@ -110,21 +110,19 @@ public class CapReqBuilder {
             if (((Collection<?>) value).isEmpty()) {
                 return true;
             }
-
             return isVersion(((Collection<?>) value).iterator().next());
         }
         if (value.getClass().isArray()) {
             if (Array.getLength(value) == 0) {
                 return true;
             }
-
             return isVersion(((Object[]) value)[0]);
         }
         return false;
     }
 
-    public CapReqBuilder addAttributes(final Map<? extends String, ? extends Object> attributes) throws Exception {
-        for (final Entry<? extends String, ? extends Object> e : attributes.entrySet()) {
+    public CapReqBuilder addAttributes(final Map<String, ? extends Object> attributes) throws Exception {
+        for (final Entry<String, ? extends Object> e : attributes.entrySet()) {
             addAttribute(e.getKey(), e.getValue());
         }
         return this;
@@ -272,26 +270,24 @@ public class CapReqBuilder {
         if (value instanceof Version) {
             return new Version(value.toString());
         }
-        if (value instanceof String) {
+        if (value instanceof final String strValue) {
             try {
-                return new Version((String) value);
+                return new Version(strValue);
             } catch (final Exception e) {
                 return value;
             }
         }
-        if (value instanceof Number) {
+        if (value instanceof final Number num) {
             try {
-                return new Version(((Number) value).intValue(), 0, 0);
+                return new Version(num.intValue(), 0, 0);
             } catch (final Exception e) {
                 return value;
             }
         }
-        if (value instanceof Collection) {
-            final Collection<?> v = (Collection<?>) value;
-            if (v.isEmpty() || v.iterator().next() instanceof Version) {
+        if (value instanceof final Collection<?> coll) {
+            if (coll.isEmpty() || coll.iterator().next() instanceof Version) {
                 return value;
             }
-
             final List<Version> osgis = Lists.newArrayList();
             for (final Object m : (Collection<?>) value) {
                 osgis.add((Version) toVersions(m));

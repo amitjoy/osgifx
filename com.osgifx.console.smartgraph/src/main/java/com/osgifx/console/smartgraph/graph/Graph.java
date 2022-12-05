@@ -117,7 +117,7 @@ public interface Graph<V, E> {
      *                equality of
      *                {@link Object#equals(java.lang.Object) }
      *                method.
-     * 
+     *
      */
     Vertex<V> insertVertex(V vElement) throws InvalidVertexException;
 

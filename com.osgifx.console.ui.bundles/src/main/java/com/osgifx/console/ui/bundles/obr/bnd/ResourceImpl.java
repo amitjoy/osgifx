@@ -123,13 +123,13 @@ class ResourceImpl implements Resource, Comparable<Resource> {
         if (this == other) {
             return true;
         }
-        if (other == null || !(other instanceof Resource)) {
+        if (!(other instanceof Resource)) {
             return false;
         }
         final var        thisLocations = getLocations();
         Map<URI, String> otherLocations;
-        if (other instanceof ResourceImpl) {
-            otherLocations = ((ResourceImpl) other).getLocations();
+        if (other instanceof final ResourceImpl otherRes) {
+            otherLocations = otherRes.getLocations();
         } else {
             otherLocations = ResourceUtils.getLocations((Resource) other);
         }
