@@ -104,13 +104,10 @@ public final class XMetaTypeAdmin {
                 }
             }
             for (final String fpid : metatypeInfo.getFactoryPids()) {
-                final boolean hasAssociatedConfiguration = checkFactoryConfigurationExistence(fpid);
-                if (!hasAssociatedConfiguration) {
-                    final XObjectClassDefDTO ocd       = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
-                    final XConfigurationDTO  configDTO = toConfigDTO(null, fpid, ocd);
-                    configDTO.isFactory = true;
-                    dtos.add(configDTO);
-                }
+                final XObjectClassDefDTO ocd       = toOcdDTO(fpid, metatypeInfo, ConfigurationType.FACTORY);
+                final XConfigurationDTO  configDTO = toConfigDTO(null, fpid, ocd);
+                configDTO.isFactory = true;
+                dtos.add(configDTO);
             }
         }
         return dtos;
@@ -118,11 +115,6 @@ public final class XMetaTypeAdmin {
 
     private boolean checkConfigurationExistence(final String pid) throws IOException, InvalidSyntaxException {
         return configAdmin.listConfigurations("(service.pid=" + pid + ")") != null;
-    }
-
-    private boolean checkFactoryConfigurationExistence(final String factoryPid)
-            throws IOException, InvalidSyntaxException {
-        return configAdmin.listConfigurations("(service.factoryPid=" + factoryPid + ")") != null;
     }
 
     private XConfigurationDTO toConfigDTO(final Configuration configuration,
