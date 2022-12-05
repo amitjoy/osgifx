@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class Reflect {
+public final class Reflect {
 
     // ---------------------------------------------------------------------
     // Static API used as entrance points to the fluent API
@@ -111,7 +111,6 @@ public class Reflect {
         if (accessible == null) {
             return null;
         }
-
         if (accessible instanceof Member) {
             final Member member = (Member) accessible;
             if (Modifier.isPublic(member.getModifiers())
@@ -289,7 +288,6 @@ public class Reflect {
         try {
             return accessible(t.getField(name));
         }
-
         // Try again, getting a non-public field
         catch (final NoSuchFieldException e) {
             do {
@@ -300,7 +298,6 @@ public class Reflect {
 
                 t = t.getSuperclass();
             } while (t != null);
-
             throw new ReflectException(e);
         }
     }
@@ -322,7 +319,6 @@ public class Reflect {
     public Map<String, Reflect> fields() {
         final Map<String, Reflect> result = new LinkedHashMap<>();
         Class<?>                   t      = type();
-
         do {
             for (final Field field : t.getDeclaredFields()) {
                 if (type != object ^ Modifier.isStatic(field.getModifiers())) {
@@ -330,7 +326,6 @@ public class Reflect {
                     result.computeIfAbsent(name, key -> field(name));
                 }
             }
-
             t = t.getSuperclass();
         } while (t != null);
         return result;
@@ -435,7 +430,6 @@ public class Reflect {
 
                 t = t.getSuperclass();
             } while (t != null);
-
             throw new NoSuchMethodException();
         }
     }
@@ -468,7 +462,6 @@ public class Reflect {
                     return method;
                 }
             }
-
             t = t.getSuperclass();
         } while (t != null);
 
@@ -543,7 +536,6 @@ public class Reflect {
                     return on(constructor, args);
                 }
             }
-
             throw new ReflectException(e);
         }
     }
@@ -594,7 +586,6 @@ public class Reflect {
 
                                                 if (method.isDefault()) {
                                                     Lookup proxyLookup = null;
-
                                                     // Java 9 version
                                                     if (CACHED_LOOKUP_CONSTRUCTOR == null) {
 
@@ -608,11 +599,9 @@ public class Reflect {
                                                     } else {
                                                         proxyLookup = CACHED_LOOKUP_CONSTRUCTOR.newInstance(proxyType);
                                                     }
-
                                                     return proxyLookup.unreflectSpecial(method, proxyType).bindTo(proxy)
                                                             .invokeWithArguments(args);
                                                 }
-
                                                 throw e;
                                             }
                                         };
@@ -654,10 +643,8 @@ public class Reflect {
             if (actualTypes[i] == NULL.class || wrapper(declaredTypes[i]).isAssignableFrom(wrapper(actualTypes[i]))) {
                 continue;
             }
-
             return false;
         }
-
         return true;
     }
 
@@ -671,7 +658,6 @@ public class Reflect {
         if (obj instanceof Reflect) {
             return object.equals(((Reflect) obj).get());
         }
-
         return false;
     }
 

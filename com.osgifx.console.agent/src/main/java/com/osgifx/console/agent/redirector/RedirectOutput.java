@@ -29,7 +29,7 @@ import com.osgifx.console.agent.provider.AgentServer;
  * is send to the supervisor. We are a bit careful here that we're breaking
  * recursive calls that can happen when there is shit happening deep down below.
  */
-public class RedirectOutput extends PrintStream {
+public final class RedirectOutput extends PrintStream {
 
     private static Timer                      timer      = new Timer();
     private final List<AgentServer>           agents;

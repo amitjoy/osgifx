@@ -37,7 +37,7 @@ public final class ExtensionsViewHandler {
     public void execute() {
         final var dialog = new ExtensionsViewDialog();
         ContextInjectionFactory.inject(dialog, context);
-        logger.atInfo().log("Injected extensions view dialog to eclipse context");
+        logger.atInfo().log("Injected extensions view handler to eclipse context");
         dialog.init();
         dialog.show();
     }

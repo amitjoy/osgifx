@@ -23,18 +23,13 @@ import javafx.scene.layout.HBox;
 
 public class SmartGraphDemoContainer extends BorderPane {
 
-    public SmartGraphDemoContainer(@SuppressWarnings("rawtypes") final SmartGraphPanel graphView) {
-
+    public SmartGraphDemoContainer(final SmartGraphPanel<?, ?> graphView) {
         setCenter(new ContentZoomPane(graphView));
-
         // create bottom pane with controls
-        final var bottom = new HBox(10);
-
+        final var bottom    = new HBox(10);
         final var automatic = new CheckBox("Automatic layout");
         automatic.selectedProperty().bindBidirectional(graphView.automaticLayoutProperty());
-
         bottom.getChildren().add(automatic);
-
         setBottom(bottom);
     }
 
