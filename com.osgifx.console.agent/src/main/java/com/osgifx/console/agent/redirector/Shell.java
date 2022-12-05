@@ -24,7 +24,7 @@ import org.apache.felix.service.command.Converter;
 /**
  * A redirector that redirects the input of a Gogo Command Processor
  */
-public class Shell extends RedirectInput {
+public final class Shell extends RedirectInput {
 
     CommandSession session;
     PrintStream    out;

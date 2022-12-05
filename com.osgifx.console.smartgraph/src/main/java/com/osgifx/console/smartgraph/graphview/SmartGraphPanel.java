@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +35,8 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.osgi.framework.FrameworkUtil;
 
 import com.google.common.collect.Maps;
@@ -1091,9 +1092,7 @@ public class SmartGraphPanel<V, E> extends Pane {
 
         @Override
         public int hashCode() {
-            var hash = 7;
-            hash = 29 * hash + Objects.hashCode(this.first);
-            return 29 * hash + Objects.hashCode(this.second);
+            return new HashCodeBuilder().append(this.first).append(this.second).hashCode();
         }
 
         @Override
@@ -1105,10 +1104,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                 return false;
             }
             final Tuple<?> other = (Tuple<?>) obj;
-            if (!Objects.equals(this.first, other.first) || !Objects.equals(this.second, other.second)) {
-                return false;
-            }
-            return true;
+            return new EqualsBuilder().append(this.first, other.first).append(this.second, other.second).isEquals();
         }
     }
 

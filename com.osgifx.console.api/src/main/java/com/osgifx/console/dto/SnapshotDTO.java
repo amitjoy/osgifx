@@ -36,6 +36,7 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
 public class SnapshotDTO extends DTO {
+
     public List<XBundleDTO>              bundles;
     public List<XComponentDTO>           components;
     public List<XConfigurationDTO>       configuations;

@@ -75,34 +75,26 @@ public class ResourceUtils {
                 if (o1 == o2) {
                     return 0;
                 }
-
                 if (o1 == null) {
                     return -1;
                 }
-
                 if (o2 == null) {
                     return 1;
                 }
-
                 if (o1.equals(o2)) {
                     return 0;
                 }
-
                 final var v1 = getIdentityVersion(o1);
                 final var v2 = getIdentityVersion(o2);
-
                 if (v1 == v2) {
                     return 0;
                 }
-
                 if (v1 == null) {
                     return -1;
                 }
-
                 if (v2 == null) {
                     return 1;
                 }
-
                 return new Version(v1).compareTo(new Version(v2));
             };
 
@@ -111,22 +103,18 @@ public class ResourceUtils {
                 if (o1 == o2) {
                     return 0;
                 }
-
                 if (o1 == null) {
                     return -1;
                 }
                 if (o2 == null) {
                     return 1;
                 }
-
                 if (o1.equals(o2)) {
                     return 0;
                 }
-
-                if (o1 instanceof ResourceImpl && o2 instanceof ResourceImpl) {
-                    return ((ResourceImpl) o1).compareTo(o2);
+                if (o1 instanceof final ResourceImpl res1 && o2 instanceof final ResourceImpl res2) {
+                    return res1.compareTo(res2);
                 }
-
                 return o1.toString().compareTo(o2.toString());
             };
 
@@ -233,17 +221,14 @@ public class ResourceUtils {
         if (v instanceof Version) {
             return (Version) v;
         }
-
         if (v instanceof final org.osgi.framework.Version o) {
             final var q = o.getQualifier();
             return q.isEmpty() ? new Version(o.getMajor(), o.getMinor(), o.getMicro())
                     : new Version(o.getMajor(), o.getMinor(), o.getMicro(), q);
         }
-
-        if (v instanceof String && Version.isVersion((String) v)) {
-            return Version.valueOf((String) v);
+        if (v instanceof final String value && Version.isVersion(value)) {
+            return Version.valueOf(value);
         }
-
         return null;
     }
 
@@ -262,60 +247,47 @@ public class ResourceUtils {
             return null;
         }
 
-        if (uriObj instanceof URI) {
-            return (URI) uriObj;
+        if (uriObj instanceof final URI uri) {
+            return uri;
         }
 
         try {
-            if (uriObj instanceof URL) {
-                return ((URL) uriObj).toURI();
+            if (uriObj instanceof final URL url) {
+                return url.toURI();
             }
 
-            if (uriObj instanceof String) {
+            if (uriObj instanceof final String uri) {
                 try {
-                    final var url = new URL((String) uriObj);
+                    final var url = new URL(uri);
                     return url.toURI();
                 } catch (final MalformedURLException mfue) {
                     // Ignore
                 }
-
                 final var f = new File((String) uriObj);
                 if (f.isFile()) {
                     return f.toURI();
                 }
-                return new URI((String) uriObj);
+                return new URI(uri);
             }
-
         } catch (final URISyntaxException e) {
             throw new IllegalArgumentException("Resource content capability has illegal URL attribute", e);
         }
-
         return null;
     }
 
     public static String getVersionAttributeForNamespace(final String namespace) {
-        switch (namespace) {
-            case IdentityNamespace.IDENTITY_NAMESPACE:
-                return IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case BundleNamespace.BUNDLE_NAMESPACE:
-            case HostNamespace.HOST_NAMESPACE:
-                return AbstractWiringNamespace.CAPABILITY_BUNDLE_VERSION_ATTRIBUTE;
-            case PackageNamespace.PACKAGE_NAMESPACE:
-                return PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE:
-                return ExecutionEnvironmentNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case NativeNamespace.NATIVE_NAMESPACE:
-                return NativeNamespace.CAPABILITY_OSVERSION_ATTRIBUTE;
-            case ExtenderNamespace.EXTENDER_NAMESPACE:
-                return ExtenderNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ContractNamespace.CONTRACT_NAMESPACE:
-                return ContractNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ImplementationNamespace.IMPLEMENTATION_NAMESPACE:
-                return ImplementationNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ServiceNamespace.SERVICE_NAMESPACE:
-            default:
-                return null;
-        }
+        return switch (namespace) {
+            case IdentityNamespace.IDENTITY_NAMESPACE -> IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case BundleNamespace.BUNDLE_NAMESPACE, HostNamespace.HOST_NAMESPACE -> AbstractWiringNamespace.CAPABILITY_BUNDLE_VERSION_ATTRIBUTE;
+            case PackageNamespace.PACKAGE_NAMESPACE -> PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE -> ExecutionEnvironmentNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case NativeNamespace.NATIVE_NAMESPACE -> NativeNamespace.CAPABILITY_OSVERSION_ATTRIBUTE;
+            case ExtenderNamespace.EXTENDER_NAMESPACE -> ExtenderNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ContractNamespace.CONTRACT_NAMESPACE -> ContractNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ImplementationNamespace.IMPLEMENTATION_NAMESPACE -> ImplementationNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case ServiceNamespace.SERVICE_NAMESPACE -> null;
+            default -> null;
+        };
     }
 
     @SuppressWarnings("unchecked")
@@ -350,7 +322,6 @@ public class ResourceUtils {
         if (value == null && args != null && args.length == 1) {
             value = args[0];
         }
-
         return cnv.convert(method.getGenericReturnType(), value);
     }
 
@@ -358,7 +329,6 @@ public class ResourceUtils {
         if (providers == null || providers.isEmpty()) {
             return Collections.emptySet();
         }
-
         return getResources(providers.stream());
     }
 
@@ -399,12 +369,10 @@ public class ResourceUtils {
         if (!requirement.getNamespace().equals(capability.getNamespace()) || !isEffective(requirement, capability)) {
             return false;
         }
-
         final var filter = requirement.getDirectives().get(Namespace.REQUIREMENT_FILTER_DIRECTIVE);
         if (filter == null) {
             return true;
         }
-
         try {
             final var f = new Filter(filter);
             return f.matchMap(capability.getAttributes());
@@ -481,31 +449,24 @@ public class ResourceUtils {
         if (myName == null) {
             return -1;
         }
-
         if (theirName == null) {
             return 1;
         }
-
         final var n = myName.compareTo(theirName);
         if (n != 0) {
             return n;
         }
-
         final var myVersion    = left.version();
         final var theirVersion = right.version();
-
         if (myVersion == theirVersion) {
             return 0;
         }
-
         if (myVersion == null) {
             return -1;
         }
-
         if (theirVersion == null) {
             return 1;
         }
-
         return myVersion.compareTo(theirVersion);
     }
 

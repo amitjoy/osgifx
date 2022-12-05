@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
-import java.util.Objects;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.google.common.base.MoreObjects;
 
@@ -44,7 +45,16 @@ public final class ConnectionSettingDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, host, port, timeout, trustStorePassword, trustStorePath);
+        // @formatter:off
+        return new HashCodeBuilder()
+                         .append(name)
+                         .append(host)
+                         .append(port)
+                         .append(timeout)
+                         .append(trustStorePath)
+                         .append(trustStorePassword)
+                     .hashCode();
+        // @formatter:on
     }
 
     @Override
@@ -56,15 +66,29 @@ public final class ConnectionSettingDTO {
             return false;
         }
         final var other = (ConnectionSettingDTO) obj;
-        return Objects.equals(name, other.name) && Objects.equals(host, other.host) && port == other.port
-                && timeout == other.timeout && Objects.equals(trustStorePassword, other.trustStorePassword)
-                && Objects.equals(trustStorePath, other.trustStorePath);
+        // @formatter:off
+        return new EqualsBuilder()
+                           .append(name, other.name)
+                           .append(host, other.host)
+                           .append(port, other.port)
+                           .append(timeout, other.timeout)
+                           .append(trustStorePassword, other.trustStorePassword)
+                           .append(trustStorePath, other.trustStorePath)
+                       .isEquals();
+        // @formatter:on
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(getClass()).add("name", name).add("host", host).add("port", port)
-                .add("timeout", timeout).add("trustStorePath", trustStorePath).toString();
+        // @formatter:off
+        return MoreObjects.toStringHelper(getClass())
+                               .add("name", name)
+                               .add("host", host)
+                               .add("port", port)
+                               .add("timeout", timeout)
+                               .add("trustStorePath", trustStorePath)
+                          .toString();
+        // @formatter:on
     }
 
 }

@@ -15,8 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.ui.extension.dialog;
 
-public class DeploymentPackageDTO {
+import org.osgi.dto.DTO;
+
+public class DeploymentPackageDTO extends DTO {
+
     public String name;
     public String displayName;
     public String version;
+
 }
