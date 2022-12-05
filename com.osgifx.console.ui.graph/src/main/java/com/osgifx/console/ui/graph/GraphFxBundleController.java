@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
