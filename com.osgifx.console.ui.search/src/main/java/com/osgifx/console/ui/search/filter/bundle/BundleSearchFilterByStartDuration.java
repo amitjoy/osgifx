@@ -25,6 +25,9 @@ import java.util.function.Predicate;
 
 import org.osgi.service.component.annotations.Component;
 
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.primitives.Longs;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -34,8 +37,8 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class BundleSearchFilterByStartDuration implements SearchFilter {
 
     @Override
-    public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
-        final var bStartDuration = Long.parseLong(input.strip());
+    public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) {
+        final var bStartDuration = Longs.tryParse(input.strip());
         return switch (searchOperation) {
             case IS_GREATER_THAN -> bundle -> bundle.startDurationInMillis > bStartDuration;
             case IS_LESS_THAN -> bundle -> bundle.startDurationInMillis < bStartDuration;
@@ -56,6 +59,11 @@ public final class BundleSearchFilterByStartDuration implements SearchFilter {
     @Override
     public String placeholder() {
         return "Start Duration in Milliseconds";
+    }
+
+    @Override
+    public Validator<String> validator() {
+        return CustomValidator.forPredicate(e -> Longs.tryParse(e.strip()) != null, "Invalid Long Number");
     }
 
     @Override

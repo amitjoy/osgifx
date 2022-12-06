@@ -25,6 +25,10 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -34,11 +38,8 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class BundleSearchFilterByManifestHeader implements SearchFilter {
 
     @Override
-    public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
+    public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) {
         final var split = input.strip().split("=");
-        if (split.length != 2) {
-            throw new RuntimeException("Input format for Key Value pairs should be separated by =");
-        }
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> {
                 final var manifestHeaders = bundle.manifestHeaders;
@@ -64,6 +65,12 @@ public final class BundleSearchFilterByManifestHeader implements SearchFilter {
     @Override
     public String placeholder() {
         return "HeaderName=HeaderValue Format (Case-Sensitive)";
+    }
+
+    @Override
+    public Validator<String> validator() {
+        return CustomValidator.forPredicate(e -> Iterables.size(Splitter.on("=").split(e.strip())) == 2,
+                "Invalid Format! Allowed Format: Key=Value");
     }
 
     @Override
