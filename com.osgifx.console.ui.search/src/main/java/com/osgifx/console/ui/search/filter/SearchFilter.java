@@ -19,9 +19,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
+import com.dlsc.formsfx.model.validators.Validator;
+
 public interface SearchFilter {
 
-    Predicate<?> predicate(String input, SearchOperation operation) throws Exception;
+    Predicate<?> predicate(String input, SearchOperation operation);
 
     Collection<SearchOperation> supportedOperations();
 
@@ -29,10 +31,12 @@ public interface SearchFilter {
 
     String placeholder();
 
+    Validator<String> validator();
+
     SearchFilter DUMMY = new SearchFilter() {
 
         @Override
-        public Predicate<Object> predicate(final String input, final SearchOperation operation) throws Exception {
+        public Predicate<Object> predicate(final String input, final SearchOperation operation) {
             return e -> true;
         }
 
@@ -48,6 +52,11 @@ public interface SearchFilter {
 
         @Override
         public String placeholder() {
+            return null;
+        }
+
+        @Override
+        public Validator<String> validator() {
             return null;
         }
     };
