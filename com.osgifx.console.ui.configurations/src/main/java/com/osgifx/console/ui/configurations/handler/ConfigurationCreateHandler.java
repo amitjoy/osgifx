@@ -17,8 +17,6 @@ package com.osgifx.console.ui.configurations.handler;
 
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -32,6 +30,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.configurations.converter.ConfigurationManager;
 import com.osgifx.console.ui.configurations.dialog.ConfigurationCreateDialog;
 import com.osgifx.console.util.fx.Fx;
@@ -46,6 +45,8 @@ public final class ConfigurationCreateHandler {
     private FluentLogger         logger;
     @Inject
     private IEclipseContext      context;
+    @Inject
+    private Executor             executor;
     @Inject
     private ThreadSynchronize    threadSync;
     @Inject
@@ -109,7 +110,7 @@ public final class ConfigurationCreateHandler {
                     return null;
                 }
             };
-            CompletableFuture.runAsync(createTask);
+            executor.runAsync(createTask);
         }
     }
 

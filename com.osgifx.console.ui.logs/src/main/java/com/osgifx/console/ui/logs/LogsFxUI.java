@@ -20,8 +20,6 @@ import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +34,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -53,6 +52,8 @@ public final class LogsFxUI {
     @Inject
     @OSGiBundle
     private BundleContext     context;
+    @Inject
+    private Executor          executor;
     @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
@@ -136,7 +137,7 @@ public final class LogsFxUI {
         parent.getChildren().clear();
         progressPane.addTo(parent);
         initStatusBar(parent);
-        CompletableFuture.runAsync(task);
+        executor.runAsync(task);
     }
 
     private void initStatusBar(final BorderPane parent) {

@@ -23,7 +23,6 @@ import static javafx.scene.paint.Color.TRANSPARENT;
 import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_CENTER;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -39,6 +38,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -65,6 +65,8 @@ public final class EventsFxUI {
     @Inject
     @OSGiBundle
     private BundleContext     context;
+    @Inject
+    private Executor          executor;
     @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
@@ -139,7 +141,7 @@ public final class EventsFxUI {
         parent.getChildren().clear();
         progressPane.addTo(parent);
         initStatusBar(parent);
-        CompletableFuture.runAsync(task);
+        executor.runAsync(task);
     }
 
     private void initStatusBar(final BorderPane parent) {
