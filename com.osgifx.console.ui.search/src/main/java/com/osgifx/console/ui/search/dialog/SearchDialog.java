@@ -126,6 +126,7 @@ public final class SearchDialog extends Dialog<FilterDTO> {
             final var list = newValue.supportedOperations().stream().toList();
             operationTypeField.items(list);
             userInputField.placeholder(newValue.placeholder());
+            userInputField.validate(newValue.validator());
         });
         return renderer;
     }

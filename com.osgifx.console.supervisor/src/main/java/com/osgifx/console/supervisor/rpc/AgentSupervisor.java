@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.rpc;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
@@ -53,9 +54,8 @@ public class AgentSupervisor<S, A> {
                            final String trustStore,
                            final String trustStorePassword)
             throws Exception {
-        if (timeout < -1) {
-            throw new IllegalArgumentException("timeout cannot be less than -1");
-        }
+
+        checkArgument(timeout > -1, "timeout cannot be less than -1");
         requireNonNull(supervisor, "'supervisor' cannot be null");
         requireNonNull(host, "'host' cannot be null");
 
