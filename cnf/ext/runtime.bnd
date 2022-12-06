@@ -84,6 +84,7 @@ bundles.required: \
                  com.google.guava,\
                  org.apache.commons.lang,\
                  org.apache.commons.lang3,\
+                 org.apache.commons.commons-text,\
                  org.eclipse.equinox.preferences,\
                  controlsfx,\
                  javax.inject,\
