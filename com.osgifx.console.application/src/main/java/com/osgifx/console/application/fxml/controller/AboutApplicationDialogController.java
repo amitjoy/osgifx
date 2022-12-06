@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.controlsfx.control.HyperlinkLabel;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.SystemUtils;
@@ -78,9 +79,9 @@ public final class AboutApplicationDialogController {
 
         final Map<String, String> substitutors = Map.of("appVersion", appVersion, "appLink", appLink, "javaVersion",
                 javaVersion, "javafxVersion", javafxVersion);
+        final var                 substitution = new StringSubstitutor(substitutors);
 
-        return substitutors.entrySet().stream().reduce(input, (s, e) -> s.replace("(" + e.getKey() + ")", e.getValue()),
-                (s, s2) -> s);
+        return substitution.replace(input);
     }
 
     private String prepareVersion() {
