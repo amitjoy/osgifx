@@ -17,8 +17,6 @@ package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -33,6 +31,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.io.Files;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
 import com.osgifx.console.util.fx.Fx;
@@ -46,6 +45,8 @@ public final class BundleInstallHandler {
     private FluentLogger      logger;
     @Inject
     private IEclipseContext   context;
+    @Inject
+    private Executor          executor;
     @Inject
     private IEventBroker      eventBroker;
     @Inject
@@ -108,7 +109,7 @@ public final class BundleInstallHandler {
                     return null;
                 }
             };
-            CompletableFuture.runAsync(installTask);
+            executor.runAsync(installTask);
         }
     }
 

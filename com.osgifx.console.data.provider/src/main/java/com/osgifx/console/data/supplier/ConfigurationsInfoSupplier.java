@@ -25,7 +25,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.concurrent.CompletableFuture;
+import javax.inject.Inject;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -40,6 +40,7 @@ import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.data.manager.RuntimeInfoSupplier;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.ObservableList;
@@ -53,6 +54,8 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
 
     @Reference
     private LoggerFactory       factory;
+    @Inject
+    private Executor            executor;
     @Reference
     private EventAdmin          eventAdmin;
     @Reference
@@ -92,7 +95,7 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
             threadSync.asyncExec(configurations::clear);
             return;
         }
-        CompletableFuture.runAsync(this::retrieve);
+        executor.runAsync(this::retrieve);
     }
 
 }

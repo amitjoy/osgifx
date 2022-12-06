@@ -25,7 +25,8 @@ import static org.osgi.service.component.annotations.ReferencePolicyOption.GREED
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+
+import javax.inject.Inject;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -44,6 +45,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
 import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.data.provider.PackageDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.FXCollections;
@@ -58,6 +60,8 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 
     @Reference
     private LoggerFactory       factory;
+    @Inject
+    private Executor            executor;
     @Reference
     private EventAdmin          eventAdmin;
     @Reference
@@ -97,7 +101,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
             threadSync.asyncExec(packages::clear);
             return;
         }
-        CompletableFuture.runAsync(this::retrieve);
+        executor.runAsync(this::retrieve);
     }
 
     private synchronized ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {

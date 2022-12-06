@@ -20,7 +20,6 @@ import static com.osgifx.console.supervisor.factory.SupervisorFactory.Supervisor
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -44,6 +43,7 @@ import com.osgifx.console.application.dialog.ConnectToAgentDialog;
 import com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType;
 import com.osgifx.console.application.dialog.ConnectionDialog;
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
@@ -59,6 +59,8 @@ public final class ConnectToAgentHandler {
     @Log
     @Inject
     private FluentLogger                            logger;
+    @Inject
+    private Executor                                executor;
     @Inject
     private ThreadSynchronize                       threadSync;
     @Inject
@@ -198,7 +200,7 @@ public final class ConnectToAgentHandler {
             }
         };
 
-        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(connectTask);
+        final var taskFuture = executor.runAsync(connectTask);
         progressDialog = FxDialog.showProgressDialog("Remote Connection", connectTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
     }

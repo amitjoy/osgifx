@@ -105,6 +105,7 @@ install.order                     :   \
 	com.osgifx.console.agent;version=snapshot;startlevel=10,\
 	com.osgifx.console.application;version=snapshot;startlevel=10,\
 	com.osgifx.console.data.provider;version=snapshot;startlevel=10,\
+	com.osgifx.console.executor;version=snapshot;startlevel=10,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=10,\
 	com.osgifx.console.smartgraph;version=snapshot;startlevel=10,\
 	com.osgifx.console.supervisor;version=snapshot;startlevel=10,\

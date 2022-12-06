@@ -17,8 +17,6 @@ package com.osgifx.console.ui.bundles.handler;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_UNINSTALLED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,6 +28,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -40,6 +39,8 @@ public final class BundleUninstallHandler {
     @Log
     @Inject
     private FluentLogger      logger;
+    @Inject
+    private Executor          executor;
     @Inject
     private IEventBroker      eventBroker;
     @Inject
@@ -79,7 +80,7 @@ public final class BundleUninstallHandler {
                 return null;
             }
         };
-        CompletableFuture.runAsync(uninstallTask);
+        executor.runAsync(uninstallTask);
     }
 
     @CanExecute

@@ -17,8 +17,6 @@ package com.osgifx.console.ui.bundles.addon;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -35,6 +33,7 @@ import org.eclipse.fx.ui.workbench.renderers.base.widget.WWindow;
 import org.osgi.service.event.Event;
 
 import com.google.common.io.Files;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
@@ -52,6 +51,8 @@ public final class DragAndDropAddon {
     @Log
     @Inject
     private FluentLogger      logger;
+    @Inject
+    private Executor          executor;
     @Inject
     private ThreadSynchronize threadSync;
     @Inject
@@ -126,7 +127,7 @@ public final class DragAndDropAddon {
                                     return null;
                                 }
                             };
-                            CompletableFuture.runAsync(installTask);
+                            executor.runAsync(installTask);
                         });
 
             }
