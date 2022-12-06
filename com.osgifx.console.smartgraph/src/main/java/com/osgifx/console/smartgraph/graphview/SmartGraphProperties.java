@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import org.osgi.framework.FrameworkUtil;
 
+import com.google.common.primitives.Doubles;
+
 /**
  * Properties used by {@link SmartGraphPanel}. Default file is given by the
  * {@link #DEFAULT_FILE} property.
@@ -220,14 +222,9 @@ public class SmartGraphProperties {
     }
 
     private double getDoubleProperty(final String propertyName, final double defaultValue) {
-        final var p = properties.getProperty(propertyName, Double.toString(defaultValue));
-        try {
-            return Double.parseDouble(p);
-        } catch (final NumberFormatException e) {
-            System.err.printf("Error in reading property %s: %s", propertyName, e.getMessage());
-            return defaultValue;
-        }
-
+        final var    property     = properties.getProperty(propertyName, Double.toString(defaultValue));
+        final Double parsedDouble = Doubles.tryParse(property);
+        return parsedDouble == null ? defaultValue : parsedDouble;
     }
 
     private boolean getBooleanProperty(final String propertyName, final boolean defaultValue) {
@@ -235,7 +232,6 @@ public class SmartGraphProperties {
         try {
             return Boolean.parseBoolean(p);
         } catch (final NumberFormatException e) {
-            System.err.printf("Error in reading property %s: %s", propertyName, e.getMessage());
             return defaultValue;
         }
     }
