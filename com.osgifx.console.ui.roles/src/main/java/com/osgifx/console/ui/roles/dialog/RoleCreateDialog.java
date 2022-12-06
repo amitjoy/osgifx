@@ -19,6 +19,7 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
@@ -27,8 +28,6 @@ import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.google.common.base.Enums;
-import com.google.common.base.Optional;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.ui.roles.dialog.RoleCreateDialog.RoleDTO;
 import com.osgifx.console.util.fx.FxDialog;
@@ -140,11 +139,11 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
     }
 
     private RoleDTO getInput(final Object roleType, final String roleName) {
-        final Optional<XRoleDTO.Type> type = Enums.getIfPresent(XRoleDTO.Type.class, roleType.toString().toUpperCase());
-        if (!type.isPresent()) {
+        final var type = EnumUtils.getEnumIgnoreCase(XRoleDTO.Type.class, roleType.toString());
+        if (type == null) {
             throw new RuntimeException("Role type cannot be mapped to any existing type");
         }
-        return new RoleDTO(roleName, type.get());
+        return new RoleDTO(roleName, type);
     }
 
 }
