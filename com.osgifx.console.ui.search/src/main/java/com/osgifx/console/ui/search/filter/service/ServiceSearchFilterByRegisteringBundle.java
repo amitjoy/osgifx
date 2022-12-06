@@ -25,6 +25,9 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.base.Predicates;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -34,8 +37,7 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class ServiceSearchFilterByRegisteringBundle implements SearchFilter {
 
     @Override
-    public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation)
-            throws Exception {
+    public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation) {
         return switch (searchOperation) {
             case EQUALS_TO -> service -> StringUtils.equalsIgnoreCase(service.registeringBundle, input.strip());
             default -> throw new RuntimeException("does not match any matching case");
@@ -55,6 +57,11 @@ public final class ServiceSearchFilterByRegisteringBundle implements SearchFilte
     @Override
     public String placeholder() {
         return "Symbolic Name (Case-Insensitive)";
+    }
+
+    @Override
+    public Validator<String> validator() {
+        return CustomValidator.forPredicate(Predicates.alwaysTrue(), "");
     }
 
     @Override
