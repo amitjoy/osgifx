@@ -18,7 +18,6 @@ package com.osgifx.console.ui.gogo;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,6 +30,7 @@ import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Throwables;
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.concurrent.Task;
@@ -45,6 +45,8 @@ public final class GogoFxController {
     @Log
     @Inject
     private FluentLogger       logger;
+    @Inject
+    private Executor           executor;
     @FXML
     private TextField          input;
     @FXML
@@ -143,7 +145,7 @@ public final class GogoFxController {
             input.clear();
             logger.atInfo().log("Task for command '%s' has been succeeded", command);
         });
-        CompletableFuture.runAsync(task);
+        executor.runAsync(task);
     }
 
 }

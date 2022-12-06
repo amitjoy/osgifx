@@ -19,7 +19,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -34,6 +33,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -53,6 +53,8 @@ public final class GameFxUI {
     @Inject
     @OSGiBundle
     private BundleContext     context;
+    @Inject
+    private Executor          executor;
     @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
@@ -132,7 +134,7 @@ public final class GameFxUI {
         progressPane.addTo(parent);
         statusBar.addTo(parent);
 
-        CompletableFuture.runAsync(task);
+        executor.runAsync(task);
     }
 
 }

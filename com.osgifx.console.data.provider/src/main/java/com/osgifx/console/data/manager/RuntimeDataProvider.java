@@ -37,10 +37,11 @@ import static org.osgi.service.component.annotations.ReferenceCardinality.OPTION
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import javax.inject.Inject;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -68,6 +69,7 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.data.provider.PackageDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.ObservableList;
@@ -78,6 +80,8 @@ public final class RuntimeDataProvider implements DataProvider {
 
     @Reference
     private LoggerFactory       factory;
+    @Inject
+    private Executor            executor;
     @Reference
     private EventAdmin          eventAdmin;
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
@@ -96,10 +100,10 @@ public final class RuntimeDataProvider implements DataProvider {
         if (id == null) {
             if (isAsync) {
                 // @formatter:off
-                final Collection<CompletableFuture<Void>> futures =
+                final var futures =
                         infoSuppliers.values()
                                      .stream()
-                                     .map(s -> CompletableFuture.runAsync(s::retrieve))
+                                     .map(s -> executor.runAsync(s::retrieve))
                                      .toList();
                 // @formatter:on
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
@@ -112,7 +116,7 @@ public final class RuntimeDataProvider implements DataProvider {
                 logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
             }
         } else if (isAsync) {
-            CompletableFuture.runAsync(() -> retrieve(id)).thenRunAsync(() -> logger.atInfo()
+            executor.runAsync(() -> retrieve(id)).thenRunAsync(() -> logger.atInfo()
                     .log("Runtime information of '%s' has been retrieved successfully (async)", id));
         } else {
             retrieve(id);

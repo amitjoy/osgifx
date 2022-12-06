@@ -18,7 +18,6 @@ package com.osgifx.console.ui.extension.handler;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.FileInputStream;
-import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -31,6 +30,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.annotation.bundle.Requirement;
 import org.osgi.service.deploymentadmin.DeploymentAdmin;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
@@ -42,6 +42,8 @@ public final class ExtensionInstallHandler {
     @Log
     @Inject
     private FluentLogger      logger;
+    @Inject
+    private Executor          executor;
     @Inject
     private IWorkbench        workbench;
     @Inject
@@ -84,7 +86,7 @@ public final class ExtensionInstallHandler {
                 }
             };
 
-            final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
+            final var taskFuture = executor.runAsync(task);
             progressDialog = FxDialog.showProgressDialog("Extension Installation", task, getClass().getClassLoader(),
                     () -> {
                         final var isCancelled = deploymentAdmin.cancel();
