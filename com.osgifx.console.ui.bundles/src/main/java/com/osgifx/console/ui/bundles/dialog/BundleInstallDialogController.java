@@ -24,6 +24,8 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.google.common.primitives.Ints;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -82,12 +84,11 @@ public final class BundleInstallDialogController {
             return null;
         }
         final var sl    = startLevel.getText();
-        var       level = DEFAULT_START_LEVEL;
-        try {
-            level = Integer.parseInt(sl);
-        } catch (final Exception e) {
-            logger.atError().withException(e).log(
-                    "Start level value cannot be parsed. Fall back to default start level - %s", DEFAULT_START_LEVEL);
+        var       level = Ints.tryParse(sl);
+        if (level == null) {
+            logger.atWarning().log("Start level value cannot be parsed. Fall back to default start level - %s",
+                    DEFAULT_START_LEVEL);
+            level = DEFAULT_START_LEVEL;
         }
         return new BundleInstallDTO(bundle, startBundleToggle.isSelected(), level);
     }

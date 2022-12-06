@@ -29,6 +29,7 @@ import org.eclipse.fx.core.preferences.Preference;
 import org.eclipse.fx.core.preferences.Value;
 
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
@@ -61,7 +62,7 @@ public final class ConnectionPreferenceHandler {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new ConnectionSettingDTO(name, host, Integer.parseInt(port), Integer.parseInt(timeout),
+        final var dto         = new ConnectionSettingDTO(name, host, Ints.tryParse(port), Ints.tryParse(timeout),
                 truststore, truststorePassword);
 
         if ("ADD".equals(type)) {
