@@ -43,6 +43,10 @@ import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Doubles;
+import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.util.converter.ValueConverter;
@@ -244,28 +248,16 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                     final var captionAsLong = "Long Number";
                     txtField.setPromptText(captionAsLong);
                     final TextFormatter<?> longFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> {
-                                try {
-                                    Long.parseLong(change.getControlNewText());
-                                    return change;
-                                } catch (final Exception e) {
-                                    return null;
-                                }
-                            });
+                            (UnaryOperator<TextFormatter.Change>) change -> Longs
+                                    .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(longFormatter);
                     break;
                 case INTEGER:
                     final var captionAsInteger = "Integer Number";
                     txtField.setPromptText(captionAsInteger);
                     final TextFormatter<?> integerFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> {
-                                try {
-                                    Integer.parseInt(change.getControlNewText());
-                                    return change;
-                                } catch (final Exception e) {
-                                    return null;
-                                }
-                            });
+                            (UnaryOperator<TextFormatter.Change>) change -> Ints
+                                    .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(integerFormatter);
                     break;
                 case BOOLEAN:
@@ -274,28 +266,16 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                     final var captionAsDouble = "Decimal Number";
                     txtField.setPromptText(captionAsDouble);
                     final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> {
-                                try {
-                                    Double.parseDouble(change.getControlNewText());
-                                    return change;
-                                } catch (final Exception e) {
-                                    return null;
-                                }
-                            });
+                            (UnaryOperator<TextFormatter.Change>) change -> Doubles
+                                    .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(doubleFormatter);
                     break;
                 case FLOAT:
                     final var captionAsFloat = "Decimal Number";
                     txtField.setPromptText(captionAsFloat);
                     final TextFormatter<?> floatFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> {
-                                try {
-                                    Float.parseFloat(change.getControlNewText());
-                                    return change;
-                                } catch (final Exception e) {
-                                    return null;
-                                }
-                            });
+                            (UnaryOperator<TextFormatter.Change>) change -> Floats
+                                    .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(floatFormatter);
                     break;
                 case CHAR:
