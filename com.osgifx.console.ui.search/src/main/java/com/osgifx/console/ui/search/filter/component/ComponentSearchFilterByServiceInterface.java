@@ -25,6 +25,9 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.base.Predicates;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -34,8 +37,7 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class ComponentSearchFilterByServiceInterface implements SearchFilter {
 
     @Override
-    public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation)
-            throws Exception {
+    public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation) {
         return switch (searchOperation) {
             case EQUALS_TO -> component -> component.serviceInterfaces.stream()
                     .anyMatch(i -> StringUtils.equalsIgnoreCase(i, input.strip()));
@@ -56,6 +58,11 @@ public final class ComponentSearchFilterByServiceInterface implements SearchFilt
     @Override
     public String placeholder() {
         return "Fully Qualified Interface Name (Case-Insensitive)";
+    }
+
+    @Override
+    public Validator<String> validator() {
+        return CustomValidator.forPredicate(Predicates.alwaysTrue(), "");
     }
 
     @Override
