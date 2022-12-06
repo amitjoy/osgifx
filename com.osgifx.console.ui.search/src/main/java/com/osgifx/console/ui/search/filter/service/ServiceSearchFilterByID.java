@@ -26,6 +26,9 @@ import java.util.function.Predicate;
 
 import org.osgi.service.component.annotations.Component;
 
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.primitives.Longs;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -35,9 +38,8 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class ServiceSearchFilterByID implements SearchFilter {
 
     @Override
-    public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation)
-            throws Exception {
-        final var serviceId = Long.parseLong(input.strip());
+    public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation) {
+        final var serviceId = Longs.tryParse(input.strip());
         return switch (searchOperation) {
             case EQUALS_TO -> service -> service.id == serviceId;
             case IS_GREATER_THAN -> service -> service.id > serviceId;
@@ -59,6 +61,11 @@ public final class ServiceSearchFilterByID implements SearchFilter {
     @Override
     public String placeholder() {
         return "Service ID Number";
+    }
+
+    @Override
+    public Validator<String> validator() {
+        return CustomValidator.forPredicate(e -> Longs.tryParse(e.strip()) != null, "Invalid Long Number");
     }
 
     @Override

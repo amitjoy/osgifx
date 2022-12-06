@@ -27,6 +27,8 @@ import java.util.function.Predicate;
 import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Component;
 
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.Validator;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -36,7 +38,7 @@ import com.osgifx.console.ui.search.filter.SearchOperation;
 public final class BundleSearchFilterByVersion implements SearchFilter {
 
     @Override
-    public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) throws Exception {
+    public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) {
         final var version = new Version(input.strip());
 
         return switch (searchOperation) {
@@ -69,6 +71,18 @@ public final class BundleSearchFilterByVersion implements SearchFilter {
     @Override
     public String placeholder() {
         return "Conformant Bundle Version";
+    }
+
+    @Override
+    public Validator<String> validator() {
+        return CustomValidator.forPredicate(e -> {
+            try {
+                Version.parseVersion(e.strip());
+                return true;
+            } catch (final Exception ex) {
+                return false;
+            }
+        }, "Invalid Version Format");
     }
 
     @Override
