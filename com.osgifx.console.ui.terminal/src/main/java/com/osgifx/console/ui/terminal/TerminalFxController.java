@@ -17,8 +17,6 @@ package com.osgifx.console.ui.terminal;
 
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,6 +27,7 @@ import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Throwables;
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.concurrent.Task;
@@ -47,6 +46,8 @@ public final class TerminalFxController {
     private TextField       input;
     @FXML
     private TextArea        output;
+    @Inject
+    private Executor        executor;
     @Inject
     @Optional
     private Supervisor      supervisor;
@@ -138,7 +139,7 @@ public final class TerminalFxController {
             input.clear();
             logger.atDebug().log("Task for command '%s' has been succeeded", command);
         });
-        CompletableFuture.runAsync(task);
+        executor.runAsync(task);
     }
 
 }

@@ -23,12 +23,9 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +44,7 @@ import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.osgifx.console.smartgraph.graphview.SmartGraphPanel;
 import com.osgifx.console.smartgraph.graphview.SmartPlacementStrategy;
@@ -74,6 +72,8 @@ public final class GraphFxComponentController implements GraphController {
     @Log
     @Inject
     private FluentLogger                 logger;
+    @Inject
+    private Executor                     executor;
     @FXML
     private SegmentedButton              strategyButton;
     @FXML
@@ -95,7 +95,6 @@ public final class GraphFxComponentController implements GraphController {
     @Inject
     private RuntimeComponentGraph        runtimeGraph;
     private MaskerPane                   progressPane;
-    private ExecutorService              executor;
     private FxComponentGraph             fxGraph;
     private Future<?>                    graphGenFuture;
 
@@ -104,7 +103,6 @@ public final class GraphFxComponentController implements GraphController {
         try {
             addExportToDotContextMenu();
             initComponentsList();
-            executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen-component"));
             progressPane = new MaskerPane();
             initStrategyButton();
             initWiringSelection();
@@ -147,11 +145,6 @@ public final class GraphFxComponentController implements GraphController {
                 });
     }
 
-    @PreDestroy
-    public void destroy() {
-        executor.shutdownNow();
-    }
-
     private void addExportToDotContextMenu() {
         final var item = new MenuItem("Export to DOT");
         item.setOnAction(event -> {
@@ -161,9 +154,8 @@ public final class GraphFxComponentController implements GraphController {
                 return;
             }
             exportToDOT(location);
-            threadSync.asyncExec(() -> {
-                Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported");
-            });
+            threadSync.asyncExec(
+                    () -> Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported"));
         });
         final var menu = new ContextMenu();
         menu.getItems().add(item);
@@ -257,7 +249,7 @@ public final class GraphFxComponentController implements GraphController {
         if (graphGenFuture != null) {
             graphGenFuture.cancel(true);
         }
-        graphGenFuture = executor.submit(task);
+        graphGenFuture = executor.runAsync(task);
     }
 
     @FXML

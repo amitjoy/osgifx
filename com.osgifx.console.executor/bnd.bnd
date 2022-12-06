@@ -1,0 +1,3 @@
+-buildpath      : ${bundles.required}
+-privatepackage : com.osgifx.console.executor*
+                  

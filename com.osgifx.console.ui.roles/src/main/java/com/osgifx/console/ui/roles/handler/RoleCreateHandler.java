@@ -17,8 +17,6 @@ package com.osgifx.console.ui.roles.handler;
 
 import static com.osgifx.console.event.topics.RoleActionEventTopics.ROLE_CREATED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -33,6 +31,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.roles.dialog.RoleCreateDialog;
 import com.osgifx.console.util.fx.Fx;
@@ -47,6 +46,8 @@ public final class RoleCreateHandler {
     private FluentLogger      logger;
     @Inject
     private IEclipseContext   context;
+    @Inject
+    private Executor          executor;
     @Inject
     @Optional
     private Supervisor        supervisor;
@@ -102,7 +103,7 @@ public final class RoleCreateHandler {
                     return null;
                 }
             };
-            CompletableFuture.runAsync(createTask);
+            executor.runAsync(createTask);
         }
     }
 
