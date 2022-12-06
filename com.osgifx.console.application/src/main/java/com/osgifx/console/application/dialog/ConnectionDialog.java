@@ -29,6 +29,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.google.common.primitives.Ints;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.scene.control.Button;
@@ -152,35 +153,27 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             validationSupport.registerValidator(port,
                     Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
             validationSupport.registerValidator(port, Validator.createPredicateValidator(value -> {
-                try {
-                    final var parsedPort = Integer.parseInt(value.toString());
-                    return parsedPort > 0 && parsedPort < 65536;
-                } catch (final Exception e) {
-                    return false;
-                }
+                final var parsedPort = Ints.tryParse(value.toString());
+                return parsedPort != null && parsedPort > 0 && parsedPort < 65536;
             }, String.format(requiredPortFormat, portCaption)));
             validationSupport.registerValidator(timeout,
                     Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
-            validationSupport.registerValidator(timeout, Validator.createPredicateValidator(value -> {
-                try {
-                    Integer.parseInt(value.toString());
-                    return true;
-                } catch (final Exception e) {
-                    return false;
-                }
-            }, String.format(requiredNumberFormat, timeoutCaption)));
+            validationSupport.registerValidator(timeout,
+                    Validator.createPredicateValidator(value -> Ints.tryParse(value.toString()) != null,
+                            String.format(requiredNumberFormat, timeoutCaption)));
         });
         setResultConverter(dialogButton -> {
-            try {
-                return dialogButton == saveButtonType
-                        ? new ConnectionSettingDTO(name.getText(), hostname.getText(), Integer.parseInt(port.getText()),
-                                Integer.parseInt(timeout.getText()), trustStore.getAccessibleText(),
-                                trustStorePassword.getText())
-                        : null;
-            } catch (final Exception e) {
-                logger.atError().withException(e).log("Connection settings cannot be added due to validation problem");
-                throw e;
+            final var p = Ints.tryParse(port.getText());
+            final var t = Ints.tryParse(timeout.getText());
+
+            if (p == null || t == null) {
+                logger.atError().log("Connection settings cannot be added due to validation problem");
+                throw new RuntimeException("Port and Host formats are not compliant");
             }
+            return dialogButton == saveButtonType
+                    ? new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
+                            trustStorePassword.getText())
+                    : null;
         });
     }
 
