@@ -35,8 +35,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.framework.FrameworkUtil;
 
 import com.google.common.collect.Maps;
@@ -84,14 +83,14 @@ public class SmartGraphPanel<V, E> extends Pane {
     /*
      * INTERNAL DATA STRUCTURE
      */
-    private final Graph<V, E>                               theGraph;
-    private final SmartPlacementStrategy                    placementStrategy;
-    private final Map<Vertex<V>, SmartGraphVertexNode<V>>   vertexNodes;
-    private final Map<Edge<E, V>, SmartGraphEdgeBase>       edgeNodes;
-    private Map<Edge<E, V>, Tuple<Vertex<V>>>               connections;
-    private final Map<Tuple<SmartGraphVertexNode>, Integer> placedEdges = Maps.newHashMap();
-    private boolean                                         initialized;
-    private final boolean                                   edgesWithArrows;
+    private final Graph<V, E>                                                    theGraph;
+    private final SmartPlacementStrategy                                         placementStrategy;
+    private final Map<Vertex<V>, SmartGraphVertexNode<V>>                        vertexNodes;
+    private final Map<Edge<E, V>, SmartGraphEdgeBase>                            edgeNodes;
+    private Map<Edge<E, V>, Pair<Vertex<V>, Vertex<V>>>                          connections;
+    private final Map<Pair<SmartGraphVertexNode, SmartGraphVertexNode>, Integer> placedEdges = Maps.newHashMap();
+    private boolean                                                              initialized;
+    private final boolean                                                        edgesWithArrows;
 
     /*
      * INTERACTION WITH VERTICES AND EDGES
@@ -414,7 +413,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                 final var graphEdge = createEdge(edge, graphVertexIn, graphVertexOppositeOut);
 
                 /* Track Edges already placed */
-                connections.put(edge, new Tuple<>(vertex, oppositeVertex));
+                connections.put(edge, Pair.of(vertex, oppositeVertex));
                 addEdge(graphEdge, edge);
 
                 if (this.edgesWithArrows) {
@@ -444,7 +443,7 @@ public class SmartGraphPanel<V, E> extends Pane {
          * Otherwise, we would have to regenerate the appropriate edges.
          */
         var       edgeIndex = 0;
-        final var counter   = placedEdges.get(new Tuple<>(graphVertexInbound, graphVertexOutbound));
+        final var counter   = placedEdges.get(Pair.of(graphVertexInbound, graphVertexOutbound));
         if (counter != null) {
             edgeIndex = counter;
         }
@@ -459,7 +458,7 @@ public class SmartGraphPanel<V, E> extends Pane {
         }
 
         edgeIndex++;
-        placedEdges.put(new Tuple<>(graphVertexInbound, graphVertexOutbound), edgeIndex);
+        placedEdges.put(Pair.of(graphVertexInbound, graphVertexOutbound), edgeIndex);
 
         return graphEdge;
     }
@@ -593,7 +592,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                 }
 
                 /* Track edges */
-                connections.put(edge, new Tuple<>(u, v));
+                connections.put(edge, Pair.of(u, v));
                 addEdge(graphEdge, edge);
 
             }
@@ -619,9 +618,9 @@ public class SmartGraphPanel<V, E> extends Pane {
             // the adjacency is kept in parallel in an internal data structure
             final var vertexTuple = connections.get(e);
 
-            if (getTotalEdgesBetween(vertexTuple.first, vertexTuple.second) == 0) {
-                final var v0 = vertexNodes.get(vertexTuple.first);
-                final var v1 = vertexNodes.get(vertexTuple.second);
+            if (getTotalEdgesBetween(vertexTuple.getLeft(), vertexTuple.getRight()) == 0) {
+                final var v0 = vertexNodes.get(vertexTuple.getLeft());
+                final var v1 = vertexNodes.get(vertexTuple.getRight());
 
                 v0.removeAdjacentVertex(v1);
                 v1.removeAdjacentVertex(v0);
@@ -1073,39 +1072,6 @@ public class SmartGraphPanel<V, E> extends Pane {
 
             }
         });
-    }
-
-    /**
-     * Represents a tuple in Java.
-     *
-     * @param <T> the type of the tuple
-     */
-    private class Tuple<T> {
-
-        private final T first;
-        private final T second;
-
-        public Tuple(final T first, final T second) {
-            this.first  = first;
-            this.second = second;
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder().append(this.first).append(this.second).hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-            final Tuple<?> other = (Tuple<?>) obj;
-            return new EqualsBuilder().append(this.first, other.first).append(this.second, other.second).isEquals();
-        }
     }
 
     private String getStyleClass(final Vertex<V> vertex, final Graph<V, E> graph) {
