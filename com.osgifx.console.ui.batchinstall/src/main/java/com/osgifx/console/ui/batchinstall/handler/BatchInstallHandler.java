@@ -17,8 +17,6 @@ package com.osgifx.console.ui.batchinstall.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -33,6 +31,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.batchinstall.dialog.ArtifactInstaller;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog;
 import com.osgifx.console.util.fx.FxDialog;
@@ -49,6 +48,8 @@ public final class BatchInstallHandler {
     private FluentLogger      logger;
     @Inject
     private IEclipseContext   context;
+    @Inject
+    private Executor          executor;
     @Inject
     private ArtifactInstaller installer;
     @Inject
@@ -95,7 +96,7 @@ public final class BatchInstallHandler {
                         }
                     }
                 });
-                final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(batchTask).exceptionally(e -> {
+                final var taskFuture = executor.runAsync(batchTask).exceptionally(e -> {
                     if (progressDialog != null) {
                         threadSync.asyncExec(() -> {
                             progressDialog.close();

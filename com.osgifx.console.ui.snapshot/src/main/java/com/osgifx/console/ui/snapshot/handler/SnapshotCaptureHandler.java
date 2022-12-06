@@ -18,7 +18,6 @@ package com.osgifx.console.ui.snapshot.handler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +33,7 @@ import org.eclipse.fx.core.log.Log;
 import com.google.gson.Gson;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.dto.SnapshotDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
@@ -48,6 +48,8 @@ public final class SnapshotCaptureHandler {
     @Log
     @Inject
     private FluentLogger      logger;
+    @Inject
+    private Executor          executor;
     @Inject
     @Optional
     private Supervisor        supervisor;
@@ -84,6 +86,7 @@ public final class SnapshotCaptureHandler {
                 }
             }
         };
+
         snapshotTask.valueProperty().addListener((ChangeListener<String>) (obs, oldValue, newValue) -> {
             if (newValue != null) {
                 threadSync.asyncExec(() -> {
@@ -97,8 +100,9 @@ public final class SnapshotCaptureHandler {
                 });
             }
         });
-        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(snapshotTask);
-        progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", snapshotTask, getClass().getClassLoader(),
+
+        final var taskFuture = executor.runAsync(snapshotTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Snapshot", snapshotTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
     }
 

@@ -17,7 +17,6 @@ package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -32,6 +31,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType;
@@ -43,6 +43,8 @@ public final class DisconnectFromAgentHandler {
     @Log
     @Inject
     private FluentLogger                            logger;
+    @Inject
+    private Executor                                executor;
     @Inject
     @Optional
     private Supervisor                              supervisor;
@@ -95,7 +97,7 @@ public final class DisconnectFromAgentHandler {
                 logger.atInfo().log("Application specific context values have been reset");
             }
         };
-        CompletableFuture.runAsync(disconnectTask);
+        executor.runAsync(disconnectTask);
     }
 
     @CanExecute

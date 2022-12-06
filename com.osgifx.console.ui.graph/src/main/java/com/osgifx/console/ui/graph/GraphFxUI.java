@@ -18,8 +18,6 @@ package com.osgifx.console.ui.graph;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,6 +39,7 @@ import org.osgi.framework.BundleContext;
 
 import com.google.common.base.Enums;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -61,6 +60,8 @@ public final class GraphFxUI {
     @Inject
     @OSGiBundle
     private BundleContext     context;
+    @Inject
+    private Executor          executor;
     @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
@@ -126,7 +127,7 @@ public final class GraphFxUI {
                                 return null;
                             }
                         };
-                        CompletableFuture.runAsync(task);
+                        executor.runAsync(task);
                     }, () -> partService.hidePart(part), "Bundles", "Bundles", "Components"));
         } else {
             loadContent(loadedController.type());
