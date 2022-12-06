@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
@@ -41,6 +40,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
@@ -55,6 +55,8 @@ public final class SnapshotImportHandler {
     @Log
     @Inject
     private FluentLogger               logger;
+    @Inject
+    private Executor                   executor;
     @Inject
     @Optional
     private Supervisor                 supervisor;
@@ -115,7 +117,7 @@ public final class SnapshotImportHandler {
                 logger.atInfo().log("Snapshot has been successfully imported");
             });
 
-            final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(task);
+            final var taskFuture = executor.runAsync(task);
             progressDialog = FxDialog.showProgressDialog("Import Snapshot", task, getClass().getClassLoader(), () -> {
                 taskFuture.cancel(true);
             });

@@ -17,8 +17,6 @@ package com.osgifx.console.application.addon;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 
 import org.controlsfx.dialog.ProgressDialog;
@@ -31,6 +29,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
@@ -40,6 +39,8 @@ public final class AgentConnectedAddon {
     @Log
     @Inject
     private FluentLogger               logger;
+    @Inject
+    private Executor                   executor;
     @Inject
     private ThreadSynchronize          threadSync;
     @Inject
@@ -72,7 +73,7 @@ public final class AgentConnectedAddon {
         final var agent  = isLocalAgent.getValue() ? "local" : "remote";
         final var header = "Retrieving information from " + agent + " agent";
 
-        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(dataRetrievalTask);
+        final var taskFuture = executor.runAsync(dataRetrievalTask);
         progressDialog = FxDialog.showProgressDialog(header, dataRetrievalTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
     }

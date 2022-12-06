@@ -18,7 +18,6 @@ package com.osgifx.console.ui.heap;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
@@ -38,6 +37,7 @@ import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
@@ -88,6 +88,8 @@ public final class HeapMonitorPane extends BorderPane {
     @Log
     @Inject
     private FluentLogger      logger;
+    @Inject
+    private Executor          executor;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
@@ -334,7 +336,7 @@ public final class HeapMonitorPane extends BorderPane {
                 });
             }
         });
-        final CompletableFuture<?> taskFuture = CompletableFuture.runAsync(heapdumpTask);
+        final var taskFuture = executor.runAsync(heapdumpTask);
         progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", heapdumpTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
     }

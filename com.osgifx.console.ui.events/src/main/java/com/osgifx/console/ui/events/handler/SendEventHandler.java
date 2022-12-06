@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.handler;
 
-import java.util.concurrent.CompletableFuture;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,6 +28,7 @@ import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.events.converter.EventManager;
 import com.osgifx.console.ui.events.dialog.SendEventDialog;
 import com.osgifx.console.util.fx.Fx;
@@ -44,6 +43,8 @@ public final class SendEventHandler {
     private FluentLogger      logger;
     @Inject
     private IEclipseContext   context;
+    @Inject
+    private Executor          executor;
     @Inject
     private ThreadSynchronize threadSync;
     @Inject
@@ -110,7 +111,7 @@ public final class SendEventHandler {
                     return null;
                 }
             };
-            CompletableFuture.runAsync(sendEventTask);
+            executor.runAsync(sendEventTask);
         }
     }
 

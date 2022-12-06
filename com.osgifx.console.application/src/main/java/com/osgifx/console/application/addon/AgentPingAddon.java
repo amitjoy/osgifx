@@ -17,11 +17,8 @@ package com.osgifx.console.application.addon;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 import javax.annotation.PostConstruct;
@@ -36,17 +33,19 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 public final class AgentPingAddon {
 
-    private static final long   INITIAL_DELAY = Duration.ofSeconds(0).toMillis();
-    private static final long   MAX_DELAY     = Duration.ofSeconds(5).toMillis();
-    private static final String THREAD_NAME   = "osgifx-agent-ping";
+    private static final Duration INITIAL_DELAY = Duration.ofSeconds(0);
+    private static final Duration MAX_DELAY     = Duration.ofSeconds(5);
 
     @Log
     @Inject
     private FluentLogger                logger;
+    @Inject
+    private Executor                    executor;
     @Inject
     @Optional
     private Supervisor                  supervisor;
@@ -62,12 +61,10 @@ public final class AgentPingAddon {
     @Inject
     @ContextValue("connected.agent")
     private ContextBoundValue<String>   connectedAgent;
-    private ScheduledExecutorService    executor;
     private volatile ScheduledFuture<?> future;
 
     @PostConstruct
     public void init() {
-        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, THREAD_NAME));
         logger.atInfo().log("Agent ping addon has been initialized");
     }
 
@@ -82,7 +79,7 @@ public final class AgentPingAddon {
                 logger.atWarning().log("Agent ping request did not succeed");
                 eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
             }
-        }, INITIAL_DELAY, MAX_DELAY, MILLISECONDS);
+        }, INITIAL_DELAY, MAX_DELAY);
         logger.atInfo().log("Agent ping scheduler has been started");
     }
 
@@ -92,18 +89,11 @@ public final class AgentPingAddon {
         logger.atInfo().log("Agent disconnected event has been received");
         future.cancel(true);
         future = null;
-        // there can be a race condition when this addon is just destroyed and the
-        // disconnected event is received simultaneously
-        if (!executor.isShutdown()) {
-            isConnected.publish(false);
-            isLocalAgent.publish(false);
-        }
         connectedAgent.publish(null);
     }
 
     @PreDestroy
     private void destroy() {
-        executor.shutdownNow();
         logger.atInfo().log("Agent ping addon has been destroyed");
     }
 
