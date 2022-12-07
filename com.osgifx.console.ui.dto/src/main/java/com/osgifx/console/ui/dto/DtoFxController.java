@@ -90,7 +90,7 @@ public final class DtoFxController {
             return;
         }
         final var content = new Gson().toJson(runtimeDTO);
-        final var json    = new JsonParser().parse(content).getAsJsonObject();
+        final var json    = JsonParser.parseString(content).getAsJsonObject();
 
         final var root = parseJSON("ROOT", json);
         dtoTree.setRoot(root);
