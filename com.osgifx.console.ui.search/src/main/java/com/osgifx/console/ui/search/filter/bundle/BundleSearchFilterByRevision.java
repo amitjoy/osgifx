@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.base.VerifyException;
 import com.google.common.primitives.Ints;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
@@ -44,7 +45,7 @@ public final class BundleSearchFilterByRevision implements SearchFilter {
             case EQUALS_TO -> bundle -> bundle.revisions == parsedInput;
             case IS_GREATER_THAN -> bundle -> bundle.revisions > parsedInput;
             case IS_LESS_THAN -> bundle -> bundle.revisions < parsedInput;
-            default -> throw new RuntimeException("does not match any matching case");
+            default -> throw new VerifyException("no matching case found");
         };
     }
 
