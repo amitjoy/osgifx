@@ -21,8 +21,6 @@ import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
@@ -53,6 +51,7 @@ import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 import javafx.collections.FXCollections;
@@ -78,6 +77,8 @@ public final class HealthCheckFxController {
     @Log
     @Inject
     private FluentLogger          logger;
+    @Inject
+    private Executor              executor;
     @FXML
     private SegmentedButton       hcTypeButton;
     @FXML
@@ -107,7 +108,6 @@ public final class HealthCheckFxController {
     @Named("is_snapshot_agent")
     private boolean               isSnapshotAgent;
     private MaskerPane            progressPane;
-    private ExecutorService       executor;
     private Future<?>             hcExecFuture;
     private Subscription          subscription;
 
@@ -115,7 +115,6 @@ public final class HealthCheckFxController {
     public void initialize() {
         try {
             initHcList();
-            executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "hc-executor"));
             progressPane = new MaskerPane();
             logger.atDebug().log("FXML controller has been initialized");
             initHcTypeButton();
@@ -191,7 +190,6 @@ public final class HealthCheckFxController {
 
     @PreDestroy
     public void destroy() {
-        executor.shutdownNow();
         subscription.dispose();
     }
 
@@ -320,7 +318,7 @@ public final class HealthCheckFxController {
         if (hcExecFuture != null) {
             hcExecFuture.cancel(true);
         }
-        hcExecFuture = executor.submit(task);
+        hcExecFuture = executor.runAsync(task);
     }
 
     @FXML
