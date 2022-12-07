@@ -32,7 +32,7 @@ sonatype.url.staging                  =         ${sonatype.url}/service/local/st
                                                   password=${env;SONATYPE_PASSWORD;},\
                                                 -bnd
 
-efxclipse.version                     =         3.8.0
+efxclipse.version                     =         3.9.0
 efxclipse.url                         =         https://download.eclipse.org/efxclipse/runtime-released/${efxclipse.version}/site/repository.xml.gz
 
 bin.directory                         =         ${if;${is;${driver};gradle};target/gradle/classes;target/classes}
