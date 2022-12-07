@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Component;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.model.validators.Validator;
 import com.google.common.base.Predicates;
+import com.google.common.base.VerifyException;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -44,7 +45,7 @@ public final class ServiceSearchFilterByType implements SearchFilter {
                     .anyMatch(s -> StringUtils.equalsIgnoreCase(s, input.strip()));
             case CONTAINS -> service -> service.types.stream()
                     .anyMatch(s -> StringUtils.containsIgnoreCase(s, input.strip()));
-            default -> throw new RuntimeException("does not match any matching case");
+            default -> throw new VerifyException("no matching case found");
         };
     }
 

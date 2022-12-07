@@ -21,6 +21,7 @@ import static org.osgi.service.component.annotations.ReferenceCardinality.OPTION
 
 import java.util.Optional;
 
+import org.eclipse.fx.core.ExceptionUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.application.ApplicationDescriptor;
@@ -61,7 +62,7 @@ public final class Launcher implements Runnable {
             handle.getExitValue(0);
         } catch (final ApplicationException e) {
             logger.atError().withException(e).log(Optional.ofNullable(e.getMessage()).orElse(""));
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         } catch (final InterruptedException e) {
             logger.atError().withException(e).log(Optional.ofNullable(e.getMessage()).orElse(""));
             Thread.currentThread().interrupt();

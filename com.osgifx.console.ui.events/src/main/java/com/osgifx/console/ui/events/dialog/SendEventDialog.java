@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.dialog;
 
+import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
@@ -138,9 +139,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                 return null;
             }
             try {
-                if (validationSupport.isInvalid()) {
-                    throw new RuntimeException("Topic validation failed");
-                }
+                verify(!validationSupport.isInvalid(), "Topic validation failed");
                 return data == ButtonData.OK_DONE ? getInput(txtTopic, isSyncToggle) : null;
             } catch (final Exception e) {
                 logger.atError().withException(e).log("Configuration values cannot be converted");

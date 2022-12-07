@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.roles.dialog;
 
+import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import javax.inject.Inject;
@@ -109,25 +110,7 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
             final var data = param == null ? null : param.getButtonData();
             try {
                 if (data == ButtonData.OK_DONE) {
-                    if (validationSupport.isInvalid()) {
-                        throw new RuntimeException("Role name validation failed");
-                    }
-                    return getInput(dropdownRoleType.getValue(), txtRoleName.getText());
-                }
-                return null;
-            } catch (final Exception e) {
-                logger.atError().withException(e).log("Role cannot be created");
-                throw e;
-            }
-        });
-
-        setResultConverter(dialogButton -> {
-            final var data = dialogButton == null ? null : dialogButton.getButtonData();
-            try {
-                if (data == ButtonData.OK_DONE) {
-                    if (validationSupport.isInvalid()) {
-                        throw new RuntimeException("Role name validation failed");
-                    }
+                    verify(!validationSupport.isInvalid(), "Role name validation failed");
                     return getInput(dropdownRoleType.getValue(), txtRoleName.getText());
                 }
                 return null;
@@ -140,9 +123,7 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
 
     private RoleDTO getInput(final Object roleType, final String roleName) {
         final var type = EnumUtils.getEnumIgnoreCase(XRoleDTO.Type.class, roleType.toString());
-        if (type == null) {
-            throw new RuntimeException("Role type cannot be mapped to any existing type");
-        }
+        verify(type != null, "Role type cannot be mapped to any existing type");
         return new RoleDTO(roleName, type);
     }
 

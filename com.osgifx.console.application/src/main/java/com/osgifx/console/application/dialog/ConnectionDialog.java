@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
+import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
 import javax.inject.Inject;
@@ -166,10 +167,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             final var p = Ints.tryParse(port.getText());
             final var t = Ints.tryParse(timeout.getText());
 
-            if (p == null || t == null) {
-                logger.atError().log("Connection settings cannot be added due to validation problem");
-                throw new RuntimeException("Port and Host formats are not compliant");
-            }
+            verify(p != null && t != null, "Port and Host formats are not compliant");
             return dialogButton == saveButtonType
                     ? new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
                             trustStorePassword.getText())

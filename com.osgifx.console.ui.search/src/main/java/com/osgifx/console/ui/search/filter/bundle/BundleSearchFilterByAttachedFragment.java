@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Component;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.model.validators.Validator;
 import com.google.common.base.Predicates;
+import com.google.common.base.VerifyException;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -44,7 +45,7 @@ public final class BundleSearchFilterByAttachedFragment implements SearchFilter 
                     .anyMatch(h -> StringUtils.equalsIgnoreCase(h.symbolicName, input.strip()));
             case CONTAINS -> bundle -> bundle.fragmentsAttached.stream()
                     .anyMatch(h -> StringUtils.containsIgnoreCase(h.symbolicName, input.strip()));
-            default -> throw new RuntimeException("does not match any matching case");
+            default -> throw new VerifyException("no matching case found");
         };
     }
 
