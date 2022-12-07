@@ -1,4 +1,5 @@
--buildpath : org.apache.felix.converter,\
+-buildpath : org.apache.commons.lang3,\
+             org.apache.felix.converter,\
              org.eclipse.fx.core,\
              com.google.guava,\
              controlsfx
