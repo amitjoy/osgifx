@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1668298636124">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1670251783929">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="license" value="http://www.eclipse.org/legal/epl-2.0, https://www.gnu.org/software/classpath/license.html"/>
@@ -4140,55 +4140,55 @@
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.enum"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.enum"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.enums"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.enums"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.builder"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.builder"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.time"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.time"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.exception"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.exception"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.mutable"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.mutable"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.text"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.text"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.reflect"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.reflect"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
       <attribute name="bundle-symbolic-name" value="com.osgifx.console.runtime"/>
       <attribute name="bundle-version" value="0.0.0" type="Version"/>
-      <attribute name="osgi.wiring.package" value="org.apache.commons.lang3.math"/>
+      <attribute name="osgi.wiring.package" value="org.apache.commons.lang.math"/>
       <attribute name="version" value="2.6.0" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.package">
@@ -7681,31 +7681,31 @@
     <capability namespace="osgi.contract">
       <directive name="uses" value="javax.json,javax.json.spi,javax.json.stream"/>
       <attribute name="osgi.contract" value="JavaJSONP"/>
-      <attribute name="version" value="1.1.0,1.0.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.1.0" type="Version"/>
     </capability>
     <capability namespace="osgi.ee">
       <attribute name="osgi.ee" value="OSGi/Minimum"/>
-      <attribute name="version" value="1.0.0,1.1.0,1.2.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.ee">
       <attribute name="osgi.ee" value="JRE"/>
-      <attribute name="version" value="1.0.0,1.1.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.ee">
       <attribute name="osgi.ee" value="JavaSE"/>
-      <attribute name="version" value="1.0.0,1.1.0,1.2.0,1.3.0,1.4.0,1.5.0,1.6.0,1.7.0,1.8.0,9.0.0,10.0.0,11.0.0,12.0.0,13.0.0,14.0.0,15.0.0,16.0.0,17.0.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.0.0" type="Version"/>
     </capability>
     <capability namespace="osgi.ee">
       <attribute name="osgi.ee" value="JavaSE/compact1"/>
-      <attribute name="version" value="1.8.0,9.0.0,10.0.0,11.0.0,12.0.0,13.0.0,14.0.0,15.0.0,16.0.0,17.0.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.8.0" type="Version"/>
     </capability>
     <capability namespace="osgi.ee">
       <attribute name="osgi.ee" value="JavaSE/compact2"/>
-      <attribute name="version" value="1.8.0,9.0.0,10.0.0,11.0.0,12.0.0,13.0.0,14.0.0,15.0.0,16.0.0,17.0.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.8.0" type="Version"/>
     </capability>
     <capability namespace="osgi.ee">
       <attribute name="osgi.ee" value="JavaSE/compact3"/>
-      <attribute name="version" value="1.8.0,9.0.0,10.0.0,11.0.0,12.0.0,13.0.0,14.0.0,15.0.0,16.0.0,17.0.0" type="List&lt;Version&gt;"/>
+      <attribute name="version" value="1.8.0" type="Version"/>
     </capability>
     <capability namespace="osgi.extender">
       <attribute name="osgi.extender" value="osgi.configurator"/>
