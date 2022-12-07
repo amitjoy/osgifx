@@ -12,7 +12,6 @@ bundles.console: \
                  org.eclipse.equinox.console
 
 bundles.deps: \
-                 com.ibm.icu.base,\
                  javax.annotation,\
                  javax.inject,\
                  javax.xml.jre,\
