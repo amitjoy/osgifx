@@ -29,6 +29,7 @@ import org.osgi.service.component.annotations.Component;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.model.validators.Validator;
 import com.google.common.base.Predicates;
+import com.google.common.base.VerifyException;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -44,7 +45,7 @@ public final class ComponentSearchFilterByPID implements SearchFilter {
                     .anyMatch(pid -> StringUtils.equalsIgnoreCase(pid, input.strip()));
             case CONTAINS -> component -> component.configurationPid.stream()
                     .anyMatch(pid -> StringUtils.containsIgnoreCase(pid, input.strip()));
-            default -> throw new RuntimeException("does not match any matching case");
+            default -> throw new VerifyException("no matching case found");
         };
     }
 

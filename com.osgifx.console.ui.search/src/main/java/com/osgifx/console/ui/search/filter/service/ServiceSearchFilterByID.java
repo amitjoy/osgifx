@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.base.VerifyException;
 import com.google.common.primitives.Longs;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
@@ -44,7 +45,7 @@ public final class ServiceSearchFilterByID implements SearchFilter {
             case EQUALS_TO -> service -> service.id == serviceId;
             case IS_GREATER_THAN -> service -> service.id > serviceId;
             case IS_LESS_THAN -> service -> service.id < serviceId;
-            default -> throw new RuntimeException("does not match any matching case");
+            default -> throw new VerifyException("no matching case found");
         };
     }
 

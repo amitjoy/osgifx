@@ -26,6 +26,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.fx.core.ExceptionUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.resource.Resource;
@@ -100,7 +101,7 @@ public final class GenerateObrHandler {
             builder.addRequirements(bundle.bundleRevision.requirements);
             return builder.build();
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         }
 
     }
