@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.batchinstall.dialog;
 
+import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.agent.dto.XResultDTO.ERROR;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
@@ -151,9 +152,8 @@ public final class ArtifactInstaller {
     private static String readAttributeFromManifest(final File jarResource, final String attribute) throws Exception {
         try (var is = new FileInputStream(jarResource); var jarStream = new JarInputStream(is);) {
             final var manifest = jarStream.getManifest();
-            if (manifest == null) {
-                throw new RuntimeException(jarResource + " is not a valid JAR");
-            }
+            verify(manifest != null, jarResource + " is not a valid JAR");
+
             final var value = manifest.getMainAttributes().getValue(attribute);
             if (value.contains(";")) {
                 return value.split(";")[0];

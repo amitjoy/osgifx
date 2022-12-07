@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.model.validators.Validator;
 import com.google.common.base.Splitter;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.Iterables;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
@@ -47,7 +48,7 @@ public final class ComponentSearchFilterByProperty implements SearchFilter {
                 }
                 return false;
             };
-            default -> throw new RuntimeException("does not match any matching case");
+            default -> throw new VerifyException("no matching case found");
         };
     }
 

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.fx.core.ExceptionUtils;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 import org.osgi.service.component.annotations.Activate;
@@ -76,7 +77,7 @@ public final class SnapshotAgent implements Agent {
             final var reader = new JsonReader(new FileReader(configuration.location()));
             snapshotDTO = gson.fromJson(reader, SnapshotDTO.class);
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         }
     }
 
