@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events.dialog;
 
+import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
 
@@ -100,9 +101,7 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
             }
             try {
                 if (data == ButtonData.OK_DONE) {
-                    if (validationSupport.isInvalid()) {
-                        throw new RuntimeException("Topic validation failed");
-                    }
+                    verify(!validationSupport.isInvalid(), "Topic validation failed");
                     return getInput();
                 }
                 return null;

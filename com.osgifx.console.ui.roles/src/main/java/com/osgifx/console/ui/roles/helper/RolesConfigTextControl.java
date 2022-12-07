@@ -20,6 +20,7 @@ import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.C
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.fx.core.ExceptionUtils;
 
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
@@ -78,7 +79,7 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
             try {
                 editableArea.setSkin(new TextAreaMaskSkin(editableArea));
             } catch (final Exception e) {
-                throw new RuntimeException(e);
+                throw ExceptionUtils.wrap(e);
             }
         }
 

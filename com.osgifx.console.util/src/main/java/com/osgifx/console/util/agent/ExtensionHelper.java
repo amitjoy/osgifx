@@ -17,6 +17,7 @@ package com.osgifx.console.util.agent;
 
 import java.util.Map;
 
+import org.eclipse.fx.core.ExceptionUtils;
 import org.osgi.dto.DTO;
 import org.osgi.util.converter.Converters;
 import org.osgi.util.converter.TypeReference;
@@ -41,7 +42,7 @@ public final class ExtensionHelper {
             final var                 executeExtension = agent.executeExtension(name, properties);
             return converter.convert(executeExtension).to(resultType);
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         }
     }
 
