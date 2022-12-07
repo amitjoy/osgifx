@@ -23,12 +23,9 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,6 +44,7 @@ import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
 import com.osgifx.console.smartgraph.graphview.SmartGraphPanel;
 import com.osgifx.console.smartgraph.graphview.SmartPlacementStrategy;
@@ -73,6 +71,8 @@ public final class GraphFxBundleController implements GraphController {
     @Log
     @Inject
     private FluentLogger              logger;
+    @Inject
+    private Executor                  executor;
     @FXML
     private SegmentedButton           strategyButton;
     @FXML
@@ -95,7 +95,6 @@ public final class GraphFxBundleController implements GraphController {
     private RuntimeBundleGraph        runtimeGraph;
     private MaskerPane                progressPane;
     private FxBundleGraph             fxGraph;
-    private ExecutorService           executor;
     private Future<?>                 graphGenFuture;
 
     @FXML
@@ -103,7 +102,6 @@ public final class GraphFxBundleController implements GraphController {
         try {
             addExportToDotContextMenu();
             initBundlesList();
-            executor     = Executors.newSingleThreadExecutor(r -> new Thread(r, "graph-gen-bundle"));
             progressPane = new MaskerPane();
             initStrategyButton();
             initWiringSelection();
@@ -136,11 +134,6 @@ public final class GraphFxBundleController implements GraphController {
     private void initWiringSelection() {
         wiringSelection.getItems().addAll("Find all bundles that are required by", "Find all bundles that require");
         wiringSelection.getSelectionModel().select(0);
-    }
-
-    @PreDestroy
-    public void destroy() {
-        executor.shutdownNow();
     }
 
     private void addExportToDotContextMenu() {
@@ -246,7 +239,7 @@ public final class GraphFxBundleController implements GraphController {
         if (graphGenFuture != null) {
             graphGenFuture.cancel(true);
         }
-        graphGenFuture = executor.submit(task);
+        graphGenFuture = executor.runAsync(task);
     }
 
     @FXML
