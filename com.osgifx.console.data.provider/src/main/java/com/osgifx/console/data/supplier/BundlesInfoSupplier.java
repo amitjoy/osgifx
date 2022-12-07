@@ -24,8 +24,6 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -53,7 +51,7 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
 
     @Reference
     private LoggerFactory       factory;
-    @Inject
+    @Reference
     private Executor            executor;
     @Reference
     private EventAdmin          eventAdmin;

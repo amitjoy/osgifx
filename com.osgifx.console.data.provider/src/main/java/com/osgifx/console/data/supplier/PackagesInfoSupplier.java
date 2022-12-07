@@ -26,8 +26,6 @@ import static org.osgi.service.component.annotations.ReferencePolicyOption.GREED
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -60,7 +58,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
 
     @Reference
     private LoggerFactory       factory;
-    @Inject
+    @Reference
     private Executor            executor;
     @Reference
     private EventAdmin          eventAdmin;

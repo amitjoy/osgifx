@@ -41,8 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.ServiceReference;
@@ -80,7 +78,7 @@ public final class RuntimeDataProvider implements DataProvider {
 
     @Reference
     private LoggerFactory       factory;
-    @Inject
+    @Reference
     private Executor            executor;
     @Reference
     private EventAdmin          eventAdmin;
