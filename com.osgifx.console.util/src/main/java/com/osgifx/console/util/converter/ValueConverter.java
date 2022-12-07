@@ -16,15 +16,20 @@
 package com.osgifx.console.util.converter;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.CharUtils;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.ConverterBuilder;
 import org.osgi.util.converter.Converters;
 import org.osgi.util.converter.Rule;
 import org.osgi.util.converter.TypeReference;
 
+import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 
 public final class ValueConverter {
@@ -44,9 +49,11 @@ public final class ValueConverter {
         });
         cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
         });
-        cb.rule(new Rule<String, int[]>(v -> Stream.of(v.split(",")).mapToInt(Integer::parseInt).toArray()) {
+        cb.rule(new Rule<String, int[]>(
+                v -> Stream.of(v.split(",")).mapToInt(Ints::tryParse).filter(Objects::nonNull).toArray()) {
         });
-        cb.rule(new Rule<String, List<Integer>>(v -> Stream.of(v.split(",")).map(Integer::parseInt).toList()) {
+        cb.rule(new Rule<String, List<Integer>>(
+                v -> Stream.of(v.split(",")).map(Ints::tryParse).filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, boolean[]>(v -> {
             final var split = v.split(",");
@@ -60,16 +67,19 @@ public final class ValueConverter {
         });
         cb.rule(new Rule<String, List<Boolean>>(v -> Stream.of(v.split(",")).map(Boolean::parseBoolean).toList()) {
         });
-        cb.rule(new Rule<String, double[]>(v -> Stream.of(v.split(",")).mapToDouble(Double::parseDouble).toArray()) {
+        cb.rule(new Rule<String, double[]>(
+                v -> Stream.of(v.split(",")).mapToDouble(Doubles::tryParse).filter(Objects::nonNull).toArray()) {
         });
-        cb.rule(new Rule<String, List<Double>>(v -> Stream.of(v.split(",")).map(Double::parseDouble).toList()) {
+        cb.rule(new Rule<String, List<Double>>(
+                v -> Stream.of(v.split(",")).map(Doubles::tryParse).filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, float[]>(v -> {
-            final var elements = Stream.of(v.split(",")).map(Double::parseDouble).toList();
+            final var elements = Stream.of(v.split(",")).map(Doubles::tryParse).filter(Objects::nonNull).toList();
             return Floats.toArray(elements);
         }) {
         });
-        cb.rule(new Rule<String, List<Float>>(v -> Stream.of(v.split(",")).map(Float::parseFloat).toList()) {
+        cb.rule(new Rule<String, List<Float>>(
+                v -> Stream.of(v.split(",")).map(Floats::tryParse).filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, char[]>(v -> {
             final var split = v.split(",");
@@ -81,11 +91,13 @@ public final class ValueConverter {
             return array;
         }) {
         });
-        cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(",")).map(e -> e.charAt(0)).toList()) {
+        cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(",")).map(CharUtils::toChar).toList()) {
         });
-        cb.rule(new Rule<String, long[]>(v -> Stream.of(v.split(",")).mapToLong(Long::parseLong).toArray()) {
+        cb.rule(new Rule<String, long[]>(
+                v -> Stream.of(v.split(",")).mapToLong(Longs::tryParse).filter(Objects::nonNull).toArray()) {
         });
-        cb.rule(new Rule<String, List<Long>>(v -> Stream.of(v.split(",")).map(Long::parseLong).toList()) {
+        cb.rule(new Rule<String, List<Long>>(
+                v -> Stream.of(v.split(",")).map(Longs::tryParse).filter(Objects::nonNull).toList()) {
         });
     }
 
