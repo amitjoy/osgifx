@@ -116,8 +116,7 @@ public final class ConfigurationEditorFxController {
         final var pid = config.pid;
         final var ocd = config.ocd;
 
-        deleteConfigButton
-                .setDisable(isSnapshotAgent || config.properties == null || config.isFactory || config.pid == null);
+        deleteConfigButton.setDisable(isSnapshotAgent || config.location == null || config.isFactory);
         deleteConfigButton.setOnAction(event -> {
             logger.atInfo().log("Configuration delete request has been sent for PID '%s'", pid);
             deleteConfiguration(pid);
@@ -140,16 +139,13 @@ public final class ConfigurationEditorFxController {
             logger.atInfo().log("Configuration create request has been sent for PID '%s'", effectivePID);
             createOrUpdateConfiguration(effectivePID, properties);
         });
-        cancelButton.setDisable(isSnapshotAgent);
         cancelButton.setOnAction(e -> form.reset());
 
-        final BooleanProperty isSnapshot               = new SimpleBooleanProperty(isSnapshotAgent);
-        final BooleanProperty isPersisted              = new SimpleBooleanProperty(config.isPersisted);
-        final var             isPersistedConfigBinding = new When(isPersisted).then(true).otherwise(false);
-        final var             isSnapshotBinding        = new When(isSnapshot).then(true).otherwise(false);
+        final BooleanProperty isSnapshot        = new SimpleBooleanProperty(isSnapshotAgent);
+        final var             isSnapshotBinding = new When(isSnapshot).then(true).otherwise(false);
 
-        saveConfigButton.disableProperty().bind(isSnapshotBinding
-                .or(form.changedProperty().not().or(form.validProperty().not()).and(isPersistedConfigBinding)));
+        cancelButton.disableProperty().bind(isSnapshotBinding.or(form.changedProperty().not()));
+        saveConfigButton.disableProperty().bind(isSnapshotBinding.or(form.validProperty().not()));
     }
 
     private void deleteConfiguration(final String pid) {
