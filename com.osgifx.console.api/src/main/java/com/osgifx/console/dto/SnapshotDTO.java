@@ -39,7 +39,7 @@ public class SnapshotDTO extends DTO {
 
     public List<XBundleDTO>              bundles;
     public List<XComponentDTO>           components;
-    public List<XConfigurationDTO>       configuations;
+    public List<XConfigurationDTO>       configurations;
     public List<XPropertyDTO>            properties;
     public List<XServiceDTO>             services;
     public List<XThreadDTO>              threads;

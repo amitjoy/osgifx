@@ -27,7 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-public class PeekablePasswordControl extends SimpleControl<PasswordField> {
+public final class PeekablePasswordControl extends SimpleControl<PasswordField> {
 
     /**
      * This StackPane is needed for achieving the readonly effect by putting the
@@ -128,9 +128,7 @@ public class PeekablePasswordControl extends SimpleControl<PasswordField> {
     @Override
     public void setupValueChangedListeners() {
         super.setupValueChangedListeners();
-
         field.errorMessagesProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-
         editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
     }
 

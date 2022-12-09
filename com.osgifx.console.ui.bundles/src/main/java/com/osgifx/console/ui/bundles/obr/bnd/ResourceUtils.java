@@ -62,7 +62,7 @@ import aQute.lib.converter.Converter;
 import aQute.lib.filter.Filter;
 import aQute.lib.strings.Strings;
 
-public class ResourceUtils {
+public final class ResourceUtils {
 
     public static final String CONTENT_NAMESPACE        = "osgi.content";
     public static final String CAPABILITY_URL_ATTRIBUTE = "url";
@@ -232,7 +232,7 @@ public class ResourceUtils {
         return null;
     }
 
-    public static final Version getVersion(final Capability cap) {
+    public static Version getVersion(final Capability cap) {
         final var attr = getVersionAttributeForNamespace(cap.getNamespace());
         if (attr == null) {
             return null;
@@ -246,16 +246,13 @@ public class ResourceUtils {
         if (uriObj == null) {
             return null;
         }
-
         if (uriObj instanceof final URI uri) {
             return uri;
         }
-
         try {
             if (uriObj instanceof final URL url) {
                 return url.toURI();
             }
-
             if (uriObj instanceof final String uri) {
                 try {
                     final var url = new URL(uri);

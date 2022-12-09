@@ -56,6 +56,7 @@ public final class AgentConnectedAddon {
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event has been received");
         final Task<Void> dataRetrievalTask = new Task<>() {
+
             @Override
             protected Void call() throws Exception {
                 // we always load all the data when agent gets connected

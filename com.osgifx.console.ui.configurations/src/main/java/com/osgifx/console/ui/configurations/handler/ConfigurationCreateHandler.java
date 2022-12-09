@@ -70,6 +70,7 @@ public final class ConfigurationCreateHandler {
         final var configuration = dialog.showAndWait();
         if (configuration.isPresent()) {
             final Task<Void> createTask = new Task<>() {
+                
                 @Override
                 protected Void call() throws Exception {
                     try {

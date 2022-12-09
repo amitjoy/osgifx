@@ -101,7 +101,6 @@ public final class RuntimeComponentGraph {
 
     private Graph<ComponentVertex, DefaultEdge> buildGraph(final List<XComponentDTO> components) {
         final List<Entry<XComponentDTO, XComponentDTO>> edges = Lists.newArrayList();
-
         prepareEdges(components, edges);
 
         final Graph<ComponentVertex, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);

@@ -60,6 +60,7 @@ public final class ExtensionInstallHandler {
 
         if (deploymentPackage != null) {
             final Task<Void> task = new Task<>() {
+
                 @Override
                 protected Void call() throws Exception {
                     try (var is = new FileInputStream(deploymentPackage)) {

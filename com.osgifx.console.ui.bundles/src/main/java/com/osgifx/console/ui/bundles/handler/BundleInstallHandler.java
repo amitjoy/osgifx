@@ -72,6 +72,7 @@ public final class BundleInstallHandler {
         final var remoteInstall = dialog.showAndWait();
         if (remoteInstall.isPresent()) {
             final Task<Void> installTask = new Task<>() {
+
                 @Override
                 protected Void call() throws Exception {
                     try {
@@ -83,11 +84,7 @@ public final class BundleInstallHandler {
                         }
                         logger.atInfo().log("Selected file to install or update as bundle: %s", file);
 
-                        final var agent = supervisor.getAgent();
-                        if (agent == null) {
-                            logger.atWarning().log("Remote agent cannot be connected");
-                            return null;
-                        }
+                        final var agent  = supervisor.getAgent();
                         final var bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
                         if (bundle == null) {
                             logger.atError().log("Bundle cannot be installed or updated");

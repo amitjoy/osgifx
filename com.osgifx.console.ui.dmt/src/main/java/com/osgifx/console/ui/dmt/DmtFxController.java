@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.dmt;
 
 import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.Map;
 
@@ -33,7 +32,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
@@ -50,7 +48,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class DmtFxController {
 
     private static final String ROOT_DMT_NODE = ".";
@@ -141,6 +138,7 @@ public final class DmtFxController {
     private void addDoubleClickEvent() {
         if (!isSnapshotAgent) {
             dmtTree.setOnMouseClicked(mouseEvent -> {
+                // double click
                 if (mouseEvent.getClickCount() == 2) {
                     final var item = dmtTree.getSelectionModel().getSelectedItem();
                     final var node = items.get(item);
@@ -171,7 +169,7 @@ public final class DmtFxController {
         }
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atError().log("Remote agent is not connected");
+            logger.atError().log("Agent is not connected");
             return;
         }
         final var dto          = result.get();

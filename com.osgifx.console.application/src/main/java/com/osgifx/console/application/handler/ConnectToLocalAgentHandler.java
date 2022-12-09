@@ -91,6 +91,7 @@ public final class ConnectToLocalAgentHandler {
     @Execute
     public void execute() {
         final Task<Void> connectTask = new Task<>() {
+
             @Override
             protected Void call() throws Exception {
                 try {

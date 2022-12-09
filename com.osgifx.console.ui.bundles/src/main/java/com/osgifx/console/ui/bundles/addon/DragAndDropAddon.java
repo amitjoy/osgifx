@@ -100,12 +100,13 @@ public final class DragAndDropAddon {
                 success = true;
                 // only get the first file from the list
                 final var file = db.getFiles().get(0);
-                FxDialog.showConfirmationDialog("Bundle Installation", "Do you want to install " + file.getName(),
+                FxDialog.showConfirmationDialog("Bundle Installation", "Do you want to install " + file.getName() + "?",
                         getClass().getClassLoader(), type -> {
                             if (type == ButtonType.CANCEL) {
                                 return;
                             }
                             final Task<Void> installTask = new Task<>() {
+
                                 @Override
                                 protected Void call() throws Exception {
                                     try {
@@ -129,7 +130,6 @@ public final class DragAndDropAddon {
                             };
                             executor.runAsync(installTask);
                         });
-
             }
             event.setDropCompleted(success);
             event.consume();

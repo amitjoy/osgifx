@@ -22,7 +22,6 @@ import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
@@ -150,21 +149,19 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
     private EventDTO getInput(final CustomTextField txtTopic, final ToggleSwitch isSyncToggle) {
         final List<ConfigValue> properties = Lists.newArrayList();
-        for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : entries
-                .entrySet()) {
-            final var value       = entry.getValue();
-            final var configKey   = value.value1.get();
-            final var configValue = value.value2.get();
-            var       configType  = value.value3.get();
+        entries.forEach((k, v) -> {
+            final var configKey   = v.value1.get();
+            final var configValue = v.value2.get();
+            var       configType  = v.value3.get();
             if (Strings.isNullOrEmpty(configKey) || Strings.isNullOrEmpty(configValue)) {
-                continue;
+                return;
             }
             if (configType == null) {
                 configType = XAttributeDefType.STRING;
             }
             final var convertedValue = converter.convert(configValue, configType);
             properties.add(ConfigValue.create(configKey, convertedValue, configType));
-        }
+        });
         return new EventDTO(txtTopic.getText(), isSyncToggle.isSelected(), properties);
     }
 

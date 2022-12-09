@@ -77,10 +77,16 @@ public final class AboutApplicationDialogController {
         final var javaVersion   = Runtime.version().toString();
         final var javafxVersion = String.valueOf(SystemUtils.getMajorFXVersion());
 
-        final Map<String, String> substitutors = Map.of("appVersion", appVersion, "appLink", appLink, "javaVersion",
-                javaVersion, "javafxVersion", javafxVersion);
-        final var                 substitution = new StringSubstitutor(substitutors);
+        // @formatter:off
+        final Map<String, String> substitutors =
+                Map.of(
+                      "appVersion", appVersion,
+                      "appLink", appLink,
+                      "javaVersion", javaVersion,
+                      "javafxVersion", javafxVersion);
+        // @formatter:on
 
+        final var substitution = new StringSubstitutor(substitutors);
         return substitution.replace(input);
     }
 

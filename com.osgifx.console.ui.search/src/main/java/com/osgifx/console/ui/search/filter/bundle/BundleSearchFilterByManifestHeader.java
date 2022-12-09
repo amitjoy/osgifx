@@ -30,6 +30,7 @@ import com.dlsc.formsfx.model.validators.Validator;
 import com.google.common.base.Splitter;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.Iterables;
+import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -40,15 +41,15 @@ public final class BundleSearchFilterByManifestHeader implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) {
-        final var split = input.strip().split("=");
+        final var split       = Splitter.on("=").splitToList(input.strip());
+        final var headerKey   = split.get(0);
+        final var headerValue = split.get(1);
+
         return switch (searchOperation) {
-            case EQUALS_TO -> bundle -> {
-                final var manifestHeaders = bundle.manifestHeaders;
-                if (manifestHeaders.containsKey(split[0])) {
-                    return StringUtils.equals(manifestHeaders.get(split[0]), split[1]);
-                }
-                return false;
-            };
+            case EQUALS_TO -> bundle -> //
+                BiStream.from(bundle.manifestHeaders) //
+                        .anyMatch((k, v) -> //
+                StringUtils.equalsIgnoreCase(k, headerKey) && StringUtils.equalsIgnoreCase(v, headerValue));
             default -> throw new VerifyException("no matching case found");
         };
     }
@@ -65,7 +66,7 @@ public final class BundleSearchFilterByManifestHeader implements SearchFilter {
 
     @Override
     public String placeholder() {
-        return "HeaderName=HeaderValue Format (Case-Sensitive)";
+        return "HeaderName=HeaderValue Format (Case-Insensitive)";
     }
 
     @Override

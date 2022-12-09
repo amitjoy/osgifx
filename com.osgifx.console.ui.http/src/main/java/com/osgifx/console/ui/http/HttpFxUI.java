@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.http;
 
+import static com.osgifx.console.constants.FxConstants.ROOT_FXML;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
@@ -114,7 +115,7 @@ public final class HttpFxUI {
 
             @Override
             protected Void call() throws Exception {
-                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+                tabContent = Fx.loadFXML(loader, context, ROOT_FXML);
                 return null;
             }
 

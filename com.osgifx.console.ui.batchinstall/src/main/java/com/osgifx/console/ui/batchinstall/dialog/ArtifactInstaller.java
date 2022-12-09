@@ -76,9 +76,7 @@ public final class ArtifactInstaller {
             if (artifact.isConfiguration()) {
                 try {
                     final var pids = readConfigFile(artifact.file());
-                    for (final ConfigDTO config : pids) {
-                        configs.put(config.pid, config.properties);
-                    }
+                    pids.forEach(c -> configs.put(c.pid, c.properties));
                 } catch (final Exception e) {
                     threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
                     return null;

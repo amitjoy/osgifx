@@ -428,8 +428,8 @@ public final class OverviewFxUI {
      */
     @Inject
     @Optional
-    private void updateOnDataRetrivedEvent(@UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data,
-                                           final BorderPane parent) {
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data,
+                                            final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
         createTiles(parent);
     }
