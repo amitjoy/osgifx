@@ -55,11 +55,8 @@ public final class BundleStopHandler {
 
     @Execute
     public void execute(@Named("id") final String id) {
-        if (!isConnected) {
-            logger.atWarning().log("Remote agent cannot be connected");
-            return;
-        }
         final Task<Void> stopTask = new Task<>() {
+
             @Override
             protected Void call() throws Exception {
                 try {

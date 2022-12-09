@@ -22,7 +22,7 @@ import org.osgi.dto.DTO;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 
-public final class PackageDTO extends DTO {
+public class PackageDTO extends DTO {
 
     public String           name;
     public String           version;

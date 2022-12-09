@@ -27,7 +27,11 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.util.fx.FxDialog;
+
 public final class OpenDiagnosticsHandler {
+
+    private static final String LOG_FILE_LOCATION_PROPERTY = "org.apache.sling.commons.log.file";
 
     @Log
     @Inject
@@ -39,10 +43,11 @@ public final class OpenDiagnosticsHandler {
     @Execute
     public void execute() {
         try {
-            Desktop.getDesktop()
-                    .open(new File(context.getProperty("org.apache.sling.commons.log.file")).getParentFile());
+            final var logFileDirectory = new File(context.getProperty(LOG_FILE_LOCATION_PROPERTY)).getParentFile();
+            Desktop.getDesktop().open(logFileDirectory);
             logger.atInfo().log("Diagnostics directory has been opened");
         } catch (final IOException e) {
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
             logger.atError().withException(e).log("Cannot open diagnostics directory");
         }
     }

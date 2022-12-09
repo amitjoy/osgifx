@@ -23,7 +23,6 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -31,6 +30,7 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XAttributeDefType;
@@ -76,8 +76,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
 
         content.getChildren().add(lbMessage);
         if (!Strings.isNullOrEmpty(textInput)) {
-            final var split = textInput.split(",");
-            Stream.of(split).forEach(e -> addFieldPair(content, targetType, e));
+            Splitter.on(",").split(textInput.strip()).forEach(e -> addFieldPair(content, targetType, e));
         } else {
             addFieldPair(content, targetType);
         }

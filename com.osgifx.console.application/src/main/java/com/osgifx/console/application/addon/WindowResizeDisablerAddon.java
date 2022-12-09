@@ -30,6 +30,8 @@ import javafx.stage.Stage;
 
 public final class WindowResizeDisablerAddon {
 
+    private static final String MAIN_WINDOW_ID = "com.osgifx.console.window.main";
+
     @Inject
     private MApplication  application;
     @Inject
@@ -39,7 +41,7 @@ public final class WindowResizeDisablerAddon {
     @Optional
     public void onActivate(@EventTopic(UIEvents.UILifeCycle.ACTIVATE) final Event event) {
         try {
-            final var window = (MWindow) modelService.find("com.osgifx.console.window.main", application);
+            final var window = (MWindow) modelService.find(MAIN_WINDOW_ID, application);
             final var stage  = (Stage) ((WWindow<?>) window.getWidget()).getWidget();
             stage.setResizable(false);
         } catch (final Exception e) {

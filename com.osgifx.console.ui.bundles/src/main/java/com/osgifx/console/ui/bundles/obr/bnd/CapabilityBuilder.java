@@ -18,7 +18,7 @@ package com.osgifx.console.ui.bundles.obr.bnd;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Resource;
 
-public class CapabilityBuilder extends CapReqBuilder {
+public final class CapabilityBuilder extends CapReqBuilder {
 
     public CapabilityBuilder(final Resource resource, final String namespace) {
         super(resource, namespace);

@@ -165,6 +165,7 @@ public final class ConnectToAgentHandler {
         }
         logger.atInfo().log("Selected connection: %s", selectedSettings);
         final Task<Void> connectTask = new Task<>() {
+
             @Override
             protected Void call() throws Exception {
                 try {
@@ -225,7 +226,7 @@ public final class ConnectToAgentHandler {
     }
 
     @Inject
-    @org.eclipse.e4.core.di.annotations.Optional
+    @Optional
     private void agentConnected(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event received");
         if (progressDialog != null) {

@@ -72,6 +72,7 @@ public final class RoleCreateHandler {
         final var role = dialog.showAndWait();
         if (role.isPresent()) {
             final Task<Void> createTask = new Task<>() {
+
                 @Override
                 protected Void call() throws Exception {
                     try {

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.components;
 
+import static com.osgifx.console.constants.FxConstants.ROOT_FXML;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_COMPONENT_FILTER_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
@@ -128,7 +129,7 @@ public final class ComponentsFxUI {
 
             @Override
             protected Void call() throws Exception {
-                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+                tabContent = Fx.loadFXML(loader, context, ROOT_FXML);
                 final var controller = (ComponentsFxController) loader.getController();
                 if (searchFilter != null) {
                     controller.onFilterUpdateEvent(searchFilter);

@@ -415,55 +415,48 @@ public final class ConfigurationEditorFxController {
                         XAttributeDefType.BOOLEAN_ARRAY);
                 break;
             case BOOLEAN_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, Boolean.class,
-                        XAttributeDefType.BOOLEAN_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.BOOLEAN_LIST);
                 break;
             case DOUBLE_ARRAY:
                 field = processArray(key, currentValue, defaultValue, options, hasOCD, double.class,
                         XAttributeDefType.DOUBLE_ARRAY);
                 break;
             case DOUBLE_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, Double.class,
-                        XAttributeDefType.DOUBLE_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.DOUBLE_LIST);
                 break;
             case LONG_ARRAY:
                 field = processArray(key, currentValue, defaultValue, options, hasOCD, long.class,
                         XAttributeDefType.LONG_ARRAY);
                 break;
             case LONG_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, Long.class,
-                        XAttributeDefType.LONG_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.LONG_LIST);
                 break;
             case INTEGER_ARRAY:
                 field = processArray(key, currentValue, defaultValue, options, hasOCD, int.class,
                         XAttributeDefType.INTEGER_ARRAY);
                 break;
             case INTEGER_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, Integer.class,
-                        XAttributeDefType.INTEGER_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.INTEGER_LIST);
                 break;
             case FLOAT_ARRAY:
                 field = processArray(key, currentValue, defaultValue, options, hasOCD, float.class,
                         XAttributeDefType.FLOAT_ARRAY);
                 break;
             case FLOAT_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, Float.class,
-                        XAttributeDefType.FLOAT_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.FLOAT_LIST);
                 break;
             case CHAR_ARRAY:
                 field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, CHAR_ARRAY);
                 break;
             case CHAR_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, Character.class,
-                        XAttributeDefType.CHAR_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.CHAR_LIST);
                 break;
             case STRING_ARRAY:
                 field = processArray(key, currentValue, defaultValue, options, hasOCD, String.class,
                         XAttributeDefType.STRING_ARRAY);
                 break;
             case STRING_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, String.class,
-                        XAttributeDefType.STRING_LIST);
+                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.STRING_LIST);
                 break;
             case STRING:
             default:
@@ -546,7 +539,6 @@ public final class ConfigurationEditorFxController {
                                      final List<String> defaultValue,
                                      final List<String> options,
                                      final boolean hasOCD,
-                                     final Class<T> clazz,
                                      final XAttributeDefType adType) {
         Field<?> field;
         if (hasOCD) {
