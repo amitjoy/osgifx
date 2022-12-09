@@ -79,14 +79,15 @@ bundles.required: \
                  ${bundles.deps},\
                  ${bundles.eclipse.core},\
                  ${bundles.slf4j},\
-                 org.apache.aries.component-dsl.component-dsl,\
                  com.google.guava,\
+                 org.apache.aries.component-dsl.component-dsl,\
                  org.apache.commons.lang3,\
                  org.apache.commons.commons-text,\
                  org.eclipse.equinox.preferences,\
                  controlsfx,\
                  javax.inject,\
-                 com.osgifx.console.util;version=snapshot,\
+                 com.osgifx.console.util,\
+                 com.osgifx.console.wrapper.mug,\
                  eu.hansolo.tilesfx,\
                  com.osgifx.console.wrapper.formsfx,\
                  org.apache.felix.dependencymanager

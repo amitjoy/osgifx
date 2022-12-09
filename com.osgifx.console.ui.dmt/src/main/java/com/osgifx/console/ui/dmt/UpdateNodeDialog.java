@@ -109,7 +109,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
 
     private FormRenderer createForm(final XDmtNodeDTO dmtNode) {
         final var type = dmtNode.format;
-        valueField = initNode(dmtNode);
+        initNode(dmtNode);
         if (valueField == null) {
             logger.atInfo().log("Value field is null for '%s'", dmtNode.uri);
             return null;
@@ -125,8 +125,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
         return renderer;
     }
 
-    private Field<?> initNode(final XDmtNodeDTO dmtNode) {
-        Field<?> valueField = null;
+    private void initNode(final XDmtNodeDTO dmtNode) {
         switch (dmtNode.format) {
             case STRING:
                 valueField = Field.ofStringType(dmtNode.value).required(true);
@@ -191,9 +190,8 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
                 break;
         }
         if (valueField != null) {
-            return valueField.label("Value");
+            valueField.label("Value");
         }
-        return null;
     }
 
     private <T> T convert(final String value, final Class<T> type) {

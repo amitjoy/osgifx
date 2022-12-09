@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.Focus;
@@ -37,7 +38,6 @@ import org.eclipse.fx.ui.di.FXMLLoader;
 import org.eclipse.fx.ui.di.FXMLLoaderFactory;
 import org.osgi.framework.BundleContext;
 
-import com.google.common.base.Enums;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
@@ -119,10 +119,10 @@ public final class GraphFxUI {
             threadSync.asyncExec(() -> FxDialog.showChoiceDialog("Select Graph Generation Type",
                     getClass().getClassLoader(), "/graphic/images/graph.png", strType -> {
                         final Task<Void> task = new Task<>() {
+
                             @Override
                             protected Void call() throws Exception {
-                                final var type = Enums.getIfPresent(GraphController.Type.class, strType.toUpperCase())
-                                        .or(GraphController.Type.BUNDLES);
+                                final var type = EnumUtils.getEnumIgnoreCase(GraphController.Type.class, strType);
                                 loadContent(type);
                                 return null;
                             }

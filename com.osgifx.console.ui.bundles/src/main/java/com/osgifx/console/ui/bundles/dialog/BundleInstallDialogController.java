@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.bundles.dialog;
 
 import java.io.File;
+import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
 
@@ -28,11 +29,11 @@ import com.google.common.primitives.Ints;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
@@ -125,11 +126,11 @@ public final class BundleInstallDialogController {
     }
 
     private void registerNumberValidationListener() {
-        startLevel.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                startLevel.setText(newValue.replaceAll("[^\\d]", ""));
-            }
-        });
+        final TextFormatter<?> integerFormatter = new TextFormatter<>(
+                (UnaryOperator<TextFormatter.Change>) change -> Ints.tryParse(change.getControlNewText()) != null
+                        ? change
+                        : null);
+        startLevel.setTextFormatter(integerFormatter);
     }
 
     public ObjectProperty<File> bundleProperty() {

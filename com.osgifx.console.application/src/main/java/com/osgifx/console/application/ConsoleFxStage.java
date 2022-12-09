@@ -87,6 +87,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
     public void start(final Stage initStage) throws Exception {
         this.initStage = initStage;
         final Task<Void> friendTask = new Task<>() {
+
             @Override
             protected Void call() throws InterruptedException {
                 updateMessage("Initializing Console . . .");
@@ -114,11 +115,10 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         e4Application.jfxStart(e4Application.getApplicationContext(), this, initStage);
     }
 
-    private void showSplash(final Stage initStage,
-                            final Task<?> task,
-                            final InitCompletionHandler initCompletionHandler) {
+    private void showSplash(final Stage initStage, final Task<?> task, final Runnable completionHandler) {
         progressText.textProperty().bind(task.messageProperty());
         loadProgress.progressProperty().bind(task.progressProperty());
+
         task.stateProperty().addListener((observableValue, oldState, newState) -> {
             if (newState == SUCCEEDED) {
                 loadProgress.progressProperty().unbind();
@@ -132,7 +132,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
                 fadeSplash.setOnFinished(actionEvent -> initStage.hide());
                 fadeSplash.play();
 
-                initCompletionHandler.complete();
+                completionHandler.run();
             }
         });
 
@@ -147,11 +147,6 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         initStage.initStyle(StageStyle.TRANSPARENT);
         initStage.setAlwaysOnTop(true);
         initStage.show();
-    }
-
-    @FunctionalInterface
-    public interface InitCompletionHandler {
-        void complete();
     }
 
 }

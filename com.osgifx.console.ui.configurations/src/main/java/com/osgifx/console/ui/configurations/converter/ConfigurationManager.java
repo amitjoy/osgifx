@@ -46,7 +46,7 @@ public final class ConfigurationManager {
     public boolean createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
         Agent agent = null;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return false;
         }
         final var result = agent.createOrUpdateConfiguration(pid, newProperties);
@@ -56,7 +56,7 @@ public final class ConfigurationManager {
     public boolean createFactoryConfiguration(final String factoryPid, final List<ConfigValue> newProperties) {
         Agent agent = null;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return false;
         }
         final var result = agent.createFactoryConfiguration(factoryPid, newProperties);

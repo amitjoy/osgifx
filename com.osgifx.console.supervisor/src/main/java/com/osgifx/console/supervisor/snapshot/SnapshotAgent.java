@@ -157,7 +157,7 @@ public final class SnapshotAgent implements Agent {
 
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
-        return snapshotDTO.configuations;
+        return snapshotDTO.configurations;
     }
 
     @Override

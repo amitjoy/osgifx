@@ -30,6 +30,7 @@ import com.dlsc.formsfx.model.validators.Validator;
 import com.google.common.base.Splitter;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.Iterables;
+import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
@@ -40,14 +41,15 @@ public final class ComponentSearchFilterByProperty implements SearchFilter {
 
     @Override
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation) {
-        final var split = input.strip().split("=");
+        final var split = Splitter.on("=").splitToList(input.strip());
+        final var key   = split.get(0);
+        final var value = split.get(1);
+
         return switch (searchOperation) {
-            case EQUALS_TO -> component -> {
-                if (component.properties.containsKey(split[0])) {
-                    return StringUtils.equals(component.properties.get(split[0]), split[1]);
-                }
-                return false;
-            };
+            case EQUALS_TO -> component -> //
+                BiStream.from(component.properties) //
+                        .anyMatch((k, v) -> //
+                StringUtils.equalsIgnoreCase(k, key) && StringUtils.equalsIgnoreCase(v, value));
             default -> throw new VerifyException("no matching case found");
         };
     }
@@ -64,7 +66,7 @@ public final class ComponentSearchFilterByProperty implements SearchFilter {
 
     @Override
     public String placeholder() {
-        return "PropertyName=PropertyValue Format (Case-Sensitive)";
+        return "PropertyName=PropertyValue Format (Case-Insensitive)";
     }
 
     @Override

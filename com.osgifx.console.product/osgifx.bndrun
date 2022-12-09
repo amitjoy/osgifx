@@ -114,6 +114,7 @@ install.order                     :   \
 	com.osgifx.console.ui.snapshot;version=snapshot;startlevel=10,\
 	com.osgifx.console.util;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=10,\
+	com.osgifx.console.wrapper.mug;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.tilesfx;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.toolbox;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.toolboxfx;version=snapshot;startlevel=10,\

@@ -75,7 +75,6 @@ public final class HttpDetailsFxController {
     }
 
     private List<Field<?>> initContextProperties(final XHttpComponentDTO httpComponent) {
-
         final Field<?> contextNameField      = Field.ofStringType(httpComponent.contextName).editable(false)
                 .label("Name");
         final Field<?> contextPathField      = Field.ofStringType(httpComponent.contextPath).editable(false)
