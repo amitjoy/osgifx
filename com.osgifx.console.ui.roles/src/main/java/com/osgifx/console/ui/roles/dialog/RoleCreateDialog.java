@@ -47,7 +47,6 @@ import javafx.stage.StageStyle;
 public final class RoleCreateDialog extends Dialog<RoleDTO> {
 
     public record RoleDTO(String name, XRoleDTO.Type type) {
-
     }
 
     @Log
@@ -65,7 +64,7 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
         dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/role.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
-        final var dropdownRoleType = new ComboBox<>();
+        final var dropdownRoleType = new ComboBox<String>();
         dropdownRoleType.getItems().addAll(FXCollections.observableArrayList("User", "Group"));
 
         final var txtRoleName = (CustomTextField) TextFields.createClearableTextField();
@@ -121,8 +120,8 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
         });
     }
 
-    private RoleDTO getInput(final Object roleType, final String roleName) {
-        final var type = EnumUtils.getEnumIgnoreCase(XRoleDTO.Type.class, roleType.toString());
+    private RoleDTO getInput(final String roleType, final String roleName) {
+        final var type = EnumUtils.getEnumIgnoreCase(XRoleDTO.Type.class, roleType);
         verify(type != null, "Role type cannot be mapped to any existing type");
         return new RoleDTO(roleName, type);
     }

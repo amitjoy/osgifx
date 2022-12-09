@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -29,7 +27,6 @@ import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -44,7 +41,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogsViewFxController {
 
     @Log

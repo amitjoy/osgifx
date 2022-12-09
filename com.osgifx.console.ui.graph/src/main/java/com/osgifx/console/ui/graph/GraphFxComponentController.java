@@ -18,7 +18,6 @@ package com.osgifx.console.ui.graph;
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
@@ -66,7 +64,6 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class GraphFxComponentController implements GraphController {
 
     @Log
@@ -223,13 +220,13 @@ public final class GraphFxComponentController implements GraphController {
                 progressPane.setVisible(true);
 
                 if (selection == 0) {
-                    logger.atInfo().log("Generating all graph paths for service components that are required by '%s'",
+                    logger.atDebug().log("Generating all graph paths for service components that are required by '%s'",
                             selectedComponents);
                     final Collection<GraphPath<ComponentVertex, DefaultEdge>> dependencies = runtimeGraph
                             .getAllServiceComponentsThatAreRequiredBy(selectedComponents);
                     fxGraph = new FxComponentGraph(dependencies);
                 } else {
-                    logger.atInfo().log("Generating service component cycles");
+                    logger.atDebug().log("Generating service component cycles");
                     final var graph = runtimeGraph.getAllCycles();
                     fxGraph = new FxComponentGraph(graph);
                 }

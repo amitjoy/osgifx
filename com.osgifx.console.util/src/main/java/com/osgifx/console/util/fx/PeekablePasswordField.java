@@ -26,7 +26,7 @@ import javafx.scene.input.MouseEvent;
 /**
  * A password field that supports unmasking ("peeking") the typed password
  */
-public class PeekablePasswordField extends PasswordField {
+public final class PeekablePasswordField extends PasswordField {
 
     public PeekablePasswordField() {
         setSkin(new PeekablePasswordFieldSkin(this));

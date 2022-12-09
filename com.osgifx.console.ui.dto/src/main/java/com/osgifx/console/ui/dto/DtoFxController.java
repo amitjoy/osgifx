@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dto;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -26,7 +24,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -41,7 +38,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class DtoFxController {
 
     @Log

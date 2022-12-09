@@ -34,6 +34,8 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 
 public final class ValueConverter {
 
+    private static final String SEPARATOR = ",";
+
     private final Converter converter;
 
     public ValueConverter() {
@@ -45,18 +47,18 @@ public final class ValueConverter {
     }
 
     private void initRules(final ConverterBuilder cb) {
-        cb.rule(new Rule<String, String[]>(v -> v.split(",")) {
+        cb.rule(new Rule<String, String[]>(v -> v.split(SEPARATOR)) {
         });
-        cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(",")).toList()) {
+        cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(SEPARATOR)).toList()) {
         });
         cb.rule(new Rule<String, int[]>(
-                v -> Stream.of(v.split(",")).mapToInt(Ints::tryParse).filter(Objects::nonNull).toArray()) {
+                v -> Stream.of(v.split(SEPARATOR)).mapToInt(Ints::tryParse).filter(Objects::nonNull).toArray()) {
         });
         cb.rule(new Rule<String, List<Integer>>(
-                v -> Stream.of(v.split(",")).map(Ints::tryParse).filter(Objects::nonNull).toList()) {
+                v -> Stream.of(v.split(SEPARATOR)).map(Ints::tryParse).filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, boolean[]>(v -> {
-            final var split = v.split(",");
+            final var split = v.split(SEPARATOR);
             final var array = new boolean[split.length];
             for (var i = 0; i < split.length; i++) {
                 final var value = Boolean.parseBoolean(split[i]);
@@ -65,24 +67,25 @@ public final class ValueConverter {
             return array;
         }) {
         });
-        cb.rule(new Rule<String, List<Boolean>>(v -> Stream.of(v.split(",")).map(Boolean::parseBoolean).toList()) {
+        cb.rule(new Rule<String, List<Boolean>>(
+                v -> Stream.of(v.split(SEPARATOR)).map(Boolean::parseBoolean).toList()) {
         });
         cb.rule(new Rule<String, double[]>(
-                v -> Stream.of(v.split(",")).mapToDouble(Doubles::tryParse).filter(Objects::nonNull).toArray()) {
+                v -> Stream.of(v.split(SEPARATOR)).mapToDouble(Doubles::tryParse).filter(Objects::nonNull).toArray()) {
         });
         cb.rule(new Rule<String, List<Double>>(
-                v -> Stream.of(v.split(",")).map(Doubles::tryParse).filter(Objects::nonNull).toList()) {
+                v -> Stream.of(v.split(SEPARATOR)).map(Doubles::tryParse).filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, float[]>(v -> {
-            final var elements = Stream.of(v.split(",")).map(Doubles::tryParse).filter(Objects::nonNull).toList();
+            final var elements = Stream.of(v.split(SEPARATOR)).map(Doubles::tryParse).filter(Objects::nonNull).toList();
             return Floats.toArray(elements);
         }) {
         });
         cb.rule(new Rule<String, List<Float>>(
-                v -> Stream.of(v.split(",")).map(Floats::tryParse).filter(Objects::nonNull).toList()) {
+                v -> Stream.of(v.split(SEPARATOR)).map(Floats::tryParse).filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, char[]>(v -> {
-            final var split = v.split(",");
+            final var split = v.split(SEPARATOR);
             final var array = new char[split.length];
             for (var i = 0; i < split.length; i++) {
                 final var value = split[i].charAt(0);
@@ -91,13 +94,13 @@ public final class ValueConverter {
             return array;
         }) {
         });
-        cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(",")).map(CharUtils::toChar).toList()) {
+        cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(SEPARATOR)).map(CharUtils::toChar).toList()) {
         });
         cb.rule(new Rule<String, long[]>(
-                v -> Stream.of(v.split(",")).mapToLong(Longs::tryParse).filter(Objects::nonNull).toArray()) {
+                v -> Stream.of(v.split(SEPARATOR)).mapToLong(Longs::tryParse).filter(Objects::nonNull).toArray()) {
         });
         cb.rule(new Rule<String, List<Long>>(
-                v -> Stream.of(v.split(",")).map(Longs::tryParse).filter(Objects::nonNull).toList()) {
+                v -> Stream.of(v.split(SEPARATOR)).map(Longs::tryParse).filter(Objects::nonNull).toList()) {
         });
     }
 

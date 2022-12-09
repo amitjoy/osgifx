@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.logs;
 
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import javax.inject.Inject;
 
@@ -26,7 +25,6 @@ import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.ui.di.FXMLBuilder;
 import org.eclipse.fx.ui.di.FXMLLoader;
 import org.eclipse.fx.ui.di.FXMLLoaderFactory;
-import org.osgi.annotation.bundle.Requirement;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -34,7 +32,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 
 @SuppressWarnings("deprecation")
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class StarterFxController {
 
     @Log

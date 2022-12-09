@@ -21,7 +21,7 @@ import org.osgi.service.log.LogLevel;
 
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
-import com.google.common.collect.Maps;
+import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.ui.logs.dialog.LoggerConfigurationDialog;
 
 import javafx.beans.binding.Bindings;
@@ -147,6 +147,7 @@ public final class LoggerConfigTextControl extends SimpleControl<StringField> {
         editableArea.textProperty().bindBidirectional(field.userInputProperty());
         readOnlyLabel.textProperty().bind(field.userInputProperty());
         fieldLabel.textProperty().bind(field.labelProperty());
+
         editableField.promptTextProperty().bind(field.placeholderProperty());
         editableArea.promptTextProperty().bind(field.placeholderProperty());
 
@@ -171,9 +172,7 @@ public final class LoggerConfigTextControl extends SimpleControl<StringField> {
     }
 
     private Map<String, LogLevel> prepareLogLevels(final Map<String, String> logLevels) {
-        final Map<String, LogLevel> ll = Maps.newHashMap();
-        logLevels.forEach((k, v) -> ll.put(k, LogLevel.valueOf(v)));
-        return ll;
+        return BiStream.from(logLevels).mapValues((k, v) -> LogLevel.valueOf(v)).toMap();
     }
 
 }

@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.search.filter.service;
+package com.osgifx.console.ui.search.filter.configuration;
 
-import static com.osgifx.console.ui.search.filter.SearchComponent.SERVICES;
+import static com.osgifx.console.ui.search.filter.SearchComponent.CONFIGURATIONS;
 import static com.osgifx.console.ui.search.filter.SearchOperation.EQUALS_TO;
 
 import java.util.Collection;
@@ -31,25 +31,25 @@ import com.google.common.base.Splitter;
 import com.google.common.base.VerifyException;
 import com.google.common.collect.Iterables;
 import com.google.mu.util.stream.BiStream;
-import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
 import com.osgifx.console.ui.search.filter.SearchOperation;
 
 @Component
-public final class ServiceSearchFilterByProperty implements SearchFilter {
+public final class ConfigurationSearchFilterByProperty implements SearchFilter {
 
     @Override
-    public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation) {
-        final var split = Splitter.on("=").splitToList(input.strip());
+    public Predicate<XConfigurationDTO> predicate(final String input, final SearchOperation searchOperation) {
+        final var split = Splitter.on("=").trimResults().splitToList(input.strip());
         final var key   = split.get(0);
         final var value = split.get(1);
 
         return switch (searchOperation) {
-            case EQUALS_TO -> service -> //
-                BiStream.from(service.properties) //
+            case EQUALS_TO -> configuration -> //
+                BiStream.from(configuration.properties) //
                         .anyMatch((k, v) -> //
-                StringUtils.equalsIgnoreCase(k, key) && StringUtils.equalsIgnoreCase(v, value));
+                StringUtils.equalsIgnoreCase(v.key, key) && StringUtils.equalsIgnoreCase(v.value.toString(), value));
             default -> throw new VerifyException("no matching case found");
         };
     }
@@ -61,7 +61,7 @@ public final class ServiceSearchFilterByProperty implements SearchFilter {
 
     @Override
     public SearchComponent component() {
-        return SERVICES;
+        return CONFIGURATIONS;
     }
 
     @Override

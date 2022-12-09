@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dmt;
 
+import static com.osgifx.console.constants.FxConstants.ROOT_FXML;
 import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
@@ -105,7 +106,7 @@ public final class DmtFxUI {
 
             @Override
             protected Void call() throws Exception {
-                loadedData = loadFXML("/fxml/tab-content.fxml");
+                loadedData = loadFXML(ROOT_FXML);
                 if (loadedData == null) {
                     return null;
                 }

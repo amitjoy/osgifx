@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs;
 
+import static com.osgifx.console.constants.FxConstants.ROOT_FXML;
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
@@ -122,7 +123,7 @@ public final class LogsFxUI {
 
             @Override
             protected Void call() throws Exception {
-                tabContent = Fx.loadFXML(loader, context, "/fxml/tab-content.fxml");
+                tabContent = Fx.loadFXML(loader, context, ROOT_FXML);
                 return null;
             }
 
