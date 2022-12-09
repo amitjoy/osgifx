@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -27,7 +25,6 @@ import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
@@ -41,7 +38,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class LogConfigurationsFxController {
 
     @Log

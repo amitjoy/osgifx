@@ -18,13 +18,11 @@ package com.osgifx.console.ui.healthchecks;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_HEALTHCHECKS_TOPIC;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -33,13 +31,10 @@ import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.fx.core.Subscription;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
-import org.eclipse.fx.core.event.EventBus;
-import org.eclipse.fx.core.event.Topic;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
@@ -71,7 +66,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class HealthCheckFxController {
 
     @Log
@@ -103,13 +97,10 @@ public final class HealthCheckFxController {
     @Inject
     private ThreadSynchronize     threadSync;
     @Inject
-    private EventBus              eventBus;
-    @Inject
     @Named("is_snapshot_agent")
     private boolean               isSnapshotAgent;
     private MaskerPane            progressPane;
     private Future<?>             hcExecFuture;
-    private Subscription          subscription;
 
     @FXML
     public void initialize() {
@@ -119,27 +110,9 @@ public final class HealthCheckFxController {
             logger.atDebug().log("FXML controller has been initialized");
             initHcTypeButton();
             initButtons();
-            listenToDateRetrieval();
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
-    }
-
-    /**
-     * This e(fx)clipse way to listening to events is done as the usual e4 way using
-     * event annotations doesn't work since the annotated event method is called at
-     * at the very first time before the FXML elements are even injected and
-     * therefore, throws NPE.
-     */
-    private void listenToDateRetrieval() {
-        subscription = eventBus.subscribe(new Topic<>(DATA_RETRIEVED_HEALTHCHECKS_TOPIC), event -> {
-            if (nameHcButton.isSelected()) {
-                initNames();
-            } else {
-                tagHcButton.setSelected(true);
-                initTags();
-            }
-        });
     }
 
     private void initHcTypeButton() {
@@ -186,11 +159,6 @@ public final class HealthCheckFxController {
             }
         }
         return metadata;
-    }
-
-    @PreDestroy
-    public void destroy() {
-        subscription.dispose();
     }
 
     private void initHcList() {
@@ -324,6 +292,17 @@ public final class HealthCheckFxController {
     @FXML
     private void deselectAll(final ActionEvent event) {
         hcMetadataList.getCheckModel().clearChecks();
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_HEALTHCHECKS_TOPIC) final String data) {
+        if (nameHcButton.isSelected()) {
+            initNames();
+        } else {
+            tagHcButton.setSelected(true);
+            initTags();
+        }
     }
 
 }

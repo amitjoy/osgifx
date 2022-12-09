@@ -140,6 +140,7 @@ public final class ComponentDetailsFxController {
 
     void initControls(final XComponentDTO component) {
         registerButtonHandlers(component);
+
         idLabel.setText(String.valueOf(component.id));
         componentNameLabel.setText(component.name);
         stateLabel.setText(component.state);

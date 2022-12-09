@@ -15,15 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.ui.terminal;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Throwables;
 import com.osgifx.console.agent.Agent;
@@ -36,7 +33,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class TerminalFxController {
 
     @Log
@@ -63,7 +59,7 @@ public final class TerminalFxController {
     public void initialize() {
         historyPointer = 0;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         logger.atDebug().log("FXML controller has been initialized");
@@ -131,6 +127,7 @@ public final class TerminalFxController {
                 return outputText;
             }
         };
+
         task.setOnSucceeded(t -> {
             output.appendText(task.getValue());
             output.appendText(System.lineSeparator());

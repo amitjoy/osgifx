@@ -16,9 +16,7 @@
 package com.osgifx.console.ui.configurations;
 
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -27,12 +25,12 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -49,7 +47,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ConfigurationsFxController {
 
     @Log
@@ -111,7 +108,7 @@ public final class ConfigurationsFxController {
         final var nameColumn = new TableColumn<XConfigurationDTO, String>("Name");
         nameColumn.setPrefWidth(400);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class,
-                s -> Optional.ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
+                s -> java.util.Optional.ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
 
         final var locationColumn = new TableColumn<XConfigurationDTO, String>("Location");
         locationColumn.setPrefWidth(150);
@@ -135,8 +132,8 @@ public final class ConfigurationsFxController {
     }
 
     @Inject
+    @Optional
     @SuppressWarnings("unchecked")
-    @org.eclipse.e4.core.di.annotations.Optional
     public void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super XConfigurationDTO>) filter.predicate);

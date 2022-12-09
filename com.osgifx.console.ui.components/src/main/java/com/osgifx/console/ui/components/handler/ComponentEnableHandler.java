@@ -61,6 +61,7 @@ public final class ComponentEnableHandler {
             return;
         }
         final Task<Void> enableTask = new Task<>() {
+
             @Override
             protected Void call() throws Exception {
                 try {

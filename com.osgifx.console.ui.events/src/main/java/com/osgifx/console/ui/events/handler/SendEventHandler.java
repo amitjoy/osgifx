@@ -66,6 +66,7 @@ public final class SendEventHandler {
         final var event = dialog.showAndWait();
         if (event.isPresent()) {
             final Task<Void> sendEventTask = new Task<>() {
+
                 @Override
                 protected Void call() throws Exception {
                     try {

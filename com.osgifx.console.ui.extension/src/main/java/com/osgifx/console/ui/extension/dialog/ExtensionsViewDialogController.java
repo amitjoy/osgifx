@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.extension.dialog;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -25,7 +23,6 @@ import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 import org.osgi.service.deploymentadmin.DeploymentAdmin;
 import org.osgi.service.deploymentadmin.DeploymentPackage;
 
@@ -40,7 +37,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=org.osgi.service.deploymentadmin.DeploymentAdmin)")
 public final class ExtensionsViewDialogController {
 
     @Log

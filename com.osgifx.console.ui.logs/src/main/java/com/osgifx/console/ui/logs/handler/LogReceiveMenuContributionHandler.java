@@ -17,11 +17,11 @@ package com.osgifx.console.ui.logs.handler;
 
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STOPPED_EVENT_TOPIC;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,14 +37,12 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class LogReceiveMenuContributionHandler {
 
     public static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
@@ -85,6 +83,11 @@ public final class LogReceiveMenuContributionHandler {
             supervisor.removeOSGiLogListener(logEntryListener);
             logger.atInfo().throttleByCount(10).log("OSGi log listener has been removed");
         }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.clearProperty(PROPERTY_KEY_LOG_DISPLAY);
     }
 
     @AboutToShow

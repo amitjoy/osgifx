@@ -15,15 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.ui.threads;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
@@ -35,7 +32,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.paint.Color;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class ThreadsFxController {
 
     @Log
