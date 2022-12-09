@@ -46,7 +46,7 @@ public final class EventManager {
     public XResultDTO sendEvent(final String topic, final List<ConfigValue> properties) {
         Agent agent = null;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return agent.sendEvent(topic, properties);
@@ -55,7 +55,7 @@ public final class EventManager {
     public XResultDTO postEvent(final String topic, final List<ConfigValue> properties) {
         Agent agent = null;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return agent.postEvent(topic, properties);

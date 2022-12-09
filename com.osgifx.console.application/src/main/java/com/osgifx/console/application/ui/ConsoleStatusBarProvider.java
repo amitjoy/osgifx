@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.StatusBar;
+import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 
@@ -49,7 +50,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
 
     @Override
     public void addTo(final BorderPane pane) {
-        final var glyph = new Glyph("FontAwesome", "DESKTOP");
+        final var glyph = new Glyph("FontAwesome", FontAwesome.Glyph.DESKTOP);
         glyph.useGradientEffect();
         glyph.useHoverEffect();
 

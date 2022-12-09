@@ -24,6 +24,7 @@ public final class FxConstants {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
+    public static final String ROOT_FXML    = "/fxml/tab-content.fxml";
     public static final String STANDARD_CSS = "/css/default.css";
 
 }

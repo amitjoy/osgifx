@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.gogo;
 
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -26,7 +24,6 @@ import org.controlsfx.control.textfield.TextFields;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.google.common.base.Throwables;
 import com.osgifx.console.agent.Agent;
@@ -39,7 +36,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.Supervisor)")
 public final class GogoFxController {
 
     @Log
@@ -68,7 +64,7 @@ public final class GogoFxController {
         Set<String> gogoCommands;
         if (supervisor == null || (agent = supervisor.getAgent()) == null
                 || (gogoCommands = agent.getGogoCommands()) == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         logger.atDebug().log("FXML controller has been initialized");

@@ -168,10 +168,12 @@ public final class BundleDetailsFxController {
         versionLabel.setText(bundle.version);
         locationLabel.setText(bundle.location);
         categoryLabel.setText(bundle.category);
+
         initFragment(bundle);
         initIsPersistentlyStarted(bundle);
         initIsActivationPolicyUsed(bundle);
         registerButtonHandlers(bundle);
+
         lasModifiedLabel.setText(formatLastModified(bundle.lastModified));
         docLabel.setText(bundle.documentation);
         vendorLabel.setText(bundle.vendor);

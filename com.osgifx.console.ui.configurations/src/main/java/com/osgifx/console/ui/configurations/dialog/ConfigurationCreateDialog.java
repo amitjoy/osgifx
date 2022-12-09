@@ -39,6 +39,7 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
+import com.google.common.base.Verify;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
@@ -144,8 +145,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         });
     }
 
-    private ConfigurationDTO getInput(final CustomTextField txtPid, final CustomTextField txtFactoryPid)
-            throws Exception {
+    private ConfigurationDTO getInput(final CustomTextField txtPid, final CustomTextField txtFactoryPid) {
         final List<ConfigValue> properties = Lists.newArrayList();
         for (final Entry<PropertiesForm, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entry : configurationEntries
                 .entrySet()) {
@@ -239,6 +239,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
             } else {
                 txtField = null;
             }
+            Verify.verify(node != null, "Attribute type text field cannot be null");
             switch (type) {
                 case LONG, INTEGER:
                     final var captionAsInt = switch (type) {

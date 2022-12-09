@@ -136,17 +136,14 @@ public class ContentZoomPane extends BorderPane {
 
                     setContentPivot(f * dx, f * dy);
                 }
-
             }
             // do not propagate
             event.consume();
-
         });
 
         final var sceneDragContext = new DragContext();
 
         setOnMousePressed((final MouseEvent event) -> {
-
             if (event.isSecondaryButtonDown()) {
                 getScene().setCursor(Cursor.MOVE);
 

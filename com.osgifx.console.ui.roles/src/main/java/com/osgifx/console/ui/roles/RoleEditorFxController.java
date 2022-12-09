@@ -176,29 +176,43 @@ public final class RoleEditorFxController {
         final var props = properties == null ? Map.of() : properties;
         final var creds = credentials == null ? Map.of() : credentials;
 
-        final Field<?> propertiesField = Field.ofStringType(RolesHelper.mapToString(props)).multiline(true)
-                .label("Properties").render(new RolesConfigTextControl(PROPERTIES)).valueDescription(KV_DESCRIPTION)
-                .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE))
-                .editable(!isSnapshotAgent);
+        // @formatter:off
+        final Field<?> propertiesField =
+                Field.ofStringType(RolesHelper.mapToString(props))
+                     .multiline(true)
+                     .label("Properties")
+                     .render(new RolesConfigTextControl(PROPERTIES))
+                     .valueDescription(KV_DESCRIPTION)
+                     .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE))
+                     .editable(!isSnapshotAgent);
 
-        final Field<?> credentialsField = Field.ofStringType(RolesHelper.mapToString(creds)).multiline(true)
-                .label("Credentials").render(new RolesConfigTextControl(CREDENTIALS)).valueDescription(KV_DESCRIPTION)
-                .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE))
-                .editable(!isSnapshotAgent);
+        final Field<?> credentialsField =
+                Field.ofStringType(RolesHelper.mapToString(creds))
+                     .multiline(true)
+                     .label("Credentials")
+                     .render(new RolesConfigTextControl(CREDENTIALS))
+                     .valueDescription(KV_DESCRIPTION)
+                     .validate(CustomValidator.forPredicate(this::validateKeyValuePairs, KV_VALIDATION_MESSAGE))
+                     .editable(!isSnapshotAgent);
 
         if (role.type == Type.GROUP) {
             final var allExistingRoles = getAllExistingRoles(role);
 
-            final Field<?> basicMembersField = Field
-                    .ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.basicMembers))
-                    .render(new SimpleCheckBoxControl<>()).label("Basic Members").editable(!isSnapshotAgent);
+            final Field<?> basicMembersField =
+                    Field.ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.basicMembers))
+                         .render(new SimpleCheckBoxControl<>())
+                         .label("Basic Members")
+                         .editable(!isSnapshotAgent);
 
-            final Field<?> requiredMembersField = Field
-                    .ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.requiredMembers))
-                    .render(new SimpleCheckBoxControl<>()).label("Required Members").editable(!isSnapshotAgent);
+            final Field<?> requiredMembersField =
+                    Field.ofMultiSelectionType(allExistingRoles, getSelections(allExistingRoles, role.requiredMembers))
+                         .render(new SimpleCheckBoxControl<>())
+                         .label("Required Members")
+                         .editable(!isSnapshotAgent);
 
             return List.of(propertiesField, credentialsField, basicMembersField, requiredMembersField);
         }
+        // @formatter:on
         return List.of(propertiesField, credentialsField);
     }
 

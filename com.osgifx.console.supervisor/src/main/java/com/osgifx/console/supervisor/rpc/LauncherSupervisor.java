@@ -22,11 +22,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 
+import com.google.common.collect.Lists;
+import com.google.mu.util.Substring;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -44,8 +45,8 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     private Appendable stderr;
     private int        shell = -100; // always invalid so we update it
 
-    private final List<EventListener>    eventListeners    = new CopyOnWriteArrayList<>();
-    private final List<LogEntryListener> logEntryListeners = new CopyOnWriteArrayList<>();
+    private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
+    private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
 
     @Override
     public boolean stdout(final String out) throws Exception {
@@ -116,13 +117,12 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     /**
      * The shell port to use.
+     *
      * <ul>
      * <li>&lt;0 – Attach to a local Gogo CommandSession
      * <li>0 – Use the standard console
      * <li>else – Open a stream to that port
      * </ul>
-     *
-     * @param shellPort
      */
     public void setShell(final int shellPort) {
         shell = shellPort;
@@ -204,7 +204,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             // positive match if it does contain * at the end and is a substring of the
             // received event topic
             if (topic.contains("*")) {
-                final var prefix = topic.substring(0, topic.lastIndexOf('/'));
+                final var prefix = Substring.upToIncluding(Substring.last("/")).from(topic).orElse(null);
                 if (receivedEventTopic.startsWith(prefix)) {
                     return true;
                 }
@@ -216,4 +216,5 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         }
         return false;
     }
+
 }

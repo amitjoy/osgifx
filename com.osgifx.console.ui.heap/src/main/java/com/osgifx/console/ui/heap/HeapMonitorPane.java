@@ -307,6 +307,7 @@ public final class HeapMonitorPane extends BorderPane {
         final var agent = supervisor.getAgent();
 
         final Task<byte[]> heapdumpTask = new Task<>() {
+
             @Override
             protected byte[] call() throws Exception {
                 try {

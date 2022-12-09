@@ -72,6 +72,7 @@ public final class DisconnectFromAgentHandler {
     @Execute
     public void execute() {
         final Task<Void> disconnectTask = new Task<>() {
+
             @Override
             protected Void call() throws Exception {
                 try {

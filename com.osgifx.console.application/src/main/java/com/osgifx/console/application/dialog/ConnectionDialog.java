@@ -167,7 +167,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             final var p = Ints.tryParse(port.getText());
             final var t = Ints.tryParse(timeout.getText());
 
-            verify(p != null && t != null, "Port and Host formats are not compliant");
+            verify(p != null && t != null, "Port and host formats are not compliant");
             return dialogButton == saveButtonType
                     ? new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
                             trustStorePassword.getText())

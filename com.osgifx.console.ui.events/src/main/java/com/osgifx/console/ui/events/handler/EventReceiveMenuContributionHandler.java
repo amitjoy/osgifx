@@ -17,7 +17,6 @@ package com.osgifx.console.ui.events.handler;
 
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STOPPED_EVENT_TOPIC;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -46,7 +46,6 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -56,7 +55,6 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.events.dialog.TopicEntryDialog;
 import com.osgifx.console.util.fx.Fx;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.supervisor.EventListener)")
 public final class EventReceiveMenuContributionHandler {
 
     private static final String PID                        = "event.receive.topics";
@@ -107,6 +105,11 @@ public final class EventReceiveMenuContributionHandler {
             supervisor.removeOSGiEventListener(eventListener);
             logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
         }
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.clearProperty(PROPERTY_KEY_EVENT_DISPLAY);
     }
 
     @AboutToShow
@@ -200,7 +203,7 @@ public final class EventReceiveMenuContributionHandler {
                 configuration.delete();
             }
         } catch (final IOException e) {
-            logger.atError().withException(e).log("Cannot rretrieve configuration '%s'", PID);
+            logger.atError().withException(e).log("Cannot retrieve configuration '%s'", PID);
         }
 
     }

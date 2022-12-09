@@ -71,6 +71,7 @@ public final class SnapshotCaptureHandler {
             return;
         }
         final Task<String> snapshotTask = new Task<>() {
+
             @Override
             protected String call() throws Exception {
                 try {
@@ -100,7 +101,6 @@ public final class SnapshotCaptureHandler {
                 });
             }
         });
-
         final var taskFuture = executor.runAsync(snapshotTask);
         progressDialog = FxDialog.showProgressDialog("Capture Snapshot", snapshotTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
@@ -115,7 +115,7 @@ public final class SnapshotCaptureHandler {
 
         dto.bundles              = agent.getAllBundles();
         dto.components           = agent.getAllComponents();
-        dto.configuations        = agent.getAllConfigurations();
+        dto.configurations       = agent.getAllConfigurations();
         dto.properties           = agent.getAllProperties();
         dto.services             = agent.getAllServices();
         dto.threads              = agent.getAllThreads();

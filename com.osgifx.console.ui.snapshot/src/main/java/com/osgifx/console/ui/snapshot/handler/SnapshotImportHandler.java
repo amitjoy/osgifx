@@ -90,6 +90,7 @@ public final class SnapshotImportHandler {
 
         if (snapshot != null) {
             final Task<File> task = new Task<>() {
+
                 @Override
                 protected File call() throws Exception {
                     try (var is = new FileInputStream(snapshot)) {

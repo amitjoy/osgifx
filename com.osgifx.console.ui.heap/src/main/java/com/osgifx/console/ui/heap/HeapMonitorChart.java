@@ -42,8 +42,8 @@ public final class HeapMonitorChart extends BorderPane {
     private static final int    Y_AXIS_TICK_COUNT      = 16;
     private static final long   MAX_MILLI              = 120_000L;
 
-    private static final int         X_AXIS_TICK_UNIT = 10_000;
-    private static DateTimeFormatter FORMATTER        = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final int               X_AXIS_TICK_UNIT = 10_000;
+    private static final DateTimeFormatter FORMATTER        = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private final long startCounter;
     private final long initialUpperBound;

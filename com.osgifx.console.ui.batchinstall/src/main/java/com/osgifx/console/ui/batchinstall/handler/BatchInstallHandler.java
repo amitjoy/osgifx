@@ -78,6 +78,7 @@ public final class BatchInstallHandler {
             final var selectedFeatures = dialog.showAndWait();
             if (selectedFeatures.isPresent()) {
                 final Task<String> batchTask = new Task<>() {
+
                     @Override
                     protected String call() throws Exception {
                         return installer.installArtifacts(selectedFeatures.get());

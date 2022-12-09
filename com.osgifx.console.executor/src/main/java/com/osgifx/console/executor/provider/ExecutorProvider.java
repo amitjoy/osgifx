@@ -45,6 +45,9 @@ public final class ExecutorProvider implements Executor {
     public @interface Configuration {
         @AttributeDefinition(description = "The minimum number of threads allocated to this pool", required = false)
         int coreSize() default 30;
+
+        @AttributeDefinition(description = " If this flag is set to true the containing thread pool will use daemon threads.", required = false)
+        boolean daemon() default true;
     }
 
     @Reference
@@ -57,7 +60,7 @@ public final class ExecutorProvider implements Executor {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 
         final var coreSize      = config.coreSize();
-        final var threadFactory = new Builder().namingPattern("osgi-fx-%d").daemon(true).build();
+        final var threadFactory = new Builder().namingPattern("osgifx-%d").daemon(config.daemon()).build();
 
         executor = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
     }

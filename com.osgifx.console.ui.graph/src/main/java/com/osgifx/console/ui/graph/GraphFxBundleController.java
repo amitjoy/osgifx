@@ -18,7 +18,6 @@ package com.osgifx.console.ui.graph;
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
-import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
-import org.osgi.annotation.bundle.Requirement;
 
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
@@ -65,7 +63,6 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 
-@Requirement(effective = "active", namespace = SERVICE_NAMESPACE, filter = "(objectClass=com.osgifx.console.data.provider.DataProvider)")
 public final class GraphFxBundleController implements GraphController {
 
     @Log
