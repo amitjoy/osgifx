@@ -311,8 +311,8 @@ public final class SendEventDialog extends Dialog<EventDTO> {
         if (content.getChildren().size() > 4) {
             content.getChildren().remove(form);
             getDialogPane().getScene().getWindow().sizeToScene();
+            entries.remove(form);
         }
-        entries.remove(form);
     }
 
     private String getValue(final Node node) {
