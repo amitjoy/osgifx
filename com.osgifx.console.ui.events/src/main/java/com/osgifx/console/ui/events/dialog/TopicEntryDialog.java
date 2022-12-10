@@ -160,8 +160,8 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
                 getDialogPane().getScene().getWindow().sizeToScene();
                 validationSupport.deregisterValidator(textTopic);
                 textTopic.getProperties().clear();
+                entries.remove(form);
             }
-            entries.remove(form);
         }
     }
 
