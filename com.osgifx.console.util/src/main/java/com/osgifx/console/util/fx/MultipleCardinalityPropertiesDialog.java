@@ -162,8 +162,8 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             if (content.getChildren().size() > 2) {
                 content.getChildren().remove(form);
                 getDialogPane().getScene().getWindow().sizeToScene();
+                entries.remove(form);
             }
-            entries.remove(form);
         }
 
         private Node getFieldByType(final XAttributeDefType type, final String initValue) {

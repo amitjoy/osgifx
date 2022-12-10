@@ -301,8 +301,8 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         if (content.getChildren().size() > 4) {
             content.getChildren().remove(form);
             getDialogPane().getScene().getWindow().sizeToScene();
+            configurationEntries.remove(form);
         }
-        configurationEntries.remove(form);
     }
 
     private String getValue(final Node node) {
