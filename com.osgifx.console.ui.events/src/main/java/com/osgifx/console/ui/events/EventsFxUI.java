@@ -20,17 +20,13 @@ import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECE
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STOPPED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static javafx.scene.paint.Color.TRANSPARENT;
-import static org.controlsfx.control.PopOver.ArrowLocation.BOTTOM_CENTER;
-
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.controlsfx.control.PopOver;
-import org.controlsfx.glyphfont.Glyph;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -42,21 +38,13 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
+import com.osgifx.console.ui.events.dialog.SubscribedEventsDialog;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.VBox;
 
 public final class EventsFxUI {
 
@@ -76,8 +64,10 @@ public final class EventsFxUI {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
-    @Named("subscribed_topics")
-    private Set<String>       subscribedTopics;
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
+    private IEclipseContext   eclipseContext;
 
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -147,45 +137,22 @@ public final class EventsFxUI {
 
     private void initStatusBar(final BorderPane parent) {
         if (isConnected) {
-            final var glyph = new Glyph("FontAwesome", "GEAR");
-            glyph.useGradientEffect();
-            glyph.useHoverEffect();
-
-            final var popOver = new PopOver(initPopOverNode(subscribedTopics));
-            popOver.setArrowLocation(BOTTOM_CENTER);
-
-            final var button = new Button("", glyph);
-            button.setOnMouseEntered(mouseEvent -> popOver.show(button));
-            button.setOnMouseExited(mouseEvent -> popOver.hide());
-            button.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
-
+            final var node = Fx.initStatusBarButton(this::showSubscribedEventTopicsDialog, "Subscribed Event Topics", "GEAR");
             statusBar.clearAllInRight();
-            statusBar.addToRight(button);
+            if (!isSnapshotAgent) {
+                statusBar.addToRight(node);
+            }
         } else {
             statusBar.clearAllInRight();
         }
         statusBar.addTo(parent);
     }
 
-    private Node initPopOverNode(final Set<String> topics) {
-        Node listV = null;
-        if (!topics.isEmpty()) {
-            final var listView = new ListView<String>();
-            topics.forEach(t -> listView.getItems().add(t));
-            listView.addEventFilter(KeyEvent.KEY_PRESSED, KeyEvent::consume);
-            listView.setStyle("-fx-focus-color: transparent;");
-            listV = listView;
-        }
-        VBox vBox;
-        if (listV != null) {
-            vBox = new VBox(new Label("Configured Topics"), listV);
-        } else {
-            vBox = new VBox(new Label("No configured topics"));
-        }
-        VBox.setMargin(vBox, new Insets(10, 10, 10, 10));
-        vBox.setStyle("-fx-padding: 18;");
-
-        return vBox;
+    private void showSubscribedEventTopicsDialog() {
+        final var dialog = new SubscribedEventsDialog();
+        ContextInjectionFactory.inject(dialog, eclipseContext);
+        dialog.init();
+        dialog.showAndWait();
     }
 
 }
