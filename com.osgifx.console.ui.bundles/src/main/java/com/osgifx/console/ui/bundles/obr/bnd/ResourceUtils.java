@@ -15,9 +15,20 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static java.lang.invoke.MethodHandles.publicLookup;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static org.osgi.framework.namespace.BundleNamespace.BUNDLE_NAMESPACE;
+import static org.osgi.framework.namespace.ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE;
+import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
+import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
+import static org.osgi.framework.namespace.NativeNamespace.NATIVE_NAMESPACE;
+import static org.osgi.framework.namespace.PackageNamespace.PACKAGE_NAMESPACE;
+import static org.osgi.namespace.contract.ContractNamespace.CONTRACT_NAMESPACE;
+import static org.osgi.namespace.extender.ExtenderNamespace.EXTENDER_NAMESPACE;
+import static org.osgi.namespace.implementation.ImplementationNamespace.IMPLEMENTATION_NAMESPACE;
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -40,16 +51,13 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import org.osgi.framework.namespace.AbstractWiringNamespace;
-import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.framework.namespace.ExecutionEnvironmentNamespace;
-import org.osgi.framework.namespace.HostNamespace;
 import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.framework.namespace.NativeNamespace;
 import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.namespace.contract.ContractNamespace;
 import org.osgi.namespace.extender.ExtenderNamespace;
 import org.osgi.namespace.implementation.ImplementationNamespace;
-import org.osgi.namespace.service.ServiceNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Namespace;
 import org.osgi.resource.Requirement;
@@ -203,18 +211,17 @@ public final class ResourceUtils {
     }
 
     public static IdentityCapability getIdentityCapability(final Resource resource) {
-        return capabilityStream(resource, IdentityNamespace.IDENTITY_NAMESPACE, IdentityCapability.class).findFirst()
-                .orElse(null);
+        return capabilityStream(resource, IDENTITY_NAMESPACE, IdentityCapability.class).findFirst().orElse(null);
     }
 
     public static String getIdentityVersion(final Resource resource) {
-        return capabilityStream(resource, IdentityNamespace.IDENTITY_NAMESPACE, IdentityCapability.class).findFirst()
+        return capabilityStream(resource, IDENTITY_NAMESPACE, IdentityCapability.class).findFirst()
                 .map(c -> c.getAttributes().get(IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE)).map(Object::toString)
                 .orElse(null);
     }
 
     public static BundleCap getBundleCapability(final Resource resource) {
-        return capabilityStream(resource, BundleNamespace.BUNDLE_NAMESPACE, BundleCap.class).findFirst().orElse(null);
+        return capabilityStream(resource, BUNDLE_NAMESPACE, BundleCap.class).findFirst().orElse(null);
     }
 
     public static Version toVersion(final Object v) {
@@ -274,15 +281,15 @@ public final class ResourceUtils {
 
     public static String getVersionAttributeForNamespace(final String namespace) {
         return switch (namespace) {
-            case IdentityNamespace.IDENTITY_NAMESPACE -> IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case BundleNamespace.BUNDLE_NAMESPACE, HostNamespace.HOST_NAMESPACE -> AbstractWiringNamespace.CAPABILITY_BUNDLE_VERSION_ATTRIBUTE;
-            case PackageNamespace.PACKAGE_NAMESPACE -> PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE -> ExecutionEnvironmentNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case NativeNamespace.NATIVE_NAMESPACE -> NativeNamespace.CAPABILITY_OSVERSION_ATTRIBUTE;
-            case ExtenderNamespace.EXTENDER_NAMESPACE -> ExtenderNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ContractNamespace.CONTRACT_NAMESPACE -> ContractNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ImplementationNamespace.IMPLEMENTATION_NAMESPACE -> ImplementationNamespace.CAPABILITY_VERSION_ATTRIBUTE;
-            case ServiceNamespace.SERVICE_NAMESPACE -> null;
+            case IDENTITY_NAMESPACE -> IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case BUNDLE_NAMESPACE, HOST_NAMESPACE -> AbstractWiringNamespace.CAPABILITY_BUNDLE_VERSION_ATTRIBUTE;
+            case PACKAGE_NAMESPACE -> PackageNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case EXECUTION_ENVIRONMENT_NAMESPACE -> ExecutionEnvironmentNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case NATIVE_NAMESPACE -> NativeNamespace.CAPABILITY_OSVERSION_ATTRIBUTE;
+            case EXTENDER_NAMESPACE -> ExtenderNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case CONTRACT_NAMESPACE -> ContractNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case IMPLEMENTATION_NAMESPACE -> ImplementationNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+            case SERVICE_NAMESPACE -> null;
             default -> null;
         };
     }
@@ -416,10 +423,8 @@ public final class ResourceUtils {
     }
 
     public static String getIdentity(final Capability identityCapability) throws IllegalArgumentException {
-        final var id = (String) identityCapability.getAttributes().get(IdentityNamespace.IDENTITY_NAMESPACE);
-        if (id == null) {
-            throw new IllegalArgumentException("Resource identity capability has missing identity attribute");
-        }
+        final var id = (String) identityCapability.getAttributes().get(IDENTITY_NAMESPACE);
+        verifyNotNull(id, "Resource identity capability has missing identity attribute");
         return id;
     }
 

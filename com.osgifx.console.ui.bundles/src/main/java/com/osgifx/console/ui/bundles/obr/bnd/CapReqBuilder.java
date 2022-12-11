@@ -15,7 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Verify.verifyNotNull;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -53,7 +54,7 @@ public class CapReqBuilder {
     private final Map<String, String> directives = Maps.newHashMap();
 
     public CapReqBuilder(final String namespace) {
-        this.namespace = requireNonNull(namespace);
+        this.namespace = checkNotNull(namespace);
     }
 
     public CapReqBuilder(final Resource resource, final String namespace) {
@@ -153,9 +154,7 @@ public class CapReqBuilder {
     }
 
     public Requirement buildRequirement() {
-        if (resource == null) {
-            throw new IllegalStateException("Cannot build Requirement with null Resource. use buildSyntheticRequirement");
-        }
+        verifyNotNull(resource, "Cannot build Requirement with null Resource. use buildSyntheticRequirement");
         return new RequirementImpl(namespace, resource, directives, attributes);
     }
 
