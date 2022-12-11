@@ -16,7 +16,6 @@
 package com.osgifx.console.util.fx;
 
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -24,6 +23,8 @@ import org.controlsfx.control.Notifications;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.osgi.framework.BundleContext;
+
+import com.google.common.collect.Sets;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -124,7 +125,7 @@ public final class Fx {
         final var item = new MenuItem("Copy");
         item.setOnAction(event -> {
 
-            final Set<Integer> rows = new TreeSet<>();
+            final Set<Integer> rows = Sets.newTreeSet();
             for (final TablePosition<?, ?> tablePosition : table.getSelectionModel().getSelectedCells()) {
                 rows.add(tablePosition.getRow());
             }

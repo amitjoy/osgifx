@@ -31,6 +31,7 @@ import static org.osgi.framework.Constants.BUNDLE_VENDOR;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_ID;
+import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
@@ -47,8 +48,10 @@ import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
+import org.osgi.framework.startlevel.FrameworkStartLevel;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleRevisions;
 import org.osgi.framework.wiring.BundleWire;
@@ -88,18 +91,19 @@ public final class XBundleAdmin {
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
         final XBundleDTO dto = new XBundleDTO();
 
-        dto.id            = bundle.getBundleId();
-        dto.state         = findState(bundle.getState());
-        dto.symbolicName  = bundle.getSymbolicName();
-        dto.version       = bundle.getVersion().toString();
-        dto.location      = bundle.getLocation();
-        dto.category      = getHeader(bundle, BUNDLE_CATEGORY);
-        dto.isFragment    = getHeader(bundle, FRAGMENT_HOST) != null;
-        dto.lastModified  = bundle.getLastModified();
-        dto.documentation = getHeader(bundle, BUNDLE_DOCURL);
-        dto.vendor        = getHeader(bundle, BUNDLE_VENDOR);
-        dto.description   = getHeader(bundle, BUNDLE_DESCRIPTION);
-        dto.startLevel    = getStartLevel(bundle);
+        dto.id                  = bundle.getBundleId();
+        dto.state               = findState(bundle.getState());
+        dto.symbolicName        = bundle.getSymbolicName();
+        dto.version             = bundle.getVersion().toString();
+        dto.location            = bundle.getLocation();
+        dto.category            = getHeader(bundle, BUNDLE_CATEGORY);
+        dto.isFragment          = getHeader(bundle, FRAGMENT_HOST) != null;
+        dto.lastModified        = bundle.getLastModified();
+        dto.documentation       = getHeader(bundle, BUNDLE_DOCURL);
+        dto.vendor              = getHeader(bundle, BUNDLE_VENDOR);
+        dto.description         = getHeader(bundle, BUNDLE_DESCRIPTION);
+        dto.startLevel          = getStartLevel(bundle);
+        dto.frameworkStartLevel = getFrameworkStartLevel();
         // @formatter:off
         dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()
                                                               .stream()
@@ -137,6 +141,15 @@ public final class XBundleAdmin {
     private static int getStartLevel(final Bundle bundle) {
         try {
             return bundle.adapt(BundleStartLevel.class).getStartLevel();
+        } catch (final Exception e) {
+            return -1;
+        }
+    }
+
+    private static int getFrameworkStartLevel() {
+        try {
+            final BundleContext current = FrameworkUtil.getBundle(XBundleAdmin.class).getBundleContext();
+            return current.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkStartLevel.class).getStartLevel();
         } catch (final Exception e) {
             return -1;
         }
