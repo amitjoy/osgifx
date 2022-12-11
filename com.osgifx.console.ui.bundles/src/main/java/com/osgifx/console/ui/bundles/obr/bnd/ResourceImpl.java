@@ -16,7 +16,8 @@
 package com.osgifx.console.ui.bundles.obr.bnd;
 
 import static aQute.lib.collections.Logic.retain;
-import static java.util.Collections.unmodifiableList;
+import static org.osgi.framework.namespace.IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE;
+import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
 
 import java.net.URI;
 import java.util.Collection;
@@ -26,12 +27,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 class ResourceImpl implements Resource, Comparable<Resource> {
 
@@ -52,11 +52,11 @@ class ResourceImpl implements Resource, Comparable<Resource> {
             list.add(capability);
         }
         for (final Map.Entry<String, List<Capability>> entry : prepare.entrySet()) {
-            entry.setValue(unmodifiableList(Lists.newArrayList(entry.getValue())));
+            entry.setValue(ImmutableList.copyOf(entry.getValue()));
         }
-        allCapabilities = unmodifiableList(Lists.newArrayList(capabilities));
+        allCapabilities = ImmutableList.copyOf(capabilities);
         capabilityMap   = prepare;
-        locations       = null;                                              // clear so equals/hashCode can recompute
+        locations       = null;                              // clear so equals/hashCode can recompute
     }
 
     @Override
@@ -77,9 +77,9 @@ class ResourceImpl implements Resource, Comparable<Resource> {
             list.add(requirement);
         }
         for (final Map.Entry<String, List<Requirement>> entry : prepare.entrySet()) {
-            entry.setValue(unmodifiableList(Lists.newArrayList(entry.getValue())));
+            entry.setValue(ImmutableList.copyOf(entry.getValue()));
         }
-        allRequirements = unmodifiableList(Lists.newArrayList(requirements));
+        allRequirements = ImmutableList.copyOf(requirements);
         requirementMap  = prepare;
     }
 
@@ -93,12 +93,12 @@ class ResourceImpl implements Resource, Comparable<Resource> {
     @Override
     public String toString() {
         final var builder    = new StringBuilder();
-        final var identities = getCapabilities(IdentityNamespace.IDENTITY_NAMESPACE);
+        final var identities = getCapabilities(IDENTITY_NAMESPACE);
         if (identities.size() == 1) {
             final var idCap = identities.get(0);
-            final var id    = idCap.getAttributes().get(IdentityNamespace.IDENTITY_NAMESPACE);
+            final var id    = idCap.getAttributes().get(IDENTITY_NAMESPACE);
             builder.append(id);
-            final var version = idCap.getAttributes().get(IdentityNamespace.CAPABILITY_VERSION_ATTRIBUTE);
+            final var version = idCap.getAttributes().get(CAPABILITY_VERSION_ATTRIBUTE);
             if (version != null) {
                 builder.append(" version=").append(version);
             }

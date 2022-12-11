@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.smartgraph.graphview;
 
-import org.apache.commons.lang3.Validate;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.osgifx.console.smartgraph.graph.Edge;
 
@@ -48,8 +48,8 @@ public class SmartGraphEdgeLine<E, V> extends Line implements SmartGraphEdgeBase
     public SmartGraphEdgeLine(final Edge<E, V> edge,
                               final SmartGraphVertexNode inbound,
                               final SmartGraphVertexNode outbound) {
-        Validate.notNull(inbound);
-        Validate.notNull(outbound);
+        checkNotNull(inbound, "Inbound node cannot be null");
+        checkNotNull(outbound, "Outbound node cannot be null");
 
         this.inbound  = inbound;
         this.outbound = outbound;

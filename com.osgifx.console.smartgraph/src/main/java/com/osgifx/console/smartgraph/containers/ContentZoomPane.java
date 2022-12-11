@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.smartgraph.containers;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.geometry.Insets;
@@ -49,9 +51,7 @@ public class ContentZoomPane extends BorderPane {
     private static final double SCROLL_DELTA = 0.25;
 
     public ContentZoomPane(final Node content) {
-        if (content == null) {
-            throw new IllegalArgumentException("Content cannot be null.");
-        }
+        checkNotNull(content, "Content cannot be null");
 
         this.content = content;
 
@@ -106,7 +106,6 @@ public class ContentZoomPane extends BorderPane {
     }
 
     private void enablePanAndZoom() {
-
         setOnScroll((final ScrollEvent event) -> {
             final double direction     = event.getDeltaY() >= 0 ? 1 : -1;
             final double currentScale  = scaleFactorProperty.getValue();

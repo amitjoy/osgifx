@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.smartgraph.graphview;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Verify.verify;
+import static com.google.common.base.Verify.verifyNotNull;
 import static com.osgifx.console.smartgraph.graphview.UtilitiesJavaFX.pick;
 import static com.osgifx.console.smartgraph.graphview.UtilitiesPoint2D.attractiveForce;
 import static com.osgifx.console.smartgraph.graphview.UtilitiesPoint2D.repellingForce;
@@ -35,7 +38,6 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.framework.FrameworkUtil;
 
@@ -175,7 +177,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                            final SmartGraphProperties properties,
                            final SmartPlacementStrategy placementStrategy,
                            final URI cssFile) {
-        Validate.notNull(theGraph);
+        checkNotNull(theGraph, "Graph cannot be null");
 
         this.theGraph          = theGraph;
         this.graphProperties   = properties != null ? properties : new SmartGraphProperties();
@@ -290,13 +292,8 @@ public class SmartGraphPanel<V, E> extends Pane {
      * vertices.
      */
     public void update() {
-        if (getScene() == null) {
-            throw new IllegalStateException("You must call this method after the instance was added to a scene.");
-        }
-
-        if (!this.initialized) {
-            throw new IllegalStateException("You must call init() method before any updates.");
-        }
+        verifyNotNull(getScene(), "You must call this method after the instance was added to a scene.");
+        verify(this.initialized, "You must call init() method before any updates.");
 
         // this will be called from a non-javafx thread, so this must be guaranteed to
         // run of the graphics thread
@@ -316,20 +313,14 @@ public class SmartGraphPanel<V, E> extends Pane {
      * vertices.
      */
     public void updateAndWait() {
-        if (getScene() == null) {
-            throw new IllegalStateException("You must call this method after the instance was added to a scene.");
-        }
-
-        if (!this.initialized) {
-            throw new IllegalStateException("You must call init() method before any updates.");
-        }
+        verifyNotNull(getScene(), "You must call this method after the instance was added to a scene.");
+        verify(this.initialized, "You must call init() method before any updates.");
 
         final FutureTask<?> update = new FutureTask<>(() -> {
             updateNodes();
             return true;
         });
 
-        //
         if (!Platform.isFxApplicationThread()) {
             // this will be called from a non-javafx thread, so this must be guaranteed to
             // run of the graphics thread
@@ -338,8 +329,11 @@ public class SmartGraphPanel<V, E> extends Pane {
             // wait for completion, only outside javafx thread; otherwise -> deadlock
             try {
                 update.get(1, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            } catch (ExecutionException | TimeoutException ex) {
                 Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (final InterruptedException ex) {
+                Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, null, ex);
+                Thread.currentThread().interrupt();
             }
         } else {
             updateNodes();
