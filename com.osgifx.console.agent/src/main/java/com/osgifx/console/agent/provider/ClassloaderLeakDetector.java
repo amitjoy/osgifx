@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -100,7 +99,7 @@ public final class ClassloaderLeakDetector implements Runnable {
 
     @Inject
     public ClassloaderLeakDetector(final BundleContext context,
-            final BundleStartTimeCalculator bundleStartTimeCalculator) {
+                                   final BundleStartTimeCalculator bundleStartTimeCalculator) {
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
     }
@@ -186,7 +185,7 @@ public final class ClassloaderLeakDetector implements Runnable {
         final List<BundleInfo> suspiciousBundles = new ArrayList<>(bundleInfos.values());
         // filter out ACTIVE bundles that have only one classloader created for them
         suspiciousBundles.removeIf(bi -> bi.hasSingleInstance() && activeBundleIds.contains(bi.bundleId));
-        return suspiciousBundles.stream().map(this::toDTO).collect(Collectors.toSet());
+        return suspiciousBundles.stream().map(this::toDTO).collect(toSet());
     }
 
     private XBundleDTO toDTO(final BundleInfo bundleInfo) {

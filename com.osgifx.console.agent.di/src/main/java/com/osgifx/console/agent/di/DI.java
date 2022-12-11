@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.di;
 
+import static java.util.stream.Collectors.toList;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -26,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -174,7 +175,7 @@ public final class DI {
                 return getProviderArgument(param, type);
             }
             return getInstance(param.getType(), type);
-        }).collect(Collectors.toList());
+        }).collect(toList());
 
         try {
             final T newInstance = constructor.newInstance(arguments.toArray());
@@ -189,7 +190,7 @@ public final class DI {
             return newInstance;
         } catch (final Exception e) {
             throw new DiException(createErrorMessageStart(type) + "An Exception was thrown during the instantiation.",
-                    e);
+                                  e);
         }
     }
 
@@ -225,16 +226,13 @@ public final class DI {
      */
     public <T> void bindInterface(final Class<T> interfaceType, final Class<? extends T> implementationType) {
         if (!interfaceType.isInterface()) {
-            throw new IllegalArgumentException(
-                    "The given type is not an interface. Expecting the first argument to be an interface.");
+            throw new IllegalArgumentException("The given type is not an interface. Expecting the first argument to be an interface.");
         }
         if (implementationType.isInterface()) {
-            throw new IllegalArgumentException(
-                    "The given type is an interface. Expecting the second argument to not be an interface but an actual class");
+            throw new IllegalArgumentException("The given type is an interface. Expecting the second argument to not be an interface but an actual class");
         }
         if (isAbstractClass(implementationType)) {
-            throw new IllegalArgumentException(
-                    "The given type is an abstract class. Expecting the second argument to be an actual implementing class");
+            throw new IllegalArgumentException("The given type is an abstract class. Expecting the second argument to be an actual implementing class");
         }
         interfaceMappings.put(interfaceType, implementationType);
     }
@@ -291,8 +289,7 @@ public final class DI {
      */
     public void markAsSingleton(final Class<?> type) {
         if (type.isInterface()) {
-            throw new IllegalArgumentException(
-                    "The given type is an interface. Expecting the param to be an actual class");
+            throw new IllegalArgumentException("The given type is an interface. Expecting the param to be an actual class");
         }
         singletonClasses.add(type);
     }
@@ -388,7 +385,7 @@ public final class DI {
             return (Constructor<T>) constructors[0];
         }
         final List<Constructor<?>> constructorsWithInject = Arrays.stream(constructors)
-                .filter(c -> c.isAnnotationPresent(Inject.class)).collect(Collectors.toList());
+                .filter(c -> c.isAnnotationPresent(Inject.class)).collect(toList());
 
         if (constructorsWithInject.isEmpty()) {
             throw new DiException(createErrorMessageStart(type)

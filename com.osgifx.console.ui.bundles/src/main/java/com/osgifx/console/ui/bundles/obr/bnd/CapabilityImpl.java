@@ -22,8 +22,10 @@ import org.osgi.resource.Resource;
 
 public class CapabilityImpl extends CapReq implements Capability {
 
-    CapabilityImpl(final String namespace, final Resource resource, final Map<String, String> directives,
-            final Map<String, Object> attributes) {
+    CapabilityImpl(final String namespace,
+                   final Resource resource,
+                   final Map<String, String> directives,
+                   final Map<String, Object> attributes) {
         super(MODE.Capability, namespace, resource, directives, attributes);
     }
 

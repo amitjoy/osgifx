@@ -74,7 +74,7 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
         logger.atInfo().log("Retrieving configurations info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         configurations.setAll(makeNullSafe(agent.getAllConfigurations()));

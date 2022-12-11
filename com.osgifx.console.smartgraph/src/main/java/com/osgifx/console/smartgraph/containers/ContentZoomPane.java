@@ -40,9 +40,7 @@ import javafx.scene.text.Text;
  */
 public class ContentZoomPane extends BorderPane {
 
-    /*
-     * PAN AND ZOOM
-     */
+    /* PAN AND ZOOM */
     private final DoubleProperty scaleFactorProperty = new ReadOnlyDoubleWrapper(1);
     private final Node           content;
 
@@ -110,19 +108,14 @@ public class ContentZoomPane extends BorderPane {
     private void enablePanAndZoom() {
 
         setOnScroll((final ScrollEvent event) -> {
-
-            final double direction = event.getDeltaY() >= 0 ? 1 : -1;
-
+            final double direction     = event.getDeltaY() >= 0 ? 1 : -1;
             final double currentScale  = scaleFactorProperty.getValue();
             var          computedScale = currentScale + direction * SCROLL_DELTA;
 
             computedScale = boundValue(computedScale, MIN_SCALE, MAX_SCALE);
-
             if (currentScale != computedScale) {
-
                 content.setScaleX(computedScale);
                 content.setScaleY(computedScale);
-
                 if (computedScale == 1) {
                     content.setTranslateX(-getTranslateX());
                     content.setTranslateY(-getTranslateY());
@@ -142,7 +135,6 @@ public class ContentZoomPane extends BorderPane {
         });
 
         final var sceneDragContext = new DragContext();
-
         setOnMousePressed((final MouseEvent event) -> {
             if (event.isSecondaryButtonDown()) {
                 getScene().setCursor(Cursor.MOVE);
@@ -155,14 +147,9 @@ public class ContentZoomPane extends BorderPane {
             }
 
         });
-
-        setOnMouseReleased((final MouseEvent event) -> {
-            getScene().setCursor(Cursor.DEFAULT);
-        });
-
+        setOnMouseReleased((final MouseEvent event) -> getScene().setCursor(Cursor.DEFAULT));
         setOnMouseDragged((final MouseEvent event) -> {
             if (event.isSecondaryButtonDown()) {
-
                 content.setTranslateX(sceneDragContext.translateAnchorX + event.getX() - sceneDragContext.mouseAnchorX);
                 content.setTranslateY(sceneDragContext.translateAnchorY + event.getY() - sceneDragContext.mouseAnchorY);
             }
@@ -175,13 +162,11 @@ public class ContentZoomPane extends BorderPane {
     }
 
     static class DragContext {
-
         double mouseAnchorX;
         double mouseAnchorY;
 
         double translateAnchorX;
         double translateAnchorY;
-
     }
 
 }

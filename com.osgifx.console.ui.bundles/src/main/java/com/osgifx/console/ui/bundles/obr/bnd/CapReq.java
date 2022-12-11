@@ -42,8 +42,11 @@ class CapReq {
     private final Map<String, Object> attributes;
     private transient int             hashCode = 0;
 
-    CapReq(final MODE mode, final String namespace, final Resource resource, final Map<String, String> directives,
-            final Map<String, Object> attributes) {
+    CapReq(final MODE mode,
+           final String namespace,
+           final Resource resource,
+           final Map<String, String> directives,
+           final Map<String, Object> attributes) {
         this.mode       = requireNonNull(mode);
         this.namespace  = requireNonNull(namespace);
         this.resource   = resource;

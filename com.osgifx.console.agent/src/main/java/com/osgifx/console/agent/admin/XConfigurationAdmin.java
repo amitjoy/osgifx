@@ -60,8 +60,10 @@ public final class XConfigurationAdmin {
     private final XComponentAdmin    componentAdmin;
 
     @Inject
-    public XConfigurationAdmin(final BundleContext context, final Object configAdmin, final Object metatype,
-            final XComponentAdmin componentAdmin) {
+    public XConfigurationAdmin(final BundleContext context,
+                               final Object configAdmin,
+                               final Object metatype,
+                               final XComponentAdmin componentAdmin) {
         this.context        = requireNonNull(context);
         this.metatype       = metatype;
         this.configAdmin    = (ConfigurationAdmin) configAdmin;
@@ -209,8 +211,13 @@ public final class XConfigurationAdmin {
 
         dto.componentName = componentName;
         dto.targetKey     = refName + ".target";
-        dto.targetFilter  = Optional.ofNullable(configuration.properties.remove(dto.targetKey)).map(k -> k.value)
-                .map(String.class::cast).orElse(null);
+
+        // @formatter:off
+        dto.targetFilter  = Optional.ofNullable(configuration.properties.remove(dto.targetKey))
+                                    .map(k -> k.value)
+                                    .map(String.class::cast)
+                                    .orElse(null);
+        // @formatter:on
 
         return dto;
     }

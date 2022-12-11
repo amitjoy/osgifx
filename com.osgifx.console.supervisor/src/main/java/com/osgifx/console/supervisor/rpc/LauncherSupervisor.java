@@ -187,8 +187,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
                         final int port,
                         final int timeout,
                         final String trustStore,
-                        final String trustStorePassword)
-            throws Exception {
+                        final String trustStorePassword) throws Exception {
         super.connect(Agent.class, this, host, port, timeout, trustStore, trustStorePassword);
     }
 

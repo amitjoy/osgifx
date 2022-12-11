@@ -149,7 +149,7 @@ public final class HeapMonitorPane extends BorderPane {
             for (final XMemoryPoolMXBean mpBean : heapUsage.memoryPoolBeans) {
                 if ("HEAP".equals(mpBean.type)) {
                     final var memoryUsageChart = new HeapMonitorChart(mpBean.name,
-                            getMemoryUsagedByMemoryPoolBean(mpBean), now);
+                                                                      getMemoryUsagedByMemoryPoolBean(mpBean), now);
                     addToList(memoryUsageChart, vBoxChildren);
                 }
             }
@@ -241,7 +241,7 @@ public final class HeapMonitorPane extends BorderPane {
         borderPane.setPadding(new Insets(5, 5, 5, 5));
 
         final var border = new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY,
-                BorderWidths.DEFAULT, new Insets(5)));
+                                                       BorderWidths.DEFAULT, new Insets(5)));
         borderPane.setBorder(border);
         return borderPane;
     }
