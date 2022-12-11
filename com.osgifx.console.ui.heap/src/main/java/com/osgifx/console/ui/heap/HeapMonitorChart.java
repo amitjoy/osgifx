@@ -58,8 +58,9 @@ public final class HeapMonitorChart extends BorderPane {
     private final AtomicBoolean firstUpdateCall;
     private NumberAxis          yAxis;
 
-    public HeapMonitorChart(final String title, final Supplier<XMemoryUsage> memoryUsageSupplier,
-            final long startCounter) {
+    public HeapMonitorChart(final String title,
+                            final Supplier<XMemoryUsage> memoryUsageSupplier,
+                            final long startCounter) {
         this.title               = title;
         this.memoryUsageSupplier = memoryUsageSupplier;
         counter                  = new AtomicLong(startCounter);

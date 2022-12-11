@@ -69,7 +69,7 @@ public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHand
         logger.atInfo().log("Retrieving threads info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         threads.setAll(makeNullSafe(agent.getAllThreads()));

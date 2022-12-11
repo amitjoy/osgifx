@@ -126,10 +126,8 @@ public final class BundleInstallDialogController {
     }
 
     private void registerNumberValidationListener() {
-        final TextFormatter<?> integerFormatter = new TextFormatter<>(
-                (UnaryOperator<TextFormatter.Change>) change -> Ints.tryParse(change.getControlNewText()) != null
-                        ? change
-                        : null);
+        final TextFormatter<?> integerFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> Ints
+                .tryParse(change.getControlNewText()) != null ? change : null);
         startLevel.setTextFormatter(integerFormatter);
     }
 

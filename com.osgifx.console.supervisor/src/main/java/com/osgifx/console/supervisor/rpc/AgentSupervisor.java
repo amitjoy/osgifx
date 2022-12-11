@@ -41,8 +41,10 @@ public class AgentSupervisor<S, A> {
     protected int                port;
     protected int                timeout;
 
-    protected void connect(final Class<A> agent, final S supervisor, final String host, final int port)
-            throws Exception {
+    protected void connect(final Class<A> agent,
+                           final S supervisor,
+                           final String host,
+                           final int port) throws Exception {
         connect(agent, supervisor, host, port, -1, null, null);
     }
 
@@ -52,8 +54,7 @@ public class AgentSupervisor<S, A> {
                            final int port,
                            final int timeout,
                            final String trustStore,
-                           final String trustStorePassword)
-            throws Exception {
+                           final String trustStorePassword) throws Exception {
 
         checkArgument(timeout > -1, "timeout cannot be less than -1");
         requireNonNull(supervisor, "'supervisor' cannot be null");

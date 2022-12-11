@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -66,10 +67,14 @@ public final class XServiceAdmin {
         dto.id                = refDTO.id;
         dto.bundleId          = bundleInfo.id;
         dto.registeringBundle = bundleInfo.symbolicName;
-        dto.properties        = refDTO.properties.entrySet().stream()
-                .collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
+        // @formatter:off
+        dto.properties        = refDTO.properties.entrySet()
+                                                 .stream()
+                                                 .collect(
+                                                         toMap(Map.Entry::getKey, e -> arrayToString(e.getValue())));
         dto.usingBundles      = getUsingBundles(refDTO.usingBundles, context);
         dto.types             = getObjectClass(refDTO.properties);
+        // @formatter:on
 
         return dto;
     }
@@ -101,12 +106,13 @@ public final class XServiceAdmin {
     }
 
     private String bsn(final long id, final BundleContext context) {
-        for (final Bundle b : context.getBundles()) {
-            if (b.getBundleId() == id) {
-                return b.getSymbolicName();
-            }
-        }
-        return null;
+        // @formatter:off
+        return Stream.of(context.getBundles())
+                     .filter(b -> b.getBundleId() == id)
+                     .map(Bundle::getSymbolicName)
+                     .findAny()
+                     .orElse(null);
+        // @formatter:on
     }
 
 }

@@ -126,9 +126,13 @@ public final class LogConfigurationEditorFxController {
     }
 
     private FormRenderer createForm(final XBundleLoggerContextDTO loggerContext) {
-        form = Form.of(Section.of(initGenericFields(loggerContext).toArray(new Field[0])).title("Generic Information"),
-                Section.of(initField(loggerContext).toArray(new Field[0])).title("Logger Context Configuration"))
-                .title("Logger Context Configuration");
+        // @formatter:off
+        form = Form.of(
+                     Section.of(initGenericFields(loggerContext).toArray(new Field[0]))
+                            .title("Generic Information"),
+                     Section.of(initField(loggerContext).toArray(new Field[0]))
+                            .title("Logger Context Configuration"));
+        // @formatter:on
         final var renderer = new FormRenderer(form);
 
         GridPane.setColumnSpan(renderer, 2);

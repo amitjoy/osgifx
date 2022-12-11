@@ -35,9 +35,11 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.framework.FrameworkUtil;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.osgifx.console.smartgraph.graph.Digraph;
 import com.osgifx.console.smartgraph.graph.Edge;
@@ -152,8 +154,9 @@ public class SmartGraphPanel<V, E> extends Pane {
      * @param properties custom properties, null for default
      * @param placementStrategy placement strategy, null for default
      */
-    public SmartGraphPanel(final Graph<V, E> theGraph, final SmartGraphProperties properties,
-            final SmartPlacementStrategy placementStrategy) {
+    public SmartGraphPanel(final Graph<V, E> theGraph,
+                           final SmartGraphProperties properties,
+                           final SmartPlacementStrategy placementStrategy) {
 
         this(theGraph, properties, placementStrategy, null);
     }
@@ -168,12 +171,12 @@ public class SmartGraphPanel<V, E> extends Pane {
      * @param cssFile alternative css file, instead of default
      *            'smartgraph.css'
      */
-    public SmartGraphPanel(final Graph<V, E> theGraph, final SmartGraphProperties properties,
-            final SmartPlacementStrategy placementStrategy, final URI cssFile) {
+    public SmartGraphPanel(final Graph<V, E> theGraph,
+                           final SmartGraphProperties properties,
+                           final SmartPlacementStrategy placementStrategy,
+                           final URI cssFile) {
+        Validate.notNull(theGraph);
 
-        if (theGraph == null) {
-            throw new IllegalArgumentException("The graph cannot be null.");
-        }
         this.theGraph          = theGraph;
         this.graphProperties   = properties != null ? properties : new SmartGraphProperties();
         this.placementStrategy = placementStrategy != null ? placementStrategy : new SmartRandomPlacementStrategy();
@@ -239,9 +242,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      *             called.
      */
     public void init() throws IllegalStateException {
-        if (this.initialized) {
-            throw new IllegalStateException("Already initialized. Use update() method instead.");
-        }
+        Preconditions.checkState(!initialized, "Already initialized. Use update() method instead.");
 
         final var width  = getPrefWidth();
         final var height = getPrefHeight();
@@ -381,7 +382,7 @@ public class SmartGraphPanel<V, E> extends Pane {
         /* create vertex graphical representations */
         for (final Vertex<V> vertex : listOfVertices()) {
             final var vertexAnchor = new SmartGraphVertexNode<>(vertex, 0, 0, graphProperties.getVertexRadius(),
-                    graphProperties.getVertexAllowUserMove());
+                                                                graphProperties.getVertexAllowUserMove());
             final var styleClass   = getStyleClass(vertex, theGraph);
             vertexAnchor.setStyleClass(styleClass);
             vertexNodes.put(vertex, vertexAnchor);
@@ -550,8 +551,8 @@ public class SmartGraphPanel<V, E> extends Pane {
                     }
                 }
 
-                final SmartGraphVertexNode newVertex = new SmartGraphVertexNode<>(vertex, x, y,
-                        graphProperties.getVertexRadius(), graphProperties.getVertexAllowUserMove());
+                final SmartGraphVertexNode newVertex = new SmartGraphVertexNode<>(vertex, x, y, graphProperties
+                        .getVertexRadius(), graphProperties.getVertexAllowUserMove());
 
                 // track new nodes
                 newVertices.add(newVertex);

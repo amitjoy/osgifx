@@ -31,7 +31,7 @@ public class Version implements Comparable<Version> {
     public static final Pattern VERSION        = Pattern.compile(VERSION_STRING);
     public static final Version LOWEST         = new Version();
     public static final Version HIGHEST        = new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE,
-            HIGHESTCHAR);
+                                                             HIGHESTCHAR);
 
     public static final Version emptyVersion = LOWEST;
     public static final Version ONE          = new Version(1, 0, 0);

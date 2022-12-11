@@ -154,8 +154,7 @@ public class CapReqBuilder {
 
     public Requirement buildRequirement() {
         if (resource == null) {
-            throw new IllegalStateException(
-                    "Cannot build Requirement with null Resource. use buildSyntheticRequirement");
+            throw new IllegalStateException("Cannot build Requirement with null Resource. use buildSyntheticRequirement");
         }
         return new RequirementImpl(namespace, resource, directives, attributes);
     }
@@ -294,8 +293,8 @@ public class CapReqBuilder {
             }
             return osgis;
         }
-        throw new IllegalArgumentException(
-                "cannot convert " + value + " to an org.osgi.framework Version(s) object as requested");
+        throw new IllegalArgumentException("cannot convert " + value
+                + " to an org.osgi.framework Version(s) object as requested");
     }
 
     @Override
