@@ -15,18 +15,18 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Namespace;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 
 class CapReq {
 
@@ -47,11 +47,11 @@ class CapReq {
            final Resource resource,
            final Map<String, String> directives,
            final Map<String, Object> attributes) {
-        this.mode       = requireNonNull(mode);
-        this.namespace  = requireNonNull(namespace);
+        this.mode       = checkNotNull(mode);
+        this.namespace  = checkNotNull(namespace);
         this.resource   = resource;
-        this.directives = unmodifiableMap(Maps.newHashMap(directives));
-        this.attributes = unmodifiableMap(Maps.newHashMap(attributes));
+        this.directives = ImmutableMap.copyOf(directives);
+        this.attributes = ImmutableMap.copyOf(attributes);
     }
 
     public String getNamespace() {
@@ -75,7 +75,15 @@ class CapReq {
         if (hashCode != 0) {
             return hashCode;
         }
-        return hashCode = Objects.hash(attributes, directives, mode, namespace, resource);
+        // @formatter:off
+        return new HashCodeBuilder()
+                      .append(attributes)
+                      .append(directives)
+                      .append(mode)
+                      .append(namespace)
+                      .append(resource)
+                   .toHashCode();
+        // @formatter:on
     }
 
     @Override
