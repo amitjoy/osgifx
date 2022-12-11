@@ -25,13 +25,13 @@ import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -39,6 +39,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Maps;
+import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -143,6 +144,7 @@ public final class OverviewFxUI {
                     createRuntimeTable(
                             runtimeInfo.frameworkBsn(),
                             runtimeInfo.frameworkVersion(),
+                            runtimeInfo.frameworkStartLevel(),
                             runtimeInfo.memoryInfo(),
                             runtimeInfo.osName(),
                             runtimeInfo.osVersion(),
@@ -159,6 +161,8 @@ public final class OverviewFxUI {
         final var frameworkBsn         = dataProvider.bundles().stream().findFirst().map(b -> b.symbolicName)
                 .orElse("");
         final var frameworkVersion     = dataProvider.bundles().stream().findFirst().map(b -> b.version).orElse("");
+        final var frameworkStartLevel  = dataProvider.bundles().stream().findFirst().map(b -> b.frameworkStartLevel)
+                .orElse(-1);
         final var osName               = dataProvider.properties().stream().filter(p -> "os.name".equals(p.name))
                 .map(p -> p.value).map(Object::toString).findAny().orElse("");
         final var osVersion            = dataProvider.properties().stream().filter(p -> "os.version".equals(p.name))
@@ -172,8 +176,8 @@ public final class OverviewFxUI {
         final var memoryInfo           = requireNonNullElse(dataProvider.memory(), new XMemoryInfoDTO());
         final var uptime               = toUptimeEntry(memoryInfo.uptime);
 
-        return new OverviewInfo(frameworkBsn, frameworkVersion, osName, osVersion, osArchitecture, noOfThreads,
-                                noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
+        return new OverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName, osVersion, osArchitecture,
+                                noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -305,6 +309,7 @@ public final class OverviewFxUI {
 
     private Node createRuntimeTable(final String frameworkBsn,
                                     final String frameworkVersion,
+                                    final int frameworkStartLevel,
                                     final XMemoryInfoDTO memoryInfo,
                                     final String osName,
                                     final String osVersion,
@@ -335,8 +340,8 @@ public final class OverviewFxUI {
                 Map.of(
                         "Framework", frameworkBsn,
                         "Framework Version", frameworkVersion,
-                        "Memory Total", String.valueOf(memoryInfo.totalMemory),
-                        "Memory Free", String.valueOf(memoryInfo.freeMemory),
+                        "Framework Start Level", String.valueOf(frameworkStartLevel),
+                        "Total Memory", FileUtils.byteCountToDisplaySize(memoryInfo.totalMemory),
                         "OS Name", osName,
                         "OS Version", osVersion,
                         "OS Architecture", osArchitecture);
@@ -345,12 +350,7 @@ public final class OverviewFxUI {
         final Map<String, String> filteredMap = Maps.newTreeMap();
         filteredMap.putAll(runtimeInfo);
 
-        for (final Entry<String, String> entry : filteredMap.entrySet()) {
-            final var key   = entry.getKey();
-            final var value = entry.getValue();
-            final var node  = getTileTableInfo(key, value);
-            dataTable.getChildren().add(node);
-        }
+        BiStream.from(filteredMap).mapToObj(this::getTileTableInfo).forEach(n -> dataTable.getChildren().add(n));
         return dataTable;
     }
 
@@ -396,6 +396,7 @@ public final class OverviewFxUI {
 
     private record OverviewInfo(String frameworkBsn,
                                 String frameworkVersion,
+                                int frameworkStartLevel,
                                 String osName,
                                 String osVersion,
                                 String osArchitecture,
@@ -406,7 +407,7 @@ public final class OverviewFxUI {
                                 XMemoryInfoDTO memoryInfo,
                                 UptimeDTO uptime) {
         public OverviewInfo() {
-            this("", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
+            this("", "", -1, "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
         }
     }
 

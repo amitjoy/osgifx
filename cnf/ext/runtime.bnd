@@ -82,6 +82,7 @@ bundles.required: \
                  com.google.guava,\
                  org.apache.aries.component-dsl.component-dsl,\
                  org.apache.commons.lang3,\
+                 org.apache.commons.commons-io,\
                  org.apache.commons.commons-text,\
                  org.eclipse.equinox.preferences,\
                  controlsfx,\
