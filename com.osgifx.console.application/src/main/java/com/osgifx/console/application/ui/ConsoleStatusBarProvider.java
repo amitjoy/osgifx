@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.application.ui;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.scene.paint.Color.GREEN;
 import static javafx.scene.paint.Color.TRANSPARENT;
@@ -79,13 +79,13 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
 
     @Override
     public void addToLeft(final Node node) {
-        requireNonNull(node, "Specified node cannot be null");
+        checkNotNull(node, "Specified node cannot be null");
         statusBar.getLeftItems().add(node);
     }
 
     @Override
     public void addToRight(final Node node) {
-        requireNonNull(node, "Specified node cannot be null");
+        checkNotNull(node, "Specified node cannot be null");
         statusBar.getRightItems().add(node);
     }
 

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
+import static com.google.common.base.Verify.verify;
+
 import java.util.regex.Pattern;
 
 public class Version implements Comparable<Version> {
@@ -64,9 +66,7 @@ public class Version implements Comparable<Version> {
     public Version(String version) {
         version = version.trim();
         final var m = VERSION.matcher(version);
-        if (!m.matches()) {
-            throw new IllegalArgumentException("Invalid syntax for version: " + version);
-        }
+        verify(m.matches(), "Invalid syntax for version: %s", version);
 
         major = Integer.parseInt(m.group(1));
         if (m.group(3) != null) {
