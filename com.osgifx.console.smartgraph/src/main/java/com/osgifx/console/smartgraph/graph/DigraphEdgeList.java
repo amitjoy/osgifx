@@ -261,7 +261,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public String toString() {
-        final var sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:\n", numVertices(),
+        final var sb = new StringBuilder(String.format("Graph with %d vertices and %d edges:%n", numVertices(),
                 numEdges()));
 
         sb.append("--- Vertices: \n");

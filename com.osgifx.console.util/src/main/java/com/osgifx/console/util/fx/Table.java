@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
+import static com.google.common.base.Verify.verify;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -61,9 +63,7 @@ public final class Table {
             if (maxWidths == null) {
                 maxWidths = new int[cells.length];
             }
-            if (cells.length != maxWidths.length) {
-                throw new IllegalArgumentException("Number of row-cells and headers should be consistent");
-            }
+            verify(cells.length == maxWidths.length, "Number of row-cells and headers should be consistent");
             for (var i = 0; i < cells.length; i++) {
                 maxWidths[i] = Math.max(maxWidths[i], cells[i].length());
             }
