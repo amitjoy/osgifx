@@ -43,8 +43,7 @@ import jakarta.inject.Inject;
 
 public final class XDmtAdmin {
 
-    private XDmtNodeDTO parent;
-
+    private XDmtNodeDTO    parent;
     private final DmtAdmin dmtAdmin;
 
     @Inject
@@ -91,8 +90,7 @@ public final class XDmtAdmin {
     private XResultDTO updateNode(final DmtSession session,
                                   final String uri,
                                   final Object value,
-                                  final DmtDataType format)
-            throws DmtException {
+                                  final DmtDataType format) throws DmtException {
         session.setNodeValue(uri, convertValue(value, format));
         return createResult(SUCCESS, "DMT node has been successfully updated");
     }
@@ -146,8 +144,7 @@ public final class XDmtAdmin {
     private XDmtNodeDTO createNode(final DmtSession session,
                                    final String uri,
                                    final XDmtNodeDTO parent,
-                                   final boolean isRoot)
-            throws DmtException {
+                                   final boolean isRoot) throws DmtException {
         final List<String> data = extractData(session, uri, isRoot);
         final XDmtNodeDTO  node = new XDmtNodeDTO();
 

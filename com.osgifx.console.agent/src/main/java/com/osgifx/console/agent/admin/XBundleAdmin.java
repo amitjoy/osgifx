@@ -18,6 +18,12 @@ package com.osgifx.console.agent.admin;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
+import static org.osgi.framework.Bundle.ACTIVE;
+import static org.osgi.framework.Bundle.INSTALLED;
+import static org.osgi.framework.Bundle.RESOLVED;
+import static org.osgi.framework.Bundle.STARTING;
+import static org.osgi.framework.Bundle.STOPPING;
+import static org.osgi.framework.Bundle.UNINSTALLED;
 import static org.osgi.framework.Constants.BUNDLE_CATEGORY;
 import static org.osgi.framework.Constants.BUNDLE_DESCRIPTION;
 import static org.osgi.framework.Constants.BUNDLE_DOCURL;
@@ -183,6 +189,7 @@ public final class XBundleAdmin {
 
             dto.id           = b.getBundleId();
             dto.symbolicName = b.getSymbolicName();
+
             attachedHosts.add(dto);
         }
         return attachedHosts;
@@ -372,17 +379,17 @@ public final class XBundleAdmin {
 
     private static String findState(final int state) {
         switch (state) {
-            case Bundle.ACTIVE:
+            case ACTIVE:
                 return "ACTIVE";
-            case Bundle.INSTALLED:
+            case INSTALLED:
                 return "INSTALLED";
-            case Bundle.RESOLVED:
+            case RESOLVED:
                 return "RESOLVED";
-            case Bundle.STARTING:
+            case STARTING:
                 return "STARTING";
-            case Bundle.STOPPING:
+            case STOPPING:
                 return "STOPPING";
-            case Bundle.UNINSTALLED:
+            case UNINSTALLED:
                 return "UNINSTALLED";
             default:
                 break;

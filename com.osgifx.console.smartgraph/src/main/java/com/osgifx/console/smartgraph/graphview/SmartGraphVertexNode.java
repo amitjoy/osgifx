@@ -67,8 +67,11 @@ public class SmartGraphVertexNode<T> extends Circle implements SmartGraphVertex<
      * @param radius radius of this vertex representation, i.e., a circle
      * @param allowMove should the vertex be draggable with the mouse
      */
-    public SmartGraphVertexNode(final Vertex<T> v, final double x, final double y, final double radius,
-            final boolean allowMove) {
+    public SmartGraphVertexNode(final Vertex<T> v,
+                                final double x,
+                                final double y,
+                                final double radius,
+                                final boolean allowMove) {
         super(x, y, radius);
 
         this.underlyingVertex = v;

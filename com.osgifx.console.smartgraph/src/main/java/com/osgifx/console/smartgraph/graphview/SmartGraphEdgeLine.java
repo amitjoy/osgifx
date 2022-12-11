@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.smartgraph.graphview;
 
+import org.apache.commons.lang3.Validate;
+
 import com.osgifx.console.smartgraph.graph.Edge;
 
 import javafx.scene.shape.Line;
@@ -43,11 +45,11 @@ public class SmartGraphEdgeLine<E, V> extends Line implements SmartGraphEdgeBase
     private final SmartStyleProxy styleProxy;
 
     @SuppressWarnings("rawtypes")
-    public SmartGraphEdgeLine(final Edge<E, V> edge, final SmartGraphVertexNode inbound,
-            final SmartGraphVertexNode outbound) {
-        if (inbound == null || outbound == null) {
-            throw new IllegalArgumentException("Cannot connect null vertices.");
-        }
+    public SmartGraphEdgeLine(final Edge<E, V> edge,
+                              final SmartGraphVertexNode inbound,
+                              final SmartGraphVertexNode outbound) {
+        Validate.notNull(inbound);
+        Validate.notNull(outbound);
 
         this.inbound  = inbound;
         this.outbound = outbound;

@@ -47,14 +47,14 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(LOGGER_CONTEXTS_ID)
-//@formatter:off
+// @formatter:off
 @EventTopics({
     AGENT_DISCONNECTED_EVENT_TOPIC,
     BUNDLE_ACTION_EVENT_TOPICS,
     COMPONENT_ACTION_EVENT_TOPICS,
     CONFIGURATION_ACTION_EVENT_TOPICS,
     LOGGER_CONTEXT_ACTION_EVENT_TOPICS })
-//@formatter:on
+// @formatter:on
 public final class LoggerContextsInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
     public static final String LOGGER_CONTEXTS_ID = "loggerContexts";
@@ -83,7 +83,7 @@ public final class LoggerContextsInfoSupplier implements RuntimeInfoSupplier, Ev
         logger.atInfo().log("Retrieving logger contexts info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         loggerContexts.setAll(makeNullSafe(agent.getBundleLoggerContexts()));

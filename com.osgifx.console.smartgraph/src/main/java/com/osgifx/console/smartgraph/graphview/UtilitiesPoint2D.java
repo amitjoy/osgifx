@@ -46,7 +46,7 @@ public class UtilitiesPoint2D {
 
         // rotate point
         final var rotatedOrigin = new Point2D(result.getX() * cos - result.getY() * sin,
-                result.getX() * sin + result.getY() * cos);
+                                              result.getX() * sin + result.getY() * cos);
 
         return rotatedOrigin.add(pivot);
     }

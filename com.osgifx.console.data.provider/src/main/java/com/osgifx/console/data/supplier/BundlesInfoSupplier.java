@@ -73,7 +73,7 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
         logger.atInfo().log("Retrieving bundles info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         bundles.setAll(makeNullSafe(agent.getAllBundles()));

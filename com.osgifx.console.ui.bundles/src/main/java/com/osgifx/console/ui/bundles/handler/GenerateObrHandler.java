@@ -82,6 +82,7 @@ public final class GenerateObrHandler {
         }
         final var xmlResourceGenerator = new XMLResourceGenerator();
         final var outputFile           = new File(location, IO.prepareFilenameFor("xml"));
+
         try (final var buffer = new ByteArrayOutputStream();
                 OutputStream fileStream = new FileOutputStream(outputFile)) {
             xmlResourceGenerator.resources(resources);
@@ -97,8 +98,10 @@ public final class GenerateObrHandler {
     private Resource toResource(final XBundleDTO bundle) {
         try {
             final var builder = new ResourceBuilder();
+
             builder.addCapabilities(bundle.bundleRevision.capabilities);
             builder.addRequirements(bundle.bundleRevision.requirements);
+
             return builder.build();
         } catch (final Exception e) {
             throw ExceptionUtils.wrap(e);

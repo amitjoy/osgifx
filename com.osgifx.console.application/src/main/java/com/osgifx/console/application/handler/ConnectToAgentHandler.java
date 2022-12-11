@@ -18,6 +18,7 @@ package com.osgifx.console.application.handler;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
+import static javafx.scene.control.ButtonType.CANCEL;
 
 import java.util.Map;
 
@@ -50,7 +51,6 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
-import javafx.scene.control.ButtonType;
 
 public final class ConnectToAgentHandler {
 
@@ -116,7 +116,7 @@ public final class ConnectToAgentHandler {
             removeCurrentSelection();
             return;
         }
-        if (selectedButton == ButtonType.CANCEL) {
+        if (selectedButton == CANCEL) {
             removeCurrentSelection();
         }
     }

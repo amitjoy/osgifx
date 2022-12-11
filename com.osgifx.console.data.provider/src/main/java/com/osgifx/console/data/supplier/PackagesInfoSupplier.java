@@ -80,7 +80,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
         logger.atInfo().log("Retrieving packages info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         packages.setAll(preparePackages(agent.getAllBundles()));

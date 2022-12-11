@@ -15,13 +15,14 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static java.util.stream.Collectors.toList;
+import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
+
 import java.util.Collection;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.service.cdi.runtime.CDIComponentRuntime;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
@@ -47,8 +48,12 @@ public final class XDtoAdmin {
     private final Object         jaxRsRuntime;
 
     @Inject
-    public XDtoAdmin(final BundleContext context, final Object scrRuntime, final Object jaxRsRuntime,
-            final Object httpRuntime, final Object cdiRuntime, final PackageWirings wirings) {
+    public XDtoAdmin(final BundleContext context,
+                     final Object scrRuntime,
+                     final Object jaxRsRuntime,
+                     final Object httpRuntime,
+                     final Object cdiRuntime,
+                     final PackageWirings wirings) {
         this.context      = context;
         this.wirings      = wirings;
         this.scrRuntime   = scrRuntime;
@@ -76,9 +81,13 @@ public final class XDtoAdmin {
         final CDIComponentRuntime    cdi = (CDIComponentRuntime) cdiRuntime;
         final CDIComponentRuntimeDTO dto = new CDIComponentRuntimeDTO();
 
-        dto.containers         = cdi.getContainerDTOs();
-        dto.containerTemplates = Stream.of(context.getBundles()).map(cdi::getContainerTemplateDTO)
-                .collect(Collectors.toList());
+        dto.containers = cdi.getContainerDTOs();
+
+        // @formatter:off
+        dto.containerTemplates = Stream.of(context.getBundles())
+                                       .map(cdi::getContainerTemplateDTO)
+                                       .collect(toList());
+        // @formatter:on
 
         return dto;
     }
@@ -116,14 +125,13 @@ public final class XDtoAdmin {
 
         dto.componentDescriptionDTOs   = scr.getComponentDescriptionDTOs();
         dto.componentConfigurationDTOs = scr.getComponentDescriptionDTOs().stream()
-                .map(desc -> scr.getComponentConfigurationDTOs(desc)).flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .map(desc -> scr.getComponentConfigurationDTOs(desc)).flatMap(Collection::stream).collect(toList());
 
         return dto;
     }
 
     private FrameworkDTO prepareFrameworkDTO() {
-        final Bundle systemBundle = context.getBundle(Constants.SYSTEM_BUNDLE_ID);
+        final Bundle systemBundle = context.getBundle(SYSTEM_BUNDLE_ID);
         return systemBundle.adapt(FrameworkDTO.class);
     }
 

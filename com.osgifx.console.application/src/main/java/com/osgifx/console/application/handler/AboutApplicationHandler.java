@@ -38,6 +38,7 @@ public final class AboutApplicationHandler {
         final var dialog = new AboutApplicationDialog();
         ContextInjectionFactory.inject(dialog, context);
         logger.atInfo().log("Injected about dialog to eclipse context");
+
         dialog.init();
         dialog.show();
     }

@@ -132,7 +132,7 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
 
         public BundleStartDuration toBundleStartDuration() {
             return new BundleStartDuration(bundleSymbolicName, Instant.ofEpochMilli(startingTimestamp),
-                    Duration.ofMillis(startedTimestamp - startingTimestamp));
+                                           Duration.ofMillis(startedTimestamp - startingTimestamp));
         }
     }
 }
