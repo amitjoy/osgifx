@@ -226,8 +226,10 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
 
             getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 
-            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(
-                    txtKey::getText, () -> getValue(node), comboBox::getValue);
+            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(txtKey::getText,
+                                                                                                          () -> getValue(
+                                                                                                                  node),
+                                                                                                          comboBox::getValue);
             configurationEntries.put(this, tuple);
         }
 
@@ -260,18 +262,15 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                     final var captionAsDouble = "Decimal Number";
                     txtField.setPromptText(captionAsDouble);
                     final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
-                    final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> (pattern.matcher(change.getControlNewText())
-                                    .matches() ? change : null));
+                    final TextFormatter<?> doubleFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> (pattern
+                            .matcher(change.getControlNewText()).matches() ? change : null));
                     txtField.setTextFormatter(doubleFormatter);
                     break;
                 case CHAR:
                     final var valueCaptionAsChar = "Character Value";
                     txtField.setPromptText(valueCaptionAsChar);
-                    final TextFormatter<?> charFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1
-                                    ? change
-                                    : null));
+                    final TextFormatter<?> charFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> (change
+                            .getControlNewText().length() == 1 ? change : null));
                     txtField.setTextFormatter(charFormatter);
                     break;
                 case STRING:

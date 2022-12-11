@@ -46,7 +46,7 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(HTTP_ID)
-//@formatter:off
+// @formatter:off
 @EventTopics({
     AGENT_DISCONNECTED_EVENT_TOPIC,
     BUNDLE_ACTION_EVENT_TOPICS,
@@ -81,7 +81,7 @@ public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, Ev
         logger.atInfo().log("Retrieving HTTP components info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         httpComponents.setAll(makeNullSafe(agent.getHttpComponents()));

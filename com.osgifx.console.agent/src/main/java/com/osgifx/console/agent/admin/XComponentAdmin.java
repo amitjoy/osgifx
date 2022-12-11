@@ -21,7 +21,14 @@ import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
 import static com.osgifx.console.agent.helper.OSGiCompendiumService.SCR;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.osgi.framework.Constants.OBJECTCLASS;
+import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.ACTIVE;
+import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.SATISFIED;
+import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.UNSATISFIED_CONFIGURATION;
+import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.UNSATISFIED_REFERENCE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.dto.ServiceReferenceDTO;
@@ -77,7 +83,7 @@ public final class XComponentAdmin {
                     // configuration yet as it is probably disabled
                     dtos.add(toDTO(null, compDescDTO));
                 }
-                dtos.addAll(compConfDTOs.stream().map(dto -> toDTO(dto, compDescDTO)).collect(Collectors.toList()));
+                dtos.addAll(compConfDTOs.stream().map(dto -> toDTO(dto, compDescDTO)).collect(toList()));
             }
         } catch (final Exception e) {
             // for any exception occurs in Felix
@@ -207,38 +213,52 @@ public final class XComponentAdmin {
         dto.scope               = compDescDTO.scope;
         dto.implementationClass = compDescDTO.implementationClass;
         dto.configurationPolicy = compDescDTO.configurationPolicy;
-        dto.serviceInterfaces   = Stream.of(compDescDTO.serviceInterfaces).collect(Collectors.toList());
-        dto.configurationPid    = Stream.of(compDescDTO.configurationPid).collect(Collectors.toList());
+        dto.serviceInterfaces   = Stream.of(compDescDTO.serviceInterfaces).collect(toList());
+        dto.configurationPid    = Stream.of(compDescDTO.configurationPid).collect(toList());
+
+        // @formatter:off
         dto.properties          = Optional.ofNullable(compConfDTO)
-                .map(a -> a.properties.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> arrayToString(e.getValue()))))
-                .orElse(Collections.emptyMap());
-        dto.references          = Stream.of(compDescDTO.references).map(this::toRef).collect(Collectors.toList());
+                                          .map(a -> a.properties.entrySet().stream()
+                                          .collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue()))))
+                                          .orElse(emptyMap());
+        dto.references          = Stream.of(compDescDTO.references).map(this::toRef).collect(toList());
+       // @formatter:on
 
         final String failure = getR7field(compConfDTO, "failure");
         dto.failure = Optional.ofNullable(failure).orElse("");
 
-        dto.activate              = compDescDTO.activate;
-        dto.deactivate            = compDescDTO.deactivate;
-        dto.modified              = compDescDTO.modified;
+        dto.activate   = compDescDTO.activate;
+        dto.deactivate = compDescDTO.deactivate;
+        dto.modified   = compDescDTO.modified;
+
+        // @formatter:off
         dto.satisfiedReferences   = Stream.of(
-                Optional.ofNullable(compConfDTO).map(a -> a.satisfiedReferences).orElse(new SatisfiedReferenceDTO[0]))
-                .map(this::toXS).collect(Collectors.toList());
-        dto.unsatisfiedReferences = Stream.of(Optional.ofNullable(compConfDTO).map(a -> a.unsatisfiedReferences)
-                .orElse(new UnsatisfiedReferenceDTO[0])).map(this::toXUS).collect(Collectors.toList());
+                                        Optional.ofNullable(compConfDTO)
+                                                .map(a -> a.satisfiedReferences)
+                                                .orElse(new SatisfiedReferenceDTO[0]))
+                                          .map(this::toXS)
+                                          .collect(toList());
+
+        dto.unsatisfiedReferences = Stream.of(
+                                        Optional.ofNullable(compConfDTO)
+                                                .map(a -> a.unsatisfiedReferences)
+                                                .orElse(new UnsatisfiedReferenceDTO[0]))
+                                          .map(this::toXUS)
+                                          .collect(toList());
+        // @formatter:on
 
         return dto;
     }
 
     private static String mapToState(final int state) {
         switch (state) {
-            case ComponentConfigurationDTO.ACTIVE:
+            case ACTIVE:
                 return "ACTIVE";
-            case ComponentConfigurationDTO.SATISFIED:
+            case SATISFIED:
                 return "SATISFIED";
-            case ComponentConfigurationDTO.UNSATISFIED_REFERENCE:
+            case UNSATISFIED_REFERENCE:
                 return "UNSATISFIED_REFERENCE";
-            case ComponentConfigurationDTO.UNSATISFIED_CONFIGURATION:
+            case UNSATISFIED_CONFIGURATION:
                 return "UNSATISFIED_CONFIGURATION";
             case 16: // ComponentConfigurationDTO.FAILED_ACTIVATION OSGi R7
                 return "FAILED_ACTIVATION";

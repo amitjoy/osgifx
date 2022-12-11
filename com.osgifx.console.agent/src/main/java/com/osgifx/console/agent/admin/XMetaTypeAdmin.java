@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -210,7 +209,7 @@ public final class XMetaTypeAdmin {
 
     @SafeVarargs
     private static <T> List<T> joinLists(final List<T>... lists) {
-        return Stream.of(lists).flatMap(Collection::stream).collect(Collectors.toList());
+        return Stream.of(lists).flatMap(Collection::stream).collect(toList());
     }
 
     private static XAttributeDefType defType(final int defType, final int cardinality) {

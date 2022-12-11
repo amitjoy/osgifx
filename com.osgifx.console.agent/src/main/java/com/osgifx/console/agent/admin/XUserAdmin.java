@@ -251,8 +251,12 @@ public final class XUserAdmin {
     }
 
     private List<XRoleDTO> mergeMembers(final List<XRoleDTO> basicMembers, final List<XRoleDTO> requiredMembers) {
-        return Stream.of(basicMembers, requiredMembers).filter(Objects::nonNull).flatMap(Collection::stream)
-                .collect(toList());
+        // @formatter:off
+        return Stream.of(basicMembers, requiredMembers)
+                     .filter(Objects::nonNull)
+                     .flatMap(Collection::stream)
+                     .collect(toList());
+        // @formatter:on
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

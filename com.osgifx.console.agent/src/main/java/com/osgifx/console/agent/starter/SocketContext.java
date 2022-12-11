@@ -65,12 +65,12 @@ public final class SocketContext {
                     SSLContext.class,
                     "(" + AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY + "=" + sslContextFilter + ")");
             if (sslContextRefs == null || sslContextRefs.isEmpty()) {
-                throw new RuntimeException(
-                        "Custom SSLContext service for OSGi.fx secure agent communication is not available");
+                throw new RuntimeException("Custom SSLContext service for OSGi.fx secure agent communication is not available");
             }
             final ServiceReference<SSLContext> serviceRef = sslContextRefs.iterator().next();
             final SSLContext                   sslContext = bundleContext.getService(serviceRef);
             final SSLServerSocketFactory       ssf        = sslContext.getServerSocketFactory();
+
             return "*".equals(host) ? ssf.createServerSocket(port)
                     : ssf.createServerSocket(port, 3, InetAddress.getByName(host));
         }

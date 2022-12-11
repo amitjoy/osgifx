@@ -78,8 +78,7 @@ public final class SnapshotSupervisor implements Supervisor {
                         final int port,
                         final int timeout,
                         final String trustStore,
-                        final String trustStorePassword)
-            throws Exception {
+                        final String trustStorePassword) throws Exception {
         logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 

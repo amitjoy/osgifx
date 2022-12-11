@@ -74,7 +74,7 @@ public final class Activator extends Thread implements BundleActivator {
                     agents.add(sa);
 
                     final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class,
-                            sa, socket) {
+                                                                                                    sa, socket) {
                         @Override
                         public void close() throws IOException {
                             agents.remove(sa);

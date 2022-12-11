@@ -30,7 +30,6 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.util.converter.Converter;
 import org.osgi.util.converter.Converters;
 
-import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
@@ -289,9 +288,7 @@ public final class BundleDetailsFxController {
     }
 
     private Map<String, Object> createCommandMap(final long value) {
-        final Map<String, Object> properties = Maps.newHashMap();
-        properties.put("id", value);
-        return properties;
+        return Map.of("id", value);
     }
 
 }

@@ -46,7 +46,7 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(HEALTHCHECKS_ID)
-//@formatter:off
+// @formatter:off
 @EventTopics({
     AGENT_DISCONNECTED_EVENT_TOPIC,
     BUNDLE_ACTION_EVENT_TOPICS,
@@ -81,7 +81,7 @@ public final class HealthChecksInfoSupplier implements RuntimeInfoSupplier, Even
         logger.atInfo().log("Retrieving health checks info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         healthchecks.setAll(makeNullSafe(agent.getAllHealthChecks()));
