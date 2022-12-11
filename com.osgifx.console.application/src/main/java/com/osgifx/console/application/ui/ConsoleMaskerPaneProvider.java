@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.application.ui;
 
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.controlsfx.control.MaskerPane;
 
@@ -29,7 +29,7 @@ public final class ConsoleMaskerPaneProvider implements ConsoleMaskerPane {
 
     @Override
     public void addTo(final BorderPane pane) {
-        requireNonNull(pane, "Specified pane cannot be null");
+        checkNotNull(pane, "Specified 'pane' cannot be null");
         pane.setCenter(maskerPane);
     }
 

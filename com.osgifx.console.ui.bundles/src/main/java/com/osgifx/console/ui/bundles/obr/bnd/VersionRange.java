@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
+import static com.google.common.base.Verify.verify;
+
 import java.util.Formatter;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,7 +30,7 @@ public class VersionRange {
     char          start = '[';
     char          end   = ']';
 
-    private final static Pattern RANGE = Pattern.compile(
+    private static final Pattern RANGE = Pattern.compile(
             "(\\(|\\[)\\s*(" + Version.VERSION_STRING + ")\\s*,\\s*(" + Version.VERSION_STRING + ")\\s*(\\)|\\])");
 
     public VersionRange(String string) {
@@ -57,10 +59,7 @@ public class VersionRange {
             low  = new Version(v1);
             high = new Version(v2);
             end  = m.group(18).charAt(0);
-            if (low.compareTo(high) > 0) {
-                throw new IllegalArgumentException("Low Range is higher than High Range: " + low + "-" + high);
-            }
-
+            verify(low.compareTo(high) <= 0, "Low Range is higher than High Range: %s - %s", low, high);
         } else {
             final var v = new Version(string);
             if (auto == 3) {

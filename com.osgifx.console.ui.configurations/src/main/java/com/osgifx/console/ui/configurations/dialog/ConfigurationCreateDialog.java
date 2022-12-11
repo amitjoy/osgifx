@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations.dialog;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
@@ -39,7 +40,6 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
-import com.google.common.base.Verify;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.ConfigValue;
@@ -241,7 +241,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
             } else {
                 txtField = null;
             }
-            Verify.verify(node != null, "Attribute type text field cannot be null");
+            verifyNotNull(node, "Attribute type text field cannot be null");
             switch (type) {
                 case LONG, INTEGER:
                     final var captionAsInt = switch (type) {

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.obr.bnd;
 
+import static com.google.common.base.Verify.verify;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +45,7 @@ public class ResourceBuilder {
         if (builder == null) {
             return this;
         }
-        if (built) {
-            throw new IllegalStateException("Resource already built");
-        }
+        verify(!built, "Resource already built");
         addCapability0(builder);
         return this;
     }
@@ -80,9 +80,7 @@ public class ResourceBuilder {
         if (builder == null) {
             return this;
         }
-        if (built) {
-            throw new IllegalStateException("Resource already built");
-        }
+        verify(!built, "Resource already built");
         addRequirement0(builder);
         return this;
     }
@@ -106,9 +104,7 @@ public class ResourceBuilder {
     }
 
     public Resource build() {
-        if (built) {
-            throw new IllegalStateException("Resource already built");
-        }
+        verify(!built, "Resource already built");
         built = true;
         resource.setCapabilities(capabilities.values());
         resource.setRequirements(requirements.values());

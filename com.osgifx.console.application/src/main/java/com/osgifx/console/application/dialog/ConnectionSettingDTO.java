@@ -57,7 +57,7 @@ public final class ConnectionSettingDTO {
                          .append(timeout)
                          .append(trustStorePath)
                          .append(trustStorePassword)
-                     .hashCode();
+                     .toHashCode();
         // @formatter:on
     }
 
