@@ -46,13 +46,13 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(SERVICES_ID)
-//@formatter:off
+// @formatter:off
 @EventTopics({
     AGENT_DISCONNECTED_EVENT_TOPIC,
     BUNDLE_ACTION_EVENT_TOPICS,
     COMPONENT_ACTION_EVENT_TOPICS,
     CONFIGURATION_ACTION_EVENT_TOPICS })
-//@formatter:on
+// @formatter:on
 public final class ServicesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
     public static final String SERVICES_ID = "services";

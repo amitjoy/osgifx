@@ -15,9 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.handler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 
@@ -28,6 +25,7 @@ import com.osgifx.console.agent.helper.Reflect;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.supervisor.Supervisor;
 
+import aQute.bnd.exceptions.Exceptions;
 import jakarta.inject.Inject;
 
 public final class OSGiLogListener implements LogListener {
@@ -55,8 +53,8 @@ public final class OSGiLogListener implements LogListener {
         dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
         dto.message = entry.getMessage();
 
-        dto.level     = getLevel(entry.getLevel());             // must not use OSGi R7 reference to getLogLevel()
-        dto.exception = toExceptionString(entry.getException());
+        dto.level     = getLevel(entry.getLevel());               // must not use OSGi R7 reference to getLogLevel()
+        dto.exception = Exceptions.toString(entry.getException());
         dto.loggedAt  = entry.getTime();
 
         final XResultDTO threadInfoResult = executeR7method(entry, "getThreadInfo");
@@ -104,15 +102,6 @@ public final class OSGiLogListener implements LogListener {
             dto.result = XResultDTO.ERROR;
         }
         return dto;
-    }
-
-    public static String toExceptionString(final Throwable exception) {
-        if (exception == null) {
-            return null;
-        }
-        final StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
     }
 
 }

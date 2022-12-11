@@ -63,7 +63,7 @@ public final class ConnectionPreferenceHandler {
         final var gson        = new Gson();
         final var connections = getStoredValues();
         final var dto         = new ConnectionSettingDTO(name, host, Ints.tryParse(port), Ints.tryParse(timeout),
-                truststore, truststorePassword);
+                                                         truststore, truststorePassword);
 
         if ("ADD".equals(type)) {
             connections.add(dto);

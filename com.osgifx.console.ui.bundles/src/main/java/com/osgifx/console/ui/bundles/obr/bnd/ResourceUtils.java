@@ -306,8 +306,7 @@ public final class ResourceUtils {
     private static Object get(final Method method,
                               final Map<String, Object> attrs,
                               final Map<String, String> directives,
-                              final Object[] args)
-            throws Exception {
+                              final Object[] args) throws Exception {
         final var name = method.getName().replace('_', '.');
 
         Object value;

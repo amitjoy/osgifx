@@ -19,6 +19,7 @@ import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionT
 import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.CONNECT;
 import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.REMOVE_CONNECTION;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 
 import java.util.Map;
@@ -70,8 +71,8 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
         final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
         final var removeConnectionButton = new ButtonType("Remove", ButtonBar.ButtonData.LEFT);
 
-        dialogPane.getButtonTypes().addAll(ButtonType.OK);
-        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.getButtonTypes().addAll(OK);
+        dialogPane.getButtonTypes().addAll(CANCEL);
         dialogPane.getButtonTypes().addAll(addConnectionButton);
         dialogPane.getButtonTypes().addAll(removeConnectionButton);
 
@@ -83,7 +84,7 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
         final var controller = (ConnectionSettingsDialogController) loader.getController();
 
         dialogPane.lookupButton(removeConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
-        dialogPane.lookupButton(ButtonType.OK).disableProperty().bind(controller.selectedSettings().isNull());
+        dialogPane.lookupButton(OK).disableProperty().bind(controller.selectedSettings().isNull());
         dialogPane.setContent(content);
     }
 

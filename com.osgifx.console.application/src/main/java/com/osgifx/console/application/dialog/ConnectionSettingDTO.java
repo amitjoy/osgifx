@@ -33,8 +33,12 @@ public final class ConnectionSettingDTO {
         // needed for GSON
     }
 
-    public ConnectionSettingDTO(final String name, final String host, final int port, final int timeout,
-            final String trustStorePath, final String trustStorePassword) {
+    public ConnectionSettingDTO(final String name,
+                                final String host,
+                                final int port,
+                                final int timeout,
+                                final String trustStorePath,
+                                final String trustStorePassword) {
         this.name               = name;
         this.host               = host;
         this.port               = port;

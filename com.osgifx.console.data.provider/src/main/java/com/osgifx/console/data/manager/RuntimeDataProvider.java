@@ -95,31 +95,33 @@ public final class RuntimeDataProvider implements DataProvider {
 
     @Override
     public void retrieveInfo(final String id, final boolean isAsync) {
+        // @formatter:off
         if (id == null) {
             if (isAsync) {
-                // @formatter:off
                 final var futures =
                         infoSuppliers.values()
                                      .stream()
                                      .map(s -> executor.runAsync(s::retrieve))
                                      .toList();
-                // @formatter:on
+
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                        .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
-                        .thenRunAsync(() -> logger.atInfo()
-                                .log("All runtime informations have been retrieved successfully (async)"));
+                                 .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
+                                 .thenRunAsync(() -> logger.atInfo() .log("All runtime informations have been retrieved successfully (async)"));
             } else {
-                infoSuppliers.values().stream().forEach(RuntimeInfoSupplier::retrieve);
+                infoSuppliers.values()
+                             .stream()
+                             .forEach(RuntimeInfoSupplier::retrieve);
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
                 logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
             }
         } else if (isAsync) {
-            executor.runAsync(() -> retrieve(id)).thenRunAsync(() -> logger.atInfo()
-                    .log("Runtime information of '%s' has been retrieved successfully (async)", id));
+            executor.runAsync(() -> retrieve(id))
+                    .thenRunAsync(() -> logger.atInfo() .log("Runtime information of '%s' has been retrieved successfully (async)", id));
         } else {
             retrieve(id);
             logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
         }
+        // @formatter:on
     }
 
     @Override
@@ -196,7 +198,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public XMemoryInfoDTO memory() {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return agent.getMemoryInfo();
@@ -206,7 +208,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public XDmtNodeDTO readDmtNode(final String rootURI) {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return agent.readDmtNode(rootURI);
@@ -216,7 +218,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public RuntimeDTO readRuntimeDTO() {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return agent.getRuntimeDTO();
@@ -234,8 +236,11 @@ public final class RuntimeDataProvider implements DataProvider {
     }
 
     private ObservableList<?> getData(final String id) {
-        return Optional.ofNullable(infoSuppliers.get(id)).map(RuntimeInfoSupplier::supply)
-                .orElse(observableArrayList());
+        // @formatter:off
+        return Optional.ofNullable(infoSuppliers.get(id))
+                       .map(RuntimeInfoSupplier::supply)
+                       .orElse(observableArrayList());
+        // @formatter:on
     }
 
     private void retrieve(final String id) {

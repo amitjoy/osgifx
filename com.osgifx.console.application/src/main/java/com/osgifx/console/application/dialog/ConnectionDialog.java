@@ -17,6 +17,7 @@ package com.osgifx.console.application.dialog;
 
 import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static org.controlsfx.validation.Validator.createEmptyValidator;
 
 import javax.inject.Inject;
 
@@ -147,18 +148,16 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             final var requiredPortFormat   = "'%s' should be a valid port number";
             final var requiredNumberFormat = "'%s' should be a valid integer number";
 
-            validationSupport.registerValidator(name,
-                    Validator.createEmptyValidator(String.format(requiredFormat, nameCaption)));
+            validationSupport.registerValidator(name, createEmptyValidator(String.format(requiredFormat, nameCaption)));
             validationSupport.registerValidator(hostname,
-                    Validator.createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
-            validationSupport.registerValidator(port,
-                    Validator.createEmptyValidator(String.format(requiredFormat, portCaption)));
+                    createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
+            validationSupport.registerValidator(port, createEmptyValidator(String.format(requiredFormat, portCaption)));
             validationSupport.registerValidator(port, Validator.createPredicateValidator(value -> {
                 final var parsedPort = Ints.tryParse(value.toString());
                 return parsedPort != null && parsedPort > 0 && parsedPort < 65536;
             }, String.format(requiredPortFormat, portCaption)));
             validationSupport.registerValidator(timeout,
-                    Validator.createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
+                    createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
             validationSupport.registerValidator(timeout,
                     Validator.createPredicateValidator(value -> Ints.tryParse(value.toString()) != null,
                             String.format(requiredNumberFormat, timeoutCaption)));
@@ -170,7 +169,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             verify(p != null && t != null, "Port and host formats are not compliant");
             return dialogButton == saveButtonType
                     ? new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
-                            trustStorePassword.getText())
+                                               trustStorePassword.getText())
                     : null;
         });
     }

@@ -51,11 +51,11 @@ public final class ValueConverter {
         });
         cb.rule(new Rule<String, List<String>>(v -> Stream.of(v.split(SEPARATOR)).toList()) {
         });
-        cb.rule(new Rule<String, int[]>(
-                v -> Stream.of(v.split(SEPARATOR)).mapToInt(Ints::tryParse).filter(Objects::nonNull).toArray()) {
+        cb.rule(new Rule<String, int[]>(v -> Stream.of(v.split(SEPARATOR)).mapToInt(Ints::tryParse)
+                .filter(Objects::nonNull).toArray()) {
         });
-        cb.rule(new Rule<String, List<Integer>>(
-                v -> Stream.of(v.split(SEPARATOR)).map(Ints::tryParse).filter(Objects::nonNull).toList()) {
+        cb.rule(new Rule<String, List<Integer>>(v -> Stream.of(v.split(SEPARATOR)).map(Ints::tryParse)
+                .filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, boolean[]>(v -> {
             final var split = v.split(SEPARATOR);
@@ -67,22 +67,22 @@ public final class ValueConverter {
             return array;
         }) {
         });
-        cb.rule(new Rule<String, List<Boolean>>(
-                v -> Stream.of(v.split(SEPARATOR)).map(Boolean::parseBoolean).toList()) {
+        cb.rule(new Rule<String, List<Boolean>>(v -> Stream.of(v.split(SEPARATOR)).map(Boolean::parseBoolean)
+                .toList()) {
         });
-        cb.rule(new Rule<String, double[]>(
-                v -> Stream.of(v.split(SEPARATOR)).mapToDouble(Doubles::tryParse).filter(Objects::nonNull).toArray()) {
+        cb.rule(new Rule<String, double[]>(v -> Stream.of(v.split(SEPARATOR)).mapToDouble(Doubles::tryParse)
+                .filter(Objects::nonNull).toArray()) {
         });
-        cb.rule(new Rule<String, List<Double>>(
-                v -> Stream.of(v.split(SEPARATOR)).map(Doubles::tryParse).filter(Objects::nonNull).toList()) {
+        cb.rule(new Rule<String, List<Double>>(v -> Stream.of(v.split(SEPARATOR)).map(Doubles::tryParse)
+                .filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, float[]>(v -> {
             final var elements = Stream.of(v.split(SEPARATOR)).map(Doubles::tryParse).filter(Objects::nonNull).toList();
             return Floats.toArray(elements);
         }) {
         });
-        cb.rule(new Rule<String, List<Float>>(
-                v -> Stream.of(v.split(SEPARATOR)).map(Floats::tryParse).filter(Objects::nonNull).toList()) {
+        cb.rule(new Rule<String, List<Float>>(v -> Stream.of(v.split(SEPARATOR)).map(Floats::tryParse)
+                .filter(Objects::nonNull).toList()) {
         });
         cb.rule(new Rule<String, char[]>(v -> {
             final var split = v.split(SEPARATOR);
@@ -96,11 +96,11 @@ public final class ValueConverter {
         });
         cb.rule(new Rule<String, List<Character>>(v -> Stream.of(v.split(SEPARATOR)).map(CharUtils::toChar).toList()) {
         });
-        cb.rule(new Rule<String, long[]>(
-                v -> Stream.of(v.split(SEPARATOR)).mapToLong(Longs::tryParse).filter(Objects::nonNull).toArray()) {
+        cb.rule(new Rule<String, long[]>(v -> Stream.of(v.split(SEPARATOR)).mapToLong(Longs::tryParse)
+                .filter(Objects::nonNull).toArray()) {
         });
-        cb.rule(new Rule<String, List<Long>>(
-                v -> Stream.of(v.split(SEPARATOR)).map(Longs::tryParse).filter(Objects::nonNull).toList()) {
+        cb.rule(new Rule<String, List<Long>>(v -> Stream.of(v.split(SEPARATOR)).map(Longs::tryParse)
+                .filter(Objects::nonNull).toList()) {
         });
     }
 

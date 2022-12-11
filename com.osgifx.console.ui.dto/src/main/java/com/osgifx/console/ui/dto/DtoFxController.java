@@ -112,6 +112,7 @@ public final class DtoFxController {
                 final var    childName = entry.getKey();
                 final Object childJson = entry.getValue();
                 final var    child     = parseJSON(childName, childJson);
+
                 item.getInternalChildren().add(child);
             });
         } else if (json instanceof final JsonArray array) {
@@ -120,6 +121,7 @@ public final class DtoFxController {
                 final var    childName = String.valueOf(i);
                 final Object childJson = array.get(i);
                 final var    child     = parseJSON(childName, childJson);
+
                 item.getInternalChildren().add(child);
             }
         } else {

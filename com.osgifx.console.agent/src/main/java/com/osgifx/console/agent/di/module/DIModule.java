@@ -45,6 +45,9 @@ import com.osgifx.console.agent.provider.PackageWirings;
 @SuppressWarnings("rawtypes")
 public final class DIModule {
 
+    private static final String GOGO_COMMAND_SCOPE    = "osgi.command.scope";
+    private static final String GOGO_COMMAND_FUNCTION = "osgi.command.function";
+
     private final DI            di;
     private final BundleContext context;
 
@@ -77,13 +80,14 @@ public final class DIModule {
         initServiceTrackers();
 
         di.bindProvider(XComponentAdmin.class, () -> new XComponentAdmin(scrTracker.getService()));
-        di.bindProvider(XConfigurationAdmin.class, () -> new XConfigurationAdmin(context,
-                configAdminTracker.getService(), metatypeTracker.getService(), di.getInstance(XComponentAdmin.class)));
+        di.bindProvider(XConfigurationAdmin.class,
+                () -> new XConfigurationAdmin(context, configAdminTracker.getService(), metatypeTracker.getService(),
+                                              di.getInstance(XComponentAdmin.class)));
         di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(dmtAdminTracker.getService()));
         di.bindProvider(XDtoAdmin.class,
                 () -> new XDtoAdmin(context, scrTracker.getService(), jaxrsServiceRuntimeTracker.getService(),
-                        httpServiceRuntimeTracker.getService(), cdiServiceRuntimeTracker.getService(),
-                        di.getInstance(PackageWirings.class)));
+                                    httpServiceRuntimeTracker.getService(), cdiServiceRuntimeTracker.getService(),
+                                    di.getInstance(PackageWirings.class)));
         di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(eventAdminTracker.getService()));
         di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, felixHcExecutorTracker.getService()));
         di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(httpServiceRuntimeTracker.getService()));
@@ -130,17 +134,19 @@ public final class DIModule {
         eventAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
         configAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
         felixHcExecutorTracker     = new ServiceTracker<>(context,
-                "org.apache.felix.hc.api.execution.HealthCheckExecutor", null);
+                                                          "org.apache.felix.hc.api.execution.HealthCheckExecutor",
+                                                          null);
         scrTracker                 = new ServiceTracker<>(context,
-                "org.osgi.service.component.runtime.ServiceComponentRuntime", null);
+                                                          "org.osgi.service.component.runtime.ServiceComponentRuntime",
+                                                          null);
         cdiServiceRuntimeTracker   = new ServiceTracker<>(context, "org.osgi.service.cdi.runtime.CDIComponentRuntime",
-                null);
+                                                          null);
         httpServiceRuntimeTracker  = new ServiceTracker<>(context, "org.osgi.service.http.runtime.HttpServiceRuntime",
-                null);
+                                                          null);
         jaxrsServiceRuntimeTracker = new ServiceTracker<>(context, "org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime",
-                null);
+                                                          null);
         agentExtensionTracker      = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class,
-                null) {
+                                                                                        null) {
 
                                        @Override
                                        @SuppressWarnings("unchecked")
@@ -175,9 +181,9 @@ public final class DIModule {
                                        @Override
                                        public Object addingService(final ServiceReference<Object> reference) {
                                            final String   scope     = String
-                                                   .valueOf(reference.getProperty("osgi.command.scope"));
+                                                   .valueOf(reference.getProperty(GOGO_COMMAND_SCOPE));
                                            final String[] functions = adapt(
-                                                   reference.getProperty("osgi.command.function"));
+                                                   reference.getProperty(GOGO_COMMAND_FUNCTION));
                                            addCommand(scope, functions);
                                            return super.addingService(reference);
                                        }
@@ -186,9 +192,9 @@ public final class DIModule {
                                        public void removedService(final ServiceReference<Object> reference,
                                                                   final Object service) {
                                            final String   scope     = String
-                                                   .valueOf(reference.getProperty("osgi.command.scope"));
+                                                   .valueOf(reference.getProperty(GOGO_COMMAND_SCOPE));
                                            final String[] functions = adapt(
-                                                   reference.getProperty("osgi.command.function"));
+                                                   reference.getProperty(GOGO_COMMAND_FUNCTION));
                                            removeCommand(scope, functions);
                                        }
 

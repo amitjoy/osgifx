@@ -226,8 +226,10 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
             getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 
-            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(
-                    txtKey::getText, () -> getValue(node), comboBox::getValue);
+            final var tuple = new Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>(txtKey::getText,
+                                                                                                          () -> getValue(
+                                                                                                                  node),
+                                                                                                          comboBox::getValue);
             entries.put(this, tuple);
         }
 
@@ -243,17 +245,15 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                 case LONG:
                     final var captionAsLong = "Long Number";
                     txtField.setPromptText(captionAsLong);
-                    final TextFormatter<?> longFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> Longs
-                                    .tryParse(change.getControlNewText()) != null ? change : null);
+                    final TextFormatter<?> longFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> Longs
+                            .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(longFormatter);
                     break;
                 case INTEGER:
                     final var captionAsInteger = "Integer Number";
                     txtField.setPromptText(captionAsInteger);
-                    final TextFormatter<?> integerFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> Ints
-                                    .tryParse(change.getControlNewText()) != null ? change : null);
+                    final TextFormatter<?> integerFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> Ints
+                            .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(integerFormatter);
                     break;
                 case BOOLEAN:
@@ -261,31 +261,27 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                 case DOUBLE:
                     final var captionAsDouble = "Decimal Number";
                     txtField.setPromptText(captionAsDouble);
-                    final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> Doubles
-                                    .tryParse(change.getControlNewText()) != null ? change : null);
+                    final TextFormatter<?> doubleFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> Doubles
+                            .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(doubleFormatter);
                     break;
                 case FLOAT:
                     final var captionAsFloat = "Decimal Number";
                     txtField.setPromptText(captionAsFloat);
-                    final TextFormatter<?> floatFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> Floats
-                                    .tryParse(change.getControlNewText()) != null ? change : null);
+                    final TextFormatter<?> floatFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> Floats
+                            .tryParse(change.getControlNewText()) != null ? change : null);
                     txtField.setTextFormatter(floatFormatter);
                     break;
                 case CHAR:
-                    final var valueCaptionAsChar = "Character Value";
-                    txtField.setPromptText(valueCaptionAsChar);
-                    final TextFormatter<?> charFormatter = new TextFormatter<>(
-                            (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText().length() == 1
-                                    ? change
-                                    : null));
+                    final var captionAsChar = "Character Value";
+                    txtField.setPromptText(captionAsChar);
+                    final TextFormatter<?> charFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> (change
+                            .getControlNewText().length() == 1 ? change : null));
                     txtField.setTextFormatter(charFormatter);
                     break;
                 case STRING:
-                    final var valueCaptionAsStr = "String Value";
-                    txtField.setPromptText(valueCaptionAsStr);
+                    final var captionAsStr = "String Value";
+                    txtField.setPromptText(captionAsStr);
                     break;
                 case PASSWORD:
                     final var valueCaptionAsPwd = "Password Value";

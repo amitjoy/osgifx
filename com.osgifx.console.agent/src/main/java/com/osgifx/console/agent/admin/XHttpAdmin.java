@@ -15,11 +15,13 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.osgi.service.http.runtime.HttpServiceRuntime;
 import org.osgi.service.http.runtime.dto.ErrorPageDTO;
@@ -67,14 +69,12 @@ public final class XHttpAdmin {
     }
 
     private List<XHttpComponentDTO> initServlets(final RuntimeDTO runtime) {
-        final List<XHttpComponentDTO> servlets           = new ArrayList<>();
-        final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
-
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XHttpComponentDTO> servletDTOs = initServletsByContext(servletContextDTO);
-            servlets.addAll(servletDTOs);
-        }
-        return servlets;
+        // @formatter:off
+        return Stream.of(runtime.servletContextDTOs)
+                     .map(this::initServletsByContext)
+                     .flatMap(List::stream)
+                     .collect(toList());
+        // @formatter:on
     }
 
     private List<XHttpComponentDTO> initServletsByContext(final ServletContextDTO servletContextDTO) {
@@ -99,14 +99,12 @@ public final class XHttpAdmin {
     }
 
     private List<XHttpComponentDTO> initFilters(final RuntimeDTO runtime) {
-        final List<XHttpComponentDTO> filters            = new ArrayList<>();
-        final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
-
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XHttpComponentDTO> filterDTOs = initFiltersByContext(servletContextDTO);
-            filters.addAll(filterDTOs);
-        }
-        return filters;
+        // @formatter:off
+        return Stream.of(runtime.servletContextDTOs)
+                     .map(this::initFiltersByContext)
+                     .flatMap(List::stream)
+                     .collect(toList());
+        // @formatter:on
     }
 
     private List<XHttpComponentDTO> initFiltersByContext(final ServletContextDTO servletContextDTO) {
@@ -133,14 +131,12 @@ public final class XHttpAdmin {
     }
 
     private List<XHttpComponentDTO> initResources(final RuntimeDTO runtime) {
-        final List<XHttpComponentDTO> resources          = new ArrayList<>();
-        final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
-
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XHttpComponentDTO> resourceDTOs = initResourcesByContext(servletContextDTO);
-            resources.addAll(resourceDTOs);
-        }
-        return resources;
+        // @formatter:off
+        return Stream.of(runtime.servletContextDTOs)
+                     .map(this::initResourcesByContext)
+                     .flatMap(List::stream)
+                     .collect(toList());
+        // @formatter:on
     }
 
     private List<XHttpComponentDTO> initResourcesByContext(final ServletContextDTO servletContextDTO) {
@@ -163,14 +159,12 @@ public final class XHttpAdmin {
     }
 
     private List<XHttpComponentDTO> initListeners(final RuntimeDTO runtime) {
-        final List<XHttpComponentDTO> listeners          = new ArrayList<>();
-        final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
-
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XHttpComponentDTO> listenerDTOs = initListenersByContext(servletContextDTO);
-            listeners.addAll(listenerDTOs);
-        }
-        return listeners;
+        // @formatter:off
+        return Stream.of(runtime.servletContextDTOs)
+                     .map(this::initListenersByContext)
+                     .flatMap(List::stream)
+                     .collect(toList());
+        // @formatter:on
     }
 
     private List<XHttpComponentDTO> initListenersByContext(final ServletContextDTO servletContextDTO) {
@@ -192,14 +186,12 @@ public final class XHttpAdmin {
     }
 
     private List<XHttpComponentDTO> initErrorPages(final RuntimeDTO runtime) {
-        final List<XHttpComponentDTO> errorPages         = new ArrayList<>();
-        final ServletContextDTO[]     servletContextDTOs = runtime.servletContextDTOs;
-
-        for (final ServletContextDTO servletContextDTO : servletContextDTOs) {
-            final List<XHttpComponentDTO> errorPageDTOs = initErrorPagesByContext(servletContextDTO);
-            errorPages.addAll(errorPageDTOs);
-        }
-        return errorPages;
+        // @formatter:off
+        return Stream.of(runtime.servletContextDTOs)
+                     .map(this::initErrorPagesByContext)
+                     .flatMap(List::stream)
+                     .collect(toList());
+        // @formatter:on
     }
 
     private List<XHttpComponentDTO> initErrorPagesByContext(final ServletContextDTO servletContextDTO) {
@@ -216,7 +208,7 @@ public final class XHttpAdmin {
             dto.serviceId        = eDTO.serviceId;
             dto.servletInfo      = eDTO.servletInfo;
             dto.exceptions       = Arrays.asList(eDTO.exceptions);
-            dto.errorCodes       = Arrays.stream(eDTO.errorCodes).boxed().collect(Collectors.toList());
+            dto.errorCodes       = Arrays.stream(eDTO.errorCodes).boxed().collect(toList());
             dto.type             = "Error Page";
 
             errorPageDTO.add(dto);

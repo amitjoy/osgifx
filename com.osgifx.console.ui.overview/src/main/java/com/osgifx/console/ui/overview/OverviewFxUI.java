@@ -173,7 +173,7 @@ public final class OverviewFxUI {
         final var uptime               = toUptimeEntry(memoryInfo.uptime);
 
         return new OverviewInfo(frameworkBsn, frameworkVersion, osName, osVersion, osArchitecture, noOfThreads,
-                noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
+                                noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -394,9 +394,17 @@ public final class OverviewFxUI {
     private record UptimeDTO(int days, int hours, int minutes, int seconds) {
     }
 
-    private record OverviewInfo(String frameworkBsn, String frameworkVersion, String osName, String osVersion,
-            String osArchitecture, int noOfThreads, int noOfInstalledBundles, int noOfServices, int noOfComponents,
-            XMemoryInfoDTO memoryInfo, UptimeDTO uptime) {
+    private record OverviewInfo(String frameworkBsn,
+                                String frameworkVersion,
+                                String osName,
+                                String osVersion,
+                                String osArchitecture,
+                                int noOfThreads,
+                                int noOfInstalledBundles,
+                                int noOfServices,
+                                int noOfComponents,
+                                XMemoryInfoDTO memoryInfo,
+                                UptimeDTO uptime) {
         public OverviewInfo() {
             this("", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
         }

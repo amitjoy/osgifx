@@ -69,7 +69,7 @@ public final class ExecutorProvider implements Executor {
     void deactivate() {
         final var running = executor.shutdownNow();
         if (!running.isEmpty()) {
-            logger.atWarning().log("Shutting down while tasks %s are running", running);
+            logger.atWarning().log("Shutting down while %s tasks are running", running.size());
         }
     }
 

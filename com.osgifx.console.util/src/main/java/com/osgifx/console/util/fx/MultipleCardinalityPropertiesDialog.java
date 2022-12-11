@@ -201,17 +201,15 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
                         final var valueCaptionAsDouble = "Decimal Number";
                         txtField.setPromptText(valueCaptionAsDouble);
                         final var pattern = Pattern.compile("\\d*|\\d+\\.\\d*");
-                        final TextFormatter<?> doubleFormatter = new TextFormatter<>(
-                                (UnaryOperator<TextFormatter.Change>) change -> (pattern
-                                        .matcher(change.getControlNewText()).matches() ? change : null));
+                        final TextFormatter<?> doubleFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> (pattern
+                                .matcher(change.getControlNewText()).matches() ? change : null));
                         txtField.setTextFormatter(doubleFormatter);
                         break;
                     case CHAR_ARRAY, CHAR_LIST:
                         final var valueCaptionAsChar = "Character Value";
                         txtField.setPromptText(valueCaptionAsChar);
-                        final TextFormatter<?> charFormatter = new TextFormatter<>(
-                                (UnaryOperator<TextFormatter.Change>) change -> (change.getControlNewText()
-                                        .length() == 1 ? change : null));
+                        final TextFormatter<?> charFormatter = new TextFormatter<>((UnaryOperator<TextFormatter.Change>) change -> (change
+                                .getControlNewText().length() == 1 ? change : null));
                         txtField.setTextFormatter(charFormatter);
                         break;
                     case STRING_ARRAY, STRING_LIST:

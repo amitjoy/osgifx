@@ -74,6 +74,7 @@ public final class XLoggerAdmin {
             bundleLoggerContext.name         = bsn;
             bundleLoggerContext.rootLogLevel = loggerAdmin.getLoggerContext(null).getLogLevels().get(ROOT_LOGGER_NAME);
             bundleLoggerContext.logLevels    = loggerContext.getLogLevels();
+
             loggerContexts.add(bundleLoggerContext);
         }
         return loggerContexts;
@@ -100,8 +101,8 @@ public final class XLoggerAdmin {
                 "The logger context '" + bsn + "' has been updated (non-persistently) successfully");
     }
 
-    private XResultDTO updateLoggerContextPersistently(final String bsn, final Map<String, String> logLevels)
-            throws Exception {
+    private XResultDTO updateLoggerContextPersistently(final String bsn,
+                                                       final Map<String, String> logLevels) throws Exception {
         final Map<String, LogLevel> levels           = toLogLevels(logLevels);
         final String                pid              = "org.osgi.service.log.admin|" + bsn;
         final Map<String, Object>   configProperties = levels.entrySet().stream()
