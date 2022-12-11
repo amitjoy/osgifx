@@ -35,6 +35,7 @@ public class XBundleDTO extends DTO {
     public String                version;
     public String                description;
     public int                   startLevel;
+    public int                   frameworkStartLevel;
     public String                symbolicName;
     public long                  startDurationInMillis;
     public BundleRevisionDTO     bundleRevision;
