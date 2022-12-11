@@ -137,7 +137,8 @@ public final class EventsFxUI {
 
     private void initStatusBar(final BorderPane parent) {
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(this::showSubscribedEventTopicsDialog, "Subscribed Event Topics", "GEAR");
+            final var node = Fx.initStatusBarButton(this::showSubscribedEventTopicsDialog, "Subscribed Event Topics",
+                    "GEAR");
             statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);

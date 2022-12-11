@@ -89,8 +89,7 @@ public class DeploymentPackageExporter implements Exporter {
     @Override
     public Entry<String, aQute.bnd.osgi.Resource> export(final String type,
                                                          final Project project,
-                                                         final Map<String, String> options)
-            throws Exception {
+                                                         final Map<String, String> options) throws Exception {
         this.project = project;
         try {
             final var symbolicName       = options.get("symbolicName");
@@ -157,8 +156,7 @@ public class DeploymentPackageExporter implements Exporter {
 
     private Collection<DeploymentPackageEntryDTO> prepareEntries(final Collection<Container> bundles,
                                                                  final String resourceProcessors,
-                                                                 final String resources)
-            throws Exception {
+                                                                 final String resources) throws Exception {
         final List<DeploymentPackageEntryDTO> entries = Lists.newArrayList();
 
         final var resBundles            = prepareBundles(bundles);
@@ -215,8 +213,7 @@ public class DeploymentPackageExporter implements Exporter {
         return result;
     }
 
-    private List<DeploymentPackageResourceProcessorDTO> prepareResourceProcessors(final String resourceProcessors)
-            throws Exception {
+    private List<DeploymentPackageResourceProcessorDTO> prepareResourceProcessors(final String resourceProcessors) throws Exception {
         if (resourceProcessors == null) {
             return List.of();
         }

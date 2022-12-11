@@ -47,14 +47,14 @@ import javafx.collections.ObservableList;
 
 @Component
 @SupplierID(ROLES_ID)
-//@formatter:off
+// @formatter:off
 @EventTopics({
     AGENT_DISCONNECTED_EVENT_TOPIC,
     BUNDLE_ACTION_EVENT_TOPICS,
     COMPONENT_ACTION_EVENT_TOPICS,
     CONFIGURATION_ACTION_EVENT_TOPICS,
     ROLE_ACTION_EVENT_TOPICS })
-//@formatter:on
+// @formatter:on
 public final class RolesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
 
     public static final String ROLES_ID = "roles";
@@ -83,7 +83,7 @@ public final class RolesInfoSupplier implements RuntimeInfoSupplier, EventHandle
         logger.atInfo().log("Retrieving roles info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         roles.setAll(makeNullSafe(agent.getAllRoles()));

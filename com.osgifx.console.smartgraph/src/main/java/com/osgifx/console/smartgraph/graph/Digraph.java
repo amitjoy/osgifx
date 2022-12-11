@@ -106,8 +106,9 @@ public interface Digraph<V, E> extends Graph<V, E> {
      *                method.
      */
     @Override
-    Edge<E, V> insertEdge(Vertex<V> outbound, Vertex<V> inbound, E edgeElement)
-            throws InvalidVertexException, InvalidEdgeException;
+    Edge<E, V> insertEdge(Vertex<V> outbound,
+                          Vertex<V> inbound,
+                          E edgeElement) throws InvalidVertexException, InvalidEdgeException;
 
     /**
      * Inserts a new edge with a given element between two existing vertices and
@@ -133,7 +134,8 @@ public interface Digraph<V, E> extends Graph<V, E> {
      *                method.
      */
     @Override
-    Edge<E, V> insertEdge(V outboundElement, V inboundElement, E edgeElement)
-            throws InvalidVertexException, InvalidEdgeException;
+    Edge<E, V> insertEdge(V outboundElement,
+                          V inboundElement,
+                          E edgeElement) throws InvalidVertexException, InvalidEdgeException;
 
 }

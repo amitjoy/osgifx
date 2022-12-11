@@ -28,6 +28,7 @@ import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
@@ -58,7 +59,6 @@ import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.exec.CommandLine;
@@ -381,7 +381,12 @@ public final class AgentServer implements Agent, Closeable {
             return Collections.emptyList();
         }
         final String[] entry = command.split(" ");
-        return Stream.of(entry).filter(e -> !e.isEmpty()).map(String::trim).collect(toCollection(() -> commandEntries));
+        // @formatter:off
+        return Stream.of(entry)
+                     .filter(e -> !e.isEmpty())
+                     .map(String::trim)
+                     .collect(toCollection(() -> commandEntries));
+        // @formatter:on
     }
 
     public void setSupervisor(final Supervisor remote) {
@@ -390,16 +395,19 @@ public final class AgentServer implements Agent, Closeable {
 
     private BundleDTO toDTO(final Bundle b) {
         final BundleDTO bd = new BundleDTO();
+
         bd.id           = b.getBundleId();
         bd.lastModified = b.getLastModified();
         bd.state        = b.getState();
         bd.symbolicName = b.getSymbolicName();
         bd.version      = b.getVersion() == null ? "0" : b.getVersion().toString();
+
         return bd;
     }
 
     private BundleRevisionDTO toDTO(final BundleRevision resource) {
         final BundleRevisionDTO brd = new BundleRevisionDTO();
+
         brd.bundle       = resource.getBundle().getBundleId();
         brd.id           = sequence.getAndIncrement();
         brd.symbolicName = resource.getSymbolicName();
@@ -422,21 +430,25 @@ public final class AgentServer implements Agent, Closeable {
 
     private RequirementDTO toDTO(final int resource, final Requirement r) {
         final RequirementDTO rd = new RequirementDTO();
+
         rd.id         = sequence.getAndIncrement();
         rd.resource   = resource;
         rd.namespace  = r.getNamespace();
         rd.directives = r.getDirectives();
         rd.attributes = r.getAttributes();
+
         return rd;
     }
 
     private CapabilityDTO toDTO(final int resource, final Capability r) {
         final CapabilityDTO rd = new CapabilityDTO();
+
         rd.id         = sequence.getAndIncrement();
         rd.resource   = resource;
         rd.namespace  = r.getNamespace();
         rd.directives = r.getDirectives();
         rd.attributes = r.getAttributes();
+
         return rd;
     }
 
@@ -522,23 +534,24 @@ public final class AgentServer implements Agent, Closeable {
             if (!matcher.matches()) {
                 throw new IllegalArgumentException("No proper Bundle-SymbolicName in bundle: " + value);
             }
-
-            final String bsn = matcher.group(1);
-
-            String versionString = mainAttributes.getValue(BUNDLE_VERSION);
+            final String bsn           = matcher.group(1);
+            String       versionString = mainAttributes.getValue(BUNDLE_VERSION);
             if (versionString == null) {
                 versionString = "0";
             }
-
             final Version version = Version.parseVersion(versionString);
-
             return new AbstractMap.SimpleEntry<>(bsn, version);
         }
     }
 
     private Set<Bundle> findBundles(final String bsn, final Version version) {
-        return Stream.of(di.getInstance(BundleContext.class).getBundles()).filter(b -> bsn.equals(b.getSymbolicName()))
-                .filter(b -> version == null || version.equals(b.getVersion())).collect(Collectors.toSet());
+        // @formatter:off
+        return Stream.of(di.getInstance(BundleContext.class)
+                     .getBundles())
+                     .filter(b -> bsn.equals(b.getSymbolicName()))
+                     .filter(b -> version == null || version.equals(b.getVersion()))
+                     .collect(toSet());
+        // @formatter:on
     }
 
     private String getLocation(final byte[] data) throws IOException {
@@ -550,9 +563,8 @@ public final class AgentServer implements Agent, Closeable {
             case 1:
                 return bundles.iterator().next().getLocation();
             default:
-                throw new IllegalArgumentException(
-                        "No location specified but there are multiple bundles with the same bsn " + entry.getKey()
-                                + ": " + bundles);
+                throw new IllegalArgumentException("No location specified but there are multiple bundles with the same bsn "
+                        + entry.getKey() + ": " + bundles);
         }
     }
 
@@ -930,8 +942,7 @@ public final class AgentServer implements Agent, Closeable {
     private BundleDTO installBundleWithData(String location,
                                             final byte[] data,
                                             final int startLevel,
-                                            final boolean shouldRefresh)
-            throws IOException, BundleException, InterruptedException {
+                                            final boolean shouldRefresh) throws IOException, BundleException, InterruptedException {
         requireNonNull(data);
 
         Bundle installedBundle;
@@ -996,7 +1007,7 @@ public final class AgentServer implements Agent, Closeable {
 
     private Closeable trackLogReader(final OSGiLogListener logListener) {
         logReaderTracker = new ServiceTracker<Object, Object>(di.getInstance(BundleContext.class),
-                "org.osgi.service.log.LogReaderService", null) {
+                                                              "org.osgi.service.log.LogReaderService", null) {
 
             @Override
             public Object addingService(final ServiceReference<Object> reference) {

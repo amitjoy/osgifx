@@ -73,7 +73,7 @@ public final class LeaksInfoSupplier implements RuntimeInfoSupplier, EventHandle
         logger.atInfo().log("Retrieving classloader leaks info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         leaks.setAll(makeNullSafe(agent.getClassloaderLeaks()));

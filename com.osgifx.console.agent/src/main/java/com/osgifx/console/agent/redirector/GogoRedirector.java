@@ -59,7 +59,7 @@ public final class GogoRedirector implements Redirector {
         this.agentServer = agentServer;
         stdin            = new Shell();
         tracker          = new ServiceTracker<CommandProcessor, CommandProcessor>(context, CommandProcessor.class,
-                null) {
+                                                                                  null) {
                              @Override
                              public CommandProcessor addingService(final ServiceReference<CommandProcessor> reference) {
                                  final CommandProcessor cp = proxy(CommandProcessor.class,

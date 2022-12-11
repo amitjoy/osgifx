@@ -81,7 +81,7 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
         logger.atInfo().log("Retrieving components info from remote runtime");
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return;
         }
         components.setAll(makeNullSafe(agent.getAllComponents()));

@@ -95,8 +95,7 @@ public final class LogConfigurationsFxController {
         nameColumn.setPrefWidth(650);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
-        final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>(
-                "Has Custom Log Levels?");
+        final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>("Has Custom Log Levels?");
 
         hasCustomLogLevelsColumn.setPrefWidth(250);
         hasCustomLogLevelsColumn.setCellValueFactory(c -> new SimpleBooleanProperty(!c.getValue().logLevels.isEmpty()));

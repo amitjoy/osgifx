@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.felix.hc.api.HealthCheck.ASYNC_CRON_EXPRESSION;
 import static org.apache.felix.hc.api.HealthCheck.ASYNC_INTERVAL_IN_SEC;
 import static org.apache.felix.hc.api.HealthCheck.KEEP_NON_OK_RESULTS_STICKY_FOR_SEC;
@@ -29,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.felix.hc.api.HealthCheck;
 import org.apache.felix.hc.api.Result;
@@ -91,35 +91,41 @@ public final class XHcAdmin {
         options.setCombineTagsWithOr(true);
 
         final List<HealthCheckExecutionResult> results = felixHcExecutor.execute(selector, options);
-        return results.stream().map(this::toResultDTO).collect(Collectors.toList());
+        return results.stream().map(this::toResultDTO).collect(toList());
     }
 
     private List<XHealthCheckDTO> findAllHealthChecks() throws InvalidSyntaxException {
         final Collection<ServiceReference<HealthCheck>> refs = context.getServiceReferences(HealthCheck.class, null);
-        return refs.stream().map(this::toDTO).collect(Collectors.toList());
+        return refs.stream().map(this::toDTO).collect(toList());
     }
 
     private XHealthCheckDTO toDTO(final ServiceReference<HealthCheck> reference) {
         final XHealthCheckDTO dto = new XHealthCheckDTO();
 
+        // @formatter:off
         dto.serviceID              = Long.parseLong(reference.getProperty(SERVICE_ID).toString());
-        dto.name                   = Optional.ofNullable(reference.getProperty(NAME)).map(Object::toString)
-                .orElse(null);
+        dto.name                   = Optional.ofNullable(reference.getProperty(NAME))
+                                             .map(Object::toString)
+                                             .orElse(null);
         dto.tags                   = Optional.ofNullable(reference.getProperty(TAGS))
-                .map(e -> cnv(new TypeReference<List<String>>() {
-                                           },
-                        e))
-                .orElse(null);
-        dto.mbeanName              = Optional.ofNullable(reference.getProperty(MBEAN_NAME)).map(Object::toString)
-                .orElse(null);
+                                             .map(e -> cnv(new TypeReference<List<String>>() {}, e))
+                                             .orElse(null);
+        dto.mbeanName              = Optional.ofNullable(reference.getProperty(MBEAN_NAME))
+                                             .map(Object::toString)
+                                             .orElse(null);
         dto.cronExpression         = Optional.ofNullable(reference.getProperty(ASYNC_CRON_EXPRESSION))
-                .map(Object::toString).orElse(null);
+                                             .map(Object::toString)
+                                             .orElse(null);
         dto.interval               = Optional.ofNullable(reference.getProperty(ASYNC_INTERVAL_IN_SEC))
-                .map(e -> cnv(Long.class, e)).orElse(null);
+                                             .map(e -> cnv(Long.class, e))
+                                             .orElse(null);
         dto.resultTTL              = Optional.ofNullable(reference.getProperty(RESULT_CACHE_TTL_IN_MS))
-                .map(e -> cnv(Long.class, e)).orElse(null);
+                                             .map(e -> cnv(Long.class, e))
+                                             .orElse(null);
         dto.keepNonOkResultsSticky = Optional.ofNullable(reference.getProperty(KEEP_NON_OK_RESULTS_STICKY_FOR_SEC))
-                .map(e -> cnv(Long.class, e)).orElse(null);
+                                             .map(e -> cnv(Long.class, e))
+                                             .orElse(null);
+        // @formatter:on
 
         return dto;
     }
