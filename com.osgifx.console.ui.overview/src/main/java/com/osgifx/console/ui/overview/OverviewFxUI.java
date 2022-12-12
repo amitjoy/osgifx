@@ -32,7 +32,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -157,10 +156,10 @@ public final class OverviewFxUI {
                             runtimeInfo.frameworkBsn(),
                             runtimeInfo.frameworkVersion(),
                             runtimeInfo.frameworkStartLevel(),
-                            runtimeInfo.memoryInfo(),
                             runtimeInfo.osName(),
                             runtimeInfo.osVersion(),
-                            runtimeInfo.osArchitecture()));
+                            runtimeInfo.osArchitecture(),
+                            runtimeInfo.javaVersion()));
             // @formatter:on
         }));
         dataRetrieverTimeline.setCycleCount(INDEFINITE);
@@ -208,6 +207,13 @@ public final class OverviewFxUI {
                                                                   .findAny()
                                                                   .orElse("");
 
+        final var javaVersion          = dataProvider.properties().stream()
+                                                                  .filter(p -> "java.version".equals(p.name))
+                                                                  .map(p -> p.value)
+                                                                  .map(Object::toString)
+                                                                  .findAny()
+                                                                  .orElse("");
+
         final var noOfThreads          = dataProvider.threads().size();
         final var noOfInstalledBundles = dataProvider.bundles().size();
         final var noOfServices         = dataProvider.services().size();
@@ -217,7 +223,8 @@ public final class OverviewFxUI {
         // @formatter:on
 
         return new OverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName, osVersion, osArchitecture,
-                                noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
+                                javaVersion, noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents,
+                                memoryInfo, uptime);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -350,10 +357,10 @@ public final class OverviewFxUI {
     private Node createRuntimeTable(final String frameworkBsn,
                                     final String frameworkVersion,
                                     final String frameworkStartLevel,
-                                    final XMemoryInfoDTO memoryInfo,
                                     final String osName,
                                     final String osVersion,
-                                    final String osArchitecture) {
+                                    final String osArchitecture,
+                                    final String javaVersion) {
         final var name = new Label("");
         name.setTextFill(Tile.FOREGROUND);
         name.setAlignment(Pos.CENTER_LEFT);
@@ -381,7 +388,7 @@ public final class OverviewFxUI {
                         "Framework", frameworkBsn,
                         "Framework Version", frameworkVersion,
                         "Framework Start Level", frameworkStartLevel,
-                        "Total Memory", FileUtils.byteCountToDisplaySize(memoryInfo.totalMemory),
+                        "Java Version", javaVersion,
                         "OS Name", osName,
                         "OS Version", osVersion,
                         "OS Architecture", osArchitecture);
@@ -440,6 +447,7 @@ public final class OverviewFxUI {
                                 String osName,
                                 String osVersion,
                                 String osArchitecture,
+                                String javaVersion,
                                 int noOfThreads,
                                 int noOfInstalledBundles,
                                 int noOfServices,
@@ -447,7 +455,7 @@ public final class OverviewFxUI {
                                 XMemoryInfoDTO memoryInfo,
                                 UptimeDTO uptime) {
         public OverviewInfo() {
-            this("", "", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
+            this("", "", "", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
         }
     }
 
