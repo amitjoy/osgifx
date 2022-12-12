@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -100,6 +100,8 @@ public final class OverviewFxUI {
         retrieveRuntimeInfo();
         createTiles(parent);
         createPeriodicTaskToSetRuntimeInfo();
+
+        dataRetrieverTimeline.play();
         logger.atDebug().log("Overview part has been initialized");
     }
 
@@ -109,6 +111,11 @@ public final class OverviewFxUI {
         // the CSS overridden problem gets overridden once again with the TileFX
         // embedded CSS and the number tiles are shown properly
         createTiles(parent);
+    }
+
+    @PreDestroy
+    public void destroy() {
+        dataRetrieverTimeline.stop();
     }
 
     private void createPeriodicTaskToSetRuntimeInfo() {
@@ -132,8 +139,11 @@ public final class OverviewFxUI {
             availableMemoryTile.setMaxValue(totalMemoryInMB);
             availableMemoryTile.setThreshold(totalMemoryInMB * .8);
 
-            final var memoryConsumptionInfoInPercentage = ((double) totalMemoryInBytes - freeMemoryInBytes) * 100
-                    / totalMemoryInBytes;
+            var memoryConsumptionInfoInPercentage = 0D;
+            if (totalMemoryInBytes != 0) {
+                memoryConsumptionInfoInPercentage = (totalMemoryInBytes - freeMemoryInBytes) * 100D
+                        / totalMemoryInBytes;
+            }
 
             memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
@@ -146,10 +156,10 @@ public final class OverviewFxUI {
                             runtimeInfo.frameworkBsn(),
                             runtimeInfo.frameworkVersion(),
                             runtimeInfo.frameworkStartLevel(),
-                            runtimeInfo.memoryInfo(),
                             runtimeInfo.osName(),
                             runtimeInfo.osVersion(),
-                            runtimeInfo.osArchitecture()));
+                            runtimeInfo.osArchitecture(),
+                            runtimeInfo.javaVersion()));
             // @formatter:on
         }));
         dataRetrieverTimeline.setCycleCount(INDEFINITE);
@@ -159,26 +169,62 @@ public final class OverviewFxUI {
         if (!isConnected) {
             return new OverviewInfo();
         }
-        final var frameworkBsn         = dataProvider.bundles().stream().findFirst().map(b -> b.symbolicName)
-                .orElse("");
-        final var frameworkVersion     = dataProvider.bundles().stream().findFirst().map(b -> b.version).orElse("");
-        final var frameworkStartLevel  = dataProvider.bundles().stream().findFirst().map(b -> b.frameworkStartLevel)
-                .orElse(-1);
-        final var osName               = dataProvider.properties().stream().filter(p -> "os.name".equals(p.name))
-                .map(p -> p.value).map(Object::toString).findAny().orElse("");
-        final var osVersion            = dataProvider.properties().stream().filter(p -> "os.version".equals(p.name))
-                .map(p -> p.value).map(Object::toString).findAny().orElse("");
-        final var osArchitecture       = dataProvider.properties().stream().filter(p -> "os.arch".equals(p.name))
-                .map(p -> p.value).map(Object::toString).findAny().orElse("");
+        // @formatter:off
+        final var frameworkBsn         = dataProvider.bundles().stream()
+                                                               .findFirst()
+                                                               .map(b -> b.symbolicName)
+                                                               .orElse("");
+
+        final var frameworkVersion     = dataProvider.bundles().stream()
+                                                               .findFirst()
+                                                               .map(b -> b.version)
+                                                               .orElse("");
+
+        final var frameworkStartLevel  = dataProvider.bundles().stream()
+                                                               .findFirst()
+                                                               .map(b -> b.frameworkStartLevel)
+                                                               .map(Object::toString)
+                                                               .orElse("");
+
+        final var osName               = dataProvider.properties().stream()
+                                                                  .filter(p -> "os.name".equals(p.name))
+                                                                  .map(p -> p.value)
+                                                                  .map(Object::toString)
+                                                                  .findAny()
+                                                                  .orElse("");
+
+        final var osVersion            = dataProvider.properties().stream()
+                                                                  .filter(p -> "os.version".equals(p.name))
+                                                                  .map(p -> p.value)
+                                                                  .map(Object::toString)
+                                                                  .findAny()
+                                                                  .orElse("");
+
+        final var osArchitecture       = dataProvider.properties().stream()
+                                                                  .filter(p -> "os.arch".equals(p.name))
+                                                                  .map(p -> p.value)
+                                                                  .map(Object::toString)
+                                                                  .findAny()
+                                                                  .orElse("");
+
+        final var javaVersion          = dataProvider.properties().stream()
+                                                                  .filter(p -> "java.version".equals(p.name))
+                                                                  .map(p -> p.value)
+                                                                  .map(Object::toString)
+                                                                  .findAny()
+                                                                  .orElse("");
+
         final var noOfThreads          = dataProvider.threads().size();
         final var noOfInstalledBundles = dataProvider.bundles().size();
         final var noOfServices         = dataProvider.services().size();
         final var noOfComponents       = dataProvider.components().size();
         final var memoryInfo           = requireNonNullElse(dataProvider.memory(), new XMemoryInfoDTO());
         final var uptime               = toUptimeEntry(memoryInfo.uptime);
+        // @formatter:on
 
         return new OverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName, osVersion, osArchitecture,
-                                noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents, memoryInfo, uptime);
+                                javaVersion, noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents,
+                                memoryInfo, uptime);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -310,11 +356,11 @@ public final class OverviewFxUI {
 
     private Node createRuntimeTable(final String frameworkBsn,
                                     final String frameworkVersion,
-                                    final int frameworkStartLevel,
-                                    final XMemoryInfoDTO memoryInfo,
+                                    final String frameworkStartLevel,
                                     final String osName,
                                     final String osVersion,
-                                    final String osArchitecture) {
+                                    final String osArchitecture,
+                                    final String javaVersion) {
         final var name = new Label("");
         name.setTextFill(Tile.FOREGROUND);
         name.setAlignment(Pos.CENTER_LEFT);
@@ -341,8 +387,8 @@ public final class OverviewFxUI {
                 Map.of(
                         "Framework", frameworkBsn,
                         "Framework Version", frameworkVersion,
-                        "Framework Start Level", String.valueOf(frameworkStartLevel),
-                        "Total Memory", FileUtils.byteCountToDisplaySize(memoryInfo.totalMemory),
+                        "Framework Start Level", frameworkStartLevel,
+                        "Java Version", javaVersion,
                         "OS Name", osName,
                         "OS Version", osVersion,
                         "OS Architecture", osArchitecture);
@@ -397,10 +443,11 @@ public final class OverviewFxUI {
 
     private record OverviewInfo(String frameworkBsn,
                                 String frameworkVersion,
-                                int frameworkStartLevel,
+                                String frameworkStartLevel,
                                 String osName,
                                 String osVersion,
                                 String osArchitecture,
+                                String javaVersion,
                                 int noOfThreads,
                                 int noOfInstalledBundles,
                                 int noOfServices,
@@ -408,7 +455,7 @@ public final class OverviewFxUI {
                                 XMemoryInfoDTO memoryInfo,
                                 UptimeDTO uptime) {
         public OverviewInfo() {
-            this("", "", -1, "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
+            this("", "", "", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
         }
     }
 
@@ -428,7 +475,11 @@ public final class OverviewFxUI {
                                                 final BorderPane parent) {
         logger.atInfo().log("Agent disconnected event received");
         dataRetrieverTimeline.stop();
+
+        retrieveRuntimeInfo();
         createTiles(parent);
+        createPeriodicTaskToSetRuntimeInfo();
+        dataRetrieverTimeline.play();
     }
 
     /*

@@ -10,10 +10,10 @@ javac.encoding                        =         UTF-8
 -resolve.effective                    =         resolve, active
 -x-overwritestrategy                  =         gc
 
--sources                              =         false
 -noee                                 =         true
 -remoteworkspace                      =         true
 -nodefaultversion                     =         true
+-sources                              =         ${if;${is;${driver};gradle};false;true}
 
 src                                   =         src/main/java, src/main/resources
 bin                                   =         ${bin.directory}
