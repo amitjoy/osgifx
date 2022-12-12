@@ -18,6 +18,7 @@ package com.osgifx.console.ui.events.dialog;
 import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,6 @@ import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.geometry.Pos;
@@ -113,15 +113,12 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
     }
 
     private Set<String> getInput() {
-        final Set<String> topics = Sets.newHashSet();
-        for (final PropertiesForm form : entries) {
-            final var value = form.textTopic.getText();
-            if (Strings.isNullOrEmpty(value)) {
-                continue;
-            }
-            topics.add(value);
-        }
-        return topics;
+        // @formatter:off
+        return entries.stream()
+                      .map(f -> f.textTopic.getText())
+                      .filter(v -> !Strings.isNullOrEmpty(v))
+                      .collect(toSet());
+        // @formatter:on
     }
 
     private class PropertiesForm extends HBox {
