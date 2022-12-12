@@ -33,6 +33,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.application.dialog.ConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -43,25 +44,29 @@ public final class AgentPingAddon {
 
     @Log
     @Inject
-    private FluentLogger                logger;
+    private FluentLogger                            logger;
     @Inject
-    private Executor                    executor;
+    private Executor                                executor;
     @Inject
     @Optional
-    private Supervisor                  supervisor;
+    private Supervisor                              supervisor;
     @Inject
-    private IEventBroker                eventBroker;
+    private IEventBroker                            eventBroker;
     @Inject
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>  isConnected;
+    private ContextBoundValue<Boolean>              isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>  isLocalAgent;
+    private ContextBoundValue<Boolean>              isLocalAgent;
     @Inject
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>   connectedAgent;
-    private volatile ScheduledFuture<?> future;
+    private ContextBoundValue<String>               connectedAgent;
+    @Inject
+    @Optional
+    @ContextValue("selected.settings")
+    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    private volatile ScheduledFuture<?>             future;
 
     @PostConstruct
     public void init() {
@@ -78,6 +83,11 @@ public final class AgentPingAddon {
             } catch (final Exception e) {
                 logger.atWarning().log("Agent ping request did not succeed");
                 eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+
+                isConnected.publish(false);
+                isLocalAgent.publish(false);
+                selectedSettings.publish(null);
+                connectedAgent.publish(null);
             }
         }, INITIAL_DELAY, MAX_DELAY);
         logger.atInfo().log("Agent ping scheduler has been started");
