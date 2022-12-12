@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import com.dlsc.formsfx.model.validators.Validator;
+import com.google.common.base.Predicates;
 
 public interface SearchFilter {
 
@@ -37,7 +38,7 @@ public interface SearchFilter {
 
         @Override
         public Predicate<Object> predicate(final String input, final SearchOperation operation) {
-            return e -> true;
+            return Predicates.alwaysTrue();
         }
 
         @Override
