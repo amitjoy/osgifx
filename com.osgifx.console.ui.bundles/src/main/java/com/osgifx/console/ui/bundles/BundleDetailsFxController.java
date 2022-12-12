@@ -37,6 +37,9 @@ import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.beans.binding.When;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -245,10 +248,29 @@ public final class BundleDetailsFxController {
     }
 
     private void initFragment(final XBundleDTO bundle) {
-        startBundleButton.setDisable(isSnapshotAgent || bundle.isFragment || "ACTIVE".equals(bundle.state));
-        stopBundleButton.setDisable(isSnapshotAgent || bundle.isFragment || "RESOLVED".equals(bundle.state)
-                || "INSTALLED".equals(bundle.state) || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
-        uninstallBundleButton.setDisable(isSnapshotAgent || AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
+        final BooleanProperty isSnapshot        = new SimpleBooleanProperty(isSnapshotAgent);
+        final var             isSnapshotBinding = new When(isSnapshot).then(true).otherwise(false);
+
+        final BooleanProperty isFragment        = new SimpleBooleanProperty(bundle.isFragment);
+        final var             isFragmentBinding = new When(isFragment).then(true).otherwise(false);
+
+        final BooleanProperty isActive        = new SimpleBooleanProperty("ACTIVE".equals(bundle.state));
+        final var             isActiveBinding = new When(isActive).then(true).otherwise(false);
+
+        final BooleanProperty isResolved        = new SimpleBooleanProperty("RESOLVED".equals(bundle.state));
+        final var             isResolvedBinding = new When(isResolved).then(true).otherwise(false);
+
+        final BooleanProperty isInstalled        = new SimpleBooleanProperty("INSTALLED".equals(bundle.state));
+        final var             isInstalledBinding = new When(isInstalled).then(true).otherwise(false);
+
+        final BooleanProperty isAgent        = new SimpleBooleanProperty(AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
+        final var             isAgentBinding = new When(isAgent).then(true).otherwise(false);
+
+        startBundleButton.disableProperty().bind(isSnapshotBinding.or(isFragmentBinding).or(isActiveBinding));
+        stopBundleButton.disableProperty()
+                .bind(isSnapshotBinding.or(isResolvedBinding).or(isInstalledBinding).or(isAgentBinding));
+        uninstallBundleButton.disableProperty().bind(isSnapshotBinding.or(isAgentBinding));
+
         fragmentLabel.setSelected(bundle.isFragment);
     }
 
