@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.function.Failable;
 import org.osgi.resource.Capability;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
@@ -63,9 +64,7 @@ public class ResourceBuilder {
         if (capabilities == null || capabilities.isEmpty()) {
             return;
         }
-        for (final CapabilityDTO c : capabilities) {
-            addCapability(c);
-        }
+        Failable.stream(capabilities).forEach(this::addCapability);
     }
 
     public ResourceBuilder addRequirement(final RequirementDTO requirement) throws Exception {

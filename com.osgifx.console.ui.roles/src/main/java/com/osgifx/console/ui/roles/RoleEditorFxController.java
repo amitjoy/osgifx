@@ -41,7 +41,6 @@ import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.view.controls.SimpleCheckBoxControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.data.provider.DataProvider;
@@ -148,10 +147,14 @@ public final class RoleEditorFxController {
     }
 
     private FormRenderer createForm(final XRoleDTO role) {
-        form = Form
-                .of(Section.of(initGenericFields(role).toArray(new Field[0])).title("Generic Configuration"),
-                        Section.of(initFields(role).toArray(new Field[0])).title("Specific Configuration"))
-                .title("Role Configuration");
+        // @formatter:off
+        form = Form.of(
+                      Section.of(initGenericFields(role).toArray(new Field[0]))
+                             .title("Generic Configuration"),
+                      Section.of(initFields(role).toArray(new Field[0]))
+                             .title("Specific Configuration"))
+                   .title("Role Configuration");
+        // @formatter:on
         final var renderer = new FormRenderer(form);
 
         GridPane.setColumnSpan(renderer, 2);
@@ -163,10 +166,16 @@ public final class RoleEditorFxController {
     }
 
     private List<Field<?>> initGenericFields(final XRoleDTO role) {
-        final Field<?> roleNameField = Field.ofStringType(role.name).label("Name").editable(false);
-        final Field<?> roleTypeField = Field.ofStringType(role.type.name()).label("Type").editable(false);
+        // @formatter:off
+        final Field<?> roleNameField = Field.ofStringType(role.name)
+                                            .label("Name")
+                                            .editable(false);
 
-        return Lists.newArrayList(roleNameField, roleTypeField);
+        final Field<?> roleTypeField = Field.ofStringType(role.type.name())
+                                            .label("Type")
+                                            .editable(false);
+        // @formatter:on
+        return List.of(roleNameField, roleTypeField);
     }
 
     private List<Field<?>> initFields(final XRoleDTO role) {
@@ -279,20 +288,24 @@ public final class RoleEditorFxController {
     private List<String> getAllExistingRoles(final XRoleDTO role) {
         final var allRoles = dataProvider.roles();
         // a role cannot add itself as its member
-        return allRoles.stream().filter(r -> !r.name.equals(role.name)).map(r -> r.name).toList();
+        // @formatter:off
+        return allRoles.stream()
+                       .filter(r -> !r.name.equals(role.name))
+                       .map(r -> r.name)
+                       .toList();
+        // @formatter:on
     }
 
     private List<Integer> getSelections(final List<String> shownMembers, final List<XRoleDTO> configuredMembers) {
         if (configuredMembers == null) {
             return List.of();
         }
-        final List<Integer> selections = Lists.newArrayList();
-        for (final XRoleDTO member : configuredMembers) {
-            if (shownMembers.contains(member.name)) {
-                selections.add(shownMembers.indexOf(member.name));
-            }
-        }
-        return selections;
+        // @formatter:off
+        return configuredMembers.stream()
+                                .filter(m -> shownMembers.contains(m.name))
+                                .map(m -> shownMembers.indexOf(m.name))
+                                .toList();
+        // @formatter:on
     }
 
 }

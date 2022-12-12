@@ -203,11 +203,13 @@ public final class ConfigurationEditorFxController {
     }
 
     private List<Group> createGroups(final XConfigurationDTO config) {
-        final List<Group> formGroups              = Lists.newArrayList();
+        final List<Group> formGroups = Lists.newArrayList();
+        // @formatter:off
         final Group       genericPropertiesGroup  = Section.of(initGenericFields(config).toArray(new Field[0]))
-                .title("Generic Properties");
+                                                           .title("Generic Properties");
         final Group       specificPropertiesGroup = Section.of(initProperties(config).toArray(new Field[0]))
-                .title("Specific Properties");
+                                                           .title("Specific Properties");
+        // @formatter:off
 
         formGroups.add(genericPropertiesGroup);
         formGroups.add(specificPropertiesGroup);

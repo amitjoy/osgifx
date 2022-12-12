@@ -37,7 +37,6 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
-import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.logs.helper.LoggerConfigTextControl;
@@ -128,10 +127,11 @@ public final class LogConfigurationEditorFxController {
     private FormRenderer createForm(final XBundleLoggerContextDTO loggerContext) {
         // @formatter:off
         form = Form.of(
-                     Section.of(initGenericFields(loggerContext).toArray(new Field[0]))
-                            .title("Generic Information"),
-                     Section.of(initField(loggerContext).toArray(new Field[0]))
-                            .title("Logger Context Configuration"));
+                      Section.of(initGenericFields(loggerContext).toArray(new Field[0]))
+                             .title("Generic Information"),
+                      Section.of(initField(loggerContext).toArray(new Field[0]))
+                             .title("Logger Context Configuration"))
+                   .title("Logger Context Configuration");
         // @formatter:on
         final var renderer = new FormRenderer(form);
 
@@ -144,13 +144,20 @@ public final class LogConfigurationEditorFxController {
     }
 
     private List<Field<?>> initGenericFields(final XBundleLoggerContextDTO loggerContext) {
-        final var      rootLogLevel      = java.util.Optional.ofNullable(loggerContext.rootLogLevel).map(LogLevel::name)
-                .orElse("<NOT SET>");
-        final Field<?> nameField         = Field.ofStringType(loggerContext.name).label("Name").editable(false);
-        final Field<?> rootLogLevelField = Field.ofStringType(rootLogLevel).label("Global Root Log Level")
-                .editable(false);
+        // @formatter:off
+        final var      rootLogLevel      = java.util.Optional.ofNullable(loggerContext.rootLogLevel)
+                                                             .map(LogLevel::name)
+                                                             .orElse("<NOT SET>");
 
-        return Lists.newArrayList(nameField, rootLogLevelField);
+        final Field<?> nameField         = Field.ofStringType(loggerContext.name)
+                                                .label("Name")
+                                                .editable(false);
+
+        final Field<?> rootLogLevelField = Field.ofStringType(rootLogLevel)
+                                                .label("Global Root Log Level")
+                                                .editable(false);
+        // @formatter:on
+        return List.of(nameField, rootLogLevelField);
     }
 
     private List<Field<?>> initField(final XBundleLoggerContextDTO loggerContext) {

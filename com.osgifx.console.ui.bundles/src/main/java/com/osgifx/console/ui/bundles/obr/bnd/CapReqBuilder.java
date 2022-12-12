@@ -17,25 +17,26 @@ package com.osgifx.console.ui.bundles.obr.bnd;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verifyNotNull;
+import static com.osgifx.console.ui.bundles.obr.bnd.ResourceUtils.CONTENT_NAMESPACE;
+import static org.osgi.framework.namespace.BundleNamespace.BUNDLE_NAMESPACE;
+import static org.osgi.framework.namespace.ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE;
+import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
+import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
+import static org.osgi.framework.namespace.PackageNamespace.PACKAGE_NAMESPACE;
+import static org.osgi.namespace.contract.ContractNamespace.CONTRACT_NAMESPACE;
+import static org.osgi.namespace.extender.ExtenderNamespace.EXTENDER_NAMESPACE;
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+import static org.osgi.resource.Namespace.REQUIREMENT_FILTER_DIRECTIVE;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.function.Failable;
 import org.osgi.framework.Version;
-import org.osgi.framework.namespace.BundleNamespace;
-import org.osgi.framework.namespace.ExecutionEnvironmentNamespace;
-import org.osgi.framework.namespace.HostNamespace;
-import org.osgi.framework.namespace.IdentityNamespace;
-import org.osgi.framework.namespace.PackageNamespace;
-import org.osgi.namespace.contract.ContractNamespace;
-import org.osgi.namespace.extender.ExtenderNamespace;
-import org.osgi.namespace.service.ServiceNamespace;
 import org.osgi.resource.Capability;
-import org.osgi.resource.Namespace;
 import org.osgi.resource.Requirement;
 import org.osgi.resource.Resource;
 import org.osgi.resource.dto.CapabilityDTO;
@@ -62,17 +63,21 @@ public class CapReqBuilder {
         setResource(resource);
     }
 
-    public static CapReqBuilder clone(final CapabilityDTO capability) throws Exception {
+    public static CapReqBuilder clone(final CapabilityDTO capability) {
         final var builder = new CapabilityBuilder(capability.namespace);
+
         builder.addAttributes(capability.attributes);
         builder.addDirectives(capability.directives);
+
         return builder;
     }
 
-    public static CapReqBuilder clone(final RequirementDTO requirement) throws Exception {
+    public static CapReqBuilder clone(final RequirementDTO requirement) {
         final var builder = new RequirementBuilder(requirement.namespace);
+
         builder.addAttributes(requirement.attributes);
         builder.addDirectives(requirement.directives);
+
         return builder;
     }
 
@@ -122,10 +127,8 @@ public class CapReqBuilder {
         return false;
     }
 
-    public CapReqBuilder addAttributes(final Map<String, ? extends Object> attributes) throws Exception {
-        for (final Entry<String, ? extends Object> e : attributes.entrySet()) {
-            addAttribute(e.getKey(), e.getValue());
-        }
+    public CapReqBuilder addAttributes(final Map<String, ? extends Object> attributes) {
+        Failable.stream(attributes.entrySet()).forEach(e -> addAttribute(e.getKey(), e.getValue()));
         return this;
     }
 
@@ -133,15 +136,12 @@ public class CapReqBuilder {
         if (value == null) {
             return this;
         }
-
         directives.put(ResourceUtils.stripDirective(name), value);
         return this;
     }
 
     public CapReqBuilder addDirectives(final Map<String, String> directives) {
-        for (final Entry<String, String> e : directives.entrySet()) {
-            addDirective(e.getKey(), e.getValue());
-        }
+        Failable.stream(directives.entrySet()).forEach(e -> addDirective(e.getKey(), e.getValue()));
         return this;
     }
 
@@ -166,19 +166,19 @@ public class CapReqBuilder {
         return addDirective("filter", f.toString());
     }
 
-    public CapReqBuilder from(final Capability c) throws Exception {
+    public CapReqBuilder from(final Capability c) {
         addAttributes(c.getAttributes());
         addDirectives(c.getDirectives());
         return this;
     }
 
-    public CapReqBuilder from(final Requirement r) throws Exception {
+    public CapReqBuilder from(final Requirement r) {
         addAttributes(r.getAttributes());
         addDirectives(r.getDirectives());
         return this;
     }
 
-    public static Capability copy(final Capability c, final Resource r) throws Exception {
+    public static Capability copy(final Capability c, final Resource r) {
         final var from = new CapReqBuilder(c.getNamespace()).from(c);
         if (r == null) {
             return from.buildSyntheticCapability();
@@ -186,7 +186,7 @@ public class CapReqBuilder {
         return from.setResource(r).buildCapability();
     }
 
-    public static Requirement copy(final Requirement c, final Resource r) throws Exception {
+    public static Requirement copy(final Requirement c, final Resource r) {
         final var from = new CapReqBuilder(c.getNamespace()).from(c);
         if (r == null) {
             return from.buildSyntheticRequirement();
@@ -209,7 +209,7 @@ public class CapReqBuilder {
     }
 
     public void and(final String... s) {
-        final var previous = directives == null ? null : directives.get(Namespace.REQUIREMENT_FILTER_DIRECTIVE);
+        final var previous = directives == null ? null : directives.get(REQUIREMENT_FILTER_DIRECTIVE);
         final var filter   = new StringBuilder();
 
         if (previous != null) {
@@ -218,47 +218,46 @@ public class CapReqBuilder {
         for (final String subexpr : s) {
             filter.append(subexpr);
         }
-
         if (previous != null) {
             filter.append(")");
         }
-        addDirective(Namespace.REQUIREMENT_FILTER_DIRECTIVE, filter.toString());
+        addDirective(REQUIREMENT_FILTER_DIRECTIVE, filter.toString());
     }
 
     public boolean isPackage() {
-        return PackageNamespace.PACKAGE_NAMESPACE.equals(getNamespace());
+        return PACKAGE_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isHost() {
-        return HostNamespace.HOST_NAMESPACE.equals(getNamespace());
+        return HOST_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isBundle() {
-        return BundleNamespace.BUNDLE_NAMESPACE.equals(getNamespace());
+        return BUNDLE_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isService() {
-        return ServiceNamespace.SERVICE_NAMESPACE.equals(getNamespace());
+        return SERVICE_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isContract() {
-        return ContractNamespace.CONTRACT_NAMESPACE.equals(getNamespace());
+        return CONTRACT_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isIdentity() {
-        return IdentityNamespace.IDENTITY_NAMESPACE.equals(getNamespace());
+        return IDENTITY_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isContent() {
-        return ResourceUtils.CONTENT_NAMESPACE.equals(getNamespace());
+        return CONTENT_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isEE() {
-        return ExecutionEnvironmentNamespace.EXECUTION_ENVIRONMENT_NAMESPACE.equals(getNamespace());
+        return EXECUTION_ENVIRONMENT_NAMESPACE.equals(getNamespace());
     }
 
     public boolean isExtender() {
-        return ExtenderNamespace.EXTENDER_NAMESPACE.equals(getNamespace());
+        return EXTENDER_NAMESPACE.equals(getNamespace());
     }
 
     private Object toVersions(final Object value) {
