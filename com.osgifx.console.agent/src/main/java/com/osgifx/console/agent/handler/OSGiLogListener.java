@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.handler;
 
+import java.util.Optional;
+
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 
@@ -53,8 +55,9 @@ public final class OSGiLogListener implements LogListener {
         dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
         dto.message = entry.getMessage();
 
-        dto.level     = getLevel(entry.getLevel());               // must not use OSGi R7 reference to getLogLevel()
-        dto.exception = Exceptions.toString(entry.getException());
+        // must not use OSGi R7 reference to getLogLevel()
+        dto.level     = getLevel(entry.getLevel());
+        dto.exception = Optional.ofNullable(entry.getException()).map(Exceptions::toString).orElse(null);
         dto.loggedAt  = entry.getTime();
 
         final XResultDTO threadInfoResult = executeR7method(entry, "getThreadInfo");
