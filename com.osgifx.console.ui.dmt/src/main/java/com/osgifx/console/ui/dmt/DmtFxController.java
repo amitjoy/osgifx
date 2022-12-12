@@ -34,16 +34,19 @@ import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 
-import javafx.beans.binding.Bindings;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -57,10 +60,18 @@ public final class DmtFxController {
     private FluentLogger      logger;
     @Inject
     private IEclipseContext   context;
+    @Inject
+    private Executor          executor;
     @FXML
     private TreeView<String>  dmtTree;
     @FXML
     private TextField         searchBox;
+    @FXML
+    private Button            searchBtn;
+    @FXML
+    private Button            expandBtn;
+    @FXML
+    private Button            collapseBtn;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
@@ -104,20 +115,30 @@ public final class DmtFxController {
         }
         final var rootItem = new FilterableTreeItem<>(dmtNode.uri);
 
-        addSearchBinding(rootItem);
         dmtTree.setRoot(rootItem);
-        dmtTree.setShowRoot(false);
         initDmtTree(dmtNode, rootItem);
-        expandTreeView(rootItem);
-    }
 
-    private void addSearchBinding(final FilterableTreeItem<String> treeItem) {
-        treeItem.predicateProperty().bind(Bindings.createObjectBinding(() -> {
-            if (searchBox.getText() == null || searchBox.getText().isEmpty()) {
-                return null;
-            }
-            return TreeItemPredicate.create(itemText -> StringUtils.containsIgnoreCase(itemText, searchBox.getText()));
-        }, searchBox.textProperty()));
+        expandBtn.setOnMouseClicked(event -> expandOrCollapseTask(rootItem, true));
+        collapseBtn.setOnMouseClicked(event -> expandOrCollapseTask(rootItem, false));
+        searchBtn.setOnMouseClicked(event -> {
+            final Task<Void> task = new Task<>() {
+
+                @Override
+                protected Void call() throws Exception {
+                    threadSync.asyncExec(() -> {
+                        final var itemText = searchBox.getText();
+                        if (Strings.isNullOrEmpty(itemText)) {
+                            rootItem.setPredicate(null);
+                        } else {
+                            rootItem.setPredicate(TreeItemPredicate
+                                    .create(item -> StringUtils.containsIgnoreCase(item, searchBox.getText())));
+                        }
+                    });
+                    return null;
+                }
+            };
+            executor.runAsync(task);
+        });
     }
 
     private void initDmtTree(final XDmtNodeDTO dmtNode, final FilterableTreeItem<String> parent) {
@@ -214,10 +235,22 @@ public final class DmtFxController {
         return result.toString();
     }
 
-    private void expandTreeView(final TreeItem<?> item) {
+    private void expandOrCollapseTask(final TreeItem<?> item, final boolean expand) {
+        final Task<Void> task = new Task<>() {
+
+            @Override
+            protected Void call() throws Exception {
+                expandOrCollapseTreeView(item, expand);
+                return null;
+            }
+        };
+        executor.runAsync(task);
+    }
+
+    private void expandOrCollapseTreeView(final TreeItem<?> item, final boolean expand) {
         if (item != null && !item.isLeaf()) {
-            item.setExpanded(true);
-            item.getChildren().forEach(this::expandTreeView);
+            item.setExpanded(expand);
+            item.getChildren().forEach(e -> expandOrCollapseTreeView(e, expand));
         }
     }
 
