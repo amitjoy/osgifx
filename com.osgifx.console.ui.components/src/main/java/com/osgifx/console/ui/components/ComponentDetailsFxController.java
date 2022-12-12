@@ -40,6 +40,9 @@ import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.beans.binding.When;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -192,8 +195,14 @@ public final class ComponentDetailsFxController {
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
-        enableComponentButton.setDisable(isSnapshotAgent || !"DISABLED".equals(component.state));
-        disableComponentButton.setDisable(isSnapshotAgent || "DISABLED".equals(component.state));
+        final BooleanProperty isSnapshot        = new SimpleBooleanProperty(isSnapshotAgent);
+        final var             isSnapshotBinding = new When(isSnapshot).then(true).otherwise(false);
+
+        final BooleanProperty isEnabled        = new SimpleBooleanProperty(!"DISABLED".equals(component.state));
+        final var             isEnabledBinding = new When(isEnabled).then(true).otherwise(false);
+
+        enableComponentButton.disableProperty().bind(isSnapshotBinding.or(isEnabledBinding));
+        disableComponentButton.disableProperty().bind(isSnapshotBinding.or(isEnabledBinding.not()));
     }
 
     private void createReferenceExpandedTable(final XComponentDTO component) {
@@ -250,8 +259,10 @@ public final class ComponentDetailsFxController {
 
     private Map<String, Object> createCommandMap(final String name, final String id) {
         final Map<String, Object> properties = Maps.newHashMap();
+
         properties.computeIfAbsent("name", key -> name);
         properties.computeIfAbsent("id", key -> id);
+
         return properties;
     }
 

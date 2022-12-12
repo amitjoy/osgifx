@@ -9,3 +9,6 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       ${bundles.required},\
                       com.google.gson
 -privatepackage     : com.osgifx.console.ui.dto
+Import-Package      : \
+                      org.controlsfx.glyphfont,\
+                      *
