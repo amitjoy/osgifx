@@ -16,13 +16,39 @@
   the License.
 -->
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.glyphfont.Glyph?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.dmt.DmtFxController">
    <children>
-      <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="600.0" promptText="Search Filter" />
+      <HBox prefHeight="26.0" prefWidth="900.0">
+         <children>
+            <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="500.0" promptText="Search Filter (Only texts in visible tree items can be searched)" HBox.hgrow="ALWAYS" />
+            <Button fx:id="searchBtn" mnemonicParsing="false">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" top="5.0" />
+               </HBox.margin>
+               <graphic>
+        	      <Glyph fontFamily="FontAwesome" icon="SEARCH" />
+    	       </graphic>
+            </Button>
+            <Button fx:id="expandBtn" mnemonicParsing="false" text="Expand All">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="collapseBtn" mnemonicParsing="false" text="Collapse All">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
       <TreeView fx:id="dmtTree" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>
