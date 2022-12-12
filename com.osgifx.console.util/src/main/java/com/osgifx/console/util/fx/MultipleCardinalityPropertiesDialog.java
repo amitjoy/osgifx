@@ -19,6 +19,7 @@ import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN_ARRAY;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN_LIST;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static java.util.stream.Collectors.joining;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -110,15 +111,12 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
     }
 
     private String getInput() {
-        final List<String> properties = Lists.newArrayList();
-        for (final PropertiesForm form : entries) {
-            final var value = getValue(form.node);
-            if (Strings.isNullOrEmpty(value)) {
-                continue;
-            }
-            properties.add(value);
-        }
-        return String.join(",", properties);
+        // @formatter:off
+        return entries.stream()
+                      .map(f -> getValue(f.node))
+                      .filter(v -> !Strings.isNullOrEmpty(v))
+                      .collect(joining(","));
+        // @formatter:on
     }
 
     private String getValue(final Node node) {

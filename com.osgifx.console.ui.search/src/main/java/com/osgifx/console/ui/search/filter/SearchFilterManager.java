@@ -15,9 +15,10 @@
  ******************************************************************************/
 package com.osgifx.console.ui.search.filter;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -49,7 +50,7 @@ public final class SearchFilterManager {
     }
 
     public Map<SearchComponent, List<SearchFilter>> allFilters() {
-        return searchFilters.stream().collect(Collectors.groupingBy(SearchFilter::component));
+        return searchFilters.stream().collect(groupingBy(SearchFilter::component));
     }
 
     private List<SearchFilter> list(final SearchComponent component) {

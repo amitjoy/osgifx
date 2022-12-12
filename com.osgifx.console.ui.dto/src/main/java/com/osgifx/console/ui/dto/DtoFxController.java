@@ -118,9 +118,9 @@ public final class DtoFxController {
         } else if (json instanceof final JsonArray array) {
             item.setValue(name);
             for (var i = 0; i < array.size(); i++) {
-                final var    childName = String.valueOf(i);
-                final Object childJson = array.get(i);
-                final var    child     = parseJSON(childName, childJson);
+                final var childName = String.valueOf(i);
+                final var childJson = array.get(i);
+                final var child     = parseJSON(childName, childJson);
 
                 item.getInternalChildren().add(child);
             }

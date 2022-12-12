@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
+import static com.google.common.base.Functions.identity;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
 import static com.osgifx.console.ui.graph.BundleVertex.VERTEX_ID_FUNCTION;
 import static java.util.stream.Collectors.toMap;
@@ -36,7 +37,6 @@ import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import com.google.common.base.Functions;
 import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
@@ -98,8 +98,7 @@ public final class RuntimeBundleGraph {
     }
 
     private Map<String, XBundleDTO> processBundles(final List<XBundleDTO> bundles) {
-        return bundles.stream()
-                .collect(toMap(b -> VERTEX_ID_FUNCTION.apply(b.symbolicName, b.id), Functions.identity()));
+        return bundles.stream().collect(toMap(b -> VERTEX_ID_FUNCTION.apply(b.symbolicName, b.id), identity()));
     }
 
     private Graph<BundleVertex, DefaultEdge> buildGraph(final List<XBundleDTO> bundles, final Strategy strategy) {
