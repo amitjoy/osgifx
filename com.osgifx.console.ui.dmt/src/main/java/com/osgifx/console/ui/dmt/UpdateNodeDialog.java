@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.dmt;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 import static java.time.temporal.ChronoField.YEAR;
 
 import java.time.LocalDate;
@@ -159,7 +160,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
                                 .appendValueReduced(YEAR, 2, 2, baseYear).appendPattern("MMdd").toFormatter();
                         final var date                  = LocalDate.parse(v, originalDateFormatter);
 
-                        date.format(DateTimeFormatter.BASIC_ISO_DATE);
+                        date.format(BASIC_ISO_DATE);
                         return true;
                     } catch (final Exception ex) {
                         return false;

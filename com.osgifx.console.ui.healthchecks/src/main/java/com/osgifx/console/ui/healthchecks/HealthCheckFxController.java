@@ -231,10 +231,14 @@ public final class HealthCheckFxController {
             }
 
             private TitledPane formatResult(final XHealthCheckResultDTO result) {
-                final var form = Form
-                        .of(Section.of(initGenericFields(result).toArray(new Field[0])).title("Generic Properties"),
-                                Section.of(initResultEntryFields(result).toArray(new Field[0])).title("Results: "))
-                        .title("Result");
+                // @formatter:off
+                final var form = Form.of(
+                                         Section.of(initGenericFields(result).toArray(new Field[0]))
+                                                .title("Generic Properties"),
+                                         Section.of(initResultEntryFields(result).toArray(new Field[0]))
+                                                .title("Results: "))
+                                     .title("Result");
+                // @formatter:on
 
                 final var renderer = new FormRenderer(form);
 
@@ -266,15 +270,28 @@ public final class HealthCheckFxController {
                 var i = 0;
                 for (final ResultDTO entry : result.results) {
                     i++;
-                    final Field<?> separatorField = Field.ofStringType("").label("Result " + i).editable(false);
+                    // @formatter:off
+                    final Field<?> separatorField = Field.ofStringType("")
+                                                         .label("Result " + i)
+                                                         .editable(false);
+
                     final Field<?> statusField    = Field.ofStringType(Strings.nullToEmpty(entry.status))
-                            .label("Status").editable(false);
+                                                         .label("Status")
+                                                         .editable(false);
+
                     final Field<?> messageField   = Field.ofStringType(Strings.nullToEmpty(entry.message))
-                            .label("Message").editable(false);
+                                                         .label("Message")
+                                                         .editable(false);
+
                     final Field<?> logLevelField  = Field.ofStringType(Strings.nullToEmpty(entry.logLevel))
-                            .label("Log Level").editable(false);
+                                                         .label("Log Level")
+                                                         .editable(false);
+
                     final Field<?> exceptionField = Field.ofStringType(Strings.nullToEmpty(entry.exception))
-                            .label("Exception").multiline(true).editable(false);
+                                                         .label("Exception")
+                                                         .multiline(true)
+                                                         .editable(false);
+                    // @formatter:on
 
                     allResultFields
                             .addAll(List.of(separatorField, statusField, messageField, logLevelField, exceptionField));
