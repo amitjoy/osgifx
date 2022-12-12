@@ -123,16 +123,17 @@ public final class OverviewFxUI {
 
             final var memoryInfo = runtimeInfo.memoryInfo();
 
-            final var freeMemoryInBytes = memoryInfo.freeMemory;
-            final var maxMemoryInBytes  = memoryInfo.maxMemory;
-            final var freeMemoryInMB    = toMB(freeMemoryInBytes);
-            final var maxMemoryInMB     = toMB(maxMemoryInBytes);
+            final var freeMemoryInBytes  = memoryInfo.freeMemory;
+            final var totalMemoryInBytes = memoryInfo.totalMemory;
+            final var freeMemoryInMB     = toMB(freeMemoryInBytes);
+            final var totalMemoryInMB    = toMB(totalMemoryInBytes);
 
             availableMemoryTile.setValue(freeMemoryInMB);
-            availableMemoryTile.setMaxValue(maxMemoryInMB);
-            availableMemoryTile.setThreshold(maxMemoryInMB * .8);
+            availableMemoryTile.setMaxValue(totalMemoryInMB);
+            availableMemoryTile.setThreshold(totalMemoryInMB * .8);
 
-            final var memoryConsumptionInfoInPercentage = (double) freeMemoryInBytes / (double) maxMemoryInBytes * 100;
+            final var memoryConsumptionInfoInPercentage = ((double) totalMemoryInBytes - freeMemoryInBytes) * 100
+                    / totalMemoryInBytes;
 
             memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
