@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.batchinstall.handler;
 
+import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import javax.inject.Inject;
@@ -26,6 +28,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -54,6 +57,8 @@ public final class BatchInstallHandler {
     private ArtifactInstaller installer;
     @Inject
     private ThreadSynchronize threadSync;
+    @Inject
+    private IEventBroker      eventBroker;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
@@ -93,6 +98,8 @@ public final class BatchInstallHandler {
                                 FxDialog.showErrorDialog(HEADER, result, getClass().getClassLoader());
                             });
                         } else {
+                            eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, "");
+                            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, "");
                             threadSync.asyncExec(progressDialog::close);
                         }
                     }
