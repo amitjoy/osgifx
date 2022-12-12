@@ -51,7 +51,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
-import org.osgi.framework.startlevel.FrameworkStartLevel;
+import org.osgi.framework.startlevel.dto.FrameworkStartLevelDTO;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.framework.wiring.BundleRevisions;
 import org.osgi.framework.wiring.BundleWire;
@@ -149,7 +149,7 @@ public final class XBundleAdmin {
     private static int getFrameworkStartLevel() {
         try {
             final BundleContext current = FrameworkUtil.getBundle(XBundleAdmin.class).getBundleContext();
-            return current.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkStartLevel.class).getStartLevel();
+            return current.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkStartLevelDTO.class).startLevel;
         } catch (final Exception e) {
             return -1;
         }

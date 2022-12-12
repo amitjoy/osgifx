@@ -310,7 +310,7 @@ public final class HeapMonitorPane extends BorderPane {
             @Override
             protected byte[] call() throws Exception {
                 try {
-                    updateMessage("Capturing heapdump of the remote runtime");
+                    updateMessage("Capturing heapdump");
                     return agent.heapdump();
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot capture heapdump");

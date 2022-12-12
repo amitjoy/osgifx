@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations.dialog;
 
-import static com.google.common.base.Verify.verifyNotNull;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
@@ -241,7 +240,6 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
             } else {
                 txtField = null;
             }
-            verifyNotNull(node, "Attribute type text field cannot be null");
             switch (type) {
                 case LONG, INTEGER:
                     final var captionAsInt = switch (type) {

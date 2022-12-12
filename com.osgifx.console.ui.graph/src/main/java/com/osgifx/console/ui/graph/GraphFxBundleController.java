@@ -40,6 +40,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
 
+import com.google.common.base.Predicates;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
@@ -177,22 +178,29 @@ public final class GraphFxBundleController implements GraphController {
         });
         final var bundles             = dataProvider.bundles();
         final var filteredBundlesList = initSearchFilter(bundles);
+
         bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.symbolicName)));
         logger.atInfo().log("Bundles list has been initialized");
     }
 
     private FilteredList<XBundleDTO> initSearchFilter(final ObservableList<XBundleDTO> bundles) {
-        final var filteredBundlesList = new FilteredList<>(bundles, s -> true);
+        final var filteredBundlesList = new FilteredList<>(bundles, Predicates.alwaysTrue());
+        updateFilteredList(filteredBundlesList);
         searchText.textProperty().addListener(obs -> {
-            final var filter = searchText.getText();
-            if (filter == null || filter.isBlank()) {
-                filteredBundlesList.setPredicate(s -> true);
-            } else {
-                filteredBundlesList.setPredicate(s -> Stream.of(filter.split("\\|"))
-                        .anyMatch(e -> StringUtils.containsIgnoreCase(s.symbolicName, e)));
-            }
+            updateFilteredList(filteredBundlesList);
+            searchText.requestFocus();
         });
         return filteredBundlesList;
+    }
+
+    private void updateFilteredList(final FilteredList<XBundleDTO> filteredBundlesList) {
+        final var filter = searchText.getText();
+        if (filter == null || filter.isBlank()) {
+            filteredBundlesList.setPredicate(Predicates.alwaysTrue());
+        } else {
+            filteredBundlesList.setPredicate(s -> Stream.of(filter.split("\\|"))
+                    .anyMatch(e -> StringUtils.containsIgnoreCase(s.symbolicName, e)));
+        }
     }
 
     @FXML

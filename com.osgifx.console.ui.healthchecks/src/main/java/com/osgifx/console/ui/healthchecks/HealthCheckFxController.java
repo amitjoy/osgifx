@@ -40,6 +40,7 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -169,17 +170,22 @@ public final class HealthCheckFxController {
 
     private FilteredList<String> initSearchFilter(final ObservableList<String> metadata) {
         final var filteredMetadataList = new FilteredList<>(metadata);
+        updateFilteredList(filteredMetadataList);
         searchText.textProperty().addListener(obs -> {
-            final var filter = searchText.getText();
-            if (filter == null || filter.isBlank()) {
-                filteredMetadataList.setPredicate(s -> true);
-            } else {
-                filteredMetadataList.setPredicate(
-                        s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s, e)));
-            }
+            updateFilteredList(filteredMetadataList);
             searchText.requestFocus();
         });
         return filteredMetadataList;
+    }
+
+    private void updateFilteredList(final FilteredList<String> filteredMetadataList) {
+        final var filter = searchText.getText();
+        if (filter == null || filter.isBlank()) {
+            filteredMetadataList.setPredicate(Predicates.alwaysTrue());
+        } else {
+            filteredMetadataList.setPredicate(
+                    s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s, e)));
+        }
     }
 
     @FXML
@@ -292,7 +298,6 @@ public final class HealthCheckFxController {
                                                          .multiline(true)
                                                          .editable(false);
                     // @formatter:on
-
                     allResultFields
                             .addAll(List.of(separatorField, statusField, messageField, logLevelField, exceptionField));
                 }
