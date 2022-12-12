@@ -17,7 +17,9 @@ package com.osgifx.console.application.dialog;
 
 import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static javafx.scene.control.ButtonType.CANCEL;
 import static org.controlsfx.validation.Validator.createEmptyValidator;
+import static org.controlsfx.validation.Validator.createPredicateValidator;
 
 import javax.inject.Inject;
 
@@ -26,7 +28,6 @@ import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.validation.ValidationSupport;
-import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -62,7 +63,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
                 new ImageView(this.getClass().getResource("/graphic/images/connection-setting.png").toString()));
-        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
+        dialogPane.getButtonTypes().addAll(CANCEL);
 
         final var name = (CustomTextField) TextFields.createClearableTextField();
         name.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
@@ -152,25 +153,31 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             validationSupport.registerValidator(hostname,
                     createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
             validationSupport.registerValidator(port, createEmptyValidator(String.format(requiredFormat, portCaption)));
-            validationSupport.registerValidator(port, Validator.createPredicateValidator(value -> {
+            validationSupport.registerValidator(port, createPredicateValidator(value -> {
                 final var parsedPort = Ints.tryParse(value.toString());
                 return parsedPort != null && parsedPort > 0 && parsedPort < 65536;
             }, String.format(requiredPortFormat, portCaption)));
             validationSupport.registerValidator(timeout,
                     createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
             validationSupport.registerValidator(timeout,
-                    Validator.createPredicateValidator(value -> Ints.tryParse(value.toString()) != null,
+                    createPredicateValidator(value -> Ints.tryParse(value.toString()) != null,
                             String.format(requiredNumberFormat, timeoutCaption)));
         });
+        validationSupport.invalidProperty().addListener((obs, oldValue, newValue) -> {
+            final var saveBtn = (Button) dialogPane.lookupButton(saveButtonType);
+            saveBtn.setDisable(newValue);
+        });
         setResultConverter(dialogButton -> {
+            if (dialogButton == CANCEL) {
+                return null;
+            }
             final var p = Ints.tryParse(port.getText());
             final var t = Ints.tryParse(timeout.getText());
 
             verify(p != null && t != null, "Port and host formats are not compliant");
-            return dialogButton == saveButtonType
-                    ? new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
-                                               trustStorePassword.getText())
-                    : null;
+
+            return new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
+                                            trustStorePassword.getText());
         });
     }
 
