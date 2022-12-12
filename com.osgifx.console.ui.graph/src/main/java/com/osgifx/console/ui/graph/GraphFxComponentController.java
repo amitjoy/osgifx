@@ -40,6 +40,7 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
 
+import com.google.common.base.Predicates;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
@@ -191,17 +192,23 @@ public final class GraphFxComponentController implements GraphController {
     }
 
     private FilteredList<XComponentDTO> initSearchFilter(final ObservableList<XComponentDTO> components) {
-        final var filteredComponentsList = new FilteredList<>(components, s -> true);
+        final var filteredComponentsList = new FilteredList<>(components, Predicates.alwaysTrue());
+        updateFilteredList(filteredComponentsList);
         searchText.textProperty().addListener(obs -> {
-            final var filter = searchText.getText();
-            if (filter == null || filter.isBlank()) {
-                filteredComponentsList.setPredicate(s -> true);
-            } else {
-                filteredComponentsList.setPredicate(
-                        s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s.name, e)));
-            }
+            updateFilteredList(filteredComponentsList);
+            searchText.requestFocus();
         });
         return filteredComponentsList;
+    }
+
+    private void updateFilteredList(final FilteredList<XComponentDTO> filteredComponentsList) {
+        final var filter = searchText.getText();
+        if (filter == null || filter.isBlank()) {
+            filteredComponentsList.setPredicate(Predicates.alwaysTrue());
+        } else {
+            filteredComponentsList.setPredicate(
+                    s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s.name, e)));
+        }
     }
 
     @FXML
