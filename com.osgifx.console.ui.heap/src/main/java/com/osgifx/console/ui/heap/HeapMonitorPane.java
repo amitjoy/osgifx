@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -175,9 +176,7 @@ public final class HeapMonitorPane extends BorderPane {
         final var max = agent.getHeapUsage().memoryUsage.max;
         maxHeap.setValue(formatByteSize(max));
 
-        for (final HeapMonitorChart memoryUsageChart : memoryUsageCharts) {
-            memoryUsageChart.update();
-        }
+        memoryUsageCharts.forEach(HeapMonitorChart::update);
         updateGCStats();
     }
 
@@ -401,12 +400,14 @@ public final class HeapMonitorPane extends BorderPane {
             }
             final var agent     = supervisor.getAgent();
             final var heapUsage = agent.getHeapUsage();
-            for (final XMemoryPoolMXBean mpbean : heapUsage.memoryPoolBeans) {
-                if (bean.name.equals(mpbean.name)) {
-                    return mpbean.memoryUsage;
-                }
-            }
-            return null;
+
+            // @formatter:off
+            return Stream.of(heapUsage.memoryPoolBeans)
+                         .filter(m -> bean.name.equals(m.name))
+                         .map(m -> m.memoryUsage)
+                         .findAny()
+                         .orElse(null);
+            // @formatter:on
         };
     }
 
