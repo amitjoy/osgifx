@@ -94,6 +94,7 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
+        finishButton.disableProperty().bind(validationSupport.invalidProperty());
         setResultConverter(dialogButton -> {
             final var data = dialogButton == null ? null : dialogButton.getButtonData();
             if (data == ButtonData.CANCEL_CLOSE) {

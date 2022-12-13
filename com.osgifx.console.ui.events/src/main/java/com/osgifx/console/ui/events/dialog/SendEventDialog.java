@@ -19,6 +19,7 @@ import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
+import static org.controlsfx.validation.Validator.createPredicateValidator;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import org.controlsfx.dialog.LoginDialog;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.validation.ValidationSupport;
-import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.Triple;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -94,7 +94,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
         final var txtTopic = (CustomTextField) TextFields.createClearableTextField();
         txtTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/id.png").toExternalForm()));
         validationSupport.registerValidator(txtTopic,
-                Validator.createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
+                createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
         final var isSyncToggle = new ToggleSwitch("Is Synchronous?");
 
@@ -112,11 +112,11 @@ public final class SendEventDialog extends Dialog<EventDTO> {
 
         dialogPane.setContent(content);
 
-        final var createButtonType = new ButtonType("Send", ButtonData.OK_DONE);
-        dialogPane.getButtonTypes().addAll(createButtonType);
+        final var sendButtonType = new ButtonType("Send", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(sendButtonType);
 
-        final var loginButton = (Button) dialogPane.lookupButton(createButtonType);
-        loginButton.setOnAction(actionEvent -> {
+        final var sendButton = (Button) dialogPane.lookupButton(sendButtonType);
+        sendButton.setOnAction(actionEvent -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -131,6 +131,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
         final var pidCaption = "Topic";
 
         txtTopic.setPromptText(pidCaption);
+        sendButton.disableProperty().bind(txtTopic.textProperty().isEmpty().or(validationSupport.invalidProperty()));
 
         setResultConverter(dialogButton -> {
             final var data = dialogButton == null ? null : dialogButton.getButtonData();
