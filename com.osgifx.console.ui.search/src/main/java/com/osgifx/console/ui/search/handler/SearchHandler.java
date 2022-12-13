@@ -49,10 +49,6 @@ public final class SearchHandler {
     @Named("is_connected")
     private boolean         isConnected;
     @Inject
-    @Optional
-    @Named("is_snapshot_agent")
-    private boolean         isSnapshotAgent;
-    @Inject
     private IEventBroker    eventBroker;
     @Inject
     @Optional
@@ -97,7 +93,7 @@ public final class SearchHandler {
 
     @CanExecute
     public boolean canExecute() {
-        return isConnected && !isSnapshotAgent;
+        return isConnected;
     }
 
 }
