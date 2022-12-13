@@ -123,6 +123,10 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
+
+        createButton.disableProperty()
+                .bind(txtPid.textProperty().isEmpty().and(txtFactoryPid.textProperty().isEmpty()));
+
         final var pidCaption        = "Configuration PID";
         final var factoryPidCaption = "Factory PID";
 

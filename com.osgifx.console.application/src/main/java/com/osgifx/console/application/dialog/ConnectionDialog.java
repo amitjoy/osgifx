@@ -163,10 +163,9 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                     createPredicateValidator(value -> Ints.tryParse(value.toString()) != null,
                             String.format(requiredNumberFormat, timeoutCaption)));
         });
-        validationSupport.invalidProperty().addListener((obs, oldValue, newValue) -> {
-            final var saveBtn = (Button) dialogPane.lookupButton(saveButtonType);
-            saveBtn.setDisable(newValue);
-        });
+        final var saveBtn = (Button) dialogPane.lookupButton(saveButtonType);
+        saveBtn.disableProperty().bind(validationSupport.invalidProperty());
+
         setResultConverter(dialogButton -> {
             if (dialogButton == CANCEL) {
                 return null;

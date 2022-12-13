@@ -105,6 +105,9 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
         dropdownRoleType.getSelectionModel().select(0);
         txtRoleName.setPromptText(pidCaption);
 
+        createButton.disableProperty()
+                .bind(txtRoleName.textProperty().isEmpty().or(validationSupport.invalidProperty()));
+
         setResultConverter(param -> {
             final var data = param == null ? null : param.getButtonData();
             try {
