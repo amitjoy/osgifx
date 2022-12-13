@@ -235,7 +235,7 @@ public final class ConfigurationEditorFxController {
         final List<Field<?>> fields = Lists.newArrayList();
         for (final XComponentReferenceFilterDTO refFilter : refFilters) {
             final Field<?> targetKeyField = Field.ofStringType(Strings.nullToEmpty(refFilter.targetFilter))
-                    .label(refFilter.targetKey);
+                    .label(refFilter.targetKey).editable(!isSnapshotAgent);
             fields.add(targetKeyField);
             typeMappings.put(targetKeyField, XAttributeDefType.STRING.ordinal());
         }
