@@ -14,11 +14,16 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" fx:controller="com.osgifx.console.ui.events.dialog.SubscribedEventsDialogController" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
    <center>
-      <ListView fx:id="subscribedEvents" BorderPane.alignment="CENTER" />
+      <ListView fx:id="subscribedEvents" BorderPane.alignment="CENTER">
+      	 <placeholder>
+             <Label text="No subscribed topic" />
+         </placeholder>
+      </ListView>
    </center>
 </BorderPane>
