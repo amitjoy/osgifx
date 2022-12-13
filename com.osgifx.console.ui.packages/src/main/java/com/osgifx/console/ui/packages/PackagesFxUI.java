@@ -172,10 +172,8 @@ public final class PackagesFxUI {
                             eventBroker.post(UPDATE_PACKAGE_FILTER_EVENT_TOPIC, new SearchFilterDTO());
                         }
                     }), "Reset Search Filter", "CLOSE", Color.RED);
-            if (!isSnapshotAgent) {
-                statusBar.addToRight(new Separator(VERTICAL));
-                statusBar.addToRight(node);
-            }
+            statusBar.addToRight(new Separator(VERTICAL));
+            statusBar.addToRight(node);
         } else {
             statusBar.clearAllInRight();
         }
