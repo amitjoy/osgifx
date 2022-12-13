@@ -28,7 +28,11 @@
    <children>
       <HBox prefHeight="26.0" prefWidth="900.0">
          <children>
-            <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="500.0" promptText="Search Filter (Only texts in visible tree items can be searched)" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="500.0" promptText="Search Filter (only texts in visible tree items can be searched)" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" top="5.0" />
+               </HBox.margin>
+            </TextField>
             <Button fx:id="searchBtn" mnemonicParsing="false">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" top="5.0" />
