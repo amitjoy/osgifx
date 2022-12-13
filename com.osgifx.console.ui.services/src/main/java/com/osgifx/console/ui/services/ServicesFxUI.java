@@ -105,6 +105,7 @@ public final class ServicesFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        searchFilter = null;
         createControls(parent, loader);
     }
 
