@@ -78,6 +78,14 @@ public final class ConnectToAgentHandler {
     private ContextBoundValue<Boolean>              isConnected;
     @Inject
     @Optional
+    @ContextValue("is_local_agent")
+    private ContextBoundValue<Boolean>              isLocalAgent;
+    @Inject
+    @Optional
+    @ContextValue("is_snapshot_agent")
+    private ContextBoundValue<Boolean>              isSnapshotAgent;
+    @Inject
+    @Optional
     @ContextValue("connected.agent")
     private ContextBoundValue<String>               connectedAgent;
     @Inject
@@ -198,6 +206,8 @@ public final class ConnectToAgentHandler {
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
                 isConnected.publish(true);
+                isLocalAgent.publish(false);
+                isSnapshotAgent.publish(false);
             }
         };
 
