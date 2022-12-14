@@ -21,16 +21,22 @@ import org.controlsfx.control.MaskerPane;
 
 import com.osgifx.console.ui.ConsoleMaskerPane;
 
+import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 
 public final class ConsoleMaskerPaneProvider implements ConsoleMaskerPane {
 
     private final MaskerPane maskerPane = new MaskerPane();
 
     @Override
-    public void addTo(final BorderPane pane) {
+    public void addTo(final Pane pane) {
         checkNotNull(pane, "Specified 'pane' cannot be null");
-        pane.setCenter(maskerPane);
+        if (pane instanceof final BorderPane p) {
+            p.setCenter(maskerPane);
+        } else {
+            pane.getChildren().add(maskerPane);
+        }
     }
 
     @Override
@@ -41,6 +47,11 @@ public final class ConsoleMaskerPaneProvider implements ConsoleMaskerPane {
     @Override
     public boolean isVisible() {
         return maskerPane.isVisible();
+    }
+
+    @Override
+    public Node getMaskerPane() {
+        return maskerPane;
     }
 
 }

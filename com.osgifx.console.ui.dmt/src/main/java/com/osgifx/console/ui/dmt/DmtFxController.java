@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.dmt;
 
 import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
+import static javafx.scene.layout.Priority.ALWAYS;
 
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
@@ -50,6 +52,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.VBox;
 
 public final class DmtFxController {
 
@@ -71,6 +74,8 @@ public final class DmtFxController {
     @FXML
     private Button            expandBtn;
     @FXML
+    private VBox              treeParent;
+    @FXML
     private Button            collapseBtn;
     @Inject
     @Named("is_connected")
@@ -81,6 +86,8 @@ public final class DmtFxController {
     private IEventBroker      eventBroker;
     @Inject
     private DataProvider      dataProvider;
+    @Inject
+    private ConsoleMaskerPane progressPane;
     @Inject
     @Optional
     private Supervisor        supervisor;
@@ -130,8 +137,8 @@ public final class DmtFxController {
                         if (Strings.isNullOrEmpty(itemText)) {
                             rootItem.setPredicate(null);
                         } else {
-                            rootItem.setPredicate(TreeItemPredicate
-                                    .create(item -> StringUtils.containsIgnoreCase(item, searchBox.getText())));
+                            rootItem.setPredicate(
+                                    TreeItemPredicate.create(item -> StringUtils.containsIgnoreCase(item, itemText)));
                         }
                     });
                     return null;
@@ -240,11 +247,44 @@ public final class DmtFxController {
 
             @Override
             protected Void call() throws Exception {
+                disableSearch();
                 expandOrCollapseTreeView(item, expand);
                 return null;
             }
+
+            @Override
+            protected void succeeded() {
+                hideProgressPane();
+                enableSearch();
+            }
+
         };
+        showProgressPane();
         executor.runAsync(task);
+    }
+
+    private void enableSearch() {
+        searchBox.setDisable(false);
+        searchBtn.setDisable(false);
+    }
+
+    private void disableSearch() {
+        searchBox.setDisable(true);
+        searchBtn.setDisable(true);
+    }
+
+    private void showProgressPane() {
+        progressPane.setVisible(true);
+        VBox.setVgrow(progressPane.getMaskerPane(), ALWAYS);
+
+        treeParent.getChildren().clear();
+        progressPane.addTo(treeParent);
+    }
+
+    private void hideProgressPane() {
+        treeParent.getChildren().clear();
+        treeParent.getChildren().add(dmtTree);
+        progressPane.setVisible(false);
     }
 
     private void expandOrCollapseTreeView(final TreeItem<?> item, final boolean expand) {

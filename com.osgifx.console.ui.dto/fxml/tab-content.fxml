@@ -53,6 +53,10 @@
             </Button>
          </children>
       </HBox>
-      <TreeView fx:id="dtoTree" VBox.vgrow="ALWAYS" />
+      <VBox fx:id="treeParent" prefHeight="600.0" prefWidth="900.0">
+         <children>
+         	 <TreeView fx:id="dtoTree" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
    </children>
 </VBox>
