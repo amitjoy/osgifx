@@ -62,8 +62,8 @@ public interface Executor {
      *         exception upon cancellation
      * @throws RejectedExecutionException if the task cannot be
      *             scheduled for execution
-     * @throws NullPointerException if command is null
-     * @throws IllegalArgumentException if period less than or equal to zero
+     * @throws NullPointerException if any of the arguments is {@code null}
+     * @throws IllegalArgumentException if period is less than or equal to zero
      */
     ScheduledFuture<?> scheduleAtFixedRate(Runnable command, Duration initialDelay, Duration period);
 
@@ -85,7 +85,7 @@ public interface Executor {
      *         exception upon cancellation
      * @throws RejectedExecutionException if the task cannot be
      *             scheduled for execution
-     * @throws NullPointerException if command is null
+     * @throws NullPointerException if any of the arguments is {@code null}
      * @throws IllegalArgumentException if delay less than or equal to zero
      */
     ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, Duration initialDelay, Duration delay);

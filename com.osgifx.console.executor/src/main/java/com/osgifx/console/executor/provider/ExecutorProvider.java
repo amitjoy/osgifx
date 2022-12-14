@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.executor.provider;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
@@ -24,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
+import org.apache.commons.lang3.time.DurationUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
@@ -75,6 +78,7 @@ public final class ExecutorProvider implements Executor {
 
     @Override
     public CompletableFuture<Void> runAsync(final Runnable command) {
+        checkNotNull(command, "Task cannot be null");
         return CompletableFuture.runAsync(command, executor);
     }
 
@@ -82,6 +86,12 @@ public final class ExecutorProvider implements Executor {
     public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command,
                                                   final Duration initialDelay,
                                                   final Duration period) {
+        checkNotNull(command, "Task cannot be null");
+        checkNotNull(initialDelay, "The initial delay cannot be null");
+        checkNotNull(period, "The period cannot be null");
+        checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
+        checkArgument(DurationUtils.isPositive(period), "The period must be positive and more than zero");
+
         return executor.scheduleAtFixedRate(command, initialDelay.toMillis(), period.toMillis(), MILLISECONDS);
     }
 
@@ -89,6 +99,12 @@ public final class ExecutorProvider implements Executor {
     public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command,
                                                      final Duration initialDelay,
                                                      final Duration delay) {
+        checkNotNull(command, "Task cannot be null");
+        checkNotNull(initialDelay, "The initial delay cannot be null");
+        checkNotNull(delay, "The delay cannot be null");
+        checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
+        checkArgument(DurationUtils.isPositive(delay), "The delay must be positive and more than zero");
+
         return executor.scheduleWithFixedDelay(command, initialDelay.toMillis(), delay.toMillis(), MILLISECONDS);
     }
 
