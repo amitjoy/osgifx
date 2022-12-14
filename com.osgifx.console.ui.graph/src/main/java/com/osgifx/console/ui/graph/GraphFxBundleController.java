@@ -41,6 +41,7 @@ import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
@@ -206,11 +207,12 @@ public final class GraphFxBundleController implements GraphController {
     @FXML
     private void generateGraph(final ActionEvent event) {
         logger.atInfo().log("Generating graph for bundles");
-        final var selectedBundles = bundlesList.getCheckModel().getCheckedItems();
+        final var selectedBundles = Lists.newArrayList(bundlesList.getCheckModel().getCheckedItems());
         if (selectedBundles.isEmpty()) {
-            logger.atInfo().log("No bundles has been selected. Skipped graph generation.");
+            logger.atInfo().log("No bundle has been selected. Skipped graph generation.");
             return;
         }
+        selectedBundles.removeIf(Predicates.isNull());
         final Task<Void> task = new Task<>() {
 
             @Override
