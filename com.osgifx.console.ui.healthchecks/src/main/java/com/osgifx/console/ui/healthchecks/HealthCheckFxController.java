@@ -190,11 +190,12 @@ public final class HealthCheckFxController {
 
     @FXML
     private void executeHc(final ActionEvent event) {
-        final var selectedMetadata = hcMetadataList.getCheckModel().getCheckedItems();
+        final var selectedMetadata = Lists.newArrayList(hcMetadataList.getCheckModel().getCheckedItems());
         if (selectedMetadata.isEmpty()) {
-            logger.atInfo().log("No healthcheck metadata has been selected. Skipped execution.");
+            logger.atInfo().log("No healthcheck has been selected. Skipped execution.");
             return;
         }
+        selectedMetadata.removeIf(Predicates.isNull());
         final Task<Void> task = new Task<>() {
 
             @Override
