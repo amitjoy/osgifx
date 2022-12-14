@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dto;
 
+import static javafx.scene.layout.Priority.ALWAYS;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -32,6 +34,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.ConsoleMaskerPane;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -39,6 +42,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.VBox;
 
 public final class DtoFxController {
 
@@ -52,6 +56,8 @@ public final class DtoFxController {
     @FXML
     private Button            expandBtn;
     @FXML
+    private VBox              treeParent;
+    @FXML
     private Button            collapseBtn;
     @FXML
     private TreeView<String>  dtoTree;
@@ -64,6 +70,8 @@ public final class DtoFxController {
     private ThreadSynchronize threadSync;
     @Inject
     private DataProvider      dataProvider;
+    @Inject
+    private ConsoleMaskerPane progressPane;
     @Inject
     @Named("is_snapshot_agent")
     private boolean           isSnapshotAgent;
@@ -109,12 +117,13 @@ public final class DtoFxController {
                         if (Strings.isNullOrEmpty(itemText)) {
                             root.setPredicate(null);
                         } else {
-                            root.setPredicate(TreeItemPredicate
-                                    .create(item -> StringUtils.containsIgnoreCase(item, searchBox.getText())));
+                            root.setPredicate(
+                                    TreeItemPredicate.create(item -> StringUtils.containsIgnoreCase(item, itemText)));
                         }
                     });
                     return null;
                 }
+
             };
             executor.runAsync(task);
         });
@@ -150,11 +159,44 @@ public final class DtoFxController {
 
             @Override
             protected Void call() throws Exception {
+                disableSearch();
                 expandOrCollapseTreeView(item, expand);
                 return null;
             }
+
+            @Override
+            protected void succeeded() {
+                hideProgressPane();
+                enableSearch();
+            }
+
         };
+        showProgressPane();
         executor.runAsync(task);
+    }
+
+    private void enableSearch() {
+        searchBox.setDisable(false);
+        searchBtn.setDisable(false);
+    }
+
+    private void disableSearch() {
+        searchBox.setDisable(true);
+        searchBtn.setDisable(true);
+    }
+
+    private void showProgressPane() {
+        progressPane.setVisible(true);
+        VBox.setVgrow(progressPane.getMaskerPane(), ALWAYS);
+
+        treeParent.getChildren().clear();
+        progressPane.addTo(treeParent);
+    }
+
+    private void hideProgressPane() {
+        treeParent.getChildren().clear();
+        treeParent.getChildren().add(dtoTree);
+        progressPane.setVisible(false);
     }
 
     private void expandOrCollapseTreeView(final TreeItem<?> item, final boolean expand) {
