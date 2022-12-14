@@ -17,7 +17,7 @@ package com.osgifx.console.ui;
 
 import org.osgi.annotation.versioning.ProviderType;
 
-import javafx.scene.layout.BorderPane;
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
 /**
@@ -33,7 +33,7 @@ public interface ConsoleMaskerPane {
      * @param pane the parent pane (cannot be {@code null})
      * @throws NullPointerException if the specified pane is {@code null}
      */
-    void addTo(BorderPane pane);
+    void addTo(Pane pane);
 
     /**
      * Changes the visibility of the masker pane
@@ -46,5 +46,12 @@ public interface ConsoleMaskerPane {
      * Returns if the masker pane is visible
      */
     boolean isVisible();
+
+    /**
+     * Returns the internal masker pane
+     *
+     * @return the masker pane
+     */
+    Node getMaskerPane();
 
 }
