@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.events;
 
+import static javafx.scene.control.TableColumn.SortType.DESCENDING;
+
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -109,13 +111,7 @@ public final class EventsFxController {
         table.setItems(events);
 
         TableFilter.forTableView(table).lazy(true).apply();
-        sortByReceivedAt(receivedAtColumn);
-    }
-
-    private void sortByReceivedAt(final TableColumn<XEventDTO, Date> column) {
-        column.setSortType(TableColumn.SortType.DESCENDING);
-        table.getSortOrder().add(column);
-        table.sort();
+        Fx.initSortOrder(table, receivedAtColumn, DESCENDING);
     }
 
 }

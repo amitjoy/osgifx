@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.properties;
 
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -72,6 +74,7 @@ public final class PropertiesFxController {
 
         propertyTable.setItems(dataProvider.properties());
         TableFilter.forTableView(propertyTable).lazy(true).apply();
+        Fx.initSortOrder(propertyTable, propertyName, ASCENDING);
     }
 
 }

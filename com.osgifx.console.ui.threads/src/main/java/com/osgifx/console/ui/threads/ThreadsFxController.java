@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.threads;
 
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -92,6 +94,7 @@ public final class ThreadsFxController {
 
         table.setItems(dataProvider.threads());
         TableFilter.forTableView(table).lazy(true).apply();
+        Fx.initSortOrder(table, nameColumn, ASCENDING);
     }
 
 }

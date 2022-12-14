@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.services;
 
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_SERVICE_FILTER_EVENT_TOPIC;
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
 import static org.osgi.service.component.ComponentConstants.COMPONENT_ID;
 
 import java.util.function.Predicate;
@@ -125,6 +126,7 @@ public final class ServicesFxController {
         table.setItems(filteredList);
 
         TableFilter.forTableView(table).lazy(true).apply();
+        Fx.initSortOrder(table, idColumn, ASCENDING);
     }
 
     @Inject

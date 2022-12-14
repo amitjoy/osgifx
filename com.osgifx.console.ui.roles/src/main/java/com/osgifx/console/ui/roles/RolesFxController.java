@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.roles;
 
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -103,6 +105,7 @@ public final class RolesFxController {
 
         table.setItems(dataProvider.roles());
         TableFilter.forTableView(table).lazy(true).apply();
+        Fx.initSortOrder(table, roleNameColumn, ASCENDING);
     }
 
 }

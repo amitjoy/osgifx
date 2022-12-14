@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.http;
 
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -126,6 +128,7 @@ public final class HttpFxController {
 
         table.setItems(dataProvider.httpComponents());
         TableFilter.forTableView(table).lazy(true).apply();
+        Fx.initSortOrder(table, componentColumn, ASCENDING);
     }
 
 }

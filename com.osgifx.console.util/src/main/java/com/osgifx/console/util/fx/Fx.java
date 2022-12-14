@@ -37,6 +37,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
@@ -232,5 +233,13 @@ public final class Fx {
             button.setTooltip(new Tooltip(tooltip));
         }
         return button;
+    }
+
+    public static <C> void initSortOrder(final TableView<C> table,
+                                         final TableColumn<C, ?> column,
+                                         final SortType sortType) {
+        column.setSortType(sortType);
+        table.getSortOrder().add(column);
+        table.sort();
     }
 }

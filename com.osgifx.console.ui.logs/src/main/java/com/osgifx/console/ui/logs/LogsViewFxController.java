@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.logs;
 
+import static javafx.scene.control.TableColumn.SortType.DESCENDING;
+
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -118,13 +120,7 @@ public final class LogsViewFxController {
         table.setItems(logs);
 
         TableFilter.forTableView(table).lazy(true).apply();
-        sortByLoggedAt(loggedAtColumn);
-    }
-
-    private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {
-        column.setSortType(TableColumn.SortType.DESCENDING);
-        table.getSortOrder().add(column);
-        table.sort();
+        Fx.initSortOrder(table, loggedAtColumn, DESCENDING);
     }
 
 }

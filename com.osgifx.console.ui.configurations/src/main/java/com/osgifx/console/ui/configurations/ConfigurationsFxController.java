@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.configurations;
 
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC;
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
 
 import java.util.function.Predicate;
 
@@ -130,6 +131,7 @@ public final class ConfigurationsFxController {
         table.setItems(filteredList);
 
         TableFilter.forTableView(table).lazy(true).apply();
+        Fx.initSortOrder(table, pidColumn, ASCENDING);
     }
 
     @Inject

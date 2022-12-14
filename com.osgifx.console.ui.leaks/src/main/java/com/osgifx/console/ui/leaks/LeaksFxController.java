@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.leaks;
 
+import static javafx.scene.control.TableColumn.SortType.ASCENDING;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -75,6 +77,7 @@ public final class LeaksFxController {
 
         table.setItems(dataProvider.leaks());
         TableFilter.forTableView(table).lazy(true).apply();
+        Fx.initSortOrder(table, idColumn, ASCENDING);
     }
 
 }
