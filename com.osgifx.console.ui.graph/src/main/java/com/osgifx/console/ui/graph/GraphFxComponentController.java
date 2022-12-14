@@ -41,6 +41,7 @@ import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
 
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
@@ -215,11 +216,12 @@ public final class GraphFxComponentController implements GraphController {
     private void generateGraph(final ActionEvent event) {
         logger.atInfo().log("Generating graph for components");
         final var selection          = wiringSelection.getSelectionModel().getSelectedIndex();
-        final var selectedComponents = componentsList.getCheckModel().getCheckedItems();
+        final var selectedComponents = Lists.newArrayList(componentsList.getCheckModel().getCheckedItems());
         if (selectedComponents.isEmpty() && selection == 0) {
-            logger.atInfo().log("No components has been selected. Skipped graph generation.");
+            logger.atInfo().log("No component has been selected. Skipped graph generation.");
             return;
         }
+        selectedComponents.removeIf(Predicates.isNull());
         final Task<Void> task = new Task<>() {
 
             @Override
