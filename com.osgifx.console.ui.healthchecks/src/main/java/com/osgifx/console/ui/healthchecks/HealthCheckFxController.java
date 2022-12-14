@@ -319,9 +319,9 @@ public final class HealthCheckFxController {
     @Inject
     @Optional
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_HEALTHCHECKS_TOPIC) final String data) {
-        if (nameHcButton.isSelected()) {
+        if (nameHcButton != null && nameHcButton.isSelected()) {
             initNames();
-        } else {
+        } else if (tagHcButton != null) {
             tagHcButton.setSelected(true);
             initTags();
         }
