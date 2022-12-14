@@ -43,6 +43,7 @@ import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.mu.util.Maybe;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
@@ -171,10 +172,10 @@ public final class HealthCheckFxController {
     private FilteredList<String> initSearchFilter(final ObservableList<String> metadata) {
         final var filteredMetadataList = new FilteredList<>(metadata);
         updateFilteredList(filteredMetadataList);
-        searchText.textProperty().addListener(obs -> {
+        Maybe.of(searchText).ifPresent(st -> searchText.textProperty().addListener(obs -> {
             updateFilteredList(filteredMetadataList);
             searchText.requestFocus();
-        });
+        }));
         return filteredMetadataList;
     }
 
