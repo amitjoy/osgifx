@@ -27,7 +27,6 @@ import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -114,11 +113,11 @@ public final class DtoFxController {
                 protected Void call() throws Exception {
                     threadSync.asyncExec(() -> {
                         final var itemText = searchBox.getText();
-                        if (Strings.isNullOrEmpty(itemText)) {
+                        if (StringUtils.isBlank(itemText)) {
                             root.setPredicate(null);
                         } else {
-                            root.setPredicate(
-                                    TreeItemPredicate.create(item -> StringUtils.containsIgnoreCase(item, itemText)));
+                            root.setPredicate(TreeItemPredicate
+                                    .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
                         }
                     });
                     return null;

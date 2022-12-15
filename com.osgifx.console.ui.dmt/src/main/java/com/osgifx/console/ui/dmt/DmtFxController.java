@@ -35,7 +35,6 @@ import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -134,11 +133,11 @@ public final class DmtFxController {
                 protected Void call() throws Exception {
                     threadSync.asyncExec(() -> {
                         final var itemText = searchBox.getText();
-                        if (Strings.isNullOrEmpty(itemText)) {
+                        if (StringUtils.isBlank(itemText)) {
                             rootItem.setPredicate(null);
                         } else {
-                            rootItem.setPredicate(
-                                    TreeItemPredicate.create(item -> StringUtils.containsIgnoreCase(item, itemText)));
+                            rootItem.setPredicate(TreeItemPredicate
+                                    .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
                         }
                     });
                     return null;
