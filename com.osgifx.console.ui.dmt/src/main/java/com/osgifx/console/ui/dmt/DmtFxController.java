@@ -16,7 +16,6 @@
 package com.osgifx.console.ui.dmt;
 
 import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
-import static javafx.scene.layout.Priority.ALWAYS;
 
 import java.util.Map;
 
@@ -35,7 +34,6 @@ import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -43,16 +41,13 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
-import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.VBox;
 
 public final class DmtFxController {
 
@@ -71,12 +66,6 @@ public final class DmtFxController {
     private TextField         searchBox;
     @FXML
     private Button            searchBtn;
-    @FXML
-    private Button            expandBtn;
-    @FXML
-    private VBox              treeParent;
-    @FXML
-    private Button            collapseBtn;
     @Inject
     @Named("is_connected")
     private boolean           isConnected;
@@ -86,8 +75,6 @@ public final class DmtFxController {
     private IEventBroker      eventBroker;
     @Inject
     private DataProvider      dataProvider;
-    @Inject
-    private ConsoleMaskerPane progressPane;
     @Inject
     @Optional
     private Supervisor        supervisor;
@@ -121,12 +108,10 @@ public final class DmtFxController {
             return;
         }
         final var rootItem = new FilterableTreeItem<>(dmtNode.uri);
-
+        rootItem.setExpanded(true);
         dmtTree.setRoot(rootItem);
         initDmtTree(dmtNode, rootItem);
 
-        expandBtn.setOnMouseClicked(event -> expandOrCollapseTask(rootItem, true));
-        collapseBtn.setOnMouseClicked(event -> expandOrCollapseTask(rootItem, false));
         searchBtn.setOnMouseClicked(event -> {
             final Task<Void> task = new Task<>() {
 
@@ -134,11 +119,11 @@ public final class DmtFxController {
                 protected Void call() throws Exception {
                     threadSync.asyncExec(() -> {
                         final var itemText = searchBox.getText();
-                        if (Strings.isNullOrEmpty(itemText)) {
+                        if (StringUtils.isBlank(itemText)) {
                             rootItem.setPredicate(null);
                         } else {
-                            rootItem.setPredicate(
-                                    TreeItemPredicate.create(item -> StringUtils.containsIgnoreCase(item, itemText)));
+                            rootItem.setPredicate(TreeItemPredicate
+                                    .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
                         }
                     });
                     return null;
@@ -240,58 +225,6 @@ public final class DmtFxController {
             result.append("]");
         }
         return result.toString();
-    }
-
-    private void expandOrCollapseTask(final TreeItem<?> item, final boolean expand) {
-        final Task<Void> task = new Task<>() {
-
-            @Override
-            protected Void call() throws Exception {
-                disableSearch();
-                expandOrCollapseTreeView(item, expand);
-                return null;
-            }
-
-            @Override
-            protected void succeeded() {
-                hideProgressPane();
-                enableSearch();
-            }
-
-        };
-        showProgressPane();
-        executor.runAsync(task);
-    }
-
-    private void enableSearch() {
-        searchBox.setDisable(false);
-        searchBtn.setDisable(false);
-    }
-
-    private void disableSearch() {
-        searchBox.setDisable(true);
-        searchBtn.setDisable(true);
-    }
-
-    private void showProgressPane() {
-        progressPane.setVisible(true);
-        VBox.setVgrow(progressPane.getMaskerPane(), ALWAYS);
-
-        treeParent.getChildren().clear();
-        progressPane.addTo(treeParent);
-    }
-
-    private void hideProgressPane() {
-        treeParent.getChildren().clear();
-        treeParent.getChildren().add(dmtTree);
-        progressPane.setVisible(false);
-    }
-
-    private void expandOrCollapseTreeView(final TreeItem<?> item, final boolean expand) {
-        if (item != null && !item.isLeaf()) {
-            item.setExpanded(expand);
-            item.getChildren().forEach(e -> expandOrCollapseTreeView(e, expand));
-        }
     }
 
 }

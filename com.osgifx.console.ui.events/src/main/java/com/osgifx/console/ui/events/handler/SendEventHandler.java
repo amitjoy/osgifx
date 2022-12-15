@@ -18,6 +18,7 @@ package com.osgifx.console.ui.events.handler;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -26,7 +27,6 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.google.common.base.Strings;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.events.converter.EventManager;
@@ -75,15 +75,16 @@ public final class SendEventHandler {
                         final var isSync     = dto.isSync();
                         final var properties = dto.properties();
 
-                        if (Strings.isNullOrEmpty(topic) || properties == null) {
+                        if (StringUtils.isBlank(topic) || properties == null) {
                             return null;
                         }
 
                         XResultDTO result;
+                        final var  parsedTopic = topic.strip();
                         if (isSync) {
-                            result = eventManager.sendEvent(topic, properties);
+                            result = eventManager.sendEvent(parsedTopic, properties);
                         } else {
-                            result = eventManager.postEvent(topic, properties);
+                            result = eventManager.postEvent(parsedTopic, properties);
                         }
                         if (result == null) {
                             return null;
@@ -91,15 +92,15 @@ public final class SendEventHandler {
                         switch (result.result) {
                             case XResultDTO.SUCCESS:
                                 threadSync.asyncExec(() -> Fx.showSuccessNotification("Send Event", result.response));
-                                logger.atInfo().log("Event sent successfully to '%s'", topic);
+                                logger.atInfo().log("Event sent successfully to '%s'", parsedTopic);
                                 break;
                             case XResultDTO.ERROR:
                                 threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
-                                logger.atError().log("Event could not be sent to '%s'", topic);
+                                logger.atError().log("Event could not be sent to '%s'", parsedTopic);
                                 break;
                             case XResultDTO.SKIPPED:
                                 threadSync.asyncExec(() -> Fx.showErrorNotification("Send Event", result.response));
-                                logger.atError().log("Event could not be sent to '%s' because %s", topic,
+                                logger.atError().log("Event could not be sent to '%s' because %s", parsedTopic,
                                         result.response);
                                 break;
                             default:
