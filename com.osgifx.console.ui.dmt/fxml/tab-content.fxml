@@ -28,32 +28,22 @@
    <children>
       <HBox prefHeight="26.0" prefWidth="900.0">
          <children>
-            <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="500.0" promptText="Search Filter (only texts in visible tree items can be searched)" HBox.hgrow="ALWAYS">
+            <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="500.0" promptText="Search Filter" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" top="5.0" />
                </HBox.margin>
             </TextField>
             <Button fx:id="searchBtn" mnemonicParsing="false">
                <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" top="5.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </HBox.margin>
                <graphic>
         	      <Glyph fontFamily="FontAwesome" icon="SEARCH" />
     	       </graphic>
             </Button>
-            <Button fx:id="expandBtn" mnemonicParsing="false" text="Expand All">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="collapseBtn" mnemonicParsing="false" text="Collapse All">
-               <HBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </HBox.margin>
-            </Button>
          </children>
       </HBox>
-      <VBox fx:id="treeParent" prefHeight="600.0" prefWidth="900.0">
+      <VBox prefHeight="600.0" prefWidth="900.0">
          <children>
          	 <TreeView fx:id="dmtTree" VBox.vgrow="ALWAYS" />
          </children>

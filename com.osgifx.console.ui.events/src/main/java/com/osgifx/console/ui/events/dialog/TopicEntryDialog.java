@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.glyphfont.FontAwesome;
@@ -34,7 +35,6 @@ import org.controlsfx.validation.Validator;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.osgifx.console.util.fx.FxDialog;
 
@@ -117,7 +117,7 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
         // @formatter:off
         return entries.stream()
                       .map(f -> f.textTopic.getText())
-                      .filter(v -> !Strings.isNullOrEmpty(v))
+                      .filter(StringUtils::isNotBlank)
                       .collect(toSet());
         // @formatter:on
     }

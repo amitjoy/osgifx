@@ -20,6 +20,7 @@ import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CON
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -29,7 +30,6 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.google.common.base.Strings;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.configurations.converter.ConfigurationManager;
 import com.osgifx.console.ui.configurations.dialog.ConfigurationCreateDialog;
@@ -79,23 +79,25 @@ public final class ConfigurationCreateHandler {
                         final var factoryPid = dto.factoryPid();
                         final var properties = dto.properties();
 
-                        if (Strings.isNullOrEmpty(pid) && Strings.isNullOrEmpty(factoryPid) || properties == null) {
+                        if (StringUtils.isBlank(pid) && StringUtils.isBlank(factoryPid) || properties == null) {
                             return null;
                         }
 
-                        boolean result;
-                        String  effectivePID;
-                        if (!Strings.isNullOrEmpty(pid)) {
-                            result       = configManager.createOrUpdateConfiguration(pid, properties);
-                            effectivePID = pid;
-                        } else if (!Strings.isNullOrEmpty(factoryPid)) {
-                            result       = configManager.createFactoryConfiguration(factoryPid, properties);
-                            effectivePID = factoryPid;
+                        final boolean result;
+                        final String  effectivePID;
+
+                        if (StringUtils.isNotBlank(pid)) {
+                            effectivePID = pid.strip();
+                            result       = configManager.createOrUpdateConfiguration(effectivePID, properties);
+                        } else if (StringUtils.isNotBlank(factoryPid)) {
+                            effectivePID = factoryPid.strip();
+                            result       = configManager.createFactoryConfiguration(effectivePID, properties);
                         } else {
                             return null;
                         }
+
                         if (result) {
-                            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+                            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, effectivePID);
                             threadSync.asyncExec(() -> Fx.showSuccessNotification("New Configuration",
                                     "Configuration - '" + effectivePID + "' has been successfully created"));
                             logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
