@@ -234,8 +234,11 @@ public final class ConfigurationEditorFxController {
     private List<Field<?>> initComponentReferencesGroup(final List<XComponentReferenceFilterDTO> refFilters) {
         final List<Field<?>> fields = Lists.newArrayList();
         for (final XComponentReferenceFilterDTO refFilter : refFilters) {
+            // @formatter:off
             final Field<?> targetKeyField = Field.ofStringType(Strings.nullToEmpty(refFilter.targetFilter))
-                    .label(refFilter.targetKey).editable(!isSnapshotAgent);
+                                                 .label(refFilter.targetKey)
+                                                 .editable(!isSnapshotAgent);
+            // @formatter:on
             fields.add(targetKeyField);
             typeMappings.put(targetKeyField, XAttributeDefType.STRING.ordinal());
         }
@@ -291,8 +294,11 @@ public final class ConfigurationEditorFxController {
         final List<Field<?>> genericFields = Lists.newArrayList(pidField, factoryPidField, locationField);
 
         if (config.ocd != null) {
+            // @formatter:off
             final Field<?> descLocationField = Field.ofStringType(config.ocd.descriptorLocation)
-                    .label("Descriptor Location").editable(false);
+                                                    .label("Descriptor Location")
+                                                    .editable(false);
+            // @formatter:on
             genericFields.add(descLocationField);
         }
         return genericFields;
