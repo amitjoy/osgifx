@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -32,7 +33,6 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 
@@ -76,7 +76,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         final var content = new VBox(10);
 
         content.getChildren().add(lbMessage);
-        if (!Strings.isNullOrEmpty(textInput)) {
+        if (StringUtils.isNotBlank(textInput)) {
             Splitter.on(",").split(textInput.strip()).forEach(e -> addFieldPair(content, targetType, e));
         } else {
             addFieldPair(content, targetType);
@@ -114,7 +114,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         // @formatter:off
         return entries.stream()
                       .map(f -> getValue(f.node))
-                      .filter(v -> !Strings.isNullOrEmpty(v))
+                      .filter(StringUtils::isNotBlank)
                       .collect(joining(","));
         // @formatter:on
     }
