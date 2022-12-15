@@ -15,11 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations.control;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.view.controls.SimpleControl;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.util.fx.MultipleCardinalityPropertiesDialog;
 
@@ -80,11 +81,11 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
 
         editableArea.setOnMouseClicked(event -> {
             final var dialog = new MultipleCardinalityPropertiesDialog();
-            if (!Strings.isNullOrEmpty(key.trim())) {
+            if (StringUtils.isNotBlank(key)) {
                 final var currentValue         = field.getValue();
                 final var splitByLineSeparator = Splitter.on(System.lineSeparator()).splitToList(currentValue);
                 final var joinedValue          = Joiner.on(",").join(splitByLineSeparator);
-                dialog.init(key, type, joinedValue, classLoader);
+                dialog.init(key.strip(), type, joinedValue, classLoader);
 
                 final var entries = dialog.showAndWait();
                 if (entries.isPresent()) {
