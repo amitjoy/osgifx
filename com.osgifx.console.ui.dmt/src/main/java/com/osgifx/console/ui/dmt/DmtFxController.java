@@ -48,6 +48,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
 
 public final class DmtFxController {
 
@@ -112,25 +113,32 @@ public final class DmtFxController {
         dmtTree.setRoot(rootItem);
         initDmtTree(dmtNode, rootItem);
 
-        searchBtn.setOnMouseClicked(event -> {
-            final Task<Void> task = new Task<>() {
-
-                @Override
-                protected Void call() throws Exception {
-                    threadSync.asyncExec(() -> {
-                        final var itemText = searchBox.getText();
-                        if (StringUtils.isBlank(itemText)) {
-                            rootItem.setPredicate(null);
-                        } else {
-                            rootItem.setPredicate(TreeItemPredicate
-                                    .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
-                        }
-                    });
-                    return null;
-                }
-            };
-            executor.runAsync(task);
+        searchBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                performSearch(rootItem);
+            }
         });
+        searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
+    }
+
+    private void performSearch(final FilterableTreeItem<String> rootItem) {
+        final Task<Void> task = new Task<>() {
+
+            @Override
+            protected Void call() throws Exception {
+                threadSync.asyncExec(() -> {
+                    final var itemText = searchBox.getText();
+                    if (StringUtils.isBlank(itemText)) {
+                        rootItem.setPredicate(null);
+                    } else {
+                        rootItem.setPredicate(TreeItemPredicate
+                                .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
+                    }
+                });
+                return null;
+            }
+        };
+        executor.runAsync(task);
     }
 
     private void initDmtTree(final XDmtNodeDTO dmtNode, final FilterableTreeItem<String> parent) {
