@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
 import com.google.gson.Gson;
@@ -36,6 +37,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
 
 public final class DtoFxController {
 
@@ -91,25 +93,32 @@ public final class DtoFxController {
         root.setExpanded(true);
         dtoTree.setRoot(root);
 
-        searchBtn.setOnMouseClicked(event -> {
-            final Task<Void> task = new Task<>() {
-
-                @Override
-                protected Void call() throws Exception {
-                    threadSync.asyncExec(() -> {
-                        final var itemText = searchBox.getText();
-                        if (StringUtils.isBlank(itemText)) {
-                            root.setPredicate(null);
-                        } else {
-                            root.setPredicate(TreeItemPredicate
-                                    .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
-                        }
-                    });
-                    return null;
-                }
-            };
-            executor.runAsync(task);
+        searchBox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                performSearch(root);
+            }
         });
+        searchBtn.setOnMouseClicked(event -> performSearch(root));
+    }
+
+    private void performSearch(final FilterableTreeItem<String> rootItem) {
+        final Task<Void> task = new Task<>() {
+
+            @Override
+            protected Void call() throws Exception {
+                threadSync.asyncExec(() -> {
+                    final var itemText = searchBox.getText();
+                    if (StringUtils.isBlank(itemText)) {
+                        rootItem.setPredicate(null);
+                    } else {
+                        rootItem.setPredicate(TreeItemPredicate
+                                .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
+                    }
+                });
+                return null;
+            }
+        };
+        executor.runAsync(task);
     }
 
     private static FilterableTreeItem<String> parseJSON(final String name, final Object json) {
