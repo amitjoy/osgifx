@@ -54,11 +54,15 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
     private final String            key;
     private final XAttributeDefType type;
     private final ClassLoader       classLoader;
+    private final int               unsignedCardinality;
 
-    public MultipleCardinalityTextControl(final String key, final XAttributeDefType type) {
-        this.key    = key;
-        this.type   = type;
-        classLoader = getClass().getClassLoader();
+    public MultipleCardinalityTextControl(final String key,
+                                          final XAttributeDefType type,
+                                          final int unsignedCardinality) {
+        this.key                 = key;
+        this.type                = type;
+        classLoader              = getClass().getClassLoader();
+        this.unsignedCardinality = unsignedCardinality;
     }
 
     @Override
@@ -85,7 +89,7 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
                 final var currentValue         = field.getValue();
                 final var splitByLineSeparator = Splitter.on(System.lineSeparator()).splitToList(currentValue);
                 final var joinedValue          = Joiner.on(",").join(splitByLineSeparator);
-                dialog.init(key.strip(), type, joinedValue, classLoader);
+                dialog.init(key.strip(), type, unsignedCardinality, joinedValue, classLoader);
 
                 final var entries = dialog.showAndWait();
                 if (entries.isPresent()) {

@@ -52,14 +52,17 @@ import javafx.stage.StageStyle;
 
 public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
 
+    private int                        unsignedCardinality;
     private ClassLoader                classLoader;
     private final List<PropertiesForm> entries = Lists.newArrayList();
 
     public void init(final String key,
                      final XAttributeDefType targetType,
+                     final int unsignedCardinality,
                      final String textInput,
                      final ClassLoader classLoader) {
-        this.classLoader = classLoader;
+        this.classLoader         = classLoader;
+        this.unsignedCardinality = unsignedCardinality;
         final var dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
@@ -226,8 +229,10 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
     }
 
     private void addFieldPair(final VBox content, final XAttributeDefType type, final String initValue) {
-        content.getChildren().add(new PropertiesForm(content, type, initValue));
-        getDialogPane().getScene().getWindow().sizeToScene();
+        if (content.getChildren().size() <= unsignedCardinality) {
+            content.getChildren().add(new PropertiesForm(content, type, initValue));
+            getDialogPane().getScene().getWindow().sizeToScene();
+        }
     }
 
 }
