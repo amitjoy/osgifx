@@ -1,6 +1,6 @@
 # Google
 
-com.google.mug:mug:6.4
+com.google.mug:mug:6.5
 
 # bnd
 
@@ -39,7 +39,7 @@ org.osgi:org.osgi.service.application:1.1.0
 org.osgi:org.osgi.service.async:1.0.0
 org.osgi:org.osgi.service.cdi:1.0.1
 org.osgi:org.osgi.service.cm:1.6.1
-org.osgi:org.osgi.service.component.annotations:1.5.0
+org.osgi:org.osgi.service.component.annotations:1.5.1
 org.osgi:org.osgi.service.configurator:1.0.1
 org.osgi:org.osgi.service.coordinator:1.0.2
 org.osgi:org.osgi.service.deploymentadmin:1.1.0
@@ -56,8 +56,8 @@ org.osgi:org.osgi.util.converter:1.0.9
 
 # TilesFx
 
-eu.hansolo:tilesfx:17.1.15
-eu.hansolo:toolbox:17.0.33
+eu.hansolo:tilesfx:17.1.17
+eu.hansolo:toolbox:17.0.35
 eu.hansolo:toolboxfx:17.0.33
 
 # FormsFx
