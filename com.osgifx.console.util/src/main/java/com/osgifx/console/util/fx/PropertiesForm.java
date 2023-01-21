@@ -99,7 +99,7 @@ public final class PropertiesForm {
                         final var key    = txtKey.getText();
                         final var field  = (TextField) node;
 
-                        dialog.init(key, newValue, field.getText(), getClass().getClassLoader());
+                        dialog.init(key, newValue, Integer.MAX_VALUE, field.getText(), getClass().getClassLoader());
                         final var entries = dialog.showAndWait();
                         entries.ifPresent(field::setText);
                     }
