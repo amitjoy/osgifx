@@ -177,6 +177,7 @@ public final class XMetaTypeAdmin {
         dto.id           = ad.getID();
         dto.name         = ad.getName();
         dto.description  = ad.getDescription();
+        dto.cardinality  = ad.getCardinality();
         dto.type         = defType(ad.getType(), ad.getCardinality()).ordinal();
         dto.optionValues = Optional.ofNullable(ad.getOptionLabels()).map(Arrays::asList).orElse(null);
         dto.defaultValue = Optional.ofNullable(ad.getDefaultValue()).map(Arrays::asList).orElse(null);
