@@ -15,7 +15,20 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations;
 
+import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN_LIST;
 import static com.osgifx.console.agent.dto.XAttributeDefType.CHAR_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.CHAR_LIST;
+import static com.osgifx.console.agent.dto.XAttributeDefType.DOUBLE_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.DOUBLE_LIST;
+import static com.osgifx.console.agent.dto.XAttributeDefType.FLOAT_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.FLOAT_LIST;
+import static com.osgifx.console.agent.dto.XAttributeDefType.INTEGER_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.INTEGER_LIST;
+import static com.osgifx.console.agent.dto.XAttributeDefType.LONG_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.LONG_LIST;
+import static com.osgifx.console.agent.dto.XAttributeDefType.STRING_ARRAY;
+import static com.osgifx.console.agent.dto.XAttributeDefType.STRING_LIST;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_DELETED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 import static java.lang.System.lineSeparator;
@@ -26,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -260,7 +272,7 @@ public final class ConfigurationEditorFxController {
             final var value       = entry.getValue();
             final var attrDefType = value.type;
 
-            final Field<?> field = initFieldFromType(key, value, null, attrDefType, null, false).label(key)
+            final Field<?> field = initFieldFromType(key, value, null, attrDefType, Integer.MAX_VALUE, null).label(key)
                     .editable(!isSnapshotAgent);
 
             if (uneditableProperties.contains(field.getLabel())) {
@@ -314,7 +326,7 @@ public final class ConfigurationEditorFxController {
         final var defaultVal = ad.defaultValue;
         final var id         = ad.id;
 
-        return initFieldFromType(id, currentValue, defaultVal, type, options, true).label(id)
+        return initFieldFromType(id, currentValue, defaultVal, type, ad.cardinality, options).label(id)
                 .labelDescription(ad.description);
     }
 
@@ -322,8 +334,8 @@ public final class ConfigurationEditorFxController {
                                        final ConfigValue configValue,
                                        final List<String> defaultValue,
                                        final XAttributeDefType adType,
-                                       final List<String> options,
-                                       final boolean hasOCD) {
+                                       final int cardinality,
+                                       final List<String> options) {
         final var currentValue = configValue != null ? configValue.value : null;
         Field<?>  field        = null;
         switch (adType) {
@@ -419,52 +431,46 @@ public final class ConfigurationEditorFxController {
                 }
                 break;
             case BOOLEAN_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, boolean.class,
-                        XAttributeDefType.BOOLEAN_ARRAY);
+                field = processArray(key, currentValue, defaultValue, boolean.class, BOOLEAN_ARRAY, cardinality);
                 break;
             case BOOLEAN_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.BOOLEAN_LIST);
+                field = processList(key, currentValue, defaultValue, BOOLEAN_LIST, cardinality);
                 break;
             case DOUBLE_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, double.class,
-                        XAttributeDefType.DOUBLE_ARRAY);
+                field = processArray(key, currentValue, defaultValue, double.class, DOUBLE_ARRAY, cardinality);
                 break;
             case DOUBLE_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.DOUBLE_LIST);
+                field = processList(key, currentValue, defaultValue, DOUBLE_LIST, cardinality);
                 break;
             case LONG_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, long.class,
-                        XAttributeDefType.LONG_ARRAY);
+                field = processArray(key, currentValue, defaultValue, long.class, LONG_ARRAY, cardinality);
                 break;
             case LONG_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.LONG_LIST);
+                field = processList(key, currentValue, defaultValue, LONG_LIST, cardinality);
                 break;
             case INTEGER_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, int.class,
-                        XAttributeDefType.INTEGER_ARRAY);
+                field = processArray(key, currentValue, defaultValue, int.class, INTEGER_ARRAY, cardinality);
                 break;
             case INTEGER_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.INTEGER_LIST);
+                field = processList(key, currentValue, defaultValue, INTEGER_LIST, cardinality);
                 break;
             case FLOAT_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, float.class,
-                        XAttributeDefType.FLOAT_ARRAY);
+                field = processArray(key, currentValue, defaultValue, float.class, FLOAT_ARRAY, cardinality);
                 break;
             case FLOAT_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.FLOAT_LIST);
+                field = processList(key, currentValue, defaultValue, FLOAT_LIST, cardinality);
                 break;
             case CHAR_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, char.class, CHAR_ARRAY);
+                field = processArray(key, currentValue, defaultValue, char.class, CHAR_ARRAY, cardinality);
                 break;
             case CHAR_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.CHAR_LIST);
+                field = processList(key, currentValue, defaultValue, CHAR_LIST, cardinality);
                 break;
             case STRING_ARRAY:
-                field = processArray(key, currentValue, defaultValue, options, hasOCD, String.class,
-                        XAttributeDefType.STRING_ARRAY);
+                field = processArray(key, currentValue, defaultValue, String.class, STRING_ARRAY, cardinality);
                 break;
             case STRING_LIST:
-                field = processList(key, currentValue, defaultValue, options, hasOCD, XAttributeDefType.STRING_LIST);
+                field = processList(key, currentValue, defaultValue, STRING_LIST, cardinality);
                 break;
             case STRING:
             default:
@@ -500,41 +506,27 @@ public final class ConfigurationEditorFxController {
     private <T> Field<?> processArray(final String key,
                                       final Object currentValue,
                                       final List<String> defaultValue,
-                                      final List<String> options,
-                                      final boolean hasOCD,
                                       final Class<T> clazz,
-                                      final XAttributeDefType adType) {
-        final Field<?> field;
-        if (hasOCD) {
-            T[] effectiveValue;
-            if (currentValue != null) {
-                effectiveValue = converter.convert(currentValue, getArrayClass(clazz));
-            } else {
-                effectiveValue = converter.convert(defaultValue, getArrayClass(clazz));
-            }
-            if (options != null && !options.isEmpty()) {
-                final var selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
-                }), selections);
-            } else {
-                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
-                }));
-            }
+                                      final XAttributeDefType adType,
+                                      final int cardinality) {
+        final var    control = new MultipleCardinalityTextControl(key, adType, cardinality & 0xffffffff);
+        List<String> convertedValue;
+        T[]          effectiveValue;
+        if (currentValue != null) {
+            effectiveValue = converter.convert(currentValue, getArrayClass(clazz));
         } else {
-            final var    control = new MultipleCardinalityTextControl(key, adType);
-            List<String> convertedValue;
-            if (adType == CHAR_ARRAY) {
-                final List<Character> tempValue = converter.convert(currentValue, new TypeReference<List<Character>>() {
-                });
-                convertedValue = converter.convert(tempValue, new TypeReference<List<String>>() {
-                });
-            } else {
-                convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-                });
-            }
-            field = Field.ofStringType(Joiner.on(lineSeparator()).join(convertedValue)).render(control).multiline(true);
+            effectiveValue = converter.convert(defaultValue, getArrayClass(clazz));
         }
-        return field;
+        if (adType == CHAR_ARRAY) {
+            final List<Character> tempValue = converter.convert(effectiveValue, new TypeReference<List<Character>>() {
+            });
+            convertedValue = converter.convert(tempValue, new TypeReference<List<String>>() {
+            });
+        } else {
+            convertedValue = converter.convert(effectiveValue, new TypeReference<List<String>>() {
+            });
+        }
+        return Field.ofStringType(Joiner.on(lineSeparator()).join(convertedValue)).render(control).multiline(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -542,37 +534,16 @@ public final class ConfigurationEditorFxController {
         return (Class<? extends T[]>) Array.newInstance(clazz, 0).getClass();
     }
 
-    private <T> Field<?> processList(final String key,
-                                     final Object currentValue,
-                                     final List<String> defaultValue,
-                                     final List<String> options,
-                                     final boolean hasOCD,
-                                     final XAttributeDefType adType) {
-        Field<?> field;
-        if (hasOCD) {
-            List<T> effectiveValue;
-            if (currentValue != null) {
-                effectiveValue = converter.convert(currentValue, new TypeReference<List<T>>() {
-                });
-            } else {
-                effectiveValue = converter.convert(defaultValue, new TypeReference<List<T>>() {
-                });
-            }
-            if (options != null && !options.isEmpty()) {
-                final var selections = Stream.of(effectiveValue).map(v -> options.indexOf(v.toString())).toList();
-                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
-                }), selections);
-            } else {
-                field = Field.ofMultiSelectionType(converter.convert(options, new TypeReference<List<T>>() {
-                }));
-            }
-        } else {
-            final var          control        = new MultipleCardinalityTextControl(key, adType);
-            final List<String> convertedValue = converter.convert(currentValue, new TypeReference<List<String>>() {
-                                              });
-            field = Field.ofStringType(Joiner.on(lineSeparator()).join(convertedValue)).render(control).multiline(true);
-        }
-        return field;
+    private Field<?> processList(final String key,
+                                 final Object currentValue,
+                                 final List<String> defaultValue,
+                                 final XAttributeDefType adType,
+                                 final int cardinality) {
+        final var          control        = new MultipleCardinalityTextControl(key, adType, cardinality & 0xffffffff);
+        final List<String> convertedValue = converter.convert(currentValue != null ? currentValue : defaultValue,
+                new TypeReference<List<String>>() {
+                                                  });
+        return Field.ofStringType(Joiner.on(lineSeparator()).join(convertedValue)).render(control).multiline(true);
     }
 
     private List<ConfigValue> prepareConfigurationProperties() {
