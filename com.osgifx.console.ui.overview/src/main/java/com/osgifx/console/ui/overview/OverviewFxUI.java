@@ -18,6 +18,8 @@ package com.osgifx.console.ui.overview;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAUSE;
+import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PLAY;
 import static java.util.Objects.requireNonNullElse;
 import static javafx.animation.Animation.INDEFINITE;
 
@@ -26,12 +28,14 @@ import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.controlsfx.glyphfont.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -55,7 +59,9 @@ import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -83,6 +89,9 @@ public final class OverviewFxUI {
     @Inject
     @Named("is_connected")
     private boolean          isConnected;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean          isSnapshotAgent;
 
     private Tile noOfThreadsTile;
     private Tile runtimeInfoTile;
@@ -93,10 +102,14 @@ public final class OverviewFxUI {
     private Tile availableMemoryTile;
     private Tile uptimeTile;
 
+    private Button   timelineButton;
     private Timeline dataRetrieverTimeline;
+
+    private final AtomicBoolean isRealtimeUpdateRunning = new AtomicBoolean(true);
 
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
+        createTimelineButton();
         retrieveRuntimeInfo();
         createTiles(parent);
         createPeriodicTaskToSetRuntimeInfo();
@@ -107,15 +120,63 @@ public final class OverviewFxUI {
 
     @Focus
     public void onFocus(final BorderPane parent) {
-        // This is required as a workaround to ensure that after the tab gets focussed,
-        // the CSS overridden problem gets overridden once again with the TileFX
-        // embedded CSS and the number tiles are shown properly
-        createTiles(parent);
+        if (isRealtimeUpdateRunning.get()) {
+            // This is required as a workaround to ensure that after the tab gets focused,
+            // the CSS overridden problem gets overridden once again with the TileFX
+            // embedded CSS and the number tiles are shown properly
+            createTiles(parent);
+        }
     }
 
     @PreDestroy
     public void destroy() {
         dataRetrieverTimeline.stop();
+    }
+
+    enum TimelineButtonType {
+        PLAY("PLAY", "Play Real-time Update"),
+        PAUSE("PAUSE", "Pause Real-time Update");
+
+        String glyph;
+        String tooltip;
+
+        TimelineButtonType(final String glyph, final String tooltip) {
+            this.glyph   = glyph;
+            this.tooltip = tooltip;
+        }
+    }
+
+    private void createTimelineButton() {
+        timelineButton = new Button("");
+        updateTimelineButtonTo(PAUSE);
+    }
+
+    private void updateTimelineButtonTo(final TimelineButtonType buttonType) {
+        final var glyph = new Glyph("FontAwesome", buttonType.glyph);
+        glyph.useGradientEffect();
+        glyph.useHoverEffect();
+
+        timelineButton.setGraphic(glyph);
+        timelineButton.setTooltip(new Tooltip(buttonType.tooltip));
+        timelineButton.setOnMouseClicked(mouseEvent -> {
+            if (buttonType == PLAY) {
+                playTimelineAnimation();
+            } else {
+                pauseTimelineAnimation();
+            }
+        });
+    }
+
+    private void playTimelineAnimation() {
+        dataRetrieverTimeline.play();
+        updateTimelineButtonTo(PAUSE);
+        isRealtimeUpdateRunning.set(true);
+    }
+
+    private void pauseTimelineAnimation() {
+        dataRetrieverTimeline.pause();
+        updateTimelineButtonTo(PLAY);
+        isRealtimeUpdateRunning.set(false);
     }
 
     private void createPeriodicTaskToSetRuntimeInfo() {
@@ -242,6 +303,7 @@ public final class OverviewFxUI {
 
         noOfThreadsTile = TileBuilder.create()
                                      .skinType(SkinType.NUMBER)
+                                     .numberFormat(new DecimalFormat("#"))
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Threads")
                                      .text("Number of threads")
@@ -260,6 +322,7 @@ public final class OverviewFxUI {
 
         noOfBundlesTile = TileBuilder.create()
                                      .skinType(SkinType.NUMBER)
+                                     .numberFormat(new DecimalFormat("#"))
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Bundles")
                                      .text("Number of installed bundles")
@@ -351,7 +414,7 @@ public final class OverviewFxUI {
         pane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         parent.setCenter(pane);
-        statusBar.addTo(parent);
+        initStatusBar(parent);
     }
 
     private Node createRuntimeTable(final String frameworkBsn,
@@ -493,6 +556,18 @@ public final class OverviewFxUI {
                                             final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
         createTiles(parent);
+    }
+
+    private void initStatusBar(final BorderPane parent) {
+        if (isConnected) {
+            statusBar.clearAllInRight();
+            if (!isSnapshotAgent) {
+                statusBar.addToRight(timelineButton);
+            }
+        } else {
+            statusBar.clearAllInRight();
+        }
+        statusBar.addTo(parent);
     }
 
 }
