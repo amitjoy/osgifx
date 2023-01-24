@@ -140,7 +140,7 @@ install.order                     :   \
 	org.apache.felix.gogo.runtime;version='[1.1.6,1.1.7)';startlevel=10,\
 	org.apache.felix.gogo.shell;version='[1.1.4,1.1.5)';startlevel=10,\
 	org.apache.felix.metatype;version='[1.2.4,1.2.5)';startlevel=10,\
-	org.apache.felix.scr;version='[2.2.4,2.2.5)';startlevel=10,\
+	org.apache.felix.scr;version='[2.2.6,2.2.7)';startlevel=10,\
 	org.apache.sling.commons.log;version='[5.4.2,5.4.3)';startlevel=10,\
 	org.apache.sling.commons.logservice;version='[1.1.0,1.1.1)';startlevel=10,\
 	org.eclipse.core.commands;version='[3.10.300,3.10.301)';startlevel=10,\
