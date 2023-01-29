@@ -559,15 +559,11 @@ public final class OverviewFxUI {
     }
 
     private void initStatusBar(final BorderPane parent) {
-        if (isConnected) {
-            statusBar.clearAllInRight();
-            if (!isSnapshotAgent) {
-                statusBar.addToRight(timelineButton);
-            }
-        } else {
-            statusBar.clearAllInRight();
-        }
+        statusBar.clearAllInRight();
         statusBar.addTo(parent);
+        if (isConnected && !isSnapshotAgent) {
+            statusBar.addToRight(timelineButton);
+        }
     }
 
 }

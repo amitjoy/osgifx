@@ -113,10 +113,10 @@ public final class BundlesFxUI {
     @Optional
     private void onFilterUpdateEvent(@UIEventTopic(UPDATE_BUNDLE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter,
                                      final BorderPane parent) {
-        logger.atInfo().log("Update filter event received");
+        logger.atInfo().log("Search filter update event received");
         searchFilter = filter;
         if (filter.predicate != null) {
-            initSearchFilterResetButton(parent, filter.description);
+            initSearchFilterResetButton(filter.description);
         } else {
             initStatusBar(parent);
         }
@@ -153,32 +153,30 @@ public final class BundlesFxUI {
     }
 
     private void initStatusBar(final BorderPane parent) {
+        statusBar.clearAllInRight();
+        statusBar.addTo(parent);
         if (isConnected) {
             final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
-        } else {
-            statusBar.clearAllInRight();
         }
-        statusBar.addTo(parent);
     }
 
-    private void initSearchFilterResetButton(final BorderPane parent, final String description) {
+    private void initSearchFilterResetButton(final String description) {
+        statusBar.clearAllInRight();
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(() -> FxDialog.showConfirmationDialog("Reset Search Filter?",
-                    description, getClass().getClassLoader(), btn -> {
+            final var searchFilterResetNode = Fx.initStatusBarButton(() -> FxDialog
+                    .showConfirmationDialog("Reset Search Filter?", description, getClass().getClassLoader(), btn -> {
                         if (btn == ButtonType.OK) {
                             eventBroker.post(UPDATE_BUNDLE_FILTER_EVENT_TOPIC, new SearchFilterDTO());
                         }
                     }), "Reset Search Filter", "CLOSE", Color.RED);
+            statusBar.addToRight(searchFilterResetNode);
             statusBar.addToRight(new Separator(VERTICAL));
-            statusBar.addToRight(node);
-        } else {
-            statusBar.clearAllInRight();
+            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+            statusBar.addToRight(refreshNode);
         }
-        statusBar.addTo(parent);
     }
 
     private void refreshData() {
