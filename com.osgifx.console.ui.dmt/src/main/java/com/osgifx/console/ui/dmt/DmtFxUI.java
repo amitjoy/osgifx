@@ -129,16 +129,14 @@ public final class DmtFxUI {
     }
 
     private void initStatusBar(final BorderPane parent) {
+        statusBar.clearAllInRight();
+        statusBar.addTo(parent);
         if (isConnected) {
             final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
-            statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
-        } else {
-            statusBar.clearAllInRight();
         }
-        statusBar.addTo(parent);
     }
 
     private Data<Node, DmtFxController> loadFXML(final String resourceName) {
