@@ -124,16 +124,14 @@ public final class LeaksFxUI {
     }
 
     private void initStatusBar(final BorderPane parent) {
+        statusBar.clearAllInRight();
+        statusBar.addTo(parent);
         if (isConnected) {
             final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
-        } else {
-            statusBar.clearAllInRight();
         }
-        statusBar.addTo(parent);
     }
 
     private void refreshData() {
