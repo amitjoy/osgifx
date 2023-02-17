@@ -49,7 +49,7 @@ public final class ExecutorProvider implements Executor {
         @AttributeDefinition(description = "The minimum number of threads allocated to this pool", required = false)
         int coreSize() default 30;
 
-        @AttributeDefinition(description = " If this flag is set to true the containing thread pool will use daemon threads.", required = false)
+        @AttributeDefinition(description = "If this flag is set to true the containing thread pool will use daemon threads.", required = false)
         boolean daemon() default true;
     }
 
