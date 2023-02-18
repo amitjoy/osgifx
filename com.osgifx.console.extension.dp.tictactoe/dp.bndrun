@@ -6,6 +6,4 @@
 -runrequires    : bnd.identity;id='com.osgifx.console.extension.ui.tictactoe'
 
 # the following is automatically generated due to the resolve operation
--runbundles     : \
-	com.osgifx.console.extension.ui.tictactoe;version=snapshot,\
-	com.osgifx.console.wrapper.grid;version=snapshot
+-runbundles     : com.osgifx.console.extension.ui.tictactoe;version=snapshot, com.osgifx.console.wrapper.grid;version=snapshot
