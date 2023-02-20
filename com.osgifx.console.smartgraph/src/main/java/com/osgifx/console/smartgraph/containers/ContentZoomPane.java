@@ -65,7 +65,6 @@ public class ContentZoomPane extends BorderPane {
     }
 
     private Node createSlider() {
-
         final var slider = new Slider(MIN_SCALE, MAX_SCALE, MIN_SCALE);
         slider.setOrientation(Orientation.VERTICAL);
         slider.setShowTickMarks(true);
@@ -75,8 +74,7 @@ public class ContentZoomPane extends BorderPane {
         slider.setBlockIncrement(0.125f);
         slider.setSnapToTicks(true);
 
-        final var label = new Text("Zoom");
-
+        final var label      = new Text("Zoom");
         final var paneSlider = new VBox(slider, label);
 
         paneSlider.setPadding(new Insets(10, 10, 10, 10));
@@ -93,15 +91,12 @@ public class ContentZoomPane extends BorderPane {
     }
 
     public static double boundValue(final double value, final double min, final double max) {
-
         if (Double.compare(value, min) < 0) {
             return min;
         }
-
         if (Double.compare(value, max) > 0) {
             return max;
         }
-
         return value;
     }
 
