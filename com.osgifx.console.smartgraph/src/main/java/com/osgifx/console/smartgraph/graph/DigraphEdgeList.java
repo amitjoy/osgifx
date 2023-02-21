@@ -113,7 +113,6 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         if (existsEdgeWith(edgeElement)) {
             throw new InvalidEdgeException("There's already an edge with this element.");
         }
-
         if (!existsVertexWith(outboundElement)) {
             throw new InvalidVertexException("No vertex contains " + outboundElement);
         }
@@ -123,11 +122,9 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
         final var outVertex = vertexOf(outboundElement);
         final var inVertex  = vertexOf(inboundElement);
-
-        final var newEdge = new MyEdge(edgeElement, outVertex, inVertex);
+        final var newEdge   = new MyEdge(edgeElement, outVertex, inVertex);
 
         edges.put(edgeElement, newEdge);
-
         return newEdge;
     }
 
@@ -164,7 +161,6 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         if (!edge.contains(v)) {
             return null; /* this edge does not connect vertex v */
         }
-
         if (edge.vertices()[0] == v) {
             return edge.vertices()[1];
         }
@@ -177,9 +173,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         if (existsVertexWith(vElement)) {
             throw new InvalidVertexException("There's already a vertex with this element.");
         }
-
         final var newVertex = new MyVertex(vElement);
-
         vertices.put(vElement, newVertex);
 
         return newVertex;
@@ -190,7 +184,6 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         checkVertex(v);
 
         final var element = v.element();
-
         // remove incident edges
         final var inOutEdges = incidentEdges(v);
         inOutEdges.addAll(outboundEdges(v));
@@ -198,7 +191,6 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         for (final Edge<E, V> edge : inOutEdges) {
             edges.remove(edge.element());
         }
-
         vertices.remove(v.element());
 
         return element;
@@ -219,9 +211,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         if (existsVertexWith(newElement)) {
             throw new InvalidVertexException("There's already a vertex with this element.");
         }
-
-        final var vertex = checkVertex(v);
-
+        final var vertex     = checkVertex(v);
         final var oldElement = vertex.element;
         vertex.element = newElement;
 
@@ -233,9 +223,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         if (existsEdgeWith(newElement)) {
             throw new InvalidEdgeException("There's already an edge with this element.");
         }
-
-        final var edge = checkEdge(e);
-
+        final var edge       = checkEdge(e);
         final var oldElement = edge.element;
         edge.element = newElement;
 
@@ -342,10 +330,6 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     /**
      * Checks whether a given vertex is valid and belongs to this graph
-     *
-     * @param v
-     * @return
-     * @throws InvalidVertexException
      */
     private MyVertex checkVertex(final Vertex<V> v) throws InvalidVertexException {
         if (v == null) {
@@ -377,7 +361,6 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
         } catch (final ClassCastException ex) {
             throw new InvalidVertexException("Not an adge.");
         }
-
         if (!edges.containsKey(edge.element)) {
             throw new InvalidEdgeException("Edge does not belong to this graph.");
         }
