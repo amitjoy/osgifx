@@ -31,15 +31,16 @@ import com.osgifx.console.agent.link.RemoteRPC;
 
 public class AgentSupervisor<S, A> {
 
-    private static final int     CONNECT_WAIT = 200;
+    private static final int CONNECT_WAIT = 200;
+
     private A                    agent;
-    private final CountDownLatch latch        = new CountDownLatch(1);
-    protected volatile int       exitCode;
-    private RemoteRPC<S, A>      remoteRPC;
-    private final AtomicBoolean  quit         = new AtomicBoolean();
-    protected String             host;
     protected int                port;
     protected int                timeout;
+    protected String             host;
+    private RemoteRPC<S, A>      remoteRPC;
+    protected volatile int       exitCode;
+    private final AtomicBoolean  quit  = new AtomicBoolean();
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     protected void connect(final Class<A> agent,
                            final S supervisor,
