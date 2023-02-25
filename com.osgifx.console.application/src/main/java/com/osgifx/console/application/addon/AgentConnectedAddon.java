@@ -71,7 +71,7 @@ public final class AgentConnectedAddon {
             }
         };
 
-        final var agent  = isLocalAgent.getValue() ? "local" : "remote";
+        final var agent  = Boolean.TRUE.equals(isLocalAgent.getValue()) ? "local" : "remote";
         final var header = "Retrieving information from " + agent + " agent";
 
         final var taskFuture = executor.runAsync(dataRetrievalTask);
