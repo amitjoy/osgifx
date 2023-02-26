@@ -39,6 +39,8 @@ import com.osgifx.console.ui.search.dialog.SearchDialog;
 
 public final class SearchHandler {
 
+    private static final String TAB_ID_PREFIX = "com.osgifx.console.application.tab.";
+
     @Log
     @Inject
     private FluentLogger    logger;
@@ -66,23 +68,23 @@ public final class SearchHandler {
             final var filterDTO = search.get();
             switch (filterDTO.component()) {
                 case BUNDLES:
-                    partService.showPart("com.osgifx.console.application.tab.bundles", ACTIVATE);
+                    switchToTab("bundles");
                     eventBroker.post(UPDATE_BUNDLE_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 case COMPONENTS:
-                    partService.showPart("com.osgifx.console.application.tab.components", ACTIVATE);
+                    switchToTab("components");
                     eventBroker.post(UPDATE_COMPONENT_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 case CONFIGURATIONS:
-                    partService.showPart("com.osgifx.console.application.tab.configurations", ACTIVATE);
+                    switchToTab("configurations");
                     eventBroker.post(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 case SERVICES:
-                    partService.showPart("com.osgifx.console.application.tab.services", ACTIVATE);
+                    switchToTab("services");
                     eventBroker.post(UPDATE_SERVICE_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 case PACKAGES:
-                    partService.showPart("com.osgifx.console.application.tab.packages", ACTIVATE);
+                    switchToTab("packages");
                     eventBroker.post(UPDATE_PACKAGE_FILTER_EVENT_TOPIC, filterDTO.filter());
                     break;
                 default:
@@ -94,6 +96,10 @@ public final class SearchHandler {
     @CanExecute
     public boolean canExecute() {
         return isConnected;
+    }
+
+    private void switchToTab(final String value) {
+        partService.showPart(TAB_ID_PREFIX + value, ACTIVATE);
     }
 
 }
