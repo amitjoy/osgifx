@@ -282,7 +282,7 @@ public final class SnapshotAgent implements Agent {
 
     @Override
     public Map<String, Object> executeExtension(final String name, final Map<String, Object> context) {
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
