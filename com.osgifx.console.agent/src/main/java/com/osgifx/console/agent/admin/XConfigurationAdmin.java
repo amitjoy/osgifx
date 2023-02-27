@@ -21,7 +21,6 @@ import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
 import static com.osgifx.console.agent.helper.OSGiCompendiumService.CM;
-import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public final class XConfigurationAdmin {
                                final Object configAdmin,
                                final Object metatype,
                                final XComponentAdmin componentAdmin) {
-        this.context        = requireNonNull(context);
+        this.context        = context;
         this.metatype       = metatype;
         this.configAdmin    = (ConfigurationAdmin) configAdmin;
         this.componentAdmin = componentAdmin;
