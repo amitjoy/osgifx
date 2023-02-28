@@ -147,7 +147,6 @@ public final class DIModule {
                                                           null);
         agentExtensionTracker      = new ServiceTracker<AgentExtension, AgentExtension>(context, AgentExtension.class,
                                                                                         null) {
-
                                        @Override
                                        @SuppressWarnings("unchecked")
                                        public AgentExtension addingService(final ServiceReference<AgentExtension> reference) {
@@ -178,6 +177,7 @@ public final class DIModule {
                                        }
                                    };
         gogoCommandsTracker        = new ServiceTracker<Object, Object>(context, gogoCommandFilter, null) {
+
                                        @Override
                                        public Object addingService(final ServiceReference<Object> reference) {
                                            final String   scope     = String
