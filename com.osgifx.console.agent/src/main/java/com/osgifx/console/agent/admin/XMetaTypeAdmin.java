@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
@@ -53,7 +52,7 @@ public final class XMetaTypeAdmin {
 
     @Inject
     public XMetaTypeAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
-        this.context     = requireNonNull(context);
+        this.context     = context;
         this.configAdmin = (ConfigurationAdmin) configAdmin;
         this.metatype    = (MetaTypeService) metatype;
     }
