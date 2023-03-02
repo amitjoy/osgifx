@@ -75,8 +75,8 @@ public final class XBundleAdmin {
 
     @Inject
     public XBundleAdmin(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
-        this.context                   = requireNonNull(context);
-        this.bundleStartTimeCalculator = requireNonNull(bundleStartTimeCalculator);
+        this.context                   = context;
+        this.bundleStartTimeCalculator = bundleStartTimeCalculator;
     }
 
     public List<XBundleDTO> get() {
