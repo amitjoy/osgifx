@@ -35,12 +35,12 @@ import com.osgifx.console.ui.search.filter.SearchFilter;
 import com.osgifx.console.ui.search.filter.SearchOperation;
 
 @Component
-public final class BundleSearchFilterByPersistentStart implements SearchFilter {
+public final class BundleSearchFilterByFragment implements SearchFilter {
 
     @Override
     public Predicate<XBundleDTO> predicate(final String input, final SearchOperation searchOperation) {
         return switch (searchOperation) {
-            case EQUALS_TO -> bundle -> bundle.isPersistentlyStarted == BooleanUtils.toBoolean(input.strip());
+            case EQUALS_TO -> bundle -> bundle.isFragment == BooleanUtils.toBoolean(input.strip());
             default -> throw new VerifyException("no matching case found");
         };
     }
@@ -67,7 +67,7 @@ public final class BundleSearchFilterByPersistentStart implements SearchFilter {
 
     @Override
     public String toString() {
-        return "Is Persistently Started?";
+        return "Is Fragment?";
     }
 
 }
