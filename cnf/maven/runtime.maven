@@ -37,49 +37,49 @@ org.osgi:org.osgi.service.component:1.5.1
 
 org.eclipse.platform:org.eclipse.equinox.app:1.6.200
 org.eclipse.platform:org.eclipse.equinox.bidi:1.4.200
-org.eclipse.platform:org.eclipse.equinox.common:3.17.0
+org.eclipse.platform:org.eclipse.equinox.common:3.17.100
 org.eclipse.platform:org.eclipse.equinox.concurrent:1.2.100
 org.eclipse.platform:org.eclipse.equinox.console:1.4.500
 org.eclipse.platform:org.eclipse.equinox.ds:1.6.200
-org.eclipse.platform:org.eclipse.equinox.event:1.6.100
+org.eclipse.platform:org.eclipse.equinox.event:1.6.200
 org.eclipse.platform:org.eclipse.equinox.launcher:1.6.400
 org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx:1.2.700
 org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.700
 org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.700
 org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.700
-org.eclipse.platform:org.eclipse.equinox.preferences:3.10.100
+org.eclipse.platform:org.eclipse.equinox.preferences:3.10.200
 org.eclipse.platform:org.eclipse.equinox.registry:3.11.200
-org.eclipse.platform:org.eclipse.osgi:3.18.200
+org.eclipse.platform:org.eclipse.osgi:3.18.300
 org.eclipse.platform:org.eclipse.osgi.services:3.11.100
 
 # Eclipse e4
 
-org.eclipse.platform:org.eclipse.e4.core.commands:1.0.300
+org.eclipse.platform:org.eclipse.e4.core.commands:1.0.400
 org.eclipse.platform:org.eclipse.e4.core.contexts:1.11.0
 org.eclipse.platform:org.eclipse.e4.core.di:1.8.300
 org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.7.200
 org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.17.200
 org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.16.400
 org.eclipse.platform:org.eclipse.e4.core.services:2.3.400
-org.eclipse.platform:org.eclipse.e4.emf.xpath:0.3.100
-org.eclipse.platform:org.eclipse.e4.ui.di:1.4.100
-org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.2.300
-org.eclipse.platform:org.eclipse.e4.ui.services:1.5.100
-org.eclipse.platform:org.eclipse.e4.ui.workbench:1.14.0
+org.eclipse.platform:org.eclipse.e4.emf.xpath:0.3.200
+org.eclipse.platform:org.eclipse.e4.ui.di:1.4.200
+org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.3.0
+org.eclipse.platform:org.eclipse.e4.ui.services:1.5.200
+org.eclipse.platform:org.eclipse.e4.ui.workbench:1.14.100
 
 # Eclipse Platform
 
-org.eclipse.platform:org.eclipse.core.commands:3.10.300
+org.eclipse.platform:org.eclipse.core.commands:3.10.400
 org.eclipse.platform:org.eclipse.core.contenttype:3.8.200
-org.eclipse.platform:org.eclipse.core.databinding:1.11.200
-org.eclipse.platform:org.eclipse.core.databinding.beans:1.9.0
-org.eclipse.platform:org.eclipse.core.databinding.observable:1.12.100
-org.eclipse.platform:org.eclipse.core.databinding.property:1.9.100
+org.eclipse.platform:org.eclipse.core.databinding:1.12.0
+org.eclipse.platform:org.eclipse.core.databinding.beans:1.9.100
+org.eclipse.platform:org.eclipse.core.databinding.observable:1.12.200
+org.eclipse.platform:org.eclipse.core.databinding.property:1.9.200
 org.eclipse.platform:org.eclipse.core.filebuffers:3.7.200
 org.eclipse.platform:org.eclipse.core.filesystem:1.9.500
-org.eclipse.platform:org.eclipse.core.jobs:3.13.200
+org.eclipse.platform:org.eclipse.core.jobs:3.13.300
 org.eclipse.platform:org.eclipse.core.net:1.4.0
-org.eclipse.platform:org.eclipse.core.resources:3.18.100
+org.eclipse.platform:org.eclipse.core.resources:3.18.200
 org.eclipse.platform:org.eclipse.core.runtime:3.26.100
 org.eclipse.platform:org.eclipse.core.variables:3.5.100
 
