@@ -33,16 +33,20 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.google.mu.util.Substring;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.GridPane;
 
@@ -105,7 +109,7 @@ public final class ComponentsFxController {
 
         final var componentNameColumn = new TableColumn<XComponentDTO, String>("Name");
 
-        componentNameColumn.setPrefWidth(900);
+        componentNameColumn.setPrefWidth(800);
         componentNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var stateColumn = new TableColumn<XComponentDTO, String>("State");
@@ -113,10 +117,16 @@ public final class ComponentsFxController {
         stateColumn.setPrefWidth(200);
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
+        final var conditionIdColumn = new TableColumn<XComponentDTO, String>("Condition ID");
+
+        conditionIdColumn.setPrefWidth(180);
+        conditionIdColumn.setCellValueFactory(this::parseConditionId);
+
         table.getColumns().add(expanderColumn);
         table.getColumns().add(idColumn);
         table.getColumns().add(componentNameColumn);
         table.getColumns().add(stateColumn);
+        table.getColumns().add(conditionIdColumn);
 
         filteredList = new FilteredList<>(dataProvider.components());
         table.setItems(filteredList);
@@ -130,6 +140,21 @@ public final class ComponentsFxController {
     public void onFilterUpdateEvent(@UIEventTopic(UPDATE_COMPONENT_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super XComponentDTO>) filter.predicate);
+    }
+
+    private ReadOnlyStringProperty parseConditionId(final CellDataFeatures<XComponentDTO, String> p) {
+        final var property = p.getValue().properties.get("osgi.ds.satisfying.condition.target");
+        final var value    = new SimpleStringProperty();
+        if (property != null) {
+            // @formatter:off
+            Substring.between("(", ")")
+                     .from(property)
+                     .ifPresent(e -> Substring.first("=")
+                                              .splitThenTrim(e)
+                                              .ifPresent((n, k) -> value.set(k)));
+            // @formatter:on
+        }
+        return value;
     }
 
 }
