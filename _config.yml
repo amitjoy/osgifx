@@ -7,4 +7,4 @@ theme: jekyll-theme-minimal
 jdeploy:
   url: https://www.jdeploy.com/~osgifx
 agent:
-  url: https://search.maven.org/search?q=g:com.osgifx%20AND%20a:com.osgifx.console.agent
+  url: https://central.sonatype.com/artifact/com.osgifx/com.osgifx.console.agent/2.3.1
