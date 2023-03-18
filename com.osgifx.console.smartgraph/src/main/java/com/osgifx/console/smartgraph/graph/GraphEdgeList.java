@@ -43,8 +43,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
      * Creates a empty graph.
      */
     public GraphEdgeList() {
-        this.vertices = Maps.newHashMap();
-        this.edges    = Maps.newHashMap();
+        vertices = Maps.newHashMap();
+        edges    = Maps.newHashMap();
     }
 
     @Override
@@ -69,17 +69,13 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public Collection<Edge<E, V>> incidentEdges(final Vertex<V> v) throws InvalidVertexException {
-
         checkVertex(v);
-
         final List<Edge<E, V>> incidentEdges = Lists.newArrayList();
         for (final Edge<E, V> edge : edges.values()) {
-
             if (((MyEdge) edge).contains(v)) {
                 /* edge.vertices()[0] == v || edge.vertices()[1] == v */
                 incidentEdges.add(edge);
             }
-
         }
 
         return incidentEdges;
