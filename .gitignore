@@ -247,6 +247,7 @@ bin_test/
 **/fxartifacts/*
 **/heapdumps/*
 **/exception.txt
+cnf/local/index.xml
 
 # jdeploy
 jdeploy/*
