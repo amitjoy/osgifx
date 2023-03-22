@@ -1,5 +1,8 @@
--buildpath : org.apache.commons.lang3,\
-             org.apache.felix.converter,\
-             org.eclipse.fx.core,\
-             com.google.guava,\
-             controlsfx
+-buildpath          : biz.aQute.bndlib;packages=*,\
+                      biz.aQute.bnd.util;packages=*,\
+                      org.apache.commons.lang3,\
+                      org.apache.felix.converter,\
+                      org.eclipse.fx.core,\
+                      com.google.guava,\
+                      controlsfx
+-conditionalpackage : aQute.*
