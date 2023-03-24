@@ -77,6 +77,16 @@ public interface Agent {
     String AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY = "osgi.fx.agent.secure.sslcontext.filter";
 
     /**
+     * The property key to specify the publish topic for publishing the data using MQTT
+     */
+    String AGENT_MQTT_PUB_TOPIC_KEY = "osgi.fx.agent.mqtt.pub.topic";
+
+    /**
+     * The property key to specify the subscription topic for receiving the data using MQTT
+     */
+    String AGENT_MQTT_SUB_TOPIC = "osgi.fx.agent.mqtt.sub.topic";
+
+    /**
      * The property key to enable agent logs
      */
     String TRACE_LOG_KEY = "osgi.fx.agent.logs.enabled";
