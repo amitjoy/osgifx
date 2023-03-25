@@ -127,13 +127,13 @@ import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.OSGiEventHandler;
 import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.helper.AgentHelper;
-import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.redirector.ConsoleRedirector;
 import com.osgifx.console.agent.redirector.GogoRedirector;
 import com.osgifx.console.agent.redirector.NullRedirector;
 import com.osgifx.console.agent.redirector.RedirectOutput;
 import com.osgifx.console.agent.redirector.Redirector;
 import com.osgifx.console.agent.redirector.SocketRedirector;
+import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.bnd.exceptions.Exceptions;
