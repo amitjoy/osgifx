@@ -61,7 +61,6 @@ public final class RedirectOutput extends PrintStream {
         this.err    = err;
     }
 
-    // TODO: java11 - use OutputStream.nullOutputStream()
     private static PrintStream newNullOutputStream() {
         return new PrintStream(new NullOutputStream());
     }
