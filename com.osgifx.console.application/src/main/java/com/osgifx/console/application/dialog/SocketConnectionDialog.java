@@ -46,7 +46,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
 
-public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
+public final class SocketConnectionDialog extends Dialog<SocketConnectionSettingDTO> {
 
     @Log
     @Inject
@@ -58,7 +58,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
 
-        dialogPane.setHeaderText("Add Connection Settings");
+        dialogPane.setHeaderText("Add Socket Connection Settings");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
@@ -175,8 +175,8 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
             verify(p != null && t != null, "Port and host formats are not compliant");
 
-            return new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
-                                            trustStorePassword.getText());
+            return new SocketConnectionSettingDTO(name.getText(), hostname.getText(), p, t,
+                                                  trustStore.getAccessibleText(), trustStorePassword.getText());
         });
     }
 
