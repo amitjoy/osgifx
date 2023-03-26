@@ -30,7 +30,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
@@ -65,7 +65,7 @@ public final class DisconnectFromAgentHandler {
     @Inject
     @Optional
     @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     @Inject
     private SupervisorFactory                       supervisorFactory;
 

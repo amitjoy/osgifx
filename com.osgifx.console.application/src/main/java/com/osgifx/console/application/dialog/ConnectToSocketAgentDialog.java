@@ -15,9 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
-import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.ADD_CONNECTION;
-import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.CONNECT;
-import static com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType.REMOVE_CONNECTION;
+import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.ADD_CONNECTION;
+import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.CONNECT;
+import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.REMOVE_CONNECTION;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -41,7 +41,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
-public final class ConnectToAgentDialog extends Dialog<ButtonType> {
+public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
 
     public enum ActionType {
         CONNECT,
@@ -65,7 +65,7 @@ public final class ConnectToAgentDialog extends Dialog<ButtonType> {
         dialogPane.setPrefWidth(670);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-        dialogPane.setHeaderText("Connect to Remote Agent");
+        dialogPane.setHeaderText("Connect to Remote Socket Agent");
         dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
 
         final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);

@@ -23,7 +23,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 
@@ -35,17 +35,17 @@ import javafx.scene.control.TableView;
 public final class ConnectionSettingsDialogController {
 
     @FXML
-    private TableView<ConnectionSettingDTO>            connectionTable;
+    private TableView<SocketConnectionSettingDTO>            connectionTable;
     @FXML
-    private TableColumn<ConnectionSettingDTO, String>  nameColumn;
+    private TableColumn<SocketConnectionSettingDTO, String>  nameColumn;
     @FXML
-    private TableColumn<ConnectionSettingDTO, String>  hostColumn;
+    private TableColumn<SocketConnectionSettingDTO, String>  hostColumn;
     @FXML
-    private TableColumn<ConnectionSettingDTO, Integer> portColumn;
+    private TableColumn<SocketConnectionSettingDTO, Integer> portColumn;
     @FXML
-    private TableColumn<ConnectionSettingDTO, Integer> timeoutColumn;
+    private TableColumn<SocketConnectionSettingDTO, Integer> timeoutColumn;
     @FXML
-    private TableColumn<ConnectionSettingDTO, String>  trustStoreColumn;
+    private TableColumn<SocketConnectionSettingDTO, String>  trustStoreColumn;
     @Log
     @Inject
     private FluentLogger                               logger;
@@ -53,7 +53,7 @@ public final class ConnectionSettingsDialogController {
     private ConnectionsProvider                        connectionsProvider;
     @Inject
     @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO>    selectedSettings;
+    private ContextBoundValue<SocketConnectionSettingDTO>    selectedSettings;
 
     @FXML
     public void initialize() {
@@ -71,7 +71,7 @@ public final class ConnectionSettingsDialogController {
         logger.atDebug().log("FXML controller has been initialized");
     }
 
-    public ReadOnlyObjectProperty<ConnectionSettingDTO> selectedSettings() {
+    public ReadOnlyObjectProperty<SocketConnectionSettingDTO> selectedSettings() {
         return connectionTable.getSelectionModel().selectedItemProperty();
     }
 

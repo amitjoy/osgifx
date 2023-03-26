@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.common.base.MoreObjects;
 
-public final class ConnectionSettingDTO {
+public final class SocketConnectionSettingDTO {
 
     public String name;
     public String host;
@@ -29,11 +29,11 @@ public final class ConnectionSettingDTO {
     public String trustStorePath;
     public String trustStorePassword;
 
-    public ConnectionSettingDTO() {
+    public SocketConnectionSettingDTO() {
         // needed for GSON
     }
 
-    public ConnectionSettingDTO(final String name,
+    public SocketConnectionSettingDTO(final String name,
                                 final String host,
                                 final int port,
                                 final int timeout,
@@ -69,7 +69,7 @@ public final class ConnectionSettingDTO {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final var other = (ConnectionSettingDTO) obj;
+        final var other = (SocketConnectionSettingDTO) obj;
         // @formatter:off
         return new EqualsBuilder()
                            .append(name, other.name)

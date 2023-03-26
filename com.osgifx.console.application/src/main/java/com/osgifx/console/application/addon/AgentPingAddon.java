@@ -33,7 +33,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -65,7 +65,7 @@ public final class AgentPingAddon {
     @Inject
     @Optional
     @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     private volatile ScheduledFuture<?>             future;
 
     @PostConstruct

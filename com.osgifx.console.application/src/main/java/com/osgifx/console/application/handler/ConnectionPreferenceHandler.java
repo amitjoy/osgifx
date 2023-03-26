@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 
 public final class ConnectionPreferenceHandler {
@@ -62,7 +62,7 @@ public final class ConnectionPreferenceHandler {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new ConnectionSettingDTO(name, host, Ints.tryParse(port), Ints.tryParse(timeout),
+        final var dto         = new SocketConnectionSettingDTO(name, host, Ints.tryParse(port), Ints.tryParse(timeout),
                                                          truststore, truststorePassword);
 
         if ("ADD".equals(type)) {
@@ -79,10 +79,10 @@ public final class ConnectionPreferenceHandler {
         settings.publish(gson.toJson(connections));
     }
 
-    private List<ConnectionSettingDTO> getStoredValues() {
+    private List<SocketConnectionSettingDTO> getStoredValues() {
         final var                  gson        = new Gson();
-        List<ConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
-                new TypeToken<List<ConnectionSettingDTO>>() {
+        List<SocketConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
+                new TypeToken<List<SocketConnectionSettingDTO>>() {
                                                        }.getType());
         if (connections == null) {
             connections = Lists.newArrayList();
