@@ -36,6 +36,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
@@ -98,7 +99,17 @@ public final class ConnectToLocalAgentHandler {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
                     supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to Local Agent on " + localAgentPort);
-                    supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout, null, null);
+
+                    // @formatter:off
+                    final var socketConnection = SocketConnection
+                            .builder()
+                            .host(localAgentHost)
+                            .port(localAgentPort)
+                            .timeout(localAgentTimeout)
+                            .build();
+                    // @formatter:on
+
+                    supervisor.connect(socketConnection);
                     logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost,
                             localAgentPort);
                     return null;

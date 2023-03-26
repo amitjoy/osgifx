@@ -40,11 +40,12 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.application.dialog.ConnectToAgentDialog;
-import com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType;
-import com.osgifx.console.application.dialog.ConnectionDialog;
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ConnectToSocketAgentDialog;
+import com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType;
+import com.osgifx.console.application.dialog.SocketConnectionDialog;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
@@ -52,7 +53,7 @@ import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 
-public final class ConnectToAgentHandler {
+public final class ConnectToSocketAgentHandler {
 
     private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.preference";
 
@@ -90,14 +91,14 @@ public final class ConnectToAgentHandler {
     private ContextBoundValue<String>               connectedAgent;
     @Inject
     @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     @Inject
     private SupervisorFactory                       supervisorFactory;
     private ProgressDialog                          progressDialog;
 
     @Execute
     public void execute() {
-        final var connectToAgentDialog = new ConnectToAgentDialog();
+        final var connectToAgentDialog = new ConnectToSocketAgentDialog();
         ContextInjectionFactory.inject(connectToAgentDialog, context);
         logger.atInfo().log("Injected connect to agent dialog to eclipse context");
 
@@ -137,7 +138,7 @@ public final class ConnectToAgentHandler {
     private void addConnection() {
         logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
-        final var connectionDialog = new ConnectionDialog();
+        final var connectionDialog = new SocketConnectionDialog();
         ContextInjectionFactory.inject(connectionDialog, context);
         logger.atInfo().log("Injected connection dialog to eclipse context");
         connectionDialog.init();
@@ -154,7 +155,7 @@ public final class ConnectToAgentHandler {
 
     private void removeConnection() {
         logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
-        final ConnectionSettingDTO settings = selectedSettings.getValue();
+        final SocketConnectionSettingDTO settings = selectedSettings.getValue();
         if (settings == null) {
             logger.atInfo().log("No connection setting has been selected");
             return;
@@ -180,8 +181,19 @@ public final class ConnectToAgentHandler {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
                     supervisorFactory.createSupervisor(SOCKET_RPC);
                     updateMessage("Connecting to " + settings.host + ":" + settings.port);
-                    supervisor.connect(settings.host, settings.port, settings.timeout, settings.trustStorePath,
-                            settings.trustStorePassword);
+
+                    // @formatter:off
+                    final var socketConnection = SocketConnection
+                            .builder()
+                            .host(settings.host)
+                            .port(settings.port)
+                            .timeout(settings.timeout)
+                            .truststore(settings.trustStorePath)
+                            .truststorePass(settings.trustStorePassword)
+                            .build();
+                    // @formatter:on
+
+                    supervisor.connect(socketConnection);
                     logger.atInfo().log("Successfully connected to %s", settings);
                     return null;
                 } catch (final InterruptedException e) {
@@ -216,7 +228,7 @@ public final class ConnectToAgentHandler {
                 () -> taskFuture.cancel(true));
     }
 
-    private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
+    private void triggerCommand(final SocketConnectionSettingDTO dto, final String type) {
         final Map<String, Object> properties = Maps.newHashMap();
 
         properties.put("name", dto.name);

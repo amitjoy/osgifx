@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,21 +27,21 @@ import javafx.collections.ObservableList;
 @Component(service = ConnectionsProvider.class)
 public final class ConnectionsProvider {
 
-    private final ObservableList<ConnectionSettingDTO> connections = FXCollections.observableArrayList();
+    private final ObservableList<SocketConnectionSettingDTO> connections = FXCollections.observableArrayList();
 
-    public synchronized void addConnection(final ConnectionSettingDTO connection) {
+    public synchronized void addConnection(final SocketConnectionSettingDTO connection) {
         connections.add(connection);
     }
 
-    public synchronized void removeConnection(final ConnectionSettingDTO connection) {
+    public synchronized void removeConnection(final SocketConnectionSettingDTO connection) {
         connections.remove(connection);
     }
 
-    public synchronized void addConnections(final List<ConnectionSettingDTO> connections) {
+    public synchronized void addConnections(final List<SocketConnectionSettingDTO> connections) {
         this.connections.addAll(connections);
     }
 
-    public synchronized ObservableList<ConnectionSettingDTO> getConnections() {
+    public synchronized ObservableList<SocketConnectionSettingDTO> getConnections() {
         return connections;
     }
 
