@@ -18,18 +18,37 @@ package com.osgifx.console.supervisor.rpc;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import com.osgifx.console.agent.link.RemoteRPC;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
+
+import com.osgifx.console.agent.rpc.MqttRPC;
+import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.SocketRPC;
+import com.osgifx.console.supervisor.MqttConnection;
+import com.osgifx.console.supervisor.SocketConnection;
 
 public class AgentSupervisor<S, A> {
+
+    @interface MqttConfig {
+        String server();
+
+        int port();
+
+        String username();
+
+        String password();
+
+        String pubTopic();
+
+        String subTopic();
+    }
 
     private static final int CONNECT_WAIT = 200;
 
@@ -39,47 +58,35 @@ public class AgentSupervisor<S, A> {
     protected String             host;
     private RemoteRPC<S, A>      remoteRPC;
     protected volatile int       exitCode;
-    private final AtomicBoolean  quit  = new AtomicBoolean();
     private final CountDownLatch latch = new CountDownLatch(1);
 
-    protected void connect(final Class<A> agent,
-                           final S supervisor,
-                           final String host,
-                           final int port) throws Exception {
-        connect(agent, supervisor, host, port, -1, null, null);
-    }
-
-    protected void connect(final Class<A> agent,
-                           final S supervisor,
-                           final String host,
-                           final int port,
-                           final int timeout,
-                           final String trustStore,
-                           final String trustStorePassword) throws Exception {
+    protected void connectToSocket(final Class<A> agent,
+                                   final S supervisor,
+                                   final SocketConnection socketConnection) throws Exception {
 
         checkArgument(timeout > -1, "timeout cannot be less than -1");
         checkNotNull(supervisor, "'supervisor' cannot be null");
-        checkNotNull(host, "'host' cannot be null");
+        checkNotNull(socketConnection.host(), "'host' cannot be null");
 
         var retryTimeout = timeout;
-        this.host    = host;
-        this.port    = port;
-        this.timeout = timeout;
+        host    = socketConnection.host();
+        port    = socketConnection.port();
+        timeout = socketConnection.timeout();
 
         while (true) {
             try {
                 SSLSocketFactory sf = null;
-                if (trustStore != null && trustStorePassword != null) {
-                    System.setProperty("javax.net.ssl.trustStore", trustStore);
-                    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+                if (socketConnection.trustStore() != null && socketConnection.trustStorePassword() != null) {
+                    System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
+                    System.setProperty("javax.net.ssl.trustStorePassword", socketConnection.trustStorePassword());
                     System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
                     sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 }
                 final var socket = sf == null ? new Socket() : sf.createSocket();
                 socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
-                remoteRPC = new RemoteRPC<>(agent, supervisor, socket);
-                this.setAgent(remoteRPC);
+                remoteRPC = new SocketRPC<>(agent, supervisor, socket);
+                this.setRemoteRPC(remoteRPC);
                 remoteRPC.open();
                 return;
             } catch (final ConnectException e) {
@@ -95,34 +102,36 @@ public class AgentSupervisor<S, A> {
         }
     }
 
-    public void setAgent(final RemoteRPC<S, A> link) {
-        this.agent     = link.getRemote();
-        this.remoteRPC = link;
+    protected void connectToMQTT(final BundleContext bundleContext,
+                                 final ConfigurationAdmin configurationAdmin,
+                                 final Class<A> agent,
+                                 final S supervisor,
+                                 final MqttConnection connection) {
+        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, "amit/mondal", "mondal/amit");
+        this.setRemoteRPC(remoteRPC);
+        remoteRPC.open();
+        // TODO use connection to dynamically change parameters in config admin
+
+        // final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
+
+        // ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
+        // ch.set(ch.d().server(), connection.server());
+        // ch.set(ch.d().port(), connection.port());
+        // ch.set(ch.d().username(), connection.username());
+        // ch.set(ch.d().password(), connection.password());
+        // ch.set(ch.d().pubTopic(), connection.pubTopic());
+        // ch.set(ch.d().subTopic(), connection.subTopic());
+        // ch.update();
     }
 
-    public void close() throws IOException {
-        clearSSLProperties();
-        if (quit.getAndSet(true)) {
-            return;
-        }
-        if (remoteRPC.isOpen()) {
-            remoteRPC.close();
-        }
-        latch.countDown();
+    private void setRemoteRPC(final RemoteRPC<S, A> rpc) {
+        agent     = rpc.getRemote();
+        remoteRPC = rpc;
     }
 
     public int join() throws InterruptedException {
         latch.await();
         return exitCode;
-    }
-
-    protected void exit(final int exitCode) {
-        this.exitCode = exitCode;
-        try {
-            close();
-        } catch (final Exception e) {
-            // ignore
-        }
     }
 
     public A getAgent() {
