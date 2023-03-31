@@ -56,7 +56,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final AtomicInteger                     id       = new AtomicInteger(10_000);
     private final ConcurrentMap<Integer, RpcResult> promises = new ConcurrentHashMap<>();
     private final AtomicBoolean                     started  = new AtomicBoolean();
-    private final AtomicBoolean                     quit     = new AtomicBoolean();
+    private final AtomicBoolean                     stopped  = new AtomicBoolean();
     private final ThreadLocal<Integer>              msgId    = new ThreadLocal<>();
 
     private final L        local;
@@ -68,7 +68,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     public static class RpcMessage {
         int      id;
         String   methodName;
-        String[] args;
+        String[] methodArgs;
     }
 
     public static class RpcResult {
@@ -101,8 +101,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                     final ByteBuffer   payload = msg.payload();
                     final RpcMessage   message = decodeMessage(payload);
                     final List<byte[]> args    = new ArrayList<>();
-                    if (message.args != null) {
-                        for (final String arg : message.args) {
+                    if (message.methodArgs != null) {
+                        for (final String arg : message.methodArgs) {
                             args.add(Base64.getDecoder().decode(arg));
                         }
                     }
@@ -132,7 +132,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     @Override
     public void close() throws IOException {
-        if (quit.getAndSet(true)) {
+        if (stopped.getAndSet(true)) {
             return; // already closed
         }
         if (local instanceof Closeable) {
@@ -149,7 +149,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     @Override
     @SuppressWarnings("unchecked")
     public synchronized R getRemote() {
-        if (quit.get()) {
+        if (stopped.get()) {
             return null;
         }
         if (remote == null) {
@@ -184,7 +184,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     @Override
     public boolean isOpen() {
-        return !quit.get();
+        return !stopped.get();
     }
 
     /*
@@ -357,7 +357,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 vals.add(encodedValue);
             }
         }
-        msg.args = vals.toArray(new String[0]);
+        msg.methodArgs = vals.toArray(new String[0]);
         return msg;
     }
 
