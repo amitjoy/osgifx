@@ -87,7 +87,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     @Override
     public void open() {
         if (isAlive()) {
-            throw new IllegalStateException("Socket RPC already running");
+            throw new IllegalStateException("Socket RPC is already running");
         }
         if (in != null) {
             start();

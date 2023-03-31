@@ -93,7 +93,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     @Override
     public void open() {
         if (!started.compareAndSet(false, true)) {
-            throw new IllegalStateException("MQTT RPC already running");
+            throw new IllegalStateException("MQTT RPC is already running");
         }
         pubSub = new PubSub(bundleContext, subscriber -> {
             subscriber.subscribe(subTopic).forEach(msg -> {
