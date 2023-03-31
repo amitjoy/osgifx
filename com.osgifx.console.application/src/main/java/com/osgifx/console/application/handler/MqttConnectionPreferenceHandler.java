@@ -32,46 +32,46 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 
-public final class ConnectionPreferenceHandler {
+public final class MqttConnectionPreferenceHandler {
 
     @Log
     @Inject
     private FluentLogger        logger;
     @Inject
-    @Preference(nodePath = "osgi.fx.connections", key = "settings", defaultValue = "")
+    @Preference(nodePath = "osgi.fx.connections", key = "mqtt.settings", defaultValue = "")
     private Value<String>       settings;
     @Inject
     private ConnectionsProvider connectionsProvider;
 
     @PostConstruct
     public void init() {
-        connectionsProvider.addConnections(getStoredValues());
+        connectionsProvider.addMqttConnections(getStoredValues());
     }
 
     @Execute
     public void execute(@Named("name") final String name,
-                        @Named("host") final String host,
+                        @Named("server") final String server,
                         @Named("port") final String port,
                         @Named("timeout") final String timeout,
                         @Named("type") final String type,
-                        @Named("truststore") @Optional final String truststore,
-                        @Named("truststorePassword") @Optional final String truststorePassword) {
+                        @Named("username") @Optional final String username,
+                        @Named("password") @Optional final String password) {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new SocketConnectionSettingDTO(name, host, Ints.tryParse(port), Ints.tryParse(timeout),
-                                                         truststore, truststorePassword);
+        final var dto         = new MqttConnectionSettingDTO(name, server, Ints.tryParse(port), Ints.tryParse(timeout),
+                                                             username, password);
 
         if ("ADD".equals(type)) {
             connections.add(dto);
-            connectionsProvider.addConnection(dto);
+            connectionsProvider.addMqttConnection(dto);
             logger.atInfo().log("New connection has been added: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
-            connectionsProvider.removeConnection(dto);
+            connectionsProvider.removeMqttConnection(dto);
             logger.atInfo().log("Existing connection has been deleted: %s", dto);
         } else {
             logger.atWarning().log("Cannot execute command with type '%s'", type);
@@ -79,11 +79,11 @@ public final class ConnectionPreferenceHandler {
         settings.publish(gson.toJson(connections));
     }
 
-    private List<SocketConnectionSettingDTO> getStoredValues() {
-        final var                  gson        = new Gson();
-        List<SocketConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
-                new TypeToken<List<SocketConnectionSettingDTO>>() {
-                                                       }.getType());
+    private List<MqttConnectionSettingDTO> getStoredValues() {
+        final var                      gson        = new Gson();
+        List<MqttConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
+                new TypeToken<List<MqttConnectionSettingDTO>>() {
+                                                           }.getType());
         if (connections == null) {
             connections = Lists.newArrayList();
         }
