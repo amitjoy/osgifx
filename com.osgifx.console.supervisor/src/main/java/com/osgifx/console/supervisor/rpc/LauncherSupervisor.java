@@ -61,17 +61,10 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Reference
     private ConfigurationAdmin configurationAdmin;
 
-    // @Override
-    // public void connect(final SocketConnection socketConnection) throws Exception {
-    // checkNotNull(socketConnection, "'socketConnection' cannot be null");
-    // super.connectToSocket(Agent.class, this, socketConnection);
-    // }
-
     @Override
     public void connect(final SocketConnection socketConnection) throws Exception {
-        // TODO TEST MQTT - REMOVE THIS
-        final var mqttConnection = MqttConnection.builder().build();
-        connect(mqttConnection);
+        checkNotNull(socketConnection, "'socketConnection' cannot be null");
+        super.connectToSocket(Agent.class, this, socketConnection);
     }
 
     @Override

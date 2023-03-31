@@ -55,46 +55,46 @@ import javafx.concurrent.Task;
 
 public final class ConnectToSocketAgentHandler {
 
-    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.preference";
+    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.socket.connection.preference";
 
     @Log
     @Inject
-    private FluentLogger                            logger;
+    private FluentLogger                                  logger;
     @Inject
-    private Executor                                executor;
+    private Executor                                      executor;
     @Inject
-    private ThreadSynchronize                       threadSync;
+    private ThreadSynchronize                             threadSync;
     @Inject
-    private IEclipseContext                         context;
+    private IEclipseContext                               context;
     @Inject
-    private IEventBroker                            eventBroker;
+    private IEventBroker                                  eventBroker;
     @Inject
     @Optional
-    private Supervisor                              supervisor;
+    private Supervisor                                    supervisor;
     @Inject
-    private CommandService                          commandService;
+    private CommandService                                commandService;
     @Inject
     @Optional
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>              isConnected;
+    private ContextBoundValue<Boolean>                    isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>              isLocalAgent;
+    private ContextBoundValue<Boolean>                    isLocalAgent;
     @Inject
     @Optional
     @ContextValue("is_snapshot_agent")
-    private ContextBoundValue<Boolean>              isSnapshotAgent;
+    private ContextBoundValue<Boolean>                    isSnapshotAgent;
     @Inject
     @Optional
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>               connectedAgent;
+    private ContextBoundValue<String>                     connectedAgent;
     @Inject
     @ContextValue("selected.settings")
     private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     @Inject
-    private SupervisorFactory                       supervisorFactory;
-    private ProgressDialog                          progressDialog;
+    private SupervisorFactory                             supervisorFactory;
+    private ProgressDialog                                progressDialog;
 
     @Execute
     public void execute() {
@@ -213,7 +213,7 @@ public final class ConnectToSocketAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", settings);
-                final var connection = settings.host + ":" + settings.port;
+                final var connection = "[SOCKET] " + settings.host + ":" + settings.port;
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);

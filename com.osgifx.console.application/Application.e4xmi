@@ -22,7 +22,8 @@
       </children>
     </mainMenu>
   </children>
-  <handlers xmi:id="_Y0EEwCWwEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.handler.preference" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
+  <handlers xmi:id="_XSkqEM_BEe2KarxZeLtaOg" elementId="com.osgifx.console.application.handler.socket.connection.preference" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.SocketConnectionPreferenceHandler" command="_TMF9ACVrEeyVo_nfbAX0Bg"/>
+  <handlers xmi:id="_Y0EEwCWwEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.handler.mqtt.connection.preference" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.MqttConnectionPreferenceHandler" command="_N5yVwM_BEe2KarxZeLtaOg"/>
   <handlers xmi:id="_Whi4IMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.handler.refresh" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.RefreshHandler" command="_IPypwMNnEeynHblGyo61Iw"/>
   <handlers xmi:id="_1jdMsMT2EeynHblGyo61Iw" elementId="com.osgifx.console.application.handler.connect.agent.remote.socket" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToSocketAgentHandler" command="_skZnAMT2EeynHblGyo61Iw"/>
   <handlers xmi:id="__SnpMM7dEe2u0N9EDY_GZA" elementId="com.osgifx.console.application.handler.connect.agent.remote.mqtt" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToMqttAgentHandler" command="_3NYncM7dEe2u0N9EDY_GZA"/>
@@ -30,12 +31,13 @@
   <handlers xmi:id="_ZCyP0AJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.handler.connect.agent.local" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.ConnectToLocalAgentHandler" command="_LFMTkAJzEe2rVexxjfx5Hw"/>
   <bindingTables xmi:id="_9_QOEMNmEeynHblGyo61Iw" elementId="com.osgifx.console.application.bindingtable.refresh" bindingContext="_1NNJoMNmEeynHblGyo61Iw">
     <bindings xmi:id="_CjmjAMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.refresh" keySequence="M1+R" command="_IPypwMNnEeynHblGyo61Iw"/>
-    <bindings xmi:id="_Ku86EMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.connect.agent.remote" keySequence="M1+N" command="_skZnAMT2EeynHblGyo61Iw"/>
+    <bindings xmi:id="_I-g4IM_NEe2KarxZeLtaOg" elementId="com.osgifx.console.application.keybinding.connect.agent.remote.mqtt" keySequence="M1+M" command="_3NYncM7dEe2u0N9EDY_GZA"/>
+    <bindings xmi:id="_Ku86EMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.connect.agent.remote.socket" keySequence="M1+N" command="_skZnAMT2EeynHblGyo61Iw"/>
     <bindings xmi:id="_zPCdkMT3EeynHblGyo61Iw" elementId="com.osgifx.console.application.keybinding.disconnect.agent" keySequence="M1+D" command="_fg9JYMT3EeynHblGyo61Iw"/>
     <bindings xmi:id="_y5S60AJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.keybinding.connect.agent.local" keySequence="M1+L" command="_LFMTkAJzEe2rVexxjfx5Hw"/>
   </bindingTables>
   <rootContext xmi:id="_1NNJoMNmEeynHblGyo61Iw" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="Windows and Dialogs" description="Windows and Dialogs"/>
-  <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.preference" commandName="Connection Preference">
+  <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.socket.connection.preference" commandName="Socket Connection Preference">
     <parameters xmi:id="_hoaR4G7cEe2jJYc4TDMqiA" elementId="name" name="Name" optional="false"/>
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
@@ -43,6 +45,15 @@
     <parameters xmi:id="_bwGcQCWpEeyVo_nfbAX0Bg" elementId="type" name="Type" optional="false"/>
     <parameters xmi:id="_VQZVsGxSEe21Cs8uJesKFQ" elementId="truststore" name="Truststore"/>
     <parameters xmi:id="_Z-KFUGxSEe21Cs8uJesKFQ" elementId="truststorePassword" name="Truststore Password"/>
+  </commands>
+  <commands xmi:id="_N5yVwM_BEe2KarxZeLtaOg" elementId="com.osgifx.console.application.command.mqtt.connection.preference" commandName="MQTT Connection Preference">
+    <parameters xmi:id="_N5yVwc_BEe2KarxZeLtaOg" elementId="name" name="Name" optional="false"/>
+    <parameters xmi:id="_N5yVws_BEe2KarxZeLtaOg" elementId="server" name="Server" optional="false"/>
+    <parameters xmi:id="_N5yVw8_BEe2KarxZeLtaOg" elementId="port" name="Port" optional="false"/>
+    <parameters xmi:id="_8M7t8M_KEe2KarxZeLtaOg" elementId="timeout" name="Timeout" optional="false"/>
+    <parameters xmi:id="_N5yVxc_BEe2KarxZeLtaOg" elementId="type" name="Type" optional="false"/>
+    <parameters xmi:id="_N5yVxs_BEe2KarxZeLtaOg" elementId="username" name="Username"/>
+    <parameters xmi:id="_N5yVx8_BEe2KarxZeLtaOg" elementId="password" name="Password"/>
   </commands>
   <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View" description="Refreshes the views by retrieving the current state of the remote runtime"/>
   <commands xmi:id="_LFMTkAJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.command.connect.agent.local" commandName="Connect to Local Agent" description="Establishes connection to the local agent"/>
