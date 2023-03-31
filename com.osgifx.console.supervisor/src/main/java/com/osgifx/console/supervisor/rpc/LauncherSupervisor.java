@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.rpc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 
@@ -23,7 +24,11 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 
 import com.google.common.collect.Lists;
@@ -33,6 +38,8 @@ import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
+import com.osgifx.console.supervisor.MqttConnection;
+import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
@@ -47,6 +54,31 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
     private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
+
+    @Activate
+    private BundleContext bundleContext;
+
+    @Reference
+    private ConfigurationAdmin configurationAdmin;
+
+    // @Override
+    // public void connect(final SocketConnection socketConnection) throws Exception {
+    // checkNotNull(socketConnection, "'socketConnection' cannot be null");
+    // super.connectToSocket(Agent.class, this, socketConnection);
+    // }
+
+    @Override
+    public void connect(final SocketConnection socketConnection) throws Exception {
+        // TODO TEST MQTT - REMOVE THIS
+        final var mqttConnection = MqttConnection.builder().build();
+        connect(mqttConnection);
+    }
+
+    @Override
+    public void connect(final MqttConnection mqttConnection) throws Exception {
+        checkNotNull(mqttConnection, "'mqttConnection' cannot be null");
+        super.connectToMQTT(bundleContext, configurationAdmin, Agent.class, this, mqttConnection);
+    }
 
     @Override
     public boolean stdout(final String out) throws Exception {
@@ -64,6 +96,49 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onOSGiEvent(final XEventDTO event) {
+        checkNotNull(event, "'event' cannot be null");
+        eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics()))
+                .forEach(listener -> listener.onEvent(event));
+    }
+
+    @Override
+    public void logged(final XLogEntryDTO logEvent) {
+        checkNotNull(logEvent, "'logEvent' cannot be null");
+        logEntryListeners.forEach(listener -> listener.logged(logEvent));
+    }
+
+    @Override
+    public void addOSGiEventListener(final EventListener eventListener) {
+        checkNotNull(eventListener, "'logEntryListener' cannot be null");
+        if (eventListeners.contains(eventListener)) {
+            return;
+        }
+        eventListeners.add(eventListener);
+    }
+
+    @Override
+    public void removeOSGiEventListener(final EventListener eventListener) {
+        checkNotNull(eventListener, "'eventListener' cannot be null");
+        eventListeners.remove(eventListener);
+    }
+
+    @Override
+    public void addOSGiLogListener(final LogEntryListener logEntryListener) {
+        checkNotNull(logEntryListener, "'logEntryListener' cannot be null");
+        if (logEntryListeners.contains(logEntryListener)) {
+            return;
+        }
+        logEntryListeners.add(logEntryListener);
+    }
+
+    @Override
+    public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
+        checkNotNull(logEntryListener, "'logEntryListener' cannot be null");
+        logEntryListeners.remove(logEntryListener);
     }
 
     public void setStdout(final Appendable out) throws Exception {
@@ -111,10 +186,6 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         getAgent().redirect(shell);
     }
 
-    public void connect(final String host, final int port) throws Exception {
-        super.connect(Agent.class, this, host, port);
-    }
-
     /**
      * The shell port to use.
      *
@@ -143,53 +214,6 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             getAgent().redirect(shell);
             this.shell = shell;
         }
-    }
-
-    @Override
-    public void onOSGiEvent(final XEventDTO event) {
-        eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics()))
-                .forEach(listener -> listener.onEvent(event));
-    }
-
-    @Override
-    public void logged(final XLogEntryDTO logEvent) {
-        logEntryListeners.forEach(listener -> listener.logged(logEvent));
-    }
-
-    @Override
-    public void addOSGiEventListener(final EventListener eventListener) {
-        if (eventListeners.contains(eventListener)) {
-            return;
-        }
-        eventListeners.add(eventListener);
-    }
-
-    @Override
-    public void removeOSGiEventListener(final EventListener eventListener) {
-        eventListeners.remove(eventListener);
-    }
-
-    @Override
-    public void addOSGiLogListener(final LogEntryListener logEntryListener) {
-        if (logEntryListeners.contains(logEntryListener)) {
-            return;
-        }
-        logEntryListeners.add(logEntryListener);
-    }
-
-    @Override
-    public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
-        logEntryListeners.remove(logEntryListener);
-    }
-
-    @Override
-    public void connect(final String host,
-                        final int port,
-                        final int timeout,
-                        final String trustStore,
-                        final String trustStorePassword) throws Exception {
-
-        super.connect(Agent.class, this, host, port, timeout, trustStore, trustStorePassword);
     }
 
     private static boolean matchTopic(final String receivedEventTopic, final Collection<String> listenerTopics) {
