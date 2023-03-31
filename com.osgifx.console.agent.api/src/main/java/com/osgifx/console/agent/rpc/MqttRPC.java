@@ -347,7 +347,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                     argValue = (byte[]) arg;
                 } else {
                     final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    codec.enc().to(bout).put(msg);
+                    codec.enc().to(bout).put(arg);
                     argValue = bout.toByteArray();
                 }
                 final String encodedValue = Base64.getEncoder().encodeToString(argValue);
