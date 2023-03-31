@@ -26,13 +26,13 @@ import org.osgi.service.messaging.MessagePublisher;
 import org.osgi.service.messaging.MessageSubscription;
 import org.osgi.util.tracker.ServiceTracker;
 
-public final class PubSub {
+public final class MqttClient {
 
     private final BundleContext                                            bundleContext;
     private final ServiceTracker<MessagePublisher, MessagePublisher>       publisherTracker;
     private final ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker;
 
-    public PubSub(final BundleContext bundleContext, final Consumer<MessageSubscription> subscriberCallback) {
+    public MqttClient(final BundleContext bundleContext, final Consumer<MessageSubscription> subscriberCallback) {
         this.bundleContext = bundleContext;
         publisherTracker   = new ServiceTracker<>(bundleContext, MessagePublisher.class, null);
         subscriberTracker  = new ServiceTracker<MessageSubscription, MessageSubscription>(bundleContext,
