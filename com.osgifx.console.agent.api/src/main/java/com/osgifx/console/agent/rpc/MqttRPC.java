@@ -66,15 +66,15 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final ExecutorService executor = Executors.newFixedThreadPool(4);
 
     public static class RpcMessage {
-        int      id;
-        String   methodName;
-        String[] methodArgs;
+        public int      id;
+        public String   methodName;
+        public String[] methodArgs;
     }
 
     public static class RpcResult {
-        boolean resolved;
-        byte[]  value;
-        boolean exception;
+        public boolean resolved;
+        public byte[]  value;
+        public boolean exception;
     }
 
     @SuppressWarnings("unchecked")
