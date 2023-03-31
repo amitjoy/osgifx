@@ -124,14 +124,10 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         pubSub.open();
     }
 
-    private RpcMessage decodeMessage(final ByteBuffer payload) {
+    private RpcMessage decodeMessage(final ByteBuffer payload) throws Exception {
         final byte[] arr = new byte[payload.remaining()];
         payload.get(arr);
-        try {
-            return codec.dec().from(arr).get(RpcMessage.class);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
+        return codec.dec().from(arr).get(RpcMessage.class);
     }
 
     @Override
@@ -341,13 +337,13 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         }
     }
 
-    private RpcMessage msg(final int msgId, final Method m, final Object[] args) throws Exception {
+    private RpcMessage msg(final int msgId, final Method method, final Object[] args) throws Exception {
         final RpcMessage msg = new RpcMessage();
-        msg.methodName = m == null ? "" : m.getName();
+        msg.methodName = method == null ? "" : method.getName();
         msg.id         = msgId;
 
+        final List<String> vals = new ArrayList<>();
         if (args != null) {
-            final List<String> vals = new ArrayList<>();
             for (final Object arg : args) {
                 byte[] value;
                 if (arg instanceof byte[]) {
@@ -360,8 +356,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 final String encodedValue = Base64.getEncoder().encodeToString(value);
                 vals.add(encodedValue);
             }
-            msg.args = vals.toArray(new String[0]);
         }
+        msg.args = vals.toArray(new String[0]);
         return msg;
     }
 
