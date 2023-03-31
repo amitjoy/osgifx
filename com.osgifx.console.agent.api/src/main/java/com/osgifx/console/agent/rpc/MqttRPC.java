@@ -49,10 +49,10 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     private static final JSONCodec codec = new JSONCodec();
 
-    private final BundleContext                     bundleContext;
-    private PubSub                                  pubSub;
+    private MqttClient                              mqttClient;
     private final String                            pubTopic;
     private final String                            subTopic;
+    private final BundleContext                     bundleContext;
     private final AtomicInteger                     id       = new AtomicInteger(10_000);
     private final ConcurrentMap<Integer, RpcResult> promises = new ConcurrentHashMap<>();
     private final AtomicBoolean                     started  = new AtomicBoolean();
@@ -95,7 +95,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         if (!started.compareAndSet(false, true)) {
             throw new IllegalStateException("MQTT RPC is already running");
         }
-        pubSub = new PubSub(bundleContext, subscriber -> {
+        mqttClient = new MqttClient(bundleContext, subscriber -> {
             subscriber.subscribe(subTopic).forEach(msg -> {
                 try {
                     final ByteBuffer   payload = msg.payload();
@@ -121,7 +121,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 }
             });
         });
-        pubSub.open();
+        mqttClient.open();
     }
 
     private RpcMessage decodeMessage(final ByteBuffer payload) throws Exception {
@@ -142,7 +142,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 // nothing to do
             }
         }
-        pubSub.close();
+        mqttClient.close();
         executor.shutdownNow();
     }
 
@@ -215,9 +215,9 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             promises.put(msg.id, new RpcResult());
         }
         trace("send");
-        final Optional<MessagePublisher> publisher = pubSub.pub();
+        final Optional<MessagePublisher> publisher = mqttClient.pub();
         if (publisher.isPresent()) {
-            final Optional<MessageContextBuilder> msgCtx = pubSub.msgCtx();
+            final Optional<MessageContextBuilder> msgCtx = mqttClient.msgCtx();
             if (!msgCtx.isPresent()) {
                 throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
             }
