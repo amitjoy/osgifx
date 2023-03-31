@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.osgi.service.component.annotations.Component;
 
+import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 
 import javafx.collections.FXCollections;
@@ -27,22 +28,39 @@ import javafx.collections.ObservableList;
 @Component(service = ConnectionsProvider.class)
 public final class ConnectionsProvider {
 
-    private final ObservableList<SocketConnectionSettingDTO> connections = FXCollections.observableArrayList();
+    private final ObservableList<SocketConnectionSettingDTO> socketConnections = FXCollections.observableArrayList();
+    private final ObservableList<MqttConnectionSettingDTO>   mqttConnections   = FXCollections.observableArrayList();
 
-    public synchronized void addConnection(final SocketConnectionSettingDTO connection) {
-        connections.add(connection);
+    public synchronized void addSocketConnection(final SocketConnectionSettingDTO connection) {
+        socketConnections.add(connection);
     }
 
-    public synchronized void removeConnection(final SocketConnectionSettingDTO connection) {
-        connections.remove(connection);
+    public synchronized void removeSocketConnection(final SocketConnectionSettingDTO connection) {
+        socketConnections.remove(connection);
     }
 
-    public synchronized void addConnections(final List<SocketConnectionSettingDTO> connections) {
-        this.connections.addAll(connections);
+    public synchronized void addSocketConnections(final List<SocketConnectionSettingDTO> connections) {
+        socketConnections.addAll(connections);
     }
 
-    public synchronized ObservableList<SocketConnectionSettingDTO> getConnections() {
-        return connections;
+    public synchronized void addMqttConnection(final MqttConnectionSettingDTO connection) {
+        mqttConnections.add(connection);
+    }
+
+    public synchronized void removeMqttConnection(final MqttConnectionSettingDTO connection) {
+        mqttConnections.remove(connection);
+    }
+
+    public synchronized void addMqttConnections(final List<MqttConnectionSettingDTO> connections) {
+        mqttConnections.addAll(connections);
+    }
+
+    public synchronized ObservableList<SocketConnectionSettingDTO> getSocketConnections() {
+        return socketConnections;
+    }
+
+    public synchronized ObservableList<MqttConnectionSettingDTO> getMqttConnections() {
+        return mqttConnections;
     }
 
 }

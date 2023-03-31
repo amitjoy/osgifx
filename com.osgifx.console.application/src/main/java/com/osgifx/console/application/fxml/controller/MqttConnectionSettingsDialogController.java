@@ -23,6 +23,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
@@ -32,38 +33,38 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-public final class ConnectionSettingsDialogController {
+public final class MqttConnectionSettingsDialogController {
 
     @FXML
-    private TableView<SocketConnectionSettingDTO>            connectionTable;
+    private TableView<MqttConnectionSettingDTO>              connectionTable;
     @FXML
-    private TableColumn<SocketConnectionSettingDTO, String>  nameColumn;
+    private TableColumn<MqttConnectionSettingDTO, String>    nameColumn;
     @FXML
-    private TableColumn<SocketConnectionSettingDTO, String>  hostColumn;
+    private TableColumn<MqttConnectionSettingDTO, String>    serverColumn;
     @FXML
-    private TableColumn<SocketConnectionSettingDTO, Integer> portColumn;
+    private TableColumn<MqttConnectionSettingDTO, Integer>   portColumn;
     @FXML
     private TableColumn<SocketConnectionSettingDTO, Integer> timeoutColumn;
     @FXML
-    private TableColumn<SocketConnectionSettingDTO, String>  trustStoreColumn;
+    private TableColumn<MqttConnectionSettingDTO, String>    usernameColumn;
     @Log
     @Inject
-    private FluentLogger                               logger;
+    private FluentLogger                                     logger;
     @Inject
-    private ConnectionsProvider                        connectionsProvider;
+    private ConnectionsProvider                              connectionsProvider;
     @Inject
     @ContextValue("selected.settings")
-    private ContextBoundValue<SocketConnectionSettingDTO>    selectedSettings;
+    private ContextBoundValue<MqttConnectionSettingDTO>      selectedSettings;
 
     @FXML
     public void initialize() {
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
-        hostColumn.setCellValueFactory(new DTOCellValueFactory<>("host", String.class));
+        serverColumn.setCellValueFactory(new DTOCellValueFactory<>("server", String.class));
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
-        trustStoreColumn.setCellValueFactory(new DTOCellValueFactory<>("trustStorePath", String.class));
+        usernameColumn.setCellValueFactory(new DTOCellValueFactory<>("username", String.class));
 
-        connectionTable.setItems(connectionsProvider.getConnections());
+        connectionTable.setItems(connectionsProvider.getMqttConnections());
         connectionTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldSettings, newSettings) -> selectedSettings.publish(newSettings));
 
@@ -71,7 +72,7 @@ public final class ConnectionSettingsDialogController {
         logger.atDebug().log("FXML controller has been initialized");
     }
 
-    public ReadOnlyObjectProperty<SocketConnectionSettingDTO> selectedSettings() {
+    public ReadOnlyObjectProperty<MqttConnectionSettingDTO> selectedSettings() {
         return connectionTable.getSelectionModel().selectedItemProperty();
     }
 

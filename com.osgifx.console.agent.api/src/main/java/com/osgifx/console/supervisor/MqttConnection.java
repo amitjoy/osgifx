@@ -21,6 +21,7 @@ public class MqttConnection {
 
     private final String server;
     private final int    port;
+    private final int    timeout;
     private final String username;
     private final String password;
     private final String pubTopic;
@@ -28,12 +29,14 @@ public class MqttConnection {
 
     private MqttConnection(final String server,
                            final int port,
+                           final int timeout,
                            final String username,
                            final String password,
                            final String pubTopic,
                            final String subTopic) {
         this.server   = server;
         this.port     = port;
+        this.timeout  = timeout;
         this.username = username;
         this.password = password;
         this.pubTopic = pubTopic;
@@ -46,6 +49,10 @@ public class MqttConnection {
 
     public int port() {
         return port;
+    }
+
+    public int timeout() {
+        return timeout;
     }
 
     public String username() {
@@ -71,6 +78,7 @@ public class MqttConnection {
     public static class MqttConnectionBuilder {
         private String server;
         private int    port;
+        private int    timeout;
         private String username;
         private String password;
         private String pubTopic;
@@ -86,6 +94,14 @@ public class MqttConnection {
                 throw new IllegalArgumentException("'port' cannot be less than or equal to zero");
             }
             this.port = port;
+            return this;
+        }
+
+        public MqttConnectionBuilder timeout(final int timeout) {
+            if (timeout < -1) {
+                throw new IllegalArgumentException("'timeout' cannot be negative");
+            }
+            this.timeout = timeout;
             return this;
         }
 
@@ -110,7 +126,7 @@ public class MqttConnection {
         }
 
         public MqttConnection build() {
-            return new MqttConnection(server, port, username, password, pubTopic, subTopic);
+            return new MqttConnection(server, port, timeout, username, password, pubTopic, subTopic);
         }
     }
 

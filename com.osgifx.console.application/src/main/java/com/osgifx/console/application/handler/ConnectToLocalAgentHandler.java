@@ -133,7 +133,7 @@ public final class ConnectToLocalAgentHandler {
                 logger.atInfo().log("Agent connected event has been sent for Local Agent on %s:%s", localAgentHost,
                         localAgentPort);
 
-                final var connection = localAgentHost + ":" + localAgentPort;
+                final var connection = "[SOCKET] " + localAgentHost + ":" + localAgentPort;
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
