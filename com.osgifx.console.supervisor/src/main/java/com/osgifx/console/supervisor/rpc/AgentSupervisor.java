@@ -37,6 +37,8 @@ import com.osgifx.console.supervisor.SocketConnection;
 public class AgentSupervisor<S, A> {
 
     @interface MqttConfig {
+        final int MAX_PACKET_SIZE = 256 * 1024 * 1024;
+
         String server();
 
         int port();
@@ -45,9 +47,9 @@ public class AgentSupervisor<S, A> {
 
         String password();
 
-        String pubTopic();
+        int maximumPacketSize();
 
-        String subTopic();
+        int sendMaximumPacketSize();
     }
 
     private static final int CONNECT_WAIT = 200;
@@ -107,21 +109,20 @@ public class AgentSupervisor<S, A> {
                                  final Class<A> agent,
                                  final S supervisor,
                                  final MqttConnection connection) {
+        // final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
+        //
+        // ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
+        // ch.set(ch.d().server(), "broker.hivemq.com");
+        // ch.set(ch.d().port(), "1883");
+        // ch.set(ch.d().username(), connection.username());
+        // ch.set(ch.d().password(), connection.password());
+        // ch.set(ch.d().maximumPacketSize(), MqttConfig.MAX_PACKET_SIZE);
+        // ch.set(ch.d().sendMaximumPacketSize(), MqttConfig.MAX_PACKET_SIZE);
+        // ch.update();
+
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, "amit/mondal", "mondal/amit");
         this.setRemoteRPC(remoteRPC);
         remoteRPC.open();
-        // TODO use connection to dynamically change parameters in config admin
-
-        // final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
-
-        // ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
-        // ch.set(ch.d().server(), connection.server());
-        // ch.set(ch.d().port(), connection.port());
-        // ch.set(ch.d().username(), connection.username());
-        // ch.set(ch.d().password(), connection.password());
-        // ch.set(ch.d().pubTopic(), connection.pubTopic());
-        // ch.set(ch.d().subTopic(), connection.subTopic());
-        // ch.update();
     }
 
     private void setRemoteRPC(final RemoteRPC<S, A> rpc) {
