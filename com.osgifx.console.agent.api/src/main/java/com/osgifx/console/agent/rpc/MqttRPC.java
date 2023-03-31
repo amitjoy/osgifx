@@ -98,18 +98,18 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         mqttClient = new MqttClient(bundleContext, subscriber -> {
             subscriber.subscribe(subTopic).forEach(msg -> {
                 try {
-                    final ByteBuffer   payload = msg.payload();
-                    final RpcMessage   message = decodeMessage(payload);
-                    final List<byte[]> args    = new ArrayList<>();
+                    final ByteBuffer   payload    = msg.payload();
+                    final RpcMessage   message    = decodeMessage(payload);
+                    final List<byte[]> methodArgs = new ArrayList<>();
                     if (message.methodArgs != null) {
                         for (final String arg : message.methodArgs) {
-                            args.add(Base64.getDecoder().decode(arg));
+                            methodArgs.add(Base64.getDecoder().decode(arg));
                         }
                     }
                     final Runnable r = () -> {
                         try {
                             msgId.set(message.id);
-                            executeCommand(message.methodName, message.id, args);
+                            executeCommand(message.methodName, message.id, methodArgs);
                         } catch (final Exception e) {
                             // nothing to do
                         }
@@ -187,9 +187,6 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         return !stopped.get();
     }
 
-    /*
-     * Signaling function
-     */
     protected void terminate() {
         try {
             close();
@@ -200,7 +197,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     private Method getMethod(final String cmd, final int count) {
         for (final Method m : local.getClass().getMethods()) {
-            if (m.getDeclaringClass() == MqttRPC.class) {
+            if (m.getDeclaringClass() == RemoteRPC.class) {
                 continue;
             }
             if (m.getName().equals(cmd) && m.getParameterTypes().length == count) {
@@ -342,22 +339,22 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         msg.methodName = method == null ? "" : method.getName();
         msg.id         = msgId;
 
-        final List<String> vals = new ArrayList<>();
+        final List<String> methodArgs = new ArrayList<>();
         if (args != null) {
             for (final Object arg : args) {
-                byte[] value;
+                byte[] argValue;
                 if (arg instanceof byte[]) {
-                    value = (byte[]) arg;
+                    argValue = (byte[]) arg;
                 } else {
                     final ByteArrayOutputStream bout = new ByteArrayOutputStream();
                     codec.enc().to(bout).put(msg);
-                    value = bout.toByteArray();
+                    argValue = bout.toByteArray();
                 }
-                final String encodedValue = Base64.getEncoder().encodeToString(value);
-                vals.add(encodedValue);
+                final String encodedValue = Base64.getEncoder().encodeToString(argValue);
+                methodArgs.add(encodedValue);
             }
         }
-        msg.methodArgs = vals.toArray(new String[0]);
+        msg.methodArgs = methodArgs.toArray(new String[0]);
         return msg;
     }
 
