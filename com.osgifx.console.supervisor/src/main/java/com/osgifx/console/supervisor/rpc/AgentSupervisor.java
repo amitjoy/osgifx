@@ -43,11 +43,15 @@ import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
 public class AgentSupervisor<S, A> {
 
     @interface MqttConfig {
-        final int MAX_PACKET_SIZE = 256 * 1024 * 1024;
+        final int MAX_PACKET_SIZE = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
+
+        String id();
 
         String server();
 
         int port();
+
+        boolean cleanStart();
 
         boolean automaticReconnect();
 
@@ -126,8 +130,10 @@ public class AgentSupervisor<S, A> {
         final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
 
         ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
+        ch.set(ch.d().id(), connection.clientId());
         ch.set(ch.d().server(), connection.server());
         ch.set(ch.d().port(), connection.port());
+        ch.set(ch.d().cleanStart(), true);
         ch.set(ch.d().automaticReconnect(), false);
 
         if (!Strings.isNullOrEmpty(connection.username()) && !Strings.isNullOrEmpty(connection.password())) {
