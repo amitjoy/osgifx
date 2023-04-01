@@ -60,6 +60,7 @@ public final class Activator extends Thread implements BundleActivator {
         serverSocket = socketContext.getSocket();
 
         System.err.println("OSGi.fx Socket Agent Host: " + socketContext.host() + ":" + socketContext.port());
+        start();
         module.start();
 
         final boolean isMQTTwired = module.di().getInstance(PackageWirings.class).isMqttWired();
@@ -83,7 +84,6 @@ public final class Activator extends Thread implements BundleActivator {
             mqttRPC.open();
             agentServer.setEndpoint(mqttRPC);
         }
-        start();
     }
 
     @Override
