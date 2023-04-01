@@ -185,7 +185,7 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
             final var p = Ints.tryParse(port.getText());
             final var t = Ints.tryParse(timeout.getText());
 
-            verify(p != null && t != null, "Port and host formats are not compliant");
+            verify(p != null && t != null, "Port and timeout formats are not compliant");
             if (setting != null) {
                 setting.name               = name.getText();
                 setting.host               = hostname.getText();

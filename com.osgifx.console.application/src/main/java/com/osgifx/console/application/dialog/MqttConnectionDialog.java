@@ -197,7 +197,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             final var p = Ints.tryParse(port.getText());
             final var t = Ints.tryParse(timeout.getText());
 
-            verify(p != null && t != null, "Port and server formats are not compliant");
+            verify(p != null && t != null, "Port and timeout formats are not compliant");
             if (setting != null) {
                 setting.name     = name.getText();
                 setting.clientId = clientId.getText();
