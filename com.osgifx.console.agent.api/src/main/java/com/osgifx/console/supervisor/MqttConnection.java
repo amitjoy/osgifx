@@ -19,6 +19,7 @@ import static java.util.Objects.requireNonNull;
 
 public class MqttConnection {
 
+    private final String clientId;
     private final String server;
     private final int    port;
     private final int    timeout;
@@ -27,13 +28,15 @@ public class MqttConnection {
     private final String pubTopic;
     private final String subTopic;
 
-    private MqttConnection(final String server,
+    private MqttConnection(final String clientId,
+                           final String server,
                            final int port,
                            final int timeout,
                            final String username,
                            final String password,
                            final String pubTopic,
                            final String subTopic) {
+        this.clientId = clientId;
         this.server   = server;
         this.port     = port;
         this.timeout  = timeout;
@@ -41,6 +44,10 @@ public class MqttConnection {
         this.password = password;
         this.pubTopic = pubTopic;
         this.subTopic = subTopic;
+    }
+
+    public String clientId() {
+        return clientId;
     }
 
     public String server() {
@@ -76,6 +83,7 @@ public class MqttConnection {
     }
 
     public static class MqttConnectionBuilder {
+        private String clientId;
         private String server;
         private int    port;
         private int    timeout;
@@ -83,6 +91,11 @@ public class MqttConnection {
         private String password;
         private String pubTopic;
         private String subTopic;
+
+        public MqttConnectionBuilder clientId(final String clientId) {
+            this.clientId = requireNonNull(clientId, "'clientId' cannot be null");
+            return this;
+        }
 
         public MqttConnectionBuilder server(final String server) {
             this.server = requireNonNull(server, "'server' cannot be null");
@@ -126,7 +139,7 @@ public class MqttConnection {
         }
 
         public MqttConnection build() {
-            return new MqttConnection(server, port, timeout, username, password, pubTopic, subTopic);
+            return new MqttConnection(clientId, server, port, timeout, username, password, pubTopic, subTopic);
         }
     }
 

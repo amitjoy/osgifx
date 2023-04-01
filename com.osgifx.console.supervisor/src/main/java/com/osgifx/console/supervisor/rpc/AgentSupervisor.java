@@ -17,6 +17,8 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_PACKET_SIZE;
+import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
 
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
@@ -28,11 +30,15 @@ import javax.net.ssl.SSLSocketFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.google.common.base.Strings;
 import com.osgifx.console.agent.rpc.MqttRPC;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.SocketRPC;
 import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.util.configuration.ConfigHelper;
+
+import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
 
 public class AgentSupervisor<S, A> {
 
@@ -43,6 +49,10 @@ public class AgentSupervisor<S, A> {
 
         int port();
 
+        boolean automaticReconnect();
+
+        boolean simpleAuth();
+
         String username();
 
         String password();
@@ -50,6 +60,10 @@ public class AgentSupervisor<S, A> {
         int maximumPacketSize();
 
         int sendMaximumPacketSize();
+
+        String connectedListenerFilter();
+
+        String disconnectedListenerFilter();
     }
 
     private static final int CONNECT_WAIT = 200;
@@ -109,18 +123,26 @@ public class AgentSupervisor<S, A> {
                                  final Class<A> agent,
                                  final S supervisor,
                                  final MqttConnection connection) {
-        // final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
-        //
-        // ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
-        // ch.set(ch.d().server(), "broker.hivemq.com");
-        // ch.set(ch.d().port(), "1883");
-        // ch.set(ch.d().username(), connection.username());
-        // ch.set(ch.d().password(), connection.password());
-        // ch.set(ch.d().maximumPacketSize(), MqttConfig.MAX_PACKET_SIZE);
-        // ch.set(ch.d().sendMaximumPacketSize(), MqttConfig.MAX_PACKET_SIZE);
-        // ch.update();
+        final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
 
-        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, "amit/mondal", "mondal/amit");
+        ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
+        ch.set(ch.d().server(), connection.server());
+        ch.set(ch.d().port(), connection.port());
+        ch.set(ch.d().automaticReconnect(), false);
+
+        if (!Strings.isNullOrEmpty(connection.username()) && !Strings.isNullOrEmpty(connection.password())) {
+            ch.set(ch.d().simpleAuth(), true);
+            ch.set(ch.d().username(), connection.username());
+            ch.set(ch.d().password(), connection.password());
+        }
+
+        ch.set(ch.d().maximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
+        ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
+        ch.update();
+
+        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic());
         this.setRemoteRPC(remoteRPC);
         remoteRPC.open();
     }
