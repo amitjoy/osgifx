@@ -129,7 +129,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         final var nameCaption     = "Connection Name";
         final var clientIdCaption = "Client ID";
         final var serverCaption   = "Server";
-        final var portCaption     = "Port (between 1 to 65536)";
+        final var portCaption     = "Port (1883 or 8883)";
         final var timeoutCaption  = "Timeout in millis";
         final var usernameCaption = "Username";
         final var passwordCaption = "Password";
@@ -160,7 +160,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             validationSupport.registerValidator(port, createEmptyValidator(String.format(requiredFormat, portCaption)));
             validationSupport.registerValidator(port, createPredicateValidator(value -> {
                 final var parsedPort = Ints.tryParse(value.toString());
-                return parsedPort != null && parsedPort > 0 && parsedPort < 65536;
+                return parsedPort != null && (parsedPort == 1883 || parsedPort == 8883);
             }, String.format(requiredPortFormat, portCaption)));
             validationSupport.registerValidator(timeout,
                     createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
