@@ -115,6 +115,10 @@ public final class ConnectToMqttAgentHandler {
             removeCurrentSelection();
             return;
         }
+        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.EDIT_CONNECTION)) {
+            editConnection(selectedSettings.getValue());
+            return;
+        }
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
             removeConnection();
             removeCurrentSelection();
@@ -141,7 +145,7 @@ public final class ConnectToMqttAgentHandler {
         final var connectionDialog = new MqttConnectionDialog();
         ContextInjectionFactory.inject(connectionDialog, context);
         logger.atInfo().log("Injected connection dialog to eclipse context");
-        connectionDialog.init();
+        connectionDialog.init(null);
 
         final var value = connectionDialog.showAndWait();
 
@@ -150,6 +154,24 @@ public final class ConnectToMqttAgentHandler {
             triggerCommand(dto, "ADD");
             logger.atInfo().log("ADD command has been invoked for %s", dto);
             Fx.showSuccessNotification("Connection Settings", "New connection settings has been added successfully");
+        }
+    }
+
+    private void editConnection(final MqttConnectionSettingDTO setting) {
+        logger.atInfo().log("'%s'-'editConnection(..)' event has been invoked", getClass().getSimpleName());
+
+        final var connectionDialog = new MqttConnectionDialog();
+        ContextInjectionFactory.inject(connectionDialog, context);
+        logger.atInfo().log("Injected connection dialog to eclipse context");
+        connectionDialog.init(setting);
+
+        final var value = connectionDialog.showAndWait();
+
+        if (value.isPresent()) {
+            final var dto = value.get();
+            triggerCommand(dto, "EDIT");
+            logger.atInfo().log("EDIT command has been invoked for %s", dto);
+            Fx.showSuccessNotification("Connection Settings", "Connection settings has been updated successfully");
         }
     }
 
@@ -234,6 +256,7 @@ public final class ConnectToMqttAgentHandler {
     private void triggerCommand(final MqttConnectionSettingDTO dto, final String type) {
         final Map<String, Object> properties = Maps.newHashMap();
 
+        properties.put("id", dto.id);
         properties.put("name", dto.name);
         properties.put("clientId", dto.clientId);
         properties.put("server", dto.server);
