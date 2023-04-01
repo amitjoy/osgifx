@@ -127,14 +127,14 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             }
         });
         final var nameCaption     = "Connection Name";
-        final var clientIdCaption = "MQTT Client ID (Local)";
+        final var clientIdCaption = "Client ID";
         final var serverCaption   = "Server";
         final var portCaption     = "Port (between 1 to 65536)";
         final var timeoutCaption  = "Timeout in millis";
         final var usernameCaption = "Username";
         final var passwordCaption = "Password";
-        final var pubTopicCaption = "Publish Topic";
-        final var subTopicCaption = "Subscription Topic";
+        final var pubTopicCaption = "Agent Publish Topic";
+        final var subTopicCaption = "Agent Subscription Topic";
 
         name.setPromptText(nameCaption);
         clientId.setPromptText(clientIdCaption);
