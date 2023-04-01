@@ -17,12 +17,15 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
+import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -30,9 +33,15 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
+import org.osgi.util.promise.Deferred;
+import org.osgi.util.promise.PromiseFactory;
 
 import com.google.common.collect.Lists;
 import com.google.mu.util.Substring;
+import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedContext;
+import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedListener;
+import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedContext;
+import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedListener;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -42,15 +51,25 @@ import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component
+import aQute.bnd.exceptions.Exceptions;
+
+@Component(property = MQTT_CONNECTION_LISTENER_FILTER_PROP)
 @SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
-public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent> implements Supervisor {
+public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
+        implements Supervisor, MqttClientConnectedListener, MqttClientDisconnectedListener {
 
-    public static final String CONDITION_ID_VALUE = "rpc-agent";
+    public static final String CONDITION_ID_VALUE                    = "rpc-agent";
+    public static final String MQTT_CONNECTION_LISTENER_FILTER_KEY   = "mqtt_connection_filter";
+    public static final String MQTT_CONNECTION_LISTENER_FILTER_VALUE = "true";
+    public static final String MQTT_CONNECTION_LISTENER_FILTER_PROP  = MQTT_CONNECTION_LISTENER_FILTER_KEY + "="
+            + MQTT_CONNECTION_LISTENER_FILTER_VALUE;
+    public static final String MQTT_CONNECTION_LISTENER_FILTER       = "(" + MQTT_CONNECTION_LISTENER_FILTER_PROP + ")";
 
-    private Appendable stdout;
-    private Appendable stderr;
-    private int        shell = -100; // always invalid so we update it
+    private Appendable        stdout;
+    private Appendable        stderr;
+    private int               shell = -100;         // always invalid so we update it
+    private Deferred<Boolean> mqttConnectionPromise;
+    private PromiseFactory    promiseFactory;
 
     private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
     private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
@@ -61,6 +80,11 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Reference
     private ConfigurationAdmin configurationAdmin;
 
+    @Activate
+    void activate() {
+        promiseFactory = new PromiseFactory(Executors.newSingleThreadExecutor());
+    }
+
     @Override
     public void connect(final SocketConnection socketConnection) throws Exception {
         checkNotNull(socketConnection, "'socketConnection' cannot be null");
@@ -70,7 +94,15 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Override
     public void connect(final MqttConnection mqttConnection) throws Exception {
         checkNotNull(mqttConnection, "'mqttConnection' cannot be null");
+
+        mqttConnectionPromise = promiseFactory.deferred();
         super.connectToMQTT(bundleContext, configurationAdmin, Agent.class, this, mqttConnection);
+
+        try {
+            mqttConnectionPromise.getPromise().timeout(mqttConnection.timeout()).getValue();
+        } catch (final InvocationTargetException e) {
+            throw (Exception) Exceptions.unrollCause(e, InvocationTargetException.class);
+        }
     }
 
     @Override
@@ -132,6 +164,19 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
         checkNotNull(logEntryListener, "'logEntryListener' cannot be null");
         logEntryListeners.remove(logEntryListener);
+    }
+
+    @Override
+    public synchronized void onConnected(final MqttClientConnectedContext context) {
+        mqttConnectionPromise.resolve(true);
+    }
+
+    @Override
+    public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
+        final Throwable cause = context.getCause();
+        if (cause != null) {
+            mqttConnectionPromise.fail(cause);
+        }
     }
 
     public void setStdout(final Appendable out) throws Exception {
