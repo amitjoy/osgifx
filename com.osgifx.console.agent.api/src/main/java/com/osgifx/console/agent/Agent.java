@@ -84,7 +84,7 @@ public interface Agent {
     /**
      * The property key to specify the subscription topic for receiving the data using MQTT
      */
-    String AGENT_MQTT_SUB_TOPIC = "osgi.fx.agent.mqtt.sub.topic";
+    String AGENT_MQTT_SUB_TOPIC_KEY = "osgi.fx.agent.mqtt.sub.topic";
 
     /**
      * The property key to enable agent logs
