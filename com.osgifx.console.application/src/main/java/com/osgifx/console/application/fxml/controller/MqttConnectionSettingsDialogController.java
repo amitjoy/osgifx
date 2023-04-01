@@ -40,6 +40,8 @@ public final class MqttConnectionSettingsDialogController {
     @FXML
     private TableColumn<MqttConnectionSettingDTO, String>    nameColumn;
     @FXML
+    private TableColumn<MqttConnectionSettingDTO, String>    clientIdColumn;
+    @FXML
     private TableColumn<MqttConnectionSettingDTO, String>    serverColumn;
     @FXML
     private TableColumn<MqttConnectionSettingDTO, Integer>   portColumn;
@@ -47,6 +49,10 @@ public final class MqttConnectionSettingsDialogController {
     private TableColumn<SocketConnectionSettingDTO, Integer> timeoutColumn;
     @FXML
     private TableColumn<MqttConnectionSettingDTO, String>    usernameColumn;
+    @FXML
+    private TableColumn<MqttConnectionSettingDTO, String>    pubTopicColumn;
+    @FXML
+    private TableColumn<MqttConnectionSettingDTO, String>    subTopicColumn;
     @Log
     @Inject
     private FluentLogger                                     logger;
@@ -59,10 +65,13 @@ public final class MqttConnectionSettingsDialogController {
     @FXML
     public void initialize() {
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
+        clientIdColumn.setCellValueFactory(new DTOCellValueFactory<>("clientId", String.class));
         serverColumn.setCellValueFactory(new DTOCellValueFactory<>("server", String.class));
         portColumn.setCellValueFactory(new DTOCellValueFactory<>("port", Integer.class));
         timeoutColumn.setCellValueFactory(new DTOCellValueFactory<>("timeout", Integer.class));
         usernameColumn.setCellValueFactory(new DTOCellValueFactory<>("username", String.class));
+        pubTopicColumn.setCellValueFactory(new DTOCellValueFactory<>("pubTopic", String.class));
+        subTopicColumn.setCellValueFactory(new DTOCellValueFactory<>("subTopic", String.class));
 
         connectionTable.setItems(connectionsProvider.getMqttConnections());
         connectionTable.getSelectionModel().selectedItemProperty()

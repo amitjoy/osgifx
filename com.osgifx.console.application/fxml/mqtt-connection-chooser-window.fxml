@@ -24,10 +24,13 @@
       <TableView fx:id="connectionTable" layoutY="69.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columns>
           <TableColumn fx:id="nameColumn" editable="false" prefWidth="125.0" text="Name" />
+          <TableColumn fx:id="clientIdColumn" editable="false" prefWidth="125.0" text="Client ID" />
           <TableColumn fx:id="serverColumn" editable="false" prefWidth="145.0" text="Server" />
           <TableColumn fx:id="portColumn" editable="false" prefWidth="112.0" text="Port" />
           <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="118.0" text="Timeout" />
           <TableColumn fx:id="usernameColumn" editable="false" minWidth="0.0" prefWidth="120.0" text="Username" />
+          <TableColumn fx:id="pubTopicColumn" editable="false" minWidth="0.0" prefWidth="120.0" text="Pub Topic" />
+          <TableColumn fx:id="subTopicColumn" editable="false" minWidth="0.0" prefWidth="120.0" text="Sub Topic" />
         </columns>
         <placeholder>
         	<Label text="No MQTT connections configured" />
