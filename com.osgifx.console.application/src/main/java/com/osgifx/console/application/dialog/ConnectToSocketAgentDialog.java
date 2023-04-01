@@ -17,6 +17,7 @@ package com.osgifx.console.application.dialog;
 
 import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.ADD_CONNECTION;
 import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.CONNECT;
+import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.EDIT_CONNECTION;
 import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.REMOVE_CONNECTION;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.scene.control.ButtonType.CANCEL;
@@ -46,6 +47,7 @@ public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
     public enum ActionType {
         CONNECT,
         ADD_CONNECTION,
+        EDIT_CONNECTION,
         REMOVE_CONNECTION
     }
 
@@ -69,20 +71,24 @@ public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
         dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
 
         final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
+        final var editConnectionButton   = new ButtonType("Edit", ButtonBar.ButtonData.LEFT);
         final var removeConnectionButton = new ButtonType("Remove", ButtonBar.ButtonData.LEFT);
 
         dialogPane.getButtonTypes().addAll(OK);
         dialogPane.getButtonTypes().addAll(CANCEL);
         dialogPane.getButtonTypes().addAll(addConnectionButton);
+        dialogPane.getButtonTypes().addAll(editConnectionButton);
         dialogPane.getButtonTypes().addAll(removeConnectionButton);
 
         buttonTypes.put(ADD_CONNECTION, addConnectionButton);
+        buttonTypes.put(EDIT_CONNECTION, editConnectionButton);
         buttonTypes.put(REMOVE_CONNECTION, removeConnectionButton);
         buttonTypes.put(CONNECT, OK);
 
         final var content    = Fx.loadFXML(loader, context, "/fxml/socket-connection-chooser-window.fxml");
         final var controller = (SocketConnectionSettingsDialogController) loader.getController();
 
+        dialogPane.lookupButton(editConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
         dialogPane.lookupButton(removeConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
         dialogPane.lookupButton(OK).disableProperty().bind(controller.selectedSettings().isNull());
         dialogPane.setContent(content);

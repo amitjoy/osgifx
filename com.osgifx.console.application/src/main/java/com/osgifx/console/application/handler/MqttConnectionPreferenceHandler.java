@@ -16,6 +16,7 @@
 package com.osgifx.console.application.handler;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -52,7 +53,8 @@ public final class MqttConnectionPreferenceHandler {
     }
 
     @Execute
-    public void execute(@Named("name") final String name,
+    public void execute(@Named("id") final String id,
+                        @Named("name") final String name,
                         @Named("clientId") final String clientId,
                         @Named("server") final String server,
                         @Named("port") final String port,
@@ -65,7 +67,7 @@ public final class MqttConnectionPreferenceHandler {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new MqttConnectionSettingDTO(name, clientId, server, Ints.tryParse(port),
+        final var dto         = new MqttConnectionSettingDTO(id, name, clientId, server, Ints.tryParse(port),
                                                              Ints.tryParse(timeout), username, password, pubTopic,
                                                              subTopic);
 
@@ -73,6 +75,18 @@ public final class MqttConnectionPreferenceHandler {
             connections.add(dto);
             connectionsProvider.addMqttConnection(dto);
             logger.atInfo().log("New connection has been added: %s", dto);
+        } else if ("EDIT".equals(type)) {
+            // @formatter:off
+            final var index = IntStream.range(0, connections.size())
+                                       .filter(i -> connections.get(i).id.equals(dto.id))
+                                       .findFirst()
+                                       .orElse(-1);
+            // @formatter:on
+            if (index != -1) {
+                connections.set(index, dto);
+            }
+            connectionsProvider.updateMqttConnection(dto);
+            logger.atInfo().log("Existing connection has been updated: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
             connectionsProvider.removeMqttConnection(dto);

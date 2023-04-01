@@ -16,6 +16,7 @@
 package com.osgifx.console.application.handler;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -52,7 +53,8 @@ public final class SocketConnectionPreferenceHandler {
     }
 
     @Execute
-    public void execute(@Named("name") final String name,
+    public void execute(@Named("id") final String id,
+                        @Named("name") final String name,
                         @Named("host") final String host,
                         @Named("port") final String port,
                         @Named("timeout") final String timeout,
@@ -62,13 +64,25 @@ public final class SocketConnectionPreferenceHandler {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new SocketConnectionSettingDTO(name, host, Ints.tryParse(port), Ints.tryParse(timeout),
-                                                               truststore, truststorePassword);
+        final var dto         = new SocketConnectionSettingDTO(id, name, host, Ints.tryParse(port),
+                                                               Ints.tryParse(timeout), truststore, truststorePassword);
 
         if ("ADD".equals(type)) {
             connections.add(dto);
             connectionsProvider.addSocketConnection(dto);
             logger.atInfo().log("New connection has been added: %s", dto);
+        } else if ("EDIT".equals(type)) {
+            // @formatter:off
+            final var index = IntStream.range(0, connections.size())
+                                       .filter(i -> connections.get(i).id.equals(dto.id))
+                                       .findFirst()
+                                       .orElse(-1);
+            // @formatter:on
+            if (index != -1) {
+                connections.set(index, dto);
+            }
+            connectionsProvider.updateSocketConnection(dto);
+            logger.atInfo().log("Existing connection has been updated: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
             connectionsProvider.removeSocketConnection(dto);

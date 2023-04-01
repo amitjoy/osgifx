@@ -21,6 +21,8 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import static org.controlsfx.validation.Validator.createEmptyValidator;
 import static org.controlsfx.validation.Validator.createPredicateValidator;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
@@ -54,11 +56,15 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
     @Inject
     private ThreadSynchronize threadSync;
 
-    public void init() {
+    public void init(final SocketConnectionSettingDTO setting) {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
 
-        dialogPane.setHeaderText("Add Socket Connection Settings");
+        if (setting == null) {
+            dialogPane.setHeaderText("Add Socket Connection Settings");
+        } else {
+            dialogPane.setHeaderText("Edit Socket Connection Settings");
+        }
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
@@ -67,22 +73,28 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
 
         final var name = (CustomTextField) TextFields.createClearableTextField();
         name.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> name.setText(s.name));
 
         final var hostname = (CustomTextField) TextFields.createClearableTextField();
         hostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> hostname.setText(s.host));
 
         final var port = (CustomTextField) TextFields.createClearableTextField();
         port.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> port.setText(String.valueOf(s.port)));
 
         final var timeout = (CustomTextField) TextFields.createClearableTextField();
         timeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> timeout.setText(String.valueOf(s.timeout)));
 
         final var trustStore = (CustomTextField) TextFields.createClearableTextField();
         trustStore.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> trustStore.setText(s.trustStorePath));
 
         final var trustStorePassword = (CustomPasswordField) TextFields.createClearablePasswordField();
         trustStorePassword
                 .setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> trustStorePassword.setText(s.trustStorePassword));
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -174,7 +186,16 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
             final var t = Ints.tryParse(timeout.getText());
 
             verify(p != null && t != null, "Port and host formats are not compliant");
+            if (setting != null) {
+                setting.name               = name.getText();
+                setting.host               = hostname.getText();
+                setting.port               = p;
+                setting.timeout            = t;
+                setting.trustStorePath     = trustStore.getAccessibleText();
+                setting.trustStorePassword = trustStorePassword.getText();
 
+                return setting;
+            }
             return new SocketConnectionSettingDTO(name.getText(), hostname.getText(), p, t,
                                                   trustStore.getAccessibleText(), trustStorePassword.getText());
         });

@@ -16,6 +16,7 @@
 package com.osgifx.console.application.preference;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -35,6 +36,18 @@ public final class ConnectionsProvider {
         socketConnections.add(connection);
     }
 
+    public synchronized void updateSocketConnection(final SocketConnectionSettingDTO connection) {
+     // @formatter:off
+        final var index = IntStream.range(0, socketConnections.size())
+                                   .filter(i -> socketConnections.get(i).id.equals(connection.id))
+                                   .findFirst()
+                                   .orElse(-1);
+        // @formatter:on
+        if (index != -1) {
+            socketConnections.set(index, connection);
+        }
+    }
+
     public synchronized void removeSocketConnection(final SocketConnectionSettingDTO connection) {
         socketConnections.remove(connection);
     }
@@ -45,6 +58,18 @@ public final class ConnectionsProvider {
 
     public synchronized void addMqttConnection(final MqttConnectionSettingDTO connection) {
         mqttConnections.add(connection);
+    }
+
+    public synchronized void updateMqttConnection(final MqttConnectionSettingDTO connection) {
+        // @formatter:off
+        final var index = IntStream.range(0, mqttConnections.size())
+                                   .filter(i -> mqttConnections.get(i).id.equals(connection.id))
+                                   .findFirst()
+                                   .orElse(-1);
+        // @formatter:on
+        if (index != -1) {
+            mqttConnections.set(index, connection);
+        }
     }
 
     public synchronized void removeMqttConnection(final MqttConnectionSettingDTO connection) {

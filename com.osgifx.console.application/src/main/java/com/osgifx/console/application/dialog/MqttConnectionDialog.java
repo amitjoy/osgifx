@@ -21,6 +21,8 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import static org.controlsfx.validation.Validator.createEmptyValidator;
 import static org.controlsfx.validation.Validator.createPredicateValidator;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
@@ -52,11 +54,15 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
     @Inject
     private ThreadSynchronize threadSync;
 
-    public void init() {
+    public void init(final MqttConnectionSettingDTO setting) {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
 
-        dialogPane.setHeaderText("Add MQTT Connection Settings");
+        if (setting == null) {
+            dialogPane.setHeaderText("Add MQTT Connection Settings");
+        } else {
+            dialogPane.setHeaderText("Edit MQTT Connection Settings");
+        }
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
@@ -65,30 +71,39 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
 
         final var name = (CustomTextField) TextFields.createClearableTextField();
         name.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> name.setText(s.name));
 
         final var clientId = (CustomTextField) TextFields.createClearableTextField();
         clientId.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> clientId.setText(s.clientId));
 
         final var server = (CustomTextField) TextFields.createClearableTextField();
         server.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> server.setText(s.server));
 
         final var port = (CustomTextField) TextFields.createClearableTextField();
         port.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> port.setText(String.valueOf(s.port)));
 
         final var timeout = (CustomTextField) TextFields.createClearableTextField();
         timeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> timeout.setText(String.valueOf(s.timeout)));
 
         final var username = (CustomTextField) TextFields.createClearableTextField();
         username.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> username.setText(s.username));
 
         final var password = (CustomPasswordField) TextFields.createClearablePasswordField();
         password.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> password.setText(s.password));
 
         final var pubTopic = (CustomTextField) TextFields.createClearableTextField();
         pubTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> pubTopic.setText(s.pubTopic));
 
         final var subTopic = (CustomTextField) TextFields.createClearableTextField();
         subTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> subTopic.setText(s.subTopic));
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -183,6 +198,19 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             final var t = Ints.tryParse(timeout.getText());
 
             verify(p != null && t != null, "Port and server formats are not compliant");
+            if (setting != null) {
+                setting.name     = name.getText();
+                setting.clientId = clientId.getText();
+                setting.server   = server.getText();
+                setting.port     = p;
+                setting.timeout  = t;
+                setting.username = username.getText();
+                setting.password = password.getText();
+                setting.pubTopic = pubTopic.getText();
+                setting.subTopic = subTopic.getText();
+
+                return setting;
+            }
             return new MqttConnectionSettingDTO(name.getText(), clientId.getText(), server.getText(), p, t,
                                                 username.getText(), password.getText(), pubTopic.getText(),
                                                 subTopic.getText());

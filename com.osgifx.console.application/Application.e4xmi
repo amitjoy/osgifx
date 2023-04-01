@@ -38,6 +38,7 @@
   </bindingTables>
   <rootContext xmi:id="_1NNJoMNmEeynHblGyo61Iw" elementId="org.eclipse.ui.contexts.dialogAndWindow" name="Windows and Dialogs" description="Windows and Dialogs"/>
   <commands xmi:id="_TMF9ACVrEeyVo_nfbAX0Bg" elementId="com.osgifx.console.application.command.socket.connection.preference" commandName="Socket Connection Preference">
+    <parameters xmi:id="_d0QB8NC_Ee2KarxZeLtaOg" elementId="id" name="ID" optional="false"/>
     <parameters xmi:id="_hoaR4G7cEe2jJYc4TDMqiA" elementId="name" name="Name" optional="false"/>
     <parameters xmi:id="_YgDxACVrEeyVo_nfbAX0Bg" elementId="host" name="Hostname" optional="false"/>
     <parameters xmi:id="_bB6CsCVrEeyVo_nfbAX0Bg" elementId="port" name="Port" optional="false"/>
@@ -47,6 +48,7 @@
     <parameters xmi:id="_Z-KFUGxSEe21Cs8uJesKFQ" elementId="truststorePassword" name="Truststore Password"/>
   </commands>
   <commands xmi:id="_N5yVwM_BEe2KarxZeLtaOg" elementId="com.osgifx.console.application.command.mqtt.connection.preference" commandName="MQTT Connection Preference">
+    <parameters xmi:id="_AKWBANDDEe2KarxZeLtaOg" elementId="id" name="ID" optional="false"/>
     <parameters xmi:id="_f2GzINBKEe2KarxZeLtaOg" elementId="name" name="Name" optional="false"/>
     <parameters xmi:id="_N5yVwc_BEe2KarxZeLtaOg" elementId="clientId" name="MQTT Client ID (Local)" optional="false"/>
     <parameters xmi:id="_N5yVws_BEe2KarxZeLtaOg" elementId="server" name="Server" optional="false"/>
