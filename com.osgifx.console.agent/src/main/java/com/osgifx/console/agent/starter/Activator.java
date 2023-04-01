@@ -59,7 +59,7 @@ public final class Activator extends Thread implements BundleActivator {
         final SocketContext socketContext = new SocketContext(bundleContext);
         serverSocket = socketContext.getSocket();
 
-        System.err.println("OSGi.fx Socket Agent Host: " + socketContext.host() + ":" + socketContext.port());
+        System.err.println("[OSGi.fx] Socket Agent Host: " + socketContext.host() + ":" + socketContext.port());
         start();
         module.start();
 
@@ -69,7 +69,7 @@ public final class Activator extends Thread implements BundleActivator {
             final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
 
             if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
-                System.err.print("OSGi.fx MQTT agent topics not defined");
+                System.err.print("[OSGi.fx] MQTT agent topics not defined");
                 return;
             }
             final AgentServer agentServer = new AgentServer(module.di());
