@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
+import java.util.UUID;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,6 +24,7 @@ import com.google.common.base.MoreObjects;
 
 public final class MqttConnectionSettingDTO {
 
+    public String id;
     public String name;
     public String clientId;
     public String server;
@@ -45,6 +48,21 @@ public final class MqttConnectionSettingDTO {
                                     final String password,
                                     final String pubTopic,
                                     final String subTopic) {
+        this(UUID.randomUUID().toString(), name, clientId, server, port, timeout, username, password, pubTopic,
+             subTopic);
+    }
+
+    public MqttConnectionSettingDTO(final String id,
+                                    final String name,
+                                    final String clientId,
+                                    final String server,
+                                    final int port,
+                                    final int timeout,
+                                    final String username,
+                                    final String password,
+                                    final String pubTopic,
+                                    final String subTopic) {
+        this.id       = id;
         this.name     = name;
         this.clientId = clientId;
         this.server   = server;
@@ -60,6 +78,7 @@ public final class MqttConnectionSettingDTO {
     public int hashCode() {
         // @formatter:off
         return new HashCodeBuilder()
+                         .append(id)
                          .append(name)
                          .append(clientId)
                          .append(server)
@@ -84,6 +103,7 @@ public final class MqttConnectionSettingDTO {
         final var other = (MqttConnectionSettingDTO) obj;
         // @formatter:off
         return new EqualsBuilder()
+                           .append(id, other.id)
                            .append(name, other.name)
                            .append(clientId, other.clientId)
                            .append(server, other.server)
@@ -101,6 +121,7 @@ public final class MqttConnectionSettingDTO {
     public String toString() {
         // @formatter:off
         return MoreObjects.toStringHelper(getClass())
+                               .add("id", id)
                                .add("name", name)
                                .add("clientId", clientId)
                                .add("server", server)
