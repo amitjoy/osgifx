@@ -290,7 +290,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     }
 
     private void trace(final String message) {
-        final boolean isTracingEnabled = Boolean.getBoolean(Agent.TRACE_LOG_KEY);
+        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_TRACE_LOG_KEY);
         if (isTracingEnabled) {
             System.out.println("[OSGi.fx] " + message);
         }

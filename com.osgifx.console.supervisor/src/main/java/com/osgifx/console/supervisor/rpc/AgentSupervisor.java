@@ -127,6 +127,7 @@ public class AgentSupervisor<S, A> {
                                  final Class<A> agent,
                                  final S supervisor,
                                  final MqttConnection connection) {
+
         final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
 
         ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
