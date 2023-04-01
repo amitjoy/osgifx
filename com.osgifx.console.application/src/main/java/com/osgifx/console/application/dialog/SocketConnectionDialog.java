@@ -117,7 +117,7 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var nameCaption               = "Name";
+        final var nameCaption               = "Connection Name";
         final var hostnameCaption           = "Host";
         final var portCaption               = "Port (between 1 to 65536)";
         final var timeoutCaption            = "Timeout in millis";
