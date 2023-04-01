@@ -56,45 +56,45 @@ import com.osgifx.console.agent.extension.AgentExtensionName;
 public interface Agent {
 
     /**
-     * The default port. The port can be overridden with the System/framework
-     * property {$value {@link #AGENT_SERVER_PORT_KEY}.
+     * The pattern for a server port specification: {@code [<interface>:]<port>} .
      */
-    int DEFAULT_PORT = 29998;
+    Pattern AGENT_SOCKET_PORT_PATTERN = Pattern.compile("(?:([^:]+):)?(\\d+)");
 
     /**
-     * The property key to set the agent's port.
+     * The default port. The port can be overridden with the System/framework
+     * property {$value {@link #AGENT_SOCKET_PORT_KEY}.
      */
-    String AGENT_SERVER_PORT_KEY = "osgi.fx.agent.port";
+    int AGENT_SOCKET_PORT_DEFAULT = 29998;
+
+    /**
+     * The property key to set the agent's socket port.
+     */
+    String AGENT_SOCKET_PORT_KEY = "osgi.fx.agent.socket.port";
 
     /**
      * The property key to enable secure agent communication.
      */
-    String AGENT_SECURE_COMMUNICATION_KEY = "osgi.fx.agent.secure";
+    String AGENT_SOCKET_SECURE_COMMUNICATION_KEY = "osgi.fx.agent.socket.secure";
 
     /**
      * The property key for the custom {@link SSLContext} enabling secure agent communication.
      */
-    String AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY = "osgi.fx.agent.secure.sslcontext.filter";
+    String AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY = "osgi.fx.agent.socket.secure.sslcontext.filter";
 
     /**
      * The property key to specify the publish topic for publishing the data using MQTT
      */
-    String AGENT_MQTT_PUB_TOPIC_KEY = "osgi.fx.agent.mqtt.pub.topic";
+    String AGENT_MQTT_PUB_TOPIC_KEY = "osgi.fx.agent.mqtt.pubtopic";
 
     /**
      * The property key to specify the subscription topic for receiving the data using MQTT
      */
-    String AGENT_MQTT_SUB_TOPIC_KEY = "osgi.fx.agent.mqtt.sub.topic";
+    String AGENT_MQTT_SUB_TOPIC_KEY = "osgi.fx.agent.mqtt.subtopic";
 
     /**
      * The property key to enable agent logs
      */
-    String TRACE_LOG_KEY = "osgi.fx.agent.logs.enabled";
-
-    /**
-     * The pattern for a server port specification: {@code [<interface>:]<port>} .
-     */
-    Pattern PORT_PATTERN = Pattern.compile("(?:([^:]+):)?(\\d+)");
+    String AGENT_TRACE_LOG_KEY = "osgi.fx.agent.logs.enabled";
 
     /**
      * The port for attaching to a remote Gogo CommandSession

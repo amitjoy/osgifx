@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
-import static com.osgifx.console.agent.Agent.AGENT_SECURE_COMMUNICATION_KEY;
-import static com.osgifx.console.agent.Agent.AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY;
-import static com.osgifx.console.agent.Agent.AGENT_SERVER_PORT_KEY;
-import static com.osgifx.console.agent.Agent.DEFAULT_PORT;
-import static com.osgifx.console.agent.Agent.PORT_PATTERN;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_SECURE_COMMUNICATION_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_DEFAULT;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_PATTERN;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -52,10 +52,10 @@ public final class SocketContext {
     }
 
     public ServerSocket getSocket() throws Exception {
-        final String secureCommunicationEnabled = bundleContext.getProperty(AGENT_SECURE_COMMUNICATION_KEY);
+        final String secureCommunicationEnabled = bundleContext.getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY);
         if (Boolean.parseBoolean(secureCommunicationEnabled)) {
             final String sslContextFilter = bundleContext
-                    .getProperty(AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY);
+                    .getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY);
             if (sslContextFilter == null) {
                 final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                 return "*".equals(host) ? ssf.createServerSocket(port)
@@ -63,7 +63,7 @@ public final class SocketContext {
             }
             final Collection<ServiceReference<SSLContext>> sslContextRefs = bundleContext.getServiceReferences(
                     SSLContext.class,
-                    "(" + AGENT_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY + "=" + sslContextFilter + ")");
+                    "(" + AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY + "=" + sslContextFilter + ")");
             if (sslContextRefs == null || sslContextRefs.isEmpty()) {
                 throw new RuntimeException("Custom SSLContext service for OSGi.fx secure agent communication is not available");
             }
@@ -78,13 +78,13 @@ public final class SocketContext {
     }
 
     private void extractSpec() {
-        String portKey = bundleContext.getProperty(AGENT_SERVER_PORT_KEY);
+        String portKey = bundleContext.getProperty(AGENT_SOCKET_PORT_KEY);
         if (portKey == null) {
-            portKey = DEFAULT_PORT + "";
+            portKey = AGENT_SOCKET_PORT_DEFAULT + "";
         }
-        final Matcher m = PORT_PATTERN.matcher(portKey);
+        final Matcher m = AGENT_SOCKET_PORT_PATTERN.matcher(portKey);
         if (!m.matches()) {
-            throw new IllegalArgumentException("Invalid port specification in property '" + AGENT_SERVER_PORT_KEY
+            throw new IllegalArgumentException("Invalid port specification in property '" + AGENT_SOCKET_PORT_KEY
                     + "', expects [<host>:]<port> : " + port);
         }
         host = m.group(1);
