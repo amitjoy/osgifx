@@ -66,6 +66,9 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         final var name = (CustomTextField) TextFields.createClearableTextField();
         name.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
 
+        final var clientId = (CustomTextField) TextFields.createClearableTextField();
+        clientId.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
+
         final var server = (CustomTextField) TextFields.createClearableTextField();
         server.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
 
@@ -81,6 +84,12 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         final var password = (CustomPasswordField) TextFields.createClearablePasswordField();
         password.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
 
+        final var pubTopic = (CustomTextField) TextFields.createClearableTextField();
+        pubTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
+
+        final var subTopic = (CustomTextField) TextFields.createClearableTextField();
+        subTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
+
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
         lbMessage.setVisible(false);
@@ -90,11 +99,14 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
 
         content.getChildren().add(lbMessage);
         content.getChildren().add(name);
+        content.getChildren().add(clientId);
         content.getChildren().add(server);
         content.getChildren().add(port);
         content.getChildren().add(timeout);
         content.getChildren().add(username);
         content.getChildren().add(password);
+        content.getChildren().add(pubTopic);
+        content.getChildren().add(subTopic);
 
         dialogPane.setContent(content);
 
@@ -114,19 +126,25 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var nameCaption     = "Name";
+        final var nameCaption     = "Connection Name";
+        final var clientIdCaption = "MQTT Client ID (Local)";
         final var serverCaption   = "Server";
         final var portCaption     = "Port (between 1 to 65536)";
         final var timeoutCaption  = "Timeout in millis";
         final var usernameCaption = "Username";
         final var passwordCaption = "Password";
+        final var pubTopicCaption = "Publish Topic";
+        final var subTopicCaption = "Subscription Topic";
 
         name.setPromptText(nameCaption);
+        clientId.setPromptText(clientIdCaption);
         server.setPromptText(serverCaption);
         port.setPromptText(portCaption);
         timeout.setPromptText(timeoutCaption);
         username.setPromptText(usernameCaption);
         password.setPromptText(passwordCaption);
+        pubTopic.setPromptText(pubTopicCaption);
+        subTopic.setPromptText(subTopicCaption);
 
         final var validationSupport = new ValidationSupport();
         threadSync.asyncExec(() -> {
@@ -135,6 +153,8 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             final var requiredNumberFormat = "'%s' should be a valid integer number";
 
             validationSupport.registerValidator(name, createEmptyValidator(String.format(requiredFormat, nameCaption)));
+            validationSupport.registerValidator(clientId,
+                    createEmptyValidator(String.format(requiredFormat, clientIdCaption)));
             validationSupport.registerValidator(server,
                     createEmptyValidator(String.format(requiredFormat, serverCaption)));
             validationSupport.registerValidator(port, createEmptyValidator(String.format(requiredFormat, portCaption)));
@@ -147,6 +167,10 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             validationSupport.registerValidator(timeout,
                     createPredicateValidator(value -> Ints.tryParse(value.toString()) != null,
                             String.format(requiredNumberFormat, timeoutCaption)));
+            validationSupport.registerValidator(pubTopic,
+                    createEmptyValidator(String.format(requiredFormat, pubTopicCaption)));
+            validationSupport.registerValidator(subTopic,
+                    createEmptyValidator(String.format(requiredFormat, subTopicCaption)));
         });
         final var saveBtn = (Button) dialogPane.lookupButton(saveButtonType);
         saveBtn.disableProperty().bind(validationSupport.invalidProperty());
@@ -159,8 +183,9 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
             final var t = Ints.tryParse(timeout.getText());
 
             verify(p != null && t != null, "Port and server formats are not compliant");
-            return new MqttConnectionSettingDTO(name.getText(), server.getText(), p, t, username.getText(),
-                                                password.getText());
+            return new MqttConnectionSettingDTO(name.getText(), clientId.getText(), server.getText(), p, t,
+                                                username.getText(), password.getText(), pubTopic.getText(),
+                                                subTopic.getText());
         });
     }
 
