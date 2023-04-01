@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import java.io.Closeable;
@@ -58,21 +60,28 @@ public final class Activator extends Thread implements BundleActivator {
         serverSocket = socketContext.getSocket();
 
         System.err.println("OSGi.fx Socket Agent Host: " + socketContext.host() + ":" + socketContext.port());
-
         module.start();
 
         final boolean isMQTTwired = module.di().getInstance(PackageWirings.class).isMqttWired();
         if (isMQTTwired) {
+            final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
+            final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
+
+            if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
+                System.err.print("OSGi.fx MQTT agent topics not defined");
+                return;
+            }
             final AgentServer agentServer = new AgentServer(module.di());
             agents.add(agentServer);
             final RemoteRPC<Agent, Supervisor> mqttRPC = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
-                                                                       "mondal/amit", "amit/mondal");
+                                                                       pubTopic, subTopic);
 
             module.bindInstance(AgentServer.class, agentServer);
             module.bindInstance(RemoteRPC.class, mqttRPC);
             module.bindInstance(Supervisor.class, mqttRPC.getRemote());
 
             mqttRPC.open();
+            agentServer.setEndpoint(mqttRPC);
         }
         start();
     }
