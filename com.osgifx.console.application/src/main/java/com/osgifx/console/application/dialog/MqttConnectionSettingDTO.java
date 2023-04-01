@@ -23,28 +23,37 @@ import com.google.common.base.MoreObjects;
 public final class MqttConnectionSettingDTO {
 
     public String name;
+    public String clientId;
     public String server;
     public int    port;
     public int    timeout;
     public String username;
     public String password;
+    public String pubTopic;
+    public String subTopic;
 
     public MqttConnectionSettingDTO() {
         // needed for GSON
     }
 
     public MqttConnectionSettingDTO(final String name,
+                                    final String clientId,
                                     final String server,
                                     final int port,
                                     final int timeout,
                                     final String username,
-                                    final String password) {
+                                    final String password,
+                                    final String pubTopic,
+                                    final String subTopic) {
         this.name     = name;
+        this.clientId = clientId;
         this.server   = server;
         this.port     = port;
         this.timeout  = timeout;
         this.username = username;
         this.password = password;
+        this.pubTopic = pubTopic;
+        this.subTopic = subTopic;
     }
 
     @Override
@@ -52,11 +61,14 @@ public final class MqttConnectionSettingDTO {
         // @formatter:off
         return new HashCodeBuilder()
                          .append(name)
+                         .append(clientId)
                          .append(server)
                          .append(port)
                          .append(timeout)
                          .append(username)
                          .append(password)
+                         .append(pubTopic)
+                         .append(subTopic)
                      .toHashCode();
         // @formatter:on
     }
@@ -73,11 +85,14 @@ public final class MqttConnectionSettingDTO {
         // @formatter:off
         return new EqualsBuilder()
                            .append(name, other.name)
+                           .append(clientId, other.clientId)
                            .append(server, other.server)
                            .append(port, other.port)
                            .append(timeout, other.timeout)
                            .append(username, other.username)
                            .append(password, other.password)
+                           .append(pubTopic, other.pubTopic)
+                           .append(subTopic, other.subTopic)
                        .isEquals();
         // @formatter:on
     }
@@ -87,10 +102,13 @@ public final class MqttConnectionSettingDTO {
         // @formatter:off
         return MoreObjects.toStringHelper(getClass())
                                .add("name", name)
+                               .add("clientId", clientId)
                                .add("server", server)
                                .add("port", port)
                                .add("timeout", timeout)
                                .add("username", username)
+                               .add("pubTopic", pubTopic)
+                               .add("subTopic", subTopic)
                           .toString();
         // @formatter:on
     }

@@ -185,10 +185,14 @@ public final class ConnectToMqttAgentHandler {
                     // @formatter:off
                     final var mqttConnection = MqttConnection
                             .builder()
+                            .clientId(settings.clientId)
                             .server(settings.server)
                             .port(settings.port)
                             .username(settings.username)
                             .password(settings.password)
+                            .timeout(settings.timeout)
+                            .pubTopic(settings.pubTopic)
+                            .subTopic(settings.subTopic)
                             .build();
                     // @formatter:on
 
@@ -231,12 +235,15 @@ public final class ConnectToMqttAgentHandler {
         final Map<String, Object> properties = Maps.newHashMap();
 
         properties.put("name", dto.name);
+        properties.put("clientId", dto.clientId);
         properties.put("server", dto.server);
         properties.put("port", dto.port);
         properties.put("timeout", dto.timeout);
         properties.put("type", type);
         properties.put("username", dto.username);
         properties.put("password", dto.password);
+        properties.put("pubTopic", dto.pubTopic);
+        properties.put("subTopic", dto.subTopic);
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }
