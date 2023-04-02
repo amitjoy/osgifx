@@ -44,29 +44,29 @@ public final class AgentPingAddon {
 
     @Log
     @Inject
-    private FluentLogger                            logger;
+    private FluentLogger                                  logger;
     @Inject
-    private Executor                                executor;
+    private Executor                                      executor;
     @Inject
     @Optional
-    private Supervisor                              supervisor;
+    private Supervisor                                    supervisor;
     @Inject
-    private IEventBroker                            eventBroker;
+    private IEventBroker                                  eventBroker;
     @Inject
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>              isConnected;
+    private ContextBoundValue<Boolean>                    isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>              isLocalAgent;
+    private ContextBoundValue<Boolean>                    isLocalAgent;
     @Inject
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>               connectedAgent;
+    private ContextBoundValue<String>                     connectedAgent;
     @Inject
     @Optional
     @ContextValue("selected.settings")
     private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
-    private volatile ScheduledFuture<?>             future;
+    private volatile ScheduledFuture<?>                   future;
 
     @PostConstruct
     public void init() {
@@ -98,7 +98,6 @@ public final class AgentPingAddon {
     private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent disconnected event has been received");
         future.cancel(true);
-        future = null;
         connectedAgent.publish(null);
     }
 
