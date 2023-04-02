@@ -64,7 +64,7 @@ public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setPrefHeight(240);
-        dialogPane.setPrefWidth(670);
+        dialogPane.setPrefWidth(540);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Connect to Remote Socket Agent");
