@@ -71,7 +71,7 @@ public class ConfigHelper<T> {
         lastInvocation = method;
 
         final var name  = Converter.mangleMethodName(method.getName());
-        var          value = properties.get(name);
+        var       value = properties.get(name);
         if (value == null) {
             value = method.getDefaultValue();
         }
@@ -112,7 +112,7 @@ public class ConfigHelper<T> {
         assert lastInvocation != null : "Missing invocation of target interface";
 
         final var key = Converter.mangleMethodName(lastInvocation.getName());
-        Object       value;
+        Object    value;
         try {
             value = Converter.cnv(lastInvocation.getGenericReturnType(), newer);
         } catch (final Exception e) {
@@ -168,16 +168,15 @@ public class ConfigHelper<T> {
      *
      * @throws IOException
      */
-    public boolean update() {
+    public void update() {
         requireNonNull(pid, "First read the PID before you update");
         Configuration configuration;
         try {
             configuration = cm.getConfiguration(pid, "?");
-            return configuration.updateIfDifferent(properties);
+            configuration.update(properties);
         } catch (final IOException e) {
             // highly unlikely to occur
         }
-        return false;
     }
 
     /**
