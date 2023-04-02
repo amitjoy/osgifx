@@ -17,7 +17,7 @@ package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 import static javafx.scene.control.ButtonType.CANCEL;
 
 import java.util.Map;
@@ -201,7 +201,7 @@ public final class ConnectToMqttAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
-                    supervisorFactory.createSupervisor(SOCKET_RPC);
+                    supervisorFactory.createSupervisor(REMOTE_RPC);
                     updateMessage("Connecting to " + settings.server + ":" + settings.port);
 
                     // @formatter:off
