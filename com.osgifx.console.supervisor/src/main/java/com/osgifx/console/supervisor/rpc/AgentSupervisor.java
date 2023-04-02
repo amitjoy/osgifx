@@ -68,6 +68,8 @@ public class AgentSupervisor<S, A> {
         String connectedListenerFilter();
 
         String disconnectedListenerFilter();
+
+        String osgi_ds_satisfying_condition_target();
     }
 
     private static final int CONNECT_WAIT = 200;
@@ -126,7 +128,8 @@ public class AgentSupervisor<S, A> {
                                  final ConfigurationAdmin configurationAdmin,
                                  final Class<A> agent,
                                  final S supervisor,
-                                 final MqttConnection connection) {
+                                 final MqttConnection connection,
+                                 final String conditionFilter) {
 
         final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
 
@@ -147,6 +150,7 @@ public class AgentSupervisor<S, A> {
         ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
         ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
         ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
+        ch.set(ch.d().osgi_ds_satisfying_condition_target(), conditionFilter);
         ch.update();
 
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic());
