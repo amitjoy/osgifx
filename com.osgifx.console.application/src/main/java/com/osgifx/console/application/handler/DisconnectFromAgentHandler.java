@@ -42,32 +42,32 @@ public final class DisconnectFromAgentHandler {
 
     @Log
     @Inject
-    private FluentLogger                            logger;
+    private FluentLogger                                  logger;
     @Inject
-    private Executor                                executor;
+    private Executor                                      executor;
     @Inject
     @Optional
-    private Supervisor                              supervisor;
+    private Supervisor                                    supervisor;
     @Inject
-    private IEventBroker                            eventBroker;
+    private IEventBroker                                  eventBroker;
     @Inject
     @Optional
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>              isConnected;
+    private ContextBoundValue<Boolean>                    isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>              isLocalAgent;
+    private ContextBoundValue<Boolean>                    isLocalAgent;
     @Inject
     @Optional
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>               connectedAgent;
+    private ContextBoundValue<String>                     connectedAgent;
     @Inject
     @Optional
     @ContextValue("selected.settings")
     private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     @Inject
-    private SupervisorFactory                       supervisorFactory;
+    private SupervisorFactory                             supervisorFactory;
 
     @Execute
     public void execute() {
