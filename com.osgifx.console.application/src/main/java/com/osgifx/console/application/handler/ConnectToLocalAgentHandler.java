@@ -17,7 +17,7 @@ package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -97,7 +97,7 @@ public final class ConnectToLocalAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
-                    supervisorFactory.createSupervisor(SOCKET_RPC);
+                    supervisorFactory.createSupervisor(REMOTE_RPC);
                     updateMessage("Connecting to Local Agent on " + localAgentPort);
 
                     // @formatter:off
