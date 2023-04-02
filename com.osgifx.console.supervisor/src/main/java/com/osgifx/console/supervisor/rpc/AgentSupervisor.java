@@ -19,16 +19,22 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_PACKET_SIZE;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
+import static org.osgi.service.condition.Condition.CONDITION_ID;
+import static org.osgi.service.condition.Condition.INSTANCE;
 
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.net.ssl.SSLSocketFactory;
 
+import org.apache.aries.component.dsl.OSGi;
+import org.apache.aries.component.dsl.OSGiResult;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.condition.Condition;
 
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.rpc.MqttRPC;
@@ -124,12 +130,12 @@ public class AgentSupervisor<S, A> {
         }
     }
 
-    protected void connectToMQTT(final BundleContext bundleContext,
-                                 final ConfigurationAdmin configurationAdmin,
-                                 final Class<A> agent,
-                                 final S supervisor,
-                                 final MqttConnection connection,
-                                 final String conditionFilter) {
+    protected OSGiResult connectToMQTT(final BundleContext bundleContext,
+                                       final ConfigurationAdmin configurationAdmin,
+                                       final Class<A> agent,
+                                       final S supervisor,
+                                       final MqttConnection connection,
+                                       final String conditionID) {
 
         final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
 
@@ -150,12 +156,18 @@ public class AgentSupervisor<S, A> {
         ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
         ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
         ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
-        ch.set(ch.d().osgi_ds_satisfying_condition_target(), conditionFilter);
+        ch.set(ch.d().osgi_ds_satisfying_condition_target(), "(" + CONDITION_ID + "=" + conditionID + ")");
         ch.update();
+
+        // register the condition service to enable messaging client
+        final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
+                .run(bundleContext);
 
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic());
         this.setRemoteRPC(remoteRPC);
         remoteRPC.open();
+
+        return result;
     }
 
     private void setRemoteRPC(final RemoteRPC<S, A> rpc) {
