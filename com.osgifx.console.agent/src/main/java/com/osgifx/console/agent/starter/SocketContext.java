@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_DEFAULT;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_PATTERN;
 import static com.osgifx.console.agent.Agent.AGENT_SOCKET_SECURE_COMMUNICATION_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY;
-import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_KEY;
-import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_DEFAULT;
-import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_PATTERN;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
