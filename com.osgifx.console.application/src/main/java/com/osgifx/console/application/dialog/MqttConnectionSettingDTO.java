@@ -34,6 +34,7 @@ public final class MqttConnectionSettingDTO {
     public String password;
     public String pubTopic;
     public String subTopic;
+    public String lwtTopic;
 
     public MqttConnectionSettingDTO() {
         // needed for GSON
@@ -47,9 +48,10 @@ public final class MqttConnectionSettingDTO {
                                     final String username,
                                     final String password,
                                     final String pubTopic,
-                                    final String subTopic) {
+                                    final String subTopic,
+                                    final String lwtTopic) {
         this(UUID.randomUUID().toString(), name, clientId, server, port, timeout, username, password, pubTopic,
-             subTopic);
+             subTopic, lwtTopic);
     }
 
     public MqttConnectionSettingDTO(final String id,
@@ -61,7 +63,8 @@ public final class MqttConnectionSettingDTO {
                                     final String username,
                                     final String password,
                                     final String pubTopic,
-                                    final String subTopic) {
+                                    final String subTopic,
+                                    final String lwtTopic) {
         this.id       = id;
         this.name     = name;
         this.clientId = clientId;
@@ -72,6 +75,7 @@ public final class MqttConnectionSettingDTO {
         this.password = password;
         this.pubTopic = pubTopic;
         this.subTopic = subTopic;
+        this.lwtTopic = lwtTopic;
     }
 
     @Override
@@ -88,6 +92,7 @@ public final class MqttConnectionSettingDTO {
                          .append(password)
                          .append(pubTopic)
                          .append(subTopic)
+                         .append(lwtTopic)
                      .toHashCode();
         // @formatter:on
     }
@@ -113,6 +118,7 @@ public final class MqttConnectionSettingDTO {
                            .append(password, other.password)
                            .append(pubTopic, other.pubTopic)
                            .append(subTopic, other.subTopic)
+                           .append(lwtTopic, other.lwtTopic)
                        .isEquals();
         // @formatter:on
     }
@@ -130,6 +136,7 @@ public final class MqttConnectionSettingDTO {
                                .add("username", username)
                                .add("pubTopic", pubTopic)
                                .add("subTopic", subTopic)
+                               .add("lwtTopic", lwtTopic)
                           .toString();
         // @formatter:on
     }
