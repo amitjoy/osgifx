@@ -215,6 +215,7 @@ public final class ConnectToMqttAgentHandler {
                             .timeout(settings.timeout)
                             .pubTopic(settings.pubTopic)
                             .subTopic(settings.subTopic)
+                            .lwtTopic(settings.lwtTopic)
                             .build();
                     // @formatter:on
 
