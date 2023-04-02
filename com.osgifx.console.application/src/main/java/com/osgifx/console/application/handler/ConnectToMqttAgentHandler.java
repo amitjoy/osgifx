@@ -267,6 +267,7 @@ public final class ConnectToMqttAgentHandler {
         properties.put("password", dto.password);
         properties.put("pubTopic", dto.pubTopic);
         properties.put("subTopic", dto.subTopic);
+        properties.put("lwtTopic", dto.lwtTopic);
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }

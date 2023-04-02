@@ -57,8 +57,9 @@
     <parameters xmi:id="_N5yVxc_BEe2KarxZeLtaOg" elementId="type" name="Type" optional="false"/>
     <parameters xmi:id="_N5yVxs_BEe2KarxZeLtaOg" elementId="username" name="Username"/>
     <parameters xmi:id="_N5yVx8_BEe2KarxZeLtaOg" elementId="password" name="Password"/>
-    <parameters xmi:id="_Ji0TsM_8Ee2KarxZeLtaOg" elementId="pubTopic" name="Publish Topic"/>
-    <parameters xmi:id="_JsYfYM_8Ee2KarxZeLtaOg" elementId="subTopic" name="Subscription Topic"/>
+    <parameters xmi:id="_Ji0TsM_8Ee2KarxZeLtaOg" elementId="pubTopic" name="Publish Topic" optional="false"/>
+    <parameters xmi:id="_JsYfYM_8Ee2KarxZeLtaOg" elementId="subTopic" name="Subscription Topic" optional="false"/>
+    <parameters xmi:id="_FfeRANEjEe2KarxZeLtaOg" elementId="lwtTopic" name="LWT Topic" optional="false"/>
   </commands>
   <commands xmi:id="_IPypwMNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.command.refresh" commandName="Refresh View" description="Refreshes the views by retrieving the current state of the remote runtime"/>
   <commands xmi:id="_LFMTkAJzEe2rVexxjfx5Hw" elementId="com.osgifx.console.application.command.connect.agent.local" commandName="Connect to Local Agent" description="Establishes connection to the local agent"/>
