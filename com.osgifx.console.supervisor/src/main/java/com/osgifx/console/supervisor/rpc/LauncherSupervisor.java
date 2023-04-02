@@ -18,21 +18,33 @@ package com.osgifx.console.supervisor.rpc;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
+import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
+import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
+import static org.osgi.service.condition.Condition.INSTANCE;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 
+import org.apache.aries.component.dsl.OSGi;
+import org.apache.aries.component.dsl.OSGiResult;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
+import org.osgi.service.condition.Condition;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.messaging.MessageSubscription;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.PromiseFactory;
 
@@ -59,6 +71,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         implements Supervisor, MqttClientConnectedListener, MqttClientDisconnectedListener {
 
     public static final String CONDITION_ID_VALUE                    = "rpc-agent";
+    public static final String MQTT_CONDITION_ID_VALUE               = "mqtt-messaging";
     public static final String MQTT_CONNECTION_LISTENER_FILTER_KEY   = "mqtt_connection_filter";
     public static final String MQTT_CONNECTION_LISTENER_FILTER_VALUE = "true";
     public static final String MQTT_CONNECTION_LISTENER_FILTER_PROP  = MQTT_CONNECTION_LISTENER_FILTER_KEY + "="
@@ -78,11 +91,25 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     private BundleContext bundleContext;
 
     @Reference
+    private EventAdmin eventAdmin;
+
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile MessageSubscription subscriber;
+
+    @Reference
     private ConfigurationAdmin configurationAdmin;
+
+    private OSGiResult mqttMessagingRegistration;
 
     @Activate
     void activate() {
         promiseFactory = new PromiseFactory(Executors.newSingleThreadExecutor());
+    }
+
+    @Deactivate
+    void deactivate() {
+        // this will be called when the agent is disconnected
+        Optional.ofNullable(mqttMessagingRegistration).ifPresent(OSGiResult::close);
     }
 
     @Override
@@ -96,10 +123,23 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         checkNotNull(mqttConnection, "'mqttConnection' cannot be null");
 
         mqttConnectionPromise = promiseFactory.deferred();
-        super.connectToMQTT(bundleContext, configurationAdmin, Agent.class, this, mqttConnection);
+
+        // register the condition service to enable messaging client
+        mqttMessagingRegistration = OSGi
+                .register(Condition.class, INSTANCE, Map.of(CONDITION_ID, MQTT_CONDITION_ID_VALUE)).run(bundleContext);
+
+        // connect to the client
+        super.connectToMQTT(bundleContext, configurationAdmin, Agent.class, this, mqttConnection,
+                "(" + CONDITION_ID + "=" + MQTT_CONDITION_ID_VALUE + ")");
 
         try {
             mqttConnectionPromise.getPromise().timeout(mqttConnection.timeout()).getValue();
+            // @formatter:off
+            Optional.ofNullable(subscriber)
+                    .ifPresent(s ->
+                         s.subscribe(mqttConnection.lwtTopic())
+                          .forEach(t -> sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC)));
+            // @formatter:on
         } catch (final InvocationTargetException e) {
             throw (Exception) Exceptions.unrollCause(e, InvocationTargetException.class);
         }
@@ -277,6 +317,11 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             }
         }
         return false;
+    }
+
+    private void sendEvent(final String topic) {
+        final var event = new Event(topic, Map.of());
+        eventAdmin.postEvent(event);
     }
 
 }
