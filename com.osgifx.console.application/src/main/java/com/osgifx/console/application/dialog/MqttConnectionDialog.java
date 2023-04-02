@@ -105,6 +105,10 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         subTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
         Optional.ofNullable(setting).ifPresent(s -> subTopic.setText(s.subTopic));
 
+        final var lwtTopic = (CustomTextField) TextFields.createClearableTextField();
+        lwtTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> lwtTopic.setText(s.lwtTopic));
+
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
         lbMessage.setVisible(false);
@@ -122,6 +126,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         content.getChildren().add(password);
         content.getChildren().add(pubTopic);
         content.getChildren().add(subTopic);
+        content.getChildren().add(lwtTopic);
 
         dialogPane.setContent(content);
 
@@ -150,6 +155,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         final var passwordCaption = "Password";
         final var pubTopicCaption = "Agent Publish Topic";
         final var subTopicCaption = "Agent Subscription Topic";
+        final var lwtTopicCaption = "Agent Runtime LWT Topic";
 
         name.setPromptText(nameCaption);
         clientId.setPromptText(clientIdCaption);
@@ -160,6 +166,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         password.setPromptText(passwordCaption);
         pubTopic.setPromptText(pubTopicCaption);
         subTopic.setPromptText(subTopicCaption);
+        lwtTopic.setPromptText(lwtTopicCaption);
 
         final var validationSupport = new ValidationSupport();
         threadSync.asyncExec(() -> {
@@ -186,6 +193,8 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
                     createEmptyValidator(String.format(requiredFormat, pubTopicCaption)));
             validationSupport.registerValidator(subTopic,
                     createEmptyValidator(String.format(requiredFormat, subTopicCaption)));
+            validationSupport.registerValidator(lwtTopic,
+                    createEmptyValidator(String.format(requiredFormat, lwtTopicCaption)));
         });
         final var saveBtn = (Button) dialogPane.lookupButton(saveButtonType);
         saveBtn.disableProperty().bind(validationSupport.invalidProperty());
@@ -208,12 +217,13 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
                 setting.password = password.getText();
                 setting.pubTopic = pubTopic.getText();
                 setting.subTopic = subTopic.getText();
+                setting.lwtTopic = lwtTopic.getText();
 
                 return setting;
             }
             return new MqttConnectionSettingDTO(name.getText(), clientId.getText(), server.getText(), p, t,
                                                 username.getText(), password.getText(), pubTopic.getText(),
-                                                subTopic.getText());
+                                                subTopic.getText(), lwtTopic.getText());
         });
     }
 

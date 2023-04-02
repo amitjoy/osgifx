@@ -27,6 +27,7 @@ public class MqttConnection {
     private final String password;
     private final String pubTopic;
     private final String subTopic;
+    private final String lwtTopic;
 
     private MqttConnection(final String clientId,
                            final String server,
@@ -35,7 +36,8 @@ public class MqttConnection {
                            final String username,
                            final String password,
                            final String pubTopic,
-                           final String subTopic) {
+                           final String subTopic,
+                           final String lwtTopic) {
         this.clientId = clientId;
         this.server   = server;
         this.port     = port;
@@ -44,6 +46,7 @@ public class MqttConnection {
         this.password = password;
         this.pubTopic = pubTopic;
         this.subTopic = subTopic;
+        this.lwtTopic = lwtTopic;
     }
 
     public String clientId() {
@@ -78,6 +81,10 @@ public class MqttConnection {
         return subTopic;
     }
 
+    public String lwtTopic() {
+        return lwtTopic;
+    }
+
     public static MqttConnectionBuilder builder() {
         return new MqttConnectionBuilder();
     }
@@ -91,6 +98,7 @@ public class MqttConnection {
         private String password;
         private String pubTopic;
         private String subTopic;
+        private String lwtTopic;
 
         public MqttConnectionBuilder clientId(final String clientId) {
             this.clientId = requireNonNull(clientId, "'clientId' cannot be null");
@@ -138,8 +146,14 @@ public class MqttConnection {
             return this;
         }
 
+        public MqttConnectionBuilder lwtTopic(final String lwtTopic) {
+            this.lwtTopic = requireNonNull(subTopic, "'lwtTopic' cannot be null");
+            return this;
+        }
+
         public MqttConnection build() {
-            return new MqttConnection(clientId, server, port, timeout, username, password, pubTopic, subTopic);
+            return new MqttConnection(clientId, server, port, timeout, username, password, pubTopic, subTopic,
+                                      lwtTopic);
         }
     }
 
