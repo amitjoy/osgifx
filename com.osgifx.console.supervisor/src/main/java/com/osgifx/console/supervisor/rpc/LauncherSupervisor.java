@@ -21,7 +21,6 @@ import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTI
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
-import static org.osgi.service.condition.Condition.INSTANCE;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,7 +31,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -41,7 +39,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
-import org.osgi.service.condition.Condition;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.messaging.MessageSubscription;
@@ -115,7 +112,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Override
     public void connect(final SocketConnection socketConnection) throws Exception {
         checkNotNull(socketConnection, "'socketConnection' cannot be null");
-        super.connectToSocket(Agent.class, this, socketConnection);
+        connectToSocket(Agent.class, this, socketConnection);
     }
 
     @Override
@@ -123,17 +120,11 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         checkNotNull(mqttConnection, "'mqttConnection' cannot be null");
 
         mqttConnectionPromise = promiseFactory.deferred();
-
-        // register the condition service to enable messaging client
-        mqttMessagingRegistration = OSGi
-                .register(Condition.class, INSTANCE, Map.of(CONDITION_ID, MQTT_CONDITION_ID_VALUE)).run(bundleContext);
-
-        // connect to the client
-        super.connectToMQTT(bundleContext, configurationAdmin, Agent.class, this, mqttConnection,
-                "(" + CONDITION_ID + "=" + MQTT_CONDITION_ID_VALUE + ")");
-
         try {
+            mqttMessagingRegistration = connectToMQTT(bundleContext, configurationAdmin, Agent.class, this,
+                    mqttConnection, MQTT_CONDITION_ID_VALUE);
             mqttConnectionPromise.getPromise().timeout(mqttConnection.timeout()).getValue();
+
             // @formatter:off
             Optional.ofNullable(subscriber)
                     .ifPresent(s ->
