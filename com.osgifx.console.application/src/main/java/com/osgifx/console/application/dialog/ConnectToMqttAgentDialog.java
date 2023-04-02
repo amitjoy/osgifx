@@ -63,8 +63,8 @@ public final class ConnectToMqttAgentDialog extends Dialog<ButtonType> {
     public void init() {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.setPrefHeight(270);
-        dialogPane.setPrefWidth(1020);
+        dialogPane.setPrefHeight(240);
+        dialogPane.setPrefWidth(670);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
         dialogPane.setHeaderText("Connect to Remote MQTT Agent");
