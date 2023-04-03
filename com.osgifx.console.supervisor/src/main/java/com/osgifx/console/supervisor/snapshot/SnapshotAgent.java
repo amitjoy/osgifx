@@ -320,4 +320,34 @@ public final class SnapshotAgent implements Agent {
         // nothing to do
     }
 
+    @Override
+    public boolean isReceivingLogEnabled() {
+        return false;
+    }
+
+    @Override
+    public void enableReceivingLog() {
+        // nothing to do
+    }
+
+    @Override
+    public void disableReceivingLog() {
+        // nothing to do
+    }
+
+    @Override
+    public boolean isReceivingEventEnabled() {
+        return false;
+    }
+
+    @Override
+    public void enableReceivingEvent() {
+        // nothing to do
+    }
+
+    @Override
+    public void disableReceivingEvent() {
+        // nothing to do
+    }
+
 }

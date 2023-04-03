@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -50,6 +49,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.osgifx.console.agent.Agent;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.events.dialog.TopicEntryDialog;
@@ -57,8 +57,7 @@ import com.osgifx.console.util.fx.Fx;
 
 public final class EventReceiveMenuContributionHandler {
 
-    private static final String PID                        = "event.receive.topics";
-    public static final String  PROPERTY_KEY_EVENT_DISPLAY = "osgi.fx.event";
+    private static final String PID = "event.receive.topics";
 
     @Log
     @Inject
@@ -93,11 +92,12 @@ public final class EventReceiveMenuContributionHandler {
 
     @PostConstruct
     public void init() {
-        if (supervisor == null || supervisor.getAgent() == null) {
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
             logger.atInfo().log("Agent is not connected");
             return;
         }
-        final var currentState = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
+        final var currentState = agent.isReceivingEventEnabled();
         if (currentState) {
             supervisor.addOSGiEventListener(eventListener);
             logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
@@ -107,21 +107,25 @@ public final class EventReceiveMenuContributionHandler {
         }
     }
 
-    @PreDestroy
-    public void destroy() {
-        System.clearProperty(PROPERTY_KEY_EVENT_DISPLAY);
-    }
-
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        final var value = Boolean.getBoolean(PROPERTY_KEY_EVENT_DISPLAY);
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atInfo().log("Agent is not connected");
+            return;
+        }
+        final var value = agent.isReceivingEventEnabled();
         prepareMenu(items, value);
     }
 
     @Execute
     public void execute(final MDirectMenuItem menuItem) {
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atInfo().log("Agent is not connected");
+            return;
+        }
         final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
-
         if (accessibilityPhrase) {
             final var dialog = new TopicEntryDialog();
             ContextInjectionFactory.inject(dialog, eclipseContext);
@@ -138,6 +142,7 @@ public final class EventReceiveMenuContributionHandler {
             subscribedTopics.publish(topics);
             updateConfig(topics);
             supervisor.addOSGiEventListener(eventListener);
+            agent.enableReceivingEvent();
             eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
             Fx.showSuccessNotification("Event Notification", "Events will now be received");
             logger.atInfo().log("OSGi events will now be received");
@@ -145,11 +150,11 @@ public final class EventReceiveMenuContributionHandler {
             subscribedTopics.publish(Set.of());
             updateConfig(Set.of());
             supervisor.removeOSGiEventListener(eventListener);
+            agent.disableReceivingEvent();
             eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
             Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
             logger.atInfo().log("OSGi events will not be received anymore");
         }
-        System.setProperty(PROPERTY_KEY_EVENT_DISPLAY, String.valueOf(accessibilityPhrase));
     }
 
     @CanExecute
