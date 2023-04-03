@@ -56,11 +56,14 @@ public final class Activator extends Thread implements BundleActivator {
         module = new DIModule(bundleContext);
         module.di().getInstance(ClassloaderLeakDetector.class).start();
 
-        final SocketContext socketContext = new SocketContext(bundleContext);
-        serverSocket = socketContext.getSocket();
-
-        System.err.println("[OSGi.fx] Socket Agent Host: " + socketContext.host() + ":" + socketContext.port());
-        start();
+        try {
+            final SocketContext socketContext = new SocketContext(bundleContext);
+            serverSocket = socketContext.getSocket();
+            start();
+            System.err.println("[OSGi.fx] Socket Agent: " + socketContext.host() + ":" + socketContext.port());
+        } catch (final IllegalArgumentException e) {
+            System.err.println("[OSGi.fx] Socket agent not configured");
+        }
         module.start();
 
         final boolean isMQTTwired = module.di().getInstance(PackageWirings.class).isMqttWired();
@@ -69,7 +72,7 @@ public final class Activator extends Thread implements BundleActivator {
             final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
 
             if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
-                System.err.print("[OSGi.fx] MQTT agent topics not defined");
+                System.err.print("[OSGi.fx] MQTT agent not configured");
                 return;
             }
             final AgentServer agentServer = new AgentServer(module.di());

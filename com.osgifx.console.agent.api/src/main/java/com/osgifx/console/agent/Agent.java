@@ -61,12 +61,6 @@ public interface Agent {
     Pattern AGENT_SOCKET_PORT_PATTERN = Pattern.compile("(?:([^:]+):)?(\\d+)");
 
     /**
-     * The default port. The port can be overridden with the System/framework
-     * property {$value {@link #AGENT_SOCKET_PORT_KEY}.
-     */
-    int AGENT_SOCKET_PORT_DEFAULT = 29998;
-
-    /**
      * The property key to set the agent's socket port.
      */
     String AGENT_SOCKET_PORT_KEY = "osgi.fx.agent.socket.port";
