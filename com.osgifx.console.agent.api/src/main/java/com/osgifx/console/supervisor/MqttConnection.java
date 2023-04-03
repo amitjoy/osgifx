@@ -147,7 +147,7 @@ public class MqttConnection {
         }
 
         public MqttConnectionBuilder lwtTopic(final String lwtTopic) {
-            this.lwtTopic = requireNonNull(subTopic, "'lwtTopic' cannot be null");
+            this.lwtTopic = requireNonNull(lwtTopic, "'lwtTopic' cannot be null");
             return this;
         }
 
