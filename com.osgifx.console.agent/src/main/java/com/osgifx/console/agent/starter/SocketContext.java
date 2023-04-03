@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
-import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_DEFAULT;
 import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_PATTERN;
 import static com.osgifx.console.agent.Agent.AGENT_SOCKET_SECURE_COMMUNICATION_KEY;
@@ -78,9 +77,9 @@ public final class SocketContext {
     }
 
     private void extractSpec() {
-        String portKey = bundleContext.getProperty(AGENT_SOCKET_PORT_KEY);
+        final String portKey = bundleContext.getProperty(AGENT_SOCKET_PORT_KEY);
         if (portKey == null) {
-            portKey = AGENT_SOCKET_PORT_DEFAULT + "";
+            throw new IllegalArgumentException("Socket port not defined");
         }
         final Matcher m = AGENT_SOCKET_PORT_PATTERN.matcher(portKey);
         if (!m.matches()) {
