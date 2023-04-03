@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 
 import org.apache.aries.component.dsl.OSGiResult;
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
@@ -68,7 +70,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         implements Supervisor, MqttClientConnectedListener, MqttClientDisconnectedListener {
 
     public static final String CONDITION_ID_VALUE                    = "rpc-agent";
-    public static final String MQTT_CONDITION_ID_VALUE               = "mqtt-messaging";
+    public static final String MQTT_CONDITION_ID                     = "mqtt-messaging";
     public static final String MQTT_CONNECTION_LISTENER_FILTER_KEY   = "mqtt_connection_filter";
     public static final String MQTT_CONNECTION_LISTENER_FILTER_VALUE = "true";
     public static final String MQTT_CONNECTION_LISTENER_FILTER_PROP  = MQTT_CONNECTION_LISTENER_FILTER_KEY + "="
@@ -88,6 +90,9 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     private BundleContext bundleContext;
 
     @Reference
+    private LoggerFactory factory;
+
+    @Reference
     private EventAdmin eventAdmin;
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
@@ -96,17 +101,19 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Reference
     private ConfigurationAdmin configurationAdmin;
 
-    private OSGiResult mqttMessagingRegistration;
+    private FluentLogger logger;
+    private OSGiResult   mqttMessagingCondition;
 
     @Activate
     void activate() {
+        logger         = FluentLogger.of(factory.createLogger(getClass().getName()));
         promiseFactory = new PromiseFactory(Executors.newSingleThreadExecutor());
     }
 
     @Deactivate
     void deactivate() {
-        // this will be called when the agent is disconnected
-        Optional.ofNullable(mqttMessagingRegistration).ifPresent(OSGiResult::close);
+        // this will be called when the agent is disconnected to deregister the service
+        Optional.ofNullable(mqttMessagingCondition).ifPresent(OSGiResult::close);
     }
 
     @Override
@@ -121,16 +128,23 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
         mqttConnectionPromise = promiseFactory.deferred();
         try {
-            mqttMessagingRegistration = connectToMQTT(bundleContext, configurationAdmin, Agent.class, this,
-                    mqttConnection, MQTT_CONDITION_ID_VALUE);
+            // @formatter:off
+            mqttMessagingCondition = connectToMQTT(
+                                              bundleContext,
+                                              configurationAdmin,
+                                              Agent.class,
+                                              this,
+                                              mqttConnection,
+                                              MQTT_CONDITION_ID);
+            // @formatter:on
             mqttConnectionPromise.getPromise().timeout(mqttConnection.timeout()).getValue();
 
-            // @formatter:off
-            Optional.ofNullable(subscriber)
-                    .ifPresent(s ->
-                         s.subscribe(mqttConnection.lwtTopic())
-                          .forEach(t -> sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC)));
-            // @formatter:on
+            if (subscriber != null && mqttConnection.lwtTopic() != null) {
+                subscriber.subscribe(mqttConnection.lwtTopic()).forEach(t -> {
+                    logger.atInfo().log("Server notified about the disconnection of the remote agent");
+                    sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC);
+                });
+            }
         } catch (final InvocationTargetException e) {
             throw (Exception) Exceptions.unrollCause(e, InvocationTargetException.class);
         }
