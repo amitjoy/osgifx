@@ -47,6 +47,7 @@ import org.osgi.service.messaging.MessageSubscription;
 import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.PromiseFactory;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.mu.util.Substring;
 import com.hivemq.client.mqtt.lifecycle.MqttClientConnectedContext;
@@ -139,8 +140,9 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             // @formatter:on
             mqttConnectionPromise.getPromise().timeout(mqttConnection.timeout()).getValue();
 
-            if (subscriber != null && mqttConnection.lwtTopic() != null) {
-                subscriber.subscribe(mqttConnection.lwtTopic()).forEach(t -> {
+            final var lwtTopic = mqttConnection.lwtTopic();
+            if (subscriber != null && !Strings.isNullOrEmpty(lwtTopic)) {
+                subscriber.subscribe(lwtTopic).forEach(t -> {
                     logger.atInfo().log("Server notified about the disconnection of the remote agent");
                     sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC);
                 });
