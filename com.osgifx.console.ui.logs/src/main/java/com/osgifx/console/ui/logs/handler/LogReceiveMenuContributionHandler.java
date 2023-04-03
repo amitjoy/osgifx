@@ -21,7 +21,6 @@ import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -39,13 +38,12 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.agent.Agent;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 
 public final class LogReceiveMenuContributionHandler {
-
-    public static final String PROPERTY_KEY_LOG_DISPLAY = "osgi.fx.log";
 
     @Log
     @Inject
@@ -71,11 +69,12 @@ public final class LogReceiveMenuContributionHandler {
 
     @PostConstruct
     public void init() {
-        if (supervisor == null || supervisor.getAgent() == null) {
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
             logger.atInfo().log("Agent is not connected");
             return;
         }
-        final var currentState = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
+        final var currentState = agent.isReceivingLogEnabled();
         if (currentState) {
             supervisor.addOSGiLogListener(logEntryListener);
             logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
@@ -85,34 +84,36 @@ public final class LogReceiveMenuContributionHandler {
         }
     }
 
-    @PreDestroy
-    public void destroy() {
-        System.clearProperty(PROPERTY_KEY_LOG_DISPLAY);
-    }
-
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        final var value = Boolean.getBoolean(PROPERTY_KEY_LOG_DISPLAY);
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atInfo().log("Agent is not connected");
+            return;
+        }
+        final var value = agent.isReceivingLogEnabled();
         prepareMenu(items, value);
     }
 
     @Execute
     public void execute(final MDirectMenuItem menuItem) {
-        final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
-
-        if (accessibilityPhrase) {
-            eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-        } else {
-            eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atInfo().log("Agent is not connected");
+            return;
         }
-
-        System.setProperty(PROPERTY_KEY_LOG_DISPLAY, String.valueOf(accessibilityPhrase));
-
+        final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
         if (accessibilityPhrase) {
+            agent.enableReceivingLog();
+            eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+
             supervisor.addOSGiLogListener(logEntryListener);
             Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
             logger.atInfo().log("OSGi logs will now be received");
         } else {
+            agent.disableReceivingLog();
+            eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+
             supervisor.removeOSGiLogListener(logEntryListener);
             Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
             logger.atInfo().log("OSGi logs will not be received anymore");

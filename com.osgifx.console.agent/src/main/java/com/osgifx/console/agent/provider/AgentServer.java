@@ -142,10 +142,12 @@ import aQute.lib.converter.TypeReference;
 
 public final class AgentServer implements Agent, Closeable {
 
-    private static final long          RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
-    private static final long          WATCHDOG_TIMEOUT = Duration.ofSeconds(30).toMillis();
-    private static final AtomicInteger sequence         = new AtomicInteger(1000);
-    private static final Pattern       BSN_PATTERN      = Pattern.compile("\\s*([^;\\s]+).*");
+    private static final long          RESULT_TIMEOUT           = Duration.ofSeconds(20).toMillis();
+    private static final long          WATCHDOG_TIMEOUT         = Duration.ofSeconds(30).toMillis();
+    private static final AtomicInteger sequence                 = new AtomicInteger(1000);
+    private static final Pattern       BSN_PATTERN              = Pattern.compile("\\s*([^;\\s]+).*");
+    public static final String         PROPERTY_ENABLE_LOGGING  = "osgi.fx.enable.logging";
+    public static final String         PROPERTY_ENABLE_EVENTING = "osgi.fx.enable.eventing";
 
     public volatile boolean              quit;
     private Supervisor                   remote;
@@ -339,6 +341,36 @@ public final class AgentServer implements Agent, Closeable {
             return rout.getLastOutput();
         }
         return null;
+    }
+
+    @Override
+    public boolean isReceivingLogEnabled() {
+        return Boolean.getBoolean(PROPERTY_ENABLE_LOGGING);
+    }
+
+    @Override
+    public void enableReceivingLog() {
+        System.setProperty(PROPERTY_ENABLE_LOGGING, String.valueOf(true));
+    }
+
+    @Override
+    public void disableReceivingLog() {
+        System.setProperty(PROPERTY_ENABLE_LOGGING, String.valueOf(false));
+    }
+
+    @Override
+    public boolean isReceivingEventEnabled() {
+        return Boolean.getBoolean(PROPERTY_ENABLE_EVENTING);
+    }
+
+    @Override
+    public void enableReceivingEvent() {
+        System.setProperty(PROPERTY_ENABLE_EVENTING, String.valueOf(true));
+    }
+
+    @Override
+    public void disableReceivingEvent() {
+        System.setProperty(PROPERTY_ENABLE_EVENTING, String.valueOf(false));
     }
 
     @Override

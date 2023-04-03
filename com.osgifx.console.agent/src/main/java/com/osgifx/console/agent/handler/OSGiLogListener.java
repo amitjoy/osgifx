@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.handler;
 
+import static com.osgifx.console.agent.provider.AgentServer.PROPERTY_ENABLE_LOGGING;
+
 import java.util.Optional;
 
 import org.osgi.service.log.LogEntry;
@@ -44,7 +46,10 @@ public final class OSGiLogListener implements LogListener {
     @Override
     public void logged(final LogEntry entry) {
         if (supervisor != null) {
-            supervisor.logged(toDTO(entry));
+            final boolean isLoggingEnabled = Boolean.getBoolean(PROPERTY_ENABLE_LOGGING);
+            if (isLoggingEnabled) {
+                supervisor.logged(toDTO(entry));
+            }
         }
     }
 
