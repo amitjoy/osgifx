@@ -108,17 +108,22 @@ public final class DmtFxController {
         if (dmtNode == null) {
             return;
         }
-        final var rootItem = new FilterableTreeItem<>(dmtNode.uri);
-        rootItem.setExpanded(true);
-        dmtTree.setRoot(rootItem);
-        initDmtTree(dmtNode, rootItem);
+        dmtNode.thenAccept(node -> {
+            threadSync.asyncExec(() -> {
+                final var rootItem = new FilterableTreeItem<>(node.uri);
+                rootItem.setExpanded(true);
+                dmtTree.setRoot(rootItem);
+                initDmtTree(node, rootItem);
 
-        searchBox.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                performSearch(rootItem);
-            }
+                searchBox.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ENTER) {
+                        performSearch(rootItem);
+                    }
+                });
+                searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
+            });
         });
-        searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
+
     }
 
     private void performSearch(final FilterableTreeItem<String> rootItem) {
