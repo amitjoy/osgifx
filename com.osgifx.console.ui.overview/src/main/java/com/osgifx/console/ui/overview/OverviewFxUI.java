@@ -21,6 +21,7 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAUSE;
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PLAY;
 import static java.util.Objects.requireNonNullElse;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static javafx.animation.Animation.INDEFINITE;
 import static javafx.geometry.Orientation.VERTICAL;
 
@@ -28,6 +29,7 @@ import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -42,6 +44,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -83,23 +86,25 @@ public final class OverviewFxUI {
 
     private static final double TILE_WIDTH    = 500;
     private static final double TILE_HEIGHT   = 220;
-    private static final double REFRESH_DELAY = 3;
+    private static final double REFRESH_DELAY = 5;
 
     @Log
     @Inject
-    private FluentLogger     logger;
+    private FluentLogger      logger;
     @Inject
-    private ConsoleStatusBar statusBar;
+    private ConsoleStatusBar  statusBar;
     @Inject
-    private DataProvider     dataProvider;
+    private DataProvider      dataProvider;
     @Inject
     @Named("is_connected")
-    private boolean          isConnected;
+    private boolean           isConnected;
+    @Inject
+    private ThreadSynchronize threadSync;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean          isSnapshotAgent;
+    private boolean           isSnapshotAgent;
     @Inject
-    private IEclipseContext  eclipseContext;
+    private IEclipseContext   eclipseContext;
 
     private Tile noOfThreadsTile;
     private Tile runtimeInfoTile;
@@ -199,25 +204,29 @@ public final class OverviewFxUI {
 
             final var memoryInfo = runtimeInfo.memoryInfo();
 
-            final var freeMemoryInBytes  = memoryInfo.freeMemory;
-            final var totalMemoryInBytes = memoryInfo.totalMemory;
-            final var freeMemoryInMB     = toMB(freeMemoryInBytes);
-            final var totalMemoryInMB    = toMB(totalMemoryInBytes);
+            memoryInfo.thenAccept(info -> {
+                final var freeMemoryInBytes  = info.freeMemory;
+                final var totalMemoryInBytes = info.totalMemory;
+                final var freeMemoryInMB     = toMB(freeMemoryInBytes);
+                final var totalMemoryInMB    = toMB(totalMemoryInBytes);
 
-            availableMemoryTile.setValue(freeMemoryInMB);
-            availableMemoryTile.setMaxValue(totalMemoryInMB);
-            availableMemoryTile.setThreshold(totalMemoryInMB * .8);
+                threadSync.asyncExec(() -> {
+                    availableMemoryTile.setValue(freeMemoryInMB);
+                    availableMemoryTile.setMaxValue(totalMemoryInMB);
+                    availableMemoryTile.setThreshold(totalMemoryInMB * .8);
 
-            var memoryConsumptionInfoInPercentage = 0D;
-            if (totalMemoryInBytes != 0) {
-                memoryConsumptionInfoInPercentage = (totalMemoryInBytes - freeMemoryInBytes) * 100D
-                        / totalMemoryInBytes;
-            }
+                    var memoryConsumptionInfoInPercentage = 0D;
+                    if (totalMemoryInBytes != 0) {
+                        memoryConsumptionInfoInPercentage = (totalMemoryInBytes - freeMemoryInBytes) * 100D
+                                / totalMemoryInBytes;
+                    }
 
-            memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
+                    memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
-            final var uptime = runtimeInfo.uptime();
-            uptimeTile.setDuration(LocalTime.of(uptime.hours(), uptime.minutes(), uptime.seconds()));
+                    final var uptime = toUptimeEntry(info.uptime);
+                    uptimeTile.setDuration(LocalTime.of(uptime.hours, uptime.minutes(), uptime.seconds()));
+                });
+            });
 
             // @formatter:off
             runtimeInfoTile.setGraphic(
@@ -287,13 +296,12 @@ public final class OverviewFxUI {
         final var noOfInstalledBundles = dataProvider.bundles().size();
         final var noOfServices         = dataProvider.services().size();
         final var noOfComponents       = dataProvider.components().size();
-        final var memoryInfo           = requireNonNullElse(dataProvider.memory(), new XMemoryInfoDTO());
-        final var uptime               = toUptimeEntry(memoryInfo.uptime);
+        final var memoryInfo           = requireNonNullElse(dataProvider.memory(), completedFuture(new XMemoryInfoDTO()));
         // @formatter:on
 
         return new OverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName, osVersion, osArchitecture,
                                 javaVersion, noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents,
-                                memoryInfo, uptime);
+                                memoryInfo);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -523,10 +531,9 @@ public final class OverviewFxUI {
                                 int noOfInstalledBundles,
                                 int noOfServices,
                                 int noOfComponents,
-                                XMemoryInfoDTO memoryInfo,
-                                UptimeDTO uptime) {
+                                CompletableFuture<XMemoryInfoDTO> memoryInfo) {
         public OverviewInfo() {
-            this("", "", "", "", "", "", "", 0, 0, 0, 0, new XMemoryInfoDTO(), new UptimeDTO(0, 0, 0, 0));
+            this("", "", "", "", "", "", "", 0, 0, 0, 0, completedFuture(new XMemoryInfoDTO()));
         }
     }
 
