@@ -193,8 +193,6 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
                     createEmptyValidator(String.format(requiredFormat, pubTopicCaption)));
             validationSupport.registerValidator(subTopic,
                     createEmptyValidator(String.format(requiredFormat, subTopicCaption)));
-            validationSupport.registerValidator(lwtTopic,
-                    createEmptyValidator(String.format(requiredFormat, lwtTopicCaption)));
         });
         final var saveBtn = (Button) dialogPane.lookupButton(saveButtonType);
         saveBtn.disableProperty().bind(validationSupport.invalidProperty());
