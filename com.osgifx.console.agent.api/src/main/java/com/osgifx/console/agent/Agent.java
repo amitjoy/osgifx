@@ -212,6 +212,40 @@ public interface Agent {
     String execGogoCommand(String command) throws Exception;
 
     /**
+     * Checks if the receiving of logs is enabled
+     *
+     * @return {@code true} if enabled, otherwise, {@code false}
+     */
+    boolean isReceivingLogEnabled();
+
+    /**
+     * Enables receiving logs from remote agent
+     */
+    void enableReceivingLog();
+
+    /**
+     * Disables receiving logs from remote agent
+     */
+    void disableReceivingLog();
+
+    /**
+     * Checks if the receiving of events is enabled
+     *
+     * @return {@code true} if enabled, otherwise, {@code false}
+     */
+    boolean isReceivingEventEnabled();
+
+    /**
+     * Enables receiving events from remote agent
+     */
+    void enableReceivingEvent();
+
+    /**
+     * Disables receiving logs from remote agent
+     */
+    void disableReceivingEvent();
+
+    /**
      * Executes the specified terminal (CLI) command in a separate process.
      *
      * @param command the command to execute
