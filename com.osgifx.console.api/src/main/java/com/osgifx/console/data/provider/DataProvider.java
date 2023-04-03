@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.data.provider;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 import com.osgifx.console.agent.dto.RuntimeDTO;
@@ -157,20 +159,20 @@ public interface DataProvider {
      *
      * @return the memory information
      */
-    XMemoryInfoDTO memory();
+    CompletableFuture<XMemoryInfoDTO> memory();
 
     /**
      * Returns the DMT node information of the specified node
      *
      * @return the DMT node information
      */
-    XDmtNodeDTO readDmtNode(String rootURI);
+    CompletableFuture<XDmtNodeDTO> readDmtNode(String rootURI);
 
     /**
      * Returns the runtime DTOs together
      *
      * @return the runtime DTOs together
      */
-    RuntimeDTO readRuntimeDTO();
+    CompletableFuture<RuntimeDTO> readRuntimeDTO();
 
 }
