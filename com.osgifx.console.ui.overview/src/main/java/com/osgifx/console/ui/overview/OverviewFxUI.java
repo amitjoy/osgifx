@@ -22,6 +22,7 @@ import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAU
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PLAY;
 import static java.util.Objects.requireNonNullElse;
 import static javafx.animation.Animation.INDEFINITE;
+import static javafx.geometry.Orientation.VERTICAL;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
@@ -36,6 +37,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.glyphfont.Glyph;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -47,6 +50,7 @@ import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleStatusBar;
+import com.osgifx.console.util.fx.Fx;
 
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
@@ -61,6 +65,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -76,8 +81,9 @@ import javafx.util.Duration;
 
 public final class OverviewFxUI {
 
-    private static final double TILE_WIDTH  = 500;
-    private static final double TILE_HEIGHT = 220;
+    private static final double TILE_WIDTH    = 500;
+    private static final double TILE_HEIGHT   = 220;
+    private static final double REFRESH_DELAY = 3;
 
     @Log
     @Inject
@@ -92,6 +98,8 @@ public final class OverviewFxUI {
     @Inject
     @Named("is_snapshot_agent")
     private boolean          isSnapshotAgent;
+    @Inject
+    private IEclipseContext  eclipseContext;
 
     private Tile noOfThreadsTile;
     private Tile runtimeInfoTile;
@@ -112,7 +120,7 @@ public final class OverviewFxUI {
         createTimelineButton();
         retrieveRuntimeInfo();
         createTiles(parent);
-        createPeriodicTaskToSetRuntimeInfo();
+        createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
 
         dataRetrieverTimeline.play();
         logger.atDebug().log("Overview part has been initialized");
@@ -179,8 +187,8 @@ public final class OverviewFxUI {
         isRealtimeUpdateRunning.set(false);
     }
 
-    private void createPeriodicTaskToSetRuntimeInfo() {
-        dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(1), a -> {
+    private void createPeriodicTaskToSetRuntimeInfo(final double refreshDelay) {
+        dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelay), a -> {
 
             final var runtimeInfo = retrieveRuntimeInfo();
 
@@ -541,7 +549,7 @@ public final class OverviewFxUI {
 
         retrieveRuntimeInfo();
         createTiles(parent);
-        createPeriodicTaskToSetRuntimeInfo();
+        createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
         dataRetrieverTimeline.play();
     }
 
@@ -562,7 +570,25 @@ public final class OverviewFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected && !isSnapshotAgent) {
+            final var refreshDelayDialog = Fx.initStatusBarButton(this::showViewRefreshDelayDialog,
+                    "View Refresh Delay", "GEAR");
             statusBar.addToRight(timelineButton);
+            statusBar.addToRight(new Separator(VERTICAL));
+            statusBar.addToRight(refreshDelayDialog);
+        }
+    }
+
+    private void showViewRefreshDelayDialog() {
+        final var dialog = new ViewRefreshDelayDialog();
+        ContextInjectionFactory.inject(dialog, eclipseContext);
+        dialog.init();
+        final var refreshDelay = dialog.showAndWait();
+        if (refreshDelay.isPresent()) {
+            dataRetrieverTimeline.stop();
+            createPeriodicTaskToSetRuntimeInfo(refreshDelay.get());
+            dataRetrieverTimeline.play();
+
+            Fx.showSuccessNotification("Refresh Delay", "View refresh delay has been updated successfully");
         }
     }
 
