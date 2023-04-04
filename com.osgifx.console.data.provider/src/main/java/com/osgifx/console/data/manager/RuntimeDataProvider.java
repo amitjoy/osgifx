@@ -58,6 +58,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -222,6 +223,16 @@ public final class RuntimeDataProvider implements DataProvider {
             return null;
         }
         return executor.supplyAsync(agent::getRuntimeDTO);
+    }
+
+    @Override
+    public CompletableFuture<XHeapUsageDTO> heapUsage() {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            logger.atWarning().log("Agent is not connected");
+            return null;
+        }
+        return executor.supplyAsync(agent::getHeapUsage);
     }
 
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
