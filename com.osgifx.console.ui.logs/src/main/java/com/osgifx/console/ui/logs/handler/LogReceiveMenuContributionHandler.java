@@ -34,11 +34,13 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
@@ -47,25 +49,29 @@ public final class LogReceiveMenuContributionHandler {
 
     @Log
     @Inject
-    private FluentLogger     logger;
+    private FluentLogger      logger;
     @Inject
     @OSGiBundle
-    private BundleContext    context;
+    private BundleContext     context;
+    @Inject
+    private Executor          executor;
     @Inject
     @Optional
-    private Supervisor       supervisor;
+    private Supervisor        supervisor;
     @Inject
-    private IEventBroker     eventBroker;
+    private ThreadSynchronize threadSync;
     @Inject
-    private EModelService    modelService;
+    private IEventBroker      eventBroker;
     @Inject
-    private LogEntryListener logEntryListener;
+    private EModelService     modelService;
+    @Inject
+    private LogEntryListener  logEntryListener;
     @Inject
     @Named("is_connected")
-    private boolean          isConnected;
+    private boolean           isConnected;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean          isSnapshotAgent;
+    private boolean           isSnapshotAgent;
 
     @PostConstruct
     public void init() {
@@ -74,14 +80,16 @@ public final class LogReceiveMenuContributionHandler {
             logger.atInfo().log("Agent is not connected");
             return;
         }
-        final var currentState = agent.isReceivingLogEnabled();
-        if (currentState) {
-            supervisor.addOSGiLogListener(logEntryListener);
-            logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
-        } else {
-            supervisor.removeOSGiLogListener(logEntryListener);
-            logger.atInfo().throttleByCount(10).log("OSGi log listener has been removed");
-        }
+        executor.runAsync(() -> {
+            final var currentState = agent.isReceivingLogEnabled();
+            if (currentState) {
+                supervisor.addOSGiLogListener(logEntryListener);
+                logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
+            } else {
+                supervisor.removeOSGiLogListener(logEntryListener);
+                logger.atInfo().throttleByCount(10).log("OSGi log listener has been removed");
+            }
+        });
     }
 
     @AboutToShow
@@ -104,19 +112,23 @@ public final class LogReceiveMenuContributionHandler {
         }
         final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
         if (accessibilityPhrase) {
-            agent.enableReceivingLog();
-            eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-
-            supervisor.addOSGiLogListener(logEntryListener);
-            Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
-            logger.atInfo().log("OSGi logs will now be received");
+            executor.runAsync(agent::enableReceivingLog)
+                    .thenRun(() -> threadSync.asyncExec(() -> eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC,
+                            String.valueOf(accessibilityPhrase))))
+                    .thenRun(() -> supervisor.addOSGiLogListener(logEntryListener))
+                    .thenRun(() -> threadSync.asyncExec(() -> {
+                        Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
+                        logger.atInfo().log("OSGi logs will now be received");
+                    }));
         } else {
-            agent.disableReceivingLog();
-            eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-
-            supervisor.removeOSGiLogListener(logEntryListener);
-            Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
-            logger.atInfo().log("OSGi logs will not be received anymore");
+            executor.runAsync(agent::disableReceivingLog)
+                    .thenRun(() -> threadSync.asyncExec(() -> eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC,
+                            String.valueOf(accessibilityPhrase))))
+                    .thenRun(() -> supervisor.removeOSGiLogListener(logEntryListener))
+                    .thenRun(() -> threadSync.asyncExec(() -> {
+                        Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
+                        logger.atInfo().log("OSGi logs will not be received anymore");
+                    }));
         }
     }
 
