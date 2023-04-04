@@ -27,6 +27,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -174,5 +175,12 @@ public interface DataProvider {
      * @return the runtime DTOs together
      */
     CompletableFuture<RuntimeDTO> readRuntimeDTO();
+
+    /**
+     * Returns the heap usage information
+     *
+     * @return the heap usage information
+     */
+    CompletableFuture<XHeapUsageDTO> heapUsage();
 
 }

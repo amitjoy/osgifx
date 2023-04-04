@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
@@ -27,6 +28,7 @@ import org.osgi.framework.FrameworkUtil;
 
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 
+import javafx.application.Platform;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
 import javafx.scene.chart.AreaChart;
@@ -48,18 +50,18 @@ public final class HeapMonitorChart extends BorderPane {
     private final long startCounter;
     private final long initialUpperBound;
 
-    private NumberAxis                     xAxis;
-    private final String                   title;
-    private final AtomicLong               counter;
-    private XYChart.Series<Number, Number> usageSeries;
-    private XYChart.Series<Number, Number> maxMemorySeries;
-    private final Supplier<XMemoryUsage>   memoryUsageSupplier;
+    private NumberAxis                                      xAxis;
+    private final String                                    title;
+    private final AtomicLong                                counter;
+    private XYChart.Series<Number, Number>                  usageSeries;
+    private XYChart.Series<Number, Number>                  maxMemorySeries;
+    private final Supplier<CompletableFuture<XMemoryUsage>> memoryUsageSupplier;
 
     private final AtomicBoolean firstUpdateCall;
     private NumberAxis          yAxis;
 
     public HeapMonitorChart(final String title,
-                            final Supplier<XMemoryUsage> memoryUsageSupplier,
+                            final Supplier<CompletableFuture<XMemoryUsage>> memoryUsageSupplier,
                             final long startCounter) {
         this.title               = title;
         this.memoryUsageSupplier = memoryUsageSupplier;
@@ -71,16 +73,26 @@ public final class HeapMonitorChart extends BorderPane {
     }
 
     private Parent createContent() {
-        final var memoryUsage = memoryUsageSupplier.get();
-        final var used        = memoryUsage.used / KB_CONVERSION;
-        final var max         = memoryUsage.max / KB_CONVERSION;
-
         xAxis = new NumberAxis(startCounter, initialUpperBound, X_AXIS_TICK_UNIT);
+        yAxis = new NumberAxis();
 
-        final double tickSize = max / Y_AXIS_TICK_COUNT;
-        final var    rounding = 10d;
+        final var memoryUsage = memoryUsageSupplier.get();
+        memoryUsage.thenAccept(usage -> {
+            if (usage == null) {
+                return;
+            }
+            final var used = usage.used / KB_CONVERSION;
+            final var max  = usage.max / KB_CONVERSION;
 
-        yAxis = new NumberAxis(0, Math.max(max, used), Math.round(tickSize / rounding) * rounding);
+            final double tickSize = max / Y_AXIS_TICK_COUNT;
+            final var    rounding = 10d;
+
+            Platform.runLater(() -> {
+                yAxis.setLowerBound(0);
+                yAxis.setUpperBound(Math.max(max, used));
+                yAxis.setTickUnit(Math.round(tickSize / rounding) * rounding);
+            });
+        });
 
         final var chart             = new AreaChart<>(xAxis, yAxis);
         final var bundle            = FrameworkUtil.getBundle(getClass());
@@ -121,41 +133,47 @@ public final class HeapMonitorChart extends BorderPane {
 
         chart.getData().add(maxMemorySeries);
         chart.getData().add(usageSeries);
+
         return chart;
     }
 
     private synchronized void updateMemoryUsage() {
         final var memoryUsage = memoryUsageSupplier.get();
-        if (memoryUsage == null) {
-            return;
-        }
-        final var used = memoryUsage.used / KB_CONVERSION;
-        final var max  = memoryUsage.max / KB_CONVERSION;
+        memoryUsage.thenAccept(usage -> {
+            if (usage == null) {
+                return;
+            }
+            final var used = usage.used / KB_CONVERSION;
+            final var max  = usage.max / KB_CONVERSION;
 
-        counter.set(System.currentTimeMillis());
+            Platform.runLater(() -> {
+                counter.set(System.currentTimeMillis());
 
-        if (firstUpdateCall.get()) {
-            xAxis.setLowerBound(counter.get());
-            firstUpdateCall.set(false);
-        }
-        yAxis.setUpperBound(Math.max(used, max));
+                if (firstUpdateCall.get()) {
+                    xAxis.setLowerBound(counter.get());
+                    firstUpdateCall.set(false);
+                }
+                yAxis.setUpperBound(Math.max(used, max));
 
-        final var usedHeapSizeList = usageSeries.getData();
-        final var maxHeapSizeList  = maxMemorySeries.getData();
+                final var usedHeapSizeList = usageSeries.getData();
+                final var maxHeapSizeList  = maxMemorySeries.getData();
 
-        usedHeapSizeList.add(new XYChart.Data<>(counter.get(), used));
-        maxHeapSizeList.add(new XYChart.Data<>(counter.get(), max));
+                usedHeapSizeList.add(new XYChart.Data<>(counter.get(), used));
+                maxHeapSizeList.add(new XYChart.Data<>(counter.get(), max));
 
-        // if we go over upper bound, delete old data, and change the bounds
-        if (counter.get() > initialUpperBound) {
-            final var numberNumberData = usedHeapSizeList.get(1);
-            final var secondValue      = numberNumberData.getXValue();
-            xAxis.setLowerBound(secondValue.doubleValue());
-            xAxis.setUpperBound(counter.get());
-            usedHeapSizeList.remove(0);
-            maxHeapSizeList.remove(0);
+                // if we go over upper bound, delete old data, and change the bounds
+                if (counter.get() > initialUpperBound) {
+                    final var numberNumberData = usedHeapSizeList.get(1);
+                    final var secondValue      = numberNumberData.getXValue();
+                    xAxis.setLowerBound(secondValue.doubleValue());
+                    xAxis.setUpperBound(counter.get());
+                    usedHeapSizeList.remove(0);
+                    maxHeapSizeList.remove(0);
 
-        }
+                }
+            });
+        });
+
     }
 
     void update() {
