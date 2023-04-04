@@ -108,21 +108,19 @@ public final class DmtFxController {
         if (dmtNode == null) {
             return;
         }
-        dmtNode.thenAccept(node -> {
-            threadSync.asyncExec(() -> {
-                final var rootItem = new FilterableTreeItem<>(node.uri);
-                rootItem.setExpanded(true);
-                dmtTree.setRoot(rootItem);
-                initDmtTree(node, rootItem);
+        dmtNode.thenAccept(node -> threadSync.asyncExec(() -> {
+            final var rootItem = new FilterableTreeItem<>(node.uri);
+            rootItem.setExpanded(true);
+            dmtTree.setRoot(rootItem);
+            initDmtTree(node, rootItem);
 
-                searchBox.setOnKeyPressed(event -> {
-                    if (event.getCode() == KeyCode.ENTER) {
-                        performSearch(rootItem);
-                    }
-                });
-                searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
+            searchBox.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    performSearch(rootItem);
+                }
             });
-        });
+            searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
+        }));
 
     }
 
@@ -198,28 +196,29 @@ public final class DmtFxController {
             logger.atError().log("Agent is not connected");
             return;
         }
-        final var dto          = result.get();
-        final var updateResult = agent.updateDmtNode(dto.uri(), dto.value(), dto.format());
-        logger.atInfo().log("DMT node '%s' update request processed", node.uri);
-        switch (updateResult.result) {
-            case XResultDTO.SUCCESS:
-                logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
-                threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update",
-                        node.uri + "has been updated successfully updated"));
-                eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
-                logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
-                break;
-            case XResultDTO.ERROR:
-                logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
-                threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", updateResult.response));
-                break;
-            case XResultDTO.SKIPPED:
-                logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
-                threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", updateResult.response));
-                break;
-            default:
-                break;
-        }
+        final var dto = result.get();
+        executor.supplyAsync(() -> agent.updateDmtNode(dto.uri(), dto.value(), dto.format())).thenAccept(r -> {
+            logger.atInfo().log("DMT node '%s' update request processed", node.uri);
+            switch (r.result) {
+                case XResultDTO.SUCCESS:
+                    logger.atInfo().log("DMT node '%s' updated successfully", node.uri);
+                    threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update",
+                            node.uri + "has been updated successfully updated"));
+                    eventBroker.send(DMT_UPDATED_EVENT_TOPIC, node.uri);
+                    logger.atInfo().log("DMT node '%s' updated event sent", node.uri);
+                    break;
+                case XResultDTO.ERROR:
+                    logger.atInfo().log("DMT node '%s' could not be updated", node.uri);
+                    threadSync.asyncExec(() -> Fx.showErrorNotification("DMT Node Update", r.response));
+                    break;
+                case XResultDTO.SKIPPED:
+                    logger.atInfo().log("DMT node '%s' update request has been skipped", node.uri);
+                    threadSync.asyncExec(() -> Fx.showSuccessNotification("DMT Node Update", r.response));
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     private String initItemText(final XDmtNodeDTO node) {
