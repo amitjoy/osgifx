@@ -40,6 +40,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.di.Service;
@@ -50,6 +51,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.events.dialog.TopicEntryDialog;
@@ -63,8 +65,12 @@ public final class EventReceiveMenuContributionHandler {
     @Inject
     private FluentLogger                   logger;
     @Inject
+    private Executor                       executor;
+    @Inject
     @Optional
     private Supervisor                     supervisor;
+    @Inject
+    private ThreadSynchronize              threadSync;
     @Inject
     private ConfigurationAdmin             configAdmin;
     @Inject
@@ -97,14 +103,16 @@ public final class EventReceiveMenuContributionHandler {
             logger.atInfo().log("Agent is not connected");
             return;
         }
-        final var currentState = agent.isReceivingEventEnabled();
-        if (currentState) {
-            supervisor.addOSGiEventListener(eventListener);
-            logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
-        } else {
-            supervisor.removeOSGiEventListener(eventListener);
-            logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
-        }
+        executor.runAsync(() -> {
+            final var currentState = agent.isReceivingEventEnabled();
+            if (currentState) {
+                supervisor.addOSGiEventListener(eventListener);
+                logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
+            } else {
+                supervisor.removeOSGiEventListener(eventListener);
+                logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
+            }
+        });
     }
 
     @AboutToShow
@@ -142,18 +150,20 @@ public final class EventReceiveMenuContributionHandler {
             subscribedTopics.publish(topics);
             updateConfig(topics);
             supervisor.addOSGiEventListener(eventListener);
-            agent.enableReceivingEvent();
-            eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-            Fx.showSuccessNotification("Event Notification", "Events will now be received");
-            logger.atInfo().log("OSGi events will now be received");
+
+            executor.runAsync(agent::enableReceivingEvent).thenRun(() -> threadSync.asyncExec(() -> {
+                eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+                Fx.showSuccessNotification("Event Notification", "Events will now be received");
+            })).thenRun(() -> logger.atInfo().log("OSGi events will now be received"));
         } else {
             subscribedTopics.publish(Set.of());
             updateConfig(Set.of());
             supervisor.removeOSGiEventListener(eventListener);
-            agent.disableReceivingEvent();
-            eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-            Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
-            logger.atInfo().log("OSGi events will not be received anymore");
+
+            executor.runAsync(agent::disableReceivingEvent).thenRun(() -> threadSync.asyncExec(() -> {
+                eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
+                Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
+            })).thenRun(() -> logger.atInfo().log("OSGi events will not be received anymore"));
         }
     }
 
