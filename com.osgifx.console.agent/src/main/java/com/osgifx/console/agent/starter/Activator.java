@@ -33,6 +33,7 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.di.module.DIModule;
 import com.osgifx.console.agent.provider.AgentServer;
+import com.osgifx.console.agent.provider.AgentServer.RpcType;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
 import com.osgifx.console.agent.rpc.MqttRPC;
@@ -75,7 +76,7 @@ public final class Activator extends Thread implements BundleActivator {
                 System.err.print("[OSGi.fx] MQTT agent not configured");
                 return;
             }
-            final AgentServer agentServer = new AgentServer(module.di());
+            final AgentServer agentServer = new AgentServer(module.di(), RpcType.MQTT_RPC);
             agents.add(agentServer);
             final RemoteRPC<Agent, Supervisor> mqttRPC = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
                                                                        pubTopic, subTopic);
@@ -99,7 +100,7 @@ public final class Activator extends Thread implements BundleActivator {
                     socket.setSoTimeout(1000);
 
                     // create a new agent, and link it up.
-                    final AgentServer agentServer = new AgentServer(module.di());
+                    final AgentServer agentServer = new AgentServer(module.di(), RpcType.SOCKET_RPC);
                     agents.add(agentServer);
 
                     final SocketRPC<Agent, Supervisor> socketRPC = new SocketRPC<Agent, Supervisor>(Supervisor.class,
