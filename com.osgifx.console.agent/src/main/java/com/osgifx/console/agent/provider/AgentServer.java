@@ -142,6 +142,11 @@ import aQute.lib.converter.TypeReference;
 
 public final class AgentServer implements Agent, Closeable {
 
+    public enum RpcType {
+        MQTT_RPC,
+        SOCKET_RPC
+    }
+
     private static final long          RESULT_TIMEOUT           = Duration.ofSeconds(20).toMillis();
     private static final long          WATCHDOG_TIMEOUT         = Duration.ofSeconds(30).toMillis();
     private static final AtomicInteger sequence                 = new AtomicInteger(1000);
@@ -150,6 +155,7 @@ public final class AgentServer implements Agent, Closeable {
     public static final String         PROPERTY_ENABLE_EVENTING = "osgi.fx.enable.eventing";
 
     public volatile boolean              quit;
+    private final RpcType                rpcType;
     private Supervisor                   remote;
     private RemoteRPC<Agent, Supervisor> remoteRPC;
     private final Map<String, String>    installed  = new HashMap<>();
@@ -162,8 +168,9 @@ public final class AgentServer implements Agent, Closeable {
 
     private final DI di;
 
-    public AgentServer(final DI di) {
-        this.di = di;
+    public AgentServer(final DI di, final RpcType rpcType) {
+        this.di      = di;
+        this.rpcType = rpcType;
     }
 
     public BundleContext getContext() {
@@ -513,7 +520,7 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
-    public void abort() throws Exception {
+    public void disconnect() throws Exception {
         cleanup(-3);
     }
 
