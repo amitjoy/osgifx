@@ -254,10 +254,10 @@ public interface Agent {
     String execCliCommand(String command);
 
     /**
-     * Abort the remote agent. The agent should send an event back and die. This is
+     * Disconnects the remote agent. The agent should send an event back and die. This is
      * an async method.
      */
-    void abort() throws Exception;
+    void disconnect() throws Exception;
 
     /**
      * Ping the remote agent to see if it is still alive.

@@ -288,9 +288,9 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         return exitCode;
     }
 
-    public void abort() throws Exception {
+    public void disconnect() throws Exception {
         if (isOpen()) {
-            getAgent().abort();
+            getAgent().disconnect();
         }
     }
 

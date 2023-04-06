@@ -137,7 +137,8 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
-    public void abort() throws Exception {
+    public void disconnect() throws Exception {
+        // nothing to do
     }
 
     @Override
