@@ -495,9 +495,11 @@ public final class AgentServer implements Agent, Closeable {
         if (quit) {
             return;
         }
-        quit = true;
-        redirect(0);
-        remoteRPC.close();
+        if (rpcType == RpcType.SOCKET_RPC) {
+            quit = true;
+            redirect(0);
+            remoteRPC.close();
+        }
     }
 
     @Override
