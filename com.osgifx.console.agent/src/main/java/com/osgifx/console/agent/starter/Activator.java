@@ -109,7 +109,6 @@ public final class Activator extends Thread implements BundleActivator {
                         @Override
                         public void close() throws IOException {
                             agents.remove(agentServer);
-                            module.stop();
                             super.close();
                         }
                     };
@@ -138,6 +137,7 @@ public final class Activator extends Thread implements BundleActivator {
         close(serverSocket);
         agents.forEach(this::close);
         module.di().getInstance(ClassloaderLeakDetector.class).stop();
+        module.stop();
     }
 
     private Throwable close(final Closeable in) {
