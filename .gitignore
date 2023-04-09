@@ -248,6 +248,7 @@ bin_test/
 **/heapdumps/*
 **/exception.txt
 cnf/local/index.xml
+cnf/local/index.xml.sha
 
 # jdeploy
 jdeploy/*
