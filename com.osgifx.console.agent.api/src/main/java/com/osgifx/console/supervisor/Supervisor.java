@@ -53,6 +53,11 @@ public interface Supervisor {
     void connect(MqttConnection mqttConnection) throws Exception;
 
     /**
+     * Disconnects the remote agent
+     */
+    void disconnect() throws Exception;
+
+    /**
      * Redirected standard output
      *
      * @param out the text that was redirected
