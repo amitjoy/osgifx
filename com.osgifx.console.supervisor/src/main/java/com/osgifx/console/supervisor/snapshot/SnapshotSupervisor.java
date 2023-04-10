@@ -86,6 +86,11 @@ public final class SnapshotSupervisor implements Supervisor {
     }
 
     @Override
+    public void disconnect() throws Exception {
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
+    }
+
+    @Override
     public void onOSGiEvent(final XEventDTO event) {
         logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
