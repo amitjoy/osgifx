@@ -76,7 +76,7 @@ public final class DisconnectFromAgentHandler {
             @Override
             protected Void call() throws Exception {
                 try {
-                    supervisor.getAgent().disconnect();
+                    supervisor.disconnect();
                     Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
                     logger.atInfo().log("Agent connection has been successfully aborted");
                 } catch (final Exception e) {
