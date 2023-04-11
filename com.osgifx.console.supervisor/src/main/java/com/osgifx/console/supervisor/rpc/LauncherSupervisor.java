@@ -24,12 +24,14 @@ import static org.osgi.service.condition.Condition.CONDITION_ID;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.aries.component.dsl.OSGiResult;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -44,8 +46,6 @@ import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.messaging.MessageSubscription;
-import org.osgi.util.promise.Deferred;
-import org.osgi.util.promise.PromiseFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -63,8 +63,6 @@ import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 
-import aQute.bnd.exceptions.Exceptions;
-
 @Component(property = MQTT_CONNECTION_LISTENER_FILTER_PROP)
 @SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
 public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
@@ -78,11 +76,10 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             + MQTT_CONNECTION_LISTENER_FILTER_VALUE;
     public static final String MQTT_CONNECTION_LISTENER_FILTER       = "(" + MQTT_CONNECTION_LISTENER_FILTER_PROP + ")";
 
-    private Appendable        stdout;
-    private Appendable        stderr;
-    private int               shell = -100;         // always invalid so we update it
-    private Deferred<Boolean> mqttConnectionPromise;
-    private PromiseFactory    promiseFactory;
+    private Appendable                 stdout;
+    private Appendable                 stderr;
+    private int                        shell = -100;
+    private CompletableFuture<Boolean> mqttConnectionPromise;
 
     private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
     private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
@@ -107,8 +104,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     @Activate
     void activate() {
-        logger         = FluentLogger.of(factory.createLogger(getClass().getName()));
-        promiseFactory = new PromiseFactory(Executors.newSingleThreadExecutor());
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
     @Deactivate
@@ -127,7 +123,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     public void connect(final MqttConnection mqttConnection) throws Exception {
         checkNotNull(mqttConnection, "'mqttConnection' cannot be null");
 
-        mqttConnectionPromise = promiseFactory.deferred();
+        mqttConnectionPromise = new CompletableFuture<>();
         try {
             // @formatter:off
             mqttMessagingCondition = connectToMQTT(
@@ -138,7 +134,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
                                               mqttConnection,
                                               MQTT_CONDITION_ID);
             // @formatter:on
-            mqttConnectionPromise.getPromise().timeout(mqttConnection.timeout()).getValue();
+            mqttConnectionPromise.get(mqttConnection.timeout(), TimeUnit.MILLISECONDS);
 
             final var lwtTopic = mqttConnection.lwtTopic();
             if (subscriber != null && !Strings.isNullOrEmpty(lwtTopic)) {
@@ -147,8 +143,10 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
                     sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC);
                 });
             }
-        } catch (final InvocationTargetException e) {
-            throw (Exception) Exceptions.unrollCause(e, InvocationTargetException.class);
+        } catch (final TimeoutException | ExecutionException e) {
+            throw e;
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -215,14 +213,14 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     @Override
     public synchronized void onConnected(final MqttClientConnectedContext context) {
-        mqttConnectionPromise.resolve(true);
+        mqttConnectionPromise.complete(true);
     }
 
     @Override
     public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
         final Throwable cause = context.getCause();
         if (cause != null) {
-            mqttConnectionPromise.fail(cause);
+            mqttConnectionPromise.completeExceptionally(cause);
         }
     }
 
@@ -288,9 +286,12 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
         return exitCode;
     }
 
+    @Override
     public void disconnect() throws Exception {
+        mqttConnectionPromise = null;
         if (isOpen()) {
             getAgent().disconnect();
+            remoteRPC.close();
         }
     }
 
