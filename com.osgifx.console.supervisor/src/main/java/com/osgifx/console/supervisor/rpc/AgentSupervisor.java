@@ -84,7 +84,7 @@ public class AgentSupervisor<S, A> {
     protected int                port;
     protected int                timeout;
     protected String             host;
-    private RemoteRPC<S, A>      remoteRPC;
+    protected RemoteRPC<S, A>    remoteRPC;
     protected volatile int       exitCode;
     private final CountDownLatch latch = new CountDownLatch(1);
 
