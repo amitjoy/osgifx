@@ -20,6 +20,7 @@ import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.packageNotWired;
+import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
@@ -495,7 +496,7 @@ public final class AgentServer implements Agent, Closeable {
         if (quit) {
             return;
         }
-        if (rpcType == RpcType.SOCKET_RPC) {
+        if (rpcType == SOCKET_RPC) {
             quit = true;
             redirect(0);
             remoteRPC.close();
