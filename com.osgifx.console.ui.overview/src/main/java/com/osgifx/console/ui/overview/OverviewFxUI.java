@@ -118,6 +118,7 @@ public final class OverviewFxUI {
     private Button   timelineButton;
     private Timeline dataRetrieverTimeline;
 
+    private double              refreshDelay            = REFRESH_DELAY;
     private final AtomicBoolean isRealtimeUpdateRunning = new AtomicBoolean(true);
 
     @PostConstruct
@@ -193,6 +194,8 @@ public final class OverviewFxUI {
     }
 
     private void createPeriodicTaskToSetRuntimeInfo(final double refreshDelay) {
+        this.refreshDelay = refreshDelay;
+        // @formatter:off
         dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelay), a -> {
 
             final var runtimeInfo = retrieveRuntimeInfo();
@@ -228,7 +231,6 @@ public final class OverviewFxUI {
                 });
             });
 
-            // @formatter:off
             runtimeInfoTile.setGraphic(
                     createRuntimeTable(
                             runtimeInfo.frameworkBsn(),
@@ -588,11 +590,11 @@ public final class OverviewFxUI {
     private void showViewRefreshDelayDialog() {
         final var dialog = new ViewRefreshDelayDialog();
         ContextInjectionFactory.inject(dialog, eclipseContext);
-        dialog.init();
-        final var refreshDelay = dialog.showAndWait();
-        if (refreshDelay.isPresent()) {
+        dialog.init(Math.round(refreshDelay));
+        final var refreshDelayInput = dialog.showAndWait();
+        if (refreshDelayInput.isPresent()) {
             dataRetrieverTimeline.stop();
-            createPeriodicTaskToSetRuntimeInfo(refreshDelay.get());
+            createPeriodicTaskToSetRuntimeInfo(refreshDelayInput.get());
             dataRetrieverTimeline.play();
 
             Fx.showSuccessNotification("Refresh Delay", "View refresh delay has been updated successfully");
