@@ -17,6 +17,7 @@ package com.osgifx.console.application.addon;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledFuture;
@@ -77,19 +78,21 @@ public final class AgentPingAddon {
     @Optional
     private void agentConnected(@EventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event has been received");
-        future = executor.scheduleWithFixedDelay(() -> {
-            try {
-                supervisor.getAgent().ping();
-            } catch (final Exception e) {
-                logger.atWarning().log("Agent ping request did not succeed");
-                eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
+        if (supervisor.getType() == SOCKET_RPC) {
+            future = executor.scheduleWithFixedDelay(() -> {
+                try {
+                    supervisor.getAgent().ping();
+                } catch (final Exception e) {
+                    logger.atWarning().log("Agent ping request did not succeed");
+                    eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
 
-                isConnected.publish(false);
-                isLocalAgent.publish(false);
-                selectedSettings.publish(null);
-                connectedAgent.publish(null);
-            }
-        }, INITIAL_DELAY, MAX_DELAY);
+                    isConnected.publish(false);
+                    isLocalAgent.publish(false);
+                    selectedSettings.publish(null);
+                    connectedAgent.publish(null);
+                }
+            }, INITIAL_DELAY, MAX_DELAY);
+        }
         logger.atInfo().log("Agent ping scheduler has been started");
     }
 
