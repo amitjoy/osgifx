@@ -20,6 +20,7 @@ import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.packageNotWired;
+import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
@@ -127,13 +128,13 @@ import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.OSGiEventHandler;
 import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.helper.AgentHelper;
-import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.redirector.ConsoleRedirector;
 import com.osgifx.console.agent.redirector.GogoRedirector;
 import com.osgifx.console.agent.redirector.NullRedirector;
 import com.osgifx.console.agent.redirector.RedirectOutput;
 import com.osgifx.console.agent.redirector.Redirector;
 import com.osgifx.console.agent.redirector.SocketRedirector;
+import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -142,12 +143,20 @@ import aQute.lib.converter.TypeReference;
 
 public final class AgentServer implements Agent, Closeable {
 
-    private static final long          RESULT_TIMEOUT   = Duration.ofSeconds(20).toMillis();
-    private static final long          WATCHDOG_TIMEOUT = Duration.ofSeconds(30).toMillis();
-    private static final AtomicInteger sequence         = new AtomicInteger(1000);
-    private static final Pattern       BSN_PATTERN      = Pattern.compile("\\s*([^;\\s]+).*");
+    public enum RpcType {
+        MQTT_RPC,
+        SOCKET_RPC
+    }
+
+    private static final long          RESULT_TIMEOUT           = Duration.ofSeconds(20).toMillis();
+    private static final long          WATCHDOG_TIMEOUT         = Duration.ofSeconds(30).toMillis();
+    private static final AtomicInteger sequence                 = new AtomicInteger(1000);
+    private static final Pattern       BSN_PATTERN              = Pattern.compile("\\s*([^;\\s]+).*");
+    public static final String         PROPERTY_ENABLE_LOGGING  = "osgi.fx.enable.logging";
+    public static final String         PROPERTY_ENABLE_EVENTING = "osgi.fx.enable.eventing";
 
     public volatile boolean              quit;
+    private final RpcType                rpcType;
     private Supervisor                   remote;
     private RemoteRPC<Agent, Supervisor> remoteRPC;
     private final Map<String, String>    installed  = new HashMap<>();
@@ -160,8 +169,9 @@ public final class AgentServer implements Agent, Closeable {
 
     private final DI di;
 
-    public AgentServer(final DI di) {
-        this.di = di;
+    public AgentServer(final DI di, final RpcType rpcType) {
+        this.di      = di;
+        this.rpcType = rpcType;
     }
 
     public BundleContext getContext() {
@@ -342,6 +352,36 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
+    public boolean isReceivingLogEnabled() {
+        return Boolean.getBoolean(PROPERTY_ENABLE_LOGGING);
+    }
+
+    @Override
+    public void enableReceivingLog() {
+        System.setProperty(PROPERTY_ENABLE_LOGGING, String.valueOf(true));
+    }
+
+    @Override
+    public void disableReceivingLog() {
+        System.setProperty(PROPERTY_ENABLE_LOGGING, String.valueOf(false));
+    }
+
+    @Override
+    public boolean isReceivingEventEnabled() {
+        return Boolean.getBoolean(PROPERTY_ENABLE_EVENTING);
+    }
+
+    @Override
+    public void enableReceivingEvent() {
+        System.setProperty(PROPERTY_ENABLE_EVENTING, String.valueOf(true));
+    }
+
+    @Override
+    public void disableReceivingEvent() {
+        System.setProperty(PROPERTY_ENABLE_EVENTING, String.valueOf(false));
+    }
+
+    @Override
     public String execCliCommand(final String command) {
         requireNonNull(command, "CLI command cannot be null");
 
@@ -456,9 +496,11 @@ public final class AgentServer implements Agent, Closeable {
         if (quit) {
             return;
         }
-        quit = true;
-        redirect(0);
-        remoteRPC.close();
+        if (rpcType == SOCKET_RPC) {
+            quit = true;
+            redirect(0);
+            remoteRPC.close();
+        }
     }
 
     @Override
@@ -481,7 +523,7 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
-    public void abort() throws Exception {
+    public void disconnect() throws Exception {
         cleanup(-3);
     }
 

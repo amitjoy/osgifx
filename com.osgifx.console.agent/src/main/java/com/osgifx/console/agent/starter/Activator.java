@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import java.io.Closeable;
@@ -30,9 +32,13 @@ import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.di.module.DIModule;
-import com.osgifx.console.agent.link.RemoteRPC;
 import com.osgifx.console.agent.provider.AgentServer;
+import com.osgifx.console.agent.provider.AgentServer.RpcType;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
+import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.rpc.MqttRPC;
+import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.SocketRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
 /**
@@ -51,11 +57,37 @@ public final class Activator extends Thread implements BundleActivator {
         module = new DIModule(bundleContext);
         module.di().getInstance(ClassloaderLeakDetector.class).start();
 
-        final SocketContext socketContext = new SocketContext(bundleContext);
-        serverSocket = socketContext.getSocket();
+        try {
+            final SocketContext socketContext = new SocketContext(bundleContext);
+            serverSocket = socketContext.getSocket();
+            start();
+            System.err.println("[OSGi.fx] Socket Agent: " + socketContext.host() + ":" + socketContext.port());
+        } catch (final IllegalArgumentException e) {
+            System.err.println("[OSGi.fx] Socket agent not configured");
+        }
+        module.start();
 
-        System.err.println("OSGi.fx Agent Host: " + socketContext.host() + ":" + socketContext.port());
-        start();
+        final boolean isMQTTwired = module.di().getInstance(PackageWirings.class).isMqttWired();
+        if (isMQTTwired) {
+            final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
+            final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
+
+            if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
+                System.err.print("[OSGi.fx] MQTT agent not configured");
+                return;
+            }
+            final AgentServer agentServer = new AgentServer(module.di(), RpcType.MQTT_RPC);
+            agents.add(agentServer);
+            final RemoteRPC<Agent, Supervisor> mqttRPC = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
+                                                                       pubTopic, subTopic);
+
+            module.bindInstance(AgentServer.class, agentServer);
+            module.bindInstance(RemoteRPC.class, mqttRPC);
+            module.bindInstance(Supervisor.class, mqttRPC.getRemote());
+
+            mqttRPC.open();
+            agentServer.setEndpoint(mqttRPC);
+        }
     }
 
     @Override
@@ -67,27 +99,25 @@ public final class Activator extends Thread implements BundleActivator {
                     // timeout to get interrupts
                     socket.setSoTimeout(1000);
 
-                    module.start();
-
                     // create a new agent, and link it up.
-                    final AgentServer sa = new AgentServer(module.di());
-                    agents.add(sa);
+                    final AgentServer agentServer = new AgentServer(module.di(), RpcType.SOCKET_RPC);
+                    agents.add(agentServer);
 
-                    final RemoteRPC<Agent, Supervisor> remoteRPC = new RemoteRPC<Agent, Supervisor>(Supervisor.class,
-                                                                                                    sa, socket) {
+                    final SocketRPC<Agent, Supervisor> socketRPC = new SocketRPC<Agent, Supervisor>(Supervisor.class,
+                                                                                                    agentServer,
+                                                                                                    socket) {
                         @Override
                         public void close() throws IOException {
-                            agents.remove(sa);
-                            module.stop();
+                            agents.remove(agentServer);
                             super.close();
                         }
                     };
-                    module.bindInstance(AgentServer.class, sa);
-                    module.bindInstance(RemoteRPC.class, remoteRPC);
-                    module.bindInstance(Supervisor.class, remoteRPC.getRemote());
+                    module.bindInstance(AgentServer.class, agentServer);
+                    module.bindInstance(RemoteRPC.class, socketRPC);
+                    module.bindInstance(Supervisor.class, socketRPC.getRemote());
 
-                    sa.setEndpoint(remoteRPC);
-                    remoteRPC.run();
+                    agentServer.setEndpoint(socketRPC);
+                    socketRPC.run();
                 } catch (final Exception e) {
                 } catch (final Throwable t) {
                     t.printStackTrace();
@@ -107,6 +137,7 @@ public final class Activator extends Thread implements BundleActivator {
         close(serverSocket);
         agents.forEach(this::close);
         module.di().getInstance(ClassloaderLeakDetector.class).stop();
+        module.stop();
     }
 
     private Throwable close(final Closeable in) {

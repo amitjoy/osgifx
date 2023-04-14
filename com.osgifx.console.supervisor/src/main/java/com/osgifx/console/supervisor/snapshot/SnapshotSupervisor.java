@@ -34,6 +34,8 @@ import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
+import com.osgifx.console.supervisor.MqttConnection;
+import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
@@ -64,6 +66,11 @@ public final class SnapshotSupervisor implements Supervisor {
     }
 
     @Override
+    public RpcType getType() {
+        return null;
+    }
+
+    @Override
     public boolean stdout(final String out) throws Exception {
         return false;
     }
@@ -74,11 +81,17 @@ public final class SnapshotSupervisor implements Supervisor {
     }
 
     @Override
-    public void connect(final String host,
-                        final int port,
-                        final int timeout,
-                        final String trustStore,
-                        final String trustStorePassword) throws Exception {
+    public void connect(final SocketConnection socketConnection) throws Exception {
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
+    }
+
+    @Override
+    public void connect(final MqttConnection mqttConnection) throws Exception {
+        logger.atInfo().log(NOT_IMPLEMENTED_LOG);
+    }
+
+    @Override
+    public void disconnect() throws Exception {
         logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 

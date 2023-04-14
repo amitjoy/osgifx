@@ -17,6 +17,7 @@ javac.compliance      : ${javac.source}
                         org.osgi.service.cdi,\
                         org.osgi.service.jaxrs,\
                         org.osgi.service.log,\
+                        org.osgi.service.messaging,\
                         org.slf4j.api
 -privatepackage       : \
                         com.osgifx.console.agent.*,\
@@ -43,7 +44,9 @@ Import-Package        : \
                         org.osgi.service.jaxrs*;'resolution:'=optional,\
                         org.osgi.service.log;version="[1.3,2)";'resolution:'=optional,\
                         org.osgi.service.log.admin;'resolution:'=optional,\
+                        org.osgi.service.messaging;'resolution:'=optional,\
                         org.osgi.service.metatype;'resolution:'=optional,\
                         org.osgi.service.useradmin;'resolution:'=optional,\
                         org.osgi.util.promise;'resolution:'=optional,\
+                        org.osgi.util.pushstream;'resolution:'=optional,\
                         *

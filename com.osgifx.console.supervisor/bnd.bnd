@@ -3,6 +3,7 @@
                       biz.aQute.remote.agent;packages=*,\
                       com.google.gson,\
                       com.osgifx.console.agent.api;version=snapshot;packages=*,\
+                      in.bytehue.messaging.mqtt5.provider;version=latest,\
                       org.apache.aries.component-dsl.component-dsl
 -includepackage     : \
                       com.osgifx.console.dto,\

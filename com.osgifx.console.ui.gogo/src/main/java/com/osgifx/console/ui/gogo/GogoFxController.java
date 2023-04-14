@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.gogo;
 
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -61,14 +59,17 @@ public final class GogoFxController {
     @FXML
     public void initialize() {
         historyPointer = 0;
-        Set<String> gogoCommands;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null
-                || (gogoCommands = agent.getGogoCommands()) == null) {
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
             logger.atWarning().log("Agent not connected");
             return;
         }
+        executor.runAsync(() -> {
+            final var gogoCommands = agent.getGogoCommands();
+            if (gogoCommands != null) {
+                TextFields.bindAutoCompletion(input, gogoCommands);
+            }
+        });
         logger.atDebug().log("FXML controller has been initialized");
-        TextFields.bindAutoCompletion(input, gogoCommands);
     }
 
     @FXML

@@ -8,7 +8,8 @@
 -runproperties.scr              =         ds.log.enabled=false
 
 -runblacklist                   =         bnd.identity;id='com.osgifx.console.agent.api',\
-                                          bnd.identity;id='com.osgifx.console.api'
+                                          bnd.identity;id='com.osgifx.console.api',\
+                                          bnd.identity;id='org.osgi.service.messaging'
 current.directory               =         .
 storage.directory               =         ${current.directory}/.osgifx-ws
 

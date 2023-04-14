@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.data.provider;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 import com.osgifx.console.agent.dto.RuntimeDTO;
@@ -25,6 +27,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -157,20 +160,27 @@ public interface DataProvider {
      *
      * @return the memory information
      */
-    XMemoryInfoDTO memory();
+    CompletableFuture<XMemoryInfoDTO> memory();
 
     /**
      * Returns the DMT node information of the specified node
      *
      * @return the DMT node information
      */
-    XDmtNodeDTO readDmtNode(String rootURI);
+    CompletableFuture<XDmtNodeDTO> readDmtNode(String rootURI);
 
     /**
      * Returns the runtime DTOs together
      *
      * @return the runtime DTOs together
      */
-    RuntimeDTO readRuntimeDTO();
+    CompletableFuture<RuntimeDTO> readRuntimeDTO();
+
+    /**
+     * Returns the heap usage information
+     *
+     * @return the heap usage information
+     */
+    CompletableFuture<XHeapUsageDTO> heapUsage();
 
 }

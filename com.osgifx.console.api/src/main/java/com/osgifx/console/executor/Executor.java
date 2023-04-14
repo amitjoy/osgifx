@@ -17,8 +17,10 @@ package com.osgifx.console.executor;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
+import java.util.function.Supplier;
 
 /**
  * An object that executes submitted {@link Runnable} tasks. This
@@ -40,6 +42,18 @@ public interface Executor {
      * @throws NullPointerException if command is null
      */
     CompletableFuture<Void> runAsync(Runnable command);
+
+    /**
+     * Returns a new CompletableFuture that is asynchronously completed
+     * by a task running in the {@link ForkJoinPool#commonPool()} with
+     * the value obtained by calling the given Supplier.
+     *
+     * @param supplier a function returning the value to be used
+     *            to complete the returned CompletableFuture
+     * @param <U> the function's return type
+     * @return the new CompletableFuture
+     */
+    <U> CompletableFuture<U> supplyAsync(Supplier<U> supplier);
 
     /**
      * Creates and executes a periodic action that becomes enabled first

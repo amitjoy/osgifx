@@ -42,7 +42,7 @@ public final class SupervisorFactoryProvider implements SupervisorFactory {
     @Override
     public void createSupervisor(final SupervisorType type) {
         final var conditionIdValue = switch (type) {
-            case SOCKET_RPC -> LauncherSupervisor.CONDITION_ID_VALUE;
+            case REMOTE_RPC -> LauncherSupervisor.CONDITION_ID_VALUE;
             case SNAPSHOT -> SnapshotSupervisor.CONDITION_ID_VALUE;
         };
         registrations.computeIfAbsent(type,

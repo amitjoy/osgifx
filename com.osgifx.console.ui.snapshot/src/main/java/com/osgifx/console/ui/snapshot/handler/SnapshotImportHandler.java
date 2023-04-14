@@ -17,7 +17,7 @@ package com.osgifx.console.ui.snapshot.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -95,7 +95,7 @@ public final class SnapshotImportHandler {
                 protected File call() throws Exception {
                     try (var is = new FileInputStream(snapshot)) {
                         updateSnapshotLocation(snapshot.getAbsolutePath());
-                        supervisorFactory.removeSupervisor(SOCKET_RPC);
+                        supervisorFactory.removeSupervisor(REMOTE_RPC);
                         supervisorFactory.createSupervisor(SNAPSHOT);
                         return snapshot;
                     } catch (final Exception e) {

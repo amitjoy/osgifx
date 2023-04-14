@@ -14,6 +14,7 @@ Bundle-SymbolicName : ${p}; singleton:=true
                       ${bundles.required},\
                       de.jensd:fontawesomefx;packages='*',\
                       com.google.gson,\
+                      in.bytehue.messaging.mqtt5.provider,\
                       org.eclipse.equinox.app
 Import-Package      : \
                       org.controlsfx.glyphfont,\

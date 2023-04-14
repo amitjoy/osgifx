@@ -30,11 +30,42 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 @ProviderType
 public interface Supervisor {
 
+    public enum RpcType {
+        MQTT_RPC,
+        SOCKET_RPC
+    }
+
     /** The topic where an event will be sent after the agent gets connected */
     String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
 
     /** The topic where an event will be sent after the agent gets disconnected */
     String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
+
+    /**
+     * Returns the type of the communication
+     */
+    RpcType getType();
+
+    /**
+     * Connects to the provided socket using the specified options
+     *
+     * @param socketConnection the socket connection (cannot be {@code null})
+     * @throws Exception if any issue occurs during connection
+     */
+    void connect(SocketConnection socketConnection) throws Exception;
+
+    /**
+     * Connects to the provided MQTT broker using the specified options
+     *
+     * @param mqttConnection the MQTT connection (cannot be {@code null})
+     * @throws Exception if any issue occurs during connection
+     */
+    void connect(MqttConnection mqttConnection) throws Exception;
+
+    /**
+     * Disconnects the remote agent
+     */
+    void disconnect() throws Exception;
 
     /**
      * Redirected standard output
@@ -51,20 +82,6 @@ public interface Supervisor {
      * @return ignored (to make sync)
      */
     boolean stderr(String out) throws Exception;
-
-    /**
-     * Connects to the specific host and port using the provided timeout in
-     * connection
-     *
-     * @param host the host name (cannot be {@code null})
-     * @param port the port address
-     * @param timeout the timeout in milliseconds
-     * @param trustStore jks truststore for secure communication (can be {@code null})
-     * @param trustStorePassword jks truststore password for secure communication (can be {@code null})
-     *
-     * @throws Exception if any issue occurs during connection
-     */
-    void connect(String host, int port, int timeout, String trustStore, String trustStorePassword) throws Exception;
 
     /**
      * Callback method for OSGi Event Admin Events

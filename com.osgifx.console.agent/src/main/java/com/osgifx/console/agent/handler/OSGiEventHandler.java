@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.handler;
 
+import static com.osgifx.console.agent.provider.AgentServer.PROPERTY_ENABLE_EVENTING;
 import static org.osgi.service.event.EventConstants.EVENT_TOPIC;
 
 import java.util.Dictionary;
@@ -60,7 +61,10 @@ public final class OSGiEventHandler implements EventHandler {
         dto.properties = initProperties(event);
         dto.topic      = event.getTopic();
 
-        supervisor.onOSGiEvent(dto);
+        final boolean isLoggingEnabled = Boolean.getBoolean(PROPERTY_ENABLE_EVENTING);
+        if (isLoggingEnabled) {
+            supervisor.onOSGiEvent(dto);
+        }
     }
 
     private Map<String, String> initProperties(final Event event) {

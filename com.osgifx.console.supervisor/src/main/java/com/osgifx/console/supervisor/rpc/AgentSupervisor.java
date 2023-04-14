@@ -17,19 +17,68 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_PACKET_SIZE;
+import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
+import static org.osgi.service.condition.Condition.CONDITION_ID;
+import static org.osgi.service.condition.Condition.INSTANCE;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import com.osgifx.console.agent.link.RemoteRPC;
+import org.apache.aries.component.dsl.OSGi;
+import org.apache.aries.component.dsl.OSGiResult;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.condition.Condition;
+
+import com.google.common.base.Strings;
+import com.osgifx.console.agent.rpc.MqttRPC;
+import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.SocketRPC;
+import com.osgifx.console.supervisor.MqttConnection;
+import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.util.configuration.ConfigHelper;
+
+import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
 
 public class AgentSupervisor<S, A> {
+
+    @interface MqttConfig {
+        final int MAX_PACKET_SIZE = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
+
+        String id();
+
+        String server();
+
+        int port();
+
+        boolean cleanStart();
+
+        boolean automaticReconnect();
+
+        boolean simpleAuth();
+
+        String username();
+
+        String password();
+
+        int maximumPacketSize();
+
+        int sendMaximumPacketSize();
+
+        long sessionExpiryInterval();
+
+        String connectedListenerFilter();
+
+        String disconnectedListenerFilter();
+
+        String osgi_ds_satisfying_condition_target();
+    }
 
     private static final int CONNECT_WAIT = 200;
 
@@ -37,49 +86,37 @@ public class AgentSupervisor<S, A> {
     protected int                port;
     protected int                timeout;
     protected String             host;
-    private RemoteRPC<S, A>      remoteRPC;
+    protected RemoteRPC<S, A>    remoteRPC;
     protected volatile int       exitCode;
-    private final AtomicBoolean  quit  = new AtomicBoolean();
     private final CountDownLatch latch = new CountDownLatch(1);
 
-    protected void connect(final Class<A> agent,
-                           final S supervisor,
-                           final String host,
-                           final int port) throws Exception {
-        connect(agent, supervisor, host, port, -1, null, null);
-    }
-
-    protected void connect(final Class<A> agent,
-                           final S supervisor,
-                           final String host,
-                           final int port,
-                           final int timeout,
-                           final String trustStore,
-                           final String trustStorePassword) throws Exception {
+    protected void connectToSocket(final Class<A> agent,
+                                   final S supervisor,
+                                   final SocketConnection socketConnection) throws Exception {
 
         checkArgument(timeout > -1, "timeout cannot be less than -1");
         checkNotNull(supervisor, "'supervisor' cannot be null");
-        checkNotNull(host, "'host' cannot be null");
+        checkNotNull(socketConnection.host(), "'host' cannot be null");
 
         var retryTimeout = timeout;
-        this.host    = host;
-        this.port    = port;
-        this.timeout = timeout;
+        host    = socketConnection.host();
+        port    = socketConnection.port();
+        timeout = socketConnection.timeout();
 
         while (true) {
             try {
                 SSLSocketFactory sf = null;
-                if (trustStore != null && trustStorePassword != null) {
-                    System.setProperty("javax.net.ssl.trustStore", trustStore);
-                    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+                if (socketConnection.trustStore() != null && socketConnection.trustStorePassword() != null) {
+                    System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
+                    System.setProperty("javax.net.ssl.trustStorePassword", socketConnection.trustStorePassword());
                     System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
                     sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 }
                 final var socket = sf == null ? new Socket() : sf.createSocket();
                 socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
-                remoteRPC = new RemoteRPC<>(agent, supervisor, socket);
-                this.setAgent(remoteRPC);
+                remoteRPC = new SocketRPC<>(agent, supervisor, socket);
+                this.setRemoteRPC(remoteRPC);
                 remoteRPC.open();
                 return;
             } catch (final ConnectException e) {
@@ -95,34 +132,55 @@ public class AgentSupervisor<S, A> {
         }
     }
 
-    public void setAgent(final RemoteRPC<S, A> link) {
-        this.agent     = link.getRemote();
-        this.remoteRPC = link;
+    protected OSGiResult connectToMQTT(final BundleContext bundleContext,
+                                       final ConfigurationAdmin configurationAdmin,
+                                       final Class<A> agent,
+                                       final S supervisor,
+                                       final MqttConnection connection,
+                                       final String conditionID) {
+
+        final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
+
+        ch.read(MqttMessageConstants.ConfigurationPid.CLIENT);
+        ch.set(ch.d().id(), connection.clientId());
+        ch.set(ch.d().server(), connection.server());
+        ch.set(ch.d().port(), connection.port());
+        ch.set(ch.d().cleanStart(), true);
+        ch.set(ch.d().automaticReconnect(), false);
+        ch.set(ch.d().sessionExpiryInterval(), 0L);
+
+        if (!Strings.isNullOrEmpty(connection.username()) && !Strings.isNullOrEmpty(connection.password())) {
+            ch.set(ch.d().simpleAuth(), true);
+            ch.set(ch.d().username(), connection.username());
+            ch.set(ch.d().password(), connection.password());
+        }
+
+        ch.set(ch.d().maximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
+        ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
+        ch.set(ch.d().osgi_ds_satisfying_condition_target(), "(" + CONDITION_ID + "=" + conditionID + ")");
+        ch.update();
+
+        // register the condition service to enable messaging client
+        final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
+                .run(bundleContext);
+
+        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic());
+        this.setRemoteRPC(remoteRPC);
+        remoteRPC.open();
+
+        return result;
     }
 
-    public void close() throws IOException {
-        clearSSLProperties();
-        if (quit.getAndSet(true)) {
-            return;
-        }
-        if (remoteRPC.isOpen()) {
-            remoteRPC.close();
-        }
-        latch.countDown();
+    private void setRemoteRPC(final RemoteRPC<S, A> rpc) {
+        agent     = rpc.getRemote();
+        remoteRPC = rpc;
     }
 
     public int join() throws InterruptedException {
         latch.await();
         return exitCode;
-    }
-
-    protected void exit(final int exitCode) {
-        this.exitCode = exitCode;
-        try {
-            close();
-        } catch (final Exception e) {
-            // ignore
-        }
     }
 
     public A getAgent() {
