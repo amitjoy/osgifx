@@ -219,7 +219,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Override
     public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
         final Throwable cause = context.getCause();
-        if (cause != null) {
+        if (cause != null && mqttConnectionPromise != null) {
             mqttConnectionPromise.completeExceptionally(cause);
         }
     }
