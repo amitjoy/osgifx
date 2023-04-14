@@ -21,6 +21,8 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import static org.controlsfx.validation.Validator.createEmptyValidator;
 import static org.controlsfx.validation.Validator.createPredicateValidator;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
@@ -46,7 +48,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
 
-public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
+public final class SocketConnectionDialog extends Dialog<SocketConnectionSettingDTO> {
 
     @Log
     @Inject
@@ -54,11 +56,15 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
     @Inject
     private ThreadSynchronize threadSync;
 
-    public void init() {
+    public void init(final SocketConnectionSettingDTO setting) {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
 
-        dialogPane.setHeaderText("Add Connection Settings");
+        if (setting == null) {
+            dialogPane.setHeaderText("Add Socket Connection Settings");
+        } else {
+            dialogPane.setHeaderText("Edit Socket Connection Settings");
+        }
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
@@ -67,22 +73,28 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
 
         final var name = (CustomTextField) TextFields.createClearableTextField();
         name.setLeft(new ImageView(getClass().getResource("/graphic/icons/name.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> name.setText(s.name));
 
         final var hostname = (CustomTextField) TextFields.createClearableTextField();
         hostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> hostname.setText(s.host));
 
         final var port = (CustomTextField) TextFields.createClearableTextField();
         port.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> port.setText(String.valueOf(s.port)));
 
         final var timeout = (CustomTextField) TextFields.createClearableTextField();
         timeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> timeout.setText(String.valueOf(s.timeout)));
 
         final var trustStore = (CustomTextField) TextFields.createClearableTextField();
         trustStore.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> trustStore.setText(s.trustStorePath));
 
         final var trustStorePassword = (CustomPasswordField) TextFields.createClearablePasswordField();
         trustStorePassword
                 .setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> trustStorePassword.setText(s.trustStorePassword));
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -117,7 +129,7 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var nameCaption               = "Name";
+        final var nameCaption               = "Connection Name";
         final var hostnameCaption           = "Host";
         final var portCaption               = "Port (between 1 to 65536)";
         final var timeoutCaption            = "Timeout in millis";
@@ -173,10 +185,19 @@ public final class ConnectionDialog extends Dialog<ConnectionSettingDTO> {
             final var p = Ints.tryParse(port.getText());
             final var t = Ints.tryParse(timeout.getText());
 
-            verify(p != null && t != null, "Port and host formats are not compliant");
+            verify(p != null && t != null, "Port and timeout formats are not compliant");
+            if (setting != null) {
+                setting.name               = name.getText();
+                setting.host               = hostname.getText();
+                setting.port               = p;
+                setting.timeout            = t;
+                setting.trustStorePath     = trustStore.getAccessibleText();
+                setting.trustStorePassword = trustStorePassword.getText();
 
-            return new ConnectionSettingDTO(name.getText(), hostname.getText(), p, t, trustStore.getAccessibleText(),
-                                            trustStorePassword.getText());
+                return setting;
+            }
+            return new SocketConnectionSettingDTO(name.getText(), hostname.getText(), p, t,
+                                                  trustStore.getAccessibleText(), trustStorePassword.getText());
         });
     }
 

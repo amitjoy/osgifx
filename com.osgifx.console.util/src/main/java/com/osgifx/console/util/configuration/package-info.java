@@ -13,9 +13,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-/**
- * This package is not exported as it will be directly packaged inside remote
- * agent and local supervisor bundles using {@code -conditionalpackage}
- * instruction
- */
-package com.osgifx.console.agent.link;
+@org.osgi.annotation.bundle.Export
+@org.osgi.annotation.versioning.Version("1.0.0")
+package com.osgifx.console.util.configuration;

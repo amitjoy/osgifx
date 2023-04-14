@@ -111,6 +111,10 @@ public final class PackageWirings {
         return isWired("org.osgi.service.cdi.runtime");
     }
 
+    public boolean isMqttWired() {
+        return isWired("org.osgi.service.messaging");
+    }
+
     public boolean isJmxWired() {
         return isWired("javax.management");
     }

@@ -40,7 +40,7 @@ import com.osgifx.console.supervisor.Supervisor;
 public interface SupervisorFactory {
 
     public enum SupervisorType {
-        SOCKET_RPC,
+        REMOTE_RPC,
         SNAPSHOT
     }
 

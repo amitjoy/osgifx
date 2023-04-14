@@ -17,7 +17,7 @@ package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +36,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
@@ -96,9 +97,19 @@ public final class ConnectToLocalAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
-                    supervisorFactory.createSupervisor(SOCKET_RPC);
+                    supervisorFactory.createSupervisor(REMOTE_RPC);
                     updateMessage("Connecting to Local Agent on " + localAgentPort);
-                    supervisor.connect(localAgentHost, localAgentPort, localAgentTimeout, null, null);
+
+                    // @formatter:off
+                    final var socketConnection = SocketConnection
+                            .builder()
+                            .host(localAgentHost)
+                            .port(localAgentPort)
+                            .timeout(localAgentTimeout)
+                            .build();
+                    // @formatter:on
+
+                    supervisor.connect(socketConnection);
                     logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost,
                             localAgentPort);
                     return null;
@@ -122,7 +133,7 @@ public final class ConnectToLocalAgentHandler {
                 logger.atInfo().log("Agent connected event has been sent for Local Agent on %s:%s", localAgentHost,
                         localAgentPort);
 
-                final var connection = localAgentHost + ":" + localAgentPort;
+                final var connection = "[SOCKET] " + localAgentHost + ":" + localAgentPort;
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);

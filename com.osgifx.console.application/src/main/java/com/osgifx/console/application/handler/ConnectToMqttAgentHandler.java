@@ -16,8 +16,8 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SOCKET_RPC;
 import static javafx.scene.control.ButtonType.CANCEL;
 
 import java.util.Map;
@@ -40,11 +40,12 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.application.dialog.ConnectToAgentDialog;
-import com.osgifx.console.application.dialog.ConnectToAgentDialog.ActionType;
-import com.osgifx.console.application.dialog.ConnectionDialog;
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ConnectToMqttAgentDialog;
+import com.osgifx.console.application.dialog.ConnectToMqttAgentDialog.ActionType;
+import com.osgifx.console.application.dialog.MqttConnectionDialog;
+import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
@@ -52,52 +53,52 @@ import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 
-public final class ConnectToAgentHandler {
+public final class ConnectToMqttAgentHandler {
 
-    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.preference";
+    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.mqtt.connection.preference";
 
     @Log
     @Inject
-    private FluentLogger                            logger;
+    private FluentLogger                                logger;
     @Inject
-    private Executor                                executor;
+    private Executor                                    executor;
     @Inject
-    private ThreadSynchronize                       threadSync;
+    private ThreadSynchronize                           threadSync;
     @Inject
-    private IEclipseContext                         context;
+    private IEclipseContext                             context;
     @Inject
-    private IEventBroker                            eventBroker;
+    private IEventBroker                                eventBroker;
     @Inject
     @Optional
-    private Supervisor                              supervisor;
+    private Supervisor                                  supervisor;
     @Inject
-    private CommandService                          commandService;
+    private CommandService                              commandService;
     @Inject
     @Optional
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>              isConnected;
+    private ContextBoundValue<Boolean>                  isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>              isLocalAgent;
+    private ContextBoundValue<Boolean>                  isLocalAgent;
     @Inject
     @Optional
     @ContextValue("is_snapshot_agent")
-    private ContextBoundValue<Boolean>              isSnapshotAgent;
+    private ContextBoundValue<Boolean>                  isSnapshotAgent;
     @Inject
     @Optional
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>               connectedAgent;
+    private ContextBoundValue<String>                   connectedAgent;
     @Inject
     @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    private ContextBoundValue<MqttConnectionSettingDTO> selectedSettings;
     @Inject
-    private SupervisorFactory                       supervisorFactory;
-    private ProgressDialog                          progressDialog;
+    private SupervisorFactory                           supervisorFactory;
+    private ProgressDialog                              progressDialog;
 
     @Execute
     public void execute() {
-        final var connectToAgentDialog = new ConnectToAgentDialog();
+        final var connectToAgentDialog = new ConnectToMqttAgentDialog();
         ContextInjectionFactory.inject(connectToAgentDialog, context);
         logger.atInfo().log("Injected connect to agent dialog to eclipse context");
 
@@ -112,6 +113,10 @@ public final class ConnectToAgentHandler {
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
             addConnection();
             removeCurrentSelection();
+            return;
+        }
+        if (selectedButton == connectToAgentDialog.getButtonType(ActionType.EDIT_CONNECTION)) {
+            editConnection(selectedSettings.getValue());
             return;
         }
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
@@ -137,10 +142,10 @@ public final class ConnectToAgentHandler {
     private void addConnection() {
         logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
-        final var connectionDialog = new ConnectionDialog();
+        final var connectionDialog = new MqttConnectionDialog();
         ContextInjectionFactory.inject(connectionDialog, context);
         logger.atInfo().log("Injected connection dialog to eclipse context");
-        connectionDialog.init();
+        connectionDialog.init(null);
 
         final var value = connectionDialog.showAndWait();
 
@@ -152,9 +157,27 @@ public final class ConnectToAgentHandler {
         }
     }
 
+    private void editConnection(final MqttConnectionSettingDTO setting) {
+        logger.atInfo().log("'%s'-'editConnection(..)' event has been invoked", getClass().getSimpleName());
+
+        final var connectionDialog = new MqttConnectionDialog();
+        ContextInjectionFactory.inject(connectionDialog, context);
+        logger.atInfo().log("Injected connection dialog to eclipse context");
+        connectionDialog.init(setting);
+
+        final var value = connectionDialog.showAndWait();
+
+        if (value.isPresent()) {
+            final var dto = value.get();
+            triggerCommand(dto, "EDIT");
+            logger.atInfo().log("EDIT command has been invoked for %s", dto);
+            Fx.showSuccessNotification("Connection Settings", "Connection settings has been updated successfully");
+        }
+    }
+
     private void removeConnection() {
         logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
-        final ConnectionSettingDTO settings = selectedSettings.getValue();
+        final MqttConnectionSettingDTO settings = selectedSettings.getValue();
         if (settings == null) {
             logger.atInfo().log("No connection setting has been selected");
             return;
@@ -178,15 +201,31 @@ public final class ConnectToAgentHandler {
             protected Void call() throws Exception {
                 try {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
-                    supervisorFactory.createSupervisor(SOCKET_RPC);
-                    updateMessage("Connecting to " + settings.host + ":" + settings.port);
-                    supervisor.connect(settings.host, settings.port, settings.timeout, settings.trustStorePath,
-                            settings.trustStorePassword);
+                    supervisorFactory.createSupervisor(REMOTE_RPC);
+                    updateMessage("Connecting to " + settings.server + ":" + settings.port);
+
+                    // @formatter:off
+                    final var mqttConnection = MqttConnection
+                            .builder()
+                            .clientId(settings.clientId)
+                            .server(settings.server)
+                            .port(settings.port)
+                            .username(settings.username)
+                            .password(settings.password)
+                            .timeout(settings.timeout)
+                            .pubTopic(settings.pubTopic)
+                            .subTopic(settings.subTopic)
+                            .lwtTopic(settings.lwtTopic)
+                            .build();
+                    // @formatter:on
+
+                    supervisor.connect(mqttConnection);
                     logger.atInfo().log("Successfully connected to %s", settings);
                     return null;
                 } catch (final InterruptedException e) {
                     logger.atInfo().log("Connection task interrupted");
                     threadSync.asyncExec(progressDialog::close);
+                    supervisorFactory.removeSupervisor(REMOTE_RPC);
                     throw e;
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot connect to %s", settings);
@@ -194,6 +233,7 @@ public final class ConnectToAgentHandler {
                         progressDialog.close();
                         FxDialog.showExceptionDialog(e, getClass().getClassLoader());
                     });
+                    supervisorFactory.removeSupervisor(REMOTE_RPC);
                     throw e;
                 }
             }
@@ -201,7 +241,7 @@ public final class ConnectToAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", settings);
-                final var connection = settings.host + ":" + settings.port;
+                final var connection = "[MQTT] " + settings.server + ":" + settings.port;
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
@@ -216,16 +256,21 @@ public final class ConnectToAgentHandler {
                 () -> taskFuture.cancel(true));
     }
 
-    private void triggerCommand(final ConnectionSettingDTO dto, final String type) {
+    private void triggerCommand(final MqttConnectionSettingDTO dto, final String type) {
         final Map<String, Object> properties = Maps.newHashMap();
 
+        properties.put("id", dto.id);
         properties.put("name", dto.name);
-        properties.put("host", dto.host);
+        properties.put("clientId", dto.clientId);
+        properties.put("server", dto.server);
         properties.put("port", dto.port);
         properties.put("timeout", dto.timeout);
         properties.put("type", type);
-        properties.put("truststore", dto.trustStorePath);
-        properties.put("truststorePassword", dto.trustStorePassword);
+        properties.put("username", dto.username);
+        properties.put("password", dto.password);
+        properties.put("pubTopic", dto.pubTopic);
+        properties.put("subTopic", dto.subTopic);
+        properties.put("lwtTopic", dto.lwtTopic);
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }
