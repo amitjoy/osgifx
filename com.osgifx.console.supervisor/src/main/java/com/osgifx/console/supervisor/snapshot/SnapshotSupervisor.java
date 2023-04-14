@@ -66,6 +66,11 @@ public final class SnapshotSupervisor implements Supervisor {
     }
 
     @Override
+    public RpcType getType() {
+        return null;
+    }
+
+    @Override
     public boolean stdout(final String out) throws Exception {
         return false;
     }

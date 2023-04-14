@@ -16,6 +16,8 @@
 package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.osgifx.console.supervisor.Supervisor.RpcType.MQTT_RPC;
+import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
@@ -56,6 +58,7 @@ import com.hivemq.client.mqtt.lifecycle.MqttClientDisconnectedListener;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
+import com.osgifx.console.agent.rpc.MqttRPC;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -104,6 +107,11 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Activate
     void activate() {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
+
+    @Override
+    public RpcType getType() {
+        return remoteRPC instanceof MqttRPC<Supervisor, Agent> ? MQTT_RPC : SOCKET_RPC;
     }
 
     @Override
