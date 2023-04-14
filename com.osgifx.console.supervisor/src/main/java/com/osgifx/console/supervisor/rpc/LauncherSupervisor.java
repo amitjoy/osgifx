@@ -40,7 +40,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 import org.osgi.service.event.Event;
@@ -105,12 +104,6 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Activate
     void activate() {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-    }
-
-    @Deactivate
-    void deactivate() {
-        // this will be called when the agent is disconnected to deregister the service
-        Optional.ofNullable(mqttMessagingCondition).ifPresent(OSGiResult::close);
     }
 
     @Override
@@ -219,7 +212,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
     @Override
     public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
         final Throwable cause = context.getCause();
-        if (cause != null && mqttConnectionPromise != null) {
+        if (mqttConnectionPromise != null && cause != null && !cause.getMessage().contains("DISCONNECT")) {
             mqttConnectionPromise.completeExceptionally(cause);
         }
     }
@@ -293,7 +286,9 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             remoteRPC.close();
         }
         mqttConnectionPromise = null;
+        // this will be called when the agent is disconnected to deregister the service
         Optional.ofNullable(mqttMessagingCondition).ifPresent(OSGiResult::close);
+        mqttMessagingCondition = null;
     }
 
     public void redirect(final int shell) throws Exception {
