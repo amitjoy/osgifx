@@ -71,6 +71,8 @@ public class AgentSupervisor<S, A> {
 
         int sendMaximumPacketSize();
 
+        long sessionExpiryInterval();
+
         String connectedListenerFilter();
 
         String disconnectedListenerFilter();
@@ -145,6 +147,7 @@ public class AgentSupervisor<S, A> {
         ch.set(ch.d().port(), connection.port());
         ch.set(ch.d().cleanStart(), true);
         ch.set(ch.d().automaticReconnect(), false);
+        ch.set(ch.d().sessionExpiryInterval(), 0L);
 
         if (!Strings.isNullOrEmpty(connection.username()) && !Strings.isNullOrEmpty(connection.password())) {
             ch.set(ch.d().simpleAuth(), true);
