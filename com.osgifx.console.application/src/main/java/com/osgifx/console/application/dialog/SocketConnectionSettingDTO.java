@@ -15,13 +15,16 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
+import java.util.UUID;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.common.base.MoreObjects;
 
-public final class ConnectionSettingDTO {
+public final class SocketConnectionSettingDTO {
 
+    public String id;
     public String name;
     public String host;
     public int    port;
@@ -29,16 +32,27 @@ public final class ConnectionSettingDTO {
     public String trustStorePath;
     public String trustStorePassword;
 
-    public ConnectionSettingDTO() {
+    public SocketConnectionSettingDTO() {
         // needed for GSON
     }
 
-    public ConnectionSettingDTO(final String name,
-                                final String host,
-                                final int port,
-                                final int timeout,
-                                final String trustStorePath,
-                                final String trustStorePassword) {
+    public SocketConnectionSettingDTO(final String name,
+                                      final String host,
+                                      final int port,
+                                      final int timeout,
+                                      final String trustStorePath,
+                                      final String trustStorePassword) {
+        this(UUID.randomUUID().toString(), name, host, port, timeout, trustStorePath, trustStorePassword);
+    }
+
+    public SocketConnectionSettingDTO(final String id,
+                                      final String name,
+                                      final String host,
+                                      final int port,
+                                      final int timeout,
+                                      final String trustStorePath,
+                                      final String trustStorePassword) {
+        this.id                 = id;
         this.name               = name;
         this.host               = host;
         this.port               = port;
@@ -51,6 +65,7 @@ public final class ConnectionSettingDTO {
     public int hashCode() {
         // @formatter:off
         return new HashCodeBuilder()
+                         .append(id)
                          .append(name)
                          .append(host)
                          .append(port)
@@ -69,9 +84,10 @@ public final class ConnectionSettingDTO {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final var other = (ConnectionSettingDTO) obj;
+        final var other = (SocketConnectionSettingDTO) obj;
         // @formatter:off
         return new EqualsBuilder()
+                           .append(id, other.id)
                            .append(name, other.name)
                            .append(host, other.host)
                            .append(port, other.port)
@@ -86,6 +102,7 @@ public final class ConnectionSettingDTO {
     public String toString() {
         // @formatter:off
         return MoreObjects.toStringHelper(getClass())
+                               .add("id", id)
                                .add("name", name)
                                .add("host", host)
                                .add("port", port)

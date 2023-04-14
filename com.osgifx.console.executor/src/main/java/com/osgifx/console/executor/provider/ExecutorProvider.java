@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
 import org.apache.commons.lang3.time.DurationUtils;
@@ -80,6 +81,12 @@ public final class ExecutorProvider implements Executor {
     public CompletableFuture<Void> runAsync(final Runnable command) {
         checkNotNull(command, "Task cannot be null");
         return CompletableFuture.runAsync(command, executor);
+    }
+
+    @Override
+    public <U> CompletableFuture<U> supplyAsync(final Supplier<U> supplier) {
+        checkNotNull(supplier, "Supplier cannot be null");
+        return CompletableFuture.supplyAsync(supplier, executor);
     }
 
     @Override

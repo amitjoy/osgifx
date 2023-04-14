@@ -30,7 +30,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.application.dialog.ConnectionSettingDTO;
+import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
@@ -42,32 +42,32 @@ public final class DisconnectFromAgentHandler {
 
     @Log
     @Inject
-    private FluentLogger                            logger;
+    private FluentLogger                                  logger;
     @Inject
-    private Executor                                executor;
+    private Executor                                      executor;
     @Inject
     @Optional
-    private Supervisor                              supervisor;
+    private Supervisor                                    supervisor;
     @Inject
-    private IEventBroker                            eventBroker;
+    private IEventBroker                                  eventBroker;
     @Inject
     @Optional
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>              isConnected;
+    private ContextBoundValue<Boolean>                    isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>              isLocalAgent;
+    private ContextBoundValue<Boolean>                    isLocalAgent;
     @Inject
     @Optional
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>               connectedAgent;
+    private ContextBoundValue<String>                     connectedAgent;
     @Inject
     @Optional
     @ContextValue("selected.settings")
-    private ContextBoundValue<ConnectionSettingDTO> selectedSettings;
+    private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     @Inject
-    private SupervisorFactory                       supervisorFactory;
+    private SupervisorFactory                             supervisorFactory;
 
     @Execute
     public void execute() {
@@ -76,7 +76,7 @@ public final class DisconnectFromAgentHandler {
             @Override
             protected Void call() throws Exception {
                 try {
-                    supervisor.getAgent().abort();
+                    supervisor.disconnect();
                     Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
                     logger.atInfo().log("Agent connection has been successfully aborted");
                 } catch (final Exception e) {
