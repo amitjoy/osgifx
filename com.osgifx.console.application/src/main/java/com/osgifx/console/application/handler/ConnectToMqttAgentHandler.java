@@ -16,8 +16,8 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static javafx.scene.control.ButtonType.CANCEL;
 
 import java.util.Map;
@@ -225,6 +225,7 @@ public final class ConnectToMqttAgentHandler {
                 } catch (final InterruptedException e) {
                     logger.atInfo().log("Connection task interrupted");
                     threadSync.asyncExec(progressDialog::close);
+                    supervisorFactory.removeSupervisor(REMOTE_RPC);
                     throw e;
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot connect to %s", settings);
@@ -232,6 +233,7 @@ public final class ConnectToMqttAgentHandler {
                         progressDialog.close();
                         FxDialog.showExceptionDialog(e, getClass().getClassLoader());
                     });
+                    supervisorFactory.removeSupervisor(REMOTE_RPC);
                     throw e;
                 }
             }
