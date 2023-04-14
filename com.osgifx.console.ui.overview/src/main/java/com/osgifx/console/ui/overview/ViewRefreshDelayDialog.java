@@ -49,7 +49,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
 
     private final ValidationSupport validationSupport = new ValidationSupport();
 
-    public void init() {
+    public void init(final long refreshDelay) {
         final var dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
@@ -71,6 +71,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
         final var requiredFormat       = "'%s' is required";
         final var requiredNumberFormat = "'%s' should be a valid integer number";
 
+        delayField.setText(String.valueOf(refreshDelay));
         delayField.setLeft(new ImageView(getClass().getResource("/graphic/icons/delay.png").toExternalForm()));
         delayField.setPromptText("Delay in seconds");
         validationSupport.registerValidator(delayField,
