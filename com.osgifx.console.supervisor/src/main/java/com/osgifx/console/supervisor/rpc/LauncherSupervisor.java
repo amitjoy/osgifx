@@ -288,11 +288,12 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
 
     @Override
     public void disconnect() throws Exception {
-        mqttConnectionPromise = null;
         if (isOpen()) {
             getAgent().disconnect();
             remoteRPC.close();
         }
+        mqttConnectionPromise = null;
+        Optional.ofNullable(mqttMessagingCondition).ifPresent(OSGiResult::close);
     }
 
     public void redirect(final int shell) throws Exception {
