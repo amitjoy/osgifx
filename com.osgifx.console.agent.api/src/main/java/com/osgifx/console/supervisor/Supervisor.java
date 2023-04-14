@@ -30,11 +30,21 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 @ProviderType
 public interface Supervisor {
 
+    public enum RpcType {
+        MQTT_RPC,
+        SOCKET_RPC
+    }
+
     /** The topic where an event will be sent after the agent gets connected */
     String AGENT_CONNECTED_EVENT_TOPIC = "fx/console/agent/connected";
 
     /** The topic where an event will be sent after the agent gets disconnected */
     String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
+
+    /**
+     * Returns the type of the communication
+     */
+    RpcType getType();
 
     /**
      * Connects to the provided socket using the specified options
