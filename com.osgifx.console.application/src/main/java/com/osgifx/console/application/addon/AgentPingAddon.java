@@ -100,7 +100,9 @@ public final class AgentPingAddon {
     @Optional
     private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent disconnected event has been received");
-        future.cancel(true);
+        if (future != null) {
+            future.cancel(true);
+        }
         connectedAgent.publish(null);
     }
 
