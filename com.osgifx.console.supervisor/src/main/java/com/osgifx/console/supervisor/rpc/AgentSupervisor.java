@@ -17,6 +17,8 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAXIMUM_CONCURRENT_MSG_TO_RECEIVE;
+import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAXIMUM_CONCURRENT_MSG_TO_SEND;
 import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_PACKET_SIZE;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
@@ -49,7 +51,9 @@ import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
 public class AgentSupervisor<S, A> {
 
     @interface MqttConfig {
-        final int MAX_PACKET_SIZE = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
+        final int MAXIMUM_CONCURRENT_MSG_TO_SEND    = 5;
+        final int MAXIMUM_CONCURRENT_MSG_TO_RECEIVE = 5;
+        final int MAX_PACKET_SIZE                   = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
 
         String id();
 
@@ -66,6 +70,10 @@ public class AgentSupervisor<S, A> {
         String username();
 
         String password();
+
+        int sendMaximum();
+
+        int receiveMaximum();
 
         int maximumPacketSize();
 
@@ -155,6 +163,8 @@ public class AgentSupervisor<S, A> {
             ch.set(ch.d().password(), connection.password());
         }
 
+        ch.set(ch.d().sendMaximum(), MAXIMUM_CONCURRENT_MSG_TO_SEND);
+        ch.set(ch.d().receiveMaximum(), MAXIMUM_CONCURRENT_MSG_TO_RECEIVE);
         ch.set(ch.d().maximumPacketSize(), MAX_PACKET_SIZE);
         ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
         ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
