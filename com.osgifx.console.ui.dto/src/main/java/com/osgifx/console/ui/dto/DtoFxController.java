@@ -82,23 +82,27 @@ public final class DtoFxController {
     }
 
     private void initTree() {
-        final var runtimeDTO = dataProvider.readRuntimeDTO();
-        if (runtimeDTO == null) {
+        final var promise = dataProvider.readRuntimeDTO();
+        if (promise == null) {
             return;
         }
-        final var content = new Gson().toJson(runtimeDTO);
-        final var json    = JsonParser.parseString(content).getAsJsonObject();
+        promise.thenAccept(dto -> {
+            final var content = new Gson().toJson(dto);
+            final var json    = JsonParser.parseString(content).getAsJsonObject();
 
-        final var root = parseJSON("ROOT", json);
-        root.setExpanded(true);
-        dtoTree.setRoot(root);
+            threadSync.asyncExec(() -> {
+                final var root = parseJSON("ROOT", json);
+                root.setExpanded(true);
+                dtoTree.setRoot(root);
 
-        searchBox.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                performSearch(root);
-            }
+                searchBox.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ENTER) {
+                        performSearch(root);
+                    }
+                });
+                searchBtn.setOnMouseClicked(event -> performSearch(root));
+            });
         });
-        searchBtn.setOnMouseClicked(event -> performSearch(root));
     }
 
     private void performSearch(final FilterableTreeItem<String> rootItem) {
