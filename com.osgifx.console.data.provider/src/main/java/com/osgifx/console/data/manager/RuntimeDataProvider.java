@@ -107,7 +107,7 @@ public final class RuntimeDataProvider implements DataProvider {
 
                 CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                                  .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
-                                 .thenRunAsync(() -> logger.atInfo() .log("All runtime informations have been retrieved successfully (async)"));
+                                 .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
             } else {
                 infoSuppliers.values()
                              .stream()
@@ -117,7 +117,7 @@ public final class RuntimeDataProvider implements DataProvider {
             }
         } else if (isAsync) {
             executor.runAsync(() -> retrieve(id))
-                    .thenRunAsync(() -> logger.atInfo() .log("Runtime information of '%s' has been retrieved successfully (async)", id));
+                    .thenRunAsync(() -> logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (async)", id));
         } else {
             retrieve(id);
             logger.atInfo().log("Runtime information of '%s' has been retrieved successfully (sync)", id);
@@ -199,7 +199,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public CompletableFuture<XMemoryInfoDTO> memory() {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return executor.supplyAsync(agent::getMemoryInfo);
@@ -209,7 +209,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public CompletableFuture<XDmtNodeDTO> readDmtNode(final String rootURI) {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return executor.supplyAsync(() -> agent.readDmtNode(rootURI));
@@ -219,7 +219,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public CompletableFuture<RuntimeDTO> readRuntimeDTO() {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return executor.supplyAsync(agent::getRuntimeDTO);
@@ -229,7 +229,7 @@ public final class RuntimeDataProvider implements DataProvider {
     public CompletableFuture<XHeapUsageDTO> heapUsage() {
         final var agent = supervisor.getAgent();
         if (agent == null) {
-            logger.atWarning().log("Agent is not connected");
+            logger.atWarning().log("Agent not connected");
             return null;
         }
         return executor.supplyAsync(agent::getHeapUsage);
