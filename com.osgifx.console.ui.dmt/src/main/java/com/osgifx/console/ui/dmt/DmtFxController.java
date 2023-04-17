@@ -104,11 +104,11 @@ public final class DmtFxController {
     }
 
     private void initTree() {
-        final var dmtNode = dataProvider.readDmtNode(ROOT_DMT_NODE);
-        if (dmtNode == null) {
+        final var promise = dataProvider.readDmtNode(ROOT_DMT_NODE);
+        if (promise == null) {
             return;
         }
-        dmtNode.thenAccept(node -> threadSync.asyncExec(() -> {
+        promise.thenAccept(node -> threadSync.asyncExec(() -> {
             final var rootItem = new FilterableTreeItem<>(node.uri);
             rootItem.setExpanded(true);
             dmtTree.setRoot(rootItem);
