@@ -32,6 +32,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
@@ -50,6 +51,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 @Component
+@ServiceRanking(103)
 @SupplierID(PACKAGES_ID)
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, BUNDLE_ACTION_EVENT_TOPICS })
 public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHandler {
