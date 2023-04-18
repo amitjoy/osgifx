@@ -57,7 +57,7 @@ org.osgi:org.osgi.util.converter:1.0.9
 # TilesFx
 
 eu.hansolo:tilesfx:17.1.17
-eu.hansolo:toolbox:17.0.41
+eu.hansolo:toolbox:17.0.43
 eu.hansolo:toolboxfx:17.0.33
 
 # FormsFx
