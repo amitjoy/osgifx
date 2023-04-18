@@ -150,8 +150,8 @@ public final class HeapMonitorPane extends BorderPane {
         if (supervisor == null || supervisor.getAgent() == null) {
             return box;
         }
-        final var heapUsage = dataProvider.heapUsage();
-        heapUsage.thenAccept(usage -> {
+        final var promise = dataProvider.heapUsage();
+        promise.thenAccept(usage -> {
             threadSync.asyncExec(() -> {
                 for (final XMemoryPoolMXBean mpBean : usage.memoryPoolBeans) {
                     if ("HEAP".equals(mpBean.type)) {
@@ -404,8 +404,8 @@ public final class HeapMonitorPane extends BorderPane {
             if (!isConnected) {
                 return CompletableFuture.completedFuture(new XMemoryUsage());
             }
-            final var heapUsage = dataProvider.heapUsage();
-            return heapUsage.thenApply(usage -> Stream.of(usage.memoryPoolBeans).filter(m -> bean.name.equals(m.name))
+            final var promise = dataProvider.heapUsage();
+            return promise.thenApply(usage -> Stream.of(usage.memoryPoolBeans).filter(m -> bean.name.equals(m.name))
                     .map(m -> m.memoryUsage).findAny().orElse(null));
         };
     }
