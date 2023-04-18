@@ -32,24 +32,20 @@ import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
-import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
-import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
-import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.ComponentServiceObjects;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.event.EventAdmin;
 
-import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
@@ -78,16 +74,16 @@ import javafx.collections.ObservableList;
 public final class RuntimeDataProvider implements DataProvider {
 
     @Reference
-    private LoggerFactory       factory;
+    private LoggerFactory                                                     factory;
     @Reference
-    private Executor            executor;
+    private Executor                                                          executor;
     @Reference
-    private EventAdmin          eventAdmin;
+    private EventAdmin                                                        eventAdmin;
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
-    private volatile Supervisor supervisor;
-
-    private FluentLogger                           logger;
-    private final Map<String, RuntimeInfoSupplier> infoSuppliers = Maps.newConcurrentMap();
+    private volatile Supervisor                                               supervisor;
+    @Reference
+    private volatile Collection<ComponentServiceObjects<RuntimeInfoSupplier>> infoSuppliers;
+    private FluentLogger                                                      logger;
 
     @Activate
     public void activate() {
@@ -100,8 +96,8 @@ public final class RuntimeDataProvider implements DataProvider {
         if (id == null) {
             if (isAsync) {
                 final var futures =
-                        infoSuppliers.values()
-                                     .stream()
+                        infoSuppliers.stream()
+                                     .map(ComponentServiceObjects::getService)
                                      .map(s -> executor.runAsync(s::retrieve))
                                      .toList();
 
@@ -109,9 +105,10 @@ public final class RuntimeDataProvider implements DataProvider {
                                  .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
                                  .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
             } else {
-                infoSuppliers.values()
-                             .stream()
+                infoSuppliers.stream()
+                             .map(ComponentServiceObjects::getService)
                              .forEach(RuntimeInfoSupplier::retrieve);
+
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
                 logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
             }
@@ -235,27 +232,24 @@ public final class RuntimeDataProvider implements DataProvider {
         return executor.supplyAsync(agent::getHeapUsage);
     }
 
-    @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    void bindInfoSupplier(final RuntimeInfoSupplier supplier, final ServiceReference<RuntimeInfoSupplier> reference) {
-        final var id = (String) reference.getProperty(PROPERTY_ID);
-        infoSuppliers.put(id, supplier);
-    }
-
-    void unbindInfoSupplier(final ServiceReference<RuntimeInfoSupplier> reference) {
-        final var id = (String) reference.getProperty(PROPERTY_ID);
-        infoSuppliers.remove(id);
-    }
-
     private ObservableList<?> getData(final String id) {
         // @formatter:off
-        return Optional.ofNullable(infoSuppliers.get(id))
-                       .map(RuntimeInfoSupplier::supply)
-                       .orElse(observableArrayList());
+        return infoSuppliers.stream()
+                            .filter(cso -> cso.getServiceReference().getProperty(PROPERTY_ID).equals(id))
+                            .map(ComponentServiceObjects::getService)
+                            .map(RuntimeInfoSupplier::supply)
+                            .findFirst()
+                            .orElse(observableArrayList());
         // @formatter:on
     }
 
     private void retrieve(final String id) {
-        Optional.ofNullable(infoSuppliers.get(id)).ifPresent(RuntimeInfoSupplier::retrieve);
+        // @formatter:off
+        infoSuppliers.stream()
+                     .filter(cso -> cso.getServiceReference().getProperty(PROPERTY_ID).equals(id))
+                     .map(ComponentServiceObjects::getService)
+                     .findFirst()
+                     .ifPresent(RuntimeInfoSupplier::retrieve);
     }
 
 }
