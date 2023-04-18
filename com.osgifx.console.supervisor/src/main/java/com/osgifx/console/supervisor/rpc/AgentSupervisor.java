@@ -29,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -40,6 +41,7 @@ import org.osgi.service.condition.Condition;
 
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.rpc.MqttRPC;
+import com.osgifx.console.agent.rpc.MqttRPC.NameableThreadFactory;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.SocketRPC;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -90,7 +92,8 @@ public class AgentSupervisor<S, A> {
         String osgi_ds_satisfying_condition_target();
     }
 
-    private static final int CONNECT_WAIT = 200;
+    private static final int CONNECT_WAIT          = 200;
+    private static final int MQTT_RPC_POOL_THREADS = 30;
 
     private A                    agent;
     protected int                port;
@@ -179,7 +182,9 @@ public class AgentSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic());
+        final var executor = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, new NameableThreadFactory());
+        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
+                                  executor);
         this.setRemoteRPC(remoteRPC);
         remoteRPC.open();
 
