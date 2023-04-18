@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,6 +46,24 @@ import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.json.JSONCodec;
 
 public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
+
+    public static class NameableThreadFactory implements ThreadFactory {
+
+        private static final String NAME_PATTERN = "osgifx-agent";
+
+        private int          threadsNum;
+        private final String namePattern;
+
+        public NameableThreadFactory() {
+            namePattern = NAME_PATTERN + "-%d";
+        }
+
+        @Override
+        public Thread newThread(final Runnable runnable) {
+            threadsNum++;
+            return new Thread(runnable, String.format(namePattern, threadsNum));
+        }
+    }
 
     private static final JSONCodec codec = new JSONCodec();
 
@@ -63,12 +81,17 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private R              remote;
     private final Class<R> remoteClass;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(4);
+    private final ExecutorService executor;
 
     public static class RpcMessage {
         public int      id;
         public String   methodName;
         public String[] methodArgs;
+
+        @Override
+        public String toString() {
+            return "[id=" + id + ", methodName=" + methodName + "]";
+        }
     }
 
     public static class RpcResult {
@@ -82,12 +105,14 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                    final Class<R> remoteClass,
                    final L local,
                    final String pubTopic,
-                   final String subTopic) {
+                   final String subTopic,
+                   final ExecutorService executor) {
         this.bundleContext = bundleContext;
         this.remoteClass   = remoteClass;
         this.local         = local == null ? (L) this : local;
         this.pubTopic      = pubTopic;
         this.subTopic      = subTopic;
+        this.executor      = executor;
     }
 
     @Override
@@ -211,7 +236,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         if (msg.methodName != null) {
             promises.put(msg.id, new RpcResult());
         }
-        trace("send");
+        trace("Sending RPC: " + msg);
         final Optional<MessagePublisher> publisher = mqttClient.pub();
         if (publisher.isPresent()) {
             final Optional<MessageContextBuilder> msgCtx = mqttClient.msgCtx();
@@ -224,7 +249,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 final byte[]  data    = bout.toByteArray();
                 final Message message = msgCtx.get().channel(pubTopic).content(ByteBuffer.wrap(data)).buildMessage();
                 publisher.get().publish(message);
-                trace("sent");
+                trace("Sent RPC: " + msg);
             } catch (final Exception e) {
                 throw new RuntimeException("Message cannot be encoded");
             }
@@ -238,23 +263,23 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             msgId     = -msgId;
             exception = true;
         }
-        final RpcResult o = promises.get(msgId);
-        if (o != null) {
-            synchronized (o) {
-                trace("resolved");
-                o.value     = data;
-                o.exception = exception;
-                o.resolved  = true;
-                o.notifyAll();
+        final RpcResult result = promises.get(msgId);
+        if (result != null) {
+            synchronized (result) {
+                trace("Resolved RPC");
+                result.value     = data;
+                result.exception = exception;
+                result.resolved  = true;
+                result.notifyAll();
             }
         }
     }
 
     @SuppressWarnings("unchecked")
     private <T> T waitForResult(final int id, final Type type) throws Exception {
-        final long      deadline   = 300_000L;
-        final long      startNanos = System.nanoTime();
-        final RpcResult result     = promises.get(id);
+        final long      deadlineInMillis = 10_000L;
+        final long      startInNanos     = System.nanoTime();
+        final RpcResult result           = promises.get(id);
         try {
             do {
                 synchronized (result) {
@@ -272,16 +297,19 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                         }
                         return (T) codec.dec().from(result.value).get(type);
                     }
-                    long elapsed = System.nanoTime() - startNanos;
-                    long delay   = deadline - TimeUnit.NANOSECONDS.toMillis(elapsed);
-                    if (delay <= 0L) {
+                    long elapsedInNanos = System.nanoTime() - startInNanos;
+                    long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
+                    if (delayInMillis <= 0L) {
                         return null;
                     }
-                    trace("start delay " + delay);
-                    result.wait(delay);
-                    elapsed = System.nanoTime() - startNanos;
-                    delay   = deadline - TimeUnit.NANOSECONDS.toMillis(elapsed);
-                    trace("end delay " + delay);
+                    trace("Start Delay " + delayInMillis);
+                    result.wait(delayInMillis);
+                    elapsedInNanos = System.nanoTime() - startInNanos;
+                    delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
+                    if (delayInMillis <= 0L) {
+                        return null;
+                    }
+                    trace("End Delay " + delayInMillis);
                 }
             } while (true);
         } finally {

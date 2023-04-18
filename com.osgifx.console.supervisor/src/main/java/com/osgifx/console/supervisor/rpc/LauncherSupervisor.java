@@ -20,6 +20,7 @@ import static com.osgifx.console.supervisor.Supervisor.RpcType.MQTT_RPC;
 import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
@@ -32,7 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.aries.component.dsl.OSGiResult;
@@ -135,7 +135,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
                                               mqttConnection,
                                               MQTT_CONDITION_ID);
             // @formatter:on
-            mqttConnectionPromise.get(mqttConnection.timeout(), TimeUnit.MILLISECONDS);
+            mqttConnectionPromise.get(mqttConnection.timeout(), MILLISECONDS);
 
             final var lwtTopic = mqttConnection.lwtTopic();
             if (subscriber != null && !Strings.isNullOrEmpty(lwtTopic)) {
@@ -148,6 +148,7 @@ public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
             throw e;
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw e;
         }
     }
 
