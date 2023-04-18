@@ -28,6 +28,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
@@ -40,6 +41,7 @@ import com.osgifx.console.supervisor.Supervisor;
 import javafx.collections.ObservableList;
 
 @Component
+@ServiceRanking(113)
 @SupplierID(LOGS_ID)
 @EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, CLEAR_LOGS_TOPIC })
 public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryListener, EventHandler {

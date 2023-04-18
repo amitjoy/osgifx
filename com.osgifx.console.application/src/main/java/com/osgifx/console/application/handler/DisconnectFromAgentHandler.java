@@ -31,20 +31,15 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
-import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType;
-
-import javafx.concurrent.Task;
 
 public final class DisconnectFromAgentHandler {
 
     @Log
     @Inject
     private FluentLogger                                  logger;
-    @Inject
-    private Executor                                      executor;
     @Inject
     @Optional
     private Supervisor                                    supervisor;
@@ -71,34 +66,21 @@ public final class DisconnectFromAgentHandler {
 
     @Execute
     public void execute() {
-        final Task<Void> disconnectTask = new Task<>() {
+        try {
+            supervisor.disconnect();
+            Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
 
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    supervisor.disconnect();
-                    Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
-                    logger.atInfo().log("Agent connection has been successfully aborted");
-                } catch (final Exception e) {
-                    logger.atError().withException(e).log("Agent connection cannot be aborted");
-                }
-                return null;
-            }
+            eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
 
-            @Override
-            protected void succeeded() {
-                eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
-                logger.atInfo().log("Agent disconnected event has been successfully sent");
+            isConnected.publish(false);
+            isLocalAgent.publish(false);
+            selectedSettings.publish(null);
+            connectedAgent.publish(null);
 
-                isConnected.publish(false);
-                isLocalAgent.publish(false);
-                selectedSettings.publish(null);
-                connectedAgent.publish(null);
-
-                logger.atInfo().log("Application specific context values have been reset");
-            }
-        };
-        executor.runAsync(disconnectTask);
+            logger.atInfo().log("Agent has been successfully disconnected");
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("Agent cannot be disconnected");
+        }
     }
 
     @CanExecute

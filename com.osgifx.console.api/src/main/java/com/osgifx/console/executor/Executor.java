@@ -22,6 +22,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Supplier;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * An object that executes submitted {@link Runnable} tasks. This
  * interface provides a way of decoupling task submission from the
@@ -29,6 +31,7 @@ import java.util.function.Supplier;
  * use, scheduling, etc. An {@code Executor} is normally used
  * instead of explicitly creating threads.
  */
+@ProviderType
 public interface Executor {
 
     /**

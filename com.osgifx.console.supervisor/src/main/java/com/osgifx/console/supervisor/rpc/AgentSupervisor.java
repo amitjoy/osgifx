@@ -17,6 +17,8 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_RECEIVE;
+import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_SEND;
 import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_PACKET_SIZE;
 import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
@@ -27,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -38,6 +41,7 @@ import org.osgi.service.condition.Condition;
 
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.rpc.MqttRPC;
+import com.osgifx.console.agent.rpc.MqttRPC.NameableThreadFactory;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.SocketRPC;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -49,7 +53,9 @@ import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
 public class AgentSupervisor<S, A> {
 
     @interface MqttConfig {
-        final int MAX_PACKET_SIZE = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
+        final int MAX_CONCURRENT_MSG_TO_SEND    = 5;
+        final int MAX_CONCURRENT_MSG_TO_RECEIVE = 5;
+        final int MAX_PACKET_SIZE               = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
 
         String id();
 
@@ -67,6 +73,12 @@ public class AgentSupervisor<S, A> {
 
         String password();
 
+        int sendMaximum();
+
+        int receiveMaximum();
+
+        int keepAliveInterval();
+
         int maximumPacketSize();
 
         int sendMaximumPacketSize();
@@ -80,7 +92,8 @@ public class AgentSupervisor<S, A> {
         String osgi_ds_satisfying_condition_target();
     }
 
-    private static final int CONNECT_WAIT = 200;
+    private static final int CONNECT_WAIT          = 200;
+    private static final int MQTT_RPC_POOL_THREADS = 30;
 
     private A                    agent;
     protected int                port;
@@ -155,7 +168,10 @@ public class AgentSupervisor<S, A> {
             ch.set(ch.d().password(), connection.password());
         }
 
+        ch.set(ch.d().sendMaximum(), MAX_CONCURRENT_MSG_TO_SEND);
+        ch.set(ch.d().receiveMaximum(), MAX_CONCURRENT_MSG_TO_RECEIVE);
         ch.set(ch.d().maximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().keepAliveInterval(), 0);
         ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
         ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
         ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
@@ -166,7 +182,9 @@ public class AgentSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic());
+        final var executor = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, new NameableThreadFactory());
+        remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
+                                  executor);
         this.setRemoteRPC(remoteRPC);
         remoteRPC.open();
 
