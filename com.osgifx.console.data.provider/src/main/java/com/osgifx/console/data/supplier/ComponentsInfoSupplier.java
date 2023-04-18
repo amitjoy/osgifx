@@ -32,6 +32,7 @@ import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventHandler;
@@ -45,6 +46,7 @@ import com.osgifx.console.supervisor.Supervisor;
 import javafx.collections.ObservableList;
 
 @Component
+@ServiceRanking(101)
 @SupplierID(COMPONENTS_ID)
 // @formatter:off
 @EventTopics({
