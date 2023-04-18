@@ -25,6 +25,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
@@ -37,6 +39,7 @@ import com.osgifx.console.agent.provider.AgentServer.RpcType;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
 import com.osgifx.console.agent.rpc.MqttRPC;
+import com.osgifx.console.agent.rpc.MqttRPC.NameableThreadFactory;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.SocketRPC;
 import com.osgifx.console.supervisor.Supervisor;
@@ -47,6 +50,8 @@ import com.osgifx.console.supervisor.Supervisor;
  */
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
+
+    private static final int MQTT_RPC_POOL_THREADS = 5;
 
     private DIModule                module;
     private ServerSocket            serverSocket;
@@ -78,8 +83,11 @@ public final class Activator extends Thread implements BundleActivator {
             }
             final AgentServer agentServer = new AgentServer(module.di(), RpcType.MQTT_RPC);
             agents.add(agentServer);
-            final RemoteRPC<Agent, Supervisor> mqttRPC = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
-                                                                       pubTopic, subTopic);
+
+            final ExecutorService              executor = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS,
+                    new NameableThreadFactory());
+            final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
+                                                                        pubTopic, subTopic, executor);
 
             module.bindInstance(AgentServer.class, agentServer);
             module.bindInstance(RemoteRPC.class, mqttRPC);
