@@ -21,7 +21,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Supplier;
@@ -55,18 +54,19 @@ public final class ExecutorProvider implements Executor {
     }
 
     @Reference
-    private LoggerFactory            factory;
-    private FluentLogger             logger;
-    private ScheduledExecutorService executor;
+    private LoggerFactory               factory;
+    private FluentLogger                logger;
+    private ScheduledThreadPoolExecutor executor;
 
     @Activate
     void activate(final Configuration config) {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 
         final var coreSize      = config.coreSize();
-        final var threadFactory = new Builder().namingPattern("osgifx-%d").daemon(config.daemon()).build();
+        final var threadFactory = new Builder().namingPattern("fx-worker-%d").daemon(config.daemon()).build();
 
         executor = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
+        executor.setRemoveOnCancelPolicy(true);
     }
 
     @Deactivate
