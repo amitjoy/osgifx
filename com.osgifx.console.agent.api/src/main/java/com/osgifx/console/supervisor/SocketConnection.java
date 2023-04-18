@@ -91,12 +91,12 @@ public class SocketConnection {
         }
 
         public SocketConnectionBuilder truststore(final String trustStore) {
-            this.trustStore = requireNonNull(trustStore, "'trustStore' cannot be null");
+            this.trustStore = trustStore;
             return this;
         }
 
         public SocketConnectionBuilder truststorePass(final String trustStorePassword) {
-            this.trustStorePassword = requireNonNull(trustStorePassword, "'trustStorePassword' cannot be null");
+            this.trustStorePassword = trustStorePassword;
             return this;
         }
 
