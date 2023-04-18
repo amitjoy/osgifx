@@ -41,6 +41,8 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.condition.Condition;
 
 import com.google.common.base.Strings;
+import com.google.mu.util.concurrent.Retryer;
+import com.google.mu.util.concurrent.Retryer.Delay;
 import com.osgifx.console.agent.rpc.MqttRPC;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.SocketRPC;
@@ -92,8 +94,9 @@ public class AgentSupervisor<S, A> {
         String osgi_ds_satisfying_condition_target();
     }
 
-    private static final int CONNECT_WAIT          = 200;
-    private static final int MQTT_RPC_POOL_THREADS = 30;
+    private static final int    MQTT_RPC_POOL_THREADS         = 30;
+    private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
+    private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5;
 
     private A                    agent;
     protected int                port;
@@ -111,38 +114,34 @@ public class AgentSupervisor<S, A> {
         checkNotNull(supervisor, "'supervisor' cannot be null");
         checkNotNull(socketConnection.host(), "'host' cannot be null");
 
-        var retryTimeout = timeout;
         host    = socketConnection.host();
         port    = socketConnection.port();
         timeout = socketConnection.timeout();
 
-        while (true) {
-            try {
-                SSLSocketFactory sf = null;
-                if (socketConnection.trustStore() != null && socketConnection.trustStorePassword() != null) {
-                    System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
-                    System.setProperty("javax.net.ssl.trustStorePassword", socketConnection.trustStorePassword());
-                    System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        new Retryer().upon(ConnectException.class,
+                Delay.ofMillis(timeout).exponentialBackoff(SOCKET_RPC_BACKOFF_MULTIPLIER, SOCKET_RPC_BACKOFF_LIMIT))
+                .retryBlockingly(() -> {
+                    try {
+                        SSLSocketFactory sf = null;
+                        if (socketConnection.trustStore() != null && socketConnection.trustStorePassword() != null) {
+                            System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
+                            System.setProperty("javax.net.ssl.trustStorePassword",
+                                    socketConnection.trustStorePassword());
+                            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
-                    sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                }
-                final var socket = sf == null ? new Socket() : sf.createSocket();
-                socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
-                remoteRPC = new SocketRPC<>(agent, supervisor, socket);
-                this.setRemoteRPC(remoteRPC);
-                remoteRPC.open();
-                return;
-            } catch (final ConnectException e) {
-                clearSSLProperties();
-                if (retryTimeout == 0) {
-                    throw e;
-                }
-                if (retryTimeout > 0) {
-                    retryTimeout = Math.max(retryTimeout - CONNECT_WAIT, 0);
-                }
-                Thread.sleep(CONNECT_WAIT);
-            }
-        }
+                            sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                        }
+                        final var socket = sf == null ? new Socket() : sf.createSocket();
+                        socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
+                        remoteRPC = new SocketRPC<>(agent, supervisor, socket);
+                        this.setRemoteRPC(remoteRPC);
+                        remoteRPC.open();
+                        return null;
+                    } catch (final ConnectException e) {
+                        clearSSLProperties();
+                        throw e;
+                    }
+                });
     }
 
     protected OSGiResult connectToMQTT(final BundleContext bundleContext,
