@@ -35,13 +35,13 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.condition.Condition;
 
 import com.google.common.base.Strings;
 import com.osgifx.console.agent.rpc.MqttRPC;
-import com.osgifx.console.agent.rpc.MqttRPC.NameableThreadFactory;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.SocketRPC;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -182,7 +182,9 @@ public class AgentSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        final var executor = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, new NameableThreadFactory());
+        final var threadFactory = new Builder().namingPattern("fx-supervisor-%d").daemon(true).build();
+        final var executor      = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, threadFactory);
+
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
                                   executor);
         this.setRemoteRPC(remoteRPC);
