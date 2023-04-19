@@ -215,13 +215,15 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
     @Override
     public synchronized void onConnected(final MqttClientConnectedContext context) {
+        logger.atInfo().log("Successfully connected to '%s'", context.getClientConfig().getServerHost());
         mqttConnectionPromise.complete(true);
     }
 
     @Override
     public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
+        logger.atInfo().log("Successfully disconnected from '%s'", context.getClientConfig().getServerHost());
         final Throwable cause = context.getCause();
-        if (mqttConnectionPromise != null && cause != null && !cause.getMessage().contains("DISCONNECT")) {
+        if (mqttConnectionPromise != null && cause != null) {
             mqttConnectionPromise.completeExceptionally(cause);
         }
     }
