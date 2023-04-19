@@ -16,8 +16,8 @@
 package com.osgifx.console.application.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -110,7 +110,7 @@ public final class ConnectToLocalAgentHandler {
                     // @formatter:on
 
                     supervisor.connect(socketConnection);
-                    logger.atInfo().log("Successfully connected to Local Agent on %s:%s", localAgentHost,
+                    logger.atInfo().log("Successfully connected to local agent on %s:%s", localAgentHost,
                             localAgentPort);
                     return null;
                 } catch (final InterruptedException e) {
@@ -118,7 +118,7 @@ public final class ConnectToLocalAgentHandler {
                     threadSync.asyncExec(progressDialog::close);
                     throw e;
                 } catch (final Exception e) {
-                    logger.atError().withException(e).log("Cannot connect to Local Agent on %s:%s", localAgentHost,
+                    logger.atError().withException(e).log("Cannot connect to local agent on %s:%s", localAgentHost,
                             localAgentPort);
                     threadSync.asyncExec(() -> {
                         progressDialog.close();
@@ -130,7 +130,7 @@ public final class ConnectToLocalAgentHandler {
 
             @Override
             protected void succeeded() {
-                logger.atInfo().log("Agent connected event has been sent for Local Agent on %s:%s", localAgentHost,
+                logger.atInfo().log("Agent connected event has been sent for local agent on %s:%s", localAgentHost,
                         localAgentPort);
 
                 final var connection = "[SOCKET] " + localAgentHost + ":" + localAgentPort;

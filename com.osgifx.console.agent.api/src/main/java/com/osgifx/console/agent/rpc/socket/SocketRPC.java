@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.rpc;
+package com.osgifx.console.agent.rpc.socket;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.json.JSONCodec;
@@ -51,14 +51,14 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final DataOutputStream                  out;
     private final AtomicInteger                     id       = new AtomicInteger(10_000);
     private final ConcurrentMap<Integer, RpcResult> promises = new ConcurrentHashMap<>();
-    private final AtomicBoolean                     quit     = new AtomicBoolean();
+    private final AtomicBoolean                     stopped  = new AtomicBoolean();
     private final ThreadLocal<Integer>              msgId    = new ThreadLocal<>();
 
     private L              local;
     private R              remote;
     private final Class<R> remoteClass;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(4);
+    private ExecutorService executor;
 
     private static class RpcResult {
         boolean resolved;
@@ -66,22 +66,34 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         boolean exception;
     }
 
-    public SocketRPC(final Class<R> remoteClass, final L local, final Socket socket) throws IOException {
-        this(remoteClass, local, socket.getInputStream(), socket.getOutputStream());
+    public SocketRPC(final Class<R> remoteClass,
+                     final L local,
+                     final Socket socket,
+                     final ExecutorService executor) throws IOException {
+        this(remoteClass, local, socket.getInputStream(), socket.getOutputStream(), executor);
     }
 
-    public SocketRPC(final Class<R> remoteClass, final L local, final InputStream in, final OutputStream out) {
-        this(remoteClass, local, new DataInputStream(in), new DataOutputStream(out));
+    public SocketRPC(final Class<R> remoteClass,
+                     final L local,
+                     final InputStream in,
+                     final OutputStream out,
+                     final ExecutorService executor) {
+        this(remoteClass, local, new DataInputStream(in), new DataOutputStream(out), executor);
     }
 
     @SuppressWarnings("unchecked")
-    public SocketRPC(final Class<R> remoteClass, final L local, final DataInputStream in, final DataOutputStream out) {
+    public SocketRPC(final Class<R> remoteClass,
+                     final L local,
+                     final DataInputStream in,
+                     final DataOutputStream out,
+                     final ExecutorService executor) {
         super("fx-agent-rpc::" + remoteClass.getName());
         setDaemon(true);
         this.remoteClass = remoteClass;
         this.local       = local == null ? (L) this : local;
         this.in          = new DataInputStream(in);
         this.out         = new DataOutputStream(out);
+        this.executor    = executor;
     }
 
     @Override
@@ -96,7 +108,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
 
     @Override
     public void close() throws IOException {
-        if (quit.getAndSet(true)) {
+        if (stopped.getAndSet(true)) {
             return; // already closed
         }
         if (local instanceof Closeable) {
@@ -126,7 +138,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     @Override
     @SuppressWarnings("unchecked")
     public synchronized R getRemote() {
-        if (quit.get()) {
+        if (stopped.get()) {
             return null;
         }
         if (remote == null) {
@@ -164,15 +176,14 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
 
     @Override
     public boolean isOpen() {
-        return !quit.get();
+        return !stopped.get();
     }
 
     @Override
     public void run() {
-        while (!isInterrupted() && !quit.get()) {
+        while (!isInterrupted() && !stopped.get()) {
             try {
-                final String cmd = in.readUTF();
-                trace("rx " + cmd);
+                final String       cmd   = in.readUTF();
                 final int          id    = in.readInt();
                 final int          count = in.readShort();
                 final List<byte[]> args  = new ArrayList<>(count);
@@ -225,7 +236,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         if (m != null) {
             promises.put(msgId, new RpcResult());
         }
-        trace("send");
+        trace("Sending Socket RPC");
         synchronized (out) {
             out.writeUTF(m != null ? m.getName() : "");
             out.writeInt(msgId);
@@ -247,7 +258,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                 }
             }
             out.flush();
-            trace("sent");
+            trace("Sent Socket RPC");
         }
         return msgId;
     }
@@ -261,7 +272,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         final RpcResult o = promises.get(msgId);
         if (o != null) {
             synchronized (o) {
-                trace("resolved");
+                trace("Resolved Socket RPC");
                 o.value     = data;
                 o.exception = exception;
                 o.resolved  = true;
@@ -272,9 +283,9 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
 
     @SuppressWarnings("unchecked")
     private <T> T waitForResult(final int id, final Type type) throws Exception {
-        final long      deadline   = 300_000L;
-        final long      startNanos = System.nanoTime();
-        final RpcResult result     = promises.get(id);
+        final long      deadlineInMillis = 300_000L;
+        final long      startInNanos     = System.nanoTime();
+        final RpcResult result           = promises.get(id);
         try {
             do {
                 synchronized (result) {
@@ -292,16 +303,16 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                         }
                         return (T) codec.dec().from(result.value).get(type);
                     }
-                    long elapsed = System.nanoTime() - startNanos;
-                    long delay   = deadline - TimeUnit.NANOSECONDS.toMillis(elapsed);
-                    if (delay <= 0L) {
+                    long elapsedInNanos = System.nanoTime() - startInNanos;
+                    long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
+                    if (delayInMillis <= 0L) {
                         return null;
                     }
-                    trace("start delay " + delay);
-                    result.wait(delay);
-                    elapsed = System.nanoTime() - startNanos;
-                    delay   = deadline - TimeUnit.NANOSECONDS.toMillis(elapsed);
-                    trace("end delay " + delay);
+                    trace("Start Delay (Socket RPC)" + delayInMillis);
+                    result.wait(delayInMillis);
+                    elapsedInNanos = System.nanoTime() - startInNanos;
+                    delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
+                    trace("End Delay (Socket RPC)" + delayInMillis);
                 }
             } while (true);
         } finally {
