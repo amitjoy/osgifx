@@ -17,14 +17,17 @@ package com.osgifx.console.ui.events.handler;
 
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STOPPED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -36,6 +39,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.AboutToShow;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -95,46 +99,24 @@ public final class EventReceiveMenuContributionHandler {
     @Optional
     @ContextValue("subscribed_topics")
     private ContextBoundValue<Set<String>> subscribedTopics;
-
-    @PostConstruct
-    public void init() {
-        Agent agent;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atInfo().log("Agent is not connected");
-            return;
-        }
-        executor.runAsync(() -> {
-            final var currentState = agent.isReceivingEventEnabled();
-            if (currentState) {
-                supervisor.addOSGiEventListener(eventListener);
-                logger.atInfo().throttleByCount(10).log("OSGi event listener has been added");
-            } else {
-                supervisor.removeOSGiEventListener(eventListener);
-                logger.atInfo().throttleByCount(10).log("OSGi event listener has been removed");
-            }
-        });
-    }
+    private final BooleanSupplier          isReceivingEvent        = () -> Boolean.getBoolean("is_receiving_event");
+    private final Consumer<Boolean>        isReceivingEventUpdater = flag -> System.setProperty("is_receiving_event",
+            String.valueOf(flag));
 
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        Agent agent;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atInfo().log("Agent is not connected");
-            return;
-        }
-        final var value = agent.isReceivingEventEnabled();
-        prepareMenu(items, value);
+        prepareMenu(items, isReceivingEvent.getAsBoolean());
     }
 
     @Execute
     public void execute(final MDirectMenuItem menuItem) {
         Agent agent;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atInfo().log("Agent is not connected");
+            logger.atInfo().log("Agent not connected");
             return;
         }
-        final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
-        if (accessibilityPhrase) {
+        final var flag = !isReceivingEvent.getAsBoolean();
+        if (flag) {
             final var dialog = new TopicEntryDialog();
             ContextInjectionFactory.inject(dialog, eclipseContext);
             dialog.init();
@@ -149,21 +131,29 @@ public final class EventReceiveMenuContributionHandler {
             }
             subscribedTopics.publish(topics);
             updateConfig(topics);
-            supervisor.addOSGiEventListener(eventListener);
 
-            executor.runAsync(agent::enableReceivingEvent).thenRun(() -> threadSync.asyncExec(() -> {
-                eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-                Fx.showSuccessNotification("Event Notification", "Events will now be received");
-            })).thenRun(() -> logger.atInfo().log("OSGi events will now be received"));
+            // @formatter:off
+            executor.runAsync(agent::enableReceivingEvent)
+                    .thenRun(() -> threadSync.asyncExec(() -> {
+                                            eventBroker.post(EVENT_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(flag));
+                                            Fx.showSuccessNotification("Event Notification", "Events will now be received");}))
+                    .thenRun(() -> supervisor.addOSGiEventListener(eventListener))
+                    .thenRun(() -> logger.atInfo().log("OSGi events will now be received"))
+                    .thenRun(() -> isReceivingEventUpdater.accept(true));
+            // @formatter:on
         } else {
             subscribedTopics.publish(Set.of());
             updateConfig(Set.of());
-            supervisor.removeOSGiEventListener(eventListener);
 
-            executor.runAsync(agent::disableReceivingEvent).thenRun(() -> threadSync.asyncExec(() -> {
-                eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(accessibilityPhrase));
-                Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");
-            })).thenRun(() -> logger.atInfo().log("OSGi events will not be received anymore"));
+            // @formatter:off
+            executor.runAsync(agent::disableReceivingEvent)
+                    .thenRun(() -> threadSync.asyncExec(() -> {
+                                            eventBroker.post(EVENT_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(flag));
+                                            Fx.showSuccessNotification("Event Notification", "Events will not be received anymore");}))
+                    .thenRun(() -> supervisor.removeOSGiEventListener(eventListener))
+                    .thenRun(() -> logger.atInfo().log("OSGi events will not be received anymore"))
+                    .thenRun(() -> isReceivingEventUpdater.accept(false));
+            // @formatter:on
         }
     }
 
@@ -185,22 +175,18 @@ public final class EventReceiveMenuContributionHandler {
     private MDirectMenuItem createEventActionMenu(final Type type) {
         String label;
         String icon;
-        String accessibilityPhrase;
         if (type == Type.STOP) {
-            label               = "Stop Receiving Events";
-            icon                = "stop.png";
-            accessibilityPhrase = "false";
+            label = "Stop Receiving Events";
+            icon  = "stop.png";
         } else {
-            label               = "Start Receiving Events";
-            icon                = "start.png";
-            accessibilityPhrase = "true";
+            label = "Start Receiving Events";
+            icon  = "start.png";
         }
         final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
         final var bsn         = bundleContext.getBundle().getSymbolicName();
 
         dynamicItem.setLabel(label);
         dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
-        dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
         dynamicItem.setContributorURI("platform:/plugin/" + bsn);
         dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
@@ -220,7 +206,34 @@ public final class EventReceiveMenuContributionHandler {
         } catch (final IOException e) {
             logger.atError().withException(e).log("Cannot retrieve configuration '%s'", PID);
         }
+    }
 
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event received");
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atInfo().log("Agent not connected");
+            return;
+        }
+        executor.runAsync(() -> {
+            final var currentState = agent.isReceivingEventEnabled();
+            if (currentState) {
+                supervisor.addOSGiEventListener(eventListener);
+                logger.atInfo().log("OSGi event listener has been added");
+            } else {
+                supervisor.removeOSGiEventListener(eventListener);
+                logger.atInfo().log("OSGi event listener has been removed");
+            }
+        });
+    }
+
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event received");
+        isReceivingEventUpdater.accept(false);
     }
 
     private enum Type {
