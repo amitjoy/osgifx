@@ -17,10 +17,13 @@ package com.osgifx.console.ui.logs.handler;
 
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STOPPED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,6 +33,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.AboutToShow;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -49,86 +53,64 @@ public final class LogReceiveMenuContributionHandler {
 
     @Log
     @Inject
-    private FluentLogger      logger;
+    private FluentLogger            logger;
     @Inject
     @OSGiBundle
-    private BundleContext     context;
+    private BundleContext           context;
     @Inject
-    private Executor          executor;
+    private Executor                executor;
     @Inject
     @Optional
-    private Supervisor        supervisor;
+    private Supervisor              supervisor;
     @Inject
-    private ThreadSynchronize threadSync;
+    private ThreadSynchronize       threadSync;
     @Inject
-    private IEventBroker      eventBroker;
+    private IEventBroker            eventBroker;
     @Inject
-    private EModelService     modelService;
+    private EModelService           modelService;
     @Inject
-    private LogEntryListener  logEntryListener;
+    private LogEntryListener        logEntryListener;
     @Inject
     @Named("is_connected")
-    private boolean           isConnected;
+    private boolean                 isConnected;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean           isSnapshotAgent;
-
-    @PostConstruct
-    public void init() {
-        Agent agent;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atInfo().log("Agent is not connected");
-            return;
-        }
-        executor.runAsync(() -> {
-            final var currentState = agent.isReceivingLogEnabled();
-            if (currentState) {
-                supervisor.addOSGiLogListener(logEntryListener);
-                logger.atInfo().throttleByCount(10).log("OSGi log listener has been added");
-            } else {
-                supervisor.removeOSGiLogListener(logEntryListener);
-                logger.atInfo().throttleByCount(10).log("OSGi log listener has been removed");
-            }
-        });
-    }
+    private boolean                 isSnapshotAgent;
+    private final BooleanSupplier   isReceivingLog        = () -> Boolean.getBoolean("is_receiving_log");
+    private final Consumer<Boolean> isReceivingLogUpdater = flag -> System.setProperty("is_receiving_log",
+            String.valueOf(flag));
 
     @AboutToShow
     public void aboutToShow(final List<MMenuElement> items, final MWindow window) {
-        Agent agent;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atInfo().log("Agent is not connected");
-            return;
-        }
-        final var value = agent.isReceivingLogEnabled();
-        prepareMenu(items, value);
+        prepareMenu(items, isReceivingLog.getAsBoolean());
     }
 
     @Execute
     public void execute(final MDirectMenuItem menuItem) {
         Agent agent;
         if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            logger.atInfo().log("Agent is not connected");
+            logger.atInfo().log("Agent not connected");
             return;
         }
-        final var accessibilityPhrase = Boolean.parseBoolean(menuItem.getAccessibilityPhrase());
-        if (accessibilityPhrase) {
+        final var flag = !isReceivingLog.getAsBoolean();
+        if (flag) {
+            // @formatter:off
             executor.runAsync(agent::enableReceivingLog)
-                    .thenRun(() -> threadSync.asyncExec(() -> eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC,
-                            String.valueOf(accessibilityPhrase))))
                     .thenRun(() -> supervisor.addOSGiLogListener(logEntryListener))
+                    .thenRun(() -> logger.atInfo().log("OSGi logs will now be displayed"))
                     .thenRun(() -> threadSync.asyncExec(() -> {
-                        Fx.showSuccessNotification("Event Notification", "Logs will now be displayed");
-                        logger.atInfo().log("OSGi logs will now be received");
-                    }));
+                        eventBroker.post(LOG_RECEIVE_STARTED_EVENT_TOPIC, String.valueOf(flag));
+                        Fx.showSuccessNotification("Log Notification", "Logs will now be displayed");}))
+                    .thenRun(() -> isReceivingLogUpdater.accept(true));
         } else {
             executor.runAsync(agent::disableReceivingLog)
-                    .thenRun(() -> threadSync.asyncExec(() -> eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC,
-                            String.valueOf(accessibilityPhrase))))
                     .thenRun(() -> supervisor.removeOSGiLogListener(logEntryListener))
+                    .thenRun(() -> logger.atInfo().log("OSGi logs will now be displayed"))
                     .thenRun(() -> threadSync.asyncExec(() -> {
-                        Fx.showSuccessNotification("Event Notification", "Logs will not be displayed anymore");
-                        logger.atInfo().log("OSGi logs will not be received anymore");
-                    }));
+                        eventBroker.post(LOG_RECEIVE_STOPPED_EVENT_TOPIC, String.valueOf(flag));
+                        Fx.showSuccessNotification("Log Notification", "Logs will not be displayed anymore");}))
+                    .thenRun(() -> isReceivingLogUpdater.accept(false));
+            // @formatter:on
         }
     }
 
@@ -150,26 +132,50 @@ public final class LogReceiveMenuContributionHandler {
     private MDirectMenuItem createLogActionMenu(final Type type) {
         String label;
         String icon;
-        String accessibilityPhrase;
         if (type == Type.STOP) {
-            label               = "Stop Displaying Logs";
-            icon                = "stop.png";
-            accessibilityPhrase = "false";
+            label = "Stop Displaying Logs";
+            icon  = "stop.png";
         } else {
-            label               = "Start Displaying Logs";
-            icon                = "start.png";
-            accessibilityPhrase = "true";
+            label = "Start Displaying Logs";
+            icon  = "start.png";
         }
         final var dynamicItem = modelService.createModelElement(MDirectMenuItem.class);
         final var bsn         = context.getBundle().getSymbolicName();
 
         dynamicItem.setLabel(label);
         dynamicItem.setIconURI("platform:/plugin/" + bsn + "/graphic/icons/" + icon);
-        dynamicItem.setAccessibilityPhrase(accessibilityPhrase);
         dynamicItem.setContributorURI("platform:/plugin/" + bsn);
         dynamicItem.setContributionURI("bundleclass://" + bsn + "/" + getClass().getName());
 
         return dynamicItem;
+    }
+
+    @Inject
+    @Optional
+    private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent connected event received");
+        Agent agent;
+        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+            logger.atInfo().log("Agent not connected");
+            return;
+        }
+        executor.runAsync(() -> {
+            final var currentState = agent.isReceivingLogEnabled();
+            if (currentState) {
+                supervisor.addOSGiLogListener(logEntryListener);
+                logger.atInfo().log("OSGi log listener has been added");
+            } else {
+                supervisor.removeOSGiLogListener(logEntryListener);
+                logger.atInfo().log("OSGi log listener has been removed");
+            }
+        });
+    }
+
+    @Inject
+    @Optional
+    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
+        logger.atInfo().log("Agent disconnected event received");
+        isReceivingLogUpdater.accept(false);
     }
 
     private enum Type {
