@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.rpc;
+package com.osgifx.console.agent.rpc.mqtt;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,29 +40,12 @@ import org.osgi.service.messaging.MessageContextBuilder;
 import org.osgi.service.messaging.MessagePublisher;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.json.JSONCodec;
 
 public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
-
-    public static class NameableThreadFactory implements ThreadFactory {
-
-        private static final String NAME_PATTERN = "osgifx-agent";
-
-        private int          threadsNum;
-        private final String namePattern;
-
-        public NameableThreadFactory() {
-            namePattern = NAME_PATTERN + "-%d";
-        }
-
-        @Override
-        public Thread newThread(final Runnable runnable) {
-            threadsNum++;
-            return new Thread(runnable, String.format(namePattern, threadsNum));
-        }
-    }
 
     private static final JSONCodec codec = new JSONCodec();
 
@@ -236,7 +218,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         if (msg.methodName != null) {
             promises.put(msg.id, new RpcResult());
         }
-        trace("Sending RPC: " + msg);
+        trace("Sending MQTT RPC: " + msg);
         final Optional<MessagePublisher> publisher = mqttClient.pub();
         if (publisher.isPresent()) {
             final Optional<MessageContextBuilder> msgCtx = mqttClient.msgCtx();
@@ -249,7 +231,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 final byte[]  data    = bout.toByteArray();
                 final Message message = msgCtx.get().channel(pubTopic).content(ByteBuffer.wrap(data)).buildMessage();
                 publisher.get().publish(message);
-                trace("Sent RPC: " + msg);
+                trace("Sent MQTT RPC: " + msg);
             } catch (final Exception e) {
                 throw new RuntimeException("Message cannot be encoded");
             }
@@ -302,14 +284,14 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                     if (delayInMillis <= 0L) {
                         return null;
                     }
-                    trace("Start Delay " + delayInMillis);
+                    trace("Start Delay (MQTT RPC)" + delayInMillis);
                     result.wait(delayInMillis);
                     elapsedInNanos = System.nanoTime() - startInNanos;
                     delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
                     if (delayInMillis <= 0L) {
                         return null;
                     }
-                    trace("End Delay " + delayInMillis);
+                    trace("End Delay (MQTT RPC)" + delayInMillis);
                 }
             } while (true);
         } finally {
