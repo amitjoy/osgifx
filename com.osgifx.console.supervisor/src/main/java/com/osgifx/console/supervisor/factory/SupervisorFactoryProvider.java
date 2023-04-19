@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.condition.Condition;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.supervisor.rpc.LauncherSupervisor;
+import com.osgifx.console.supervisor.rpc.RpcSupervisor;
 import com.osgifx.console.supervisor.snapshot.SnapshotSupervisor;
 
 @Component
@@ -42,7 +42,7 @@ public final class SupervisorFactoryProvider implements SupervisorFactory {
     @Override
     public void createSupervisor(final SupervisorType type) {
         final var conditionIdValue = switch (type) {
-            case REMOTE_RPC -> LauncherSupervisor.CONDITION_ID_VALUE;
+            case REMOTE_RPC -> RpcSupervisor.CONDITION_ID_VALUE;
             case SNAPSHOT -> SnapshotSupervisor.CONDITION_ID_VALUE;
         };
         registrations.computeIfAbsent(type,

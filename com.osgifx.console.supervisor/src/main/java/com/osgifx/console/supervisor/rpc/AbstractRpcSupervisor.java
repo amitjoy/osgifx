@@ -17,10 +17,10 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_RECEIVE;
-import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_SEND;
-import static com.osgifx.console.supervisor.rpc.AgentSupervisor.MqttConfig.MAX_PACKET_SIZE;
-import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
+import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_RECEIVE;
+import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_SEND;
+import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_PACKET_SIZE;
+import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
@@ -52,7 +52,7 @@ import com.osgifx.console.util.configuration.ConfigHelper;
 
 import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
 
-public class AgentSupervisor<S, A> {
+public abstract class AbstractRpcSupervisor<S, A> {
 
     @interface MqttConfig {
         final int MAX_CONCURRENT_MSG_TO_SEND    = 5;
