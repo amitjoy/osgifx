@@ -17,6 +17,8 @@ package com.osgifx.console.agent.starter;
 
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
+import static com.osgifx.console.agent.provider.AgentServer.RpcType.MQTT_RPC;
+import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import java.io.Closeable;
@@ -27,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
@@ -34,14 +37,13 @@ import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.di.module.DIModule;
+import com.osgifx.console.agent.helper.ThreadFactoryBuilder;
 import com.osgifx.console.agent.provider.AgentServer;
-import com.osgifx.console.agent.provider.AgentServer.RpcType;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
-import com.osgifx.console.agent.rpc.MqttRPC;
-import com.osgifx.console.agent.rpc.MqttRPC.NameableThreadFactory;
 import com.osgifx.console.agent.rpc.RemoteRPC;
-import com.osgifx.console.agent.rpc.SocketRPC;
+import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
+import com.osgifx.console.agent.rpc.socket.SocketRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
 /**
@@ -51,7 +53,9 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private static final int MQTT_RPC_POOL_THREADS = 5;
+    private static final int    RPC_POOL_THREADS            = 5;
+    private static final String RPC_POOL_THREAD_NAME_PREFIX = "osgifx-agent";
+    private static final String RPC_POOL_THREAD_NAME_SUFFIX = "-%d";
 
     private DIModule                module;
     private ServerSocket            serverSocket;
@@ -66,7 +70,9 @@ public final class Activator extends Thread implements BundleActivator {
             final SocketContext socketContext = new SocketContext(bundleContext);
             serverSocket = socketContext.getSocket();
             start();
-            System.err.println("[OSGi.fx] Socket Agent: " + socketContext.host() + ":" + socketContext.port());
+            System.err.println("[OSGi.fx] Socket agent configured");
+            System.err.println(String.format("[OSGi.fx] Host: %s", socketContext.host()));
+            System.err.println(String.format("[OSGi.fx] Port: %s", socketContext.port()));
         } catch (final IllegalArgumentException e) {
             System.err.println("[OSGi.fx] Socket agent not configured");
         }
@@ -78,14 +84,17 @@ public final class Activator extends Thread implements BundleActivator {
             final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
 
             if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
-                System.err.print("[OSGi.fx] MQTT agent not configured");
+                System.err.println("[OSGi.fx] MQTT agent not configured");
                 return;
             }
-            final AgentServer agentServer = new AgentServer(module.di(), RpcType.MQTT_RPC);
+            System.err.println("[OSGi.fx] MQTT agent configured");
+            System.err.println(String.format("[OSGi.fx] PUB Topic: %s", pubTopic));
+            System.err.println(String.format("[OSGi.fx] SUB Topic: %s", subTopic));
+
+            final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
             agents.add(agentServer);
 
-            final ExecutorService              executor = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS,
-                    new NameableThreadFactory());
+            final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS);
             final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
                                                                         pubTopic, subTopic, executor);
 
@@ -108,18 +117,28 @@ public final class Activator extends Thread implements BundleActivator {
                     socket.setSoTimeout(1000);
 
                     // create a new agent, and link it up.
-                    final AgentServer agentServer = new AgentServer(module.di(), RpcType.SOCKET_RPC);
+                    final AgentServer agentServer = new AgentServer(module.di(), SOCKET_RPC);
                     agents.add(agentServer);
 
+                    // @formatter:off
+                    final ThreadFactory threadFactory =
+                            new ThreadFactoryBuilder()
+                                    .setThreadFactoryName(RPC_POOL_THREAD_NAME_PREFIX)
+                                    .setThreadNameFormat(RPC_POOL_THREAD_NAME_SUFFIX)
+                                    .setDaemon(true)
+                                    .build();
+                    // @formatter:on
+                    final ExecutorService              executor  = Executors.newFixedThreadPool(RPC_POOL_THREADS,
+                            threadFactory);
                     final SocketRPC<Agent, Supervisor> socketRPC = new SocketRPC<Agent, Supervisor>(Supervisor.class,
-                                                                                                    agentServer,
-                                                                                                    socket) {
-                        @Override
-                        public void close() throws IOException {
-                            agents.remove(agentServer);
-                            super.close();
-                        }
-                    };
+                                                                                                    agentServer, socket,
+                                                                                                    executor) {
+                                                                     @Override
+                                                                     public void close() throws IOException {
+                                                                         agents.remove(agentServer);
+                                                                         super.close();
+                                                                     }
+                                                                 };
                     module.bindInstance(AgentServer.class, agentServer);
                     module.bindInstance(RemoteRPC.class, socketRPC);
                     module.bindInstance(Supervisor.class, socketRPC.getRemote());
