@@ -18,8 +18,8 @@ package com.osgifx.console.supervisor.rpc;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.osgifx.console.supervisor.Supervisor.RpcType.MQTT_RPC;
 import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
-import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.CONDITION_ID_VALUE;
-import static com.osgifx.console.supervisor.rpc.LauncherSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
+import static com.osgifx.console.supervisor.rpc.RpcSupervisor.CONDITION_ID_VALUE;
+import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
@@ -67,7 +67,7 @@ import com.osgifx.console.supervisor.Supervisor;
 
 @Component(property = MQTT_CONNECTION_LISTENER_FILTER_PROP)
 @SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
-public final class LauncherSupervisor extends AgentSupervisor<Supervisor, Agent>
+public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent>
         implements Supervisor, MqttClientConnectedListener, MqttClientDisconnectedListener {
 
     public static final String CONDITION_ID_VALUE                    = "rpc-agent";
