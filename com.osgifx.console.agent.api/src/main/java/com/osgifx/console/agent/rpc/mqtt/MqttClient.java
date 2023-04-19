@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.rpc;
+package com.osgifx.console.agent.rpc.mqtt;
 
 import java.util.Optional;
 import java.util.function.Consumer;
