@@ -43,9 +43,9 @@ import org.osgi.service.condition.Condition;
 import com.google.common.base.Strings;
 import com.google.mu.util.concurrent.Retryer;
 import com.google.mu.util.concurrent.Retryer.Delay;
-import com.osgifx.console.agent.rpc.MqttRPC;
 import com.osgifx.console.agent.rpc.RemoteRPC;
-import com.osgifx.console.agent.rpc.SocketRPC;
+import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
+import com.osgifx.console.agent.rpc.socket.SocketRPC;
 import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.util.configuration.ConfigHelper;
@@ -95,6 +95,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
     }
 
     private static final int    MQTT_RPC_POOL_THREADS         = 30;
+    private static final int    SOCKET_RPC_POOL_THREADS       = 5;
     private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
     private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5;
 
@@ -133,7 +134,11 @@ public abstract class AbstractRpcSupervisor<S, A> {
                         }
                         final var socket = sf == null ? new Socket() : sf.createSocket();
                         socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
-                        remoteRPC = new SocketRPC<>(agent, supervisor, socket);
+
+                        final var threadFactory = new Builder().namingPattern("fx-supervisor-socket-%d").daemon(true).build();
+                        final var executor = Executors.newFixedThreadPool(SOCKET_RPC_POOL_THREADS, threadFactory);
+
+                        remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
                         this.setRemoteRPC(remoteRPC);
                         remoteRPC.open();
                         return null;
@@ -181,7 +186,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        final var threadFactory = new Builder().namingPattern("fx-supervisor-%d").daemon(true).build();
+        final var threadFactory = new Builder().namingPattern("fx-supervisor-mqtt-%d").daemon(true).build();
         final var executor      = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, threadFactory);
 
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
