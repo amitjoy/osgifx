@@ -62,6 +62,7 @@ public final class MqttConnectionPreferenceHandler {
                         @Named("type") final String type,
                         @Named("username") @Optional final String username,
                         @Named("password") @Optional final String password,
+                        @Named("tokenConfig") @Optional final String tokenConfig,
                         @Named("pubTopic") @Optional final String pubTopic,
                         @Named("subTopic") @Optional final String subTopic,
                         @Named("lwtTopic") @Optional final String lwtTopic) {
@@ -69,8 +70,8 @@ public final class MqttConnectionPreferenceHandler {
         final var gson        = new Gson();
         final var connections = getStoredValues();
         final var dto         = new MqttConnectionSettingDTO(id, name, clientId, server, Ints.tryParse(port),
-                                                             Ints.tryParse(timeout), username, password, pubTopic,
-                                                             subTopic, lwtTopic);
+                                                             Ints.tryParse(timeout), username, password, tokenConfig,
+                                                             pubTopic, subTopic, lwtTopic);
 
         if ("ADD".equals(type)) {
             connections.add(dto);

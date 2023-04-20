@@ -25,6 +25,7 @@ public class MqttConnection {
     private final int    timeout;
     private final String username;
     private final String password;
+    private final String tokenConfig;
     private final String pubTopic;
     private final String subTopic;
     private final String lwtTopic;
@@ -35,18 +36,20 @@ public class MqttConnection {
                            final int timeout,
                            final String username,
                            final String password,
+                           final String tokenConfig,
                            final String pubTopic,
                            final String subTopic,
                            final String lwtTopic) {
-        this.clientId = clientId;
-        this.server   = server;
-        this.port     = port;
-        this.timeout  = timeout;
-        this.username = username;
-        this.password = password;
-        this.pubTopic = pubTopic;
-        this.subTopic = subTopic;
-        this.lwtTopic = lwtTopic;
+        this.clientId    = clientId;
+        this.server      = server;
+        this.port        = port;
+        this.timeout     = timeout;
+        this.username    = username;
+        this.password    = password;
+        this.tokenConfig = tokenConfig;
+        this.pubTopic    = pubTopic;
+        this.subTopic    = subTopic;
+        this.lwtTopic    = lwtTopic;
     }
 
     public String clientId() {
@@ -73,6 +76,10 @@ public class MqttConnection {
         return password;
     }
 
+    public String tokenConfig() {
+        return tokenConfig;
+    }
+
     public String pubTopic() {
         return pubTopic;
     }
@@ -96,6 +103,7 @@ public class MqttConnection {
         private int    timeout;
         private String username;
         private String password;
+        private String tokenConfig;
         private String pubTopic;
         private String subTopic;
         private String lwtTopic;
@@ -136,6 +144,11 @@ public class MqttConnection {
             return this;
         }
 
+        public MqttConnectionBuilder tokenConfig(final String tokenConfig) {
+            this.tokenConfig = requireNonNull(tokenConfig, "'tokenConfig' cannot be null");
+            return this;
+        }
+
         public MqttConnectionBuilder pubTopic(final String pubTopic) {
             this.pubTopic = requireNonNull(pubTopic, "'pubTopic' cannot be null");
             return this;
@@ -152,8 +165,8 @@ public class MqttConnection {
         }
 
         public MqttConnection build() {
-            return new MqttConnection(clientId, server, port, timeout, username, password, pubTopic, subTopic,
-                                      lwtTopic);
+            return new MqttConnection(clientId, server, port, timeout, username, password, tokenConfig, pubTopic,
+                                      subTopic, lwtTopic);
         }
     }
 

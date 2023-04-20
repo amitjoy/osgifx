@@ -212,6 +212,7 @@ public final class ConnectToMqttAgentHandler {
                             .port(settings.port)
                             .username(settings.username)
                             .password(settings.password)
+                            .tokenConfig(settings.tokenConfig)
                             .timeout(settings.timeout)
                             .pubTopic(settings.pubTopic)
                             .subTopic(settings.subTopic)
@@ -268,6 +269,7 @@ public final class ConnectToMqttAgentHandler {
         properties.put("type", type);
         properties.put("username", dto.username);
         properties.put("password", dto.password);
+        properties.put("tokenConfig", dto.tokenConfig);
         properties.put("pubTopic", dto.pubTopic);
         properties.put("subTopic", dto.subTopic);
         properties.put("lwtTopic", dto.lwtTopic);
