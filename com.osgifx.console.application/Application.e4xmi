@@ -56,7 +56,8 @@
     <parameters xmi:id="_8M7t8M_KEe2KarxZeLtaOg" elementId="timeout" name="Timeout" optional="false"/>
     <parameters xmi:id="_N5yVxc_BEe2KarxZeLtaOg" elementId="type" name="Type" optional="false"/>
     <parameters xmi:id="_N5yVxs_BEe2KarxZeLtaOg" elementId="username" name="Username"/>
-    <parameters xmi:id="_N5yVx8_BEe2KarxZeLtaOg" elementId="password" name="Password"/>
+    <parameters xmi:id="_eC0RwN8KEe2OkZhOOxiaLQ" elementId="password" name="Password"/>
+    <parameters xmi:id="_N5yVx8_BEe2KarxZeLtaOg" elementId="tokenConfig" name="Token Configuration (JSON)"/>
     <parameters xmi:id="_Ji0TsM_8Ee2KarxZeLtaOg" elementId="pubTopic" name="Publish Topic" optional="false"/>
     <parameters xmi:id="_JsYfYM_8Ee2KarxZeLtaOg" elementId="subTopic" name="Subscription Topic" optional="false"/>
     <parameters xmi:id="_FfeRANEjEe2KarxZeLtaOg" elementId="lwtTopic" name="LWT Topic"/>

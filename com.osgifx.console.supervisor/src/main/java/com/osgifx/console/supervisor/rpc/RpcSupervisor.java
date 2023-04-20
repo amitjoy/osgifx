@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.aries.component.dsl.OSGiResult;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -144,10 +142,10 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
                     sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC);
                 });
             }
-        } catch (final TimeoutException | ExecutionException e) {
-            throw e;
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw e;
+        } catch (final Exception e) {
             throw e;
         }
     }
