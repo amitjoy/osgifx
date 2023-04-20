@@ -15,10 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor.rpc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,6 +31,19 @@ import java.util.function.Supplier;
 import com.google.gson.Gson;
 
 public final class TokenProvider implements Supplier<String> {
+
+    public static class TokenProviderException extends RuntimeException {
+
+        private static final long serialVersionUID = 607308379133795790L;
+
+        public TokenProviderException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
+
+        public TokenProviderException(final String message) {
+            super(message);
+        }
+    }
 
     public static class TokenConfigDTO {
         public String authServerURL;
@@ -57,7 +69,7 @@ public final class TokenProvider implements Supplier<String> {
     private final Supplier<Instant> nowProvider = Instant::now;
 
     public TokenProvider(final String tokenConfig) {
-        this.tokenConfig = requireNonNull(tokenConfig, "Token config cannot be null");
+        this.tokenConfig = checkNotNull(tokenConfig, "Token config cannot be null");
     }
 
     @Override
@@ -72,7 +84,7 @@ public final class TokenProvider implements Supplier<String> {
     private TokenInfo internalGetToken() throws TokenProviderException {
         try {
             final var config   = parseJson(tokenConfig, TokenConfigDTO.class);
-            final var endpoint = requireNonNull(config.authServerURL, "Endpoint cannot be null");
+            final var endpoint = checkNotNull(config.authServerURL, "Endpoint cannot be null");
             final var now      = nowProvider.get();
 
             // @formatter:off
@@ -94,31 +106,32 @@ public final class TokenProvider implements Supplier<String> {
             final var                  validUntil = now.plusSeconds((long) token.expires_in - REDUCE_VALID_UNTIL_BY);
 
             return new TokenInfo(token.access_token, validUntil);
-        } catch (IOException | RuntimeException e) {
-            throw new TokenProviderException("Exception during oauth request", e);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new TokenProviderException("Exception during oauth request", e);
+            throw new TokenProviderException("Exception during OAuth request", e);
+        } catch (final Exception e) {
+            throw new TokenProviderException("Exception during OAuth request", e);
         }
     }
 
     private String getPostData(final TokenConfigDTO tokenConfig) {
-        final var clientID     = requireNonNull(tokenConfig.clientId, "Client ID cannot be null");
-        final var clientSecret = requireNonNull(tokenConfig.clientSecret, "Client secret cannot be null");
-        final var scope        = requireNonNull(tokenConfig.scope, "Scope cannot be null");
-        final var audience     = requireNonNull(tokenConfig.audience, "Audience cannot be null");
+        final var clientID     = checkNotNull(tokenConfig.clientId, "Client ID cannot be null");
+        final var clientSecret = checkNotNull(tokenConfig.clientSecret, "Client secret cannot be null");
+        final var scope        = checkNotNull(tokenConfig.scope, "Scope cannot be null");
+        final var audience     = checkNotNull(tokenConfig.audience, "Audience cannot be null");
 
-        final var result = new StringBuilder();
-        result.append("grant_type=client_credentials");
-        result.append("&client_id=");
-        result.append(clientID);
-        result.append("&client_secret=");
-        result.append(clientSecret);
-        result.append("&scope=");
-        result.append(scope);
-        result.append("&audience=");
-        result.append(audience);
-
+        // @formatter:off
+        final var result = new StringBuilder()
+                                .append("grant_type=client_credentials")
+                                .append("&client_id=")
+                                .append(clientID)
+                                .append("&client_secret=")
+                                .append(clientSecret)
+                                .append("&scope=")
+                                .append(scope)
+                                .append("&audience=")
+                                .append(audience);
+        // @formatter:on
         return result.toString();
     }
 
