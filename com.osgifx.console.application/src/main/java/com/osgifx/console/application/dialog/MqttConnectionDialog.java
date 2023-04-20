@@ -97,6 +97,10 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         password.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
         Optional.ofNullable(setting).ifPresent(s -> password.setText(s.password));
 
+        final var tokenConfig = (CustomTextField) TextFields.createClearableTextField();
+        tokenConfig.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> tokenConfig.setText(s.tokenConfig));
+
         final var pubTopic = (CustomTextField) TextFields.createClearableTextField();
         pubTopic.setLeft(new ImageView(getClass().getResource("/graphic/icons/topic.png").toExternalForm()));
         Optional.ofNullable(setting).ifPresent(s -> pubTopic.setText(s.pubTopic));
@@ -124,6 +128,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         content.getChildren().add(timeout);
         content.getChildren().add(username);
         content.getChildren().add(password);
+        content.getChildren().add(tokenConfig);
         content.getChildren().add(pubTopic);
         content.getChildren().add(subTopic);
         content.getChildren().add(lwtTopic);
@@ -146,16 +151,17 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var nameCaption     = "Connection Name";
-        final var clientIdCaption = "Client ID";
-        final var serverCaption   = "Server";
-        final var portCaption     = "Port (1883 or 8883)";
-        final var timeoutCaption  = "Timeout in millis";
-        final var usernameCaption = "Username";
-        final var passwordCaption = "Password";
-        final var pubTopicCaption = "Agent Publish Topic";
-        final var subTopicCaption = "Agent Subscription Topic";
-        final var lwtTopicCaption = "Agent Runtime LWT Topic";
+        final var nameCaption        = "Connection Name";
+        final var clientIdCaption    = "Client ID";
+        final var serverCaption      = "Server";
+        final var portCaption        = "Port (1883 or 8883)";
+        final var timeoutCaption     = "Timeout in millis";
+        final var usernameCaption    = "Username";
+        final var passwordCaption    = "Password";
+        final var tokenConfigCaption = "Token Configuration (JSON)";
+        final var pubTopicCaption    = "Agent Publish Topic";
+        final var subTopicCaption    = "Agent Subscription Topic";
+        final var lwtTopicCaption    = "Agent Runtime LWT Topic";
 
         name.setPromptText(nameCaption);
         clientId.setPromptText(clientIdCaption);
@@ -164,6 +170,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         timeout.setPromptText(timeoutCaption);
         username.setPromptText(usernameCaption);
         password.setPromptText(passwordCaption);
+        tokenConfig.setPromptText(tokenConfigCaption);
         pubTopic.setPromptText(pubTopicCaption);
         subTopic.setPromptText(subTopicCaption);
         lwtTopic.setPromptText(lwtTopicCaption);
@@ -206,22 +213,23 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
 
             verify(p != null && t != null, "Port and timeout formats are not compliant");
             if (setting != null) {
-                setting.name     = name.getText();
-                setting.clientId = clientId.getText();
-                setting.server   = server.getText();
-                setting.port     = p;
-                setting.timeout  = t;
-                setting.username = username.getText();
-                setting.password = password.getText();
-                setting.pubTopic = pubTopic.getText();
-                setting.subTopic = subTopic.getText();
-                setting.lwtTopic = lwtTopic.getText();
+                setting.name        = name.getText();
+                setting.clientId    = clientId.getText();
+                setting.server      = server.getText();
+                setting.port        = p;
+                setting.timeout     = t;
+                setting.username    = username.getText();
+                setting.password    = password.getText();
+                setting.tokenConfig = tokenConfig.getText();
+                setting.pubTopic    = pubTopic.getText();
+                setting.subTopic    = subTopic.getText();
+                setting.lwtTopic    = lwtTopic.getText();
 
                 return setting;
             }
             return new MqttConnectionSettingDTO(name.getText(), clientId.getText(), server.getText(), p, t,
-                                                username.getText(), password.getText(), pubTopic.getText(),
-                                                subTopic.getText(), lwtTopic.getText());
+                                                username.getText(), password.getText(), tokenConfig.getText(),
+                                                pubTopic.getText(), subTopic.getText(), lwtTopic.getText());
         });
     }
 
