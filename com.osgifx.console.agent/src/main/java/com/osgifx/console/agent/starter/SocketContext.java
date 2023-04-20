@@ -23,6 +23,7 @@ import static com.osgifx.console.agent.Agent.AGENT_SOCKET_SECURE_COMMUNICATION_S
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.regex.Matcher;
 
 import javax.net.ssl.SSLContext;
@@ -77,11 +78,13 @@ public final class SocketContext {
     }
 
     private void extractSpec() {
-        final String portKey = bundleContext.getProperty(AGENT_SOCKET_PORT_KEY);
-        if (portKey == null) {
+        final String portKey    = bundleContext.getProperty(AGENT_SOCKET_PORT_KEY);
+        final String portKeyOld = bundleContext.getProperty("osgi.fx.agent.port"); // backward compatibility
+        if (portKey == null && portKeyOld == null) {
             throw new IllegalArgumentException("Socket port not defined");
         }
-        final Matcher m = AGENT_SOCKET_PORT_PATTERN.matcher(portKey);
+        final String  portSpec = Optional.ofNullable(portKey).orElse(portKeyOld);
+        final Matcher m        = AGENT_SOCKET_PORT_PATTERN.matcher(portSpec);
         if (!m.matches()) {
             throw new IllegalArgumentException("Invalid port specification in property '" + AGENT_SOCKET_PORT_KEY
                     + "', expects [<host>:]<port> : " + port);
