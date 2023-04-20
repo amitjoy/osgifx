@@ -47,6 +47,7 @@ import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
 import com.osgifx.console.agent.rpc.socket.SocketRPC;
 import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.supervisor.rpc.TokenProvider.TokenConfigDTO;
 import com.osgifx.console.util.configuration.ConfigHelper;
 
 import in.bytehue.messaging.mqtt5.api.MqttMessageConstants;
@@ -169,7 +170,11 @@ public abstract class AbstractRpcSupervisor<S, A> {
             if (!Strings.isNullOrEmpty(connection.password())) {
                 password = connection.password();
             } else if (!Strings.isNullOrEmpty(connection.tokenConfig())) {
-                final var tokenProvider = new TokenProvider(connection.tokenConfig());
+                final var tokenConfig = TokenProvider.parseJson(connection.tokenConfig(), TokenConfigDTO.class);
+                if (tokenConfig.clientId == null) {
+                    tokenConfig.clientId = connection.clientId();
+                }
+                final var tokenProvider = new TokenProvider(tokenConfig);
                 password = tokenProvider.get();
             }
         }
