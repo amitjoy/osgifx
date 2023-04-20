@@ -28,7 +28,6 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -99,13 +98,12 @@ public abstract class AbstractRpcSupervisor<S, A> {
     private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
     private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5;
 
-    private A                    agent;
-    protected int                port;
-    protected int                timeout;
-    protected String             host;
-    protected RemoteRPC<S, A>    remoteRPC;
-    protected volatile int       exitCode;
-    private final CountDownLatch latch = new CountDownLatch(1);
+    private A                 agent;
+    protected int             port;
+    protected int             timeout;
+    protected String          host;
+    protected RemoteRPC<S, A> remoteRPC;
+    protected volatile int    exitCode;
 
     protected void connectToSocket(final Class<A> agent,
                                    final S supervisor,
@@ -208,11 +206,6 @@ public abstract class AbstractRpcSupervisor<S, A> {
     private void setRemoteRPC(final RemoteRPC<S, A> rpc) {
         agent     = rpc.getRemote();
         remoteRPC = rpc;
-    }
-
-    public int join() throws InterruptedException {
-        latch.await();
-        return exitCode;
     }
 
     public A getAgent() {
