@@ -108,19 +108,24 @@ public final class DmtFxController {
         if (promise == null) {
             return;
         }
-        promise.thenAccept(node -> threadSync.asyncExec(() -> {
-            final var rootItem = new FilterableTreeItem<>(node.uri);
-            rootItem.setExpanded(true);
-            dmtTree.setRoot(rootItem);
-            initDmtTree(node, rootItem);
+        promise.thenAccept(node -> {
+            if (node == null) {
+                return;
+            }
+            threadSync.asyncExec(() -> {
+                final var rootItem = new FilterableTreeItem<>(node.uri);
+                rootItem.setExpanded(true);
+                dmtTree.setRoot(rootItem);
+                initDmtTree(node, rootItem);
 
-            searchBox.setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ENTER) {
-                    performSearch(rootItem);
-                }
+                searchBox.setOnKeyPressed(event -> {
+                    if (event.getCode() == KeyCode.ENTER) {
+                        performSearch(rootItem);
+                    }
+                });
+                searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
             });
-            searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
-        }));
+        });
 
     }
 
