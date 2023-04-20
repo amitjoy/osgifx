@@ -154,7 +154,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
                                        final Class<A> agent,
                                        final S supervisor,
                                        final MqttConnection connection,
-                                       final String conditionID) {
+                                       final String conditionID) throws Exception {
 
         final var ch = new ConfigHelper<>(MqttConfig.class, configurationAdmin);
 
@@ -166,12 +166,20 @@ public abstract class AbstractRpcSupervisor<S, A> {
         ch.set(ch.d().automaticReconnect(), false);
         ch.set(ch.d().sessionExpiryInterval(), 0L);
 
-        if (!Strings.isNullOrEmpty(connection.username()) && !Strings.isNullOrEmpty(connection.password())) {
+        String password = null;
+        if (!Strings.isNullOrEmpty(connection.username())) {
+            if (!Strings.isNullOrEmpty(connection.password())) {
+                password = connection.password();
+            } else if (!Strings.isNullOrEmpty(connection.tokenConfig())) {
+                final var tokenProvider = new TokenProvider(connection.tokenConfig());
+                password = tokenProvider.get();
+            }
+        }
+        if (!Strings.isNullOrEmpty(password)) {
             ch.set(ch.d().simpleAuth(), true);
             ch.set(ch.d().username(), connection.username());
-            ch.set(ch.d().password(), connection.password());
+            ch.set(ch.d().password(), password);
         }
-
         ch.set(ch.d().sendMaximum(), MAX_CONCURRENT_MSG_TO_SEND);
         ch.set(ch.d().receiveMaximum(), MAX_CONCURRENT_MSG_TO_RECEIVE);
         ch.set(ch.d().maximumPacketSize(), MAX_PACKET_SIZE);
