@@ -32,6 +32,7 @@ public final class MqttConnectionSettingDTO {
     public int    timeout;
     public String username;
     public String password;
+    public String tokenConfig;
     public String pubTopic;
     public String subTopic;
     public String lwtTopic;
@@ -47,11 +48,12 @@ public final class MqttConnectionSettingDTO {
                                     final int timeout,
                                     final String username,
                                     final String password,
+                                    final String tokenConfig,
                                     final String pubTopic,
                                     final String subTopic,
                                     final String lwtTopic) {
-        this(UUID.randomUUID().toString(), name, clientId, server, port, timeout, username, password, pubTopic,
-             subTopic, lwtTopic);
+        this(UUID.randomUUID().toString(), name, clientId, server, port, timeout, username, password, tokenConfig,
+             pubTopic, subTopic, lwtTopic);
     }
 
     public MqttConnectionSettingDTO(final String id,
@@ -62,20 +64,22 @@ public final class MqttConnectionSettingDTO {
                                     final int timeout,
                                     final String username,
                                     final String password,
+                                    final String tokenConfig,
                                     final String pubTopic,
                                     final String subTopic,
                                     final String lwtTopic) {
-        this.id       = id;
-        this.name     = name;
-        this.clientId = clientId;
-        this.server   = server;
-        this.port     = port;
-        this.timeout  = timeout;
-        this.username = username;
-        this.password = password;
-        this.pubTopic = pubTopic;
-        this.subTopic = subTopic;
-        this.lwtTopic = lwtTopic;
+        this.id          = id;
+        this.name        = name;
+        this.clientId    = clientId;
+        this.server      = server;
+        this.port        = port;
+        this.timeout     = timeout;
+        this.username    = username;
+        this.password    = password;
+        this.tokenConfig = tokenConfig;
+        this.pubTopic    = pubTopic;
+        this.subTopic    = subTopic;
+        this.lwtTopic    = lwtTopic;
     }
 
     @Override
@@ -90,6 +94,7 @@ public final class MqttConnectionSettingDTO {
                          .append(timeout)
                          .append(username)
                          .append(password)
+                         .append(tokenConfig)
                          .append(pubTopic)
                          .append(subTopic)
                          .append(lwtTopic)
@@ -116,6 +121,7 @@ public final class MqttConnectionSettingDTO {
                            .append(timeout, other.timeout)
                            .append(username, other.username)
                            .append(password, other.password)
+                           .append(tokenConfig, other.tokenConfig)
                            .append(pubTopic, other.pubTopic)
                            .append(subTopic, other.subTopic)
                            .append(lwtTopic, other.lwtTopic)
@@ -134,6 +140,7 @@ public final class MqttConnectionSettingDTO {
                                .add("port", port)
                                .add("timeout", timeout)
                                .add("username", username)
+                               .add("tokenConfig", tokenConfig)
                                .add("pubTopic", pubTopic)
                                .add("subTopic", subTopic)
                                .add("lwtTopic", lwtTopic)
