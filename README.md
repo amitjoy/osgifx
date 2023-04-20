@@ -25,9 +25,9 @@
 
 |                      	|                                             	    |
 |----------------------	|---------------------------------------------	    |
-| Java (Application)    | 17                                         	    |
+| Java (Application)    | 19                                         	    |
 | Java (Agent)          | 1.8                                         	    |
-| Rich Client Platform 	| JavaFX 17                                    	    |
+| Rich Client Platform 	| JavaFX 19                                    	    |
 | Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                       |
 | Tools                	| Bndtools 6.4.0                                     |
