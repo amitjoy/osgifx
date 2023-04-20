@@ -87,7 +87,7 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 
 1. Java 1.8
 2. OSGi R6
-3. Install `com.osgifx.console.agent.jar`
+3. Install `com.osgifx.console.agent.jar` from maven central
 
 ##### Socket
 
@@ -97,7 +97,7 @@ Note that, if you want to secure sockets, you additionally need to set `osgi.fx.
 
 ##### MQTT
 
-To use MQTT, you have to install the `in.bytehue.messaging.mqtt5.provider.jar` from https://github.com/amitjoy/osgi-messaging. This project implements the draft OSGi Messaging specification. Note that, you have to configure the `in.bytehue.messaging.client` PID in Configuration Admin for this library to work as you expect it to be. You can find the relevant configurations in the project's README. Also note that, you have to specify `maximumPacketSize` and `sendMaximumPacketSize` to `268435456` in the configuration. It denotes that the client will be able to send and receive packets of `256 MB` in size.
+To use MQTT, you have to install the `in.bytehue.messaging.mqtt5.provider.jar` from [OSGi Messaging](https://github.com/amitjoy/osgi-messaging). This project implements the draft OSGi messaging specification. Note that, you have to configure the `in.bytehue.messaging.client` PID in configuration admin for this library to work. You can find the relevant configurations in the project's README. Also note that, you have to specify `maximumPacketSize` and `sendMaximumPacketSize` to `268435456` in the configuration. It denotes that the client will be able to send and receive packets of `256 MB` in size. Note that, you have to download this JAR from `Github Packages`.
 
 Additionally, you also have to set `osgi.fx.agent.mqtt.pubtopic` property where the agent will send the responses to and set the `osgi.fx.agent.mqtt.subtopic` property where the agent will receive the requests from. 
 
