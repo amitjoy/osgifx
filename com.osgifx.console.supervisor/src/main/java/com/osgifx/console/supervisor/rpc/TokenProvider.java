@@ -26,8 +26,11 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Map;
 import java.util.function.Supplier;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 public final class TokenProvider implements Supplier<String> {
@@ -64,12 +67,19 @@ public final class TokenProvider implements Supplier<String> {
     private static final int REDUCE_VALID_UNTIL_BY = 10;
     private static final int TOKEN_TIMEOUT         = 10;
 
-    private final String            tokenConfig;
     private TokenInfo               cachedToken;
+    private final TokenConfigDTO    tokenConfig;
     private final Supplier<Instant> nowProvider = Instant::now;
 
-    public TokenProvider(final String tokenConfig) {
-        this.tokenConfig = checkNotNull(tokenConfig, "Token config cannot be null");
+    public TokenProvider(final TokenConfigDTO tokenConfig) {
+        checkNotNull(tokenConfig, "Token config cannot be null");
+        checkNotNull(tokenConfig.authServerURL, "Endpoint cannot be null");
+        checkNotNull(tokenConfig.clientId, "Client ID cannot be null");
+        checkNotNull(tokenConfig.clientSecret, "Client secret cannot be null");
+        checkNotNull(tokenConfig.scope, "Scope cannot be null");
+        checkNotNull(tokenConfig.audience, "Audience cannot be null");
+
+        this.tokenConfig = tokenConfig;
     }
 
     @Override
@@ -83,22 +93,19 @@ public final class TokenProvider implements Supplier<String> {
 
     private TokenInfo internalGetToken() throws TokenProviderException {
         try {
-            final var config   = parseJson(tokenConfig, TokenConfigDTO.class);
-            final var endpoint = checkNotNull(config.authServerURL, "Endpoint cannot be null");
-            final var now      = nowProvider.get();
-
+            final var now = nowProvider.get();
             // @formatter:off
             final var client = HttpClient.newBuilder()
                                          .connectTimeout(Duration.ofSeconds(TOKEN_TIMEOUT))
                                          .build();
 
             final var request = HttpRequest.newBuilder()
-                                           .uri(URI.create(endpoint))
+                                           .uri(URI.create(tokenConfig.authServerURL))
                                            .timeout(Duration.ofSeconds(TOKEN_TIMEOUT))
                                            .header("Connection", "close")
                                            .header("Content-Type", "application/x-www-form-urlencoded")
                                            .header("Accept", "application/json")
-                                           .POST(BodyPublishers.ofString(getPostData(config)))
+                                           .POST(BodyPublishers.ofString(getPostData(tokenConfig)))
                                            .build();
             // @formatter:on
             final HttpResponse<String> response   = client.send(request, BodyHandlers.ofString(UTF_8));
@@ -115,27 +122,18 @@ public final class TokenProvider implements Supplier<String> {
     }
 
     private String getPostData(final TokenConfigDTO tokenConfig) {
-        final var clientID     = checkNotNull(tokenConfig.clientId, "Client ID cannot be null");
-        final var clientSecret = checkNotNull(tokenConfig.clientSecret, "Client secret cannot be null");
-        final var scope        = checkNotNull(tokenConfig.scope, "Scope cannot be null");
-        final var audience     = checkNotNull(tokenConfig.audience, "Audience cannot be null");
+        final Map<String, String> elements = Maps.newLinkedHashMap();
 
-        // @formatter:off
-        final var result = new StringBuilder()
-                                .append("grant_type=client_credentials")
-                                .append("&client_id=")
-                                .append(clientID)
-                                .append("&client_secret=")
-                                .append(clientSecret)
-                                .append("&scope=")
-                                .append(scope)
-                                .append("&audience=")
-                                .append(audience);
-        // @formatter:on
-        return result.toString();
+        elements.put("grant_type", "client_credentials");
+        elements.put("client_id", tokenConfig.clientId);
+        elements.put("client_secret", tokenConfig.clientSecret);
+        elements.put("scope", tokenConfig.scope);
+        elements.put("audience", tokenConfig.audience);
+
+        return Joiner.on("&").withKeyValueSeparator("=").join(elements);
     }
 
-    private <T> T parseJson(final String input, final Class<T> clazz) {
+    public static <T> T parseJson(final String input, final Class<T> clazz) {
         return new Gson().fromJson(input, clazz);
     }
 
