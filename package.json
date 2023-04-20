@@ -21,7 +21,7 @@
             "--add-opens javafx.graphics/javafx.scene=ALL-UNNAMED",
             "--add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED"
         ],
-        "javaVersion": "17",
+        "javaVersion": "19",
         "jar": "com.osgifx.console.dist/uberjar/osgifx.jar",
         "javafx": true,
         "title": "OSGi.fx"

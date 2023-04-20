@@ -34,7 +34,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.condition.Condition;
@@ -106,6 +105,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
     protected RemoteRPC<S, A> remoteRPC;
     protected volatile int    exitCode;
 
+    @SuppressWarnings("preview")
     protected void connectToSocket(final Class<A> agent,
                                    final S supervisor,
                                    final SocketConnection socketConnection) throws Exception {
@@ -134,7 +134,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
                         final var socket = sf == null ? new Socket() : sf.createSocket();
                         socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
 
-                        final var threadFactory = new Builder().namingPattern("fx-supervisor-socket-%d").daemon(true).build();
+                        final var threadFactory = Thread.ofVirtual().name("fx-supervisor-socket-", 1).factory();
                         final var executor = Executors.newFixedThreadPool(SOCKET_RPC_POOL_THREADS, threadFactory);
 
                         remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
@@ -148,6 +148,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
                 });
     }
 
+    @SuppressWarnings("preview")
     protected OSGiResult connectToMQTT(final BundleContext bundleContext,
                                        final ConfigurationAdmin configurationAdmin,
                                        final Class<A> agent,
@@ -197,7 +198,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        final var threadFactory = new Builder().namingPattern("fx-supervisor-mqtt-%d").daemon(true).build();
+        final var threadFactory = Thread.ofVirtual().name("fx-supervisor-mqtt-", 1).factory();
         final var executor      = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, threadFactory);
 
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),

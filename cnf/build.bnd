@@ -1,7 +1,7 @@
 -includeresource.all                  =         -src/main/resources
 -donotcopy                            =         \.gitignore|\.DS_Store
 
-javac.source                          =         17
+javac.source                          =         19
 javac.target                          =         ${javac.source}
 javac.compliance                      =         ${javac.source}
 javac.debug                           =         on
