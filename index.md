@@ -87,8 +87,42 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 
 1. Java 1.8
 2. OSGi R6
+3. Install `com.osgifx.console.agent.jar`
 
-To use the agent in the OSGi environment, you need to install `com.osgifx.console.agent.jar` and set `osgi.fx.agent.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
+##### Socket
+
+Set `osgi.fx.agent.socket.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
+
+Note that, if you want to secure sockets, you additionally need to set `osgi.fx.agent.socket.secure` property to `true` and set `osgi.fx.agent.socket.secure.sslcontext.filter` property to any value you like (this is not an LDAP filter but will be used in a LDAP filter), for example: `osgi.fx.agent.socket.secure.sslcontext.filter=my_sslcontext`. For secure communication, you also need to generate your truststore as well which you need to configure in the OSGi.fx application as well.
+
+##### MQTT
+
+To use MQTT, you have to install the `in.bytehue.messaging.mqtt5.provider.jar` from https://github.com/amitjoy/osgi-messaging. This project implements the draft OSGi Messaging specification. Note that, you have to configure the `in.bytehue.messaging.client` PID in Configuration Admin for this library to work as you expect it to be. You can find the relevant configurations in the project's README. Also note that, you have to specify `maximumPacketSize` and `sendMaximumPacketSize` to `268435456` in the configuration. It denotes that the client will be able to send and receive packets of `256 MB` in size.
+
+Additionally, you also have to set `osgi.fx.agent.mqtt.pubtopic` property where the agent will send the responses to and set the `osgi.fx.agent.mqtt.subtopic` property where the agent will receive the requests from. 
+
+Note that, in several scenarios, people tend to use OAuth tokens to be retrieved from authorization server and use the token as the password for the MQTT connection. To support this, you can also configure the token configuration in the OSGi.fx application and leave the `Password` field empty. Note that, the token configuration must be provided as a valid JSON in the following format:
+
+```json
+{
+	"authServerURL": "",
+	"clientId": "",
+	"clientSecret": "",
+	"audience": "",
+	"scope": ""
+}
+```
+
+You can also ignore the `clientId` in which scenario, the application will use the configured MQTT client ID as the client ID for retrieving the token. Once the OAuth POST request is sent to the authorization server, the server should respond with a JSON having the following format:
+
+```json
+{
+	"access_token": "",
+	"expires_in": 100 (only integer value is supported here)
+}
+```
+
+Once this is configured, the OSGi.fx application will automatically retrieve the token for every session and authenticate with the broker.
 
 --------------------------------------------------------------------------------------------------------------
 
