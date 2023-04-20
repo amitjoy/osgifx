@@ -36,7 +36,7 @@
 
 ### Latest Version
 
-The latest released version: 2.3.1 (Check [Project Website](https://osgifx.com) to download)
+The latest released version: 2.3.1 (Check [Project Website](http://osgifx.com) to download)
 
 ------------------------------------------------------------------------------------------------------------
 
@@ -106,4 +106,4 @@ This project is licensed under Apache License Version 2.0 [![License](http://img
 
 ### User Guide
 
-For instructions on how to download and install latest version, please refer to the [Project Website](https://osgifx.com).
+For instructions on how to download and install latest version, please refer to the [Project Website](http://osgifx.com).
