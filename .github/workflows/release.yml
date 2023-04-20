@@ -16,10 +16,10 @@ jobs:
          uses: actions/checkout@v3
       -  name: Gradle Wrapper Validation
          uses: gradle/wrapper-validation-action@v1
-      -  name: Set up Java 17 with JavaFX
+      -  name: Set up Java 19 with JavaFX
          uses: actions/setup-java@v1
          with:
-            java-version: '17'
+            java-version: '19'
             java-package: jdk+fx
       -  name: Set up Node
          uses: actions/setup-node@v3

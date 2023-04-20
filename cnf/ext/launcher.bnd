@@ -2,7 +2,7 @@
 -runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         ${is;${driver};gradle}
 -runtrace                       =         true 
--runee                          =         JavaSE-17
+-runee                          =         JavaSE-19
 -runvm                          =         -ea
 -runsystemcapabilities          =         ${native_capability}
 -runproperties.scr              =         ds.log.enabled=false
@@ -24,7 +24,8 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                           --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,\
                                           --add-exports=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED,\
                                           --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED,\
-                                          --add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED
+                                          --add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED,\
+                                          --enable-preview
 
 -runproperties.equinox          =         osgi.instance.area.default=${storage.directory}
 
