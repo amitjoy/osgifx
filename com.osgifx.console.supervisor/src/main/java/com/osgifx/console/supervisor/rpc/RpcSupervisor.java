@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.aries.component.dsl.OSGiResult;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -80,6 +81,8 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     private Appendable                 stderr;
     private int                        shell = -100;
     private CompletableFuture<Boolean> mqttConnectionPromise;
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
     private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
@@ -212,17 +215,27 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     }
 
     @Override
-    public synchronized void onConnected(final MqttClientConnectedContext context) {
-        logger.atInfo().log("Successfully connected to '%s'", context.getClientConfig().getServerHost());
-        mqttConnectionPromise.complete(true);
+    public void onConnected(final MqttClientConnectedContext context) {
+        lock.lock();
+        try {
+            logger.atInfo().log("Successfully connected to '%s'", context.getClientConfig().getServerHost());
+            mqttConnectionPromise.complete(true);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
-    public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
-        logger.atInfo().log("Successfully disconnected from '%s'", context.getClientConfig().getServerHost());
-        final Throwable cause = context.getCause();
-        if (mqttConnectionPromise != null && cause != null) {
-            mqttConnectionPromise.completeExceptionally(cause);
+    public void onDisconnected(final MqttClientDisconnectedContext context) {
+        lock.lock();
+        try {
+            logger.atInfo().log("Successfully disconnected from '%s'", context.getClientConfig().getServerHost());
+            final Throwable cause = context.getCause();
+            if (mqttConnectionPromise != null && cause != null) {
+                mqttConnectionPromise.completeExceptionally(cause);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

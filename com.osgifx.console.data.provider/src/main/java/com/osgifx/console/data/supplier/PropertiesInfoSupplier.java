@@ -23,6 +23,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -59,6 +61,7 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
+    private final ReentrantLock                lock       = new ReentrantLock();
     private final ObservableList<XPropertyDTO> properties = observableArrayList();
 
     @Activate
@@ -67,16 +70,21 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving properties info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        lock.lock();
+        try {
+            logger.atInfo().log("Retrieving properties info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            properties.setAll(makeNullSafe(agent.getAllProperties()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
+            logger.atInfo().log("Properties info retrieved successfully");
+        } finally {
+            lock.unlock();
         }
-        properties.setAll(makeNullSafe(agent.getAllProperties()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
-        logger.atInfo().log("Properties info retrieved successfully");
     }
 
     @Override

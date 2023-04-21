@@ -26,6 +26,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -71,6 +73,7 @@ public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, Ev
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
+    private final ReentrantLock                     lock           = new ReentrantLock();
     private final ObservableList<XHttpComponentDTO> httpComponents = observableArrayList();
 
     @Activate
@@ -79,16 +82,21 @@ public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, Ev
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving HTTP components info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        lock.lock();
+        try {
+            logger.atInfo().log("Retrieving HTTP components info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            httpComponents.setAll(makeNullSafe(agent.getHttpComponents()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HTTP_TOPIC);
+            logger.atInfo().log("HTTP components info retrieved successfully");
+        } finally {
+            lock.unlock();
         }
-        httpComponents.setAll(makeNullSafe(agent.getHttpComponents()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HTTP_TOPIC);
-        logger.atInfo().log("HTTP components info retrieved successfully");
     }
 
     @Override

@@ -22,6 +22,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -56,6 +58,7 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
+    private final ReentrantLock                lock = new ReentrantLock();
     private final ObservableList<XLogEntryDTO> logs = observableArrayList();
 
     @Activate
@@ -74,8 +77,13 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
     }
 
     @Override
-    public synchronized void logged(final XLogEntryDTO logEntry) {
-        logs.add(logEntry);
+    public void logged(final XLogEntryDTO logEntry) {
+        lock.lock();
+        try {
+            logs.add(logEntry);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override

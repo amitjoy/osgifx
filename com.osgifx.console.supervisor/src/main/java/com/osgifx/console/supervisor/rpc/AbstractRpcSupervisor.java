@@ -93,8 +93,6 @@ public abstract class AbstractRpcSupervisor<S, A> {
         String osgi_ds_satisfying_condition_target();
     }
 
-    private static final int    MQTT_RPC_POOL_THREADS         = 30;
-    private static final int    SOCKET_RPC_POOL_THREADS       = 5;
     private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
     private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5;
 
@@ -134,9 +132,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
                         final var socket = sf == null ? new Socket() : sf.createSocket();
                         socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
 
-                        final var threadFactory = Thread.ofVirtual().name("fx-supervisor-socket-", 1).factory();
-                        final var executor = Executors.newFixedThreadPool(SOCKET_RPC_POOL_THREADS, threadFactory);
-
+                        final var executor = Executors.newVirtualThreadPerTaskExecutor();
                         remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
                         this.setRemoteRPC(remoteRPC);
                         remoteRPC.open();
@@ -198,9 +194,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        final var threadFactory = Thread.ofVirtual().name("fx-supervisor-mqtt-", 1).factory();
-        final var executor      = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, threadFactory);
-
+        final var executor = Executors.newVirtualThreadPerTaskExecutor();
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
                                   executor);
         this.setRemoteRPC(remoteRPC);

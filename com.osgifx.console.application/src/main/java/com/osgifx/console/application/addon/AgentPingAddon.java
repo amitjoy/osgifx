@@ -20,7 +20,10 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
 
 import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -35,7 +38,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
-import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
 public final class AgentPingAddon {
@@ -46,8 +48,6 @@ public final class AgentPingAddon {
     @Log
     @Inject
     private FluentLogger                                  logger;
-    @Inject
-    private Executor                                      executor;
     @Inject
     @Optional
     private Supervisor                                    supervisor;
@@ -68,10 +68,18 @@ public final class AgentPingAddon {
     @ContextValue("selected.settings")
     private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     private volatile ScheduledFuture<?>                   future;
+    private ScheduledExecutorService                      executor;
 
     @PostConstruct
     public void init() {
+        executor = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "agent-ping"));
         logger.atInfo().log("Agent ping addon has been initialized");
+    }
+
+    @PreDestroy
+    private void destroy() {
+        logger.atInfo().log("Agent ping addon has been destroyed");
+        executor.shutdownNow();
     }
 
     @Inject
@@ -91,7 +99,7 @@ public final class AgentPingAddon {
                     selectedSettings.publish(null);
                     connectedAgent.publish(null);
                 }
-            }, INITIAL_DELAY, MAX_DELAY);
+            }, INITIAL_DELAY.toMillis(), MAX_DELAY.toMillis(), TimeUnit.MILLISECONDS);
         }
         logger.atInfo().log("Agent ping scheduler has been started");
     }
@@ -104,11 +112,6 @@ public final class AgentPingAddon {
             future.cancel(true);
         }
         connectedAgent.publish(null);
-    }
-
-    @PreDestroy
-    private void destroy() {
-        logger.atInfo().log("Agent ping addon has been destroyed");
     }
 
 }

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.terminal;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,23 +39,24 @@ public final class TerminalFxController {
 
     @Log
     @Inject
-    private FluentLogger    logger;
+    private FluentLogger        logger;
     @FXML
-    private TextField       input;
+    private TextField           input;
     @FXML
-    private TextArea        output;
+    private TextArea            output;
     @Inject
-    private Executor        executor;
+    private Executor            executor;
     @Inject
     @Optional
-    private Supervisor      supervisor;
+    private Supervisor          supervisor;
     @Inject
-    private TerminalHistory history;
+    private TerminalHistory     history;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean         isSnapshotAgent;
-    private Agent           agent;
-    private int             historyPointer;
+    private boolean             isSnapshotAgent;
+    private Agent               agent;
+    private int                 historyPointer;
+    private final ReentrantLock lock = new ReentrantLock();
 
     @FXML
     public void initialize() {
@@ -66,41 +69,46 @@ public final class TerminalFxController {
     }
 
     @FXML
-    private synchronized void handleInput(final KeyEvent keyEvent) {
-        switch (keyEvent.getCode()) {
-            case ENTER:
-                final var command = input.getText();
-                if ("clear".equals(command)) {
-                    output.clear();
-                    input.clear();
-                    return;
-                }
-                if (command.trim().isEmpty()) {
-                    return;
-                }
-                output.appendText("$ " + command + System.lineSeparator());
-                executeCliCommand(command);
-                break;
-            case UP:
-                if (historyPointer == 0) {
-                    historyPointer = history.size();
-                }
-                historyPointer--;
-                input.setText(history.get(historyPointer));
-                input.selectAll();
-                input.selectEnd(); // Does not change anything seemingly
-                break;
-            case DOWN:
-                if (historyPointer == history.size() - 1) {
+    private void handleInput(final KeyEvent keyEvent) {
+        lock.lock();
+        try {
+            switch (keyEvent.getCode()) {
+                case ENTER:
+                    final var command = input.getText();
+                    if ("clear".equals(command)) {
+                        output.clear();
+                        input.clear();
+                        return;
+                    }
+                    if (command.trim().isEmpty()) {
+                        return;
+                    }
+                    output.appendText("$ " + command + System.lineSeparator());
+                    executeCliCommand(command);
                     break;
-                }
-                historyPointer++;
-                input.setText(history.get(historyPointer));
-                input.selectAll();
-                input.selectEnd(); // Does not change anything seemingly
-                break;
-            default:
-                break;
+                case UP:
+                    if (historyPointer == 0) {
+                        historyPointer = history.size();
+                    }
+                    historyPointer--;
+                    input.setText(history.get(historyPointer));
+                    input.selectAll();
+                    input.selectEnd(); // Does not change anything seemingly
+                    break;
+                case DOWN:
+                    if (historyPointer == history.size() - 1) {
+                        break;
+                    }
+                    historyPointer++;
+                    input.setText(history.get(historyPointer));
+                    input.selectAll();
+                    input.selectEnd(); // Does not change anything seemingly
+                    break;
+                default:
+                    break;
+            }
+        } finally {
+            lock.unlock();
         }
     }
 

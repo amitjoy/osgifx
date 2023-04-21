@@ -15,58 +15,35 @@
  ******************************************************************************/
 package com.osgifx.console.executor.provider;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.time.DurationUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.metatype.annotations.AttributeDefinition;
-import org.osgi.service.metatype.annotations.Designate;
-import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.osgifx.console.executor.Executor;
-import com.osgifx.console.executor.provider.ExecutorProvider.Configuration;
 
 @Component
-@Designate(ocd = Configuration.class)
 public final class ExecutorProvider implements Executor {
 
-    @ObjectClassDefinition(name = "Executor Configuration")
-    public @interface Configuration {
-        @AttributeDefinition(description = "The minimum number of threads allocated to this pool", required = false)
-        int coreSize() default 30;
-
-        @AttributeDefinition(description = "If this flag is set to true the containing thread pool will use daemon threads.", required = false)
-        boolean daemon() default true;
-    }
-
     @Reference
-    private LoggerFactory               factory;
-    private FluentLogger                logger;
-    private ScheduledThreadPoolExecutor executor;
+    private LoggerFactory   factory;
+    private FluentLogger    logger;
+    private ExecutorService executor;
 
     @Activate
     @SuppressWarnings("preview")
-    void activate(final Configuration config) {
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-
-        final var coreSize      = config.coreSize();
-        final var threadFactory = Thread.ofVirtual().name("fx-worker-", 1).factory();
-
-        executor = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
-        executor.setRemoveOnCancelPolicy(true);
+    void activate() {
+        logger   = FluentLogger.of(factory.createLogger(getClass().getName()));
+        executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 
     @Deactivate
@@ -87,32 +64,6 @@ public final class ExecutorProvider implements Executor {
     public <U> CompletableFuture<U> supplyAsync(final Supplier<U> supplier) {
         checkNotNull(supplier, "Supplier cannot be null");
         return CompletableFuture.supplyAsync(supplier, executor);
-    }
-
-    @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command,
-                                                  final Duration initialDelay,
-                                                  final Duration period) {
-        checkNotNull(command, "Task cannot be null");
-        checkNotNull(initialDelay, "The initial delay cannot be null");
-        checkNotNull(period, "The period cannot be null");
-        checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
-        checkArgument(DurationUtils.isPositive(period), "The period must be positive and more than zero");
-
-        return executor.scheduleAtFixedRate(command, initialDelay.toMillis(), period.toMillis(), MILLISECONDS);
-    }
-
-    @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command,
-                                                     final Duration initialDelay,
-                                                     final Duration delay) {
-        checkNotNull(command, "Task cannot be null");
-        checkNotNull(initialDelay, "The initial delay cannot be null");
-        checkNotNull(delay, "The delay cannot be null");
-        checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
-        checkArgument(DurationUtils.isPositive(delay), "The delay must be positive and more than zero");
-
-        return executor.scheduleWithFixedDelay(command, initialDelay.toMillis(), delay.toMillis(), MILLISECONDS);
     }
 
 }

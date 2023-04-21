@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.gogo;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.osgi.service.component.annotations.Component;
 
 import com.google.common.collect.EvictingQueue;
@@ -23,25 +25,46 @@ import com.google.common.collect.Lists;
 @Component(service = GogoConsoleHistory.class)
 public final class GogoConsoleHistory {
 
+    private final ReentrantLock         lock    = new ReentrantLock();
     private final EvictingQueue<String> history = EvictingQueue.create(20);
 
-    public synchronized void add(final String command) {
-        history.add(command);
-    }
-
-    public synchronized void clear() {
-        history.clear();
-    }
-
-    public synchronized int size() {
-        return history.size();
-    }
-
-    public synchronized String get(final int index) {
-        if (history.isEmpty()) {
-            return "";
+    public void add(final String command) {
+        lock.lock();
+        try {
+            history.add(command);
+        } finally {
+            lock.unlock();
         }
-        return Lists.newArrayList(history).get(index);
+    }
+
+    public void clear() {
+        lock.lock();
+        try {
+            history.clear();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public int size() {
+        lock.lock();
+        try {
+            return history.size();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public String get(final int index) {
+        lock.lock();
+        try {
+            if (history.isEmpty()) {
+                return "";
+            }
+            return Lists.newArrayList(history).get(index);
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

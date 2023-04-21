@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.osgifx.console.agent.provider.AgentServer;
 
@@ -31,14 +32,16 @@ import com.osgifx.console.agent.provider.AgentServer;
  */
 public final class RedirectOutput extends PrintStream {
 
-    private static Timer                      timer      = new Timer();
+    private static Timer                      timer        = new Timer();
     private final List<AgentServer>           agents;
     private final PrintStream                 out;
-    private StringBuilder                     sb         = new StringBuilder();
+    private StringBuilder                     sb           = new StringBuilder();
     private final boolean                     err;
-    private static final ThreadLocal<Boolean> onStack    = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> onStack      = new ThreadLocal<>();
     private TimerTask                         active;
-    private String                            lastOutput = "";
+    private String                            lastOutput   = "";
+    private final ReentrantLock               lock         = new ReentrantLock();
+    private final ReentrantLock               redirectLock = new ReentrantLock();
 
     /**
      * If we do not have an original, we create a null stream because the
@@ -97,32 +100,41 @@ public final class RedirectOutput extends PrintStream {
     }
 
     private void flushConditional() {
-        synchronized (this) {
+        lock.lock();
+        try {
             if (active != null) {
                 return;
             }
             active = new TimerTask() {
                 @Override
                 public void run() {
-                    synchronized (RedirectOutput.this) {
+                    redirectLock.lock();
+                    try {
                         active = null;
+                    } finally {
+                        redirectLock.unlock();
                     }
                     flush();
                 }
             };
             timer.schedule(active, 300);
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void flush() {
         final String output;
-        synchronized (this) {
+        lock.lock();
+        try {
             if (sb.length() == 0) {
                 return;
             }
             output = sb.toString();
             sb     = new StringBuilder();
+        } finally {
+            lock.unlock();
         }
         setLastOutput(output);
         for (final AgentServer agent : agents) {

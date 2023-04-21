@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.MBeanServer;
 
@@ -39,7 +40,8 @@ public final class XHeapAdmin {
 
     private static final String HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
 
-    private static volatile Object hotspotMBean;
+    private static volatile Object     hotspotMBean;
+    private static final ReentrantLock lock = new ReentrantLock();
 
     public XHeapUsageDTO init() {
         final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
@@ -114,10 +116,13 @@ public final class XHeapAdmin {
 
     private static void initHotspotMBean() {
         if (hotspotMBean == null) {
-            synchronized (XHeapAdmin.class) {
+            lock.lock();
+            try {
                 if (hotspotMBean == null) {
                     hotspotMBean = getHotspotMBean();
                 }
+            } finally {
+                lock.unlock();
             }
         }
     }
