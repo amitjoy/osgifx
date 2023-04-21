@@ -61,7 +61,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final Class<R> remoteClass;
 
     private ExecutorService executor;
-    private final Lock      lock = new ReentrantLock();
+    private final Lock      lock     = new ReentrantLock();
+    private final Lock      sendLock = new ReentrantLock();
 
     private static class RpcResult {
         boolean resolved;
@@ -245,7 +246,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             promises.put(msgId, new RpcResult());
         }
         trace("Sending Socket RPC");
-        synchronized (out) {
+        sendLock.lock();
+        try {
             out.writeUTF(m != null ? m.getName() : "");
             out.writeInt(msgId);
             if (values == null) {
@@ -267,6 +269,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             }
             out.flush();
             trace("Sent Socket RPC");
+        } finally {
+            sendLock.unlock();
         }
         return msgId;
     }
