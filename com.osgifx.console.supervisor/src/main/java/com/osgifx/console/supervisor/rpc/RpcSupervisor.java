@@ -41,6 +41,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 import org.osgi.service.event.Event;
@@ -108,6 +109,13 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     @Activate
     void activate() {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
+
+    @Deactivate
+    void deactivate() {
+        // this will be called when the agent is disconnected to deregister the service
+        Optional.ofNullable(mqttMessagingCondition).ifPresent(OSGiResult::close);
+        mqttMessagingCondition = null;
     }
 
     @Override
