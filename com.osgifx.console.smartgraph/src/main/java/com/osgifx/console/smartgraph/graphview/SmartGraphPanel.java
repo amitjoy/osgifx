@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,6 +115,8 @@ public class SmartGraphPanel<V, E> extends Pane {
     // This value was obtained experimentally
     private static final int AUTOMATIC_LAYOUT_ITERATIONS = 20;
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     /**
      * Constructs a visualization of the graph referenced by <code>theGraph</code>,
      * using default properties and default random placement of vertices.
@@ -180,14 +183,14 @@ public class SmartGraphPanel<V, E> extends Pane {
         checkNotNull(theGraph, "Graph cannot be null");
 
         this.theGraph          = theGraph;
-        this.graphProperties   = properties != null ? properties : new SmartGraphProperties();
+        graphProperties        = properties != null ? properties : new SmartGraphProperties();
         this.placementStrategy = placementStrategy != null ? placementStrategy : new SmartRandomPlacementStrategy();
 
-        this.edgesWithArrows = this.graphProperties.getUseEdgeArrow();
+        edgesWithArrows = graphProperties.getUseEdgeArrow();
 
-        this.repulsionForce  = this.graphProperties.getRepulsionForce();
-        this.attractionForce = this.graphProperties.getAttractionForce();
-        this.attractionScale = this.graphProperties.getAttractionScale();
+        repulsionForce  = graphProperties.getRepulsionForce();
+        attractionForce = graphProperties.getAttractionForce();
+        attractionScale = graphProperties.getAttractionScale();
 
         vertexNodes = Maps.newHashMap();
         edgeNodes   = Maps.newHashMap();
@@ -209,8 +212,8 @@ public class SmartGraphPanel<V, E> extends Pane {
             }
         };
 
-        this.automaticLayoutProperty = new SimpleBooleanProperty(false);
-        this.automaticLayoutProperty.addListener((observable, oldValue, newValue) -> {
+        automaticLayoutProperty = new SimpleBooleanProperty(false);
+        automaticLayoutProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 timer.start();
             } else {
@@ -220,13 +223,18 @@ public class SmartGraphPanel<V, E> extends Pane {
 
     }
 
-    private synchronized void runLayoutIteration() {
-        for (var i = 0; i < AUTOMATIC_LAYOUT_ITERATIONS; i++) {
-            resetForces();
-            computeForces();
-            updateForces();
+    private void runLayoutIteration() {
+        lock.lock();
+        try {
+            for (var i = 0; i < AUTOMATIC_LAYOUT_ITERATIONS; i++) {
+                resetForces();
+                computeForces();
+                updateForces();
+            }
+            applyForces();
+        } finally {
+            lock.unlock();
         }
-        applyForces();
     }
 
     /**
@@ -251,14 +259,14 @@ public class SmartGraphPanel<V, E> extends Pane {
 
         if (placementStrategy != null) {
             // call strategy to place the vertices in their initial locations
-            placementStrategy.place(width, height, this.theGraph, this.vertexNodes.values());
+            placementStrategy.place(width, height, theGraph, vertexNodes.values());
         } else {
             // apply random placement
-            new SmartRandomPlacementStrategy().place(width, height, this.theGraph, this.vertexNodes.values());
+            new SmartRandomPlacementStrategy().place(width, height, theGraph, vertexNodes.values());
             // start automatic layout
             timer.start();
         }
-        this.initialized = true;
+        initialized = true;
     }
 
     /**
@@ -267,7 +275,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      * @return automatic layout property
      */
     public BooleanProperty automaticLayoutProperty() {
-        return this.automaticLayoutProperty;
+        return automaticLayoutProperty;
     }
 
     /**
@@ -293,7 +301,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      */
     public void update() {
         verifyNotNull(getScene(), "You must call this method after the instance was added to a scene.");
-        verify(this.initialized, "You must call init() method before any updates.");
+        verify(initialized, "You must call init() method before any updates.");
 
         // this will be called from a non-javafx thread, so this must be guaranteed to
         // run of the graphics thread
@@ -314,7 +322,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      */
     public void updateAndWait() {
         verifyNotNull(getScene(), "You must call this method after the instance was added to a scene.");
-        verify(this.initialized, "You must call init() method before any updates.");
+        verify(initialized, "You must call init() method before any updates.");
 
         final FutureTask<?> update = new FutureTask<>(() -> {
             updateNodes();
@@ -341,10 +349,15 @@ public class SmartGraphPanel<V, E> extends Pane {
 
     }
 
-    private synchronized void updateNodes() {
-        removeNodes();
-        insertNodes();
-        updateLabels();
+    private void updateNodes() {
+        lock.lock();
+        try {
+            removeNodes();
+            insertNodes();
+            updateLabels();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /*
@@ -356,7 +369,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      * @param action action to be performed
      */
     public void setVertexDoubleClickAction(final Consumer<SmartGraphVertex<V>> action) {
-        this.vertexClickConsumer = action;
+        vertexClickConsumer = action;
     }
 
     /**
@@ -365,7 +378,7 @@ public class SmartGraphPanel<V, E> extends Pane {
      * @param action action to be performed
      */
     public void setEdgeDoubleClickAction(final Consumer<SmartGraphEdge<E, V>> action) {
-        this.edgeClickConsumer = action;
+        edgeClickConsumer = action;
     }
 
     /*
@@ -411,8 +424,8 @@ public class SmartGraphPanel<V, E> extends Pane {
                 connections.put(edge, Pair.of(vertex, oppositeVertex));
                 addEdge(graphEdge, edge);
 
-                if (this.edgesWithArrows) {
-                    final var arrow = new SmartArrow(this.graphProperties.getEdgeArrowSize());
+                if (edgesWithArrows) {
+                    final var arrow = new SmartArrow(graphProperties.getEdgeArrowSize());
                     graphEdge.attachArrow(arrow);
                     getChildren().add(arrow);
                 }
@@ -580,8 +593,8 @@ public class SmartGraphPanel<V, E> extends Pane {
 
                 final var graphEdge = createEdge(edge, graphVertexIn, graphVertexOut);
 
-                if (this.edgesWithArrows) {
-                    final var arrow = new SmartArrow(this.graphProperties.getEdgeArrowSize());
+                if (edgesWithArrows) {
+                    final var arrow = new SmartArrow(graphProperties.getEdgeArrowSize());
                     graphEdge.attachArrow(arrow);
                     getChildren().add(arrow);
                 }
@@ -756,7 +769,7 @@ public class SmartGraphPanel<V, E> extends Pane {
 
                 // double k = Math.sqrt(getWidth() * getHeight() / graphVertexMap.size());
                 final var repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(),
-                        this.repulsionForce);
+                        repulsionForce);
 
                 double deltaForceX = 0, deltaForceY = 0;
 
@@ -767,7 +780,7 @@ public class SmartGraphPanel<V, E> extends Pane {
                 if (areAdjacent(v, other)) {
 
                     final var attractiveForce = attractiveForce(v.getUpdatedPosition(), other.getUpdatedPosition(),
-                            vertexNodes.size(), this.attractionForce, this.attractionScale);
+                            vertexNodes.size(), attractionForce, attractionScale);
 
                     deltaForceX = attractiveForce.getX() + repellingForce.getX();
                     deltaForceY = attractiveForce.getY() + repellingForce.getY();

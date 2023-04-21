@@ -36,6 +36,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.rpc.RemoteRPC;
@@ -59,6 +61,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final Class<R> remoteClass;
 
     private ExecutorService executor;
+    private final Lock      lock = new ReentrantLock();
 
     private static class RpcResult {
         boolean resolved;
@@ -137,41 +140,46 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized R getRemote() {
-        if (stopped.get()) {
-            return null;
-        }
-        if (remote == null) {
-            remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
-                    (target, method, args) -> {
-                        try {
-                            if (method.getDeclaringClass() == Object.class) {
-                                final Object hash = new Object();
-                                return method.invoke(hash, args);
-                            }
-                            int msgId;
+    public R getRemote() {
+        lock.lock();
+        try {
+            if (stopped.get()) {
+                return null;
+            }
+            if (remote == null) {
+                remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
+                        (target, method, args) -> {
                             try {
-                                msgId = send(id.getAndIncrement(), method, args);
-                                if (method.getReturnType() == void.class) {
-                                    promises.remove(msgId);
+                                if (method.getDeclaringClass() == Object.class) {
+                                    final Object hash = new Object();
+                                    return method.invoke(hash, args);
+                                }
+                                int msgId;
+                                try {
+                                    msgId = send(id.getAndIncrement(), method, args);
+                                    if (method.getReturnType() == void.class) {
+                                        promises.remove(msgId);
+                                        return null;
+                                    }
+                                } catch (final Exception e1) {
+                                    terminate();
                                     return null;
                                 }
-                            } catch (final Exception e1) {
-                                terminate();
-                                return null;
+                                return waitForResult(msgId, method.getGenericReturnType());
+                            } catch (final InvocationTargetException e2) {
+                                throw Exceptions.unrollCause(e2, InvocationTargetException.class);
+                            } catch (final InterruptedException e3) {
+                                interrupt();
+                                throw e3;
+                            } catch (final Exception e4) {
+                                throw e4;
                             }
-                            return waitForResult(msgId, method.getGenericReturnType());
-                        } catch (final InvocationTargetException e2) {
-                            throw Exceptions.unrollCause(e2, InvocationTargetException.class);
-                        } catch (final InterruptedException e3) {
-                            interrupt();
-                            throw e3;
-                        } catch (final Exception e4) {
-                            throw e4;
-                        }
-                    });
+                        });
+            }
+            return remote;
+        } finally {
+            lock.unlock();
         }
-        return remote;
     }
 
     @Override
@@ -269,14 +277,14 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             msgId     = -msgId;
             exception = true;
         }
-        final RpcResult o = promises.get(msgId);
-        if (o != null) {
-            synchronized (o) {
+        final RpcResult result = promises.get(msgId);
+        if (result != null) {
+            synchronized (result) {
                 trace("Resolved Socket RPC");
-                o.value     = data;
-                o.exception = exception;
-                o.resolved  = true;
-                o.notifyAll();
+                result.value     = data;
+                result.exception = exception;
+                result.resolved  = true;
+                result.notifyAll();
             }
         }
     }

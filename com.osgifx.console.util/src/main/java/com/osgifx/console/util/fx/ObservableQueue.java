@@ -17,12 +17,14 @@ package com.osgifx.console.util.fx;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javafx.collections.ObservableListBase;
 
 public final class ObservableQueue<E> extends ObservableListBase<E> implements Queue<E> {
 
-    private final Queue<E> queue;
+    private final Queue<E>      queue;
+    private final ReentrantLock lock;
 
     /**
      * Creates an ObservableQueue backed by the supplied Queue. Note that
@@ -33,6 +35,7 @@ public final class ObservableQueue<E> extends ObservableListBase<E> implements Q
      */
     public ObservableQueue(final Queue<E> queue) {
         this.queue = queue;
+        lock       = new ReentrantLock();
     }
 
     /**
@@ -43,78 +46,123 @@ public final class ObservableQueue<E> extends ObservableListBase<E> implements Q
     }
 
     @Override
-    public synchronized boolean offer(final E e) {
-        beginChange();
-        final var result = queue.offer(e);
-        if (result) {
-            nextAdd(queue.size() - 1, queue.size());
-        }
-        endChange();
-        return result;
-    }
-
-    @Override
-    public synchronized boolean add(final E e) {
-        beginChange();
+    public boolean offer(final E e) {
+        lock.lock();
         try {
-            queue.add(e);
-            nextAdd(queue.size() - 1, queue.size());
-            return true;
-        } finally {
+            beginChange();
+            final var result = queue.offer(e);
+            if (result) {
+                nextAdd(queue.size() - 1, queue.size());
+            }
             endChange();
+            return result;
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
-    public synchronized E remove() {
-        beginChange();
+    public boolean add(final E e) {
+        lock.lock();
         try {
-            final var e = queue.remove();
-            nextRemove(0, e);
+            beginChange();
+            try {
+                queue.add(e);
+                nextAdd(queue.size() - 1, queue.size());
+                return true;
+            } finally {
+                endChange();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public E remove() {
+        lock.lock();
+        try {
+            beginChange();
+            try {
+                final var e = queue.remove();
+                nextRemove(0, e);
+                return e;
+            } finally {
+                endChange();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public E poll() {
+        lock.lock();
+        try {
+            beginChange();
+            final var e = queue.poll();
+            if (e != null) {
+                nextRemove(0, e);
+            }
+            endChange();
             return e;
         } finally {
-            endChange();
+            lock.unlock();
         }
     }
 
     @Override
-    public synchronized E poll() {
-        beginChange();
-        final var e = queue.poll();
-        if (e != null) {
-            nextRemove(0, e);
+    public E element() {
+        lock.lock();
+        try {
+            return queue.element();
+        } finally {
+            lock.unlock();
         }
-        endChange();
-        return e;
     }
 
     @Override
-    public synchronized E element() {
-        return queue.element();
-    }
-
-    @Override
-    public synchronized E peek() {
-        return queue.peek();
-    }
-
-    @Override
-    public synchronized E get(final int index) {
-        final var iterator = queue.iterator();
-        for (var i = 0; i < index; i++) {
-            iterator.next();
+    public E peek() {
+        lock.lock();
+        try {
+            return queue.peek();
+        } finally {
+            lock.unlock();
         }
-        return iterator.next();
     }
 
     @Override
-    public synchronized int size() {
-        return queue.size();
+    public E get(final int index) {
+        lock.lock();
+        try {
+            final var iterator = queue.iterator();
+            for (var i = 0; i < index; i++) {
+                iterator.next();
+            }
+            return iterator.next();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
-    public synchronized void clear() {
-        queue.clear();
+    public int size() {
+        lock.lock();
+        try {
+            return queue.size();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void clear() {
+        lock.lock();
+        try {
+            queue.clear();
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

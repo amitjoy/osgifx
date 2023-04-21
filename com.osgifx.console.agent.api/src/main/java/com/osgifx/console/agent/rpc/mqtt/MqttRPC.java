@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.messaging.Message;
@@ -64,6 +66,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final Class<R> remoteClass;
 
     private final ExecutorService executor;
+    private final Lock            lock = new ReentrantLock();
 
     public static class RpcMessage {
         public int      id;
@@ -155,38 +158,43 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized R getRemote() {
-        if (stopped.get()) {
-            return null;
-        }
-        if (remote == null) {
-            remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
-                    (target, method, args) -> {
-                        try {
-                            if (method.getDeclaringClass() == Object.class) {
-                                final Object hash = new Object();
-                                return method.invoke(hash, args);
-                            }
-                            int msgId;
+    public R getRemote() {
+        lock.lock();
+        try {
+            if (stopped.get()) {
+                return null;
+            }
+            if (remote == null) {
+                remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
+                        (target, method, args) -> {
                             try {
-                                msgId = send(msg(id.getAndIncrement(), method, args));
-                                if (method.getReturnType() == void.class) {
-                                    promises.remove(msgId);
+                                if (method.getDeclaringClass() == Object.class) {
+                                    final Object hash = new Object();
+                                    return method.invoke(hash, args);
+                                }
+                                int msgId;
+                                try {
+                                    msgId = send(msg(id.getAndIncrement(), method, args));
+                                    if (method.getReturnType() == void.class) {
+                                        promises.remove(msgId);
+                                        return null;
+                                    }
+                                } catch (final Exception e1) {
+                                    terminate();
                                     return null;
                                 }
-                            } catch (final Exception e1) {
-                                terminate();
-                                return null;
+                                return waitForResult(msgId, method.getGenericReturnType());
+                            } catch (final InvocationTargetException ite) {
+                                throw Exceptions.unrollCause(ite, InvocationTargetException.class);
+                            } catch (final Exception e) {
+                                throw e;
                             }
-                            return waitForResult(msgId, method.getGenericReturnType());
-                        } catch (final InvocationTargetException ite) {
-                            throw Exceptions.unrollCause(ite, InvocationTargetException.class);
-                        } catch (final Exception e) {
-                            throw e;
-                        }
-                    });
+                        });
+            }
+            return remote;
+        } finally {
+            lock.unlock();
         }
-        return remote;
     }
 
     @Override
@@ -248,7 +256,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         final RpcResult result = promises.get(msgId);
         if (result != null) {
             synchronized (result) {
-                trace("Resolved RPC");
+                trace("Resolved MQTT RPC");
                 result.value     = data;
                 result.exception = exception;
                 result.resolved  = true;

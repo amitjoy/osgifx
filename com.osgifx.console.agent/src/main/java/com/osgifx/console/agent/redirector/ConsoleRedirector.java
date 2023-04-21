@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.osgifx.console.agent.provider.AgentServer;
 
@@ -37,10 +38,13 @@ public final class ConsoleRedirector implements Redirector {
     private static RedirectInput           stdin;
     private static final List<AgentServer> agents = new CopyOnWriteArrayList<>();
     private final AgentServer              agent;
+    private final ReentrantLock            lock   = new ReentrantLock();
 
     public ConsoleRedirector(final AgentServer agent) {
         this.agent = agent;
-        synchronized (agents) {
+
+        lock.lock();
+        try {
             if (!agents.contains(agent)) {
                 agents.add(agent);
                 if (agents.size() == 1) {
@@ -53,17 +57,22 @@ public final class ConsoleRedirector implements Redirector {
                     System.setIn(stdin);
                 }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void close() throws IOException {
-        synchronized (agents) {
+        lock.lock();
+        try {
             if (agents.remove(agent) && agents.isEmpty()) {
                 System.setOut(stdout.getOut());
                 System.setErr(stderr.getOut());
                 System.setIn(stdin.getOrg());
             }
+        } finally {
+            lock.unlock();
         }
     }
 

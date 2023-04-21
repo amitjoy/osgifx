@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -65,6 +66,7 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
 
     private final Map<Long, StartTime> bundleToStartTime = new HashMap<>();
     private final Clock                clock             = Clock.systemUTC();
+    private final ReentrantLock        lock              = new ReentrantLock();
     private final long                 ourBundleId;
 
     @Inject
@@ -83,7 +85,8 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
             return;
         }
 
-        synchronized (bundleToStartTime) {
+        lock.lock();
+        try {
             switch (event.getType()) {
                 case STARTING:
                     bundleToStartTime.put(bundle.getBundleId(),
@@ -99,12 +102,17 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
                 default:
                     break;
             }
+        } finally {
+            lock.unlock();
         }
     }
 
     public List<BundleStartDuration> getBundleStartDurations() {
-        synchronized (bundleToStartTime) {
+        lock.lock();
+        try {
             return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
+        } finally {
+            lock.unlock();
         }
     }
 

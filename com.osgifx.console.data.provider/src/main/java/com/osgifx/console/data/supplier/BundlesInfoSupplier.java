@@ -24,6 +24,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -63,6 +65,7 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
+    private final ReentrantLock              lock    = new ReentrantLock();
     private final ObservableList<XBundleDTO> bundles = observableArrayList();
 
     @Activate
@@ -71,16 +74,21 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving bundles info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        lock.lock();
+        try {
+            logger.atInfo().log("Retrieving bundles info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            bundles.setAll(makeNullSafe(agent.getAllBundles()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
+            logger.atInfo().log("Bundles info retrieved successfully");
+        } finally {
+            lock.unlock();
         }
-        bundles.setAll(makeNullSafe(agent.getAllBundles()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
-        logger.atInfo().log("Bundles info retrieved successfully");
     }
 
     @Override

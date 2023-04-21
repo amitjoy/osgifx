@@ -25,6 +25,7 @@ import static org.osgi.service.component.annotations.ReferencePolicyOption.GREED
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -69,6 +70,7 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     private FluentLogger        logger;
     private Configuration       configuration;
 
+    private final ReentrantLock             lock   = new ReentrantLock();
     private final ObservableList<XEventDTO> events = observableArrayList();
 
     @Activate
@@ -89,8 +91,13 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     }
 
     @Override
-    public synchronized void onEvent(final XEventDTO event) {
-        events.add(event);
+    public void onEvent(final XEventDTO event) {
+        lock.lock();
+        try {
+            events.add(event);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override

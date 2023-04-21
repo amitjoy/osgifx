@@ -25,6 +25,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -64,6 +66,7 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
+    private final ReentrantLock                     lock           = new ReentrantLock();
     private final ObservableList<XConfigurationDTO> configurations = observableArrayList();
 
     @Activate
@@ -72,16 +75,21 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving configurations info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        lock.lock();
+        try {
+            logger.atInfo().log("Retrieving configurations info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
+            logger.atInfo().log("Configurations info retrieved successfully");
+        } finally {
+            lock.unlock();
         }
-        configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
-        logger.atInfo().log("Configurations info retrieved successfully");
     }
 
     @Override

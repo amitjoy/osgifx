@@ -18,6 +18,7 @@ package com.osgifx.console.smartgraph.graph;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,6 +39,7 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
      */
     private final Map<V, Vertex<V>>  vertices;
     private final Map<E, Edge<E, V>> edges;
+    private final ReentrantLock      lock = new ReentrantLock();
 
     /**
      * Creates a empty graph.
@@ -77,7 +79,6 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
                 incidentEdges.add(edge);
             }
         }
-
         return incidentEdges;
     }
 
@@ -97,87 +98,117 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
     }
 
     @Override
-    public synchronized boolean areAdjacent(final Vertex<V> u, final Vertex<V> v) throws InvalidVertexException {
-        // we allow loops, so we do not check if u == v
-        checkVertex(v);
-        checkVertex(u);
-        /* find and edge that contains both u and v */
-        for (final Edge<E, V> edge : edges.values()) {
-            if (((MyEdge) edge).contains(u) && ((MyEdge) edge).contains(v)) {
-                return true;
+    public boolean areAdjacent(final Vertex<V> u, final Vertex<V> v) throws InvalidVertexException {
+        lock.lock();
+        try {
+            // we allow loops, so we do not check if u == v
+            checkVertex(v);
+            checkVertex(u);
+            /* find and edge that contains both u and v */
+            for (final Edge<E, V> edge : edges.values()) {
+                if (((MyEdge) edge).contains(u) && ((MyEdge) edge).contains(v)) {
+                    return true;
+                }
             }
+            return false;
+        } finally {
+            lock.unlock();
         }
-        return false;
     }
 
     @Override
-    public synchronized Vertex<V> insertVertex(final V vElement) throws InvalidVertexException {
-        if (existsVertexWith(vElement)) {
-            throw new InvalidVertexException("There's already a vertex with this element.");
+    public Vertex<V> insertVertex(final V vElement) throws InvalidVertexException {
+        lock.lock();
+        try {
+            if (existsVertexWith(vElement)) {
+                throw new InvalidVertexException("There's already a vertex with this element.");
+            }
+            final var newVertex = new MyVertex(vElement);
+            vertices.put(vElement, newVertex);
+            return newVertex;
+        } finally {
+            lock.unlock();
         }
-        final var newVertex = new MyVertex(vElement);
-        vertices.put(vElement, newVertex);
-        return newVertex;
     }
 
     @Override
-    public synchronized Edge<E, V> insertEdge(final Vertex<V> u,
-                                              final Vertex<V> v,
-                                              final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
-        if (existsEdgeWith(edgeElement)) {
-            throw new InvalidEdgeException("There's already an edge with this element.");
-        }
-        final var outVertex = checkVertex(u);
-        final var inVertex  = checkVertex(v);
-        final var newEdge   = new MyEdge(edgeElement, outVertex, inVertex);
+    public Edge<E, V> insertEdge(final Vertex<V> u,
+                                 final Vertex<V> v,
+                                 final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        lock.lock();
+        try {
+            if (existsEdgeWith(edgeElement)) {
+                throw new InvalidEdgeException("There's already an edge with this element.");
+            }
+            final var outVertex = checkVertex(u);
+            final var inVertex  = checkVertex(v);
+            final var newEdge   = new MyEdge(edgeElement, outVertex, inVertex);
 
-        edges.put(edgeElement, newEdge);
-        return newEdge;
-
-    }
-
-    @Override
-    public synchronized Edge<E, V> insertEdge(final V vElement1,
-                                              final V vElement2,
-                                              final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
-        if (existsEdgeWith(edgeElement)) {
-            throw new InvalidEdgeException("There's already an edge with this element.");
+            edges.put(edgeElement, newEdge);
+            return newEdge;
+        } finally {
+            lock.unlock();
         }
-        if (!existsVertexWith(vElement1)) {
-            throw new InvalidVertexException("No vertex contains " + vElement1);
-        }
-        if (!existsVertexWith(vElement2)) {
-            throw new InvalidVertexException("No vertex contains " + vElement2);
-        }
-        final var outVertex = vertexOf(vElement1);
-        final var inVertex  = vertexOf(vElement2);
-        final var newEdge   = new MyEdge(edgeElement, outVertex, inVertex);
-
-        edges.put(edgeElement, newEdge);
-        return newEdge;
 
     }
 
     @Override
-    public synchronized V removeVertex(final Vertex<V> v) throws InvalidVertexException {
-        checkVertex(v);
-        final var element = v.element();
+    public Edge<E, V> insertEdge(final V vElement1,
+                                 final V vElement2,
+                                 final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+        lock.lock();
+        try {
+            if (existsEdgeWith(edgeElement)) {
+                throw new InvalidEdgeException("There's already an edge with this element.");
+            }
+            if (!existsVertexWith(vElement1)) {
+                throw new InvalidVertexException("No vertex contains " + vElement1);
+            }
+            if (!existsVertexWith(vElement2)) {
+                throw new InvalidVertexException("No vertex contains " + vElement2);
+            }
+            final var outVertex = vertexOf(vElement1);
+            final var inVertex  = vertexOf(vElement2);
+            final var newEdge   = new MyEdge(edgeElement, outVertex, inVertex);
 
-        // remove incident edges
-        final Iterable<Edge<E, V>> incidentEdges = incidentEdges(v);
-        for (final Edge<E, V> edge : incidentEdges) {
-            edges.remove(edge.element());
+            edges.put(edgeElement, newEdge);
+            return newEdge;
+        } finally {
+            lock.unlock();
         }
-        vertices.remove(v.element());
-        return element;
+
     }
 
     @Override
-    public synchronized E removeEdge(final Edge<E, V> e) throws InvalidEdgeException {
-        checkEdge(e);
-        final var element = e.element();
-        edges.remove(e.element());
-        return element;
+    public V removeVertex(final Vertex<V> v) throws InvalidVertexException {
+        lock.lock();
+        try {
+            checkVertex(v);
+            final var element = v.element();
+
+            // remove incident edges
+            final Iterable<Edge<E, V>> incidentEdges = incidentEdges(v);
+            for (final Edge<E, V> edge : incidentEdges) {
+                edges.remove(edge.element());
+            }
+            vertices.remove(v.element());
+            return element;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public E removeEdge(final Edge<E, V> e) throws InvalidEdgeException {
+        lock.lock();
+        try {
+            checkEdge(e);
+            final var element = e.element();
+            edges.remove(e.element());
+            return element;
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override

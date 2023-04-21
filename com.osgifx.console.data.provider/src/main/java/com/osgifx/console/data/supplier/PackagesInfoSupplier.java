@@ -25,6 +25,7 @@ import static org.osgi.service.component.annotations.ReferencePolicyOption.GREED
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -70,6 +71,7 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
+    private final ReentrantLock              lock     = new ReentrantLock();
     private final ObservableList<PackageDTO> packages = observableArrayList();
 
     @Activate
@@ -78,16 +80,21 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving packages info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        lock.lock();
+        try {
+            logger.atInfo().log("Retrieving packages info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            packages.setAll(preparePackages(agent.getAllBundles()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
+            logger.atInfo().log("Packages info retrieved successfully");
+        } finally {
+            lock.unlock();
         }
-        packages.setAll(preparePackages(agent.getAllBundles()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
-        logger.atInfo().log("Packages info retrieved successfully");
     }
 
     @Override
@@ -104,37 +111,42 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
         executor.runAsync(this::retrieve);
     }
 
-    private synchronized ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {
-        final List<PackageDTO>        packages      = Lists.newArrayList();
-        final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
+    private ObservableList<PackageDTO> preparePackages(final List<XBundleDTO> bundles) {
+        lock.lock();
+        try {
+            final List<PackageDTO>        packages      = Lists.newArrayList();
+            final Map<String, PackageDTO> finalPackages = Maps.newHashMap();   // key: package name, value: PackageDTO
 
-        for (final XBundleDTO bundle : bundles) {
-            final var exportedPackages = toPackageDTOs(bundle.exportedPackages);
-            final var importedPackages = toPackageDTOs(bundle.importedPackages);
+            for (final XBundleDTO bundle : bundles) {
+                final var exportedPackages = toPackageDTOs(bundle.exportedPackages);
+                final var importedPackages = toPackageDTOs(bundle.importedPackages);
 
-            exportedPackages.forEach(p -> p.exporters.add(bundle));
-            importedPackages.forEach(p -> p.importers.add(bundle));
+                exportedPackages.forEach(p -> p.exporters.add(bundle));
+                importedPackages.forEach(p -> p.importers.add(bundle));
 
-            packages.addAll(exportedPackages);
-            packages.addAll(importedPackages);
-        }
-        for (final PackageDTO pkg : packages) {
-            final var key = pkg.name + ":" + pkg.version;
-            if (!finalPackages.containsKey(key)) {
-                finalPackages.put(key, pkg);
-            } else {
-                final var packageDTO = finalPackages.get(key);
-
-                packageDTO.exporters.addAll(pkg.exporters);
-                packageDTO.importers.addAll(pkg.importers);
+                packages.addAll(exportedPackages);
+                packages.addAll(importedPackages);
             }
-        }
-        for (final PackageDTO pkg : finalPackages.values()) {
-            if (pkg.exporters.size() > 1) {
-                pkg.isDuplicateExport = true;
+            for (final PackageDTO pkg : packages) {
+                final var key = pkg.name + ":" + pkg.version;
+                if (!finalPackages.containsKey(key)) {
+                    finalPackages.put(key, pkg);
+                } else {
+                    final var packageDTO = finalPackages.get(key);
+
+                    packageDTO.exporters.addAll(pkg.exporters);
+                    packageDTO.importers.addAll(pkg.importers);
+                }
             }
+            for (final PackageDTO pkg : finalPackages.values()) {
+                if (pkg.exporters.size() > 1) {
+                    pkg.isDuplicateExport = true;
+                }
+            }
+            return FXCollections.observableArrayList(finalPackages.values());
+        } finally {
+            lock.unlock();
         }
-        return FXCollections.observableArrayList(finalPackages.values());
     }
 
     private List<PackageDTO> toPackageDTOs(final List<XPackageDTO> exportedPackages) {
