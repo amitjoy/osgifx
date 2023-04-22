@@ -18,7 +18,6 @@ package com.osgifx.console.ui.events.handler;
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECEIVE_STOPPED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -227,13 +226,6 @@ public final class EventReceiveMenuContributionHandler {
                 logger.atInfo().log("OSGi event listener has been removed");
             }
         });
-    }
-
-    @Inject
-    @Optional
-    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-        logger.atInfo().log("Agent disconnected event received");
-        isReceivingEventUpdater.accept(false);
     }
 
     private enum Type {
