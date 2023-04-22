@@ -18,7 +18,6 @@ package com.osgifx.console.ui.logs.handler;
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STARTED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_STOPPED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -169,13 +168,6 @@ public final class LogReceiveMenuContributionHandler {
                 logger.atInfo().log("OSGi log listener has been removed");
             }
         });
-    }
-
-    @Inject
-    @Optional
-    private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-        logger.atInfo().log("Agent disconnected event received");
-        isReceivingLogUpdater.accept(false);
     }
 
     private enum Type {
