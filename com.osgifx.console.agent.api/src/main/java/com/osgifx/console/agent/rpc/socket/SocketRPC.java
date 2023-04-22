@@ -269,14 +269,14 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             msgId     = -msgId;
             exception = true;
         }
-        final RpcResult o = promises.get(msgId);
-        if (o != null) {
-            synchronized (o) {
+        final RpcResult result = promises.get(msgId);
+        if (result != null) {
+            synchronized (result) {
                 trace("Resolved Socket RPC");
-                o.value     = data;
-                o.exception = exception;
-                o.resolved  = true;
-                o.notifyAll();
+                result.value     = data;
+                result.exception = exception;
+                result.resolved  = true;
+                result.notifyAll();
             }
         }
     }
