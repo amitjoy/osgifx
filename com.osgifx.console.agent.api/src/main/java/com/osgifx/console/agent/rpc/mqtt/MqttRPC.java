@@ -132,9 +132,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     }
 
     private RpcMessage decodeMessage(final ByteBuffer payload) throws Exception {
-        final byte[] arr = new byte[payload.remaining()];
-        payload.get(arr);
-        return codec.dec().from(arr).get(RpcMessage.class);
+        return codec.dec().from(payload.array()).get(RpcMessage.class);
     }
 
     @Override
