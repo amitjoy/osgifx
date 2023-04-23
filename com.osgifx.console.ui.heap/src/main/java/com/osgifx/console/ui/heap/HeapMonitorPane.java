@@ -152,6 +152,9 @@ public final class HeapMonitorPane extends BorderPane {
         }
         final var promise = dataProvider.heapUsage();
         promise.thenAccept(usage -> {
+            if (usage == null) {
+                return;
+            }
             threadSync.asyncExec(() -> {
                 for (final XMemoryPoolMXBean mpBean : usage.memoryPoolBeans) {
                     if ("HEAP".equals(mpBean.type)) {
