@@ -217,21 +217,26 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             promises.put(msg.id, new RpcResult());
         }
         trace("Sending MQTT RPC: " + msg);
-        final Optional<MessagePublisher> publisher = mqttClient.pub();
-        if (publisher.isPresent()) {
-            final Optional<MessageContextBuilder> msgCtx = mqttClient.msgCtx();
-            if (!msgCtx.isPresent()) {
-                throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
-            }
-            final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            try {
-                codec.enc().to(bout).put(msg);
-                final byte[]  data    = bout.toByteArray();
-                final Message message = msgCtx.get().channel(pubTopic).content(ByteBuffer.wrap(data)).buildMessage();
-                publisher.get().publish(message);
-                trace("Sent MQTT RPC: " + msg);
-            } catch (final Exception e) {
-                throw new RuntimeException("Message cannot be encoded");
+        final Optional<MessagePublisher> msgPublisher = mqttClient.pub();
+        if (msgPublisher.isPresent()) {
+            final MessagePublisher publisher = msgPublisher.get();
+            synchronized (publisher) {
+                final Optional<MessageContextBuilder> msgCtx = mqttClient.msgCtx();
+                if (!msgCtx.isPresent()) {
+                    throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
+                }
+                final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                try {
+                    codec.enc().to(bout).put(msg);
+
+                    final ByteBuffer data    = ByteBuffer.wrap(bout.toByteArray());
+                    final Message    message = msgCtx.get().channel(pubTopic).content(data).buildMessage();
+
+                    publisher.publish(message);
+                    trace("Sent MQTT RPC: " + msg);
+                } catch (final Exception e) {
+                    throw new RuntimeException("Message cannot be encoded");
+                }
             }
         }
         return msg.id;
