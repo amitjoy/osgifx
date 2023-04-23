@@ -56,6 +56,13 @@ public final class Activator extends Thread implements BundleActivator {
     private static final int    RPC_POOL_THREADS            = 5;
     private static final String RPC_POOL_THREAD_NAME_PREFIX = "osgifx-agent";
     private static final String RPC_POOL_THREAD_NAME_SUFFIX = "-%d";
+    // @formatter:off
+    private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
+                                                              .setThreadFactoryName(RPC_POOL_THREAD_NAME_PREFIX)
+                                                              .setThreadNameFormat(RPC_POOL_THREAD_NAME_SUFFIX)
+                                                              .setDaemon(true)
+                                                              .build();
+    // @formatter:on
 
     private DIModule                module;
     private ServerSocket            serverSocket;
@@ -94,7 +101,8 @@ public final class Activator extends Thread implements BundleActivator {
             final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
             agents.add(agentServer);
 
-            final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS);
+            final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS,
+                    THREAD_FACTORY);
             final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
                                                                         pubTopic, subTopic, executor);
 
@@ -120,16 +128,8 @@ public final class Activator extends Thread implements BundleActivator {
                     final AgentServer agentServer = new AgentServer(module.di(), SOCKET_RPC);
                     agents.add(agentServer);
 
-                    // @formatter:off
-                    final ThreadFactory threadFactory =
-                            new ThreadFactoryBuilder()
-                                    .setThreadFactoryName(RPC_POOL_THREAD_NAME_PREFIX)
-                                    .setThreadNameFormat(RPC_POOL_THREAD_NAME_SUFFIX)
-                                    .setDaemon(true)
-                                    .build();
-                    // @formatter:on
                     final ExecutorService              executor  = Executors.newFixedThreadPool(RPC_POOL_THREADS,
-                            threadFactory);
+                            THREAD_FACTORY);
                     final SocketRPC<Agent, Supervisor> socketRPC = new SocketRPC<Agent, Supervisor>(Supervisor.class,
                                                                                                     agentServer, socket,
                                                                                                     executor) {
