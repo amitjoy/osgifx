@@ -196,12 +196,14 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
             return;
         }
         eventListeners.add(eventListener);
+        sendEvent(EVENT_LISTENER_ADDED_EVENT_TOPIC);
     }
 
     @Override
     public void removeOSGiEventListener(final EventListener eventListener) {
         checkNotNull(eventListener, "'eventListener' cannot be null");
         eventListeners.remove(eventListener);
+        sendEvent(EVENT_LISTENER_REMOVED_EVENT_TOPIC);
     }
 
     @Override
@@ -211,12 +213,14 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
             return;
         }
         logEntryListeners.add(logEntryListener);
+        sendEvent(LOG_LISTENER_ADDED_EVENT_TOPIC);
     }
 
     @Override
     public void removeOSGiLogListener(final LogEntryListener logEntryListener) {
         checkNotNull(logEntryListener, "'logEntryListener' cannot be null");
         logEntryListeners.remove(logEntryListener);
+        sendEvent(LOG_LISTENER_REMOVED_EVENT_TOPIC);
     }
 
     @Override
