@@ -17,9 +17,10 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5ConnectRestrictions.DEFAULT_MAXIMUM_PACKET_SIZE;
+import static com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5ConnectRestrictions.DEFAULT_SEND_MAXIMUM_PACKET_SIZE;
 import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_RECEIVE;
 import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_SEND;
-import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_PACKET_SIZE;
 import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
@@ -57,7 +58,6 @@ public abstract class AbstractRpcSupervisor<S, A> {
     @interface MqttConfig {
         final int MAX_CONCURRENT_MSG_TO_SEND    = 5;
         final int MAX_CONCURRENT_MSG_TO_RECEIVE = 5;
-        final int MAX_PACKET_SIZE               = 256 * 1024 * 1024; // 256 MB max allowed in MQTT
 
         String id();
 
@@ -185,9 +185,9 @@ public abstract class AbstractRpcSupervisor<S, A> {
         }
         ch.set(ch.d().sendMaximum(), MAX_CONCURRENT_MSG_TO_SEND);
         ch.set(ch.d().receiveMaximum(), MAX_CONCURRENT_MSG_TO_RECEIVE);
-        ch.set(ch.d().maximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().maximumPacketSize(), DEFAULT_MAXIMUM_PACKET_SIZE);
         ch.set(ch.d().keepAliveInterval(), 0);
-        ch.set(ch.d().sendMaximumPacketSize(), MAX_PACKET_SIZE);
+        ch.set(ch.d().sendMaximumPacketSize(), DEFAULT_SEND_MAXIMUM_PACKET_SIZE);
         ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
         ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
         ch.set(ch.d().osgi_ds_satisfying_condition_target(), "(" + CONDITION_ID + "=" + conditionID + ")");
