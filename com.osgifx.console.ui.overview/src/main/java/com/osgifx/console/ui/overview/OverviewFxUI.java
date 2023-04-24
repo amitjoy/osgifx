@@ -22,7 +22,6 @@ import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAU
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PLAY;
 import static java.util.Objects.requireNonNullElse;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static javafx.animation.Animation.INDEFINITE;
 import static javafx.geometry.Orientation.VERTICAL;
 
 import java.text.DecimalFormat;
@@ -87,10 +86,13 @@ public final class OverviewFxUI {
     private static final double TILE_WIDTH    = 500;
     private static final double TILE_HEIGHT   = 220;
     private static final double REFRESH_DELAY = 5;
+    private static final int    CYCLE_COUNT   = 5;
 
     @Log
     @Inject
     private FluentLogger      logger;
+    @Inject
+    private BorderPane        parent;
     @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
@@ -122,13 +124,12 @@ public final class OverviewFxUI {
     private final AtomicBoolean isRealtimeUpdateRunning = new AtomicBoolean(true);
 
     @PostConstruct
-    public void postConstruct(final BorderPane parent) {
+    public void postConstruct() {
         createTimelineButton();
         retrieveRuntimeInfo();
-        createTiles(parent);
-        createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
+        createUIComponents(parent);
+        initTimeline();
 
-        dataRetrieverTimeline.play();
         logger.atDebug().log("Overview part has been initialized");
     }
 
@@ -139,6 +140,8 @@ public final class OverviewFxUI {
             // the CSS overridden problem gets overridden once again with the TileFX
             // embedded CSS and the number tiles are shown properly
             createTiles(parent);
+            initTimeline();
+            updateTimelineButtonTo(PAUSE);
         }
     }
 
@@ -158,6 +161,11 @@ public final class OverviewFxUI {
             this.glyph   = glyph;
             this.tooltip = tooltip;
         }
+    }
+
+    private void initTimeline() {
+        createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
+        dataRetrieverTimeline.play();
     }
 
     private void createTimelineButton() {
@@ -182,67 +190,76 @@ public final class OverviewFxUI {
     }
 
     private void playTimelineAnimation() {
-        dataRetrieverTimeline.play();
-        updateTimelineButtonTo(PAUSE);
         isRealtimeUpdateRunning.set(true);
+        updateTimelineButtonTo(PAUSE);
+        createTiles(parent);
+        dataRetrieverTimeline.play();
     }
 
     private void pauseTimelineAnimation() {
-        dataRetrieverTimeline.pause();
-        updateTimelineButtonTo(PLAY);
         isRealtimeUpdateRunning.set(false);
+        updateTimelineButtonTo(PLAY);
+        dataRetrieverTimeline.pause();
     }
 
     private void createPeriodicTaskToSetRuntimeInfo(final double refreshDelay) {
         this.refreshDelay = refreshDelay;
+        if (dataRetrieverTimeline != null) {
+            dataRetrieverTimeline.stop();
+        }
+        dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelay), a -> retrieveRuntimeData()));
+        dataRetrieverTimeline.setCycleCount(CYCLE_COUNT);
+        dataRetrieverTimeline.setOnFinished(event -> {
+            updateTimelineButtonTo(PLAY);
+            isRealtimeUpdateRunning.set(false);
+        });
+    }
+
+    private void retrieveRuntimeData() {
         // @formatter:off
-        dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelay), a -> {
+        final var runtimeInfo = retrieveRuntimeInfo();
 
-            final var runtimeInfo = retrieveRuntimeInfo();
+        noOfBundlesTile.setValue(runtimeInfo.noOfInstalledBundles());
+        noOfServicesTile.setValue(runtimeInfo.noOfServices());
+        noOfComponentsTile.setValue(runtimeInfo.noOfComponents());
+        noOfThreadsTile.setValue(runtimeInfo.noOfThreads());
 
-            noOfBundlesTile.setValue(runtimeInfo.noOfInstalledBundles());
-            noOfServicesTile.setValue(runtimeInfo.noOfServices());
-            noOfComponentsTile.setValue(runtimeInfo.noOfComponents());
-            noOfThreadsTile.setValue(runtimeInfo.noOfThreads());
+        final var memoryInfo = runtimeInfo.memoryInfo();
 
-            final var memoryInfo = runtimeInfo.memoryInfo();
+        memoryInfo.thenAccept(info -> {
+            final var freeMemoryInBytes  = info.freeMemory;
+            final var totalMemoryInBytes = info.totalMemory;
+            final var freeMemoryInMB     = toMB(freeMemoryInBytes);
+            final var totalMemoryInMB    = toMB(totalMemoryInBytes);
 
-            memoryInfo.thenAccept(info -> {
-                final var freeMemoryInBytes  = info.freeMemory;
-                final var totalMemoryInBytes = info.totalMemory;
-                final var freeMemoryInMB     = toMB(freeMemoryInBytes);
-                final var totalMemoryInMB    = toMB(totalMemoryInBytes);
+            threadSync.asyncExec(() -> {
+                availableMemoryTile.setValue(freeMemoryInMB);
+                availableMemoryTile.setMaxValue(totalMemoryInMB);
+                availableMemoryTile.setThreshold(totalMemoryInMB * .8);
 
-                threadSync.asyncExec(() -> {
-                    availableMemoryTile.setValue(freeMemoryInMB);
-                    availableMemoryTile.setMaxValue(totalMemoryInMB);
-                    availableMemoryTile.setThreshold(totalMemoryInMB * .8);
+                var memoryConsumptionInfoInPercentage = 0D;
+                if (totalMemoryInBytes != 0) {
+                    memoryConsumptionInfoInPercentage = (totalMemoryInBytes - freeMemoryInBytes) * 100D
+                            / totalMemoryInBytes;
+                }
 
-                    var memoryConsumptionInfoInPercentage = 0D;
-                    if (totalMemoryInBytes != 0) {
-                        memoryConsumptionInfoInPercentage = (totalMemoryInBytes - freeMemoryInBytes) * 100D
-                                / totalMemoryInBytes;
-                    }
+                memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
 
-                    memoryConsumptionTile.setValue(memoryConsumptionInfoInPercentage);
-
-                    final var uptime = toUptimeEntry(info.uptime);
-                    uptimeTile.setDuration(LocalTime.of(uptime.hours, uptime.minutes(), uptime.seconds()));
-                });
+                final var uptime = toUptimeEntry(info.uptime);
+                uptimeTile.setDuration(LocalTime.of(uptime.hours, uptime.minutes(), uptime.seconds()));
             });
+        });
 
-            runtimeInfoTile.setGraphic(
-                    createRuntimeTable(
-                            runtimeInfo.frameworkBsn(),
-                            runtimeInfo.frameworkVersion(),
-                            runtimeInfo.frameworkStartLevel(),
-                            runtimeInfo.osName(),
-                            runtimeInfo.osVersion(),
-                            runtimeInfo.osArchitecture(),
-                            runtimeInfo.javaVersion()));
-            // @formatter:on
-        }));
-        dataRetrieverTimeline.setCycleCount(INDEFINITE);
+        runtimeInfoTile.setGraphic(
+                createRuntimeTable(
+                        runtimeInfo.frameworkBsn(),
+                        runtimeInfo.frameworkVersion(),
+                        runtimeInfo.frameworkStartLevel(),
+                        runtimeInfo.osName(),
+                        runtimeInfo.osVersion(),
+                        runtimeInfo.osArchitecture(),
+                        runtimeInfo.javaVersion()));
+        // @formatter:on
     }
 
     private OverviewInfo retrieveRuntimeInfo() {
@@ -304,6 +321,11 @@ public final class OverviewFxUI {
         return new OverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName, osVersion, osArchitecture,
                                 javaVersion, noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents,
                                 memoryInfo);
+    }
+
+    private void createUIComponents(final BorderPane parent) {
+        createTiles(parent);
+        initStatusBar(parent);
     }
 
     private void createTiles(final BorderPane parent) {
@@ -388,16 +410,16 @@ public final class OverviewFxUI {
                                          .unit("MB")
                                          .text("Allocated memory of the remote runtime")
                                          .gradientStops(
-                                        		 new Stop(0, Bright.BLUE),
-                                        		 new Stop(0.1, Bright.BLUE_GREEN),
-                                        		 new Stop(0.2, Bright.GREEN),
-                                        		 new Stop(0.3, Bright.GREEN_YELLOW),
-                                        		 new Stop(0.4, Bright.YELLOW),
-                                        		 new Stop(0.5, Bright.YELLOW_ORANGE),
-                                        		 new Stop(0.6, Bright.ORANGE),
-                                        		 new Stop(0.7, Bright.ORANGE_RED),
-                                        		 new Stop(0.8, Bright.RED),
-                                        		 new Stop(1.0, Dark.RED))
+                                                 new Stop(0, Bright.BLUE),
+                                                 new Stop(0.1, Bright.BLUE_GREEN),
+                                                 new Stop(0.2, Bright.GREEN),
+                                                 new Stop(0.3, Bright.GREEN_YELLOW),
+                                                 new Stop(0.4, Bright.YELLOW),
+                                                 new Stop(0.5, Bright.YELLOW_ORANGE),
+                                                 new Stop(0.6, Bright.ORANGE),
+                                                 new Stop(0.7, Bright.ORANGE_RED),
+                                                 new Stop(0.8, Bright.RED),
+                                                 new Stop(1.0, Dark.RED))
                                          .strokeWithGradient(true)
                                          .animated(true)
                                          .roundedCorners(false)
@@ -432,7 +454,6 @@ public final class OverviewFxUI {
         pane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
         parent.setCenter(pane);
-        initStatusBar(parent);
     }
 
     private Node createRuntimeTable(final String frameworkBsn,
@@ -544,7 +565,7 @@ public final class OverviewFxUI {
     private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data,
                                              final BorderPane parent) {
         logger.atInfo().log("Agent connected event received");
-        dataRetrieverTimeline.play();
+        playTimelineAnimation();
         parent.setBottom(null);
         statusBar.addTo(parent);
     }
@@ -557,9 +578,8 @@ public final class OverviewFxUI {
         dataRetrieverTimeline.stop();
 
         retrieveRuntimeInfo();
-        createTiles(parent);
+        createUIComponents(parent);
         createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
-        dataRetrieverTimeline.play();
     }
 
     /*
@@ -572,7 +592,7 @@ public final class OverviewFxUI {
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data,
                                             final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
-        createTiles(parent);
+        createUIComponents(parent);
     }
 
     private void initStatusBar(final BorderPane parent) {
@@ -595,8 +615,9 @@ public final class OverviewFxUI {
         if (refreshDelayInput.isPresent()) {
             dataRetrieverTimeline.stop();
             createPeriodicTaskToSetRuntimeInfo(refreshDelayInput.get());
-            dataRetrieverTimeline.play();
-
+            if (isRealtimeUpdateRunning.get()) {
+                dataRetrieverTimeline.play();
+            }
             Fx.showSuccessNotification("Refresh Delay", "View refresh delay has been updated successfully");
         }
     }
