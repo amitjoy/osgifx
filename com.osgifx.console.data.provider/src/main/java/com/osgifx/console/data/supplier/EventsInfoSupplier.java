@@ -97,7 +97,7 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     @Deactivate
     void deactivate() {
-        future.cancel(true);
+        cancelCacheInvalidationJob();
     }
 
     @Override
@@ -140,9 +140,24 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     @Override
     public void handleEvent(final Event event) {
-        final var topic = event.getTopic();
-        threadSync.asyncExec(events::clear);
-        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic) || EVENT_LISTENER_REMOVED_EVENT_TOPIC.equals(topic)) {
+        switch (event.getTopic()) {
+            case AGENT_DISCONNECTED_EVENT_TOPIC:
+                cancelCacheInvalidationJob();
+                threadSync.asyncExec(events::clear);
+                break;
+            case EVENT_LISTENER_REMOVED_EVENT_TOPIC:
+                cancelCacheInvalidationJob();
+                break;
+            case CLEAR_EVENTS_TOPIC:
+                threadSync.asyncExec(events::clear);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void cancelCacheInvalidationJob() {
+        if (future != null) {
             future.cancel(true);
             future = null;
         }

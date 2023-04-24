@@ -83,7 +83,7 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
 
     @Deactivate
     void deactivate() {
-        future.cancel(true);
+        cancelCacheInvalidationJob();
     }
 
     @Override
@@ -121,9 +121,24 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
 
     @Override
     public void handleEvent(final Event event) {
-        final var topic = event.getTopic();
-        threadSync.asyncExec(logs::clear);
-        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic) || LOG_LISTENER_REMOVED_EVENT_TOPIC.equals(topic)) {
+        switch (event.getTopic()) {
+            case AGENT_DISCONNECTED_EVENT_TOPIC:
+                cancelCacheInvalidationJob();
+                threadSync.asyncExec(logs::clear);
+                break;
+            case LOG_LISTENER_REMOVED_EVENT_TOPIC:
+                cancelCacheInvalidationJob();
+                break;
+            case CLEAR_LOGS_TOPIC:
+                threadSync.asyncExec(logs::clear);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void cancelCacheInvalidationJob() {
+        if (future != null) {
             future.cancel(true);
             future = null;
         }
