@@ -41,6 +41,18 @@ public interface Supervisor {
     /** The topic where an event will be sent after the agent gets disconnected */
     String AGENT_DISCONNECTED_EVENT_TOPIC = "fx/console/agent/disconnected";
 
+    /** The topic where an event will be sent when the log listener is added */
+    String LOG_LISTENER_ADDED_EVENT_TOPIC = "fx/console/supervisor/log/listener/added";
+
+    /** The topic where an event will be sent when the log listener is removed */
+    String LOG_LISTENER_REMOVED_EVENT_TOPIC = "fx/console/supervisor/log/listener/removed";
+
+    /** The topic where an event will be sent when the event listener is added */
+    String EVENT_LISTENER_ADDED_EVENT_TOPIC = "fx/console/supervisor/event/listener/added";
+
+    /** The topic where an event will be sent when the event listener is removed */
+    String EVENT_LISTENER_REMOVED_EVENT_TOPIC = "fx/console/supervisor/event/listener/removed";
+
     /**
      * Returns the type of the communication
      */
