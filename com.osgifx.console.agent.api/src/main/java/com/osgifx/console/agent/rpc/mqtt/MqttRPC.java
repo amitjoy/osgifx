@@ -47,8 +47,6 @@ import aQute.lib.json.JSONCodec;
 
 public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
-    private static final JSONCodec codec = new JSONCodec();
-
     private MqttClient                              mqttClient;
     private final String                            pubTopic;
     private final String                            subTopic;
@@ -132,7 +130,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     }
 
     private RpcMessage decodeMessage(final ByteBuffer payload) throws Exception {
-        return codec.dec().from(payload.array()).get(RpcMessage.class);
+        return new JSONCodec().dec().from(payload.array()).get(RpcMessage.class);
     }
 
     @Override
@@ -227,7 +225,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 }
                 final ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 try {
-                    codec.enc().to(bout).put(msg);
+                    new JSONCodec().enc().to(bout).put(msg);
 
                     final ByteBuffer data    = ByteBuffer.wrap(bout.toByteArray());
                     final Message    message = msgCtx.get().channel(pubTopic).content(data).buildMessage();
@@ -273,14 +271,14 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                             return null;
                         }
                         if (result.exception) {
-                            final String msg = codec.dec().from(result.value).get(String.class);
+                            final String msg = new JSONCodec().dec().from(result.value).get(String.class);
                             trace("Exception during agent communication: " + msg);
                             throw new RuntimeException(msg);
                         }
                         if (type == byte[].class) {
                             return (T) result.value;
                         }
-                        return (T) codec.dec().from(result.value).get(type);
+                        return (T) new JSONCodec().dec().from(result.value).get(type);
                     }
                     long elapsedInNanos = System.nanoTime() - startInNanos;
                     long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
@@ -323,7 +321,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 if (type == byte[].class) {
                     parameters[i] = args.get(i);
                 } else {
-                    parameters[i] = codec.dec().from(args.get(i)).get(m.getGenericParameterTypes()[i]);
+                    parameters[i] = new JSONCodec().dec().from(args.get(i)).get(m.getGenericParameterTypes()[i]);
                 }
             }
             try {
@@ -360,7 +358,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                     argValue = (byte[]) arg;
                 } else {
                     final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    codec.enc().to(bout).put(arg);
+                    new JSONCodec().enc().to(bout).put(arg);
                     argValue = bout.toByteArray();
                 }
                 final String encodedValue = Base64.getEncoder().encodeToString(argValue);
