@@ -19,18 +19,24 @@ import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.PID;
 import static com.osgifx.console.event.topics.EventReceiveEventTopics.CLEAR_EVENTS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
+import static com.osgifx.console.supervisor.Supervisor.EVENT_LISTENER_REMOVED_EVENT_TOPIC;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.ServiceRanking;
@@ -41,6 +47,7 @@ import org.osgi.service.event.propertytypes.EventTopics;
 import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.data.manager.RuntimeInfoSupplier;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -49,7 +56,7 @@ import javafx.collections.ObservableList;
 @ServiceRanking(112)
 @SupplierID(EVENTS_ID)
 @Component(configurationPid = PID)
-@EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, CLEAR_EVENTS_TOPIC })
+@EventTopics({ AGENT_DISCONNECTED_EVENT_TOPIC, CLEAR_EVENTS_TOPIC, EVENT_LISTENER_REMOVED_EVENT_TOPIC })
 public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListener, EventHandler {
 
     static final String PID = "event.receive.topics";
@@ -60,14 +67,24 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     public static final String EVENTS_ID = "events";
 
+    private static final int CACHE_INVALIDATE_INITIAL_DELAY = 0;
+    private static final int CACHE_INVALIDATE_DELAY         = 5;
+    private static final int CACHE_INVALIDATE_THRESHOLD     = 100;
+    private static final int CACHE_INVALIDATE_RANGE_START   = 0;
+    private static final int CACHE_INVALIDATE_RANGE_END     = 50;
+
     @Reference
-    private LoggerFactory       factory;
+    private LoggerFactory               factory;
     @Reference
-    private ThreadSynchronize   threadSync;
+    private Executor                    executor;
+    @Reference
+    private ThreadSynchronize           threadSync;
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
-    private volatile Supervisor supervisor;
-    private FluentLogger        logger;
-    private Configuration       configuration;
+    private volatile Supervisor         supervisor;
+    private FluentLogger                logger;
+    private volatile ScheduledFuture<?> future;
+    private Configuration               configuration;
+    private final Lock                  lock = new ReentrantLock();
 
     private final ObservableList<XEventDTO> events = observableArrayList();
 
@@ -76,6 +93,11 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     void init(final Configuration configuration) {
         this.configuration = configuration;
         logger             = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
+
+    @Deactivate
+    void deactivate() {
+        future.cancel(true);
     }
 
     @Override
@@ -89,8 +111,26 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     }
 
     @Override
-    public synchronized void onEvent(final XEventDTO event) {
-        events.add(event);
+    public void onEvent(final XEventDTO event) {
+        if (future == null) {
+            executor.scheduleWithFixedDelay(() -> {
+                lock.lock();
+                try {
+                    final var size = events.size();
+                    if (size > CACHE_INVALIDATE_THRESHOLD) {
+                        events.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            }, Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
+        }
+        lock.lock();
+        try {
+            events.add(event);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -100,7 +140,12 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     @Override
     public void handleEvent(final Event event) {
+        final var topic = event.getTopic();
         threadSync.asyncExec(events::clear);
+        if (AGENT_DISCONNECTED_EVENT_TOPIC.equals(topic) || EVENT_LISTENER_REMOVED_EVENT_TOPIC.equals(topic)) {
+            future.cancel(true);
+            future = null;
+        }
     }
 
 }
