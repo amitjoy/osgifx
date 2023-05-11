@@ -76,6 +76,23 @@ public interface Agent {
     String AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY = "osgi.fx.agent.socket.secure.sslcontext.filter";
 
     /**
+     * The property key to specify the MQTT implementation type to use
+     * <p>
+     * The supported types are:
+     * <p>
+     * <ul>
+     * <li>{@code osgi}: OSGi Messaging Implementation</li>
+     * <li>{@code custom}: Custom MQTT 5 client</li>
+     * </ul>
+     */
+    String AGENT_MQTT_PROVIDER_KEY = "osgi.fx.agent.mqtt.provider";
+
+    /**
+     * The property value indicating the OSGi Messaging MQTT implementation to use
+     */
+    String AGENT_MQTT_PROVIDER_OSGI_VALUE = "osgi";
+
+    /**
      * The property key to specify the publish topic for publishing the data using MQTT
      */
     String AGENT_MQTT_PUB_TOPIC_KEY = "osgi.fx.agent.mqtt.pubtopic";
