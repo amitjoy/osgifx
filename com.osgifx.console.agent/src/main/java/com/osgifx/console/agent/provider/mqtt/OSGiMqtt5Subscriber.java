@@ -15,24 +15,59 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider.mqtt;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.util.pushstream.PushStream;
+import java.util.Optional;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.messaging.Message;
+import org.osgi.service.messaging.MessageSubscription;
+import org.osgi.util.pushstream.PushStream;
+import org.osgi.util.pushstream.PushStreamProvider;
+import org.osgi.util.pushstream.SimplePushEventSource;
+import org.osgi.util.tracker.ServiceTracker;
+
+import com.osgifx.console.agent.helper.InterruptSafe;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
 public final class OSGiMqtt5Subscriber implements Mqtt5Subscriber {
 
-    private final BundleContext bundleContext;
+    private final ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker;
 
     public OSGiMqtt5Subscriber(final BundleContext bundleContext) {
-        this.bundleContext = bundleContext;
+        subscriberTracker = new ServiceTracker<>(bundleContext, MessageSubscription.class, null);
+        subscriberTracker.open();
     }
 
     @Override
     public PushStream<Mqtt5Message> subscribe(final String channel) {
-        // TODO Auto-generated method stub
-        return null;
+        final PushStreamProvider                  provider = new PushStreamProvider();
+        final SimplePushEventSource<Mqtt5Message> source   = acquirePushEventSource(provider);
+
+        Optional.ofNullable(subscriberTracker.getService()).ifPresent(sub -> {
+            sub.subscribe(channel).forEach(msg -> {
+                final Mqtt5Message message = convertMessage(msg);
+                source.publish(message);
+            });
+        });
+        return provider.createStream(source);
+    }
+
+    private Mqtt5Message convertMessage(final Message msg) {
+        final Mqtt5Message message = new Mqtt5Message();
+
+        message.channel         = msg.getContext().getChannel();
+        message.payload         = msg.payload();
+        message.contentType     = msg.getContext().getContentEncoding();
+        message.contentEncoding = msg.getContext().getContentEncoding();
+        message.correlationId   = msg.getContext().getCorrelationId();
+        message.replyToChannel  = msg.getContext().getReplyToChannel();
+        message.extensions      = msg.getContext().getExtensions();
+
+        return message;
+    }
+
+    private SimplePushEventSource<Mqtt5Message> acquirePushEventSource(final PushStreamProvider provider) {
+        return InterruptSafe.execute(() -> provider.createSimpleEventSource(Mqtt5Message.class));
     }
 
 }
