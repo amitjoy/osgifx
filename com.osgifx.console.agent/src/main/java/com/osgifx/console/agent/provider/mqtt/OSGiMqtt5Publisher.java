@@ -15,23 +15,50 @@
  ******************************************************************************/
 package com.osgifx.console.agent.provider.mqtt;
 
+import java.util.Optional;
+
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.messaging.Message;
+import org.osgi.service.messaging.MessageContextBuilder;
+import org.osgi.service.messaging.MessagePublisher;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 
 public final class OSGiMqtt5Publisher implements Mqtt5Publisher {
 
-    private final BundleContext bundleContext;
+    private final BundleContext                                      bundleContext;
+    private final ServiceTracker<MessagePublisher, MessagePublisher> publisherTracker;
 
     public OSGiMqtt5Publisher(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
+        publisherTracker   = new ServiceTracker<>(bundleContext, MessagePublisher.class, null);
+        publisherTracker.open();
     }
 
     @Override
     public void publish(final Mqtt5Message message) {
-        // TODO Auto-generated method stub
+        Optional.ofNullable(publisherTracker.getService()).ifPresent(pub -> {
+            final Optional<MessageContextBuilder> msgCtx = msgCtx();
+            if (!msgCtx.isPresent()) {
+                throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
+            }
+            final Message msg = msgCtx.get().channel(message.channel).content(message.payload)
+                    .contentType(message.contentType).contentEncoding(message.contentEncoding)
+                    .correlationId(message.correlationId).replyTo(message.replyToChannel).extensions(message.extensions)
+                    .buildMessage();
+            pub.publish(msg);
+        });
+    }
 
+    private Optional<MessageContextBuilder> msgCtx() {
+        final ServiceReference<MessageContextBuilder> ref            = bundleContext
+                .getServiceReference(MessageContextBuilder.class);
+        final ServiceObjects<MessageContextBuilder>   serviceObjects = bundleContext.getServiceObjects(ref);
+        return Optional.ofNullable(serviceObjects.getService());
     }
 
 }
