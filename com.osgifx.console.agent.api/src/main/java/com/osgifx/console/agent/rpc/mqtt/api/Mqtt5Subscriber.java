@@ -13,6 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("5.1.0")
-package com.osgifx.console.agent;
+package com.osgifx.console.agent.rpc.mqtt.api;
+
+import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.util.pushstream.PushStream;
+
+@ProviderType
+public interface Mqtt5Subscriber {
+
+    /**
+     * Subscribe the {@link PushStream} to the given topic
+     *
+     * @param topic the topic string to subscribe to
+     * @return a {@link PushStream} instance for the subscription
+     */
+    PushStream<Mqtt5Message> subscribe(String channel);
+
+}
