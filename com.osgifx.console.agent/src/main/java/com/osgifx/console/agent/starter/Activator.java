@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_OSGI_VALUE;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.MQTT_RPC;
@@ -34,6 +36,7 @@ import java.util.concurrent.ThreadFactory;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.di.module.DIModule;
@@ -41,8 +44,12 @@ import com.osgifx.console.agent.helper.ThreadFactoryBuilder;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.provider.mqtt.SimpleMqtt5Publisher;
+import com.osgifx.console.agent.provider.mqtt.SimpleMqtt5Subscriber;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
+import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
+import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 import com.osgifx.console.agent.rpc.socket.SocketRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -85,34 +92,54 @@ public final class Activator extends Thread implements BundleActivator {
         }
         module.start();
 
+        final String mqttProviderValue = System.getProperty(AGENT_MQTT_PROVIDER_KEY);
+        if (mqttProviderValue == null) {
+            System.err.println("[OSGi.fx] MQTT agent not configured");
+            return;
+        }
         final boolean isMQTTwired = module.di().getInstance(PackageWirings.class).isMqttWired();
         if (isMQTTwired) {
-            final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
-            final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
+            System.err.println("[OSGi.fx] OSGi messaging bundle for MQTT is not installed");
+            return;
+        }
+        final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
+        final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
 
-            if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
-                System.err.println("[OSGi.fx] MQTT agent not configured");
+        if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
+            System.err.println("[OSGi.fx] MQTT agent topics not configured");
+            return;
+        }
+
+        final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
+        agents.add(agentServer);
+
+        final boolean isOSGiMessagingProvider = AGENT_MQTT_PROVIDER_OSGI_VALUE.equalsIgnoreCase(mqttProviderValue);
+        if (isOSGiMessagingProvider) {
+            bundleContext.registerService(Mqtt5Publisher.class, new SimpleMqtt5Publisher(bundleContext), null);
+            bundleContext.registerService(Mqtt5Subscriber.class, new SimpleMqtt5Subscriber(bundleContext), null);
+        } else {
+            final ServiceReference<Mqtt5Publisher>  pubRef = bundleContext.getServiceReference(Mqtt5Publisher.class);
+            final ServiceReference<Mqtt5Subscriber> subRef = bundleContext.getServiceReference(Mqtt5Subscriber.class);
+
+            if (pubRef == null || subRef == null) {
+                System.err.println("[OSGi.fx] MQTT services ain't available");
                 return;
             }
-            System.err.println("[OSGi.fx] MQTT agent configured");
-            System.err.println(String.format("[OSGi.fx] PUB Topic: %s", pubTopic));
-            System.err.println(String.format("[OSGi.fx] SUB Topic: %s", subTopic));
-
-            final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
-            agents.add(agentServer);
-
-            final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS,
-                    THREAD_FACTORY);
-            final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
-                                                                        pubTopic, subTopic, executor);
-
-            module.bindInstance(AgentServer.class, agentServer);
-            module.bindInstance(RemoteRPC.class, mqttRPC);
-            module.bindInstance(Supervisor.class, mqttRPC.getRemote());
-
-            mqttRPC.open();
-            agentServer.setEndpoint(mqttRPC);
         }
+        final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS, THREAD_FACTORY);
+        final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
+                                                                    pubTopic, subTopic, executor);
+
+        module.bindInstance(AgentServer.class, agentServer);
+        module.bindInstance(RemoteRPC.class, mqttRPC);
+        module.bindInstance(Supervisor.class, mqttRPC.getRemote());
+
+        mqttRPC.open();
+        agentServer.setEndpoint(mqttRPC);
+
+        System.err.println("[OSGi.fx] MQTT agent configured");
+        System.err.println(String.format("[OSGi.fx] PUB Topic: %s", pubTopic));
+        System.err.println(String.format("[OSGi.fx] SUB Topic: %s", subTopic));
     }
 
     @Override

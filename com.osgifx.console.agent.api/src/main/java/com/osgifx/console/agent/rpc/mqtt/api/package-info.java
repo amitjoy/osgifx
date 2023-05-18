@@ -14,5 +14,5 @@
  * the License.
  ******************************************************************************/
 @org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("5.1.0")
-package com.osgifx.console.agent;
+@org.osgi.annotation.versioning.Version("1.0.0")
+package com.osgifx.console.agent.rpc.mqtt.api;

@@ -13,6 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("5.1.0")
-package com.osgifx.console.agent;
+package com.osgifx.console.agent.rpc.mqtt.api;
+
+import org.osgi.annotation.versioning.ProviderType;
+
+@ProviderType
+public interface Mqtt5Publisher {
+
+    /**
+     * Publish the given {@link Mqtt5Message} to the given topic contained in the message
+     * context of the message
+     *
+     * @param message the {@link Mqtt5Message} to publish
+     */
+    void publish(Mqtt5Message message);
+
+}
