@@ -29,11 +29,11 @@ import com.osgifx.console.agent.helper.InterruptSafe;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
-public final class OSGiMqtt5Subscriber implements Mqtt5Subscriber {
+public final class SimpleMqtt5Subscriber implements Mqtt5Subscriber {
 
     private final ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker;
 
-    public OSGiMqtt5Subscriber(final BundleContext bundleContext) {
+    public SimpleMqtt5Subscriber(final BundleContext bundleContext) {
         subscriberTracker = new ServiceTracker<>(bundleContext, MessageSubscription.class, null);
         subscriberTracker.open();
     }
