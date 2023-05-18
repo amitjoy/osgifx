@@ -13,6 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("5.1.0")
-package com.osgifx.console.agent;
+package com.osgifx.console.agent.rpc.mqtt.api;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
+
+public class Mqtt5Message {
+
+    public ByteBuffer          payload;
+    public String              channel;
+    public String              contentType;
+    public String              contentEncoding;
+    public String              correlationId;
+    public String              replyToChannel;
+    public Map<String, Object> extensions;
+
+}

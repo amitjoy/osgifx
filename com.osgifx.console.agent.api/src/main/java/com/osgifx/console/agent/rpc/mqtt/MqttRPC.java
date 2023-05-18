@@ -35,12 +35,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.service.messaging.Message;
-import org.osgi.service.messaging.MessageContextBuilder;
-import org.osgi.service.messaging.MessagePublisher;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
+import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.json.JSONCodec;
@@ -103,7 +102,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         mqttClient = new MqttClient(bundleContext, subscriber -> {
             subscriber.subscribe(subTopic).forEach(msg -> {
                 try {
-                    final ByteBuffer   payload    = msg.payload();
+                    final ByteBuffer   payload    = msg.payload;
                     final RpcMessage   message    = decodeMessage(payload);
                     final List<byte[]> methodArgs = new ArrayList<>();
                     if (message.methodArgs != null) {
@@ -215,20 +214,18 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             promises.put(msg.id, new RpcResult());
         }
         trace("Sending MQTT RPC: " + msg);
-        final Optional<MessagePublisher> msgPublisher = mqttClient.pub();
+        final Optional<Mqtt5Publisher> msgPublisher = mqttClient.pub();
         if (msgPublisher.isPresent()) {
-            final MessagePublisher publisher = msgPublisher.get();
+            final Mqtt5Publisher publisher = msgPublisher.get();
             synchronized (publisher) {
-                final Optional<MessageContextBuilder> msgCtx = mqttClient.msgCtx();
-                if (!msgCtx.isPresent()) {
-                    throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
-                }
                 final ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 try {
                     new JSONCodec().enc().to(bout).put(msg);
 
-                    final ByteBuffer data    = ByteBuffer.wrap(bout.toByteArray());
-                    final Message    message = msgCtx.get().channel(pubTopic).content(data).buildMessage();
+                    final ByteBuffer   data    = ByteBuffer.wrap(bout.toByteArray());
+                    final Mqtt5Message message = new Mqtt5Message();
+                    message.channel = pubTopic;
+                    message.payload = data;
 
                     publisher.publish(message);
                     trace("Sent MQTT RPC: " + msg);

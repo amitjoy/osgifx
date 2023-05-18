@@ -18,6 +18,7 @@ javac.compliance      : ${javac.source}
                         org.osgi.service.jaxrs,\
                         org.osgi.service.log,\
                         org.osgi.service.messaging,\
+                        org.osgi.util.pushstream,\
                         org.slf4j.api
 -privatepackage       : \
                         com.osgifx.console.agent.*,\

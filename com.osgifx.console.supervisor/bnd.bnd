@@ -8,7 +8,9 @@
 -includepackage     : \
                       com.osgifx.console.dto,\
                       com.osgifx.console.supervisor.*
--privatepackage     : com.osgifx.console.agent.*
+-privatepackage     : \
+                      !com.osgifx.console.agent.rpc.mqtt.api,\
+                      com.osgifx.console.agent.*
 -conditionalpackage : aQute.*, com.osgifx.console.agent.link
 -fixupmessages      : 'split', 'private'
 Export-Package      : org.osgi.service.cdi,\
