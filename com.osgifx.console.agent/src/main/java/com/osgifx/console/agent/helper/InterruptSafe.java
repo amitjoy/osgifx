@@ -26,9 +26,6 @@ public final class InterruptSafe {
     /**
      * Executes task with interrupt flag reset. Interrupt flag will be set again, if
      * it was set before
-     *
-     * @param task
-     * @return task result
      */
     public static <V> V execute(final Callable<V> task) {
         boolean   interrupted  = false;
@@ -56,8 +53,6 @@ public final class InterruptSafe {
     /**
      * Executes task with interrupt flag reset. Interrupt flag will be set again, if
      * it was set before
-     *
-     * @param task
      */
     public static void execute(final Runnable task) {
         execute(() -> {
