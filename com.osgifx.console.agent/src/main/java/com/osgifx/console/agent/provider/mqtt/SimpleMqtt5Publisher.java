@@ -28,12 +28,12 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 
-public final class OSGiMqtt5Publisher implements Mqtt5Publisher {
+public final class SimpleMqtt5Publisher implements Mqtt5Publisher {
 
     private final BundleContext                                      bundleContext;
     private final ServiceTracker<MessagePublisher, MessagePublisher> publisherTracker;
 
-    public OSGiMqtt5Publisher(final BundleContext bundleContext) {
+    public SimpleMqtt5Publisher(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
         publisherTracker   = new ServiceTracker<>(bundleContext, MessagePublisher.class, null);
         publisherTracker.open();

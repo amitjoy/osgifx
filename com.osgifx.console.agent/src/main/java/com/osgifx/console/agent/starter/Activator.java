@@ -44,8 +44,8 @@ import com.osgifx.console.agent.helper.ThreadFactoryBuilder;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
-import com.osgifx.console.agent.provider.mqtt.OSGiMqtt5Publisher;
-import com.osgifx.console.agent.provider.mqtt.OSGiMqtt5Subscriber;
+import com.osgifx.console.agent.provider.mqtt.SimpleMqtt5Publisher;
+import com.osgifx.console.agent.provider.mqtt.SimpleMqtt5Subscriber;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
@@ -115,8 +115,8 @@ public final class Activator extends Thread implements BundleActivator {
 
         final boolean isOSGiMessagingProvider = AGENT_MQTT_PROVIDER_OSGI_VALUE.equalsIgnoreCase(mqttProviderValue);
         if (isOSGiMessagingProvider) {
-            bundleContext.registerService(Mqtt5Publisher.class, new OSGiMqtt5Publisher(bundleContext), null);
-            bundleContext.registerService(Mqtt5Subscriber.class, new OSGiMqtt5Subscriber(bundleContext), null);
+            bundleContext.registerService(Mqtt5Publisher.class, new SimpleMqtt5Publisher(bundleContext), null);
+            bundleContext.registerService(Mqtt5Subscriber.class, new SimpleMqtt5Subscriber(bundleContext), null);
         } else {
             final ServiceReference<Mqtt5Publisher>  pubRef = bundleContext.getServiceReference(Mqtt5Publisher.class);
             final ServiceReference<Mqtt5Subscriber> subRef = bundleContext.getServiceReference(Mqtt5Subscriber.class);
