@@ -90,7 +90,7 @@ public interface Agent {
     /**
      * The property value indicating the OSGi Messaging MQTT implementation to use
      */
-    String AGENT_MQTT_PROVIDER_OSGI_VALUE = "osgi";
+    String AGENT_MQTT_PROVIDER_DEFAULT_VALUE = "osgi-messaging";
 
     /**
      * The property key to specify the publish topic for publishing the data using MQTT
