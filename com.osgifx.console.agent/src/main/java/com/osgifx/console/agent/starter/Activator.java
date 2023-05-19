@@ -44,10 +44,10 @@ import com.osgifx.console.agent.helper.ThreadFactoryBuilder;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
-import com.osgifx.console.agent.provider.mqtt.SimpleMqtt5Publisher;
-import com.osgifx.console.agent.provider.mqtt.SimpleMqtt5Subscriber;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
+import com.osgifx.console.agent.rpc.mqtt.SimpleMqtt5Publisher;
+import com.osgifx.console.agent.rpc.mqtt.SimpleMqtt5Subscriber;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 import com.osgifx.console.agent.rpc.socket.SocketRPC;
@@ -84,6 +84,7 @@ public final class Activator extends Thread implements BundleActivator {
             final SocketContext socketContext = new SocketContext(bundleContext);
             serverSocket = socketContext.getSocket();
             start();
+
             System.err.println("[OSGi.fx] Socket agent configured");
             System.err.println(String.format("[OSGi.fx] Host: %s", socketContext.host()));
             System.err.println(String.format("[OSGi.fx] Port: %s", socketContext.port()));
@@ -92,14 +93,9 @@ public final class Activator extends Thread implements BundleActivator {
         }
         module.start();
 
-        final String mqttProviderValue = System.getProperty(AGENT_MQTT_PROVIDER_KEY);
-        if (mqttProviderValue == null) {
+        final String mqttProviderProperty = System.getProperty(AGENT_MQTT_PROVIDER_KEY);
+        if (mqttProviderProperty == null) {
             System.err.println("[OSGi.fx] MQTT agent not configured");
-            return;
-        }
-        final boolean isMQTTwired = module.di().getInstance(PackageWirings.class).isMqttWired();
-        if (isMQTTwired) {
-            System.err.println("[OSGi.fx] OSGi messaging bundle for MQTT is not installed");
             return;
         }
         final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
@@ -110,11 +106,13 @@ public final class Activator extends Thread implements BundleActivator {
             return;
         }
 
-        final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
-        agents.add(agentServer);
-
-        final boolean isOSGiMessagingProvider = AGENT_MQTT_PROVIDER_OSGI_VALUE.equalsIgnoreCase(mqttProviderValue);
-        if (isOSGiMessagingProvider) {
+        final boolean isOSGiMessagingProviderConfigured = AGENT_MQTT_PROVIDER_OSGI_VALUE.equals(mqttProviderProperty);
+        if (isOSGiMessagingProviderConfigured) {
+            final boolean isOSGiMessagingPackageWired = module.di().getInstance(PackageWirings.class).isMqttWired();
+            if (!isOSGiMessagingPackageWired) {
+                System.err.println("[OSGi.fx] OSGi messaging bundle for MQTT not installed");
+                return;
+            }
             bundleContext.registerService(Mqtt5Publisher.class, new SimpleMqtt5Publisher(bundleContext), null);
             bundleContext.registerService(Mqtt5Subscriber.class, new SimpleMqtt5Subscriber(bundleContext), null);
         } else {
@@ -122,10 +120,13 @@ public final class Activator extends Thread implements BundleActivator {
             final ServiceReference<Mqtt5Subscriber> subRef = bundleContext.getServiceReference(Mqtt5Subscriber.class);
 
             if (pubRef == null || subRef == null) {
-                System.err.println("[OSGi.fx] MQTT services ain't available");
+                System.err.println("[OSGi.fx] MQTT services not available");
                 return;
             }
         }
+        final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
+        agents.add(agentServer);
+
         final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS, THREAD_FACTORY);
         final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
                                                                     pubTopic, subTopic, executor);
