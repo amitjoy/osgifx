@@ -47,6 +47,8 @@ import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.extension.AgentExtensionName;
+import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
+import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
 /**
  * An agent runs on remote OSGi framework and provides the means to control this
@@ -81,9 +83,12 @@ public interface Agent {
      * The supported types are:
      * <p>
      * <ul>
-     * <li>{@code osgi}: OSGi Messaging Implementation</li>
+     * <li>{@code osgi-messaging}: OSGi Messaging Implementation</li>
      * <li>{@code custom}: Custom MQTT 5 client</li>
      * </ul>
+     * <p>
+     * In the latter scenario, you have to implement {@link Mqtt5Publisher} and
+     * {@link Mqtt5Subscriber} yourself.
      */
     String AGENT_MQTT_PROVIDER_KEY = "osgi.fx.agent.mqtt.provider";
 
