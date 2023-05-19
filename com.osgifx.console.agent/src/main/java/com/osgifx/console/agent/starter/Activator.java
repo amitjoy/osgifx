@@ -15,8 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.starter;
 
+import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_DEFAULT_VALUE;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_KEY;
-import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_OSGI_VALUE;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.MQTT_RPC;
@@ -106,7 +106,8 @@ public final class Activator extends Thread implements BundleActivator {
             return;
         }
 
-        final boolean isOSGiMessagingProviderConfigured = AGENT_MQTT_PROVIDER_OSGI_VALUE.equals(mqttProviderProperty);
+        final boolean isOSGiMessagingProviderConfigured = AGENT_MQTT_PROVIDER_DEFAULT_VALUE
+                .equals(mqttProviderProperty);
         if (isOSGiMessagingProviderConfigured) {
             final boolean isOSGiMessagingPackageWired = module.di().getInstance(PackageWirings.class).isMqttWired();
             if (!isOSGiMessagingPackageWired) {
