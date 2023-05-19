@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider.mqtt;
+package com.osgifx.console.agent.rpc.mqtt;
 
 import java.util.Optional;
 
@@ -42,19 +42,16 @@ public final class SimpleMqtt5Publisher implements Mqtt5Publisher {
     @Override
     public void publish(final Mqtt5Message message) {
         Optional.ofNullable(publisherTracker.getService()).ifPresent(pub -> {
-            final Optional<MessageContextBuilder> msgCtx = msgCtx();
+            final Optional<MessageContextBuilder> msgCtx = newMessageContextBuilder();
             if (!msgCtx.isPresent()) {
                 throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
             }
-            final Message msg = msgCtx.get().channel(message.channel).content(message.payload)
-                    .contentType(message.contentType).contentEncoding(message.contentEncoding)
-                    .correlationId(message.correlationId).replyTo(message.replyToChannel).extensions(message.extensions)
-                    .buildMessage();
+            final Message msg = msgCtx.get().channel(message.channel).content(message.payload).buildMessage();
             pub.publish(msg);
         });
     }
 
-    private Optional<MessageContextBuilder> msgCtx() {
+    private Optional<MessageContextBuilder> newMessageContextBuilder() {
         final ServiceReference<MessageContextBuilder> ref            = bundleContext
                 .getServiceReference(MessageContextBuilder.class);
         final ServiceObjects<MessageContextBuilder>   serviceObjects = bundleContext.getServiceObjects(ref);
