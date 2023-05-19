@@ -13,11 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider.mqtt;
-
-import java.util.Optional;
+package com.osgifx.console.agent.rpc.mqtt;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.messaging.Message;
 import org.osgi.service.messaging.MessageSubscription;
 import org.osgi.util.pushstream.PushStream;
@@ -25,43 +24,44 @@ import org.osgi.util.pushstream.PushStreamProvider;
 import org.osgi.util.pushstream.SimplePushEventSource;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.osgifx.console.agent.helper.InterruptSafe;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
 public final class SimpleMqtt5Subscriber implements Mqtt5Subscriber {
 
-    private final ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker;
+    private final BundleContext                                      bundleContext;
+    private ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker;
 
     public SimpleMqtt5Subscriber(final BundleContext bundleContext) {
-        subscriberTracker = new ServiceTracker<>(bundleContext, MessageSubscription.class, null);
-        subscriberTracker.open();
+        this.bundleContext = bundleContext;
     }
 
     @Override
     public PushStream<Mqtt5Message> subscribe(final String channel) {
         final PushStreamProvider                  provider = new PushStreamProvider();
         final SimplePushEventSource<Mqtt5Message> source   = acquirePushEventSource(provider);
-
-        Optional.ofNullable(subscriberTracker.getService()).ifPresent(sub -> {
-            sub.subscribe(channel).forEach(msg -> {
-                final Mqtt5Message message = convertMessage(msg);
-                source.publish(message);
-            });
-        });
+        subscriberTracker = new ServiceTracker<MessageSubscription, MessageSubscription>(bundleContext,
+                                                                                         MessageSubscription.class,
+                                                                                         null) {
+            @Override
+            public MessageSubscription addingService(final ServiceReference<MessageSubscription> reference) {
+                final MessageSubscription service = super.addingService(reference);
+                service.subscribe(channel).forEach(msg -> {
+                    final Mqtt5Message message = convertMessage(msg);
+                    source.publish(message);
+                });
+                return service;
+            }
+        };
+        subscriberTracker.open();
         return provider.createStream(source);
     }
 
     private Mqtt5Message convertMessage(final Message msg) {
         final Mqtt5Message message = new Mqtt5Message();
 
-        message.channel         = msg.getContext().getChannel();
-        message.payload         = msg.payload();
-        message.contentType     = msg.getContext().getContentEncoding();
-        message.contentEncoding = msg.getContext().getContentEncoding();
-        message.correlationId   = msg.getContext().getCorrelationId();
-        message.replyToChannel  = msg.getContext().getReplyToChannel();
-        message.extensions      = msg.getContext().getExtensions();
+        message.payload = msg.payload();
+        message.channel = msg.getContext().getChannel();
 
         return message;
     }
