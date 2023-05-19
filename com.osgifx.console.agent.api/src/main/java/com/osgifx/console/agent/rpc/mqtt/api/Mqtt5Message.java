@@ -16,16 +16,10 @@
 package com.osgifx.console.agent.rpc.mqtt.api;
 
 import java.nio.ByteBuffer;
-import java.util.Map;
 
 public class Mqtt5Message {
 
-    public ByteBuffer          payload;
-    public String              channel;
-    public String              contentType;
-    public String              contentEncoding;
-    public String              correlationId;
-    public String              replyToChannel;
-    public Map<String, Object> extensions;
+    public ByteBuffer payload;
+    public String     channel;
 
 }
