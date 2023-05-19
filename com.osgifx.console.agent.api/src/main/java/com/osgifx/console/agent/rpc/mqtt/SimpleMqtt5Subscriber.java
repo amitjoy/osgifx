@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.provider.mqtt;
+package com.osgifx.console.agent.rpc.mqtt;
 
 import java.util.Optional;
 
@@ -25,7 +25,6 @@ import org.osgi.util.pushstream.PushStreamProvider;
 import org.osgi.util.pushstream.SimplePushEventSource;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.osgifx.console.agent.helper.InterruptSafe;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
@@ -55,8 +54,8 @@ public final class SimpleMqtt5Subscriber implements Mqtt5Subscriber {
     private Mqtt5Message convertMessage(final Message msg) {
         final Mqtt5Message message = new Mqtt5Message();
 
-        message.channel         = msg.getContext().getChannel();
         message.payload         = msg.payload();
+        message.channel         = msg.getContext().getChannel();
         message.contentType     = msg.getContext().getContentEncoding();
         message.contentEncoding = msg.getContext().getContentEncoding();
         message.correlationId   = msg.getContext().getCorrelationId();
