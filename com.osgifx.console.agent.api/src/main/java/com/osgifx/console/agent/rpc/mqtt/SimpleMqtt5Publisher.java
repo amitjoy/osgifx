@@ -46,10 +46,7 @@ public final class SimpleMqtt5Publisher implements Mqtt5Publisher {
             if (!msgCtx.isPresent()) {
                 throw new IllegalStateException("Required service 'MessageContextBuilder' is unavailable");
             }
-            final Message msg = msgCtx.get().channel(message.channel).content(message.payload)
-                    .contentType(message.contentType).contentEncoding(message.contentEncoding)
-                    .correlationId(message.correlationId).replyTo(message.replyToChannel).extensions(message.extensions)
-                    .buildMessage();
+            final Message msg = msgCtx.get().channel(message.channel).content(message.payload).buildMessage();
             pub.publish(msg);
         });
     }

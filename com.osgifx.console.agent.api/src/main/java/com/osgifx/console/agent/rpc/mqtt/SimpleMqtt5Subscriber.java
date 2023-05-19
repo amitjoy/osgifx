@@ -54,13 +54,8 @@ public final class SimpleMqtt5Subscriber implements Mqtt5Subscriber {
     private Mqtt5Message convertMessage(final Message msg) {
         final Mqtt5Message message = new Mqtt5Message();
 
-        message.payload         = msg.payload();
-        message.channel         = msg.getContext().getChannel();
-        message.contentType     = msg.getContext().getContentEncoding();
-        message.contentEncoding = msg.getContext().getContentEncoding();
-        message.correlationId   = msg.getContext().getCorrelationId();
-        message.replyToChannel  = msg.getContext().getReplyToChannel();
-        message.extensions      = msg.getContext().getExtensions();
+        message.payload = msg.payload();
+        message.channel = msg.getContext().getChannel();
 
         return message;
     }
