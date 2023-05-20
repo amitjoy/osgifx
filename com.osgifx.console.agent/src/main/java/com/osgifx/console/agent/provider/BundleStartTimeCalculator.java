@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -107,6 +108,10 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
             return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
         }
     }
+    
+    public Optional<BundleStartDuration> getBundleStartDuration(long bundleId) {
+        return Optional.ofNullable(bundleToStartTime.get(bundleId)).map(StartTime::toBundleStartDuration);
+    }
 
     static class StartTime {
         private final String bundleSymbolicName;
@@ -132,7 +137,7 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
 
         public BundleStartDuration toBundleStartDuration() {
             return new BundleStartDuration(bundleSymbolicName, Instant.ofEpochMilli(startingTimestamp),
-                                           Duration.ofMillis(startedTimestamp - startingTimestamp));
+                                           Duration.ofMillis(getDuration()));
         }
     }
 }
