@@ -17,6 +17,10 @@ package com.osgifx.console.agent.rpc.mqtt.api;
 
 import java.nio.ByteBuffer;
 
+/**
+ * A data transfer format denoting the MQTT message payload and the
+ * associated topic (referred by {@code channel})
+ */
 public class Mqtt5Message {
 
     public ByteBuffer payload;
