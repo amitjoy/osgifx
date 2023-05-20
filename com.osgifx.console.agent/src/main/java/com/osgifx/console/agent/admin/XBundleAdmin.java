@@ -84,6 +84,7 @@ public final class XBundleAdmin {
         try {
             return Stream.of(context.getBundles()).map(b -> toDTO(b, bundleStartTimeCalculator)).collect(toList());
         } catch (final Exception e) {
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }
@@ -105,12 +106,9 @@ public final class XBundleAdmin {
         dto.startLevel          = getStartLevel(bundle);
         dto.frameworkStartLevel = getFrameworkStartLevel();
         // @formatter:off
-        dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDurations()
-                                                              .stream()
-                                                              .filter(b -> b.getSymbolicName().equals(dto.symbolicName))
+        dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDuration(bundle.getBundleId())
                                                               .map(BundleStartDuration::getStartedAfter)
                                                               .map(Duration::toMillis)
-                                                              .findAny()
                                                               .orElse(-1L);
         // @formatter:on
         dto.bundleRevision         = bundle.adapt(BundleRevisionDTO.class);
