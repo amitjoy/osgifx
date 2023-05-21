@@ -15,17 +15,18 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.mqtt.api;
 
-import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.util.pushstream.PushStream;
 
-@ProviderType
+/**
+ * The consumer interface to plugin custom functionality for consuming MQTT messages
+ */
 public interface Mqtt5Subscriber {
 
     /**
-     * Subscribe the {@link PushStream} to the given topic
+     * Subscribe to the specified topic
      *
-     * @param topic the topic string to subscribe to
-     * @return a {@link PushStream} instance for the subscription
+     * @param topic the topic to subscribe to
+     * @return {@link PushStream} instance for the subscription
      */
     PushStream<Mqtt5Message> subscribe(String channel);
 
