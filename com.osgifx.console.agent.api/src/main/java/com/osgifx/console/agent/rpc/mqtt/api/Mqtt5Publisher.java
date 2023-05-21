@@ -15,16 +15,15 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.mqtt.api;
 
-import org.osgi.annotation.versioning.ProviderType;
-
-@ProviderType
+/**
+ * The consumer interface to plugin custom functionality for publishing MQTT messages
+ */
 public interface Mqtt5Publisher {
 
     /**
-     * Publish the given {@link Mqtt5Message} to the given topic contained in the message
-     * context of the message
+     * Publish the specified message to the associated topic contained in the message
      *
-     * @param message the {@link Mqtt5Message} to publish
+     * @param message the message to publish
      */
     void publish(Mqtt5Message message);
 
