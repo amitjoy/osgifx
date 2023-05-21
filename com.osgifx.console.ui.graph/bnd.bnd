@@ -18,5 +18,6 @@ Import-Package      : \
                       org.controlsfx.glyphfont,\
                       !org.antlr.*,\
                       !org.apache.commons.text.*,\
+                      !org.apfloat.*,\
                       !org.jheaps.*,\
                       *
