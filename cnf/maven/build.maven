@@ -66,8 +66,8 @@ com.dlsc.formsfx:formsfx-core:11.6.0
 
 # JGraphT
 
-org.jgrapht:jgrapht-core:1.5.1
-org.jgrapht:jgrapht-io:1.5.1
+org.jgrapht:jgrapht-core:1.5.2
+org.jgrapht:jgrapht-io:1.5.2
 
 # Required for Tic-Tac-Toe Sample Extension
 
