@@ -2,13 +2,13 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: ''
+labels: 'bug'
 assignees: ''
 
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+A clear and concise description of what the bug is
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -18,14 +18,14 @@ Steps to reproduce the behavior:
 4. See error
 
 **Expected behavior**
-A clear and concise description of what you expected to happen.
+A clear and concise description of what you expected to happen
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If applicable, add screenshots to help explain your problem
 
 **Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Version [e.g. 22]
+ - OS with Version: [e.g. iOS 12.4.3, macOS 13.3.1]
+ - OSGi.fx Version [e.g. 2.4.0]
 
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the problem here
