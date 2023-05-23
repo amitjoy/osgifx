@@ -29,6 +29,8 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -40,6 +42,7 @@ public final class OSGiEventHandler implements EventHandler {
 
     private final Supervisor    supervisor;
     private final BundleContext context;
+    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public OSGiEventHandler(final BundleContext context, final Supervisor supervisor) {
@@ -75,7 +78,7 @@ public final class OSGiEventHandler implements EventHandler {
             try {
                 properties.put(propertyName, processElement(propertyValue));
             } catch (final Exception e) {
-                // nothing to do
+                logger.atError().msg("Event properties cannot be converted").throwable(e).log();
             }
         }
         return properties;

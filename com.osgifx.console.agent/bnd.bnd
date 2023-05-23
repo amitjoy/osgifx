@@ -10,6 +10,7 @@ javac.compliance      : ${javac.source}
                         osgi.core;version='6.0.0'
 -buildpath            : \
                         biz.aQute.remote.agent;packages=*,\
+                        com.j256.simplelogging:simplelogging;packages=*,\
                         com.osgifx.console.agent.api;version=snapshot;packages=*,\
                         com.osgifx.console.agent.di;packages=*,\
                         org.apache.commons.exec,\
@@ -25,15 +26,21 @@ javac.compliance      : ${javac.source}
                         com.osgifx.console.supervisor
 -conditionalpackage   : \
                         aQute.*,\
+                        com.j256.*,\
                         jakarta.inject,\
                         org.apache.commons.exec.*
 Import-Package        : \
+                        android.util;'resolution:'=optional,\
+                        com.amazonaws.*;'resolution:'=optional,\
                         com.sun.management;'resolution:'=optional,\
                         javax.management;'resolution:'=optional,\
                         javax.management.openmbean;'resolution:'=optional,\
                         javax.management.remote;'resolution:'=optional,\
+                        org.apache.commons.logging.*;'resolution:'=optional,\
                         org.apache.felix.hc.*;'resolution:'=optional,\
                         org.apache.felix.service.command;'resolution:'=optional,\
+                        org.apache.log4j;'resolution:'=optional,\
+                        org.apache.logging.*;'resolution:'=optional,\
                         org.osgi.service.component.runtime;'resolution:'=optional,\
                         org.osgi.service.component.runtime.dto;'resolution:'=optional,\
                         org.osgi.service.http.runtime;'resolution:'=optional,\
@@ -50,4 +57,5 @@ Import-Package        : \
                         org.osgi.service.useradmin;'resolution:'=optional,\
                         org.osgi.util.promise;'resolution:'=optional,\
                         org.osgi.util.pushstream;'resolution:'=optional,\
+                        org.slf4j.*;'resolution:'=optional,\
                         *
