@@ -38,6 +38,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XComponentDTO;
@@ -57,6 +59,7 @@ public final class XConfigurationAdmin {
     private final Object             metatype;
     private final ConfigurationAdmin configAdmin;
     private final XComponentAdmin    componentAdmin;
+    private final FluentLogger       logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XConfigurationAdmin(final BundleContext context,
@@ -71,12 +74,14 @@ public final class XConfigurationAdmin {
 
     public List<XConfigurationDTO> getConfigurations() {
         if (configAdmin == null) {
+            logger.atInfo().msg("ConfigAdmin is unavailable to retrieve the configurations").log();
             return Collections.emptyList();
         }
         List<XConfigurationDTO> configsWithoutMetatype = null;
         try {
             configsWithoutMetatype = findConfigsWithoutMetatype();
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving configurations").throwable(e).log();
             return Collections.emptyList();
         }
         return configsWithoutMetatype;

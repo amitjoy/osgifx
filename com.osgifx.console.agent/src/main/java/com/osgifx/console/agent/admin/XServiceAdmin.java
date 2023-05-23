@@ -33,6 +33,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.dto.FrameworkDTO;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 
@@ -41,6 +43,7 @@ import jakarta.inject.Inject;
 public final class XServiceAdmin {
 
     private final BundleContext context;
+    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XServiceAdmin(final BundleContext context) {
@@ -53,6 +56,7 @@ public final class XServiceAdmin {
             final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
             return dto.services.stream().map(s -> toDTO(s, context)).collect(toList());
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving services").throwable(e).log();
             return Collections.emptyList();
         }
     }

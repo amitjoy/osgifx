@@ -36,8 +36,9 @@ import java.util.concurrent.ThreadFactory;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.di.module.DIModule;
 import com.osgifx.console.agent.helper.ThreadFactoryBuilder;
@@ -73,6 +74,7 @@ public final class Activator extends Thread implements BundleActivator {
 
     private DIModule                module;
     private ServerSocket            serverSocket;
+    private final FluentLogger      logger = LoggerFactory.getFluentLogger(getClass());
     private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
 
     @Override
@@ -85,46 +87,45 @@ public final class Activator extends Thread implements BundleActivator {
             serverSocket = socketContext.getSocket();
             start();
 
-            System.err.println("[OSGi.fx] Socket agent configured");
-            System.err.println(String.format("[OSGi.fx] Host: %s", socketContext.host()));
-            System.err.println(String.format("[OSGi.fx] Port: %s", socketContext.port()));
+            logger.atInfo().msg("[OSGi.fx] Socket agent configured").log();
+            logger.atInfo().msg("[OSGi.fx] Host: {}").arg(socketContext.host()).log();
+            logger.atInfo().msg("[OSGi.fx] Port: {}").arg(socketContext.port()).log();
         } catch (final IllegalArgumentException e) {
-            System.err.println("[OSGi.fx] Socket agent not configured");
+            logger.atInfo().msg("[OSGi.fx] Socket agent not configured").log();
         }
         module.start();
 
         final String mqttProviderProperty = System.getProperty(AGENT_MQTT_PROVIDER_KEY);
         if (mqttProviderProperty == null) {
-            System.err.println("[OSGi.fx] MQTT agent not configured");
+            logger.atInfo().msg("[OSGi.fx] MQTT agent not configured").log();
             return;
         }
         final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
         final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
 
         if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
-            System.err.println("[OSGi.fx] MQTT agent topics not configured");
+            logger.atWarn().msg("[OSGi.fx] MQTT agent topics not configured").log();
             return;
         }
 
         final boolean isOSGiMessagingProviderConfigured = AGENT_MQTT_PROVIDER_DEFAULT_VALUE
                 .equals(mqttProviderProperty);
+
         if (isOSGiMessagingProviderConfigured) {
+            logger.atInfo().msg("[OSGi.fx] OSGi messaging provider configured for MQTT communication").log();
+
             final boolean isOSGiMessagingPackageWired = module.di().getInstance(PackageWirings.class).isMqttWired();
             if (!isOSGiMessagingPackageWired) {
-                System.err.println("[OSGi.fx] OSGi messaging bundle for MQTT not installed");
+                logger.atWarn().msg("[OSGi.fx] OSGi messaging bundle for MQTT not installed").log();
                 return;
             }
+
             bundleContext.registerService(Mqtt5Publisher.class, new SimpleMqtt5Publisher(bundleContext), null);
             bundleContext.registerService(Mqtt5Subscriber.class, new SimpleMqtt5Subscriber(bundleContext), null);
         } else {
-            final ServiceReference<Mqtt5Publisher>  pubRef = bundleContext.getServiceReference(Mqtt5Publisher.class);
-            final ServiceReference<Mqtt5Subscriber> subRef = bundleContext.getServiceReference(Mqtt5Subscriber.class);
-
-            if (pubRef == null || subRef == null) {
-                System.err.println("[OSGi.fx] MQTT services not available");
-                return;
-            }
+            logger.atInfo().msg("[OSGi.fx] Custom messaging provider configured for MQTT communication").log();
         }
+
         final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
         agents.add(agentServer);
 
@@ -139,9 +140,9 @@ public final class Activator extends Thread implements BundleActivator {
         mqttRPC.open();
         agentServer.setEndpoint(mqttRPC);
 
-        System.err.println("[OSGi.fx] MQTT agent configured");
-        System.err.println(String.format("[OSGi.fx] PUB Topic: %s", pubTopic));
-        System.err.println(String.format("[OSGi.fx] SUB Topic: %s", subTopic));
+        logger.atInfo().msg("[OSGi.fx] MQTT agent configured").log();
+        logger.atInfo().msg("[OSGi.fx] PUB Topic: {}").arg(pubTopic).log();
+        logger.atInfo().msg("[OSGi.fx] SUB Topic: {}").arg(subTopic).log();
     }
 
     @Override
@@ -174,13 +175,12 @@ public final class Activator extends Thread implements BundleActivator {
 
                     agentServer.setEndpoint(socketRPC);
                     socketRPC.run();
-                } catch (final Exception e) {
                 } catch (final Throwable t) {
-                    t.printStackTrace();
+                    logger.atError().throwable(t).log();
                 }
             }
         } catch (final Throwable t) {
-            t.printStackTrace(System.err);
+            logger.atError().throwable(t).log();
             throw t;
         } finally {
             close(serverSocket);
@@ -201,8 +201,9 @@ public final class Activator extends Thread implements BundleActivator {
             if (in != null) {
                 in.close();
             }
-        } catch (final Throwable e) {
-            return e;
+        } catch (final Throwable t) {
+            logger.atError().throwable(t).log();
+            return t;
         }
         return null;
     }

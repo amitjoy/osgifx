@@ -29,6 +29,8 @@ import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.http.runtime.HttpServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.CDIComponentRuntimeDTO;
 import com.osgifx.console.agent.dto.HttpServiceRuntimeDTO;
 import com.osgifx.console.agent.dto.JaxRsServiceRuntimeDTO;
@@ -46,6 +48,7 @@ public final class XDtoAdmin {
     private final Object         cdiRuntime;
     private final Object         httpRuntime;
     private final Object         jaxRsRuntime;
+    private final FluentLogger   logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XDtoAdmin(final BundleContext context,
@@ -76,6 +79,7 @@ public final class XDtoAdmin {
 
     private CDIComponentRuntimeDTO prepareCDIDTO() {
         if (!wirings.isCDIWired() || cdiRuntime == null) {
+            logger.atInfo().msg("CDI bundle is unavailable to retrieve the CDI DTO").log();
             return null;
         }
         final CDIComponentRuntime    cdi = (CDIComponentRuntime) cdiRuntime;
@@ -94,6 +98,7 @@ public final class XDtoAdmin {
 
     private HttpServiceRuntimeDTO prepareHttpDTO() {
         if (!wirings.isHttpServiceRuntimeWired() || httpRuntime == null) {
+            logger.atInfo().msg("HTTP bundle is unavailable to retrieve the HTTP DTO").log();
             return null;
         }
         final HttpServiceRuntime    http = (HttpServiceRuntime) httpRuntime;
@@ -106,6 +111,7 @@ public final class XDtoAdmin {
 
     private JaxRsServiceRuntimeDTO prepareJaxRsDTO() {
         if (!wirings.isJaxRsWired() || jaxRsRuntime == null) {
+            logger.atInfo().msg("JAX-RS bundle is unavailable to retrieve the JAX-RS DTO").log();
             return null;
         }
         final JaxrsServiceRuntime    jaxRs = (JaxrsServiceRuntime) jaxRsRuntime;
@@ -118,6 +124,7 @@ public final class XDtoAdmin {
 
     private ServiceComponentRuntimeDTO prepareScrDTO() {
         if (!wirings.isScrWired() || scrRuntime == null) {
+            logger.atInfo().msg("SCR runtime is unavailable to retrieve the SCR DTO").log();
             return null;
         }
         final ServiceComponentRuntime    scr = (ServiceComponentRuntime) scrRuntime;
@@ -125,7 +132,7 @@ public final class XDtoAdmin {
 
         dto.componentDescriptionDTOs   = scr.getComponentDescriptionDTOs();
         dto.componentConfigurationDTOs = scr.getComponentDescriptionDTOs().stream()
-                .map(desc -> scr.getComponentConfigurationDTOs(desc)).flatMap(Collection::stream).collect(toList());
+                .map(scr::getComponentConfigurationDTOs).flatMap(Collection::stream).collect(toList());
 
         return dto;
     }

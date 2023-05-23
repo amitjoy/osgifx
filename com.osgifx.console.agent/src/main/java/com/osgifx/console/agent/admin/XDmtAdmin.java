@@ -35,6 +35,8 @@ import org.osgi.service.dmt.DmtException;
 import org.osgi.service.dmt.DmtSession;
 import org.osgi.service.dmt.MetaNode;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -43,8 +45,9 @@ import jakarta.inject.Inject;
 
 public final class XDmtAdmin {
 
-    private XDmtNodeDTO    parent;
-    private final DmtAdmin dmtAdmin;
+    private XDmtNodeDTO        parent;
+    private final DmtAdmin     dmtAdmin;
+    private final FluentLogger logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XDmtAdmin(final Object dmtAdmin) {
@@ -53,6 +56,7 @@ public final class XDmtAdmin {
 
     public XDmtNodeDTO readDmtNode(final String rootURI) {
         if (dmtAdmin == null) {
+            logger.atInfo().msg("DmtAdmin is unavailable to retrieve the tree").log();
             return null;
         }
         processNode(rootURI, parent);
@@ -61,6 +65,7 @@ public final class XDmtAdmin {
 
     public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
         if (dmtAdmin == null) {
+            logger.atInfo().msg("DmtAdmin is unavailable to update the node").log();
             return createResult(SKIPPED, serviceUnavailable(DMT));
         }
         DmtSession session = null;
