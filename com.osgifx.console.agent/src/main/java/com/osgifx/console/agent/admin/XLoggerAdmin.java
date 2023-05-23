@@ -41,6 +41,8 @@ import org.osgi.service.log.LogLevel;
 import org.osgi.service.log.admin.LoggerAdmin;
 import org.osgi.service.log.admin.LoggerContext;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
@@ -52,6 +54,7 @@ public final class XLoggerAdmin {
     private final BundleContext context;
     private final LoggerAdmin   loggerAdmin;
     private final boolean       isConfigAdminWired;
+    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XLoggerAdmin(final Object loggerAdmin, final PackageWirings packageWirings, final BundleContext context) {
@@ -62,6 +65,7 @@ public final class XLoggerAdmin {
 
     public List<XBundleLoggerContextDTO> getLoggerContexts() {
         if (loggerAdmin == null) {
+            logger.atInfo().msg("Logger admin is unavailable").log();
             return Collections.emptyList();
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();

@@ -42,6 +42,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
@@ -55,6 +57,7 @@ public final class XHcAdmin {
 
     private final BundleContext       context;
     private final HealthCheckExecutor felixHcExecutor;
+    private final FluentLogger        logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XHcAdmin(final BundleContext context, final Object felixHcExecutor) {
@@ -64,17 +67,20 @@ public final class XHcAdmin {
 
     public List<XHealthCheckDTO> getHealthchecks() {
         if (context == null) {
+            logger.atWarn().msg("Bundle context is null").log();
             return Collections.emptyList();
         }
         try {
             return findAllHealthChecks();
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving health checks").throwable(e).log();
             return Collections.emptyList();
         }
     }
 
     public List<XHealthCheckResultDTO> executeHealthChecks(List<String> tags, List<String> names) {
         if (felixHcExecutor == null) {
+            logger.atInfo().msg("Felix HC executor is unavailable to execute health check").log();
             return Collections.emptyList();
         }
         HealthCheckSelector selector;

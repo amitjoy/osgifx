@@ -37,6 +37,8 @@ import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
@@ -46,7 +48,8 @@ import jakarta.inject.Inject;
 
 public final class XUserAdmin {
 
-    private final UserAdmin userAdmin;
+    private final UserAdmin    userAdmin;
+    private final FluentLogger logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XUserAdmin(final Object userAdmin) {
@@ -55,6 +58,7 @@ public final class XUserAdmin {
 
     public List<XRoleDTO> getRoles() {
         if (userAdmin == null) {
+            logger.atInfo().msg("UserAdmin is unavailable").log();
             return Collections.emptyList();
         }
         final List<XRoleDTO> dtos = new ArrayList<>();
@@ -64,6 +68,7 @@ public final class XUserAdmin {
             }
         } catch (final Exception e) {
             // for any exception occurs in remote runtime
+            logger.atError().msg("Error occurred while retrieving users").throwable(e).log();
             return Collections.emptyList();
         }
         return dtos;

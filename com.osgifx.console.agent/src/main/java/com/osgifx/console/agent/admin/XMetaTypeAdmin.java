@@ -37,6 +37,8 @@ import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XAttributeDefDTO;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
@@ -49,6 +51,7 @@ public final class XMetaTypeAdmin {
     private final BundleContext      context;
     private final MetaTypeService    metatype;
     private final ConfigurationAdmin configAdmin;
+    private final FluentLogger       logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XMetaTypeAdmin(final BundleContext context, final Object configAdmin, final Object metatype) {
@@ -58,7 +61,12 @@ public final class XMetaTypeAdmin {
     }
 
     public List<XConfigurationDTO> getConfigurations() {
-        if (configAdmin == null || metatype == null) {
+        if (configAdmin == null) {
+            logger.atInfo().msg("ConfigAdmin is unavailable").log();
+            return Collections.emptyList();
+        }
+        if (metatype == null) {
+            logger.atInfo().msg("Metatype is unavailable").log();
             return Collections.emptyList();
         }
         List<XConfigurationDTO> configsWithMetatype    = null;
@@ -67,6 +75,7 @@ public final class XMetaTypeAdmin {
             configsWithMetatype    = findConfigsWithMetatype();
             metatypeWithoutConfigs = findMetatypeWithoutConfigs();
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving configurations").throwable(e).log();
             return Collections.emptyList();
         }
         return joinLists(configsWithMetatype, metatypeWithoutConfigs);

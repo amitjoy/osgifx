@@ -32,6 +32,8 @@ import org.osgi.service.http.runtime.dto.RuntimeDTO;
 import org.osgi.service.http.runtime.dto.ServletContextDTO;
 import org.osgi.service.http.runtime.dto.ServletDTO;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 
 import jakarta.inject.Inject;
@@ -39,6 +41,7 @@ import jakarta.inject.Inject;
 public final class XHttpAdmin {
 
     private final HttpServiceRuntime httpServiceRuntime;
+    private final FluentLogger       logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XHttpAdmin(final Object httpServiceRuntime) {
@@ -47,12 +50,14 @@ public final class XHttpAdmin {
 
     public List<XHttpComponentDTO> runtime() {
         if (httpServiceRuntime == null) {
+            logger.atInfo().msg("HTTP service runtime is unavailable").log();
             return Collections.emptyList();
         }
         try {
             final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
             return initHttpComponents(runtime);
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving HTTP components").throwable(e).log();
             return Collections.emptyList();
         }
     }

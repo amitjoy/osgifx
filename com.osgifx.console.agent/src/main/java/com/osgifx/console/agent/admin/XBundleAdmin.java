@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Bundle.ACTIVE;
@@ -58,6 +57,8 @@ import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
@@ -73,6 +74,8 @@ public final class XBundleAdmin {
     private final BundleContext             context;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
+    private static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
+
     @Inject
     public XBundleAdmin(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
         this.context                   = context;
@@ -80,11 +83,14 @@ public final class XBundleAdmin {
     }
 
     public List<XBundleDTO> get() {
-        requireNonNull(context);
+        if (context == null) {
+            logger.atWarn().msg("Bundle context is null").log();
+            return Collections.emptyList();
+        }
         try {
             return Stream.of(context.getBundles()).map(b -> toDTO(b, bundleStartTimeCalculator)).collect(toList());
         } catch (final Exception e) {
-            e.printStackTrace();
+            logger.atError().msg("Error occurred while retrieving bundles").throwable(e).log();
             return Collections.emptyList();
         }
     }
@@ -140,6 +146,8 @@ public final class XBundleAdmin {
         try {
             return bundle.adapt(BundleStartLevel.class).getStartLevel();
         } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve start level")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return -1;
         }
     }
@@ -149,6 +157,8 @@ public final class XBundleAdmin {
             final BundleContext current = FrameworkUtil.getBundle(XBundleAdmin.class).getBundleContext();
             return current.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkStartLevelDTO.class).startLevel;
         } catch (final Exception e) {
+            logger.atError().msg("The system bundle cannot be adapted to retrieve framework start level").throwable(e)
+                    .log();
             return -1;
         }
     }
@@ -161,7 +171,8 @@ public final class XBundleAdmin {
                 // throws unchecked exception (for example, if the bundle is uninstalled)
                 return startLevel.isActivationPolicyUsed();
             } catch (final Exception e) {
-                // nothing to do
+                logger.atError().msg("Invalid state '{}' for bundle '{}'").arg(bundle.getState())
+                        .arg(bundle.getSymbolicName()).throwable(e).log();
             }
         }
         return false;
@@ -175,55 +186,74 @@ public final class XBundleAdmin {
                 // throws unchecked exception (for example, if the bundle is uninstalled)
                 return startLevel.isPersistentlyStarted();
             } catch (final Exception e) {
-                // nothing to do
+                logger.atError().msg("Invalid state '{}' for bundle '{}'").arg(bundle.getState())
+                        .arg(bundle.getSymbolicName()).throwable(e).log();
             }
         }
         return false;
     }
 
     private static int getBundleRevisions(final Bundle bundle) {
-        final BundleRevisions revisions = bundle.adapt(BundleRevisions.class);
-        return revisions.getRevisions().size();
+        try {
+            final BundleRevisions revisions = bundle.adapt(BundleRevisions.class);
+            return revisions.getRevisions().size();
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the revisions")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
+            return -1;
+        }
     }
 
     private static List<XBundleInfoDTO> getHostBundles(final Bundle bundle) {
-        final List<XBundleInfoDTO> attachedHosts = new ArrayList<>();
-        final BundleWiring         wiring        = bundle.adapt(BundleWiring.class);
+        try {
+            final List<XBundleInfoDTO> attachedHosts = new ArrayList<>();
+            final BundleWiring         wiring        = bundle.adapt(BundleWiring.class);
 
-        // wiring can be null for non-started installed bundles
-        if (wiring == null) {
+            // wiring can be null for non-started installed bundles
+            if (wiring == null) {
+                return Collections.emptyList();
+            }
+            for (final BundleWire wire : wiring.getRequiredWires(HOST_NAMESPACE)) {
+                final Bundle         b   = wire.getProviderWiring().getBundle();
+                final XBundleInfoDTO dto = new XBundleInfoDTO();
+
+                dto.id           = b.getBundleId();
+                dto.symbolicName = b.getSymbolicName();
+
+                attachedHosts.add(dto);
+            }
+            return attachedHosts;
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the host bundles")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-        for (final BundleWire wire : wiring.getRequiredWires(HOST_NAMESPACE)) {
-            final Bundle         b   = wire.getProviderWiring().getBundle();
-            final XBundleInfoDTO dto = new XBundleInfoDTO();
-
-            dto.id           = b.getBundleId();
-            dto.symbolicName = b.getSymbolicName();
-
-            attachedHosts.add(dto);
-        }
-        return attachedHosts;
     }
 
     private static List<XBundleInfoDTO> getAttachedFragements(final Bundle bundle) {
-        final List<XBundleInfoDTO> attachedFragments = new ArrayList<>();
-        final BundleWiring         wiring            = bundle.adapt(BundleWiring.class);
+        try {
+            final List<XBundleInfoDTO> attachedFragments = new ArrayList<>();
+            final BundleWiring         wiring            = bundle.adapt(BundleWiring.class);
 
-        // wiring can be null for non-started installed bundles
-        if (wiring == null) {
+            // wiring can be null for non-started installed bundles
+            if (wiring == null) {
+                return Collections.emptyList();
+            }
+            for (final BundleWire wire : wiring.getProvidedWires(HOST_NAMESPACE)) {
+                final Bundle         b   = wire.getRequirerWiring().getBundle();
+                final XBundleInfoDTO dto = new XBundleInfoDTO();
+
+                dto.id           = b.getBundleId();
+                dto.symbolicName = b.getSymbolicName();
+
+                attachedFragments.add(dto);
+            }
+            return attachedFragments;
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the attached fragments")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-        for (final BundleWire wire : wiring.getProvidedWires(HOST_NAMESPACE)) {
-            final Bundle         b   = wire.getRequirerWiring().getBundle();
-            final XBundleInfoDTO dto = new XBundleInfoDTO();
-
-            dto.id           = b.getBundleId();
-            dto.symbolicName = b.getSymbolicName();
-
-            attachedFragments.add(dto);
-        }
-        return attachedFragments;
     }
 
     private static List<XServiceInfoDTO> getUsedServices(final Bundle bundle) {
@@ -234,6 +264,8 @@ public final class XBundleAdmin {
             // throws unchecked exception (for example, if the bundle is uninstalled)
             usedServices = bundle.getServicesInUse();
         } catch (final Exception e) {
+            logger.atWarn().msg("Invalid state '{}' for bundle '{}'").arg(bundle.getState())
+                    .arg(bundle.getSymbolicName()).log();
             usedServices = new ServiceReference<?>[0];
         }
         if (usedServices == null) {
@@ -256,6 +288,8 @@ public final class XBundleAdmin {
             // throws unchecked exception (for example, if the bundle is uninstalled)
             registeredServices = bundle.getRegisteredServices();
         } catch (final Exception e) {
+            logger.atWarn().msg("Invalid state '{}' for bundle '{}'").arg(bundle.getState())
+                    .arg(bundle.getSymbolicName()).log();
             registeredServices = new ServiceReference<?>[0];
         }
         if (registeredServices == null) {
@@ -285,47 +319,59 @@ public final class XBundleAdmin {
     }
 
     private static List<XBundleInfoDTO> getWiredBundlesAsProvider(final Bundle bundle) {
-        final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-        if (bundleWiring == null) {
+        try {
+            final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+            if (bundleWiring == null) {
+                return Collections.emptyList();
+            }
+            final List<XBundleInfoDTO> bundles       = new ArrayList<>();
+            final List<BundleWire>     providedWires = bundleWiring.getProvidedWires(null);
+
+            for (final BundleWire wire : providedWires) {
+                final BundleRevision requirer = wire.getRequirer();
+                final XBundleInfoDTO dto      = new XBundleInfoDTO();
+
+                dto.id           = requirer.getBundle().getBundleId();
+                dto.symbolicName = requirer.getSymbolicName();
+
+                if (!containsWire(bundles, dto.symbolicName, dto.id)) {
+                    bundles.add(dto);
+                }
+            }
+            return bundles;
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the wired bundles as provider")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-        final List<XBundleInfoDTO> bundles       = new ArrayList<>();
-        final List<BundleWire>     providedWires = bundleWiring.getProvidedWires(null);
-
-        for (final BundleWire wire : providedWires) {
-            final BundleRevision requirer = wire.getRequirer();
-            final XBundleInfoDTO dto      = new XBundleInfoDTO();
-
-            dto.id           = requirer.getBundle().getBundleId();
-            dto.symbolicName = requirer.getSymbolicName();
-
-            if (!containsWire(bundles, dto.symbolicName, dto.id)) {
-                bundles.add(dto);
-            }
-        }
-        return bundles;
     }
 
     private static List<XBundleInfoDTO> getWiredBundlesAsRequirer(final Bundle bundle) {
-        final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-        if (bundleWiring == null) {
+        try {
+            final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+            if (bundleWiring == null) {
+                return Collections.emptyList();
+            }
+            final List<XBundleInfoDTO> bundles       = new ArrayList<>();
+            final List<BundleWire>     requierdWires = bundleWiring.getRequiredWires(null);
+
+            for (final BundleWire wire : requierdWires) {
+                final BundleRevision provider = wire.getProvider();
+                final XBundleInfoDTO dto      = new XBundleInfoDTO();
+
+                dto.id           = provider.getBundle().getBundleId();
+                dto.symbolicName = provider.getSymbolicName();
+
+                if (!containsWire(bundles, dto.symbolicName, dto.id)) {
+                    bundles.add(dto);
+                }
+            }
+            return bundles;
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the wired bundles as requirer")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-        final List<XBundleInfoDTO> bundles       = new ArrayList<>();
-        final List<BundleWire>     requierdWires = bundleWiring.getRequiredWires(null);
-
-        for (final BundleWire wire : requierdWires) {
-            final BundleRevision provider = wire.getProvider();
-            final XBundleInfoDTO dto      = new XBundleInfoDTO();
-
-            dto.id           = provider.getBundle().getBundleId();
-            dto.symbolicName = provider.getSymbolicName();
-
-            if (!containsWire(bundles, dto.symbolicName, dto.id)) {
-                bundles.add(dto);
-            }
-        }
-        return bundles;
     }
 
     private static boolean containsWire(final List<XBundleInfoDTO> bundles, final String bsn, final long id) {
@@ -333,55 +379,67 @@ public final class XBundleAdmin {
     }
 
     private static List<XPackageDTO> getImportedPackages(final Bundle bundle) {
-        final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-        if (bundleWiring == null) {
+        try {
+            final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+            if (bundleWiring == null) {
+                return Collections.emptyList();
+            }
+            final List<BundleWire>  bundleWires      = bundleWiring.getRequiredWires(PACKAGE_NAMESPACE);
+            final List<XPackageDTO> importedPackages = new ArrayList<>();
+
+            for (final BundleWire bundleWire : bundleWires) {
+                final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
+                final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
+                final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
+
+                if (!hasPackage(importedPackages, pkg, version)) {
+                    final XPackageDTO dto = new XPackageDTO();
+
+                    dto.name    = pkg;
+                    dto.version = version;
+                    dto.type    = XpackageType.IMPORT;
+
+                    importedPackages.add(dto);
+                }
+            }
+            return importedPackages;
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the imported packages")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-        final List<BundleWire>  bundleWires      = bundleWiring.getRequiredWires(PACKAGE_NAMESPACE);
-        final List<XPackageDTO> importedPackages = new ArrayList<>();
-
-        for (final BundleWire bundleWire : bundleWires) {
-            final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
-            final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
-            final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
-
-            if (!hasPackage(importedPackages, pkg, version)) {
-                final XPackageDTO dto = new XPackageDTO();
-
-                dto.name    = pkg;
-                dto.version = version;
-                dto.type    = XpackageType.IMPORT;
-
-                importedPackages.add(dto);
-            }
-        }
-        return importedPackages;
     }
 
     private static List<XPackageDTO> getExportedPackages(final Bundle bundle) {
-        final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-        if (bundleWiring == null) {
+        try {
+            final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+            if (bundleWiring == null) {
+                return Collections.emptyList();
+            }
+            final List<BundleWire>  bundleWires      = bundleWiring.getProvidedWires(PACKAGE_NAMESPACE);
+            final List<XPackageDTO> exportedPackages = new ArrayList<>();
+
+            for (final BundleWire bundleWire : bundleWires) {
+                final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
+                final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
+                final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
+
+                if (!hasPackage(exportedPackages, pkg, version)) {
+                    final XPackageDTO dto = new XPackageDTO();
+
+                    dto.name    = pkg;
+                    dto.version = version;
+                    dto.type    = XpackageType.EXPORT;
+
+                    exportedPackages.add(dto);
+                }
+            }
+            return exportedPackages;
+        } catch (final Exception e) {
+            logger.atError().msg("The bundle '{}' cannot be adapted to retrieve the exported packages")
+                    .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-        final List<BundleWire>  bundleWires      = bundleWiring.getProvidedWires(PACKAGE_NAMESPACE);
-        final List<XPackageDTO> exportedPackages = new ArrayList<>();
-
-        for (final BundleWire bundleWire : bundleWires) {
-            final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
-            final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
-            final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
-
-            if (!hasPackage(exportedPackages, pkg, version)) {
-                final XPackageDTO dto = new XPackageDTO();
-
-                dto.name    = pkg;
-                dto.version = version;
-                dto.type    = XpackageType.EXPORT;
-
-                exportedPackages.add(dto);
-            }
-        }
-        return exportedPackages;
     }
 
     private static boolean hasPackage(final List<XPackageDTO> packages, final String name, final String version) {
