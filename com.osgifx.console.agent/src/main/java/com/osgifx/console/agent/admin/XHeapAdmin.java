@@ -30,6 +30,8 @@ import java.util.List;
 
 import javax.management.MBeanServer;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
@@ -37,9 +39,9 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 
 public final class XHeapAdmin {
 
-    private static final String HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
-
+    private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
     private static volatile Object hotspotMBean;
+    private final FluentLogger     logger            = LoggerFactory.getFluentLogger(getClass());
 
     public XHeapUsageDTO init() {
         final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
@@ -54,7 +56,7 @@ public final class XHeapAdmin {
             heapUsage.gcBeans         = initGcMBeans(gcMBeans);
             heapUsage.memoryPoolBeans = initMemoryPoolMBeans(memoryPoolMBeans);
         } catch (final Exception e) {
-            // nothing to do
+            logger.atError().msg("Error occurred while retrieving heap usage").throwable(e).log();
         }
         return heapUsage;
     }
