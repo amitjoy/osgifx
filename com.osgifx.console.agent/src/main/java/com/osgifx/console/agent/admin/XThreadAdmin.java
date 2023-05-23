@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
 
@@ -33,6 +35,7 @@ import jakarta.inject.Inject;
 public final class XThreadAdmin {
 
     private final PackageWirings wirings;
+    private final FluentLogger   logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XThreadAdmin(final PackageWirings wirings) {
@@ -45,6 +48,7 @@ public final class XThreadAdmin {
             final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
             return threadList.stream().map(this::toDTO).collect(toList());
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving threads").throwable(e).log();
             return Collections.emptyList();
         }
     }
