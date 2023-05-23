@@ -32,11 +32,15 @@ import javax.net.ssl.SSLServerSocketFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
+
 public final class SocketContext {
 
     private String              host;
     private int                 port;
     private final BundleContext bundleContext;
+    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
 
     public SocketContext(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -54,9 +58,11 @@ public final class SocketContext {
     public ServerSocket getSocket() throws Exception {
         final String secureCommunicationEnabled = bundleContext.getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY);
         if (Boolean.parseBoolean(secureCommunicationEnabled)) {
+            logger.atInfo().msg("Secure communication enabled").log();
             final String sslContextFilter = bundleContext
                     .getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY);
             if (sslContextFilter == null) {
+                logger.atWarn().msg("SSL context LDAP filter is not set for secure communication").log();
                 final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
                 return "*".equals(host) ? ssf.createServerSocket(port)
                         : ssf.createServerSocket(port, 3, InetAddress.getByName(host));

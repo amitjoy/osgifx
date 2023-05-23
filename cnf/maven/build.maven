@@ -72,3 +72,7 @@ org.jgrapht:jgrapht-io:1.5.2
 # Required for Tic-Tac-Toe Sample Extension
 
 eu.lestard:advanced-bindings:0.4.0
+
+# Logging Facade
+
+com.j256.simplelogging:simplelogging:2.2

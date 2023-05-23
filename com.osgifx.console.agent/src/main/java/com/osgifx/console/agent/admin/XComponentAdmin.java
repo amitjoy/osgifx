@@ -50,6 +50,8 @@ import org.osgi.service.component.runtime.dto.SatisfiedReferenceDTO;
 import org.osgi.service.component.runtime.dto.UnsatisfiedReferenceDTO;
 import org.osgi.util.promise.Promise;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XReferenceDTO;
@@ -63,6 +65,7 @@ import jakarta.inject.Inject;
 public final class XComponentAdmin {
 
     private final ServiceComponentRuntime scr;
+    private final FluentLogger            logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XComponentAdmin(final Object scr) {
@@ -71,6 +74,7 @@ public final class XComponentAdmin {
 
     public List<XComponentDTO> getComponents() {
         if (scr == null) {
+            logger.atInfo().msg("SCR is unavailable to retrieve the components").log();
             return Collections.emptyList();
         }
         final List<XComponentDTO> dtos = new ArrayList<>();
@@ -86,7 +90,7 @@ public final class XComponentAdmin {
                 dtos.addAll(compConfDTOs.stream().map(dto -> toDTO(dto, compDescDTO)).collect(toList()));
             }
         } catch (final Exception e) {
-            // for any exception occurs in Felix
+            logger.atError().msg("Error occurred while retrieving components").throwable(e).log();
             return Collections.emptyList();
         }
         return dtos;
