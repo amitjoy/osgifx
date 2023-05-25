@@ -153,7 +153,7 @@ public final class SocketRedirector implements Redirector {
         try {
             out.join(500);
         } catch (final InterruptedException e) {
-            // ignore, best effort
+            Thread.currentThread().interrupt();
         }
     }
 
