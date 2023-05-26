@@ -80,7 +80,6 @@ public final class RedirectOutput extends PrintStream {
         if ((off | len | b.length - (len + off) | off + len) < 0) {
             throw new IndexOutOfBoundsException();
         }
-
         out.write(b, off, len);
         if (onStack.get() == null) {
             onStack.set(true);
@@ -136,6 +135,7 @@ public final class RedirectOutput extends PrintStream {
                     agent.getSupervisor().stdout(output);
                 }
             } catch (final InterruptedException ie) {
+                Thread.currentThread().interrupt();
                 return;
             } catch (final Exception ie) {
                 try {
