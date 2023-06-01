@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.CM;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.METATYPE;
 import static java.util.stream.Collectors.toList;
 import static org.osgi.service.metatype.ObjectClassDefinition.ALL;
 
@@ -62,11 +65,11 @@ public final class XMetaTypeAdmin {
 
     public List<XConfigurationDTO> getConfigurations() {
         if (configAdmin == null) {
-            logger.atInfo().msg("ConfigAdmin is unavailable").log();
+            logger.atInfo().msg(serviceUnavailable(CM)).log();
             return Collections.emptyList();
         }
         if (metatype == null) {
-            logger.atInfo().msg("Metatype is unavailable").log();
+            logger.atInfo().msg(serviceUnavailable(METATYPE)).log();
             return Collections.emptyList();
         }
         List<XConfigurationDTO> configsWithMetatype    = null;
