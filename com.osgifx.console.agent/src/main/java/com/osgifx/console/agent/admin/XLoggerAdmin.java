@@ -65,7 +65,7 @@ public final class XLoggerAdmin {
 
     public List<XBundleLoggerContextDTO> getLoggerContexts() {
         if (loggerAdmin == null) {
-            logger.atInfo().msg("Logger admin is unavailable").log();
+            logger.atInfo().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return Collections.emptyList();
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();
@@ -86,23 +86,29 @@ public final class XLoggerAdmin {
 
     public XResultDTO updateLoggerContext(final String bsn, final Map<String, String> logLevels) {
         if (loggerAdmin == null) {
+            logger.atInfo().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(LOGGER_ADMIN));
         }
         try {
             if (isConfigAdminWired) {
+                logger.atDebug().msg("Updating logger context persistently for '%s'").arg(bsn).log();
                 return updateLoggerContextPersistently(bsn, logLevels);
             }
+            logger.atDebug().msg("Updating logger context non-persistently for '%s'").arg(bsn).log();
             return updateLoggerContextNonPersistently(bsn, logLevels);
         } catch (final Exception e) {
-            return createResult(ERROR, "The logger context '" + bsn + "' could not be updated");
+            logger.atError().msg("The logger context of '%s' could not be updated").arg(bsn).log();
+            return createResult(ERROR, "The logger context of '" + bsn + "' could not be updated");
         }
     }
 
     private XResultDTO updateLoggerContextNonPersistently(final String bsn, final Map<String, String> logLevels) {
         final Map<String, LogLevel> levels = toLogLevels(logLevels);
         loggerAdmin.getLoggerContext(bsn).setLogLevels(levels);
+        logger.atDebug().msg("The logger context of '%s' has been updated (non-persistently) successfully").arg(bsn)
+                .log();
         return createResult(SUCCESS,
-                "The logger context '" + bsn + "' has been updated (non-persistently) successfully");
+                "The logger context of '" + bsn + "' has been updated (non-persistently) successfully");
     }
 
     private XResultDTO updateLoggerContextPersistently(final String bsn,
@@ -118,6 +124,7 @@ public final class XLoggerAdmin {
         final Configuration                        configuration    = service.getConfiguration(pid, "?");
 
         configuration.update(new Hashtable<>(configProperties));
+        logger.atDebug().msg("The logger context of '%s' has been updated (persistently) successfully").arg(bsn).log();
         return createResult(SUCCESS, "The logger context '" + bsn + "' has been updated (persistently) successfully");
     }
 
