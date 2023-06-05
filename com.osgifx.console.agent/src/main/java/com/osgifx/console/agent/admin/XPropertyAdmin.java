@@ -29,6 +29,8 @@ import java.util.Properties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.dto.FrameworkDTO;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO.XPropertyType;
 
@@ -37,6 +39,7 @@ import jakarta.inject.Inject;
 public final class XPropertyAdmin {
 
     private final BundleContext context;
+    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XPropertyAdmin(final BundleContext context) {
@@ -48,6 +51,7 @@ public final class XPropertyAdmin {
             final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
             return prepareProperties(dto.properties);
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while retrieving properties").throwable(e).log();
             return Collections.emptyList();
         }
     }

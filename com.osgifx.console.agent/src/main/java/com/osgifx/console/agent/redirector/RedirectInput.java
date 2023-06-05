@@ -57,8 +57,6 @@ public class RedirectInput extends InputStream {
 
     /**
      * Provide the string that should be treated as input for the running code.
-     *
-     * @param s the string
      */
     public synchronized void add(final String s) throws IOException {
         final byte[] bytes = s.getBytes();
@@ -73,8 +71,7 @@ public class RedirectInput extends InputStream {
     private void write(final byte b) {
         synchronized (ring) {
             ring[in] = b;
-
-            in = (in + 1) % ring.length;
+            in       = (in + 1) % ring.length;
             if (in == out) {
                 // skip oldest output
                 out = (out + 1) % ring.length;
@@ -123,7 +120,6 @@ public class RedirectInput extends InputStream {
             }
             buffer[i] = (byte) (0xFF & c);
             n++;
-
             if (c == '\n') {
                 break;
             }

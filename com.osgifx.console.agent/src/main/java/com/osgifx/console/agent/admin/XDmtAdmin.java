@@ -56,7 +56,7 @@ public final class XDmtAdmin {
 
     public XDmtNodeDTO readDmtNode(final String rootURI) {
         if (dmtAdmin == null) {
-            logger.atInfo().msg("DmtAdmin is unavailable to retrieve the tree").log();
+            logger.atWarn().msg(serviceUnavailable(DMT)).log();
             return null;
         }
         processNode(rootURI, parent);
@@ -65,21 +65,24 @@ public final class XDmtAdmin {
 
     public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
         if (dmtAdmin == null) {
-            logger.atInfo().msg("DmtAdmin is unavailable to update the node").log();
+            logger.atWarn().msg(serviceUnavailable(DMT)).log();
             return createResult(SKIPPED, serviceUnavailable(DMT));
         }
         DmtSession session = null;
         try {
             session = dmtAdmin.getSession(uri, LOCK_TYPE_EXCLUSIVE);
             if (!session.isNodeUri(uri) || !session.isLeafNode(uri)) {
+                logger.atInfo().msg("The specified URI '%s' is not associated with a leaf node").arg(uri).log();
                 return createResult(SKIPPED, "The specified URI is not associated with a leaf node");
             }
             final MetaNode metaNode = session.getMetaNode(uri);
             if (metaNode == null) {
+                logger.atInfo().msg("Unable to retrieve meta info of the node - '%s'").arg(uri).log();
                 return createResult(SKIPPED, "Unable to retrieve meta info of the node");
             }
             return updateNode(session, uri, value, format);
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while updating DMT node").throwable(e).log();
             return createResult(ERROR, "The DMT node cannot be updated");
         } finally {
             if (session != null) {
@@ -142,7 +145,7 @@ public final class XDmtAdmin {
                 processNode(childPath, startNode);
             }
         } catch (final Exception e) {
-            // nothing to do
+            logger.atError().msg("Error occurred").throwable(e).log();
         }
     }
 
@@ -184,7 +187,7 @@ public final class XDmtAdmin {
             }
             createdAt = session.getNodeTimestamp(uri);
         } catch (final Exception e) {
-            // nothing to do
+            logger.atError().msg("Error occurred").throwable(e).log();
         }
         data.add(value);
         data.add(format);

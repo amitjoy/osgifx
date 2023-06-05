@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
+import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
+import static com.osgifx.console.agent.helper.OSGiCompendiumService.HTTP_RUNTIME;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ public final class XHttpAdmin {
 
     public List<XHttpComponentDTO> runtime() {
         if (httpServiceRuntime == null) {
-            logger.atInfo().msg("HTTP service runtime is unavailable").log();
+            logger.atWarn().msg(serviceUnavailable(HTTP_RUNTIME)).log();
             return Collections.emptyList();
         }
         try {
