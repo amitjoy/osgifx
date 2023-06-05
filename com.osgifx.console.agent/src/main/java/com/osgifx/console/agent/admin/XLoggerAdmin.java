@@ -65,7 +65,7 @@ public final class XLoggerAdmin {
 
     public List<XBundleLoggerContextDTO> getLoggerContexts() {
         if (loggerAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(LOGGER_ADMIN)).log();
+            logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return Collections.emptyList();
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();
@@ -86,7 +86,7 @@ public final class XLoggerAdmin {
 
     public XResultDTO updateLoggerContext(final String bsn, final Map<String, String> logLevels) {
         if (loggerAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(LOGGER_ADMIN)).log();
+            logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(LOGGER_ADMIN));
         }
         try {

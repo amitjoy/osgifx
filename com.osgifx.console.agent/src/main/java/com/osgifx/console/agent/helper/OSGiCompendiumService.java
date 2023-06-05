@@ -23,7 +23,8 @@ public enum OSGiCompendiumService {
     DMT("DMT Admin"),
     USER_ADMIN("User Admin"),
     LOGGER_ADMIN("R7 Logger Admin"),
-    EVENT_ADMIN("Event Admin");
+    EVENT_ADMIN("Event Admin"),
+    HTTP_RUNTIME("Event Admin");
 
     String comprehensibleName;
 

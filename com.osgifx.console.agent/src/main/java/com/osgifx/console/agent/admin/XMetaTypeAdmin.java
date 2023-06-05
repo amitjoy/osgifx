@@ -65,11 +65,11 @@ public final class XMetaTypeAdmin {
 
     public List<XConfigurationDTO> getConfigurations() {
         if (configAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(CM)).log();
+            logger.atWarn().msg(serviceUnavailable(CM)).log();
             return Collections.emptyList();
         }
         if (metatype == null) {
-            logger.atInfo().msg(serviceUnavailable(METATYPE)).log();
+            logger.atWarn().msg(serviceUnavailable(METATYPE)).log();
             return Collections.emptyList();
         }
         List<XConfigurationDTO> configsWithMetatype    = null;

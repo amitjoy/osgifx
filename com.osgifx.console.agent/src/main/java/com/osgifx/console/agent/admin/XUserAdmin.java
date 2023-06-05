@@ -58,7 +58,7 @@ public final class XUserAdmin {
 
     public List<XRoleDTO> getRoles() {
         if (userAdmin == null) {
-            logger.atInfo().msg("UserAdmin is unavailable").log();
+            logger.atWarn().msg("UserAdmin is unavailable").log();
             return Collections.emptyList();
         }
         final List<XRoleDTO> dtos = new ArrayList<>();
@@ -76,7 +76,7 @@ public final class XUserAdmin {
 
     public XResultDTO createRole(final String name, final Type type) {
         if (userAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(USER_ADMIN)).log();
+            logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final Role role = userAdmin.createRole(name, getType(type));
@@ -89,7 +89,7 @@ public final class XUserAdmin {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public XResultDTO updateRole(final XRoleDTO roleDTO) {
         if (userAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(USER_ADMIN)).log();
+            logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         try {
@@ -191,7 +191,7 @@ public final class XUserAdmin {
 
     public XResultDTO removeRole(final String name) {
         if (userAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(USER_ADMIN)).log();
+            logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final boolean isRemoved = userAdmin.removeRole(name);
