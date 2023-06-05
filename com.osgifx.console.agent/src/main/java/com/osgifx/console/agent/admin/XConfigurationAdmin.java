@@ -74,7 +74,7 @@ public final class XConfigurationAdmin {
 
     public List<XConfigurationDTO> getConfigurations() {
         if (configAdmin == null) {
-            logger.atInfo().msg("ConfigAdmin is unavailable to retrieve the configurations").log();
+            logger.atInfo().msg(serviceUnavailable(CM)).log();
             return Collections.emptyList();
         }
         List<XConfigurationDTO> configsWithoutMetatype = null;
@@ -89,7 +89,7 @@ public final class XConfigurationAdmin {
 
     public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
         if (configAdmin == null) {
-            logger.atInfo().msg("ConfigAdmin is unavailable to create or update the configuration").log();
+            logger.atInfo().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
@@ -112,7 +112,7 @@ public final class XConfigurationAdmin {
 
     public XResultDTO deleteConfiguration(final String pid) {
         if (configAdmin == null) {
-            logger.atInfo().msg("ConfigAdmin is unavailable to delete the configuration").log();
+            logger.atInfo().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
@@ -139,7 +139,7 @@ public final class XConfigurationAdmin {
 
     public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
         if (configAdmin == null) {
-            logger.atInfo().msg("ConfigAdmin is unavailable to create the factory configuration").log();
+            logger.atInfo().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
