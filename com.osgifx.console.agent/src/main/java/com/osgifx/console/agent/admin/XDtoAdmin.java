@@ -79,7 +79,7 @@ public final class XDtoAdmin {
 
     private CDIComponentRuntimeDTO prepareCDIDTO() {
         if (!wirings.isCDIWired() || cdiRuntime == null) {
-            logger.atInfo().msg("CDI bundle is unavailable to retrieve the CDI DTO").log();
+            logger.atWarn().msg("CDI bundle is unavailable to retrieve the CDI DTO").log();
             return null;
         }
         final CDIComponentRuntime    cdi = (CDIComponentRuntime) cdiRuntime;
@@ -111,7 +111,7 @@ public final class XDtoAdmin {
 
     private JaxRsServiceRuntimeDTO prepareJaxRsDTO() {
         if (!wirings.isJaxRsWired() || jaxRsRuntime == null) {
-            logger.atInfo().msg("JAX-RS bundle is unavailable to retrieve the JAX-RS DTO").log();
+            logger.atWarn().msg("JAX-RS bundle is unavailable to retrieve the JAX-RS DTO").log();
             return null;
         }
         final JaxrsServiceRuntime    jaxRs = (JaxrsServiceRuntime) jaxRsRuntime;
@@ -124,7 +124,7 @@ public final class XDtoAdmin {
 
     private ServiceComponentRuntimeDTO prepareScrDTO() {
         if (!wirings.isScrWired() || scrRuntime == null) {
-            logger.atInfo().msg("SCR runtime is unavailable to retrieve the SCR DTO").log();
+            logger.atWarn().msg("SCR runtime is unavailable to retrieve the SCR DTO").log();
             return null;
         }
         final ServiceComponentRuntime    scr = (ServiceComponentRuntime) scrRuntime;
