@@ -56,7 +56,7 @@ public final class XDmtAdmin {
 
     public XDmtNodeDTO readDmtNode(final String rootURI) {
         if (dmtAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(DMT)).log();
+            logger.atWarn().msg(serviceUnavailable(DMT)).log();
             return null;
         }
         processNode(rootURI, parent);
@@ -65,7 +65,7 @@ public final class XDmtAdmin {
 
     public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
         if (dmtAdmin == null) {
-            logger.atInfo().msg(serviceUnavailable(DMT)).log();
+            logger.atWarn().msg(serviceUnavailable(DMT)).log();
             return createResult(SKIPPED, serviceUnavailable(DMT));
         }
         DmtSession session = null;
