@@ -69,8 +69,8 @@ public final class XThreadAdmin {
     }
 
     private boolean isDeadlocked(final long id) {
-        final boolean isJMXWired = wirings.isJmxWired();
-        if (isJMXWired) {
+        final boolean isJmxWired = wirings.isJmxWired();
+        if (isJmxWired) {
             final ThreadMXBean bean      = ManagementFactory.getThreadMXBean();
             final long[]       deadlocks = bean.findDeadlockedThreads();
             if (deadlocks == null) {
@@ -78,6 +78,7 @@ public final class XThreadAdmin {
             }
             return Arrays.stream(deadlocks).anyMatch(e -> e == id);
         }
+        logger.atDebug().msg("JMX unavailable to check if thread [id: '%s'] is deadlocked").arg(id).log();
         return false;
     }
 

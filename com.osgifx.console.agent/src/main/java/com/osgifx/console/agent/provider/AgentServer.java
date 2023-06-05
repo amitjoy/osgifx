@@ -24,6 +24,10 @@ import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.HC;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.HTTP;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.JMX;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.LOG;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.R7_LOGGER;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
@@ -87,6 +91,8 @@ import org.osgi.resource.dto.CapabilityDTO;
 import org.osgi.resource.dto.RequirementDTO;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
@@ -167,7 +173,8 @@ public final class AgentServer implements Agent, Closeable {
     private Closeable              osgiLogListenerCloser;
     private ServiceRegistration<?> osgiEventListenerServiceReg;
 
-    private final DI di;
+    private final DI           di;
+    private final FluentLogger logger = LoggerFactory.getFluentLogger(getClass());
 
     public AgentServer(final DI di, final RpcType rpcType) {
         this.di      = di;
@@ -666,6 +673,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isDmtAdminAvailable) {
             return di.getInstance(XDmtAdmin.class).readDmtNode(rootURI);
         }
+        logger.atWarn().msg(packageNotWired(DMT)).log();
         return null;
     }
 
@@ -679,6 +687,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isDmtAdminAvailable) {
             return di.getInstance(XDmtAdmin.class).updateDmtNode(uri, value, format);
         }
+        logger.atWarn().msg(packageNotWired(DMT)).log();
         return createResult(SKIPPED, packageNotWired(DMT));
     }
 
@@ -688,6 +697,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isR7LogAvailable) {
             return di.getInstance(XLoggerAdmin.class).updateLoggerContext(bsn, logLevels);
         }
+        logger.atWarn().msg(packageNotWired(R7_LOGGER)).log();
         return createResult(SKIPPED, packageNotWired(R7_LOGGER));
     }
 
@@ -697,6 +707,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isScrAvailable) {
             return di.getInstance(XComponentAdmin.class).enableComponent(id);
         }
+        logger.atWarn().msg(packageNotWired(SCR)).log();
         return createResult(SKIPPED, packageNotWired(SCR));
     }
 
@@ -708,6 +719,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isScrAvailable) {
             return di.getInstance(XComponentAdmin.class).enableComponent(name);
         }
+        logger.atWarn().msg(packageNotWired(SCR)).log();
         return createResult(SKIPPED, packageNotWired(SCR));
     }
 
@@ -717,6 +729,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isScrAvailable) {
             return di.getInstance(XComponentAdmin.class).disableComponent(id);
         }
+        logger.atWarn().msg(packageNotWired(SCR)).log();
         return createResult(SKIPPED, packageNotWired(SCR));
     }
 
@@ -728,6 +741,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isScrAvailable) {
             return di.getInstance(XComponentAdmin.class).disableComponent(name);
         }
+        logger.atWarn().msg(packageNotWired(SCR)).log();
         return createResult(SKIPPED, packageNotWired(SCR));
     }
 
@@ -739,6 +753,7 @@ public final class AgentServer implements Agent, Closeable {
             final Map<String, Object> finalProperties = parseProperties(newProperties);
             return createOrUpdateConfig(pid, finalProperties);
         } catch (final Exception e) {
+            logger.atError().msg("Configurations cannot be converted").throwable(e).log();
             return createResult(ERROR,
                     "One or more configuration properties cannot be converted to the requested type");
         }
@@ -759,6 +774,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isConfigAdminAvailable) {
             return di.getInstance(XConfigurationAdmin.class).deleteConfiguration(pid);
         }
+        logger.atWarn().msg(packageNotWired(CM)).log();
         return createResult(SKIPPED, packageNotWired(CM));
     }
 
@@ -778,6 +794,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "One or configuration properties cannot be converted to the requested type");
             }
         }
+        logger.atWarn().msg(packageNotWired(CM)).log();
         return createResult(SKIPPED, packageNotWired(CM));
     }
 
@@ -796,6 +813,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "Event could not be sent successfully");
             }
         }
+        logger.atWarn().msg(packageNotWired(EVENT_ADMIN)).log();
         return createResult(SKIPPED, packageNotWired(EVENT_ADMIN));
     }
 
@@ -814,6 +832,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "Event could not be sent successfully");
             }
         }
+        logger.atWarn().msg(packageNotWired(EVENT_ADMIN)).log();
         return createResult(SKIPPED, packageNotWired(EVENT_ADMIN));
     }
 
@@ -849,6 +868,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "The role cannot be created");
             }
         }
+        logger.atWarn().msg(packageNotWired(USER_ADMIN)).log();
         return createResult(SKIPPED, packageNotWired(USER_ADMIN));
     }
 
@@ -864,6 +884,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "The role cannot be updated");
             }
         }
+        logger.atWarn().msg(packageNotWired(USER_ADMIN)).log();
         return createResult(SKIPPED, packageNotWired(USER_ADMIN));
     }
 
@@ -879,6 +900,7 @@ public final class AgentServer implements Agent, Closeable {
                 return createResult(ERROR, "The role cannot be removed");
             }
         }
+        logger.atWarn().msg(packageNotWired(USER_ADMIN)).log();
         return createResult(SKIPPED, packageNotWired(USER_ADMIN));
     }
 
@@ -888,6 +910,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isUserAdminAvailable) {
             return di.getInstance(XUserAdmin.class).getRoles();
         }
+        logger.atWarn().msg(packageNotWired(USER_ADMIN)).log();
         return Collections.emptyList();
     }
 
@@ -897,6 +920,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isR7LogAvailable) {
             return di.getInstance(XLoggerAdmin.class).getLoggerContexts();
         }
+        logger.atWarn().msg(packageNotWired(R7_LOGGER)).log();
         return Collections.emptyList();
     }
 
@@ -906,6 +930,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isFelixHcAvailable) {
             return di.getInstance(XHcAdmin.class).getHealthchecks();
         }
+        logger.atWarn().msg(packageNotWired(HC)).log();
         return Collections.emptyList();
     }
 
@@ -915,6 +940,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isFelixHcAvailable) {
             return di.getInstance(XHcAdmin.class).executeHealthChecks(tags, names);
         }
+        logger.atWarn().msg(packageNotWired(HC)).log();
         return Collections.emptyList();
     }
 
@@ -936,6 +962,7 @@ public final class AgentServer implements Agent, Closeable {
             return Converter.cnv(new TypeReference<Map<String, Object>>() {
             }, result);
         } catch (final Exception e) {
+            logger.atError().msg("Error occurred while executing extension - '%s'").arg(name).throwable(e).log();
             throw new RuntimeException(e);
         }
     }
@@ -951,13 +978,18 @@ public final class AgentServer implements Agent, Closeable {
         if (isHttpServiceRuntimeWired) {
             return di.getInstance(XHttpAdmin.class).runtime();
         }
+        logger.atWarn().msg(packageNotWired(HTTP)).log();
         return Collections.emptyList();
     }
 
     @Override
     public XHeapUsageDTO getHeapUsage() {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
-        return isJMXWired ? di.getInstance(XHeapAdmin.class).init() : null;
+        if (isJMXWired) {
+            return di.getInstance(XHeapAdmin.class).init();
+        }
+        logger.atWarn().msg(packageNotWired(JMX)).log();
+        return null;
     }
 
     @Override
@@ -973,12 +1005,20 @@ public final class AgentServer implements Agent, Closeable {
     @Override
     public byte[] heapdump() throws Exception {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
-        return isJMXWired ? di.getInstance(XHeapAdmin.class).heapdump() : null;
+        if (isJMXWired) {
+            return di.getInstance(XHeapAdmin.class).heapdump();
+        }
+        logger.atWarn().msg(packageNotWired(JMX)).log();
+        return null;
     }
 
     private long getSystemUptime() {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
-        return isJMXWired ? ManagementFactory.getRuntimeMXBean().getUptime() : 0L;
+        if (isJMXWired) {
+            return ManagementFactory.getRuntimeMXBean().getUptime();
+        }
+        logger.atWarn().msg(packageNotWired(JMX)).log();
+        return 0L;
     }
 
     private BundleDTO installBundleWithData(String location,
@@ -1028,6 +1068,7 @@ public final class AgentServer implements Agent, Closeable {
                         "One or more configuration properties cannot be converted to the requested type");
             }
         }
+        logger.atWarn().msg(packageNotWired(CM)).log();
         return createResult(SKIPPED, packageNotWired(CM));
     }
 
@@ -1036,6 +1077,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isEventAdminAvailable) {
             return di.getInstance(OSGiEventHandler.class).register();
         }
+        logger.atWarn().msg(packageNotWired(EVENT_ADMIN)).log();
         return null;
     }
 
@@ -1044,6 +1086,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isLogAvailable) {
             return trackLogReader(di.getInstance(OSGiLogListener.class));
         }
+        logger.atWarn().msg(packageNotWired(LOG)).log();
         return null;
     }
 
