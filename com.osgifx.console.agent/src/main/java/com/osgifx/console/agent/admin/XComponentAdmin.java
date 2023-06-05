@@ -74,7 +74,7 @@ public final class XComponentAdmin {
 
     public List<XComponentDTO> getComponents() {
         if (scr == null) {
-            logger.atInfo().msg("SCR is unavailable to retrieve the components").log();
+            logger.atInfo().msg(serviceUnavailable(SCR)).log();
             return Collections.emptyList();
         }
         final List<XComponentDTO> dtos = new ArrayList<>();
@@ -98,6 +98,7 @@ public final class XComponentAdmin {
 
     public XResultDTO enableComponent(final long id) {
         if (scr == null) {
+            logger.atInfo().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
@@ -127,6 +128,7 @@ public final class XComponentAdmin {
 
     public XResultDTO enableComponent(final String name) {
         if (scr == null) {
+            logger.atInfo().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
@@ -151,6 +153,7 @@ public final class XComponentAdmin {
 
     public XResultDTO disableComponent(final long id) {
         if (scr == null) {
+            logger.atInfo().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
@@ -178,6 +181,7 @@ public final class XComponentAdmin {
 
     public XResultDTO disableComponent(final String name) {
         if (scr == null) {
+            logger.atInfo().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
