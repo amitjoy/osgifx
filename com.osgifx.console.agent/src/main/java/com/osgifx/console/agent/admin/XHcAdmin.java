@@ -80,7 +80,7 @@ public final class XHcAdmin {
 
     public List<XHealthCheckResultDTO> executeHealthChecks(List<String> tags, List<String> names) {
         if (felixHcExecutor == null) {
-            logger.atInfo().msg("Felix HC executor is unavailable to execute health check").log();
+            logger.atWarn().msg("Felix HC executor is unavailable to execute health check").log();
             return Collections.emptyList();
         }
         HealthCheckSelector selector;
