@@ -4,12 +4,12 @@ com.google.mug:mug:6.6
 
 # bnd
 
-biz.aQute.bnd:biz.aQute.bndlib:6.4.0
-biz.aQute.bnd:biz.aQute.resolve:6.4.0
-biz.aQute.bnd:biz.aQute.remote.agent:6.4.0
-biz.aQute.bnd:biz.aQute.launchpad:6.4.0
-biz.aQute.bnd:biz.aQute.remote.agent:6.4.0
-biz.aQute.bnd:biz.aQute.bnd.util:6.4.0
+biz.aQute.bnd:biz.aQute.bndlib:6.4.1
+biz.aQute.bnd:biz.aQute.resolve:6.4.1
+biz.aQute.bnd:biz.aQute.remote.agent:6.4.1
+biz.aQute.bnd:biz.aQute.launchpad:6.4.1
+biz.aQute.bnd:biz.aQute.remote.agent:6.4.1
+biz.aQute.bnd:biz.aQute.bnd.util:6.4.1
 
 # Apache
 
