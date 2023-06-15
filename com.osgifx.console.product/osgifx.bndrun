@@ -144,31 +144,31 @@ install.order                     :   \
 	org.apache.felix.scr;version='[2.2.6,2.2.7)';startlevel=10,\
 	org.apache.sling.commons.log;version='[5.4.2,5.4.3)';startlevel=10,\
 	org.apache.sling.commons.logservice;version='[1.1.0,1.1.1)';startlevel=10,\
-	org.eclipse.core.commands;version='[3.10.400,3.10.401)';startlevel=10,\
-	org.eclipse.core.contenttype;version='[3.8.200,3.8.201)';startlevel=10,\
-	org.eclipse.core.databinding.observable;version='[1.12.200,1.12.201)';startlevel=10,\
-	org.eclipse.core.databinding.property;version='[1.9.200,1.9.201)';startlevel=10,\
+	org.eclipse.core.commands;version='[3.11.0,3.11.1)';startlevel=10,\
+	org.eclipse.core.contenttype;version='[3.9.0,3.9.1)';startlevel=10,\
+	org.eclipse.core.databinding.observable;version='[1.13.0,1.13.1)';startlevel=10,\
+	org.eclipse.core.databinding.property;version='[1.10.0,1.10.1)';startlevel=10,\
 	org.eclipse.core.expressions;version='[3.8.200,3.8.201)';startlevel=10,\
-	org.eclipse.core.jobs;version='[3.13.300,3.13.301)';startlevel=10,\
-	org.eclipse.core.runtime;version='[3.26.100,3.26.101)';startlevel=10,\
-	org.eclipse.e4.core.commands;version='[1.0.400,1.0.401)';startlevel=10,\
-	org.eclipse.e4.core.contexts;version='[1.11.0,1.11.1)';startlevel=10,\
-	org.eclipse.e4.core.di;version='[1.8.300,1.8.301)';startlevel=10,\
-	org.eclipse.e4.core.di.annotations;version='[1.7.200,1.7.201)';startlevel=10,\
-	org.eclipse.e4.core.di.extensions;version='[0.17.200,0.17.201)';startlevel=10,\
-	org.eclipse.e4.core.di.extensions.supplier;version='[0.16.400,0.16.401)';startlevel=10,\
-	org.eclipse.e4.core.services;version='[2.3.400,2.3.401)';startlevel=10,\
-	org.eclipse.e4.emf.xpath;version='[0.3.200,0.3.201)';startlevel=10,\
-	org.eclipse.e4.ui.di;version='[1.4.200,1.4.201)';startlevel=10,\
-	org.eclipse.e4.ui.model.workbench;version='[2.3.0,2.3.1)';startlevel=10,\
-	org.eclipse.e4.ui.services;version='[1.5.200,1.5.201)';startlevel=10,\
-	org.eclipse.e4.ui.workbench;version='[1.14.100,1.14.101)';startlevel=10,\
+	org.eclipse.core.jobs;version='[3.14.0,3.14.1)';startlevel=10,\
+	org.eclipse.core.runtime;version='[3.27.0,3.27.1)';startlevel=10,\
+	org.eclipse.e4.core.commands;version='[1.1.0,1.1.1)';startlevel=10,\
+	org.eclipse.e4.core.contexts;version='[1.12.0,1.12.1)';startlevel=10,\
+	org.eclipse.e4.core.di;version='[1.9.0,1.9.1)';startlevel=10,\
+	org.eclipse.e4.core.di.annotations;version='[1.8.0,1.8.1)';startlevel=10,\
+	org.eclipse.e4.core.di.extensions;version='[0.18.0,0.18.1)';startlevel=10,\
+	org.eclipse.e4.core.di.extensions.supplier;version='[0.17.0,0.17.1)';startlevel=10,\
+	org.eclipse.e4.core.services;version='[2.4.0,2.4.1)';startlevel=10,\
+	org.eclipse.e4.emf.xpath;version='[0.4.0,0.4.1)';startlevel=10,\
+	org.eclipse.e4.ui.di;version='[1.5.0,1.5.1)';startlevel=10,\
+	org.eclipse.e4.ui.model.workbench;version='[2.4.0,2.4.1)';startlevel=10,\
+	org.eclipse.e4.ui.services;version='[1.6.0,1.6.1)';startlevel=10,\
+	org.eclipse.e4.ui.workbench;version='[1.15.0,1.15.1)';startlevel=10,\
 	org.eclipse.emf.common;version='[2.26.0,2.26.1)';startlevel=10,\
 	org.eclipse.emf.ecore;version='[2.28.0,2.28.1)';startlevel=10,\
 	org.eclipse.emf.ecore.change;version='[2.14.0,2.14.1)';startlevel=10,\
 	org.eclipse.emf.ecore.xmi;version='[2.17.0,2.17.1)';startlevel=10,\
 	org.eclipse.equinox.app;version='[1.6.200,1.6.201)';startlevel=10,\
-	org.eclipse.equinox.common;version='[3.17.100,3.17.101)';startlevel=10,\
+	org.eclipse.equinox.common;version='[3.18.0,3.18.1)';startlevel=10,\
 	org.eclipse.equinox.console;version='[1.4.500,1.4.501)';startlevel=10,\
 	org.eclipse.equinox.event;version='[1.6.200,1.6.201)';startlevel=10,\
 	org.eclipse.equinox.preferences;version='[3.10.200,3.10.201)';startlevel=10,\
