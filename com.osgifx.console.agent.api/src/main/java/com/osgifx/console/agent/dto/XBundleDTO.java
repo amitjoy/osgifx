@@ -30,6 +30,7 @@ public class XBundleDTO extends DTO {
     public int                   revisions;
     public boolean               isFragment;
     public long                  lastModified;
+    public long                  dataFolderSize;
     public String                documentation;
     public String                vendor;
     public String                version;
