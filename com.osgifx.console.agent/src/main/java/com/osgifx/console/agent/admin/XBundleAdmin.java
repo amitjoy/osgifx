@@ -106,6 +106,7 @@ public final class XBundleAdmin {
         dto.category            = getHeader(bundle, BUNDLE_CATEGORY);
         dto.isFragment          = getHeader(bundle, FRAGMENT_HOST) != null;
         dto.lastModified        = bundle.getLastModified();
+        dto.dataFolderSize      = bundle.getBundleContext().getDataFile("").length();
         dto.documentation       = getHeader(bundle, BUNDLE_DOCURL);
         dto.vendor              = getHeader(bundle, BUNDLE_VENDOR);
         dto.description         = getHeader(bundle, BUNDLE_DESCRIPTION);
