@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles;
 
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -71,6 +73,8 @@ public final class BundleDetailsFxController {
     private ToggleSwitch                               fragmentLabel;
     @FXML
     private Label                                      lasModifiedLabel;
+    @FXML
+    private Label                                      dataFolderSizeLabel;
     @FXML
     private Label                                      docLabel;
     @FXML
@@ -177,6 +181,7 @@ public final class BundleDetailsFxController {
         registerButtonHandlers(bundle);
 
         lasModifiedLabel.setText(formatLastModified(bundle.lastModified));
+        dataFolderSizeLabel.setText(humanReadableByteCount(bundle.dataFolderSize));
         docLabel.setText(bundle.documentation);
         vendorLabel.setText(bundle.vendor);
         revisionsLabel.setText(String.valueOf(bundle.revisions));
@@ -245,6 +250,18 @@ public final class BundleDetailsFxController {
             return "No last modification";
         }
         return converter.convert(lastModified).to(Date.class).toString();
+    }
+
+    private String humanReadableByteCount(long bytes) {
+        if (-1000 < bytes && bytes < 1000) {
+            return bytes + " B";
+        }
+        final CharacterIterator ci = new StringCharacterIterator("kMGTPE");
+        while (bytes <= -999_950 || bytes >= 999_950) {
+            bytes /= 1000;
+            ci.next();
+        }
+        return String.format("%.1f %cB", bytes / 1000.0, ci.current());
     }
 
     private void initFragment(final XBundleDTO bundle) {
