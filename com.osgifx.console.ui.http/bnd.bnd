@@ -4,7 +4,8 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  fragment.e4xmi = fragment.e4xmi,\
 					  css = css,\
 					  fxml = fxml,\
-					  graphic = graphic
+					  graphic = graphic,\
+					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
 -buildpath          : \
                       ${bundles.required},\
                       com.google.gson
