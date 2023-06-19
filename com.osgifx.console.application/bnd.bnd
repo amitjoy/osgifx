@@ -1,4 +1,5 @@
 Bundle-SymbolicName : ${p}; singleton:=true
+-dependson          : com.osgifx.console.assets.common
 -privatepackage     : \
                       styles,\
                       com.osgifx.console.ui.*,\
@@ -9,7 +10,8 @@ Bundle-SymbolicName : ${p}; singleton:=true
 					  css = css,\
 					  font = font,\
 					  fxml = fxml,\
-					  graphic = graphic
+					  graphic = graphic,\
+					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
 -buildpath          : \
                       ${bundles.required},\
                       de.jensd:fontawesomefx;packages='*',\
