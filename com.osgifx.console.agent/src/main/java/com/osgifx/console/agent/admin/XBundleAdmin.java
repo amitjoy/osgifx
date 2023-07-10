@@ -35,6 +35,7 @@ import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,7 +107,7 @@ public final class XBundleAdmin {
         dto.category            = getHeader(bundle, BUNDLE_CATEGORY);
         dto.isFragment          = getHeader(bundle, FRAGMENT_HOST) != null;
         dto.lastModified        = bundle.getLastModified();
-        dto.dataFolderSize      = bundle.getBundleContext().getDataFile("").length();
+        dto.dataFolderSize      = getStorageSize(bundle);
         dto.documentation       = getHeader(bundle, BUNDLE_DOCURL);
         dto.vendor              = getHeader(bundle, BUNDLE_VENDOR);
         dto.description         = getHeader(bundle, BUNDLE_DESCRIPTION);
@@ -133,6 +134,21 @@ public final class XBundleAdmin {
         dto.isActivationPolicyUsed = getActivationPolicyUsed(bundle);
 
         return dto;
+    }
+
+    private static long getStorageSize(final Bundle bundle) {
+        final BundleContext bundleContext = bundle.getBundleContext();
+        final String        bsn           = bundle.getSymbolicName();
+        if (bundleContext == null) {
+            logger.atDebug().msg("Bundle context is null for '{}'").arg(bsn).log();
+            return -1;
+        }
+        final File storage = bundleContext.getDataFile("");
+        if (storage == null) {
+            logger.atDebug().msg("Bundle storage is null for '{}'").arg(bsn).log();
+            return -1;
+        }
+        return storage.length();
     }
 
     /**
