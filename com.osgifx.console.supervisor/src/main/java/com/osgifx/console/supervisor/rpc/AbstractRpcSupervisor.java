@@ -87,9 +87,9 @@ public abstract class AbstractRpcSupervisor<S, A> {
 
         long sessionExpiryInterval();
 
-        String connectedListenerFilter();
+        String[] connectedListenerFilters();
 
-        String disconnectedListenerFilter();
+        String[] disconnectedListenerFilters();
 
         String osgi_ds_satisfying_condition_target();
     }
@@ -188,8 +188,8 @@ public abstract class AbstractRpcSupervisor<S, A> {
         ch.set(ch.d().maximumPacketSize(), DEFAULT_MAXIMUM_PACKET_SIZE);
         ch.set(ch.d().keepAliveInterval(), 0);
         ch.set(ch.d().sendMaximumPacketSize(), DEFAULT_SEND_MAXIMUM_PACKET_SIZE);
-        ch.set(ch.d().connectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
-        ch.set(ch.d().disconnectedListenerFilter(), MQTT_CONNECTION_LISTENER_FILTER);
+        ch.set(ch.d().connectedListenerFilters(), new String[] { MQTT_CONNECTION_LISTENER_FILTER });
+        ch.set(ch.d().disconnectedListenerFilters(), new String[] { MQTT_CONNECTION_LISTENER_FILTER });
         ch.set(ch.d().osgi_ds_satisfying_condition_target(), "(" + CONDITION_ID + "=" + conditionID + ")");
         ch.update();
 
