@@ -253,6 +253,9 @@ public final class BundleDetailsFxController {
     }
 
     private String humanReadableByteCount(long bytes) {
+        if (bytes == -1) {
+            return "<IGNORED>";
+        }
         if (-1000 < bytes && bytes < 1000) {
             return bytes + " B";
         }
