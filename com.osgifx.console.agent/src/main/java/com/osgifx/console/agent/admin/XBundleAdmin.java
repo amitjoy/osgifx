@@ -141,12 +141,12 @@ public final class XBundleAdmin {
         final String        bsn           = bundle.getSymbolicName();
         if (bundleContext == null) {
             logger.atDebug().msg("Bundle context is null for '{}'").arg(bsn).log();
-            return -1;
+            return -1L;
         }
         final File storage = bundleContext.getDataFile("");
         if (storage == null) {
             logger.atDebug().msg("Bundle storage is null for '{}'").arg(bsn).log();
-            return -1;
+            return -1L;
         }
         return storage.length();
     }
