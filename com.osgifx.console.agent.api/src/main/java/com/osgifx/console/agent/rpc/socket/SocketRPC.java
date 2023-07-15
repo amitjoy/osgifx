@@ -249,7 +249,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     out.write(data);
                 } else {
                     final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    new JSONCodec().enc().to(bout).put(value);
+                    new JSONCodec().enc().deflate().to(bout).put(value);
                     final byte[] data = bout.toByteArray();
                     out.writeInt(data.length);
                     out.write(data);
@@ -292,14 +292,14 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                             return null;
                         }
                         if (result.exception) {
-                            final String msg = new JSONCodec().dec().from(result.value).get(String.class);
+                            final String msg = new JSONCodec().dec().inflate().from(result.value).get(String.class);
                             trace("Exception during agent communication: " + msg);
                             throw new RuntimeException(msg);
                         }
                         if (type == byte[].class) {
                             return (T) result.value;
                         }
-                        return (T) new JSONCodec().dec().from(result.value).get(type);
+                        return (T) new JSONCodec().dec().inflate().from(result.value).get(type);
                     }
                     long elapsedInNanos = System.nanoTime() - startInNanos;
                     long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
@@ -339,7 +339,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                 if (type == byte[].class) {
                     parameters[i] = args.get(i);
                 } else {
-                    parameters[i] = new JSONCodec().dec().from(args.get(i)).get(m.getGenericParameterTypes()[i]);
+                    parameters[i] = new JSONCodec().dec().inflate().from(args.get(i))
+                            .get(m.getGenericParameterTypes()[i]);
                 }
             }
             try {
