@@ -120,7 +120,7 @@ public final class OverviewFxUI {
     private Button   timelineButton;
     private Timeline dataRetrieverTimeline;
 
-    private double              refreshDelay            = REFRESH_DELAY;
+    private double              refreshDelayInSeconds   = REFRESH_DELAY;
     private final AtomicBoolean isRealtimeUpdateRunning = new AtomicBoolean(true);
 
     @PostConstruct
@@ -202,12 +202,13 @@ public final class OverviewFxUI {
         dataRetrieverTimeline.pause();
     }
 
-    private void createPeriodicTaskToSetRuntimeInfo(final double refreshDelay) {
-        this.refreshDelay = refreshDelay;
+    private void createPeriodicTaskToSetRuntimeInfo(final double refreshDelayInSeconds) {
+        this.refreshDelayInSeconds = refreshDelayInSeconds;
         if (dataRetrieverTimeline != null) {
             dataRetrieverTimeline.stop();
         }
-        dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelay), a -> retrieveRuntimeData()));
+        dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelayInSeconds),
+                                                          a -> retrieveRuntimeData()));
         dataRetrieverTimeline.setCycleCount(CYCLE_COUNT);
         dataRetrieverTimeline.setOnFinished(event -> {
             updateTimelineButtonTo(PLAY);
@@ -610,7 +611,7 @@ public final class OverviewFxUI {
     private void showViewRefreshDelayDialog() {
         final var dialog = new ViewRefreshDelayDialog();
         ContextInjectionFactory.inject(dialog, eclipseContext);
-        dialog.init(Math.round(refreshDelay));
+        dialog.init(Math.round(refreshDelayInSeconds));
         final var refreshDelayInput = dialog.showAndWait();
         if (refreshDelayInput.isPresent()) {
             dataRetrieverTimeline.stop();
