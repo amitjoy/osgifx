@@ -53,7 +53,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
         final var dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.setHeaderText("View Refresh Delay");
+        dialogPane.setHeaderText("Refresh Delay in Seconds");
         dialogPane.getStylesheets().add(getClass().getClassLoader().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
                 new ImageView(getClass().getClassLoader().getResource("/graphic/images/delay.png").toString()));
