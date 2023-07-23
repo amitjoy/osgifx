@@ -61,7 +61,7 @@ public final class AgentConnectedAddon {
             protected Void call() throws Exception {
                 // we always load all the data when agent gets connected
                 // later we will load only the respective data when we select a specific tab
-                dataProvider.retrieveInfo(null, false);
+                dataProvider.retrieveInfo(null, true);
                 return null;
             }
 
