@@ -63,7 +63,7 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private static final int    RPC_POOL_CORE_THREADS_SIZE          = 1;
+    private static final int    RPC_POOL_CORE_THREADS_SIZE          = 5;
     private static final int    RPC_POOL_MAX_THREADS_SIZE           = 20;
     private static final int    RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS = 60;
     private static final String RPC_POOL_THREAD_NAME_SUFFIX         = "-%d";
