@@ -1,5 +1,0 @@
-{
-	"in.bytehue.messaging.client": {
-		"osgi.ds.satisfying.condition.target": "(osgi.condition.id=unresolvable)"
-	}
-}
