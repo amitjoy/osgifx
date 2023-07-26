@@ -21,6 +21,7 @@ import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.MQTT_RPC;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
 import java.io.Closeable;
@@ -30,8 +31,9 @@ import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleActivator;
@@ -61,9 +63,12 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private static final int    RPC_POOL_THREADS            = 5;
-    private static final String RPC_POOL_THREAD_NAME_PREFIX = "osgifx-agent";
-    private static final String RPC_POOL_THREAD_NAME_SUFFIX = "-%d";
+    private static final int    RPC_POOL_CORE_THREADS_SIZE          = 1;
+    private static final int    RPC_POOL_MAX_THREADS_SIZE           = 20;
+    private static final int    RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS = 60;
+    private static final String RPC_POOL_THREAD_NAME_SUFFIX         = "-%d";
+    private static final String RPC_POOL_THREAD_NAME_PREFIX         = "osgifx-agent";
+
     // @formatter:off
     private static final ThreadFactory THREAD_FACTORY = new ThreadFactoryBuilder()
                                                               .setThreadFactoryName(RPC_POOL_THREAD_NAME_PREFIX)
@@ -129,7 +134,7 @@ public final class Activator extends Thread implements BundleActivator {
         final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
         agents.add(agentServer);
 
-        final ExecutorService              executor = Executors.newFixedThreadPool(RPC_POOL_THREADS, THREAD_FACTORY);
+        final ExecutorService              executor = newFixedThreadPool();
         final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
                                                                     pubTopic, subTopic, executor);
 
@@ -158,8 +163,7 @@ public final class Activator extends Thread implements BundleActivator {
                     final AgentServer agentServer = new AgentServer(module.di(), SOCKET_RPC);
                     agents.add(agentServer);
 
-                    final ExecutorService              executor  = Executors.newFixedThreadPool(RPC_POOL_THREADS,
-                            THREAD_FACTORY);
+                    final ExecutorService              executor  = newFixedThreadPool();
                     final SocketRPC<Agent, Supervisor> socketRPC = new SocketRPC<Agent, Supervisor>(Supervisor.class,
                                                                                                     agentServer, socket,
                                                                                                     executor) {
@@ -206,6 +210,15 @@ public final class Activator extends Thread implements BundleActivator {
             return t;
         }
         return null;
+    }
+
+    public static ExecutorService newFixedThreadPool() {
+        final ThreadPoolExecutor executor = new ThreadPoolExecutor(RPC_POOL_CORE_THREADS_SIZE,
+                                                                   RPC_POOL_MAX_THREADS_SIZE,
+                                                                   RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS, SECONDS,
+                                                                   new LinkedBlockingQueue<>(), THREAD_FACTORY);
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
     }
 
 }
