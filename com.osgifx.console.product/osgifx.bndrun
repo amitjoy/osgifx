@@ -9,6 +9,8 @@ default.startlevel                :   10
 # the launcher needs to be started at the end as it needs the rest of the 
 # components to be ready before application startup
 startlevels                       :   com.osgifx.console.agent;startlevel=1,\
+                                      org.apache.felix.configadmin;startlevel=2,\
+                                      org.apache.felix.configurator;startlevel=2,\
                                       org.apache.felix.scr;startlevel=2,\
                                       com.osgifx.console.logging;startlevel=2,\
                                       org.eclipse.fx.core.slf4j;startlevel=3,\
@@ -28,6 +30,13 @@ startlevels                       :   com.osgifx.console.agent;startlevel=1,\
 -runproperties.name               :   launch.name=OSGi.fx
 -runproperties.logging            :   org.apache.sling.commons.log.file=${storage.directory}/logs/fx.log,\
                                       org.apache.sling.commons.log.pattern="{0,date,yyyy-MM-dd  HH:mm:ss.SSSXXX}     {4}     [{2}]  [{3}]  {5}"
+
+# the following configuration is used to ensure that MQTT client will not be automatically enabled
+-runproperties.mqtt.init.config   :   configurator.initial='{\
+                                        ":configurator:version":"1.0",\
+                                        ":configurator:symbolic-name":"com.osgifx.config.init",\
+                                        "in.bytehue.messaging.client":{"osgi.ds.satisfying.condition.target":"(osgi.condition.id=unresolvable)"}\
+                                      }'
 
 # Ramanujan's Number
 port                              :   1729
