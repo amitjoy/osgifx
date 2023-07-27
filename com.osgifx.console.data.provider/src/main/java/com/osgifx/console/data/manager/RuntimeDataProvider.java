@@ -136,72 +136,72 @@ public final class RuntimeDataProvider implements DataProvider {
 
     @Override
     public ObservableList<XBundleDTO> bundles() {
-        return (ObservableList<XBundleDTO>) getData(BUNDLES_ID);
+        return (ObservableList<XBundleDTO>) supply(BUNDLES_ID);
     }
 
     @Override
     public ObservableList<PackageDTO> packages() {
-        return (ObservableList<PackageDTO>) getData(PACKAGES_ID);
+        return (ObservableList<PackageDTO>) supply(PACKAGES_ID);
     }
 
     @Override
     public ObservableList<XServiceDTO> services() {
-        return (ObservableList<XServiceDTO>) getData(SERVICES_ID);
+        return (ObservableList<XServiceDTO>) supply(SERVICES_ID);
     }
 
     @Override
     public ObservableList<XComponentDTO> components() {
-        return (ObservableList<XComponentDTO>) getData(COMPONENTS_ID);
+        return (ObservableList<XComponentDTO>) supply(COMPONENTS_ID);
     }
 
     @Override
     public ObservableList<XConfigurationDTO> configurations() {
-        return (ObservableList<XConfigurationDTO>) getData(CONFIGURATIONS_ID);
+        return (ObservableList<XConfigurationDTO>) supply(CONFIGURATIONS_ID);
     }
 
     @Override
     public ObservableList<XEventDTO> events() {
-        return (ObservableList<XEventDTO>) getData(EVENTS_ID);
+        return (ObservableList<XEventDTO>) supply(EVENTS_ID);
     }
 
     @Override
     public ObservableList<XLogEntryDTO> logs() {
-        return (ObservableList<XLogEntryDTO>) getData(LOGS_ID);
+        return (ObservableList<XLogEntryDTO>) supply(LOGS_ID);
     }
 
     @Override
     public ObservableList<XPropertyDTO> properties() {
-        return (ObservableList<XPropertyDTO>) getData(PROPERTIES_ID);
+        return (ObservableList<XPropertyDTO>) supply(PROPERTIES_ID);
     }
 
     @Override
     public ObservableList<XThreadDTO> threads() {
-        return (ObservableList<XThreadDTO>) getData(THREADS_ID);
+        return (ObservableList<XThreadDTO>) supply(THREADS_ID);
     }
 
     @Override
     public ObservableList<XBundleDTO> leaks() {
-        return (ObservableList<XBundleDTO>) getData(LEAKS_ID);
+        return (ObservableList<XBundleDTO>) supply(LEAKS_ID);
     }
 
     @Override
     public ObservableList<XHttpComponentDTO> httpComponents() {
-        return (ObservableList<XHttpComponentDTO>) getData(HTTP_ID);
+        return (ObservableList<XHttpComponentDTO>) supply(HTTP_ID);
     }
 
     @Override
     public ObservableList<XHealthCheckDTO> healthchecks() {
-        return (ObservableList<XHealthCheckDTO>) getData(HEALTHCHECKS_ID);
+        return (ObservableList<XHealthCheckDTO>) supply(HEALTHCHECKS_ID);
     }
 
     @Override
     public ObservableList<XRoleDTO> roles() {
-        return (ObservableList<XRoleDTO>) getData(ROLES_ID);
+        return (ObservableList<XRoleDTO>) supply(ROLES_ID);
     }
 
     @Override
     public ObservableList<XBundleLoggerContextDTO> loggerContexts() {
-        return (ObservableList<XBundleLoggerContextDTO>) getData(LOGGER_CONTEXTS_ID);
+        return (ObservableList<XBundleLoggerContextDTO>) supply(LOGGER_CONTEXTS_ID);
     }
 
     @Override
@@ -244,7 +244,7 @@ public final class RuntimeDataProvider implements DataProvider {
         return executor.supplyAsync(agent::getHeapUsage);
     }
 
-    private ObservableList<?> getData(final String id) {
+    private ObservableList<?> supply(final String id) {
         for (final Entry<String, RuntimeInfoSupplier> entry : infoSuppliers.entrySet()) {
             final var supplierId  = entry.getKey();
             final var supplierRef = entry.getValue();

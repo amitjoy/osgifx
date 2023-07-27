@@ -108,9 +108,9 @@ public interface Agent {
     String AGENT_MQTT_SUB_TOPIC_KEY = "osgi.fx.agent.mqtt.subtopic";
 
     /**
-     * The property key to enable agent logs
+     * The property key to enable agent RPC logs
      */
-    String AGENT_TRACE_LOG_KEY = "osgi.fx.agent.logs.enabled";
+    String AGENT_RPC_TRACE_LOG_KEY = "osgi.fx.agent.rpc.logs.enabled";
 
     /**
      * The port for attaching to a remote Gogo CommandSession
