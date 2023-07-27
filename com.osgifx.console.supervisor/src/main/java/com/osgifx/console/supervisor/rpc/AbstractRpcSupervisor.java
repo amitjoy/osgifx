@@ -22,6 +22,7 @@ import static com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5ConnectRestricti
 import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_RECEIVE;
 import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_SEND;
 import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
@@ -29,7 +30,9 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -94,10 +97,12 @@ public abstract class AbstractRpcSupervisor<S, A> {
         String osgi_ds_satisfying_condition_target();
     }
 
-    private static final int    MQTT_RPC_POOL_THREADS         = 30;
-    private static final int    SOCKET_RPC_POOL_THREADS       = 5;
     private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
-    private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5;
+    private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5d;
+
+    private static final int RPC_POOL_CORE_THREADS_SIZE          = 10;
+    private static final int RPC_POOL_MAX_THREADS_SIZE           = 30;
+    private static final int RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS = 60;
 
     private A                 agent;
     protected int             port;
@@ -134,9 +139,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
                         final var socket = sf == null ? new Socket() : sf.createSocket();
                         socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
 
-                        final var threadFactory = new Builder().namingPattern("fx-supervisor-socket-%d").daemon(true).build();
-                        final var executor = Executors.newFixedThreadPool(SOCKET_RPC_POOL_THREADS, threadFactory);
-
+                        final var executor = newFixedThreadPool("fx-supervisor-socket-%d");
                         remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
                         this.setRemoteRPC(remoteRPC);
                         remoteRPC.open();
@@ -197,9 +200,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        final var threadFactory = new Builder().namingPattern("fx-supervisor-mqtt-%d").daemon(true).build();
-        final var executor      = Executors.newFixedThreadPool(MQTT_RPC_POOL_THREADS, threadFactory);
-
+        final var executor = newFixedThreadPool("fx-supervisor-mqtt-%d");
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
                                   executor);
         this.setRemoteRPC(remoteRPC);
@@ -225,6 +226,15 @@ public abstract class AbstractRpcSupervisor<S, A> {
         System.clearProperty("javax.net.ssl.trustStore");
         System.clearProperty("javax.net.ssl.trustStorePassword");
         System.clearProperty("javax.net.ssl.trustStoreType");
+    }
+
+    public static ExecutorService newFixedThreadPool(final String namingPattern) {
+        final var threadFactory = new Builder().namingPattern(namingPattern).daemon(true).build();
+        final var executor      = new ThreadPoolExecutor(RPC_POOL_CORE_THREADS_SIZE, RPC_POOL_MAX_THREADS_SIZE,
+                                                         RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS, SECONDS,
+                                                         new LinkedBlockingQueue<>(), threadFactory);
+        executor.allowCoreThreadTimeOut(true);
+        return executor;
     }
 
 }
