@@ -28,14 +28,12 @@ import org.eclipse.fx.ui.services.startup.StartupProgressTrackerService;
 import org.osgi.annotation.bundle.Header;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.configurator.annotations.RequireConfigurator;
 
 import com.osgifx.console.application.ui.ConsoleMaskerPaneProvider;
 import com.osgifx.console.application.ui.ConsoleStatusBarProvider;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
-@RequireConfigurator
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class FxStarter extends DependencyActivatorBase {
 
