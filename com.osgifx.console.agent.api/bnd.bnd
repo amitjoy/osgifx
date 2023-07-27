@@ -5,6 +5,7 @@ javac.compliance     : ${javac.source}
 -baseline            : *
 -buildpath.osgi      : \
                        biz.aQute.remote.agent;packages=*,\
+                       com.j256.simplelogging:simplelogging;packages=*,\
                        org.apache.felix.healthcheck.api,\
                        org.osgi.service.component.annotations,\
                        org.osgi.service.cdi,\

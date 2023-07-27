@@ -26,9 +26,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,6 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.osgi.framework.BundleContext;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
@@ -46,15 +48,16 @@ import aQute.lib.json.JSONCodec;
 
 public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
-    private MqttClient                              mqttClient;
-    private final String                            pubTopic;
-    private final String                            subTopic;
-    private final BundleContext                     bundleContext;
-    private final AtomicInteger                     id       = new AtomicInteger(10_000);
-    private final ConcurrentMap<Integer, RpcResult> promises = new ConcurrentHashMap<>();
-    private final AtomicBoolean                     started  = new AtomicBoolean();
-    private final AtomicBoolean                     stopped  = new AtomicBoolean();
-    private final ThreadLocal<Integer>              msgId    = new ThreadLocal<>();
+    private MqttClient                    mqttClient;
+    private final String                  pubTopic;
+    private final String                  subTopic;
+    private final BundleContext           bundleContext;
+    private final AtomicInteger           id       = new AtomicInteger(10_000);
+    private final Map<Integer, RpcResult> promises = new ConcurrentHashMap<>();
+    private final AtomicBoolean           started  = new AtomicBoolean();
+    private final AtomicBoolean           stopped  = new AtomicBoolean();
+    private final ThreadLocal<Integer>    msgId    = new ThreadLocal<>();
+    private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
 
     private final L        local;
     private R              remote;
@@ -298,9 +301,9 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     }
 
     private void trace(final String message) {
-        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_TRACE_LOG_KEY);
+        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_RPC_TRACE_LOG_KEY);
         if (isTracingEnabled) {
-            System.out.println("[OSGi.fx] " + message);
+            logger.atDebug().msg("[OSGi.fx] {}").arg(message).log();
         }
     }
 
