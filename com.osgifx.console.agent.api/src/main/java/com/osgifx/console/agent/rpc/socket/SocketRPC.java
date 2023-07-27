@@ -30,13 +30,15 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.j256.simplelogging.FluentLogger;
+import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
@@ -45,12 +47,13 @@ import aQute.lib.json.JSONCodec;
 
 public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R> {
 
-    private final DataInputStream                   in;
-    private final DataOutputStream                  out;
-    private final AtomicInteger                     id       = new AtomicInteger(10_000);
-    private final ConcurrentMap<Integer, RpcResult> promises = new ConcurrentHashMap<>();
-    private final AtomicBoolean                     stopped  = new AtomicBoolean();
-    private final ThreadLocal<Integer>              msgId    = new ThreadLocal<>();
+    private final DataInputStream         in;
+    private final DataOutputStream        out;
+    private final AtomicInteger           id       = new AtomicInteger(10_000);
+    private final Map<Integer, RpcResult> promises = new ConcurrentHashMap<>();
+    private final AtomicBoolean           stopped  = new AtomicBoolean();
+    private final ThreadLocal<Integer>    msgId    = new ThreadLocal<>();
+    private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
 
     private L              local;
     private R              remote;
@@ -68,7 +71,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                      final L local,
                      final Socket socket,
                      final ExecutorService executor) throws IOException {
-        this(remoteClass, local, socket.getInputStream(), socket.getOutputStream(), executor);
+        this(remoteClass, local, new DataInputStream(socket.getInputStream()),
+             new DataOutputStream(socket.getOutputStream()), executor);
     }
 
     public SocketRPC(final Class<R> remoteClass,
@@ -319,9 +323,9 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     }
 
     private void trace(final String message) {
-        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_TRACE_LOG_KEY);
+        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_RPC_TRACE_LOG_KEY);
         if (isTracingEnabled) {
-            System.out.println("[OSGi.fx] " + message);
+            logger.atDebug().msg("[OSGi.fx] {}").arg(message).log();
         }
     }
 
