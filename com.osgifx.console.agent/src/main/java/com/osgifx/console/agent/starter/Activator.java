@@ -24,10 +24,10 @@ import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -56,6 +56,8 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 import com.osgifx.console.agent.rpc.socket.SocketRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
+import aQute.lib.io.IO;
+
 /**
  * The agent bundles uses an activator instead of DS to not constrain the target
  * environment in any way.
@@ -63,7 +65,7 @@ import com.osgifx.console.supervisor.Supervisor;
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
 public final class Activator extends Thread implements BundleActivator {
 
-    private static final int    RPC_POOL_CORE_THREADS_SIZE          = 5;
+    private static final int    RPC_POOL_CORE_THREADS_SIZE          = 10;
     private static final int    RPC_POOL_MAX_THREADS_SIZE           = 20;
     private static final int    RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS = 60;
     private static final String RPC_POOL_THREAD_NAME_SUFFIX         = "-%d";
@@ -100,7 +102,7 @@ public final class Activator extends Thread implements BundleActivator {
         }
         module.start();
 
-        final String mqttProviderProperty = System.getProperty(AGENT_MQTT_PROVIDER_KEY);
+        final String mqttProviderProperty = bundleContext.getProperty(AGENT_MQTT_PROVIDER_KEY);
         if (mqttProviderProperty == null) {
             logger.atInfo().msg("[OSGi.fx] MQTT agent not configured").log();
             return;
@@ -179,6 +181,12 @@ public final class Activator extends Thread implements BundleActivator {
 
                     agentServer.setEndpoint(socketRPC);
                     socketRPC.run();
+                } catch (final SocketException e) {
+                    if (!isInterrupted()) {
+                        logger.atWarn().msg("[OSGi.fx] Accepting agent requests").throwable(e).log();
+                    }
+                } catch (final Exception e) {
+                    logger.atWarn().msg("[OSGi.fx] Accepting agent requests").throwable(e).log();
                 } catch (final Throwable t) {
                     logger.atError().throwable(t).log();
                 }
@@ -187,29 +195,17 @@ public final class Activator extends Thread implements BundleActivator {
             logger.atError().throwable(t).log();
             throw t;
         } finally {
-            close(serverSocket);
+            IO.close(serverSocket);
         }
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
         interrupt();
-        close(serverSocket);
-        agents.forEach(this::close);
+        IO.close(serverSocket);
+        agents.forEach(IO::close);
         module.di().getInstance(ClassloaderLeakDetector.class).stop();
         module.stop();
-    }
-
-    private Throwable close(final Closeable in) {
-        try {
-            if (in != null) {
-                in.close();
-            }
-        } catch (final Throwable t) {
-            logger.atError().throwable(t).log();
-            return t;
-        }
-        return null;
     }
 
     public static ExecutorService newFixedThreadPool() {
