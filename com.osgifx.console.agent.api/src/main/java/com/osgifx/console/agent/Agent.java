@@ -58,6 +58,11 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 public interface Agent {
 
     /**
+     * Bundle location prefix for installing new bundles
+     */
+    String BUNDLE_LOCATION_PREFIX = "manual:";
+
+    /**
      * The pattern for a server port specification: {@code [<interface>:]<port>} .
      */
     Pattern AGENT_SOCKET_PORT_PATTERN = Pattern.compile("(?:([^:]+):)?(\\d+)");
