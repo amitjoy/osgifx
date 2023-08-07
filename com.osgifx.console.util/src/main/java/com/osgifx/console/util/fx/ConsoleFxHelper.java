@@ -18,6 +18,8 @@ package com.osgifx.console.util.fx;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.CharMatcher;
 
 public final class ConsoleFxHelper {
@@ -38,7 +40,7 @@ public final class ConsoleFxHelper {
     }
 
     public static boolean validateTopic(final String topic) {
-        if (topic.isBlank()) {
+        if (StringUtils.isBlank(topic)) {
             return false;
         }
         final var alphabetLowerCaseMatcher = CharMatcher.inRange('a', 'z');

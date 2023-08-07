@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.function.Function;
 
 import org.osgi.util.converter.Converter;
@@ -37,9 +39,9 @@ public final class DTOCellValueFactory<S, T> implements Callback<CellDataFeature
     }
 
     public DTOCellValueFactory(final String property, final Class<T> clazz, final Function<S, T> nullValueReplacer) {
-        this.clazz             = clazz;
-        this.property          = property;
-        this.converter         = Converters.standardConverter();
+        this.clazz             = checkNotNull(clazz);
+        this.property          = checkNotNull(property);
+        converter              = Converters.standardConverter();
         this.nullValueReplacer = nullValueReplacer;
     }
 
