@@ -608,7 +608,7 @@ public final class AgentServer implements Agent, Closeable {
         final Set<Bundle>                bundles = findBundles(entry.getKey(), null);
         switch (bundles.size()) {
             case 0:
-                return "manual:" + entry.getKey();
+                return BUNDLE_LOCATION_PREFIX + entry.getKey();
             case 1:
                 return bundles.iterator().next().getLocation();
             default:
