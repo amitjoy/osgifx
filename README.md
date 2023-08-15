@@ -36,7 +36,7 @@
 
 ### Latest Version
 
-The latest released version: 2.4.2 (Check [Project Website](http://osgifx.com) to download)
+The latest released version: 2.4.3 (Check [Project Website](http://osgifx.com) to download)
 
 ------------------------------------------------------------------------------------------------------------
 
