@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.fx.core.ExceptionUtils;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
@@ -41,10 +43,10 @@ import aQute.lib.converter.Converter;
  */
 public class ConfigHelper<T> {
 
-    final T                         delegate;
-    final Class<T>                  type;
-    final Hashtable<String, Object> properties = new Hashtable<>();
-    final ConfigurationAdmin        cm;
+    final T                   delegate;
+    final Class<T>            type;
+    final ConfigurationAdmin  cm;
+    final Map<String, Object> properties = new HashMap<>();
 
     Method lastInvocation;
     String pid;
@@ -116,7 +118,7 @@ public class ConfigHelper<T> {
         try {
             value = Converter.cnv(lastInvocation.getGenericReturnType(), newer);
         } catch (final Exception e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         }
         if (value instanceof Enum<?>) {
             value = ((Enum<?>) value).name();
@@ -151,7 +153,7 @@ public class ConfigHelper<T> {
         try {
             configuration = cm.getConfiguration(pid, "?");
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         }
         final var dict = configuration.getProperties();
         if (dict != null) {
@@ -173,7 +175,7 @@ public class ConfigHelper<T> {
         Configuration configuration;
         try {
             configuration = cm.getConfiguration(pid, "?");
-            configuration.update(properties);
+            configuration.update(FrameworkUtil.asDictionary(properties));
         } catch (final IOException e) {
             // highly unlikely to occur
         }
