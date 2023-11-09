@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.eclipse.fx.core.ExceptionUtils;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -57,9 +59,9 @@ public class FactoryConfigHelper<T> extends ConfigHelper<T> {
         try {
             configuration = cm.createFactoryConfiguration(factoryPid, "?");
             pid           = configuration.getPid();
-            configuration.update(properties);
+            configuration.update(FrameworkUtil.asDictionary(properties));
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            throw ExceptionUtils.wrap(e);
         }
         return this;
     }

@@ -4,10 +4,10 @@ com.google.code.gson:gson:2.10.1
 
 # Apache
 
-commons-io:commons-io:2.13.0
+commons-io:commons-io:2.15.0
 org.apache.aries.component-dsl:org.apache.aries.component-dsl.component-dsl:1.2.2
 org.apache.commons:commons-lang3:3.13.0
-org.apache.commons:commons-text:1.10.0
+org.apache.commons:commons-text:1.11.0
 
 # JSON
 
@@ -35,53 +35,53 @@ org.osgi:org.osgi.service.component:1.5.1
 
 # Equinox
 
-org.eclipse.platform:org.eclipse.equinox.app:1.6.200
-org.eclipse.platform:org.eclipse.equinox.bidi:1.4.200
-org.eclipse.platform:org.eclipse.equinox.common:3.18.0
+org.eclipse.platform:org.eclipse.equinox.app:1.6.300
+org.eclipse.platform:org.eclipse.equinox.bidi:1.4.300
+org.eclipse.platform:org.eclipse.equinox.common:3.18.100
 org.eclipse.platform:org.eclipse.equinox.concurrent:1.2.100
 org.eclipse.platform:org.eclipse.equinox.console:1.4.500
 org.eclipse.platform:org.eclipse.equinox.ds:1.6.200
 org.eclipse.platform:org.eclipse.equinox.event:1.6.200
-org.eclipse.platform:org.eclipse.equinox.launcher:1.6.400
+org.eclipse.platform:org.eclipse.equinox.launcher:1.6.500
 org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx:1.2.700
 org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.700
 org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.700
 org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.700
-org.eclipse.platform:org.eclipse.equinox.preferences:3.10.200
-org.eclipse.platform:org.eclipse.equinox.registry:3.11.200
-org.eclipse.platform:org.eclipse.osgi:3.18.400
+org.eclipse.platform:org.eclipse.equinox.preferences:3.10.300
+org.eclipse.platform:org.eclipse.equinox.registry:3.11.300
+org.eclipse.platform:org.eclipse.osgi:3.18.500
 org.eclipse.platform:org.eclipse.osgi.services:3.11.100
 
 # Eclipse e4
 
-org.eclipse.platform:org.eclipse.e4.core.commands:1.1.0
-org.eclipse.platform:org.eclipse.e4.core.contexts:1.12.0
-org.eclipse.platform:org.eclipse.e4.core.di:1.9.0
-org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.8.0
+org.eclipse.platform:org.eclipse.e4.core.commands:1.1.100
+org.eclipse.platform:org.eclipse.e4.core.contexts:1.12.100
+org.eclipse.platform:org.eclipse.e4.core.di:1.9.100
+org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.8.100
 org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.18.0
-org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.17.0
-org.eclipse.platform:org.eclipse.e4.core.services:2.4.0
-org.eclipse.platform:org.eclipse.e4.emf.xpath:0.4.0
-org.eclipse.platform:org.eclipse.e4.ui.di:1.5.0
-org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.4.0
-org.eclipse.platform:org.eclipse.e4.ui.services:1.6.0
-org.eclipse.platform:org.eclipse.e4.ui.workbench:1.15.0
+org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.17.100
+org.eclipse.platform:org.eclipse.e4.core.services:2.4.100
+org.eclipse.platform:org.eclipse.e4.emf.xpath:0.4.100
+org.eclipse.platform:org.eclipse.e4.ui.di:1.5.100
+org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.4.100
+org.eclipse.platform:org.eclipse.e4.ui.services:1.6.100
+org.eclipse.platform:org.eclipse.e4.ui.workbench:1.15.100
 
 # Eclipse Platform
 
-org.eclipse.platform:org.eclipse.core.commands:3.11.0
-org.eclipse.platform:org.eclipse.core.contenttype:3.9.0
-org.eclipse.platform:org.eclipse.core.databinding:1.13.0
-org.eclipse.platform:org.eclipse.core.databinding.beans:1.10.0
-org.eclipse.platform:org.eclipse.core.databinding.observable:1.13.0
-org.eclipse.platform:org.eclipse.core.databinding.property:1.10.0
-org.eclipse.platform:org.eclipse.core.filebuffers:3.8.0
-org.eclipse.platform:org.eclipse.core.filesystem:1.10.0
-org.eclipse.platform:org.eclipse.core.jobs:3.14.0
-org.eclipse.platform:org.eclipse.core.net:1.5.0
-org.eclipse.platform:org.eclipse.core.resources:3.19.0
-org.eclipse.platform:org.eclipse.core.runtime:3.27.0
-org.eclipse.platform:org.eclipse.core.variables:3.6.0
+org.eclipse.platform:org.eclipse.core.commands:3.11.100
+org.eclipse.platform:org.eclipse.core.contenttype:3.9.100
+org.eclipse.platform:org.eclipse.core.databinding:1.13.100
+org.eclipse.platform:org.eclipse.core.databinding.beans:1.10.100
+org.eclipse.platform:org.eclipse.core.databinding.observable:1.13.100
+org.eclipse.platform:org.eclipse.core.databinding.property:1.10.100
+org.eclipse.platform:org.eclipse.core.filebuffers:3.8.100
+org.eclipse.platform:org.eclipse.core.filesystem:1.10.100
+org.eclipse.platform:org.eclipse.core.jobs:3.15.0
+org.eclipse.platform:org.eclipse.core.net:1.5.100
+org.eclipse.platform:org.eclipse.core.resources:3.19.100
+org.eclipse.platform:org.eclipse.core.runtime:3.29.0
+org.eclipse.platform:org.eclipse.core.variables:3.6.100
 
 # OSGi Logging
 

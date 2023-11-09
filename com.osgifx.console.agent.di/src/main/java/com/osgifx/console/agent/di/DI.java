@@ -147,11 +147,9 @@ public final class DI {
                 }
                 return (T) instanceFromProvider;
             }
-
             return (T) createNewInstance(type, parent);
         } catch (final DiException rootCause) {
             final StringBuilder errorMessage = new StringBuilder("DI wasn't able to create your class hierarchy. ");
-
             if (parent != null) {
                 errorMessage.append("\nCannot instantiate the class [").append(parent.getName()).append("]. ")
                         .append("At least one of the constructor parameters of type [").append(requestedType)
@@ -186,7 +184,6 @@ public final class DI {
             if (isSingleton(type)) {
                 singletonInstances.put(type, newInstance);
             }
-
             return newInstance;
         } catch (final Exception e) {
             throw new DiException(createErrorMessageStart(type) + "An Exception was thrown during the instantiation.",
@@ -376,11 +373,9 @@ public final class DI {
     @SuppressWarnings("unchecked")
     private <T> Constructor<T> findConstructor(final Class<T> type) {
         final Constructor<?>[] constructors = type.getConstructors();
-
         if (constructors.length == 0) {
             throw new DiException(createErrorMessageStart(type) + "The class has no public constructor.");
         }
-
         if (constructors.length <= 1) {
             return (Constructor<T>) constructors[0];
         }
@@ -400,7 +395,6 @@ public final class DI {
                     + "Fix this by either make only one constructor public "
                     + "or annotate exactly one constructor with the javax.inject.Inject annotation.");
         }
-
         // we are not modifying the constructor array so we can safely cast here.
         return (Constructor<T>) constructorsWithInject.get(0);
     }

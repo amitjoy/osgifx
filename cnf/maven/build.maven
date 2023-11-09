@@ -4,12 +4,12 @@ com.google.mug:mug:6.6
 
 # bnd
 
-biz.aQute.bnd:biz.aQute.bndlib:6.4.1
-biz.aQute.bnd:biz.aQute.resolve:6.4.1
-biz.aQute.bnd:biz.aQute.remote.agent:6.4.1
-biz.aQute.bnd:biz.aQute.launchpad:6.4.1
-biz.aQute.bnd:biz.aQute.remote.agent:6.4.1
-biz.aQute.bnd:biz.aQute.bnd.util:6.4.1
+biz.aQute.bnd:biz.aQute.bndlib:7.0.0
+biz.aQute.bnd:biz.aQute.resolve:7.0.0
+biz.aQute.bnd:biz.aQute.remote.agent:7.0.0
+biz.aQute.bnd:biz.aQute.launchpad:7.0.0
+biz.aQute.bnd:biz.aQute.remote.agent:7.0.0
+biz.aQute.bnd:biz.aQute.bnd.util:7.0.0
 
 # Apache
 
@@ -58,7 +58,7 @@ org.osgi:org.osgi.util.converter:1.0.9
 
 eu.hansolo:tilesfx:17.1.31
 eu.hansolo:toolbox:17.0.57
-eu.hansolo:toolboxfx:17.0.47
+eu.hansolo:toolboxfx:17.0.49
 
 # FormsFx
 
