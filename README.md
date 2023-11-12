@@ -30,7 +30,7 @@
 | Rich Client Platform 	| JavaFX 17                                    	    |
 | Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                       |
-| Tools                	| Bndtools 6.4.0                                     |
+| Tools                	| Bndtools 7.0.0                                     |
 
 ------------------------------------------------------------------------------------------------------------
 
