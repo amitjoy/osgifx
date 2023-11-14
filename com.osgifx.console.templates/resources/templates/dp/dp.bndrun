@@ -5,4 +5,4 @@
 # only add the leaf feature bundle here which will be used to pull in other dependencies it requires
 -runrequires    : bnd.identity;id='my.sample.ui.bundle'
 
-# resolve this bndrun
+# go to the 'Run' tab below and click on 'Resolve' button to generate the required dependencies
