@@ -15,7 +15,7 @@ org.glassfish:jakarta.json:2.0.1
 
 # Felix
 
-org.apache.felix:org.apache.felix.cm.json:2.0.0
+org.apache.felix:org.apache.felix.cm.json:2.0.2
 org.apache.felix:org.apache.felix.configadmin:1.9.26
 org.apache.felix:org.apache.felix.configurator:1.0.18
 org.apache.felix:org.apache.felix.converter:1.0.18
