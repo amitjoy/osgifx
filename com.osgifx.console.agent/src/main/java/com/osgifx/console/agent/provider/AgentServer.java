@@ -953,7 +953,9 @@ public final class AgentServer implements Agent, Closeable {
         final Map<String, AgentExtension<DTO, DTO>> agentExtensions = di.getInstance(Map.class);
 
         if (!agentExtensions.containsKey(name)) {
-            throw new RuntimeException("Agent extension with name '" + name + "' doesn't exist");
+            final String msg = "Agent extension with name '" + name + "' doesn't exist";
+            logger.atError().msg(msg).log();
+            throw new RuntimeException(msg);
         }
         try {
             final AgentExtension<DTO, DTO> extension = agentExtensions.get(name);
