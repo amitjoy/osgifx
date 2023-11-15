@@ -316,7 +316,7 @@ public final class AgentServer implements Agent, Closeable {
             redirector.close();
             redirector = new NullRedirector();
         }
-        if (port == Agent.NONE) {
+        if (port == NONE) {
             return true;
         }
         if (port <= COMMAND_SESSION) {
@@ -327,7 +327,7 @@ public final class AgentServer implements Agent, Closeable {
             }
             return true;
         }
-        if (port == Agent.CONSOLE) {
+        if (port == CONSOLE) {
             redirector = new ConsoleRedirector(this);
             return true;
         }
@@ -953,7 +953,9 @@ public final class AgentServer implements Agent, Closeable {
         final Map<String, AgentExtension<DTO, DTO>> agentExtensions = di.getInstance(Map.class);
 
         if (!agentExtensions.containsKey(name)) {
-            throw new RuntimeException("Agent extension with name '" + name + "' doesn't exist");
+            final String msg = "Agent extension with name '" + name + "' doesn't exist";
+            logger.atError().msg(msg).log();
+            throw new RuntimeException(msg);
         }
         try {
             final AgentExtension<DTO, DTO> extension = agentExtensions.get(name);
