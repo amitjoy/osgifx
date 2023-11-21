@@ -54,10 +54,8 @@ public class ConfigHelper<T> {
     /**
      * Create a Config Helper for simple configurations.
      *
-     * @param type
-     *            the type of the configuration interface
-     * @param cm
-     *            the Configuration Admin service
+     * @param type the type of the configuration interface
+     * @param cm the Configuration Admin service
      */
     @SuppressWarnings("unchecked")
     public ConfigHelper(final Class<T> type, final ConfigurationAdmin cm) {
@@ -104,10 +102,8 @@ public class ConfigHelper<T> {
      * The last invocation on the proxy is remembered and used in the set method
      * to get the name and return type of the property.
      *
-     * @param older
-     *            ignored
-     * @param newer
-     *            the value to set
+     * @param older ignored
+     * @param newer the value to set
      * @return this
      */
     public <X> ConfigHelper<T> set(final X older, final X newer) {
@@ -140,8 +136,7 @@ public class ConfigHelper<T> {
     /**
      * Read a configuration
      *
-     * @param pid
-     *            a non-null PID
+     * @param pid a non-null PID
      * @return the properties read or empty if did not exist
      */
     public Map<String, Object> read(final String pid) {
