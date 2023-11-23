@@ -205,7 +205,7 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
     @Override
     public void addOSGiEventListener(final EventListener eventListener) {
-        checkNotNull(eventListener, "'logEntryListener' cannot be null");
+        checkNotNull(eventListener, "'eventListener' cannot be null");
         if (eventListeners.contains(eventListener)) {
             return;
         }
