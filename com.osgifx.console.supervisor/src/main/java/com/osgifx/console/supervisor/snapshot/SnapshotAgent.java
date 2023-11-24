@@ -72,6 +72,7 @@ public final class SnapshotAgent implements Agent {
         if (configuration.location() == null) {
             return;
         }
+        // using gson as a field variable in a component seems very luring but it leads to classloader leaks
         final var gson = new Gson();
         try {
             final var reader = new JsonReader(new FileReader(configuration.location()));
