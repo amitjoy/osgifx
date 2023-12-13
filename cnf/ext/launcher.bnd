@@ -2,7 +2,7 @@
 -runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         ${is;${driver};gradle}
 -runtrace                       =         true 
--runee                          =         JavaSE-17
+-runee                          =         JavaSE-21
 -runsystemcapabilities          =         ${native_capability}
 -runproperties.scr              =         ds.log.enabled=false
 
