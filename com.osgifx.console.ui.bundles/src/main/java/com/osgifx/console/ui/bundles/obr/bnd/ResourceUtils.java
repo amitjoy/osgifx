@@ -33,7 +33,6 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -262,9 +261,8 @@ public final class ResourceUtils {
             }
             if (uriObj instanceof final String uri) {
                 try {
-                    final var url = new URL(uri);
-                    return url.toURI();
-                } catch (final MalformedURLException mfue) {
+                    return URI.create(uri);
+                } catch (final IllegalArgumentException iae) {
                     // Ignore
                 }
                 final var f = new File((String) uriObj);
