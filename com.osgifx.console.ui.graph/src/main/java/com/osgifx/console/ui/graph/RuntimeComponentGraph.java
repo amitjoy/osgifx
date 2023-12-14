@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -43,6 +42,8 @@ import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.graph.RuntimeComponentGraph.CircularLinkedList.Node;
+
+import jakarta.inject.Inject;
 
 @Creatable
 public final class RuntimeComponentGraph {

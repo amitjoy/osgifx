@@ -21,9 +21,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.command.CommandService;
@@ -39,6 +36,8 @@ import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

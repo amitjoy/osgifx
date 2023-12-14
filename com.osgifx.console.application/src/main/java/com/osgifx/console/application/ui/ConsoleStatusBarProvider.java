@@ -20,9 +20,6 @@ import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.scene.paint.Color.GREEN;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.controlsfx.control.StatusBar;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
@@ -30,6 +27,8 @@ import org.eclipse.e4.core.di.annotations.Optional;
 
 import com.osgifx.console.ui.ConsoleStatusBar;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;

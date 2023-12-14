@@ -15,13 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.ui.components;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.agent.dto.XReferenceDTO;
 
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 

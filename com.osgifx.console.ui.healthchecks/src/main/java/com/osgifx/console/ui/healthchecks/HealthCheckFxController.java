@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
@@ -51,6 +48,8 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;

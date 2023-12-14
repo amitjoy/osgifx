@@ -19,8 +19,6 @@ import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
 
 import java.io.FileInputStream;
 
-import javax.inject.Inject;
-
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.workbench.IWorkbench;
@@ -33,6 +31,7 @@ import org.osgi.service.deploymentadmin.DeploymentAdmin;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.util.fx.FxDialog;
 
+import jakarta.inject.Inject;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 

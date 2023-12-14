@@ -18,8 +18,6 @@ package com.osgifx.console.ui.events;
 import java.util.Date;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.util.converter.Converter;
@@ -28,6 +26,7 @@ import org.osgi.util.converter.Converters;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.util.fx.Fx;
 
+import jakarta.inject.Inject;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

@@ -20,9 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -39,6 +36,8 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.io.IO;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javafx.stage.DirectoryChooser;
 
 public final class GenerateObrHandler {
