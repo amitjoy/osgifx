@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.application.addon;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -26,6 +24,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.ui.workbench.renderers.base.widget.WWindow;
 import org.osgi.service.event.Event;
 
+import jakarta.inject.Inject;
 import javafx.stage.Stage;
 
 public final class WindowResizeDisablerAddon {
