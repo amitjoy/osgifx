@@ -17,8 +17,6 @@ package com.osgifx.console.application.addon;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 
-import javax.inject.Inject;
-
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -32,6 +30,7 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.util.fx.FxDialog;
 
+import jakarta.inject.Inject;
 import javafx.concurrent.Task;
 
 public final class AgentConnectedAddon {

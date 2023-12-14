@@ -17,8 +17,6 @@ package com.osgifx.console.ui.bundles.addon;
 
 import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -38,6 +36,7 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import jakarta.inject.Inject;
 import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;

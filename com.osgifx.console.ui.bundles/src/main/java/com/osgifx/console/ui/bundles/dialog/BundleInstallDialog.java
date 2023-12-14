@@ -17,14 +17,13 @@ package com.osgifx.console.ui.bundles.dialog;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.util.fx.Fx;
 
+import jakarta.inject.Inject;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;

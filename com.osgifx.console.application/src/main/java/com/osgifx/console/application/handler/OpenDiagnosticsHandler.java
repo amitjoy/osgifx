@@ -19,8 +19,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -28,6 +26,8 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.util.fx.FxDialog;
+
+import jakarta.inject.Inject;
 
 public final class OpenDiagnosticsHandler {
 

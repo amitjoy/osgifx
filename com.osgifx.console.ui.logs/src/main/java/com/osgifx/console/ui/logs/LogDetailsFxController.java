@@ -17,8 +17,6 @@ package com.osgifx.console.ui.logs;
 
 import java.util.Date;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.util.converter.Converter;
@@ -26,6 +24,7 @@ import org.osgi.util.converter.Converters;
 
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;

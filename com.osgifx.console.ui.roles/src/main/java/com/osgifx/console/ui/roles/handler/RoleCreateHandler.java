@@ -17,9 +17,6 @@ package com.osgifx.console.ui.roles.handler;
 
 import static com.osgifx.console.event.topics.RoleActionEventTopics.ROLE_CREATED_EVENT_TOPIC;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -37,6 +34,8 @@ import com.osgifx.console.ui.roles.dialog.RoleCreateDialog;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import javafx.concurrent.Task;
 
 public final class RoleCreateHandler {

@@ -27,9 +27,6 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -59,6 +56,9 @@ import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.events.dialog.TopicEntryDialog;
 import com.osgifx.console.util.fx.Fx;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public final class EventReceiveMenuContributionHandler {
 
