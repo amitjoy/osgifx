@@ -17,8 +17,6 @@ package com.osgifx.console.ui.logs;
 
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 
-import javax.inject.Inject;
-
 import org.controlsfx.control.SegmentedButton;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -26,6 +24,7 @@ import org.eclipse.fx.ui.di.FXMLBuilder;
 import org.eclipse.fx.ui.di.FXMLLoader;
 import org.eclipse.fx.ui.di.FXMLLoaderFactory;
 
+import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ToggleButton;

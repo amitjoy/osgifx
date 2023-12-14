@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -47,6 +44,9 @@ import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.Fx;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 public final class LogReceiveMenuContributionHandler {
 

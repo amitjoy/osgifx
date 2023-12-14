@@ -19,8 +19,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -34,6 +32,8 @@ import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType;
+
+import jakarta.inject.Inject;
 
 public final class DisconnectFromAgentHandler {
 

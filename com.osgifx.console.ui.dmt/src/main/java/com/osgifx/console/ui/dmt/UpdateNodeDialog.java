@@ -26,8 +26,6 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.util.converter.Converter;
@@ -43,6 +41,7 @@ import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.ui.dmt.UpdateNodeDialog.UpdateDialogDTO;
 
+import jakarta.inject.Inject;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
