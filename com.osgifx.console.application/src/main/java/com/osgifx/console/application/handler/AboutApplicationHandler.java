@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.application.handler;
 
-import javax.inject.Inject;
-
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -24,6 +22,8 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.AboutApplicationDialog;
+
+import jakarta.inject.Inject;
 
 public final class AboutApplicationHandler {
 

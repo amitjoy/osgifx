@@ -25,8 +25,6 @@ import static com.osgifx.console.ui.search.filter.SearchComponent.SERVICES;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -43,6 +41,7 @@ import com.osgifx.console.ui.search.filter.SearchFilterManager;
 import com.osgifx.console.ui.search.filter.SearchOperation;
 import com.osgifx.console.util.fx.FxDialog;
 
+import jakarta.inject.Inject;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;

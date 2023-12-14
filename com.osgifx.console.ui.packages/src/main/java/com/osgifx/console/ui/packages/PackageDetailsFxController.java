@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.packages;
 
-import javax.inject.Inject;
-
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -27,6 +25,7 @@ import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
+import jakarta.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
