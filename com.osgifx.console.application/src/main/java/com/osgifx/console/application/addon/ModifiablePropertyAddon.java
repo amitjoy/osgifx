@@ -18,14 +18,13 @@ package com.osgifx.console.application.addon;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Maps;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 
 public final class ModifiablePropertyAddon {
