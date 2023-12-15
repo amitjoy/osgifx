@@ -63,9 +63,12 @@ org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.17.300
 org.eclipse.platform:org.eclipse.e4.core.services:2.4.200
 org.eclipse.platform:org.eclipse.e4.emf.xpath:0.4.100
 org.eclipse.platform:org.eclipse.e4.ui.di:1.5.200
-org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.4.100
 org.eclipse.platform:org.eclipse.e4.ui.services:1.6.200
 org.eclipse.platform:org.eclipse.e4.ui.workbench:1.15.200
+
+# The following cannot be used as it uses jakarta.* annotations which cannot be parsed by e(fx)clipse now
+# org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.4.100
+
 
 # Eclipse Platform
 
@@ -92,3 +95,4 @@ org.apache.sling:org.apache.sling.commons.logservice:1.1.0
 # Jakarta
 
 jakarta.inject:jakarta.inject-api:2.0.1
+jakarta.annotation:jakarta.annotation-api:2.1.1
