@@ -1,6 +1,6 @@
 package $basePackageName$;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
