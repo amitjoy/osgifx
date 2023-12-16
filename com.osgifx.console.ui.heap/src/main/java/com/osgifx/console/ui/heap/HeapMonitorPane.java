@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.Creatable;
@@ -42,7 +44,6 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.io.IO;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import javafx.animation.Animation;

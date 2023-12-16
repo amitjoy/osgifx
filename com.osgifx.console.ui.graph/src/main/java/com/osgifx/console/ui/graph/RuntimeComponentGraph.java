@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
@@ -41,7 +43,6 @@ import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.graph.RuntimeComponentGraph.CircularLinkedList.Node;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 
 @Creatable
