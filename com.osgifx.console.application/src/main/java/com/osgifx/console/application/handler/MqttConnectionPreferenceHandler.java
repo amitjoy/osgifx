@@ -18,6 +18,8 @@ package com.osgifx.console.application.handler;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -32,7 +34,6 @@ import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 

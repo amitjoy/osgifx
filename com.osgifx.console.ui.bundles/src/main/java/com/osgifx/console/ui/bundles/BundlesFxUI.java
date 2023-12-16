@@ -21,6 +21,8 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static javafx.geometry.Orientation.VERTICAL;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -39,7 +41,6 @@ import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import javafx.concurrent.Task;
