@@ -18,6 +18,8 @@ package com.osgifx.console.ui.graph;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.EnumUtils;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
@@ -41,7 +43,6 @@ import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import javafx.concurrent.Task;
