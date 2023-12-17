@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -40,8 +41,6 @@ import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.data.provider.DataProvider;
-
-import jakarta.inject.Inject;
 
 @Creatable
 public final class RuntimeBundleGraph {

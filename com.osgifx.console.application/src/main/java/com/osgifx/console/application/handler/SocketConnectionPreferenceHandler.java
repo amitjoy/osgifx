@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -33,9 +35,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 public final class SocketConnectionPreferenceHandler {
 

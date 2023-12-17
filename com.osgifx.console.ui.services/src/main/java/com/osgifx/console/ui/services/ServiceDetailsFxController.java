@@ -17,6 +17,8 @@ package com.osgifx.console.ui.services;
 
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -24,7 +26,6 @@ import org.eclipse.fx.core.log.Log;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.util.fx.Fx;
 
-import jakarta.inject.Inject;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;

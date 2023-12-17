@@ -17,11 +17,12 @@ package com.osgifx.console.ui.events.dialog;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 

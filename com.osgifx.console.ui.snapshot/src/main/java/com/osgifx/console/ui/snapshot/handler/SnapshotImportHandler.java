@@ -16,14 +16,16 @@
 package com.osgifx.console.ui.snapshot.handler;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
+import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -43,7 +45,6 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 

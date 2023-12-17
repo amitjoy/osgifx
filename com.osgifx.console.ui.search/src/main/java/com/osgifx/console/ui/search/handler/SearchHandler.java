@@ -22,6 +22,9 @@ import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_PAC
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_SERVICE_FILTER_EVENT_TOPIC;
 import static org.eclipse.e4.ui.workbench.modeling.EPartService.PartState.ACTIVATE;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
@@ -33,9 +36,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.ui.search.dialog.SearchDialog;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 public final class SearchHandler {
 

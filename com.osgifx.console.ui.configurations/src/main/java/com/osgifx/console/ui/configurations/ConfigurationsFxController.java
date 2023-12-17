@@ -19,6 +19,9 @@ import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CON
 
 import java.util.function.Predicate;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
@@ -36,8 +39,6 @@ import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

@@ -17,6 +17,9 @@ package com.osgifx.console.ui.configurations.handler;
 
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -33,8 +36,6 @@ import com.osgifx.console.ui.configurations.dialog.ConfigurationCreateDialog;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.concurrent.Task;
 
 public final class ConfigurationCreateHandler {

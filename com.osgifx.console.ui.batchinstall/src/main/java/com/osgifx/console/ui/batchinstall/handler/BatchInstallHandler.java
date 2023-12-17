@@ -19,6 +19,9 @@ import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INS
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -36,8 +39,6 @@ import com.osgifx.console.ui.batchinstall.dialog.ArtifactInstaller;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.concurrent.Task;
 import javafx.stage.DirectoryChooser;
 

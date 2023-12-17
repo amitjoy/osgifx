@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -36,8 +39,6 @@ import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.io.IO;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.stage.DirectoryChooser;

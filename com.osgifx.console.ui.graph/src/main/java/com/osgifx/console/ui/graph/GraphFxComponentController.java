@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
@@ -49,7 +51,6 @@ import com.osgifx.console.smartgraph.graphview.SmartPlacementStrategy;
 import com.osgifx.console.smartgraph.graphview.SmartRandomPlacementStrategy;
 import com.osgifx.console.util.fx.Fx;
 
-import jakarta.inject.Inject;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;

@@ -18,6 +18,8 @@ package com.osgifx.console.ui.bundles.dialog;
 import java.io.File;
 import java.util.function.UnaryOperator;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.ToggleSwitch;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -25,7 +27,6 @@ import org.eclipse.fx.core.log.Log;
 
 import com.google.common.primitives.Ints;
 
-import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
