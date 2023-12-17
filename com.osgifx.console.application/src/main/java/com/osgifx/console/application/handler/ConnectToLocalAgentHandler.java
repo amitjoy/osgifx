@@ -19,6 +19,9 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -38,8 +41,6 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.concurrent.Task;
 
 public final class ConnectToLocalAgentHandler {

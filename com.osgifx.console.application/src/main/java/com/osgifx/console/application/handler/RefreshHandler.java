@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.application.handler;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -22,9 +25,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.data.provider.DataProvider;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 public final class RefreshHandler {
 

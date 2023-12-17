@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -42,7 +44,6 @@ import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.PropertiesForm;
 import com.osgifx.console.util.fx.PropertiesForm.FormContent;
 
-import jakarta.inject.Inject;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;

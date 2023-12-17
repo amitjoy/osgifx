@@ -108,7 +108,7 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
             return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
         }
     }
-
+    
     public Optional<BundleStartDuration> getBundleStartDuration(long bundleId) {
         return Optional.ofNullable(bundleToStartTime.get(bundleId)).map(StartTime::toBundleStartDuration);
     }

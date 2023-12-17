@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.application.fxml.controller;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
@@ -26,7 +28,6 @@ import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 
-import jakarta.inject.Inject;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;

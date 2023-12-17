@@ -22,6 +22,8 @@ import static javafx.scene.control.ButtonType.CANCEL;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -49,7 +51,6 @@ import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
 import javafx.concurrent.Task;
 
 public final class ConnectToMqttAgentHandler {
