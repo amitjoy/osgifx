@@ -17,6 +17,8 @@ package com.osgifx.console.ui.extension.dialog;
 
 import java.util.stream.Stream;
 
+import javax.inject.Inject;
+
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -27,7 +29,6 @@ import org.osgi.service.deploymentadmin.DeploymentPackage;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

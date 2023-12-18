@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dto;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -29,8 +32,6 @@ import com.google.gson.JsonParser;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

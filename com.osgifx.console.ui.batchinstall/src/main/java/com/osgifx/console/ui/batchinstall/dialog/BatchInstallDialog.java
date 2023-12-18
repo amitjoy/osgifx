@@ -22,6 +22,8 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import java.io.File;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
@@ -29,7 +31,6 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog.ArtifactDTO;
 import com.osgifx.console.util.fx.Fx;
 
-import jakarta.inject.Inject;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;

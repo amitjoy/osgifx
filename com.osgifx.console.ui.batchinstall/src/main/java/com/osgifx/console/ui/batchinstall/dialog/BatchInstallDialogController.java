@@ -18,6 +18,8 @@ package com.osgifx.console.ui.batchinstall.dialog;
 import java.io.File;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.control.ListSelectionView;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -25,7 +27,6 @@ import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog.ArtifactDTO;
 
-import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
