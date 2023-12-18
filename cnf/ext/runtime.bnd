@@ -12,7 +12,7 @@ bundles.console: \
                  org.eclipse.equinox.console
 
 bundles.deps: \
-                 javax.annotation,\
+                 jakarta.annotation-api,\
                  jakarta.inject.jakarta.inject-api,\
                  javax.xml.jre,\
                  org.apache.commons.jxpath,\
