@@ -22,9 +22,6 @@ import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
 import java.time.Duration;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -37,6 +34,8 @@ import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 
 public final class AgentPingAddon {
