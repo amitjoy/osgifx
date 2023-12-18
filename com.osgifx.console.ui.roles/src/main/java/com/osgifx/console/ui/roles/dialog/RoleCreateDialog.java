@@ -18,6 +18,8 @@ package com.osgifx.console.ui.roles.dialog;
 import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.EnumUtils;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -31,7 +33,6 @@ import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.ui.roles.dialog.RoleCreateDialog.RoleDTO;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;

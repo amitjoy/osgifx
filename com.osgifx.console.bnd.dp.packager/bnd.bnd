@@ -9,6 +9,6 @@
 Import-Package      : \
                       com.google.errorprone.annotations;'resolution:'=optional,\
                       com.google.errorprone.annotations.concurrent;'resolution:'=optional,\
-                      jakarta.annotation;'resolution:'=optional,\
+                      javax.annotation;'resolution:'=optional,\
                       org.checkerframework.checker.nullness.qual;'resolution:'=optional,\
                       *

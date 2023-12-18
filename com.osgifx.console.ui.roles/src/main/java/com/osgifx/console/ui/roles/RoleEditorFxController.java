@@ -25,6 +25,9 @@ import static com.osgifx.console.ui.roles.dialog.PropertiesConfigurationDialog.C
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -47,8 +50,6 @@ import com.osgifx.console.ui.roles.helper.RolesHelper;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
