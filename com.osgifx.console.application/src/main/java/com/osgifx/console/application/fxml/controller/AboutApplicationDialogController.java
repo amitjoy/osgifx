@@ -19,6 +19,8 @@ import static org.osgi.framework.Constants.BUNDLE_DOCURL;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.commons.text.StringSubstitutor;
 import org.controlsfx.control.HyperlinkLabel;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
@@ -27,7 +29,6 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
-import jakarta.inject.Inject;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

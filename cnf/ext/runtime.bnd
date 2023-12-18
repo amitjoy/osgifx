@@ -12,8 +12,8 @@ bundles.console: \
                  org.eclipse.equinox.console
 
 bundles.deps: \
-                 jakarta.annotation-api,\
-                 jakarta.inject.jakarta.inject-api,\
+                 javax.annotation,\
+                 javax.inject,\
                  javax.xml.jre,\
                  org.apache.commons.jxpath,\
                  com.google.guava,\
@@ -86,7 +86,7 @@ bundles.required: \
                  org.apache.commons.text,\
                  org.eclipse.equinox.preferences,\
                  controlsfx,\
-                 jakarta.inject.jakarta.inject-api,\
+                 javax.inject,\
                  com.osgifx.console.util,\
                  com.osgifx.console.wrapper.mug,\
                  eu.hansolo.tilesfx,\

@@ -18,6 +18,9 @@ package com.osgifx.console.ui.heap;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -25,8 +28,6 @@ import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.ui.ConsoleStatusBar;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.inject.Inject;
 import javafx.scene.layout.BorderPane;
 
 public final class HeapMonitorFxUI {

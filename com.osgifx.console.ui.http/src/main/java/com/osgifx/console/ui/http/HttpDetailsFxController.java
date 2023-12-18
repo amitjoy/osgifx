@@ -18,6 +18,8 @@ package com.osgifx.console.ui.http;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -27,7 +29,6 @@ import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 
-import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.layout.BorderPane;

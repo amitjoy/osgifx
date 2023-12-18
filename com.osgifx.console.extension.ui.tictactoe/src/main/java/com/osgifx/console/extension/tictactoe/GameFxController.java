@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.extension.tictactoe;
 
+import javax.inject.Inject;
+
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -22,7 +24,6 @@ import com.osgifx.console.extension.tictactoe.GameLogic.States;
 
 import eu.lestard.grid.GridModel;
 import eu.lestard.grid.GridView;
-import jakarta.inject.Inject;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

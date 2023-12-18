@@ -23,6 +23,8 @@ import static org.controlsfx.validation.Validator.createPredicateValidator;
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -35,7 +37,6 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.primitives.Ints;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;

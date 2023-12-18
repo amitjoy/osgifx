@@ -19,6 +19,8 @@ import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static org.controlsfx.validation.Validator.createPredicateValidator;
 
+import javax.inject.Inject;
+
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationSupport;
@@ -30,7 +32,6 @@ import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
 import com.osgifx.console.util.fx.FxDialog;
 
-import jakarta.inject.Inject;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;

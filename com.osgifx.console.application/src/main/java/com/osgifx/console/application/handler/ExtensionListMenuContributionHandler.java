@@ -19,6 +19,8 @@ import static org.eclipse.e4.ui.workbench.modeling.EPartService.PartState.ACTIVA
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.AboutToShow;
@@ -31,8 +33,6 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
-
-import jakarta.inject.Inject;
 
 public final class ExtensionListMenuContributionHandler {
 
