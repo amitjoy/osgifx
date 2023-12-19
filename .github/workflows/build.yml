@@ -22,7 +22,7 @@ jobs:
       -  name: Set up Java 17 with JavaFX
          uses: actions/setup-java@v1
          with:
-            java-version: 17
+            java-version: '21'
             java-package: jdk+fx
       -  name: Build Workspace using Gradle
          run: ./gradlew build --max-workers=5 --parallel
