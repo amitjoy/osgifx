@@ -1,18 +1,55 @@
 <?xml version="1.0" encoding="ASCII"?>
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gahNcFw7Ee2vapz13RE2Vg" featurename="bindings" parentElementId="com.osgifx.console.application.bindingtable.refresh">
-    <elements xsi:type="commands:KeyBinding" xmi:id="_gahNcVw7Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.keybinding.snapshot.import" keySequence="M1+O" command="_gahNeFw7Ee2vapz13RE2Vg"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gahNc1w7Ee2vapz13RE2Vg" featurename="handlers" parentElementId="com.osgifx.console.application">
-    <elements xsi:type="commands:Handler" xmi:id="_gahNdFw7Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.handler.snapshot.import" contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotImportHandler" command="_gahNeFw7Ee2vapz13RE2Vg"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gahNdlw7Ee2vapz13RE2Vg" featurename="commands" parentElementId="com.osgifx.console.application">
-    <elements xsi:type="commands:Command" xmi:id="_gahNeFw7Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.command.snapshot.import" commandName="Import Snapshot" description="Imports already captured snapshot"/>
-  </fragments>
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_hbr6EFw8Ee2vapz13RE2Vg" featurename="children" parentElementId="com.osgifx.console.application.menu.extensions" positionInList="after:com.osgifx.console.application.menu.connection">
-    <elements xsi:type="menu:Menu" xmi:id="_hbr6EVw8Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.menu.snapshot" label="Snapshot">
-      <children xsi:type="menu:HandledMenuItem" xmi:id="_gahNf1w7Ee2vapz13RE2Vg" elementId="com.osgifx.console.application.handledmenuitem.import" label="Import" iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/import.png" tooltip="Imports snapshot of the remote runtime" command="_gahNeFw7Ee2vapz13RE2Vg"/>
-      <children xsi:type="menu:DirectMenuItem" xmi:id="_4VOg0FxAEe2vapz13RE2Vg" elementId="com.osgifx.console.ui.snapshot.directmenuitem.capture" label="Capture" iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/capture.png" tooltip="Captures snapshot of the remote runtime" contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotCaptureHandler"/>
-    </elements>
-  </fragments>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:commands="http://www.eclipse.org/ui/2010/UIModel/application/commands"
+	xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment"
+	xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu"
+	xmi:id="_s7J3oCBGEey33dbookdebQ">
+	<fragments xsi:type="fragment:StringModelFragment"
+		xmi:id="_gahNcFw7Ee2vapz13RE2Vg" featurename="bindings"
+		parentElementId="com.osgifx.console.application.bindingtable.refresh">
+		<elements xsi:type="commands:KeyBinding"
+			xmi:id="_gahNcVw7Ee2vapz13RE2Vg"
+			elementId="com.osgifx.console.application.keybinding.snapshot.import"
+			keySequence="M1+O" command="_gahNeFw7Ee2vapz13RE2Vg" />
+	</fragments>
+	<fragments xsi:type="fragment:StringModelFragment"
+		xmi:id="_gahNc1w7Ee2vapz13RE2Vg" featurename="handlers"
+		parentElementId="com.osgifx.console.application">
+		<elements xsi:type="commands:Handler" xmi:id="_gahNdFw7Ee2vapz13RE2Vg"
+			elementId="com.osgifx.console.application.handler.snapshot.import"
+			contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotImportHandler"
+			command="_gahNeFw7Ee2vapz13RE2Vg" />
+	</fragments>
+	<fragments xsi:type="fragment:StringModelFragment"
+		xmi:id="_gahNdlw7Ee2vapz13RE2Vg" featurename="commands"
+		parentElementId="com.osgifx.console.application">
+		<elements xsi:type="commands:Command" xmi:id="_gahNeFw7Ee2vapz13RE2Vg"
+			elementId="com.osgifx.console.application.command.snapshot.import"
+			commandName="Import Snapshot"
+			description="Imports already captured snapshot" />
+	</fragments>
+	<fragments xsi:type="fragment:StringModelFragment"
+		xmi:id="_hbr6EFw8Ee2vapz13RE2Vg" featurename="children"
+		parentElementId="com.osgifx.console.application.menu.extensions"
+		positionInList="after:com.osgifx.console.application.menu.connection">
+		<elements xsi:type="menu:Menu" xmi:id="_hbr6EVw8Ee2vapz13RE2Vg"
+			elementId="com.osgifx.console.application.menu.snapshot"
+			label="Snapshot">
+			<children xsi:type="menu:HandledMenuItem"
+				xmi:id="_gahNf1w7Ee2vapz13RE2Vg"
+				elementId="com.osgifx.console.application.handledmenuitem.import"
+				label="Import"
+				iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/import.png"
+				tooltip="Imports snapshot of the remote runtime"
+				command="_gahNeFw7Ee2vapz13RE2Vg" />
+			<children xsi:type="menu:DirectMenuItem"
+				xmi:id="_4VOg0FxAEe2vapz13RE2Vg"
+				elementId="com.osgifx.console.ui.snapshot.directmenuitem.capture"
+				label="Capture"
+				iconURI="platform:/plugin/com.osgifx.console.ui.snapshot/graphic/icons/capture.png"
+				tooltip="Captures snapshot of the remote runtime"
+				contributionURI="bundleclass://com.osgifx.console.ui.snapshot/com.osgifx.console.ui.snapshot.handler.SnapshotCaptureHandler" />
+		</elements>
+	</fragments>
 </fragment:ModelFragments>
