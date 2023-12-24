@@ -14,8 +14,20 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmi:id="_s7J3oCBGEey33dbookdebQ">
-  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack">
-    <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.properties" contributionURI="bundleclass://com.osgifx.console.ui.properties/com.osgifx.console.ui.properties.PropertiesFxUI" label="Properties" iconURI="platform:/plugin/com.osgifx.console.ui.properties/graphic/icons/properties.png" tooltip="Shows all framework and system properties set in the remote framework" closeable="true"/>
-  </fragments>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic"
+	xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment"
+	xmi:id="_s7J3oCBGEey33dbookdebQ">
+	<fragments xsi:type="fragment:StringModelFragment"
+		xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children"
+		parentElementId="com.osgifx.console.ui.extensions.partstack">
+		<elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ"
+			elementId="com.osgifx.console.application.tab.properties"
+			contributionURI="bundleclass://com.osgifx.console.ui.properties/com.osgifx.console.ui.properties.PropertiesFxUI"
+			label="Properties"
+			iconURI="platform:/plugin/com.osgifx.console.ui.properties/graphic/icons/properties.png"
+			tooltip="Shows all framework and system properties set in the remote framework"
+			closeable="true" />
+	</fragments>
 </fragment:ModelFragments>
