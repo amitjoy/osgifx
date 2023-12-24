@@ -15,7 +15,8 @@
   the License.
 -->
 <plugin>
-	<extension point="org.eclipse.e4.workbench.model" id="com.osgifx.console.ui.threads">
+	<extension point="org.eclipse.e4.workbench.model"
+		id="com.osgifx.console.ui.threads">
 		<fragment apply="always" uri="fragment.e4xmi">
 		</fragment>
 	</extension>
