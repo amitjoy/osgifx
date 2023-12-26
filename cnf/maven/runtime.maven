@@ -4,7 +4,7 @@ com.google.code.gson:gson:2.10.1
 
 # Apache
 
-commons-io:commons-io:2.15.0
+commons-io:commons-io:2.15.1
 org.apache.aries.component-dsl:org.apache.aries.component-dsl.component-dsl:1.2.2
 org.apache.commons:commons-lang3:3.14.0
 org.apache.commons:commons-text:1.11.0
