@@ -1,6 +1,6 @@
 # Google
 
-com.google.mug:mug:7.0
+com.google.mug:mug:7.1
 
 # bnd
 
@@ -13,7 +13,7 @@ biz.aQute.bnd:biz.aQute.bnd.util:7.0.0
 
 # Apache
 
-org.apache.commons:commons-exec:1.3
+org.apache.commons:commons-exec:1.4
 org.apache.felix:org.apache.felix.healthcheck.api:2.0.4
 
 # Font Awesome FX
@@ -56,9 +56,9 @@ org.osgi:org.osgi.util.converter:1.0.9
 
 # TilesFx
 
-eu.hansolo:tilesfx:21.0.1
-eu.hansolo:toolbox:21.0.3
-eu.hansolo:toolboxfx:21.0.1
+eu.hansolo:tilesfx:21.0.3
+eu.hansolo:toolbox:21.0.5
+eu.hansolo:toolboxfx:21.0.3
 
 # FormsFx
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2021-2023 Amit Kumar Mondal
+  Copyright 2021-2024 Amit Kumar Mondal
   
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License.  You may obtain a copy
@@ -17,14 +17,16 @@
 <?eclipse version="3.4"?>
 <plugin>
 	<extension id="osgifx" point="org.eclipse.core.runtime.applications">
-      <application cardinality="*" thread="any" visible="true">
-         <run class="com.osgifx.console.application.ConsoleFxApplication" />
-      </application>
-   </extension>
+		<application cardinality="*" thread="any" visible="true">
+			<run class="com.osgifx.console.application.ConsoleFxApplication" />
+		</application>
+	</extension>
 	<extension id="product" point="org.eclipse.core.runtime.products">
-		<product name="OSGi.fx" application="org.eclipse.fx.ui.workbench.fx.application">
+		<product name="OSGi.fx"
+			application="org.eclipse.fx.ui.workbench.fx.application">
 			<property name="appName" value="OSGi.fx" />
-			<property name="applicationXMI" value="com.osgifx.console.application/Application.e4xmi" />
+			<property name="applicationXMI"
+				value="com.osgifx.console.application/Application.e4xmi" />
 			<property name="cssTheme" value="theme.default" />
 			<property name="clearPersistedState" value="true" />
 		</product>
