@@ -13,7 +13,7 @@ javac.compliance      : ${javac.source}
                         com.j256.simplelogging:simplelogging;packages=*,\
                         com.osgifx.console.agent.api;version=snapshot;packages=*,\
                         com.osgifx.console.agent.di;packages=*,\
-                        org.apache.commons.exec,\
+                        org.apache.commons.commons-exec,\
                         org.apache.felix.healthcheck.api,\
                         org.osgi.service.cdi,\
                         org.osgi.service.jaxrs,\
