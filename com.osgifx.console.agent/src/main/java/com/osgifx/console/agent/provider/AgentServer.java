@@ -154,8 +154,8 @@ public final class AgentServer implements Agent, Closeable {
         SOCKET_RPC
     }
 
-    private static final long          RESULT_TIMEOUT           = Duration.ofSeconds(20).toMillis();
-    private static final long          WATCHDOG_TIMEOUT         = Duration.ofSeconds(30).toMillis();
+    private static final Duration      RESULT_TIMEOUT           = Duration.ofSeconds(20);
+    private static final Duration      WATCHDOG_TIMEOUT         = Duration.ofSeconds(30);
     private static final AtomicInteger sequence                 = new AtomicInteger(1000);
     private static final Pattern       BSN_PATTERN              = Pattern.compile("\\s*([^;\\s]+).*");
     public static final String         PROPERTY_ENABLE_LOGGING  = "osgi.fx.enable.logging";
@@ -404,8 +404,9 @@ public final class AgentServer implements Agent, Closeable {
                 cmdLine.addArgument(commandEntries.get(i));
             }
             final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-            final ExecuteWatchdog             watchdog      = new ExecuteWatchdog(WATCHDOG_TIMEOUT);
-            final Executor                    executor      = new DefaultExecutor();
+            final ExecuteWatchdog             watchdog      = ExecuteWatchdog.builder().setTimeout(WATCHDOG_TIMEOUT)
+                    .get();
+            final Executor                    executor      = DefaultExecutor.builder().get();
             final ByteArrayOutputStream       outputStream  = new ByteArrayOutputStream();
             final PumpStreamHandler           streamHandler = new PumpStreamHandler(outputStream);
 
