@@ -154,12 +154,14 @@ public final class AgentServer implements Agent, Closeable {
         SOCKET_RPC
     }
 
-    private static final Duration      RESULT_TIMEOUT           = Duration.ofSeconds(20);
-    private static final Duration      WATCHDOG_TIMEOUT         = Duration.ofSeconds(30);
-    private static final AtomicInteger sequence                 = new AtomicInteger(1000);
-    private static final Pattern       BSN_PATTERN              = Pattern.compile("\\s*([^;\\s]+).*");
-    public static final String         PROPERTY_ENABLE_LOGGING  = "osgi.fx.enable.logging";
-    public static final String         PROPERTY_ENABLE_EVENTING = "osgi.fx.enable.eventing";
+    private static final Duration      RESULT_TIMEOUT                        = Duration.ofSeconds(20);
+    private static final Duration      WATCHDOG_TIMEOUT                      = Duration.ofSeconds(30);
+    private static final AtomicInteger sequence                              = new AtomicInteger(1000);
+    private static final Pattern       BSN_PATTERN                           = Pattern.compile("\\s*([^;\\s]+).*");
+    public static final String         PROPERTY_ENABLE_LOGGING               = "osgi.fx.enable.logging";
+    public static final String         PROPERTY_ENABLE_EVENTING              = "osgi.fx.enable.eventing";
+    private static final String        COMMAND_EXECUTOR_DEFAULT_THREAD_NAME  = "exec-default";
+    private static final String        COMMAND_EXECUTOR_WATCHDOG_THREAD_NAME = "exec-watchdog";
 
     public volatile boolean              quit;
     private final RpcType                rpcType;
@@ -405,8 +407,9 @@ public final class AgentServer implements Agent, Closeable {
             }
             final DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
             final ExecuteWatchdog             watchdog      = ExecuteWatchdog.builder().setTimeout(WATCHDOG_TIMEOUT)
-                    .get();
-            final Executor                    executor      = DefaultExecutor.builder().get();
+                    .setThreadFactory(r -> new Thread(r, COMMAND_EXECUTOR_WATCHDOG_THREAD_NAME)).get();
+            final Executor                    executor      = DefaultExecutor.builder()
+                    .setThreadFactory(r -> new Thread(r, COMMAND_EXECUTOR_DEFAULT_THREAD_NAME)).get();
             final ByteArrayOutputStream       outputStream  = new ByteArrayOutputStream();
             final PumpStreamHandler           streamHandler = new PumpStreamHandler(outputStream);
 
