@@ -54,7 +54,7 @@ public interface Supervisor {
     String EVENT_LISTENER_REMOVED_EVENT_TOPIC = "fx/console/supervisor/event/listener/removed";
 
     /**
-     * Returns the type of the communication
+     * Returns the type of the RPC communication
      */
     RpcType getType();
 
