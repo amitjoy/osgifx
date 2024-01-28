@@ -147,7 +147,7 @@ public final class DI {
                 }
                 return (T) instanceFromProvider;
             }
-            return (T) createNewInstance(type, parent);
+            return (T) createNewInstance(type);
         } catch (final DiException rootCause) {
             final StringBuilder errorMessage = new StringBuilder("DI wasn't able to create your class hierarchy. ");
             if (parent != null) {
@@ -163,7 +163,7 @@ public final class DI {
     /**
      * Create a new instance of the given type.
      */
-    private <T> T createNewInstance(final Class<T> type, final Class<?> parent) {
+    private <T> T createNewInstance(final Class<T> type) {
         final Constructor<T> constructor = findConstructor(type);
         final Parameter[]    parameters  = constructor.getParameters();
 
