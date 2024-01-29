@@ -1,7 +1,15 @@
 # distro generation bnd cli command
 #    - bnd remote -p 1729 distro -o com.osgifx.console.runtime.jar com.osgifx.console.runtime
 
--include                          :   ${workspace}/cnf/efx.bndrun
+bundles.product                   :   ${bundles.javax},\
+                                      ${bundles.e4.efxclipse},\
+                                      ${bundles.eclipse.core},\
+                                      ${bundles.e4.core},\
+                                      ${bundles.configurations},\
+                                      ${bundles.slf4j},\
+                                      org.apache.felix.gogo.shell
+
+requirement.product               :   ${replacelist;${bundles.product};.+;bnd.identity\\;id='$0'}
 
 # this is required for assigning the start levels for all inbuilt bundles
 default.startlevel                :   10
@@ -178,7 +186,6 @@ install.order                     :   \
 	org.eclipse.emf.ecore.xmi;version='[2.17.0,2.17.1)';startlevel=10,\
 	org.eclipse.equinox.app;version='[1.6.400,1.6.401)';startlevel=10,\
 	org.eclipse.equinox.common;version='[3.18.200,3.18.201)';startlevel=10,\
-	org.eclipse.equinox.console;version='[1.4.600,1.4.601)';startlevel=10,\
 	org.eclipse.equinox.event;version='[1.6.300,1.6.301)';startlevel=10,\
 	org.eclipse.equinox.preferences;version='[3.10.400,3.10.401)';startlevel=10,\
 	org.eclipse.equinox.registry;version='[3.11.400,3.11.401)';startlevel=10,\
@@ -204,7 +211,6 @@ install.order                     :   \
 	org.eclipse.fx.ui.workbench.renderers.base;version='[3.9.0,3.9.1)';startlevel=10,\
 	org.eclipse.fx.ui.workbench.renderers.fx;version='[3.9.0,3.9.1)';startlevel=10,\
 	org.eclipse.fx.ui.workbench.services;version='[3.9.0,3.9.1)';startlevel=10,\
-	org.eclipse.jdt.annotation;version='[2.2.700,2.2.701)';startlevel=10,\
 	org.eclipse.osgi.services;version='[3.11.200,3.11.201)';startlevel=10,\
 	org.glassfish.jakarta.json;version='[2.0.1,2.0.2)';startlevel=10,\
 	org.osgi.service.cm;version='[1.6.1,1.6.2)';startlevel=10,\
