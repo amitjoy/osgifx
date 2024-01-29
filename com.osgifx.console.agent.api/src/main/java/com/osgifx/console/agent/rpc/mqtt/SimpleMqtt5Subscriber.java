@@ -29,8 +29,7 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
 public final class SimpleMqtt5Subscriber implements Mqtt5Subscriber {
 
-    private final BundleContext                                      bundleContext;
-    private ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker;
+    private final BundleContext bundleContext;
 
     public SimpleMqtt5Subscriber(final BundleContext bundleContext) {
         this.bundleContext = bundleContext;
@@ -40,9 +39,10 @@ public final class SimpleMqtt5Subscriber implements Mqtt5Subscriber {
     public PushStream<Mqtt5Message> subscribe(final String channel) {
         final PushStreamProvider                  provider = new PushStreamProvider();
         final SimplePushEventSource<Mqtt5Message> source   = acquirePushEventSource(provider);
-        subscriberTracker = new ServiceTracker<MessageSubscription, MessageSubscription>(bundleContext,
-                                                                                         MessageSubscription.class,
-                                                                                         null) {
+
+        final ServiceTracker<MessageSubscription, MessageSubscription> subscriberTracker = new ServiceTracker<MessageSubscription, MessageSubscription>(bundleContext,
+                                                                                                                                                        MessageSubscription.class,
+                                                                                                                                                        null) {
             @Override
             public MessageSubscription addingService(final ServiceReference<MessageSubscription> reference) {
                 final MessageSubscription service = super.addingService(reference);
