@@ -1,29 +1,6 @@
-bundles.equinox: \
-                 org.eclipse.equinox.app,\
-                 org.eclipse.equinox.common,\
-                 org.eclipse.equinox.event,\
-                 org.eclipse.equinox.preferences,\
-                 org.eclipse.equinox.registry
-
-bundles.console: \
-                 org.apache.felix.gogo.runtime,\
-                 org.apache.felix.gogo.shell,\
-                 org.apache.felix.gogo.command,\
-                 org.eclipse.equinox.console
-
-bundles.deps: \
+bundles.javax: \
                  javax.annotation,\
-                 javax.inject,\
-                 javax.xml.jre,\
-                 org.apache.commons.jxpath,\
-                 com.google.guava,\
-                 org.eclipse.jdt.annotation
-
-bundles.eclipse.emf: \
-                 org.eclipse.emf.common,\
-                 org.eclipse.emf.ecore,\
-                 org.eclipse.emf.ecore.change,\
-                 org.eclipse.emf.ecore.xmi
+                 javax.inject
 
 bundles.eclipse.core: \
                  org.eclipse.core.commands,\
@@ -73,26 +50,37 @@ bundles.e4.efxclipse: \
 bundles.slf4j: \
                  org.eclipse.fx.core.slf4j
 
-bundles.required: \
-                 ${bundles.e4.core},\
-                 ${bundles.e4.efxclipse},\
-                 ${bundles.deps},\
-                 ${bundles.eclipse.core},\
-                 ${bundles.slf4j},\
-                 com.google.guava,\
-                 org.apache.aries.component-dsl.component-dsl,\
+bundles.apache.commons: \
                  org.apache.commons.lang3,\
                  org.apache.commons.commons-io,\
-                 org.apache.commons.text,\
-                 org.eclipse.equinox.preferences,\
+                 org.apache.commons.text
+
+bundles.ui.3rdparty: \
                  controlsfx,\
-                 javax.inject,\
-                 com.osgifx.console.util,\
-                 com.osgifx.console.wrapper.mug,\
                  eu.hansolo.tilesfx,\
-                 com.osgifx.console.wrapper.formsfx,\
-                 org.apache.felix.dependencymanager
-                
+
+bundles.wrapper: \
+                 com.osgifx.console.wrapper.mug,\
+                 com.osgifx.console.wrapper.formsfx
+
 bundles.configurations: \
                  org.apache.felix.configadmin,\
                  org.apache.felix.configurator
+
+bundles.felix: \
+                 ${bundles.configurations},\
+                 org.apache.felix.dependencymanager
+
+bundles.required: \
+                 ${bundles.e4.core},\
+                 ${bundles.e4.efxclipse},\
+                 ${bundles.javax},\
+                 ${bundles.eclipse.core},\
+                 ${bundles.slf4j},\
+                 ${bundles.apache.commons},\
+                 ${bundles.ui.3rdparty},\
+                 ${bundles.wrapper},\
+                 com.google.guava,\
+                 org.apache.aries.component-dsl.component-dsl,\
+                 com.osgifx.console.util,\
+                 org.apache.felix.dependencymanager

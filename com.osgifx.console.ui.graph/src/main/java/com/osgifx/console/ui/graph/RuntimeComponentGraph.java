@@ -79,6 +79,7 @@ public final class RuntimeComponentGraph {
         return paths.getAllPaths(vertices, requirerGraph.vertexSet(), true, null);
     }
 
+    @SuppressWarnings("unused")
     public Graph<ComponentVertex, DefaultEdge> getAllCycles() {
         final var                                 tarjan = new TarjanSimpleCycles<>(requirerGraph);
         final var                                 cycles = tarjan.findSimpleCycles();
@@ -86,14 +87,15 @@ public final class RuntimeComponentGraph {
 
         for (final List<ComponentVertex> group : cycles) {
             Node<ComponentVertex> node = CircularLinkedList.create(group);
-            for (@SuppressWarnings("unused")
-            final ComponentVertex element : group) {
-                node = node.getNext();
-                final var source = node.getData();
-                graph.addVertex(source);
-                final var target = node.getNext().getData();
-                graph.addVertex(target);
-                graph.addEdge(source, target);
+            if (node != null) {
+                for (final ComponentVertex element : group) {
+                    node = node.getNext();
+                    final var source = node.getData();
+                    graph.addVertex(source);
+                    final var target = node.getNext().getData();
+                    graph.addVertex(target);
+                    graph.addEdge(source, target);
+                }
             }
         }
         return graph;

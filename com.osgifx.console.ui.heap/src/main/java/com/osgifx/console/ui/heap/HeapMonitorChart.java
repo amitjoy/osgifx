@@ -84,7 +84,7 @@ public final class HeapMonitorChart extends BorderPane {
             final var used = usage.used / KB_CONVERSION;
             final var max  = usage.max / KB_CONVERSION;
 
-            final double tickSize = max / Y_AXIS_TICK_COUNT;
+            final var tickSize = (double) max / Y_AXIS_TICK_COUNT;
             final var    rounding = 10d;
 
             Platform.runLater(() -> {
