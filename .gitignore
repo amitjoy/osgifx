@@ -9,3 +9,4 @@ Gemfile.lock
 .DS_Store
 com.osgifx.*/bin/*
 **/.osgifx-ws/*
+**/.project

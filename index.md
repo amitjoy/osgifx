@@ -65,9 +65,9 @@ OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Simila
 
 |                      	|                                             	|
 |----------------------	|---------------------------------------------	|
-| Java (Application)    | 17                                         	|
+| Java (Application)    | 21                                         	|
 | Java (Agent)          | 1.8                                         	|
-| Rich Client Platform 	| JavaFX 17                                    	|
+| Rich Client Platform 	| JavaFX 21                                    	|
 | Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
 | Tools                	| Bndtools 6.4.0                                 |
