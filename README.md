@@ -25,9 +25,9 @@
 
 |                      	|                                             	    |
 |----------------------	|---------------------------------------------	    |
-| Java (Application)    | 17                                         	    |
+| Java (Application)    | 21                                         	    |
 | Java (Agent)          | 1.8                                         	    |
-| Rich Client Platform 	| JavaFX 17                                    	    |
+| Rich Client Platform 	| JavaFX 21                                    	    |
 | Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
 | UI Libraries         	| ControlsFX, TilesFX, FormsFX                       |
 | Tools                	| Bndtools 7.0.0                                     |
@@ -36,7 +36,7 @@
 
 ### Latest Version
 
-The latest released version: 2.4.3 (Check [Project Website](http://osgifx.com) to download)
+The latest released version: 2.4.4 (Check [Project Website](http://osgifx.com) to download)
 
 ------------------------------------------------------------------------------------------------------------
 
