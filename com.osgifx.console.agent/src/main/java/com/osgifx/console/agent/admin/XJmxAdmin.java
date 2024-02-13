@@ -37,7 +37,7 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 
-public final class XHeapAdmin {
+public final class XJmxAdmin {
 
     private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
     private static volatile Object hotspotMBean;
@@ -110,9 +110,25 @@ public final class XHeapAdmin {
         }
     }
 
+    public void gc() throws Exception {
+        initHotspotMBean();
+        final Class<?> clazzBean     = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+        final Class<?> clazzVMOption = Class.forName("com.sun.management.VMOption");
+        final Method   method1       = clazzBean.getMethod("getVMOption", String.class);
+        final Method   method2       = clazzVMOption.getMethod("getValue");
+        final Object   vmOption      = method1.invoke(hotspotMBean, "DisableExplicitGC");
+        final Object   vmOptionValue = method2.invoke(vmOption);
+
+        if (vmOptionValue != null && "true".equalsIgnoreCase(vmOptionValue.toString())) {
+            logger.atInfo().msg("Explicit GC invocation is disabled").log();
+            return;
+        }
+        System.gc();
+    }
+
     private static void initHotspotMBean() throws Exception {
         if (hotspotMBean == null) {
-            synchronized (XHeapAdmin.class) {
+            synchronized (XJmxAdmin.class) {
                 if (hotspotMBean == null) {
                     hotspotMBean = getHotspotMBean();
                 }
