@@ -94,7 +94,7 @@ public final class XHeapAdmin {
         return beans.toArray(new XGarbageCollectorMXBean[0]);
     }
 
-    public byte[] heapdump() {
+    public byte[] heapdump() throws Exception {
         final File location = new File(System.getProperty("user.dir"));
         final File heapdump = new File(location, "" + System.currentTimeMillis() + ".hprof");
 
@@ -105,16 +105,12 @@ public final class XHeapAdmin {
             m.invoke(hotspotMBean, heapdump.getAbsolutePath(), true);
 
             return Files.readAllBytes(heapdump.toPath());
-        } catch (final RuntimeException re) {
-            throw re;
-        } catch (final Exception exp) {
-            throw new RuntimeException(exp);
         } finally {
             heapdump.delete();
         }
     }
 
-    private static void initHotspotMBean() {
+    private static void initHotspotMBean() throws Exception {
         if (hotspotMBean == null) {
             synchronized (XHeapAdmin.class) {
                 if (hotspotMBean == null) {
@@ -124,16 +120,10 @@ public final class XHeapAdmin {
         }
     }
 
-    private static Object getHotspotMBean() {
-        try {
-            final Class<?>    clazz  = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
-            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            return ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
-        } catch (final RuntimeException re) {
-            throw re;
-        } catch (final Exception exp) {
-            throw new RuntimeException(exp);
-        }
+    private static Object getHotspotMBean() throws Exception {
+        final Class<?>    clazz  = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
+        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        return ManagementFactory.newPlatformMXBeanProxy(server, HOTSPOT_BEAN_NAME, clazz);
     }
 
 }
