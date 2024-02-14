@@ -101,8 +101,8 @@ import com.osgifx.console.agent.admin.XDmtAdmin;
 import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
-import com.osgifx.console.agent.admin.XHeapAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
+import com.osgifx.console.agent.admin.XJmxAdmin;
 import com.osgifx.console.agent.admin.XLogReaderAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
@@ -992,7 +992,7 @@ public final class AgentServer implements Agent, Closeable {
     public XHeapUsageDTO getHeapUsage() {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
         if (isJMXWired) {
-            return di.getInstance(XHeapAdmin.class).init();
+            return di.getInstance(XJmxAdmin.class).init();
         }
         logger.atWarn().msg(packageNotWired(JMX)).log();
         return null;
@@ -1004,15 +1004,21 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
-    public void gc() {
+    public void gc() throws Exception {
+        final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
+        if (isJMXWired) {
+            di.getInstance(XJmxAdmin.class).gc();
+            return;
+        }
         System.gc();
+        logger.atWarn().msg(packageNotWired(JMX)).log();
     }
 
     @Override
     public byte[] heapdump() throws Exception {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
         if (isJMXWired) {
-            return di.getInstance(XHeapAdmin.class).heapdump();
+            return di.getInstance(XJmxAdmin.class).heapdump();
         }
         logger.atWarn().msg(packageNotWired(JMX)).log();
         return null;

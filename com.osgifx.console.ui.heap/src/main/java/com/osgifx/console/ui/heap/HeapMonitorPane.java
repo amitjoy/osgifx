@@ -300,7 +300,25 @@ public final class HeapMonitorPane extends BorderPane {
         if (agent == null) {
             return;
         }
-        executor.runAsync(agent::gc);
+        final Task<Void> gcTask = new Task<>() {
+
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    updateMessage("Performing GC");
+                    agent.gc();
+                    return null;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot perform GC");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+        executor.runAsync(gcTask);
     }
 
     private void heapDump() {
