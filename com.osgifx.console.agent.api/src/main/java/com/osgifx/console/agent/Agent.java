@@ -622,5 +622,5 @@ public interface Agent {
     /**
      * Performs a garbage collection
      */
-    void gc();
+    void gc() throws Exception;
 }
