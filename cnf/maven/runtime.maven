@@ -86,5 +86,5 @@ org.eclipse.platform:org.eclipse.core.variables:3.6.200
 # OSGi Logging
 
 org.slf4j:slf4j-api:1.7.36
-org.apache.sling:org.apache.sling.commons.log:5.4.2
+org.apache.sling:org.apache.sling.commons.log:5.5.0
 org.apache.sling:org.apache.sling.commons.logservice:1.1.0
