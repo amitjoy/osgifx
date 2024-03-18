@@ -159,7 +159,7 @@ install.order                     :   \
 	org.apache.felix.gogo.shell;version='[1.1.4,1.1.5)';startlevel=10,\
 	org.apache.felix.metatype;version='[1.2.4,1.2.5)';startlevel=10,\
 	org.apache.felix.scr;version='[2.2.10,2.2.11)';startlevel=10,\
-	org.apache.sling.commons.log;version='[5.4.2,5.4.3)';startlevel=10,\
+	org.apache.sling.commons.log;version='[5.5.0,5.5.1)';startlevel=10,\
 	org.apache.sling.commons.logservice;version='[1.1.0,1.1.1)';startlevel=10,\
 	org.eclipse.core.commands;version='[3.11.200,3.11.201)';startlevel=10,\
 	org.eclipse.core.contenttype;version='[3.9.200,3.9.201)';startlevel=10,\
