@@ -77,7 +77,7 @@ org.eclipse.platform:org.eclipse.core.databinding.observable:1.13.100
 org.eclipse.platform:org.eclipse.core.databinding.property:1.10.100
 org.eclipse.platform:org.eclipse.core.filebuffers:3.8.300
 org.eclipse.platform:org.eclipse.core.filesystem:1.10.300
-org.eclipse.platform:org.eclipse.core.jobs:3.15.100
+org.eclipse.platform:org.eclipse.core.jobs:3.15.200
 org.eclipse.platform:org.eclipse.core.net:1.5.200
 org.eclipse.platform:org.eclipse.core.resources:3.20.0
 org.eclipse.platform:org.eclipse.core.runtime:3.30.0
