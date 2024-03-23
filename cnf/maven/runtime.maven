@@ -54,7 +54,7 @@ org.eclipse.platform:org.eclipse.osgi.services:3.11.200
 
 # Eclipse e4
 
-org.eclipse.platform:org.eclipse.e4.core.commands:1.1.200
+org.eclipse.platform:org.eclipse.e4.core.commands:1.1.300
 org.eclipse.platform:org.eclipse.e4.core.contexts:1.12.400
 org.eclipse.platform:org.eclipse.e4.core.di:1.9.100
 org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.8.100
