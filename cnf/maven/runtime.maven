@@ -48,7 +48,7 @@ org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.800
 org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.800
 org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.800
 org.eclipse.platform:org.eclipse.equinox.preferences:3.10.400
-org.eclipse.platform:org.eclipse.equinox.registry:3.11.400
+org.eclipse.platform:org.eclipse.equinox.registry:3.12.0
 org.eclipse.platform:org.eclipse.osgi:3.19.0
 org.eclipse.platform:org.eclipse.osgi.services:3.12.0
 
