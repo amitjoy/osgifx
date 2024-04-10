@@ -64,7 +64,7 @@ org.eclipse.platform:org.eclipse.e4.core.services:2.4.300
 org.eclipse.platform:org.eclipse.e4.emf.xpath:0.4.200
 org.eclipse.platform:org.eclipse.e4.ui.di:1.5.100
 org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.4.100
-org.eclipse.platform:org.eclipse.e4.ui.services:1.6.100
+org.eclipse.platform:org.eclipse.e4.ui.services:1.6.300
 org.eclipse.platform:org.eclipse.e4.ui.workbench:1.15.100
 
 # Eclipse Platform
