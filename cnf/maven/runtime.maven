@@ -59,7 +59,7 @@ org.eclipse.platform:org.eclipse.e4.core.contexts:1.12.500
 org.eclipse.platform:org.eclipse.e4.core.di:1.9.300
 org.eclipse.platform:org.eclipse.e4.core.di.annotations:1.8.300
 org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.18.200
-org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.17.100
+org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.17.400
 org.eclipse.platform:org.eclipse.e4.core.services:2.4.300
 org.eclipse.platform:org.eclipse.e4.emf.xpath:0.4.200
 org.eclipse.platform:org.eclipse.e4.ui.di:1.5.100
