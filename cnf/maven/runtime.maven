@@ -62,7 +62,7 @@ org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.18.200
 org.eclipse.platform:org.eclipse.e4.core.di.extensions.supplier:0.17.400
 org.eclipse.platform:org.eclipse.e4.core.services:2.4.300
 org.eclipse.platform:org.eclipse.e4.emf.xpath:0.4.200
-org.eclipse.platform:org.eclipse.e4.ui.di:1.5.100
+org.eclipse.platform:org.eclipse.e4.ui.di:1.5.300
 org.eclipse.platform:org.eclipse.e4.ui.model.workbench:2.4.100
 org.eclipse.platform:org.eclipse.e4.ui.services:1.6.300
 org.eclipse.platform:org.eclipse.e4.ui.workbench:1.15.100
