@@ -67,7 +67,7 @@
                   <Insets top="10.0" />
                </padding>
             </VBox>
-            <Label fx:id="eclipseLink" prefHeight="48.0" prefWidth="343.0" text="This product includes software developed by other open source projects including the Eclipse Foundation" wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="3">
+            <Label fx:id="eclipseLink" prefHeight="48.0" prefWidth="343.0" text="This product includes softwares developed by other open source foundations including the Eclipse Foundation" wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="20.0" right="25.0" />
                </GridPane.margin>
