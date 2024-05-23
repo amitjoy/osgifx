@@ -1,13 +1,13 @@
 # UI
 
-com.google.code.gson:gson:2.10.1
+com.google.code.gson:gson:2.11.0
 
 # Apache
 
 commons-io:commons-io:2.16.1
 org.apache.aries.component-dsl:org.apache.aries.component-dsl.component-dsl:1.2.2
 org.apache.commons:commons-lang3:3.14.0
-org.apache.commons:commons-text:1.11.0
+org.apache.commons:commons-text:1.12.0
 
 # JSON
 
@@ -43,10 +43,10 @@ org.eclipse.platform:org.eclipse.equinox.console:1.4.700
 org.eclipse.platform:org.eclipse.equinox.ds:1.6.200
 org.eclipse.platform:org.eclipse.equinox.event:1.7.0
 org.eclipse.platform:org.eclipse.equinox.launcher:1.6.700
-org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx:1.2.800
-org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.800
-org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.800
-org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.800
+org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx:1.2.900
+org.eclipse.platform:org.eclipse.equinox.launcher.cocoa.macosx.x86_64:1.2.900
+org.eclipse.platform:org.eclipse.equinox.launcher.gtk.linux.x86_64:1.2.900
+org.eclipse.platform:org.eclipse.equinox.launcher.win32.win32.x86_64:1.2.900
 org.eclipse.platform:org.eclipse.equinox.preferences:3.11.0
 org.eclipse.platform:org.eclipse.equinox.registry:3.12.0
 org.eclipse.platform:org.eclipse.osgi:3.19.0
