@@ -1,15 +1,15 @@
 /*******************************************************************************
- * Copyright 2021-2024 Amit Kumar Mondal
+ * COPYRIGHT 2021-2024 AMIT KUMAR MONDAL
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at:
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
@@ -35,22 +35,55 @@ import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
+/**
+ * A Data Transfer Object (DTO) that captures a snapshot of various runtime
+ * states and configurations. This DTO aggregates different types of
+ * information related to the OSGi runtime and its components.
+ */
 public class SnapshotDTO extends DTO {
 
-    public List<XBundleDTO>              bundles;
-    public List<XComponentDTO>           components;
-    public List<XConfigurationDTO>       configurations;
-    public List<XPropertyDTO>            properties;
-    public List<XServiceDTO>             services;
-    public List<XThreadDTO>              threads;
-    public XDmtNodeDTO                   dmtNodes;
-    public XMemoryInfoDTO                memoryInfo;
-    public List<XRoleDTO>                roles;
-    public List<XHealthCheckDTO>         healthChecks;
-    public Set<XBundleDTO>               classloaderLeaks;
-    public List<XHttpComponentDTO>       httpComponents;
-    public List<XBundleLoggerContextDTO> bundleLoggerContexts;
-    public XHeapUsageDTO                 heapUsage;
-    public RuntimeDTO                    runtime;
+    /** A list of bundle data transfer objects. */
+    public List<XBundleDTO> bundles;
 
+    /** A list of component data transfer objects. */
+    public List<XComponentDTO> components;
+
+    /** A list of configuration data transfer objects. */
+    public List<XConfigurationDTO> configurations;
+
+    /** A list of property data transfer objects. */
+    public List<XPropertyDTO> properties;
+
+    /** A list of service data transfer objects. */
+    public List<XServiceDTO> services;
+
+    /** A list of thread data transfer objects. */
+    public List<XThreadDTO> threads;
+
+    /** A data transfer object representing the DMT nodes. */
+    public XDmtNodeDTO dmtNodes;
+
+    /** A data transfer object representing the memory information. */
+    public XMemoryInfoDTO memoryInfo;
+
+    /** A list of role data transfer objects. */
+    public List<XRoleDTO> roles;
+
+    /** A list of health check data transfer objects. */
+    public List<XHealthCheckDTO> healthChecks;
+
+    /** A set of bundle data transfer objects indicating classloader leaks. */
+    public Set<XBundleDTO> classloaderLeaks;
+
+    /** A list of HTTP component data transfer objects. */
+    public List<XHttpComponentDTO> httpComponents;
+
+    /** A list of bundle logger context data transfer objects. */
+    public List<XBundleLoggerContextDTO> bundleLoggerContexts;
+
+    /** A data transfer object representing the heap usage. */
+    public XHeapUsageDTO heapUsage;
+
+    /** A data transfer object representing the runtime information. */
+    public RuntimeDTO runtime;
 }
