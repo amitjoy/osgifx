@@ -13,13 +13,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
 package com.osgifx.console.agent.dto;
 
+/**
+ * A data transfer object (DTO) representing memory information of a system.
+ * It includes uptime, maximum memory, free memory, and total memory statistics.
+ */
 public class XMemoryInfoDTO {
 
+    /** The uptime of the system in milliseconds */
     public long uptime;
+
+    /** The maximum amount of memory that the JVM will attempt to use */
     public long maxMemory;
+
+    /** The amount of free memory in the JVM */
     public long freeMemory;
+
+    /** The total amount of memory in the JVM */
     public long totalMemory;
 
 }
