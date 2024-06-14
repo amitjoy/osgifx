@@ -13,13 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
 package com.osgifx.console.agent.dto;
 
 import org.osgi.dto.DTO;
 
+/**
+ * A data transfer object (DTO) representing information about an OSGi bundle.
+ * It includes the bundle's ID and symbolic name.
+ */
 public class XBundleInfoDTO extends DTO {
 
-    public long   id;
+    /** The unique identifier of the OSGi bundle */
+    public long id;
+
+    /** The symbolic name of the OSGi bundle */
     public String symbolicName;
 
 }
