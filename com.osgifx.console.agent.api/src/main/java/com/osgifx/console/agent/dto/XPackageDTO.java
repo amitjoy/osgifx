@@ -13,16 +13,31 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
 package com.osgifx.console.agent.dto;
 
 import org.osgi.dto.DTO;
 
+/**
+ * A data transfer object (DTO) representing information about an OSGi package.
+ * It includes the package's name, version, and type (either export or import).
+ */
 public class XPackageDTO extends DTO {
 
-    public String       name;
-    public String       version;
+    /** The name of the OSGi package */
+    public String name;
+
+    /** The version of the OSGi package */
+    public String version;
+
+    /** The type of the OSGi package (either EXPORT or IMPORT) */
     public XpackageType type;
 
+    /**
+     * Enum defining the type of OSGi package.
+     * - EXPORT: Represents a package that is exported by a bundle.
+     * - IMPORT: Represents a package that is imported by a bundle.
+     */
     public enum XpackageType {
         EXPORT,
         IMPORT
