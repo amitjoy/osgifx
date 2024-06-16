@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
 package com.osgifx.console.agent.dto;
 
 import java.util.Map;
@@ -20,10 +21,20 @@ import java.util.Map;
 import org.osgi.dto.DTO;
 import org.osgi.service.log.LogLevel;
 
+/**
+ * A data transfer object (DTO) representing the logging context of an OSGi bundle.
+ * It contains information about the name of the logger context, the root log level,
+ * and a mapping of log levels for specific loggers.
+ */
 public class XBundleLoggerContextDTO extends DTO {
 
-    public String                name;
-    public LogLevel              rootLogLevel;
+    /** The name of the logger context */
+    public String name;
+
+    /** The root log level of the logger context */
+    public LogLevel rootLogLevel;
+
+    /** Map of log levels for specific loggers within the context */
     public Map<String, LogLevel> logLevels;
 
 }
