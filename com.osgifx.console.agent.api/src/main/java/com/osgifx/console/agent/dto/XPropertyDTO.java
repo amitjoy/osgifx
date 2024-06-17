@@ -13,16 +13,31 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
 package com.osgifx.console.agent.dto;
 
 import org.osgi.dto.DTO;
 
+/**
+ * A data transfer object (DTO) representing a property in an OSGi framework or system.
+ * It encapsulates information about the name, value, and type of the property.
+ */
 public class XPropertyDTO extends DTO {
 
-    public String        name;
-    public String        value;
+    /** The name of the property */
+    public String name;
+
+    /** The value of the property */
+    public String value;
+
+    /** The type of the property, whether it belongs to the framework or system */
     public XPropertyType type;
 
+    /**
+     * Enum defining the types of properties:
+     * - FRAMEWORK: Property related to the OSGi framework.
+     * - SYSTEM: Property related to the system environment.
+     */
     public enum XPropertyType {
         FRAMEWORK,
         SYSTEM
