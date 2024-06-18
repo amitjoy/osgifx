@@ -13,18 +13,35 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+
 package com.osgifx.console.agent.dto;
 
 import java.util.List;
 
 import org.osgi.dto.DTO;
 
+/**
+ * A data transfer object (DTO) representing a node in the OSGi Device Management
+ * Tree (DMT).
+ * 
+ * It encapsulates information about the URI, value, data format, creation timestamp,
+ * and child nodes of the DMT node.
+ */
 public class XDmtNodeDTO extends DTO {
 
-    public String            uri;
-    public String            value;
-    public DmtDataType       format;
-    public String            createdAt;
+    /** The URI of the DMT node */
+    public String uri;
+
+    /** The value associated with the DMT node */
+    public String value;
+
+    /** The data format type of the DMT node */
+    public DmtDataType format;
+
+    /** The timestamp when the DMT node was created */
+    public String createdAt;
+
+    /** The list of child nodes belonging to the DMT node */
     public List<XDmtNodeDTO> children;
 
 }
