@@ -4,12 +4,11 @@ com.google.mug:mug:8.0
 
 # bnd
 
+biz.aQute.bnd:biz.aQute.bnd.util:7.0.0
 biz.aQute.bnd:biz.aQute.bndlib:7.0.0
-biz.aQute.bnd:biz.aQute.resolve:7.0.0
-biz.aQute.bnd:biz.aQute.remote.agent:7.0.0
 biz.aQute.bnd:biz.aQute.launchpad:7.0.0
 biz.aQute.bnd:biz.aQute.remote.agent:7.0.0
-biz.aQute.bnd:biz.aQute.bnd.util:7.0.0
+biz.aQute.bnd:biz.aQute.resolve:7.0.0
 
 # Apache
 
@@ -27,8 +26,6 @@ org.osgi:osgi.core:6.0.0
 
 # OSGi R8 (Required for RCP Application)
 
-org.osgi:osgi.annotation:8.1.0
-org.osgi:osgi.core:8.0.0
 org.osgi:org.osgi.application:1.0.0
 org.osgi:org.osgi.namespace.contract:1.0.0
 org.osgi:org.osgi.namespace.extender:1.0.1
@@ -53,6 +50,8 @@ org.osgi:org.osgi.service.metatype:1.4.1
 org.osgi:org.osgi.service.metatype.annotations:1.4.1
 org.osgi:org.osgi.service.useradmin:1.1.1
 org.osgi:org.osgi.util.converter:1.0.9
+org.osgi:osgi.annotation:8.1.0
+org.osgi:osgi.core:8.0.0
 
 # TilesFx
 
