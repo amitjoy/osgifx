@@ -22,7 +22,7 @@ org.apache.felix:org.apache.felix.dependencymanager:4.6.1
 org.apache.felix:org.apache.felix.deploymentadmin:0.9.10
 org.apache.felix:org.apache.felix.eventadmin:1.6.4
 org.apache.felix:org.apache.felix.metatype:1.2.4
-org.apache.felix:org.apache.felix.scr:2.2.10
+org.apache.felix:org.apache.felix.scr:2.2.12
 
 # OSGi Core Services
 org.osgi:org.osgi.service.component:1.5.1
