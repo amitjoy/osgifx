@@ -167,7 +167,7 @@ install.order                     :   \
 	org.eclipse.core.databinding.property;version='[1.10.200,1.10.201)';startlevel=10,\
 	org.eclipse.core.expressions;version='[3.8.200,3.8.201)';startlevel=10,\
 	org.eclipse.core.jobs;version='[3.15.200,3.15.201)';startlevel=10,\
-	org.eclipse.core.runtime;version='[3.31.0,3.31.1)';startlevel=10,\
+	org.eclipse.core.runtime;version='[3.31.100,3.31.101)';startlevel=10,\
 	org.eclipse.e4.core.commands;version='[1.0.200,1.0.201)';startlevel=10,\
 	org.eclipse.e4.core.contexts;version='[1.11.0,1.11.1)';startlevel=10,\
 	org.eclipse.e4.core.di;version='[1.8.300,1.8.301)';startlevel=10,\
