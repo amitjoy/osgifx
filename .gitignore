@@ -144,6 +144,7 @@ local.properties
 */.settings/org.eclipse.jdt.groovy.core.prefs
 .loadpath
 .recommenders
+org.eclipse.buildship.core.prefs
 
 # Eclipse Core
 #.project

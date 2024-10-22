@@ -96,6 +96,10 @@ Amit Kumar Mondal (admin@amitinside.com)
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/main/CONTRIBUTING.md)
 
+<a href="eclipse+installer:https://raw.githubusercontent.com/git@github.com:amitjoy/osgifx.git/main/oomph/config_osgifx.setup">
+            <img src="https://img.shields.io/static/v1?logo=eclipseide&label=eclipse%20for%20osgifx&message=branch%20:%20main&style=for-the-badge&logoColor=white&labelColor=963508&color=gray"
+                alt="osgifx workspace" /></a>
+
 --------------------------------------------------------------------------------------------------------------
 
 ### License
