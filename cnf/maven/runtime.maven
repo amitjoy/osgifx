@@ -74,7 +74,7 @@ org.eclipse.platform:org.eclipse.core.filebuffers:3.8.300
 org.eclipse.platform:org.eclipse.core.filesystem:1.10.300
 org.eclipse.platform:org.eclipse.core.jobs:3.15.200
 org.eclipse.platform:org.eclipse.core.net:1.5.300
-org.eclipse.platform:org.eclipse.core.resources:3.20.100
+org.eclipse.platform:org.eclipse.core.resources:3.21.0
 org.eclipse.platform:org.eclipse.core.runtime:3.31.100
 org.eclipse.platform:org.eclipse.core.variables:3.6.500
 
