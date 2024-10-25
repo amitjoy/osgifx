@@ -1,6 +1,6 @@
 Bundle-SymbolicName : ${p}; singleton:=true
+Model-Fragment: fragment.e4xmi;apply=always
 -includeresource    : \
-                      plugin.xml = _plugin.xml,\
 					  fragment.e4xmi = fragment.e4xmi,\
 					  css = css,\
 					  fxml = fxml,\
