@@ -184,7 +184,7 @@ install.order                     :   \
 	org.eclipse.emf.ecore;version='[2.28.0,2.28.1)';startlevel=10,\
 	org.eclipse.emf.ecore.change;version='[2.14.0,2.14.1)';startlevel=10,\
 	org.eclipse.emf.ecore.xmi;version='[2.17.0,2.17.1)';startlevel=10,\
-	org.eclipse.equinox.app;version='[1.7.0,1.7.1)';startlevel=10,\
+	org.eclipse.equinox.app;version='[1.7.200,1.7.201)';startlevel=10,\
 	org.eclipse.equinox.common;version='[3.19.0,3.19.1)';startlevel=10,\
 	org.eclipse.equinox.event;version='[1.7.0,1.7.1)';startlevel=10,\
 	org.eclipse.equinox.preferences;version='[3.11.0,3.11.1)';startlevel=10,\
