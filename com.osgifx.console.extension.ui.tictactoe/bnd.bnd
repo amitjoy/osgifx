@@ -1,8 +1,8 @@
 Bundle-SymbolicName : ${p}; singleton:=true
+Model-Fragment: fragment.e4xmi;apply=always
 -fixupmessages      : 'No translation found'
 -privatepackage     : com.osgifx.console.extension.tictactoe
 -includeresource    : \
-                      plugin.xml = _plugin.xml,\
 					  fragment.e4xmi = fragment.e4xmi,\
 					  css = css,\
 					  fxml = fxml,\

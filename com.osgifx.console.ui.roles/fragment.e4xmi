@@ -1,30 +1,9 @@
 <?xml version="1.0" encoding="ASCII"?>
-<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic"
-	xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment"
-	xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu"
-	xmi:id="_s7J3oCBGEey33dbookdebQ">
-	<fragments xsi:type="fragment:StringModelFragment"
-		xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children"
-		parentElementId="com.osgifx.console.ui.extensions.partstack">
-		<elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ"
-			elementId="com.osgifx.console.application.tab.roles"
-			contributionURI="bundleclass://com.osgifx.console.ui.roles/com.osgifx.console.ui.roles.RolesFxUI"
-			label="Roles"
-			iconURI="platform:/plugin/com.osgifx.console.ui.roles/graphic/icons/roles.png"
-			tooltip="Shows all available User Admin roles in the remote framework"
-			closeable="true" />
-	</fragments>
-	<fragments xsi:type="fragment:StringModelFragment"
-		xmi:id="_gdcQYH-WEeyYfeV-7UqQeg" featurename="children"
-		parentElementId="com.osgifx.console.application.menu.actions">
-		<elements xsi:type="menu:DirectMenuItem"
-			xmi:id="_gdcQYX-WEeyYfeV-7UqQeg"
-			elementId="com.osgifx.console.application.directmenuitem.create.role"
-			label="Add New Role"
-			iconURI="platform:/plugin/com.osgifx.console.ui.roles/graphic/icons/new-role.png"
-			tooltip="Creates OSGi user admin role"
-			contributionURI="bundleclass://com.osgifx.console.ui.roles/com.osgifx.console.ui.roles.handler.RoleCreateHandler" />
-	</fragments>
+<fragment:ModelFragments xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:fragment="http://www.eclipse.org/ui/2010/UIModel/fragment" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_s7J3oCBGEey33dbookdebQ">
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_s7J3oSBGEey33dbookdebQ" featurename="children" parentElementId="com.osgifx.console.ui.extensions.partstack" positionInList="index:16">
+    <elements xsi:type="basic:Part" xmi:id="_s7J3oiBGEey33dbookdebQ" elementId="com.osgifx.console.application.tab.roles" contributionURI="bundleclass://com.osgifx.console.ui.roles/com.osgifx.console.ui.roles.RolesFxUI" label="Roles" iconURI="platform:/plugin/com.osgifx.console.ui.roles/graphic/icons/roles.png" tooltip="Shows all available User Admin roles in the remote framework" closeable="true"/>
+  </fragments>
+  <fragments xsi:type="fragment:StringModelFragment" xmi:id="_gdcQYH-WEeyYfeV-7UqQeg" featurename="children" parentElementId="com.osgifx.console.application.menu.actions">
+    <elements xsi:type="menu:DirectMenuItem" xmi:id="_gdcQYX-WEeyYfeV-7UqQeg" elementId="com.osgifx.console.application.directmenuitem.create.role" label="Add New Role" iconURI="platform:/plugin/com.osgifx.console.ui.roles/graphic/icons/new-role.png" tooltip="Creates OSGi user admin role" contributionURI="bundleclass://com.osgifx.console.ui.roles/com.osgifx.console.ui.roles.handler.RoleCreateHandler"/>
+  </fragments>
 </fragment:ModelFragments>
