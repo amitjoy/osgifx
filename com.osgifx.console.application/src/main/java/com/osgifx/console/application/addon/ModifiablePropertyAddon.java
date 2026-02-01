@@ -43,8 +43,9 @@ public final class ModifiablePropertyAddon {
         modifiableProperties.put("selected.settings", null);
         modifiableProperties.put("subscribed_topics", Set.of());
         modifiableProperties.put("local.agent.host", "localhost");
-        modifiableProperties.put("local.agent.port", "1729");
-        modifiableProperties.put("local.agent.timeout", "200");
+        modifiableProperties.put("local.agent.command.port", "5555");
+        modifiableProperties.put("local.agent.event.port", "5556");
+        modifiableProperties.put("local.agent.timeout", "10000");
     }
 
     @PostConstruct

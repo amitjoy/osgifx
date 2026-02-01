@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
@@ -44,11 +43,9 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.StageStyle;
 
-public final class SocketConnectionDialog extends Dialog<SocketConnectionSettingDTO> {
+public final class ZmqConnectionDialog extends Dialog<ZmqConnectionSettingDTO> {
 
     @Log
     @Inject
@@ -56,14 +53,14 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
     @Inject
     private ThreadSynchronize threadSync;
 
-    public void init(final SocketConnectionSettingDTO setting) {
+    public void init(final ZmqConnectionSettingDTO setting) {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
 
         if (setting == null) {
-            dialogPane.setHeaderText("Add Socket Connection Settings");
+            dialogPane.setHeaderText("Add ZeroMQ Connection Settings");
         } else {
-            dialogPane.setHeaderText("Edit Socket Connection Settings");
+            dialogPane.setHeaderText("Edit ZeroMQ Connection Settings");
         }
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
@@ -79,22 +76,17 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         hostname.setLeft(new ImageView(getClass().getResource("/graphic/icons/hostname.png").toExternalForm()));
         Optional.ofNullable(setting).ifPresent(s -> hostname.setText(s.host));
 
-        final var port = (CustomTextField) TextFields.createClearableTextField();
-        port.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
-        Optional.ofNullable(setting).ifPresent(s -> port.setText(String.valueOf(s.port)));
+        final var commandPort = (CustomTextField) TextFields.createClearableTextField();
+        commandPort.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> commandPort.setText(String.valueOf(s.commandPort)));
+
+        final var eventPort = (CustomTextField) TextFields.createClearableTextField();
+        eventPort.setLeft(new ImageView(getClass().getResource("/graphic/icons/port.png").toExternalForm()));
+        Optional.ofNullable(setting).ifPresent(s -> eventPort.setText(String.valueOf(s.eventPort)));
 
         final var timeout = (CustomTextField) TextFields.createClearableTextField();
         timeout.setLeft(new ImageView(getClass().getResource("/graphic/icons/timeout.png").toExternalForm()));
         Optional.ofNullable(setting).ifPresent(s -> timeout.setText(String.valueOf(s.timeout)));
-
-        final var trustStore = (CustomTextField) TextFields.createClearableTextField();
-        trustStore.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
-        Optional.ofNullable(setting).ifPresent(s -> trustStore.setText(s.trustStorePath));
-
-        final var trustStorePassword = (CustomPasswordField) TextFields.createClearablePasswordField();
-        trustStorePassword
-                .setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
-        Optional.ofNullable(setting).ifPresent(s -> trustStorePassword.setText(s.trustStorePassword));
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -106,10 +98,9 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         content.getChildren().add(lbMessage);
         content.getChildren().add(name);
         content.getChildren().add(hostname);
-        content.getChildren().add(port);
+        content.getChildren().add(commandPort);
+        content.getChildren().add(eventPort);
         content.getChildren().add(timeout);
-        content.getChildren().add(trustStore);
-        content.getChildren().add(trustStorePassword);
 
         dialogPane.setContent(content);
 
@@ -129,31 +120,17 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
                 FxDialog.showExceptionDialog(ex, getClass().getClassLoader());
             }
         });
-        final var nameCaption               = "Connection Name";
-        final var hostnameCaption           = "Host";
-        final var portCaption               = "Port (between 1 to 65536)";
-        final var timeoutCaption            = "Timeout in millis";
-        final var trustStoreCaption         = "Truststore Location";
-        final var trustStorePasswordCaption = "Truststore Password";
+        final var nameCaption        = "Connection Name";
+        final var hostnameCaption    = "Host";
+        final var commandPortCaption = "Command Port (between 1 to 65536)";
+        final var eventPortCaption   = "Event Port (between 1 to 65536)";
+        final var timeoutCaption     = "Timeout in millis";
 
         name.setPromptText(nameCaption);
         hostname.setPromptText(hostnameCaption);
-        port.setPromptText(portCaption);
+        commandPort.setPromptText(commandPortCaption);
+        eventPort.setPromptText(eventPortCaption);
         timeout.setPromptText(timeoutCaption);
-        trustStore.setPromptText(trustStoreCaption);
-        trustStorePassword.setPromptText(trustStorePasswordCaption);
-
-        trustStore.setEditable(false);
-        trustStore.setOnMouseClicked(event -> {
-            final var trustStoreChooser = new FileChooser();
-            trustStoreChooser.getExtensionFilters()
-                    .add(new ExtensionFilter("Java Keystore Files (.keystore, .jks)", "*.keystore", "*.jks"));
-            final var jksTrustStore = trustStoreChooser.showOpenDialog(null);
-            if (jksTrustStore != null) {
-                trustStore.setText(jksTrustStore.getName());
-                trustStore.setAccessibleText(jksTrustStore.getAbsolutePath());
-            }
-        });
 
         final var validationSupport = new ValidationSupport();
         threadSync.asyncExec(() -> {
@@ -164,11 +141,18 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
             validationSupport.registerValidator(name, createEmptyValidator(String.format(requiredFormat, nameCaption)));
             validationSupport.registerValidator(hostname,
                     createEmptyValidator(String.format(requiredFormat, hostnameCaption)));
-            validationSupport.registerValidator(port, createEmptyValidator(String.format(requiredFormat, portCaption)));
-            validationSupport.registerValidator(port, createPredicateValidator(value -> {
+            validationSupport.registerValidator(commandPort,
+                    createEmptyValidator(String.format(requiredFormat, commandPortCaption)));
+            validationSupport.registerValidator(commandPort, createPredicateValidator(value -> {
                 final var parsedPort = Ints.tryParse(value.toString());
                 return parsedPort != null && parsedPort > 0 && parsedPort < 65536;
-            }, String.format(requiredPortFormat, portCaption)));
+            }, String.format(requiredPortFormat, commandPortCaption)));
+            validationSupport.registerValidator(eventPort,
+                    createEmptyValidator(String.format(requiredFormat, eventPortCaption)));
+            validationSupport.registerValidator(eventPort, createPredicateValidator(value -> {
+                final var parsedPort = Ints.tryParse(value.toString());
+                return parsedPort != null && parsedPort > 0 && parsedPort < 65536;
+            }, String.format(requiredPortFormat, eventPortCaption)));
             validationSupport.registerValidator(timeout,
                     createEmptyValidator(String.format(requiredFormat, timeoutCaption)));
             validationSupport.registerValidator(timeout,
@@ -182,22 +166,21 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
             if (dialogButton == CANCEL) {
                 return null;
             }
-            final var p = Ints.tryParse(port.getText());
-            final var t = Ints.tryParse(timeout.getText());
+            final var cp = Ints.tryParse(commandPort.getText());
+            final var ep = Ints.tryParse(eventPort.getText());
+            final var t  = Ints.tryParse(timeout.getText());
 
-            verify(p != null && t != null, "Port and timeout formats are not compliant");
+            verify(cp != null && ep != null && t != null, "Port and timeout formats are not compliant");
             if (setting != null) {
-                setting.name               = name.getText();
-                setting.host               = hostname.getText();
-                setting.port               = p;
-                setting.timeout            = t;
-                setting.trustStorePath     = trustStore.getAccessibleText();
-                setting.trustStorePassword = trustStorePassword.getText();
+                setting.name        = name.getText();
+                setting.host        = hostname.getText();
+                setting.timeout     = t;
+                setting.eventPort   = ep;
+                setting.commandPort = cp;
 
                 return setting;
             }
-            return new SocketConnectionSettingDTO(name.getText(), hostname.getText(), p, t,
-                                                  trustStore.getAccessibleText(), trustStorePassword.getText());
+            return new ZmqConnectionSettingDTO(name.getText(), hostname.getText(), cp, ep, t);
         });
     }
 

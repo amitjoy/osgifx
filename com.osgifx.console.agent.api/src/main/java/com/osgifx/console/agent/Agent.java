@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.net.ssl.SSLContext;
-
 import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.dto.BundleDTO;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
@@ -68,19 +66,14 @@ public interface Agent {
     Pattern AGENT_SOCKET_PORT_PATTERN = Pattern.compile("(?:([^:]+):)?(\\d+)");
 
     /**
-     * The property key to set the agent's socket port.
+     * The property key to set the agent's ZeroMQ command port.
      */
-    String AGENT_SOCKET_PORT_KEY = "osgi.fx.agent.socket.port";
-
+    String AGENT_ZMQ_COMMAND_PORT_KEY = "osgi.fx.agent.zmq.command.port";
+    
     /**
-     * The property key to enable secure agent communication.
+     * The property key to set the agent's ZeroMQ event port.
      */
-    String AGENT_SOCKET_SECURE_COMMUNICATION_KEY = "osgi.fx.agent.socket.secure";
-
-    /**
-     * The property key for the custom {@link SSLContext} enabling secure agent communication.
-     */
-    String AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY = "osgi.fx.agent.socket.secure.sslcontext.filter";
+    String AGENT_ZMQ_EVENT_PORT_KEY = "osgi.fx.agent.zmq.event.port";
 
     /**
      * The property key to specify the MQTT implementation type to use

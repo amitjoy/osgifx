@@ -20,7 +20,7 @@ import static com.osgifx.console.agent.dto.XResultDTO.SKIPPED;
 import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.packageNotWired;
-import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
+import static com.osgifx.console.agent.provider.AgentServer.RpcType.ZMQ_RPC;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
@@ -150,8 +150,8 @@ import aQute.lib.converter.TypeReference;
 public final class AgentServer implements Agent, Closeable {
 
     public enum RpcType {
-        MQTT_RPC,
-        SOCKET_RPC
+        ZMQ_RPC,
+        MQTT_RPC
     }
 
     private static final Duration      RESULT_TIMEOUT                        = Duration.ofSeconds(20);
@@ -507,7 +507,7 @@ public final class AgentServer implements Agent, Closeable {
         if (quit) {
             return;
         }
-        if (rpcType == SOCKET_RPC) {
+        if (rpcType == ZMQ_RPC) {
             quit = true;
             redirect(0);
             remoteRPC.close();
@@ -516,6 +516,13 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public void close() throws IOException {
+        // Prevent Gogo RedirectOutput from accidentally closing the AgentServer
+        // when it flushes the stream. This caused the InterruptedException.
+        if (Stream.of(Thread.currentThread().getStackTrace())
+                .anyMatch(e -> e.getClassName().endsWith("RedirectOutput") && "flush".equals(e.getMethodName()))) {
+            return;
+        }
+
         try {
             cleanup(-2);
 

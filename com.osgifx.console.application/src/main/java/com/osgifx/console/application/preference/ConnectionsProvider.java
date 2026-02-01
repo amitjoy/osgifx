@@ -21,7 +21,7 @@ import java.util.stream.IntStream;
 import org.osgi.service.component.annotations.Component;
 
 import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
-import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ZmqConnectionSettingDTO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,31 +29,31 @@ import javafx.collections.ObservableList;
 @Component(service = ConnectionsProvider.class)
 public final class ConnectionsProvider {
 
-    private final ObservableList<SocketConnectionSettingDTO> socketConnections = FXCollections.observableArrayList();
+    private final ObservableList<ZmqConnectionSettingDTO> zmqConnections = FXCollections.observableArrayList();
     private final ObservableList<MqttConnectionSettingDTO>   mqttConnections   = FXCollections.observableArrayList();
 
-    public synchronized void addSocketConnection(final SocketConnectionSettingDTO connection) {
-        socketConnections.add(connection);
+    public synchronized void addZmqConnection(final ZmqConnectionSettingDTO connection) {
+        zmqConnections.add(connection);
     }
 
-    public synchronized void updateSocketConnection(final SocketConnectionSettingDTO connection) {
+    public synchronized void updateZmqConnection(final ZmqConnectionSettingDTO connection) {
      // @formatter:off
-        final var index = IntStream.range(0, socketConnections.size())
-                                   .filter(i -> socketConnections.get(i).id.equals(connection.id))
+        final var index = IntStream.range(0, zmqConnections.size())
+                                   .filter(i -> zmqConnections.get(i).id.equals(connection.id))
                                    .findFirst()
                                    .orElse(-1);
         // @formatter:on
         if (index != -1) {
-            socketConnections.set(index, connection);
+            zmqConnections.set(index, connection);
         }
     }
 
-    public synchronized void removeSocketConnection(final SocketConnectionSettingDTO connection) {
-        socketConnections.remove(connection);
+    public synchronized void removeZmqConnection(final ZmqConnectionSettingDTO connection) {
+        zmqConnections.remove(connection);
     }
 
-    public synchronized void addSocketConnections(final List<SocketConnectionSettingDTO> connections) {
-        socketConnections.addAll(connections);
+    public synchronized void addZmqConnections(final List<ZmqConnectionSettingDTO> connections) {
+        zmqConnections.addAll(connections);
     }
 
     public synchronized void addMqttConnection(final MqttConnectionSettingDTO connection) {
@@ -80,8 +80,8 @@ public final class ConnectionsProvider {
         mqttConnections.addAll(connections);
     }
 
-    public synchronized ObservableList<SocketConnectionSettingDTO> getSocketConnections() {
-        return socketConnections;
+    public synchronized ObservableList<ZmqConnectionSettingDTO> getZmqConnections() {
+        return zmqConnections;
     }
 
     public synchronized ObservableList<MqttConnectionSettingDTO> getMqttConnections() {

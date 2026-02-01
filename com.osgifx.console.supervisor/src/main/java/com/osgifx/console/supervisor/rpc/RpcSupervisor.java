@@ -17,7 +17,7 @@ package com.osgifx.console.supervisor.rpc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.osgifx.console.supervisor.Supervisor.RpcType.MQTT_RPC;
-import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
+import static com.osgifx.console.supervisor.Supervisor.RpcType.ZMQ_RPC;
 import static com.osgifx.console.supervisor.rpc.RpcSupervisor.CONDITION_ID_VALUE;
 import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LISTENER_FILTER_PROP;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -66,7 +66,7 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.MqttConnection;
-import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.supervisor.ZmqConnection;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(property = MQTT_CONNECTION_LISTENER_FILTER_PROP)
@@ -131,13 +131,13 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
     @Override
     public RpcType getType() {
-        return remoteRPC instanceof MqttRPC<Supervisor, Agent> ? MQTT_RPC : SOCKET_RPC;
+        return remoteRPC instanceof MqttRPC<Supervisor, Agent> ? MQTT_RPC : ZMQ_RPC;
     }
 
     @Override
-    public void connect(final SocketConnection socketConnection) throws Exception {
-        checkNotNull(socketConnection, "'socketConnection' cannot be null");
-        connectToSocket(Agent.class, this, socketConnection);
+    public void connect(final ZmqConnection zmqConnection) throws Exception {
+        checkNotNull(zmqConnection, "'zmqConnection' cannot be null");
+        connectToZmq(Agent.class, this, zmqConnection);
     }
 
     @Override

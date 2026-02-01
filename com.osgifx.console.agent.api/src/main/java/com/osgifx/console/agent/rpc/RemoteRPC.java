@@ -18,7 +18,7 @@ package com.osgifx.console.agent.rpc;
 import java.io.IOException;
 
 /**
- * Defines a remote RPC mechanism over an underlying connection, such as a socket or MQTT.
+ * Defines a remote RPC mechanism over an underlying connection, such as a ZeroMQ or MQTT.
  *
  * @param <L> the local agent type
  * @param <R> the remote agent type
