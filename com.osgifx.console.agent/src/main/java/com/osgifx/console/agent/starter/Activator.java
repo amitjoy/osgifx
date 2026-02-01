@@ -49,10 +49,6 @@ import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
 import com.osgifx.console.agent.provider.PackageWirings;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
-import com.osgifx.console.agent.rpc.mqtt.SimpleMqtt5Publisher;
-import com.osgifx.console.agent.rpc.mqtt.SimpleMqtt5Subscriber;
-import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
-import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 import com.osgifx.console.agent.rpc.socket.SocketRPC;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -126,9 +122,6 @@ public final class Activator extends Thread implements BundleActivator {
                 logger.atWarn().msg("[OSGi.fx] OSGi messaging bundle for MQTT not installed").log();
                 return;
             }
-
-            bundleContext.registerService(Mqtt5Publisher.class, new SimpleMqtt5Publisher(bundleContext), null);
-            bundleContext.registerService(Mqtt5Subscriber.class, new SimpleMqtt5Subscriber(bundleContext), null);
         } else {
             logger.atInfo().msg("[OSGi.fx] Custom messaging provider configured for MQTT communication").log();
         }
