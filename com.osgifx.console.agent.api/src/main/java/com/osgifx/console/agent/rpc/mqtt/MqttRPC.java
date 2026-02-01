@@ -5,7 +5,7 @@
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -15,8 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.mqtt;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,63 +27,67 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.messaging.Message;
+import org.osgi.service.messaging.MessageContext;
+import org.osgi.service.messaging.MessageContextBuilder;
+import org.osgi.service.messaging.MessagePublisher;
+import org.osgi.service.messaging.MessageSubscription;
+import org.osgi.util.promise.Promise;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
-import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.rpc.BinaryCodec;
 import com.osgifx.console.agent.rpc.RemoteRPC;
-import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Message;
-import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 
 import aQute.bnd.exceptions.Exceptions;
-import aQute.lib.json.JSONCodec;
+import in.bytehue.messaging.mqtt5.api.MqttRequestMultiplexer;
 
+/**
+ * MQTT Implementation of RemoteRPC.
+ * Uses MqttRequestMultiplexer for correlating Request/Response.
+ */
 public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
-    private MqttClient                    mqttClient;
-    private final String                  pubTopic;
-    private final String                  subTopic;
-    private final BundleContext           bundleContext;
-    private final AtomicInteger           id       = new AtomicInteger(10_000);
-    private final Map<Integer, RpcResult> promises = new ConcurrentHashMap<>();
-    private final AtomicBoolean           started  = new AtomicBoolean();
-    private final AtomicBoolean           stopped  = new AtomicBoolean();
-    private final ThreadLocal<Integer>    msgId    = new ThreadLocal<>();
-    private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
+    // Service Trackers
+    private final ServiceTracker<MqttRequestMultiplexer, MqttRequestMultiplexer> multiplexerTracker;
+    private final ServiceTracker<MessageContextBuilder, MessageContextBuilder>   contextBuilderTracker;
+    private final ServiceTracker<MessagePublisher, MessagePublisher>             publisherTracker;
+    private final ServiceTracker<MessageSubscription, MessageSubscription>       subscriptionTracker;
 
-    private final L        local;
-    private R              remote;
-    private final Class<R> remoteClass;
+    private final String        pubTopic;
+    private final String        subTopic;
+    private final BundleContext bundleContext;
+    private final AtomicBoolean started = new AtomicBoolean();
+    private final AtomicBoolean stopped = new AtomicBoolean();
+    private final FluentLogger  logger  = LoggerFactory.getFluentLogger(getClass());
 
+    // Optimization: Shared Codec & Buffers
+    private static final BinaryCodec                 codec       = new BinaryCodec();
+    private final ThreadLocal<ByteArrayOutputStream> buffer      = ThreadLocal
+            .withInitial(() -> new ByteArrayOutputStream(4096));
+    private final ThreadLocal<ByteArrayOutputStream> argBuffer   = ThreadLocal
+            .withInitial(() -> new ByteArrayOutputStream(1024));
+    private final Map<String, Method>                methodCache = new HashMap<>();
+
+    private final L               local;
+    private R                     remote;
+    private final Class<R>        remoteClass;
     private final ExecutorService executor;
-
-    public static class RpcMessage {
-        public int      id;
-        public String   methodName;
-        public String[] methodArgs;
-
-        @Override
-        public String toString() {
-            return "[id=" + id + ", methodName=" + methodName + "]";
-        }
-    }
-
-    public static class RpcResult {
-        public boolean resolved;
-        public byte[]  value;
-        public boolean exception;
-    }
 
     @SuppressWarnings("unchecked")
     public MqttRPC(final BundleContext bundleContext,
@@ -89,12 +96,26 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                    final String pubTopic,
                    final String subTopic,
                    final ExecutorService executor) {
+
         this.bundleContext = bundleContext;
         this.remoteClass   = remoteClass;
         this.local         = local == null ? (L) this : local;
         this.pubTopic      = pubTopic;
         this.subTopic      = subTopic;
         this.executor      = executor;
+
+        // Initialize Trackers
+        this.multiplexerTracker    = new ServiceTracker<>(bundleContext, MqttRequestMultiplexer.class, null);
+        this.contextBuilderTracker = new ServiceTracker<>(bundleContext, MessageContextBuilder.class, null);
+        this.publisherTracker      = new ServiceTracker<>(bundleContext, MessagePublisher.class, null);
+        this.subscriptionTracker   = new ServiceTracker<>(bundleContext, MessageSubscription.class, null);
+
+        // Cache local methods
+        for (Method m : this.local.getClass().getMethods()) {
+            if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
+                methodCache.put(m.getName() + "#" + m.getParameterTypes().length, m);
+            }
+        }
     }
 
     @Override
@@ -102,272 +123,260 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         if (!started.compareAndSet(false, true)) {
             throw new IllegalStateException("MQTT RPC is already running");
         }
-        mqttClient = new MqttClient(bundleContext, subscriber -> {
-            subscriber.subscribe(subTopic).forEach(msg -> {
-                try {
-                    final ByteBuffer   payload    = msg.payload;
-                    final RpcMessage   message    = decodeMessage(payload);
-                    final List<byte[]> methodArgs = new ArrayList<>();
-                    if (message.methodArgs != null) {
-                        for (final String arg : message.methodArgs) {
-                            methodArgs.add(Base64.getDecoder().decode(arg));
-                        }
-                    }
-                    final Runnable r = () -> {
-                        try {
-                            msgId.set(message.id);
-                            executeCommand(message.methodName, message.id, methodArgs);
-                        } catch (final Exception e) {
-                            // nothing to do
-                        }
-                        msgId.remove();
-                    };
-                    executor.execute(r);
-                } catch (final Exception e) {
-                    return;
-                }
+
+        multiplexerTracker.open();
+        contextBuilderTracker.open();
+        publisherTracker.open();
+        subscriptionTracker.open();
+
+        // Subscribe to incoming RPC requests (Server Mode)
+        // Note: Using Optional here is safe for startup, but in dynamic OSGi,
+        // a better pattern would be addingService() in the tracker.
+        // For simplicity/readability, we assume services are present or will retry.
+        Optional.ofNullable(subscriptionTracker.getService()).ifPresent(sub -> {
+            sub.subscribe(subTopic).forEach(msg -> {
+                executor.execute(() -> handleIncomingMessage(msg));
             });
         });
-        mqttClient.open();
-    }
-
-    private RpcMessage decodeMessage(final ByteBuffer payload) throws Exception {
-        return new JSONCodec().dec().inflate().from(payload.array()).get(RpcMessage.class);
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (stopped.getAndSet(true)) {
-            return; // already closed
+            return;
         }
         if (local instanceof Closeable) {
             try {
                 ((Closeable) local).close();
             } catch (final Exception e) {
-                // nothing to do
             }
         }
-        mqttClient.close();
+        multiplexerTracker.close();
+        contextBuilderTracker.close();
+        publisherTracker.close();
+        subscriptionTracker.close();
         executor.shutdownNow();
+    }
+
+    /**
+     * Safely executes an action with a fresh MessageContextBuilder instance.
+     * Required because MessageContextBuilder is PROTOTYPE scoped.
+     */
+    private <T> T withMessageContextBuilder(Function<MessageContextBuilder, T> action) throws IOException {
+        ServiceReference<MessageContextBuilder> ref = contextBuilderTracker.getServiceReference();
+        if (ref == null)
+            throw new IOException("MessageContextBuilder service unavailable");
+
+        ServiceObjects<MessageContextBuilder> serviceObjects = bundleContext.getServiceObjects(ref);
+        if (serviceObjects == null)
+            throw new IOException("ServiceObjects for MessageContextBuilder unavailable");
+
+        MessageContextBuilder builder = serviceObjects.getService();
+        if (builder == null)
+            throw new IOException("MessageContextBuilder instance is null");
+
+        try {
+            return action.apply(builder);
+        } finally {
+            serviceObjects.ungetService(builder);
+        }
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public synchronized R getRemote() {
-        if (stopped.get()) {
+        if (stopped.get())
             return null;
-        }
+
         if (remote == null) {
             remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
                     (target, method, args) -> {
-                        try {
-                            if (method.getDeclaringClass() == Object.class) {
-                                final Object hash = new Object();
-                                return method.invoke(hash, args);
-                            }
-                            int msgId;
-                            try {
-                                msgId = send(msg(id.getAndIncrement(), method, args));
-                                if (method.getReturnType() == void.class) {
-                                    promises.remove(msgId);
-                                    return null;
-                                }
-                            } catch (final Exception e1) {
-                                terminate();
-                                return null;
-                            }
-                            return waitForResult(msgId, method.getGenericReturnType());
-                        } catch (final InvocationTargetException ite) {
-                            throw Exceptions.unrollCause(ite, InvocationTargetException.class);
-                        } catch (final Exception e) {
-                            throw e;
+                        if (method.getDeclaringClass() == Object.class) {
+                            return method.invoke(this, args);
                         }
+
+                        // Encode Request
+                        byte[] payload = encodeRequest(method, args);
+
+                        // Check Service Availability
+                        MqttRequestMultiplexer multiplexer = multiplexerTracker.getService();
+                        if (multiplexer == null) {
+                            throw new IOException("MqttRequestMultiplexer is unavailable");
+                        }
+
+                        // uild & Send using Fresh ContextBuilder
+                        return withMessageContextBuilder(mcb -> {
+                            Message request = mcb.channel(pubTopic).correlationId(UUID.randomUUID().toString())
+                                    .content(ByteBuffer.wrap(payload)).buildMessage();
+
+                            // The multiplexer uses this context to know where to listen for the reply
+                            MessageContext responseCtx = mcb.channel(pubTopic + "/reply").buildContext();
+
+                            Promise<Message> promise = multiplexer.request(request, responseCtx);
+                            try {
+                                // Block for response
+                                Message responseMsg = promise.getValue();
+                                return decodeResponse(responseMsg, method.getGenericReturnType());
+                            } catch (InvocationTargetException e) {
+                                throw new RuntimeException(e);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                throw new RuntimeException("RPC Interrupted", e);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                     });
         }
         return remote;
+    }
+
+    private byte[] encodeRequest(Method method, Object[] args) throws IOException {
+        final ByteArrayOutputStream bout = buffer.get();
+        bout.reset();
+
+        try (GZIPOutputStream gzip = new GZIPOutputStream(bout); DataOutputStream out = new DataOutputStream(gzip)) {
+
+            out.writeUTF(method.getName());
+            if (args == null)
+                args = new Object[0];
+            out.writeShort(args.length);
+
+            for (Object arg : args) {
+                // Encode each arg to temp buffer to get length
+                final ByteArrayOutputStream argBout = argBuffer.get();
+                argBout.reset();
+                try (DataOutputStream argOut = new DataOutputStream(argBout)) {
+                    try {
+                        codec.encode(arg, argOut);
+                    } catch (Exception e) {
+                        throw new IOException("Failed to encode argument", e);
+                    }
+                }
+                byte[] argBytes = argBout.toByteArray();
+                out.writeInt(argBytes.length);
+                out.write(argBytes);
+            }
+            out.flush();
+            gzip.finish();
+        }
+        return bout.toByteArray();
+    }
+
+    private Object decodeResponse(Message msg, Type returnType) throws Exception {
+        ByteBuffer payload = msg.payload();
+        byte[]     data    = new byte[payload.remaining()];
+        payload.get(data);
+
+        try (DataInputStream in = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(data)))) {
+            boolean isError = in.readBoolean();
+            if (isError) {
+                String errorMsg = (String) codec.decode(in, String.class);
+                throw new RuntimeException("Remote RPC Error: " + errorMsg);
+            }
+            if (returnType == void.class)
+                return null;
+            return codec.decode(in, returnType);
+        }
+    }
+
+    private void handleIncomingMessage(Message msg) {
+        try {
+            ByteBuffer payload = msg.payload();
+            byte[]     data    = new byte[payload.remaining()];
+            payload.get(data);
+
+            // Decode Request
+            String       methodName;
+            List<byte[]> rawArgs = new ArrayList<>();
+
+            try (DataInputStream in = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(data)))) {
+                methodName = in.readUTF();
+                int count = in.readShort();
+                for (int i = 0; i < count; i++) {
+                    int    len = in.readInt();
+                    byte[] arg = new byte[len];
+                    in.readFully(arg);
+                    rawArgs.add(arg);
+                }
+            }
+
+            // Execute
+            Object  result   = null;
+            boolean isError  = false;
+            String  errorMsg = null;
+
+            Method m = methodCache.get(methodName + "#" + rawArgs.size());
+            if (m != null) {
+                Object[] args = new Object[rawArgs.size()];
+                for (int i = 0; i < args.length; i++) {
+                    try (DataInputStream argIn = new DataInputStream(new ByteArrayInputStream(rawArgs.get(i)))) {
+                        args[i] = codec.decode(argIn, m.getGenericParameterTypes()[i]);
+                    }
+                }
+                try {
+                    result = m.invoke(local, args);
+                } catch (Throwable t) {
+                    isError  = true;
+                    errorMsg = Exceptions.unrollCause(t, InvocationTargetException.class).getMessage();
+                }
+            } else {
+                isError  = true;
+                errorMsg = "Method not found: " + methodName;
+            }
+
+            // Send Response (Dynamic Routing)
+            String replyTo  = msg.getContext().getReplyToChannel();
+            String correlId = msg.getContext().getCorrelationId();
+
+            if (replyTo != null && correlId != null) {
+                sendResponse(replyTo, correlId, result, isError, errorMsg);
+            }
+
+        } catch (Exception e) {
+            logger.atError().msg("Error processing incoming MQTT RPC").throwable(e).log();
+        }
+    }
+
+    private void sendResponse(String topic, String correlationId, Object result, boolean isError, String errorMsg) {
+        Optional<MessagePublisher> publisherOpt = Optional.ofNullable(publisherTracker.getService());
+
+        if (publisherOpt.isPresent()) {
+            try {
+                // Use Helper to get FRESH builder
+                withMessageContextBuilder(mcb -> {
+                    ByteArrayOutputStream bout = buffer.get();
+                    bout.reset();
+                    try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
+                            DataOutputStream out = new DataOutputStream(gzip)) {
+
+                        out.writeBoolean(isError);
+                        if (isError) {
+                            codec.encode(errorMsg, out);
+                        } else {
+                            codec.encode(result, out);
+                        }
+                        out.flush();
+                        gzip.finish();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Encoding failed", e);
+                    }
+
+                    Message responseMsg = mcb.channel(topic).correlationId(correlationId)
+                            .content(ByteBuffer.wrap(bout.toByteArray())).buildMessage();
+
+                    publisherOpt.get().publish(responseMsg);
+                    return null;
+                });
+
+            } catch (Exception e) {
+                logger.atError().msg("Failed to send RPC response").throwable(e).log();
+            }
+        }
     }
 
     @Override
     public boolean isOpen() {
         return !stopped.get();
     }
-
-    protected void terminate() {
-        try {
-            close();
-        } catch (final IOException e) {
-            // nothing to do
-        }
-    }
-
-    private Method getMethod(final String cmd, final int count) {
-        for (final Method m : local.getClass().getMethods()) {
-            if (m.getDeclaringClass() == RemoteRPC.class) {
-                continue;
-            }
-            if (m.getName().equals(cmd) && m.getParameterTypes().length == count) {
-                return m;
-            }
-        }
-        return null;
-    }
-
-    private int send(final RpcMessage msg) throws Exception {
-        if (msg.methodName != null) {
-            promises.put(msg.id, new RpcResult());
-        }
-        trace("Sending MQTT RPC: " + msg);
-        final Optional<Mqtt5Publisher> msgPublisher = mqttClient.pub();
-        if (msgPublisher.isPresent()) {
-            final Mqtt5Publisher publisher = msgPublisher.get();
-            synchronized (publisher) {
-                final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                try {
-                    new JSONCodec().enc().deflate().to(bout).put(msg);
-
-                    final ByteBuffer   data    = ByteBuffer.wrap(bout.toByteArray());
-                    final Mqtt5Message message = new Mqtt5Message();
-                    message.channel = pubTopic;
-                    message.payload = data;
-
-                    publisher.publish(message);
-                    trace("Sent MQTT RPC: " + msg);
-                } catch (final Exception e) {
-                    throw new RuntimeException("Message cannot be encoded");
-                }
-            }
-        }
-        return msg.id;
-    }
-
-    private void response(int msgId, final byte[] data) {
-        boolean exception = false;
-        if (msgId < 0) {
-            msgId     = -msgId;
-            exception = true;
-        }
-        final RpcResult result = promises.get(msgId);
-        if (result != null) {
-            synchronized (result) {
-                trace("Resolved RPC");
-                result.value     = data;
-                result.exception = exception;
-                result.resolved  = true;
-                result.notifyAll();
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T waitForResult(final int id, final Type type) throws Exception {
-        final long      deadlineInMillis = 10_000L;
-        final long      startInNanos     = System.nanoTime();
-        final RpcResult result           = promises.get(id);
-        try {
-            do {
-                synchronized (result) {
-                    if (result.resolved) {
-                        if (result.value == null) {
-                            return null;
-                        }
-                        if (result.exception) {
-                            final String msg = new JSONCodec().dec().inflate().from(result.value).get(String.class);
-                            trace("Exception during agent communication: " + msg);
-                            throw new RuntimeException(msg);
-                        }
-                        if (type == byte[].class) {
-                            return (T) result.value;
-                        }
-                        return (T) new JSONCodec().dec().inflate().from(result.value).get(type);
-                    }
-                    long elapsedInNanos = System.nanoTime() - startInNanos;
-                    long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
-                    if (delayInMillis <= 0L) {
-                        return null;
-                    }
-                    trace("Start Delay (MQTT RPC)" + delayInMillis);
-                    result.wait(delayInMillis);
-                    elapsedInNanos = System.nanoTime() - startInNanos;
-                    delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
-                    if (delayInMillis <= 0L) {
-                        return null;
-                    }
-                    trace("End Delay (MQTT RPC)" + delayInMillis);
-                }
-            } while (true);
-        } finally {
-            promises.remove(id);
-        }
-    }
-
-    private void trace(final String message) {
-        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_RPC_TRACE_LOG_KEY);
-        if (isTracingEnabled) {
-            logger.atDebug().msg("[OSGi.fx] {}").arg(message).log();
-        }
-    }
-
-    private void executeCommand(final String cmd, final int id, final List<byte[]> args) throws Exception {
-        if (cmd.isEmpty()) {
-            response(id, args.get(0));
-        } else {
-            final Method m = getMethod(cmd, args.size());
-            if (m == null) {
-                return;
-            }
-            final Object[] parameters = new Object[args.size()];
-            for (int i = 0; i < args.size(); i++) {
-                final Class<?> type = m.getParameterTypes()[i];
-                if (type == byte[].class) {
-                    parameters[i] = args.get(i);
-                } else {
-                    parameters[i] = new JSONCodec().dec().inflate().from(args.get(i))
-                            .get(m.getGenericParameterTypes()[i]);
-                }
-            }
-            try {
-                final Object result = m.invoke(local, parameters);
-                if (m.getReturnType() == void.class) {
-                    return;
-                }
-                try {
-                    send(msg(id, null, new Object[] { result }));
-                } catch (final Exception e) {
-                    terminate();
-                }
-            } catch (Throwable t) {
-                t = Exceptions.unrollCause(t, InvocationTargetException.class);
-                try {
-                    send(msg(-id, null, new Object[] { t + "" }));
-                } catch (final Exception e) {
-                    terminate();
-                }
-            }
-        }
-    }
-
-    private RpcMessage msg(final int msgId, final Method method, final Object[] args) throws Exception {
-        final RpcMessage msg = new RpcMessage();
-        msg.methodName = method == null ? "" : method.getName();
-        msg.id         = msgId;
-
-        final List<String> methodArgs = new ArrayList<>();
-        if (args != null) {
-            for (final Object arg : args) {
-                byte[] argValue;
-                if (arg instanceof byte[]) {
-                    argValue = (byte[]) arg;
-                } else {
-                    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    new JSONCodec().enc().deflate().to(bout).put(arg);
-                    argValue = bout.toByteArray();
-                }
-                final String encodedValue = Base64.getEncoder().encodeToString(argValue);
-                methodArgs.add(encodedValue);
-            }
-        }
-        msg.methodArgs = methodArgs.toArray(new String[0]);
-        return msg;
-    }
-
 }

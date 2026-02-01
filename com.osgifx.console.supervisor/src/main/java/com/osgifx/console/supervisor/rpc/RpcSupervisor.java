@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -59,10 +58,6 @@ import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
-import com.osgifx.console.agent.rpc.mqtt.SimpleMqtt5Publisher;
-import com.osgifx.console.agent.rpc.mqtt.SimpleMqtt5Subscriber;
-import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
-import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -112,10 +107,6 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     void activate(final BundleContext context) {
         this.context = context;
         logger       = FluentLogger.of(factory.createLogger(getClass().getName()));
-
-        // register the required MQTT services
-        pubReg = OSGi.register(Mqtt5Publisher.class, new SimpleMqtt5Publisher(context), null).run(context);
-        subReg = OSGi.register(Mqtt5Subscriber.class, new SimpleMqtt5Subscriber(context), null).run(context);
     }
 
     @Deactivate
