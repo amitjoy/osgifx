@@ -40,12 +40,12 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.application.dialog.ConnectToSocketAgentDialog;
-import com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType;
-import com.osgifx.console.application.dialog.SocketConnectionDialog;
-import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ConnectToZmqAgentDialog;
+import com.osgifx.console.application.dialog.ConnectToZmqAgentDialog.ActionType;
+import com.osgifx.console.application.dialog.ZmqConnectionDialog;
+import com.osgifx.console.application.dialog.ZmqConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
-import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.supervisor.ZmqConnection;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
@@ -53,52 +53,52 @@ import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
 
-public final class ConnectToSocketAgentHandler {
+public final class ConnectToZmqAgentHandler {
 
-    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.socket.connection.preference";
+    private static final String COMMAND_ID_MANAGE_CONNECTION = "com.osgifx.console.application.command.zmq.connection.preference";
 
     @Log
     @Inject
-    private FluentLogger                                  logger;
+    private FluentLogger                               logger;
     @Inject
-    private Executor                                      executor;
+    private Executor                                   executor;
     @Inject
-    private ThreadSynchronize                             threadSync;
+    private ThreadSynchronize                          threadSync;
     @Inject
-    private IEclipseContext                               context;
+    private IEclipseContext                            context;
     @Inject
-    private IEventBroker                                  eventBroker;
+    private IEventBroker                               eventBroker;
     @Inject
     @Optional
-    private Supervisor                                    supervisor;
+    private Supervisor                                 supervisor;
     @Inject
-    private CommandService                                commandService;
+    private CommandService                             commandService;
     @Inject
     @Optional
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>                    isConnected;
+    private ContextBoundValue<Boolean>                 isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>                    isLocalAgent;
+    private ContextBoundValue<Boolean>                 isLocalAgent;
     @Inject
     @Optional
     @ContextValue("is_snapshot_agent")
-    private ContextBoundValue<Boolean>                    isSnapshotAgent;
+    private ContextBoundValue<Boolean>                 isSnapshotAgent;
     @Inject
     @Optional
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>                     connectedAgent;
+    private ContextBoundValue<String>                  connectedAgent;
     @Inject
     @ContextValue("selected.settings")
-    private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
+    private ContextBoundValue<ZmqConnectionSettingDTO> selectedSettings;
     @Inject
-    private SupervisorFactory                             supervisorFactory;
-    private ProgressDialog                                progressDialog;
+    private SupervisorFactory                          supervisorFactory;
+    private ProgressDialog                             progressDialog;
 
     @Execute
     public void execute() {
-        final var connectToAgentDialog = new ConnectToSocketAgentDialog();
+        final var connectToAgentDialog = new ConnectToZmqAgentDialog();
         ContextInjectionFactory.inject(connectToAgentDialog, context);
         logger.atInfo().log("Injected connect to agent dialog to eclipse context");
 
@@ -142,7 +142,7 @@ public final class ConnectToSocketAgentHandler {
     private void addConnection() {
         logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
-        final var connectionDialog = new SocketConnectionDialog();
+        final var connectionDialog = new ZmqConnectionDialog();
         ContextInjectionFactory.inject(connectionDialog, context);
         logger.atInfo().log("Injected connection dialog to eclipse context");
         connectionDialog.init(null);
@@ -157,10 +157,10 @@ public final class ConnectToSocketAgentHandler {
         }
     }
 
-    private void editConnection(final SocketConnectionSettingDTO setting) {
+    private void editConnection(final ZmqConnectionSettingDTO setting) {
         logger.atInfo().log("'%s'-'editConnection(..)' event has been invoked", getClass().getSimpleName());
 
-        final var connectionDialog = new SocketConnectionDialog();
+        final var connectionDialog = new ZmqConnectionDialog();
         ContextInjectionFactory.inject(connectionDialog, context);
         logger.atInfo().log("Injected connection dialog to eclipse context");
         connectionDialog.init(setting);
@@ -177,7 +177,7 @@ public final class ConnectToSocketAgentHandler {
 
     private void removeConnection() {
         logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
-        final SocketConnectionSettingDTO settings = selectedSettings.getValue();
+        final ZmqConnectionSettingDTO settings = selectedSettings.getValue();
         if (settings == null) {
             logger.atInfo().log("No connection setting has been selected");
             return;
@@ -202,20 +202,20 @@ public final class ConnectToSocketAgentHandler {
                 try {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
                     supervisorFactory.createSupervisor(REMOTE_RPC);
-                    updateMessage("Connecting to " + settings.host + ":" + settings.port);
+                    updateMessage("Connecting to " + settings.host + ": [" + settings.commandPort + ","
+                            + settings.eventPort + "]");
 
                     // @formatter:off
-                    final var socketConnection = SocketConnection
+                    final var zmqConnection = ZmqConnection
                             .builder()
                             .host(settings.host)
-                            .port(settings.port)
                             .timeout(settings.timeout)
-                            .truststore(settings.trustStorePath)
-                            .truststorePass(settings.trustStorePassword)
+                            .eventPort(settings.eventPort)
+                            .commandPort(settings.commandPort)
                             .build();
                     // @formatter:on
 
-                    supervisor.connect(socketConnection);
+                    supervisor.connect(zmqConnection);
                     logger.atInfo().log("Successfully connected to %s", settings);
                     return null;
                 } catch (final InterruptedException e) {
@@ -237,7 +237,8 @@ public final class ConnectToSocketAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", settings);
-                final var connection = "[SOCKET] " + settings.host + ":" + settings.port;
+                final var connection = "[ZeroMQ] " + settings.host + ": [" + settings.commandPort + ","
+                        + settings.eventPort + "]";
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
@@ -252,17 +253,16 @@ public final class ConnectToSocketAgentHandler {
                 () -> taskFuture.cancel(true));
     }
 
-    private void triggerCommand(final SocketConnectionSettingDTO dto, final String type) {
+    private void triggerCommand(final ZmqConnectionSettingDTO dto, final String type) {
         final Map<String, Object> properties = Maps.newHashMap();
 
         properties.put("id", dto.id);
         properties.put("name", dto.name);
         properties.put("host", dto.host);
-        properties.put("port", dto.port);
-        properties.put("timeout", dto.timeout);
         properties.put("type", type);
-        properties.put("truststore", dto.trustStorePath);
-        properties.put("truststorePassword", dto.trustStorePassword);
+        properties.put("timeout", dto.timeout);
+        properties.put("commandPort", dto.commandPort);
+        properties.put("eventPort", dto.eventPort);
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }

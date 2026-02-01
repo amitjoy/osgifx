@@ -26,15 +26,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
-import java.net.ConnectException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
@@ -44,13 +39,11 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.condition.Condition;
 
 import com.google.common.base.Strings;
-import com.google.mu.util.concurrent.Retryer;
-import com.google.mu.util.concurrent.Retryer.Delay;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
-import com.osgifx.console.agent.rpc.socket.SocketRPC;
+import com.osgifx.console.agent.rpc.zmq.ZeroMqRPC;
 import com.osgifx.console.supervisor.MqttConnection;
-import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.supervisor.ZmqConnection;
 import com.osgifx.console.supervisor.rpc.TokenProvider.TokenConfigDTO;
 import com.osgifx.console.util.configuration.ConfigHelper;
 
@@ -97,58 +90,38 @@ public abstract class AbstractRpcSupervisor<S, A> {
         String osgi_ds_satisfying_condition_target();
     }
 
-    private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
-    private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5d;
-
     private static final int RPC_POOL_CORE_THREADS_SIZE          = 10;
     private static final int RPC_POOL_MAX_THREADS_SIZE           = 30;
     private static final int RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS = 60;
 
     private A                 agent;
-    protected int             port;
     protected int             timeout;
     protected String          host;
     protected RemoteRPC<S, A> remoteRPC;
     protected volatile int    exitCode;
+    protected int             eventPort;
+    protected int             commandPort;
 
-    protected void connectToSocket(final Class<A> agent,
-                                   final S supervisor,
-                                   final SocketConnection socketConnection) throws Exception {
+    protected void connectToZmq(final Class<A> agent,
+                                final S supervisor,
+                                final ZmqConnection connection) throws Exception {
 
-        checkArgument(timeout > -1, "timeout cannot be less than -1");
+        checkArgument(connection.timeout() > -1, "timeout cannot be less than -1");
         checkNotNull(supervisor, "'supervisor' cannot be null");
-        checkNotNull(socketConnection.host(), "'host' cannot be null");
+        checkNotNull(connection.host(), "'host' cannot be null");
 
-        host    = socketConnection.host();
-        port    = socketConnection.port();
-        timeout = socketConnection.timeout();
+        // Capture Configuration
+        this.host        = connection.host();
+        this.timeout     = connection.timeout();
+        this.eventPort   = connection.eventPort();
+        this.commandPort = connection.commandPort();
 
-        new Retryer().upon(ConnectException.class,
-                Delay.ofMillis(timeout).exponentialBackoff(SOCKET_RPC_BACKOFF_MULTIPLIER, SOCKET_RPC_BACKOFF_LIMIT))
-                .retryBlockingly(() -> {
-                    try {
-                        SSLSocketFactory sf = null;
-                        if (socketConnection.trustStore() != null && socketConnection.trustStorePassword() != null) {
-                            System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
-                            System.setProperty("javax.net.ssl.trustStorePassword",
-                                    socketConnection.trustStorePassword());
-                            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        // Instantiate the Unified ZeroMqRPC in CLIENT mode (passing host & timeout).
+        remoteRPC = new ZeroMqRPC<>(agent, supervisor, host, timeout);
 
-                            sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                        }
-                        final var socket = sf == null ? new Socket() : sf.createSocket();
-                        socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
-
-                        final var executor = newFixedThreadPool("fx-supervisor-socket-%d");
-                        remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
-                        this.setRemoteRPC(remoteRPC);
-                        remoteRPC.open();
-                        return null;
-                    } catch (final ConnectException e) {
-                        clearSSLProperties();
-                        throw e;
-                    }
-                });
+        // Set and Open
+        this.setRemoteRPC(remoteRPC);
+        remoteRPC.open();
     }
 
     protected OSGiResult connectToMQTT(final BundleContext bundleContext,
@@ -220,12 +193,6 @@ public abstract class AbstractRpcSupervisor<S, A> {
 
     public boolean isOpen() {
         return remoteRPC.isOpen();
-    }
-
-    private void clearSSLProperties() {
-        System.clearProperty("javax.net.ssl.trustStore");
-        System.clearProperty("javax.net.ssl.trustStorePassword");
-        System.clearProperty("javax.net.ssl.trustStoreType");
     }
 
     public static ExecutorService newFixedThreadPool(final String namingPattern) {

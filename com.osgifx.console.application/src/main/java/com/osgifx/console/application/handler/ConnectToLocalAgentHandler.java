@@ -36,7 +36,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.executor.Executor;
-import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.supervisor.ZmqConnection;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.FxDialog;
@@ -78,8 +78,13 @@ public final class ConnectToLocalAgentHandler {
     @Inject
     @Adapt
     @Optional
-    @Named("local.agent.port")
-    private int                        localAgentPort;
+    @Named("local.agent.command.port")
+    private int                        localAgentCommandPort;
+    @Inject
+    @Adapt
+    @Optional
+    @Named("local.agent.event.port")
+    private int                        localAgentEventPort;
     @Inject
     @Adapt
     @Optional
@@ -98,28 +103,30 @@ public final class ConnectToLocalAgentHandler {
                 try {
                     supervisorFactory.removeSupervisor(SNAPSHOT);
                     supervisorFactory.createSupervisor(REMOTE_RPC);
-                    updateMessage("Connecting to Local Agent on " + localAgentPort);
+                    updateMessage(
+                            "Connecting to Local Agent on [" + localAgentCommandPort + "," + localAgentEventPort + "]");
 
                     // @formatter:off
-                    final var socketConnection = SocketConnection
+                    final var zmqConnection = ZmqConnection
                             .builder()
                             .host(localAgentHost)
-                            .port(localAgentPort)
+                            .commandPort(localAgentCommandPort)
+                            .eventPort(localAgentEventPort)
                             .timeout(localAgentTimeout)
                             .build();
                     // @formatter:on
 
-                    supervisor.connect(socketConnection);
-                    logger.atInfo().log("Successfully connected to local agent on %s:%s", localAgentHost,
-                            localAgentPort);
+                    supervisor.connect(zmqConnection);
+                    logger.atInfo().log("Successfully connected to local agent on %s:[%s,%s]", localAgentHost,
+                            localAgentCommandPort, localAgentEventPort);
                     return null;
                 } catch (final InterruptedException e) {
                     logger.atInfo().log("Connection task interrupted");
                     threadSync.asyncExec(progressDialog::close);
                     throw e;
                 } catch (final Exception e) {
-                    logger.atError().withException(e).log("Cannot connect to local agent on %s:%s", localAgentHost,
-                            localAgentPort);
+                    logger.atError().withException(e).log("Cannot connect to local agent on %s:[%s,%s]", localAgentHost,
+                            localAgentCommandPort, localAgentEventPort);
                     threadSync.asyncExec(() -> {
                         progressDialog.close();
                         FxDialog.showExceptionDialog(e, getClass().getClassLoader());
@@ -130,10 +137,11 @@ public final class ConnectToLocalAgentHandler {
 
             @Override
             protected void succeeded() {
-                logger.atInfo().log("Agent connected event has been sent for local agent on %s:%s", localAgentHost,
-                        localAgentPort);
+                logger.atInfo().log("Agent connected event has been sent for local agent on %s:[%s,%s]", localAgentHost,
+                        localAgentCommandPort, localAgentEventPort);
 
-                final var connection = "[SOCKET] " + localAgentHost + ":" + localAgentPort;
+                final var connection = "[ZeroMQ] " + localAgentHost + ":" + "[" + localAgentCommandPort + ","
+                        + localAgentEventPort + "]";
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);

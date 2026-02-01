@@ -24,7 +24,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
-import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ZmqConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 
@@ -46,7 +46,7 @@ public final class MqttConnectionSettingsDialogController {
     @FXML
     private TableColumn<MqttConnectionSettingDTO, Integer>   portColumn;
     @FXML
-    private TableColumn<SocketConnectionSettingDTO, Integer> timeoutColumn;
+    private TableColumn<ZmqConnectionSettingDTO, Integer> timeoutColumn;
     @Log
     @Inject
     private FluentLogger                                     logger;

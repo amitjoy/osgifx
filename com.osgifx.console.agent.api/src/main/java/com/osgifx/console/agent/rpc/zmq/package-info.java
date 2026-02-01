@@ -18,4 +18,4 @@
  * agent and local supervisor bundles using {@code -conditionalpackage}
  * instruction
  */
-package com.osgifx.console.agent.rpc.socket;
+package com.osgifx.console.agent.rpc.zmq;

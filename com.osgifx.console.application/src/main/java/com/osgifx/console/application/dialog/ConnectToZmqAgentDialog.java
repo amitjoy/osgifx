@@ -15,10 +15,10 @@
  ******************************************************************************/
 package com.osgifx.console.application.dialog;
 
-import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.ADD_CONNECTION;
-import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.CONNECT;
-import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.EDIT_CONNECTION;
-import static com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType.REMOVE_CONNECTION;
+import static com.osgifx.console.application.dialog.ConnectToZmqAgentDialog.ActionType.ADD_CONNECTION;
+import static com.osgifx.console.application.dialog.ConnectToZmqAgentDialog.ActionType.CONNECT;
+import static com.osgifx.console.application.dialog.ConnectToZmqAgentDialog.ActionType.EDIT_CONNECTION;
+import static com.osgifx.console.application.dialog.ConnectToZmqAgentDialog.ActionType.REMOVE_CONNECTION;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
@@ -32,7 +32,7 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
 import com.google.common.collect.Maps;
-import com.osgifx.console.application.fxml.controller.SocketConnectionSettingsDialogController;
+import com.osgifx.console.application.fxml.controller.ZmqConnectionSettingsDialogController;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;
@@ -42,7 +42,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
-public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
+public final class ConnectToZmqAgentDialog extends Dialog<ButtonType> {
 
     public enum ActionType {
         CONNECT,
@@ -67,7 +67,7 @@ public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
         dialogPane.setPrefWidth(540);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
 
-        dialogPane.setHeaderText("Connect to Remote Socket Agent");
+        dialogPane.setHeaderText("Connect to Remote ZeroMQ Agent");
         dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/connected.png").toString()));
 
         final var addConnectionButton    = new ButtonType("Add", ButtonBar.ButtonData.LEFT);
@@ -85,8 +85,8 @@ public final class ConnectToSocketAgentDialog extends Dialog<ButtonType> {
         buttonTypes.put(REMOVE_CONNECTION, removeConnectionButton);
         buttonTypes.put(CONNECT, OK);
 
-        final var content    = Fx.loadFXML(loader, context, "/fxml/socket-connection-chooser-window.fxml");
-        final var controller = (SocketConnectionSettingsDialogController) loader.getController();
+        final var content    = Fx.loadFXML(loader, context, "/fxml/zmq-connection-chooser-window.fxml");
+        final var controller = (ZmqConnectionSettingsDialogController) loader.getController();
 
         dialogPane.lookupButton(editConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());
         dialogPane.lookupButton(removeConnectionButton).disableProperty().bind(controller.selectedSettings().isNull());

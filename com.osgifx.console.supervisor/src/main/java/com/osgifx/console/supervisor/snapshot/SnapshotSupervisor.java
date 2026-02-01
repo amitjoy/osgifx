@@ -35,7 +35,7 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.MqttConnection;
-import com.osgifx.console.supervisor.SocketConnection;
+import com.osgifx.console.supervisor.ZmqConnection;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
@@ -81,7 +81,7 @@ public final class SnapshotSupervisor implements Supervisor {
     }
 
     @Override
-    public void connect(final SocketConnection socketConnection) throws Exception {
+    public void connect(final ZmqConnection zmqConnection) throws Exception {
         logger.atInfo().log(NOT_IMPLEMENTED_LOG);
     }
 

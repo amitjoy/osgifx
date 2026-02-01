@@ -33,30 +33,31 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ZmqConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 
-public final class SocketConnectionPreferenceHandler {
+public final class ZmqConnectionPreferenceHandler {
 
     @Log
     @Inject
     private FluentLogger        logger;
     @Inject
-    @Preference(nodePath = "osgi.fx.connections", key = "socket.settings", defaultValue = "")
+    @Preference(nodePath = "osgi.fx.connections", key = "zmq.settings", defaultValue = "")
     private Value<String>       settings;
     @Inject
     private ConnectionsProvider connectionsProvider;
 
     @PostConstruct
     public void init() {
-        connectionsProvider.addSocketConnections(getStoredValues());
+        connectionsProvider.addZmqConnections(getStoredValues());
     }
 
     @Execute
     public void execute(@Named("id") final String id,
                         @Named("name") final String name,
                         @Named("host") final String host,
-                        @Named("port") final String port,
+                        @Named("commandPort") final String commandPort,
+                        @Named("eventPort") final String eventPort,
                         @Named("timeout") final String timeout,
                         @Named("type") final String type,
                         @Named("truststore") @Optional final String truststore,
@@ -64,12 +65,12 @@ public final class SocketConnectionPreferenceHandler {
 
         final var gson        = new Gson();
         final var connections = getStoredValues();
-        final var dto         = new SocketConnectionSettingDTO(id, name, host, Ints.tryParse(port),
-                                                               Ints.tryParse(timeout), truststore, truststorePassword);
+        final var dto         = new ZmqConnectionSettingDTO(id, name, host, Ints.tryParse(commandPort),
+                                                            Ints.tryParse(eventPort), Ints.tryParse(timeout));
 
         if ("ADD".equals(type)) {
             connections.add(dto);
-            connectionsProvider.addSocketConnection(dto);
+            connectionsProvider.addZmqConnection(dto);
             logger.atInfo().log("New connection has been added: %s", dto);
         } else if ("EDIT".equals(type)) {
             // @formatter:off
@@ -81,11 +82,11 @@ public final class SocketConnectionPreferenceHandler {
             if (index != -1) {
                 connections.set(index, dto);
             }
-            connectionsProvider.updateSocketConnection(dto);
+            connectionsProvider.updateZmqConnection(dto);
             logger.atInfo().log("Existing connection has been updated: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
-            connectionsProvider.removeSocketConnection(dto);
+            connectionsProvider.removeZmqConnection(dto);
             logger.atInfo().log("Existing connection has been deleted: %s", dto);
         } else {
             logger.atWarning().log("Cannot execute command with type '%s'", type);
@@ -93,11 +94,11 @@ public final class SocketConnectionPreferenceHandler {
         settings.publish(gson.toJson(connections));
     }
 
-    private List<SocketConnectionSettingDTO> getStoredValues() {
-        final var                        gson        = new Gson();
-        List<SocketConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
-                new TypeToken<List<SocketConnectionSettingDTO>>() {
-                                                             }.getType());
+    private List<ZmqConnectionSettingDTO> getStoredValues() {
+        final var                     gson        = new Gson();
+        List<ZmqConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
+                new TypeToken<List<ZmqConnectionSettingDTO>>() {
+                                                          }.getType());
         if (connections == null) {
             connections = Lists.newArrayList();
         }

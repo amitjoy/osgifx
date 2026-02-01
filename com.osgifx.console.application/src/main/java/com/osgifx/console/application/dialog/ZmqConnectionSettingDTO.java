@@ -22,43 +22,39 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.google.common.base.MoreObjects;
 
-public final class SocketConnectionSettingDTO {
+public final class ZmqConnectionSettingDTO {
 
     public String id;
     public String name;
     public String host;
-    public int    port;
     public int    timeout;
-    public String trustStorePath;
-    public String trustStorePassword;
+    public int    eventPort;
+    public int    commandPort;
 
-    public SocketConnectionSettingDTO() {
+    public ZmqConnectionSettingDTO() {
         // needed for GSON
     }
 
-    public SocketConnectionSettingDTO(final String name,
-                                      final String host,
-                                      final int port,
-                                      final int timeout,
-                                      final String trustStorePath,
-                                      final String trustStorePassword) {
-        this(UUID.randomUUID().toString(), name, host, port, timeout, trustStorePath, trustStorePassword);
+    public ZmqConnectionSettingDTO(final String name,
+                                   final String host,
+                                   final int commandPort,
+                                   final int eventPort,
+                                   final int timeout) {
+        this(UUID.randomUUID().toString(), name, host, commandPort, eventPort, timeout);
     }
 
-    public SocketConnectionSettingDTO(final String id,
-                                      final String name,
-                                      final String host,
-                                      final int port,
-                                      final int timeout,
-                                      final String trustStorePath,
-                                      final String trustStorePassword) {
-        this.id                 = id;
-        this.name               = name;
-        this.host               = host;
-        this.port               = port;
-        this.timeout            = timeout;
-        this.trustStorePath     = trustStorePath;
-        this.trustStorePassword = trustStorePassword;
+    public ZmqConnectionSettingDTO(final String id,
+                                   final String name,
+                                   final String host,
+                                   final int commandPort,
+                                   final int eventPort,
+                                   final int timeout) {
+        this.id          = id;
+        this.name        = name;
+        this.host        = host;
+        this.commandPort = commandPort;
+        this.eventPort   = eventPort;
+        this.timeout     = timeout;
     }
 
     @Override
@@ -68,10 +64,9 @@ public final class SocketConnectionSettingDTO {
                          .append(id)
                          .append(name)
                          .append(host)
-                         .append(port)
+                         .append(commandPort)
+                         .append(eventPort)
                          .append(timeout)
-                         .append(trustStorePath)
-                         .append(trustStorePassword)
                      .toHashCode();
         // @formatter:on
     }
@@ -84,16 +79,15 @@ public final class SocketConnectionSettingDTO {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final var other = (SocketConnectionSettingDTO) obj;
+        final var other = (ZmqConnectionSettingDTO) obj;
         // @formatter:off
         return new EqualsBuilder()
                            .append(id, other.id)
                            .append(name, other.name)
                            .append(host, other.host)
-                           .append(port, other.port)
                            .append(timeout, other.timeout)
-                           .append(trustStorePassword, other.trustStorePassword)
-                           .append(trustStorePath, other.trustStorePath)
+                           .append(eventPort, other.eventPort)
+                           .append(commandPort, other.commandPort)
                        .isEquals();
         // @formatter:on
     }
@@ -105,9 +99,9 @@ public final class SocketConnectionSettingDTO {
                                .add("id", id)
                                .add("name", name)
                                .add("host", host)
-                               .add("port", port)
                                .add("timeout", timeout)
-                               .add("trustStorePath", trustStorePath)
+                               .add("port", eventPort)
+                               .add("port", commandPort)
                           .toString();
         // @formatter:on
     }

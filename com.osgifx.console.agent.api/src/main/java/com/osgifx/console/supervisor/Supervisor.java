@@ -32,7 +32,7 @@ public interface Supervisor {
 
     public enum RpcType {
         MQTT_RPC,
-        SOCKET_RPC
+        ZMQ_RPC
     }
 
     /** The topic where an event will be sent after the agent gets connected */
@@ -59,12 +59,12 @@ public interface Supervisor {
     RpcType getType();
 
     /**
-     * Connects to the provided socket using the specified options
+     * Connects to the provided ZeroMQ using the specified options
      *
-     * @param socketConnection the socket connection (cannot be {@code null})
+     * @param zmqConnection the ZeroMQ connection (cannot be {@code null})
      * @throws Exception if any issue occurs during connection
      */
-    void connect(SocketConnection socketConnection) throws Exception;
+    void connect(ZmqConnection zmqConnection) throws Exception;
 
     /**
      * Connects to the provided MQTT broker using the specified options

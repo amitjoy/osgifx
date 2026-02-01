@@ -17,7 +17,7 @@ package com.osgifx.console.application.addon;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.supervisor.Supervisor.RpcType.SOCKET_RPC;
+import static com.osgifx.console.supervisor.Supervisor.RpcType.ZMQ_RPC;
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledFuture;
@@ -34,7 +34,7 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.dialog.ZmqConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -45,29 +45,29 @@ public final class AgentPingAddon {
 
     @Log
     @Inject
-    private FluentLogger                                  logger;
+    private FluentLogger                               logger;
     @Inject
-    private Executor                                      executor;
+    private Executor                                   executor;
     @Inject
     @Optional
-    private Supervisor                                    supervisor;
+    private Supervisor                                 supervisor;
     @Inject
-    private IEventBroker                                  eventBroker;
+    private IEventBroker                               eventBroker;
     @Inject
     @ContextValue("is_connected")
-    private ContextBoundValue<Boolean>                    isConnected;
+    private ContextBoundValue<Boolean>                 isConnected;
     @Inject
     @Optional
     @ContextValue("is_local_agent")
-    private ContextBoundValue<Boolean>                    isLocalAgent;
+    private ContextBoundValue<Boolean>                 isLocalAgent;
     @Inject
     @ContextValue("connected.agent")
-    private ContextBoundValue<String>                     connectedAgent;
+    private ContextBoundValue<String>                  connectedAgent;
     @Inject
     @Optional
     @ContextValue("selected.settings")
-    private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
-    private volatile ScheduledFuture<?>                   future;
+    private ContextBoundValue<ZmqConnectionSettingDTO> selectedSettings;
+    private volatile ScheduledFuture<?>                future;
 
     @PostConstruct
     public void init() {
@@ -78,7 +78,7 @@ public final class AgentPingAddon {
     @Optional
     private void agentConnected(@EventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent connected event has been received");
-        if (supervisor.getType() == SOCKET_RPC) {
+        if (supervisor.getType() == ZMQ_RPC) {
             future = executor.scheduleWithFixedDelay(() -> {
                 try {
                     supervisor.getAgent().ping();
