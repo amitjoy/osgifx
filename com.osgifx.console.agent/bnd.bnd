@@ -29,35 +29,37 @@ javac.compliance      : ${javac.source}
                         com.j256.*,\
                         jakarta.inject,\
                         org.apache.commons.exec.*
-Import-Package        : \
-                        android.util;'resolution:'=optional,\
-                        com.amazonaws.*;'resolution:'=optional,\
-                        com.sun.management;'resolution:'=optional,\
-                        javax.management;'resolution:'=optional,\
-                        javax.management.openmbean;'resolution:'=optional,\
-                        javax.management.remote;'resolution:'=optional,\
-                        org.apache.commons.logging.*;'resolution:'=optional,\
-                        org.apache.felix.hc.*;'resolution:'=optional,\
-                        org.apache.felix.service.command;'resolution:'=optional,\
-                        org.apache.log4j;'resolution:'=optional,\
-                        org.apache.logging.*;'resolution:'=optional,\
-                        org.osgi.service.component.runtime;'resolution:'=optional,\
-                        org.osgi.service.component.runtime.dto;'resolution:'=optional,\
-                        org.osgi.service.http.runtime;'resolution:'=optional,\
-                        org.osgi.service.http.runtime.dto;'resolution:'=optional,\
-                        org.osgi.service.cdi*;'resolution:'=optional,\
-                        org.osgi.service.cm;'resolution:'=optional,\
-                        org.osgi.service.dmt;'resolution:'=optional,\
-                        org.osgi.service.event;'resolution:'=optional,\
-                        org.osgi.service.jaxrs*;'resolution:'=optional,\
-                        org.osgi.service.log;version="[1.3,2)";'resolution:'=optional,\
-                        org.osgi.service.log.admin;'resolution:'=optional,\
-                        org.osgi.service.messaging;'resolution:'=optional,\
-                        org.osgi.service.metatype;'resolution:'=optional,\
-                        org.osgi.service.useradmin;'resolution:'=optional,\
-                        org.osgi.util.promise;'resolution:'=optional,\
-                        org.osgi.util.pushstream;'resolution:'=optional,\
-                        org.slf4j.*;'resolution:'=optional,\
-                        *
+Import-Package: \
+	android.util;'resolution:'=optional,\
+	com.amazonaws.*;'resolution:'=optional,\
+	com.sun.management;'resolution:'=optional,\
+	in.bytehue.messaging.mqtt5.api;'resolution:'=optional,\
+	javax.management;'resolution:'=optional,\
+	javax.management.openmbean;'resolution:'=optional,\
+	javax.management.remote;'resolution:'=optional,\
+	org.apache.commons.logging.*;'resolution:'=optional,\
+	org.apache.felix.hc.*;'resolution:'=optional,\
+	org.apache.felix.service.command;'resolution:'=optional,\
+	org.apache.log4j;'resolution:'=optional,\
+	org.apache.logging.*;'resolution:'=optional,\
+	org.osgi.service.component.runtime;'resolution:'=optional,\
+	org.osgi.service.component.runtime.dto;'resolution:'=optional,\
+	org.osgi.service.http.runtime;'resolution:'=optional,\
+	org.osgi.service.http.runtime.dto;'resolution:'=optional,\
+	org.osgi.service.cdi*;'resolution:'=optional,\
+	org.osgi.service.cm;'resolution:'=optional,\
+	org.osgi.service.dmt;'resolution:'=optional,\
+	org.osgi.service.event;'resolution:'=optional,\
+	org.osgi.service.jaxrs*;'resolution:'=optional,\
+	org.osgi.service.log;version='[1.3,2)';'resolution:'=optional,\
+	org.osgi.service.log.admin;'resolution:'=optional,\
+	org.osgi.service.messaging;'resolution:'=optional,\
+	org.osgi.service.metatype;'resolution:'=optional,\
+	org.osgi.service.useradmin;'resolution:'=optional,\
+	org.osgi.util.promise;'resolution:'=optional,\
+	org.osgi.util.pushstream;'resolution:'=optional,\
+	org.slf4j.*;'resolution:'=optional,\
+	sun.misc;'resolution:'=optional,\
+	*
 Export-Package        : \
                         com.j256.simplelogging.* 
