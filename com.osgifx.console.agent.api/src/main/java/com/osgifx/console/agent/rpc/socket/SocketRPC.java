@@ -5,7 +5,7 @@
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.socket;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -29,6 +32,7 @@ import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,15 +40,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
-import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.rpc.BinaryCodec;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
-import aQute.lib.json.JSONCodec;
 
+/**
+ * Socket Implementation of RemoteRPC.
+ * Optimized for constrained networks using TCP_NODELAY, Buffering, and GZIP compression.
+ */
 public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R> {
 
     private final DataInputStream         in;
@@ -55,10 +64,15 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final ThreadLocal<Integer>    msgId    = new ThreadLocal<>();
     private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
 
-    private L              local;
-    private R              remote;
-    private final Class<R> remoteClass;
+    // Optimization: Shared Codec & Reuse Buffers
+    private static final BinaryCodec                 codec       = new BinaryCodec();
+    private final ThreadLocal<ByteArrayOutputStream> buffer      = ThreadLocal
+            .withInitial(() -> new ByteArrayOutputStream(4096));
+    private final Map<String, Method>                methodCache = new HashMap<>();
 
+    private L               local;
+    private R               remote;
+    private final Class<R>  remoteClass;
     private ExecutorService executor;
 
     private static class RpcResult {
@@ -67,12 +81,19 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         boolean exception;
     }
 
+    private static Socket configureSocket(Socket socket) throws IOException {
+        // Critical for RPC performance to avoid 200ms latency
+        socket.setTcpNoDelay(true);
+        socket.setKeepAlive(true);
+        return socket;
+    }
+
     public SocketRPC(final Class<R> remoteClass,
                      final L local,
                      final Socket socket,
                      final ExecutorService executor) throws IOException {
-        this(remoteClass, local, new DataInputStream(socket.getInputStream()),
-             new DataOutputStream(socket.getOutputStream()), executor);
+        this(remoteClass, local, new BufferedInputStream(configureSocket(socket).getInputStream()),
+             new BufferedOutputStream(socket.getOutputStream()), executor);
     }
 
     public SocketRPC(final Class<R> remoteClass,
@@ -80,7 +101,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                      final InputStream in,
                      final OutputStream out,
                      final ExecutorService executor) {
-        this(remoteClass, local, new DataInputStream(in), new DataOutputStream(out), executor);
+        this(remoteClass, local, (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in),
+             (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out), executor);
     }
 
     @SuppressWarnings("unchecked")
@@ -93,46 +115,44 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         setDaemon(true);
         this.remoteClass = remoteClass;
         this.local       = local == null ? (L) this : local;
-        this.in          = new DataInputStream(in);
-        this.out         = new DataOutputStream(out);
+        this.in          = in;
+        this.out         = out;
         this.executor    = executor;
+
+        // Cache local methods
+        for (Method m : this.local.getClass().getMethods()) {
+            if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
+                methodCache.put(m.getName() + "#" + m.getParameterTypes().length, m);
+            }
+        }
     }
 
     @Override
     public void open() {
-        if (isAlive()) {
+        if (isAlive())
             throw new IllegalStateException("Socket RPC is already running");
-        }
-        if (in != null) {
+        if (in != null)
             start();
-        }
     }
 
     @Override
     public void close() throws IOException {
-        if (stopped.getAndSet(true)) {
-            return; // already closed
-        }
-        if (local instanceof Closeable) {
+        if (stopped.getAndSet(true))
+            return;
+        if (local instanceof Closeable)
             try {
                 ((Closeable) local).close();
-            } catch (final Exception e) {
-                // nothing to do
+            } catch (Exception e) {
             }
-        }
-        if (in != null) {
-            try {
+        try {
+            if (in != null)
                 in.close();
-            } catch (final Exception e) {
-                // nothing to do
-            }
+        } catch (Exception e) {
         }
-        if (out != null) {
-            try {
+        try {
+            if (out != null)
                 out.close();
-            } catch (final Exception e) {
-                // nothing to do
-            }
+        } catch (Exception e) {
         }
         executor.shutdownNow();
     }
@@ -140,36 +160,25 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     @Override
     @SuppressWarnings("unchecked")
     public synchronized R getRemote() {
-        if (stopped.get()) {
+        if (stopped.get())
             return null;
-        }
         if (remote == null) {
             remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
                     (target, method, args) -> {
+                        if (method.getDeclaringClass() == Object.class)
+                            return method.invoke(new Object(), args);
+                        int msgId = -1;
                         try {
-                            if (method.getDeclaringClass() == Object.class) {
-                                final Object hash = new Object();
-                                return method.invoke(hash, args);
-                            }
-                            int msgId;
-                            try {
-                                msgId = send(id.getAndIncrement(), method, args);
-                                if (method.getReturnType() == void.class) {
-                                    promises.remove(msgId);
-                                    return null;
-                                }
-                            } catch (final Exception e1) {
-                                terminate();
+                            msgId = send(id.getAndIncrement(), method, args);
+                            if (method.getReturnType() == void.class) {
+                                promises.remove(msgId);
                                 return null;
                             }
                             return waitForResult(msgId, method.getGenericReturnType());
-                        } catch (final InvocationTargetException e2) {
-                            throw Exceptions.unrollCause(e2, InvocationTargetException.class);
-                        } catch (final InterruptedException e3) {
-                            interrupt();
-                            throw e3;
-                        } catch (final Exception e4) {
-                            throw e4;
+                        } catch (final Exception e) {
+                            if (msgId != -1)
+                                promises.remove(msgId);
+                            throw Exceptions.unrollCause(e, RuntimeException.class);
                         }
                     });
         }
@@ -199,15 +208,16 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     try {
                         msgId.set(id);
                         executeCommand(cmd, id, args);
-                    } catch (final Exception e) {
-                        // nothing to do
+                    } catch (Exception e) {
+                        logger.atError().msg("Error executing command").throwable(e).log();
+                    } finally {
+                        msgId.remove();
                     }
-                    msgId.remove();
                 };
                 executor.execute(r);
-            } catch (final SocketTimeoutException ee) {
-                // Ignore, just to allow polling the actors again
-            } catch (final Exception ee) {
+            } catch (SocketTimeoutException ee) {
+                // Ignore
+            } catch (Exception ee) {
                 terminate();
                 return;
             }
@@ -217,34 +227,22 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     protected void terminate() {
         try {
             close();
-        } catch (final IOException e) {
-            // nothing to do
+        } catch (IOException e) {
         }
     }
 
     private Method getMethod(final String cmd, final int count) {
-        for (final Method m : local.getClass().getMethods()) {
-            if (m.getDeclaringClass() == RemoteRPC.class) {
-                continue;
-            }
-            if (m.getName().equals(cmd) && m.getParameterTypes().length == count) {
-                return m;
-            }
-        }
-        return null;
+        return methodCache.get(cmd + "#" + count);
     }
 
     private int send(final int msgId, final Method m, Object[] values) throws Exception {
-        if (m != null) {
+        if (m != null)
             promises.put(msgId, new RpcResult());
-        }
-        trace("Sending Socket RPC");
         synchronized (out) {
             out.writeUTF(m != null ? m.getName() : "");
             out.writeInt(msgId);
-            if (values == null) {
+            if (values == null)
                 values = new String[] {};
-            }
             out.writeShort(values.length);
             for (final Object value : values) {
                 if (value instanceof byte[]) {
@@ -252,35 +250,24 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     out.writeInt(data.length);
                     out.write(data);
                 } else {
-                    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    new JSONCodec().enc().deflate().to(bout).put(value);
+                    final ByteArrayOutputStream bout = buffer.get();
+                    bout.reset();
+                    try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
+                            DataOutputStream dataOut = new DataOutputStream(gzip)) {
+                        codec.encode(value, dataOut);
+                        dataOut.flush();
+                        gzip.finish();
+                    }
                     final byte[] data = bout.toByteArray();
                     out.writeInt(data.length);
                     out.write(data);
+                    if (data.length > 1024 * 1024)
+                        buffer.set(new ByteArrayOutputStream(4096));
                 }
             }
             out.flush();
-            trace("Sent Socket RPC");
         }
         return msgId;
-    }
-
-    private void response(int msgId, final byte[] data) {
-        boolean exception = false;
-        if (msgId < 0) {
-            msgId     = -msgId;
-            exception = true;
-        }
-        final RpcResult result = promises.get(msgId);
-        if (result != null) {
-            synchronized (result) {
-                trace("Resolved Socket RPC");
-                result.value     = data;
-                result.exception = exception;
-                result.resolved  = true;
-                result.notifyAll();
-            }
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -289,43 +276,29 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         final long      startInNanos     = System.nanoTime();
         final RpcResult result           = promises.get(id);
         try {
-            do {
-                synchronized (result) {
-                    if (result.resolved) {
-                        if (result.value == null) {
-                            return null;
-                        }
-                        if (result.exception) {
-                            final String msg = new JSONCodec().dec().inflate().from(result.value).get(String.class);
-                            trace("Exception during agent communication: " + msg);
-                            throw new RuntimeException(msg);
-                        }
-                        if (type == byte[].class) {
-                            return (T) result.value;
-                        }
-                        return (T) new JSONCodec().dec().inflate().from(result.value).get(type);
-                    }
+            synchronized (result) {
+                while (!result.resolved) {
                     long elapsedInNanos = System.nanoTime() - startInNanos;
                     long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
-                    if (delayInMillis <= 0L) {
+                    if (delayInMillis <= 0L)
                         return null;
-                    }
-                    trace("Start Delay (Socket RPC)" + delayInMillis);
                     result.wait(delayInMillis);
-                    elapsedInNanos = System.nanoTime() - startInNanos;
-                    delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
-                    trace("End Delay (Socket RPC)" + delayInMillis);
                 }
-            } while (true);
+            }
+            if (result.value == null)
+                return null;
+            try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(result.value));
+                    DataInputStream dataIn = new DataInputStream(gzip)) {
+                if (result.exception) {
+                    final String msg = (String) codec.decode(dataIn, String.class);
+                    throw new RuntimeException(msg);
+                }
+                if (type == byte[].class)
+                    return (T) result.value;
+                return (T) codec.decode(dataIn, type);
+            }
         } finally {
             promises.remove(id);
-        }
-    }
-
-    private void trace(final String message) {
-        final boolean isTracingEnabled = Boolean.getBoolean(Agent.AGENT_RPC_TRACE_LOG_KEY);
-        if (isTracingEnabled) {
-            logger.atDebug().msg("[OSGi.fx] {}").arg(message).log();
         }
     }
 
@@ -334,24 +307,24 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             response(id, args.get(0));
         } else {
             final Method m = getMethod(cmd, args.size());
-            if (m == null) {
+            if (m == null)
                 return;
-            }
             final Object[] parameters = new Object[args.size()];
             for (int i = 0; i < args.size(); i++) {
                 final Class<?> type = m.getParameterTypes()[i];
                 if (type == byte[].class) {
                     parameters[i] = args.get(i);
                 } else {
-                    parameters[i] = new JSONCodec().dec().inflate().from(args.get(i))
-                            .get(m.getGenericParameterTypes()[i]);
+                    try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(args.get(i)));
+                            DataInputStream dataIn = new DataInputStream(gzip)) {
+                        parameters[i] = codec.decode(dataIn, m.getGenericParameterTypes()[i]);
+                    }
                 }
             }
             try {
                 final Object result = m.invoke(local, parameters);
-                if (m.getReturnType() == void.class) {
+                if (m.getReturnType() == void.class)
                     return;
-                }
                 try {
                     send(id, null, new Object[] { result });
                 } catch (final Exception e) {
@@ -368,4 +341,20 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         }
     }
 
+    private void response(int msgId, final byte[] data) {
+        boolean exception = false;
+        if (msgId < 0) {
+            msgId     = -msgId;
+            exception = true;
+        }
+        final RpcResult result = promises.get(msgId);
+        if (result != null) {
+            synchronized (result) {
+                result.value     = data;
+                result.exception = exception;
+                result.resolved  = true;
+                result.notifyAll();
+            }
+        }
+    }
 }
