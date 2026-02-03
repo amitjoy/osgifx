@@ -126,6 +126,7 @@ public final class OverviewFxUI {
     @PostConstruct
     public void postConstruct() {
         createTimelineButton();
+        updateStaticOverviewInfo();
         retrieveRuntimeInfo();
         createUIComponents(parent);
         initTimeline();
@@ -263,9 +264,10 @@ public final class OverviewFxUI {
         // @formatter:on
     }
 
-    private OverviewInfo retrieveRuntimeInfo() {
+    private void updateStaticOverviewInfo() {
         if (!isConnected) {
-            return new OverviewInfo();
+            cachedStaticOverviewInfo = new StaticOverviewInfo("", "", "", "", "", "", "", 0, 0, 0, 0);
+            return;
         }
         // @formatter:off
         final var frameworkBsn         = dataProvider.bundles().stream()
@@ -316,12 +318,28 @@ public final class OverviewFxUI {
         final var noOfInstalledBundles = dataProvider.bundles().size();
         final var noOfServices         = dataProvider.services().size();
         final var noOfComponents       = dataProvider.components().size();
-        final var memoryInfo           = requireNonNullElse(dataProvider.memory(), completedFuture(new XMemoryInfoDTO()));
         // @formatter:on
 
-        return new OverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName, osVersion, osArchitecture,
-                                javaVersion, noOfThreads, noOfInstalledBundles, noOfServices, noOfComponents,
-                                memoryInfo);
+        cachedStaticOverviewInfo = new StaticOverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName,
+                                                          osVersion, osArchitecture, javaVersion, noOfThreads,
+                                                          noOfInstalledBundles, noOfServices, noOfComponents);
+    }
+
+    private OverviewInfo retrieveRuntimeInfo() {
+        if (!isConnected) {
+            return new OverviewInfo();
+        }
+        if (cachedStaticOverviewInfo == null) {
+            updateStaticOverviewInfo();
+        }
+        final var memoryInfo = requireNonNullElse(dataProvider.memory(), completedFuture(new XMemoryInfoDTO()));
+
+        return new OverviewInfo(cachedStaticOverviewInfo.frameworkBsn, cachedStaticOverviewInfo.frameworkVersion,
+                                cachedStaticOverviewInfo.frameworkStartLevel, cachedStaticOverviewInfo.osName,
+                                cachedStaticOverviewInfo.osVersion, cachedStaticOverviewInfo.osArchitecture,
+                                cachedStaticOverviewInfo.javaVersion, cachedStaticOverviewInfo.noOfThreads,
+                                cachedStaticOverviewInfo.noOfInstalledBundles, cachedStaticOverviewInfo.noOfServices,
+                                cachedStaticOverviewInfo.noOfComponents, memoryInfo);
     }
 
     private void createUIComponents(final BorderPane parent) {
@@ -544,6 +562,21 @@ public final class OverviewFxUI {
     private record UptimeDTO(int days, int hours, int minutes, int seconds) {
     }
 
+    private volatile StaticOverviewInfo cachedStaticOverviewInfo;
+
+    private record StaticOverviewInfo(String frameworkBsn,
+                                      String frameworkVersion,
+                                      String frameworkStartLevel,
+                                      String osName,
+                                      String osVersion,
+                                      String osArchitecture,
+                                      String javaVersion,
+                                      int noOfThreads,
+                                      int noOfInstalledBundles,
+                                      int noOfServices,
+                                      int noOfComponents) {
+    }
+
     private record OverviewInfo(String frameworkBsn,
                                 String frameworkVersion,
                                 String frameworkStartLevel,
@@ -578,6 +611,7 @@ public final class OverviewFxUI {
         logger.atInfo().log("Agent disconnected event received");
         dataRetrieverTimeline.stop();
 
+        updateStaticOverviewInfo();
         retrieveRuntimeInfo();
         createUIComponents(parent);
         createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
@@ -593,6 +627,7 @@ public final class OverviewFxUI {
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data,
                                             final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
+        updateStaticOverviewInfo();
         createUIComponents(parent);
     }
 
