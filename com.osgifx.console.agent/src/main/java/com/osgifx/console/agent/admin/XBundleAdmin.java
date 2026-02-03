@@ -66,7 +66,7 @@ import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
-import com.osgifx.console.agent.dto.XPackageDTO.XpackageType;
+import com.osgifx.console.agent.dto.XPackageType;
 import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator.BundleStartDuration;
@@ -459,7 +459,7 @@ public final class XBundleAdmin {
 
                     dto.name    = pkg;
                     dto.version = version;
-                    dto.type    = XpackageType.IMPORT;
+                    dto.type    = XPackageType.IMPORT;
 
                     importedPackages.add(dto);
                 }
@@ -491,7 +491,7 @@ public final class XBundleAdmin {
 
                     dto.name    = pkg;
                     dto.version = version;
-                    dto.type    = XpackageType.EXPORT;
+                    dto.type    = XPackageType.EXPORT;
 
                     exportedPackages.add(dto);
                 }
