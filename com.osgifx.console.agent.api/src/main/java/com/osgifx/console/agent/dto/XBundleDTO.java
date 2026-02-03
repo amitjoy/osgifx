@@ -110,4 +110,9 @@ public class XBundleDTO extends DTO {
     /** Indicates if activation policy is used by the bundle. */
     public boolean isActivationPolicyUsed;
 
+    @Override
+    public String toString() {
+        return "XBundleDTO [id=" + id + ", symbolicName=" + symbolicName + ", version=" + version + "]";
+    }
+
 }
