@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.osgi.service.http.runtime.HttpServiceRuntime;
@@ -42,15 +43,16 @@ import jakarta.inject.Inject;
 
 public final class XHttpAdmin {
 
-    private final HttpServiceRuntime httpServiceRuntime;
-    private final FluentLogger       logger = LoggerFactory.getFluentLogger(getClass());
+    private final Supplier<Object> httpServiceRuntimeSupplier;
+    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XHttpAdmin(final Object httpServiceRuntime) {
-        this.httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntime;
+    public XHttpAdmin(final Supplier<Object> httpServiceRuntimeSupplier) {
+        this.httpServiceRuntimeSupplier = httpServiceRuntimeSupplier;
     }
 
     public List<XHttpComponentDTO> runtime() {
+        final HttpServiceRuntime httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntimeSupplier.get();
         if (httpServiceRuntime == null) {
             logger.atWarn().msg(serviceUnavailable(HTTP_RUNTIME)).log();
             return Collections.emptyList();

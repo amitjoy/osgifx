@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -42,27 +43,27 @@ import jakarta.inject.Inject;
 
 public final class XDtoAdmin {
 
-    private final BundleContext  context;
-    private final PackageWirings wirings;
-    private final Object         scrRuntime;
-    private final Object         cdiRuntime;
-    private final Object         httpRuntime;
-    private final Object         jaxRsRuntime;
-    private final FluentLogger   logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext    context;
+    private final PackageWirings   wirings;
+    private final Supplier<Object> scrRuntimeSupplier;
+    private final Supplier<Object> cdiRuntimeSupplier;
+    private final Supplier<Object> httpRuntimeSupplier;
+    private final Supplier<Object> jaxRsRuntimeSupplier;
+    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XDtoAdmin(final BundleContext context,
-                     final Object scrRuntime,
-                     final Object jaxRsRuntime,
-                     final Object httpRuntime,
-                     final Object cdiRuntime,
+                     final Supplier<Object> scrRuntimeSupplier,
+                     final Supplier<Object> jaxRsRuntimeSupplier,
+                     final Supplier<Object> httpRuntimeSupplier,
+                     final Supplier<Object> cdiRuntimeSupplier,
                      final PackageWirings wirings) {
-        this.context      = context;
-        this.wirings      = wirings;
-        this.scrRuntime   = scrRuntime;
-        this.cdiRuntime   = cdiRuntime;
-        this.httpRuntime  = httpRuntime;
-        this.jaxRsRuntime = jaxRsRuntime;
+        this.context              = context;
+        this.wirings              = wirings;
+        this.scrRuntimeSupplier   = scrRuntimeSupplier;
+        this.cdiRuntimeSupplier   = cdiRuntimeSupplier;
+        this.httpRuntimeSupplier  = httpRuntimeSupplier;
+        this.jaxRsRuntimeSupplier = jaxRsRuntimeSupplier;
     }
 
     public RuntimeDTO runtime() {
@@ -78,11 +79,11 @@ public final class XDtoAdmin {
     }
 
     private CDIComponentRuntimeDTO prepareCDIDTO() {
-        if (!wirings.isCDIWired() || cdiRuntime == null) {
+        final CDIComponentRuntime cdi = (CDIComponentRuntime) cdiRuntimeSupplier.get();
+        if (!wirings.isCDIWired() || cdi == null) {
             logger.atWarn().msg("CDI bundle is unavailable to retrieve the CDI DTO").log();
             return null;
         }
-        final CDIComponentRuntime    cdi = (CDIComponentRuntime) cdiRuntime;
         final CDIComponentRuntimeDTO dto = new CDIComponentRuntimeDTO();
 
         dto.containers = cdi.getContainerDTOs();
@@ -90,6 +91,7 @@ public final class XDtoAdmin {
         // @formatter:off
         dto.containerTemplates = Stream.of(context.getBundles())
                                        .map(cdi::getContainerTemplateDTO)
+                                       .filter(java.util.Objects::nonNull)
                                        .collect(toList());
         // @formatter:on
 
@@ -97,12 +99,12 @@ public final class XDtoAdmin {
     }
 
     private HttpServiceRuntimeDTO prepareHttpDTO() {
-        if (!wirings.isHttpServiceRuntimeWired() || httpRuntime == null) {
+        final HttpServiceRuntime http = (HttpServiceRuntime) httpRuntimeSupplier.get();
+        if (!wirings.isHttpServiceRuntimeWired() || http == null) {
             logger.atInfo().msg("HTTP bundle is unavailable to retrieve the HTTP DTO").log();
             return null;
         }
-        final HttpServiceRuntime    http = (HttpServiceRuntime) httpRuntime;
-        final HttpServiceRuntimeDTO dto  = new HttpServiceRuntimeDTO();
+        final HttpServiceRuntimeDTO dto = new HttpServiceRuntimeDTO();
 
         dto.runtime = http.getRuntimeDTO();
 
@@ -110,12 +112,12 @@ public final class XDtoAdmin {
     }
 
     private JaxRsServiceRuntimeDTO prepareJaxRsDTO() {
-        if (!wirings.isJaxRsWired() || jaxRsRuntime == null) {
+        final JaxrsServiceRuntime jaxRs = (JaxrsServiceRuntime) jaxRsRuntimeSupplier.get();
+        if (!wirings.isJaxRsWired() || jaxRs == null) {
             logger.atWarn().msg("JAX-RS bundle is unavailable to retrieve the JAX-RS DTO").log();
             return null;
         }
-        final JaxrsServiceRuntime    jaxRs = (JaxrsServiceRuntime) jaxRsRuntime;
-        final JaxRsServiceRuntimeDTO dto   = new JaxRsServiceRuntimeDTO();
+        final JaxRsServiceRuntimeDTO dto = new JaxRsServiceRuntimeDTO();
 
         dto.runtime = jaxRs.getRuntimeDTO();
 
@@ -123,15 +125,15 @@ public final class XDtoAdmin {
     }
 
     private ServiceComponentRuntimeDTO prepareScrDTO() {
-        if (!wirings.isScrWired() || scrRuntime == null) {
+        final ServiceComponentRuntime scr = (ServiceComponentRuntime) scrRuntimeSupplier.get();
+        if (!wirings.isScrWired() || scr == null) {
             logger.atWarn().msg("SCR runtime is unavailable to retrieve the SCR DTO").log();
             return null;
         }
-        final ServiceComponentRuntime    scr = (ServiceComponentRuntime) scrRuntime;
         final ServiceComponentRuntimeDTO dto = new ServiceComponentRuntimeDTO();
 
         dto.componentDescriptionDTOs   = scr.getComponentDescriptionDTOs();
-        dto.componentConfigurationDTOs = scr.getComponentDescriptionDTOs().stream()
+        dto.componentConfigurationDTOs = dto.componentDescriptionDTOs.stream()
                 .map(scr::getComponentConfigurationDTOs).flatMap(Collection::stream).collect(toList());
 
         return dto;

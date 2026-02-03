@@ -28,6 +28,7 @@ import static org.osgi.service.dmt.Uri.PATH_SEPARATOR;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.osgi.service.dmt.DmtAdmin;
 import org.osgi.service.dmt.DmtData;
@@ -45,25 +46,45 @@ import jakarta.inject.Inject;
 
 public final class XDmtAdmin {
 
-    private XDmtNodeDTO        parent;
-    private final DmtAdmin     dmtAdmin;
-    private final FluentLogger logger = LoggerFactory.getFluentLogger(getClass());
+    private final Supplier<Object> dmtAdminSupplier;
+    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XDmtAdmin(final Object dmtAdmin) {
-        this.dmtAdmin = (DmtAdmin) dmtAdmin;
+    public XDmtAdmin(final Supplier<Object> dmtAdminSupplier) {
+        this.dmtAdminSupplier = dmtAdminSupplier;
     }
 
     public XDmtNodeDTO readDmtNode(final String rootURI) {
+        final DmtAdmin dmtAdmin = (DmtAdmin) dmtAdminSupplier.get();
         if (dmtAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(DMT)).log();
             return null;
         }
-        processNode(rootURI, parent);
-        return parent;
+        DmtSession session = null;
+        try {
+            session = dmtAdmin.getSession(rootURI, LOCK_TYPE_EXCLUSIVE);
+            if (!session.isNodeUri(rootURI)) {
+                return null;
+            }
+            final XDmtNodeDTO rootNode = createNode(session, rootURI, null, true);
+            processNode(session, rootURI, rootNode);
+            return rootNode;
+        } catch (final Exception e) {
+            logger.atError().msg("Error occurred while reading DMT node").throwable(e).log();
+            return null;
+        } finally {
+            if (session != null) {
+                try {
+                    session.close();
+                } catch (final DmtException e) {
+                    // nothing to do
+                }
+            }
+        }
     }
 
     public XResultDTO updateDmtNode(final String uri, final Object value, final DmtDataType format) {
+        final DmtAdmin dmtAdmin = (DmtAdmin) dmtAdminSupplier.get();
         if (dmtAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(DMT)).log();
             return createResult(SKIPPED, serviceUnavailable(DMT));
@@ -127,22 +148,16 @@ public final class XDmtAdmin {
         }
     }
 
-    private void processNode(final String uri, final XDmtNodeDTO parent) {
+    private void processNode(final DmtSession session, final String uri, final XDmtNodeDTO parent) {
         try {
-            final DmtSession session = dmtAdmin.getSession(uri, LOCK_TYPE_EXCLUSIVE);
             if (!session.isNodeUri(uri)) {
                 return;
             }
-            if (parent == null) {
-                // it's a root node
-                this.parent = createNode(session, uri, null, true);
-            }
-            final XDmtNodeDTO startNode     = parent == null ? this.parent : createNode(session, uri, parent, false);
-            final String[]    childrenNodes = session.getChildNodeNames(uri);
-            session.close();
+            final String[] childrenNodes = session.getChildNodeNames(uri);
             for (final String childNode : childrenNodes) {
-                final String childPath = uri.isEmpty() ? childNode : uri + PATH_SEPARATOR + childNode;
-                processNode(childPath, startNode);
+                final String      childPath = uri.isEmpty() ? childNode : uri + PATH_SEPARATOR + childNode;
+                final XDmtNodeDTO childDTO  = createNode(session, childPath, parent, false);
+                processNode(session, childPath, childDTO);
             }
         } catch (final Exception e) {
             logger.atError().msg("Error occurred").throwable(e).log();
