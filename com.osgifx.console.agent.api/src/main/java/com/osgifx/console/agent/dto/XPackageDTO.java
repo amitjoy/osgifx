@@ -31,16 +31,11 @@ public class XPackageDTO extends DTO {
     public String version;
 
     /** The type of the OSGi package (either EXPORT or IMPORT) */
-    public XpackageType type;
+    public XPackageType type;
 
-    /**
-     * Enum defining the type of OSGi package.
-     * - EXPORT: Represents a package that is exported by a bundle.
-     * - IMPORT: Represents a package that is imported by a bundle.
-     */
-    public enum XpackageType {
-        EXPORT,
-        IMPORT
+    @Override
+    public String toString() {
+        return "XPackageDTO [name=" + name + ", version=" + version + ", type=" + type + "]";
     }
 
 }
