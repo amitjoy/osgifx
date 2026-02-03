@@ -503,7 +503,7 @@ public final class AgentServer implements Agent, Closeable {
         return rd;
     }
 
-    void cleanup(final int event) throws Exception {
+    void cleanup() throws Exception {
         if (quit) {
             return;
         }
@@ -517,7 +517,7 @@ public final class AgentServer implements Agent, Closeable {
     @Override
     public void close() throws IOException {
         try {
-            cleanup(-2);
+            cleanup();
 
             if (logReaderTracker != null) {
                 logReaderTracker.close();
@@ -535,7 +535,7 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public void disconnect() throws Exception {
-        cleanup(-3);
+        cleanup();
     }
 
     public void setRemote(final Supervisor supervisor) {
@@ -641,13 +641,15 @@ public final class AgentServer implements Agent, Closeable {
         final boolean isMetatypeAvailable    = di.getInstance(PackageWirings.class).isMetatypeWired();
         final boolean isScrAvailable         = di.getInstance(PackageWirings.class).isScrWired();
 
-        final List<XConfigurationDTO> configs = new ArrayList<>();
+        final Map<String, XConfigurationDTO> configMap = new java.util.HashMap<>();
         if (isConfigAdminAvailable) {
-            configs.addAll(di.getInstance(XConfigurationAdmin.class).getConfigurations());
+            di.getInstance(XConfigurationAdmin.class).getConfigurations().forEach(c -> configMap.put(c.pid, c));
         }
         if (isMetatypeAvailable) {
-            configs.addAll(di.getInstance(XMetaTypeAdmin.class).getConfigurations());
+            di.getInstance(XMetaTypeAdmin.class).getConfigurations().forEach(c -> configMap.put(c.pid, c));
         }
+        final List<XConfigurationDTO> configs = new ArrayList<>(configMap.values());
+
         if (isScrAvailable) {
             configs.forEach(c -> di.getInstance(XConfigurationAdmin.class).setComponentReferenceFilters(c));
         }

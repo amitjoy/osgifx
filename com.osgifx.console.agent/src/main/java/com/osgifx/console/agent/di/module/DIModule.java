@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import org.osgi.dto.DTO;
@@ -28,6 +30,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
@@ -37,9 +40,11 @@ import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
+import com.osgifx.console.agent.admin.XServiceAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.di.DI;
 import com.osgifx.console.agent.extension.AgentExtension;
+import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.PackageWirings;
 
 @SuppressWarnings("rawtypes")
@@ -51,13 +56,10 @@ public final class DIModule {
     private final DI            di;
     private final BundleContext context;
 
-    private ServiceTracker<Object, Object>                 scrTracker;
-    private ServiceTracker<Object, Object>                 metatypeTracker;
     private ServiceTracker<Object, Object>                 dmtAdminTracker;
     private ServiceTracker<Object, Object>                 userAdminTracker;
     private ServiceTracker<Object, Object>                 eventAdminTracker;
     private ServiceTracker<Object, Object>                 loggerAdminTracker;
-    private ServiceTracker<Object, Object>                 configAdminTracker;
     private ServiceTracker<Object, Object>                 gogoCommandsTracker;
     private ServiceTracker<Object, Object>                 felixHcExecutorTracker;
     private ServiceTracker<Object, Object>                 cdiServiceRuntimeTracker;
@@ -67,6 +69,15 @@ public final class DIModule {
 
     private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
     private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
+    private final ExecutorService                       executor        = Executors
+            .newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+    private BundleStartTimeCalculator bundleStartTimeCalculator;
+    private XBundleAdmin              xBundleAdmin;
+    private XServiceAdmin             xServiceAdmin;
+    private XConfigurationAdmin       xConfigurationAdmin;
+    private XComponentAdmin           xComponentAdmin;
+    private XMetaTypeAdmin            xMetaTypeAdmin;
 
     public DIModule(final BundleContext context) {
         di           = new DI();
@@ -79,41 +90,73 @@ public final class DIModule {
     public void start() throws Exception {
         initServiceTrackers();
 
-        di.bindProvider(XComponentAdmin.class, () -> new XComponentAdmin(scrTracker.getService()));
-        di.bindProvider(XConfigurationAdmin.class,
-                () -> new XConfigurationAdmin(context, configAdminTracker.getService(), metatypeTracker.getService(),
-                                              di.getInstance(XComponentAdmin.class)));
-        di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(dmtAdminTracker.getService()));
+        bundleStartTimeCalculator = new BundleStartTimeCalculator(context);
+        di.bindInstance(BundleStartTimeCalculator.class, bundleStartTimeCalculator);
+
+        xBundleAdmin = new XBundleAdmin(context, bundleStartTimeCalculator, executor);
+        di.bindInstance(XBundleAdmin.class, xBundleAdmin);
+
+        xServiceAdmin = new XServiceAdmin(context, executor);
+        di.bindInstance(XServiceAdmin.class, xServiceAdmin);
+
+        xComponentAdmin = new XComponentAdmin(context, executor);
+        di.bindInstance(XComponentAdmin.class, xComponentAdmin);
+
+        xMetaTypeAdmin = new XMetaTypeAdmin(context, executor);
+        di.bindInstance(XMetaTypeAdmin.class, xMetaTypeAdmin);
+
+        xConfigurationAdmin = new XConfigurationAdmin(context, xComponentAdmin, xMetaTypeAdmin, executor);
+        di.bindInstance(XConfigurationAdmin.class, xConfigurationAdmin);
+
+        // initialize the trackers
+        xBundleAdmin.init();
+        xServiceAdmin.init();
+        xComponentAdmin.init();
+        xConfigurationAdmin.init();
+        xMetaTypeAdmin.init();
+
+        di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(() -> dmtAdminTracker.getService()));
         di.bindProvider(XDtoAdmin.class,
-                () -> new XDtoAdmin(context, scrTracker.getService(), jaxrsServiceRuntimeTracker.getService(),
-                                    httpServiceRuntimeTracker.getService(), cdiServiceRuntimeTracker.getService(),
-                                    di.getInstance(PackageWirings.class)));
-        di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(eventAdminTracker.getService()));
-        di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, felixHcExecutorTracker.getService()));
-        di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(httpServiceRuntimeTracker.getService()));
-        di.bindProvider(XMetaTypeAdmin.class,
-                () -> new XMetaTypeAdmin(context, configAdminTracker.getService(), metatypeTracker.getService()));
-        di.bindProvider(XUserAdmin.class, () -> new XUserAdmin(userAdminTracker.getService()));
-        di.bindProvider(XLoggerAdmin.class,
-                () -> new XLoggerAdmin(loggerAdminTracker.getService(), di.getInstance(PackageWirings.class), context));
+                () -> new XDtoAdmin(context, () -> xComponentAdmin.getServiceComponentRuntime(),
+                                    () -> jaxrsServiceRuntimeTracker.getService(),
+                                    () -> httpServiceRuntimeTracker.getService(),
+                                    () -> cdiServiceRuntimeTracker.getService(), di.getInstance(PackageWirings.class)));
+        di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(() -> eventAdminTracker.getService()));
+        di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, () -> felixHcExecutorTracker.getService()));
+        di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(() -> httpServiceRuntimeTracker.getService()));
+        di.bindProvider(XUserAdmin.class, () -> new XUserAdmin(() -> userAdminTracker.getService()));
+        di.bindProvider(XLoggerAdmin.class, () -> new XLoggerAdmin(() -> loggerAdminTracker.getService(),
+                                                                   di.getInstance(PackageWirings.class), context));
         di.bindInstance(Set.class, gogoCommands);
         di.bindInstance(Map.class, agentExtensions);
     }
 
     public void stop() {
-        scrTracker.close();
-        metatypeTracker.close();
+        if (xBundleAdmin != null) {
+            xBundleAdmin.stop();
+        }
+        if (xServiceAdmin != null) {
+            xServiceAdmin.stop();
+        }
+        if (xConfigurationAdmin != null) {
+            xConfigurationAdmin.stop();
+        }
+        if (xMetaTypeAdmin != null) {
+            xMetaTypeAdmin.stop();
+        }
         dmtAdminTracker.close();
         userAdminTracker.close();
         loggerAdminTracker.close();
         eventAdminTracker.close();
-        configAdminTracker.close();
         gogoCommandsTracker.close();
         agentExtensionTracker.close();
         felixHcExecutorTracker.close();
         cdiServiceRuntimeTracker.close();
         httpServiceRuntimeTracker.close();
         jaxrsServiceRuntimeTracker.close();
+        if (executor != null) {
+            executor.shutdownNow();
+        }
     }
 
     public DI di() {
@@ -127,17 +170,12 @@ public final class DIModule {
     private void initServiceTrackers() throws InvalidSyntaxException {
         final Filter gogoCommandFilter = context.createFilter("(osgi.command.scope=*)");
 
-        metatypeTracker            = new ServiceTracker<>(context, "org.osgi.service.metatype.MetaTypeService", null);
         dmtAdminTracker            = new ServiceTracker<>(context, "org.osgi.service.dmt.DmtAdmin", null);
         userAdminTracker           = new ServiceTracker<>(context, "org.osgi.service.useradmin.UserAdmin", null);
         loggerAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.log.admin.LoggerAdmin", null);
         eventAdminTracker          = new ServiceTracker<>(context, "org.osgi.service.event.EventAdmin", null);
-        configAdminTracker         = new ServiceTracker<>(context, "org.osgi.service.cm.ConfigurationAdmin", null);
         felixHcExecutorTracker     = new ServiceTracker<>(context,
                                                           "org.apache.felix.hc.api.execution.HealthCheckExecutor",
-                                                          null);
-        scrTracker                 = new ServiceTracker<>(context,
-                                                          "org.osgi.service.component.runtime.ServiceComponentRuntime",
                                                           null);
         cdiServiceRuntimeTracker   = new ServiceTracker<>(context, "org.osgi.service.cdi.runtime.CDIComponentRuntime",
                                                           null);
@@ -214,13 +252,10 @@ public final class DIModule {
                                        }
                                    };
 
-        scrTracker.open();
-        metatypeTracker.open();
         dmtAdminTracker.open();
         userAdminTracker.open();
         loggerAdminTracker.open();
         eventAdminTracker.open();
-        configAdminTracker.open();
         gogoCommandsTracker.open();
         agentExtensionTracker.open();
         felixHcExecutorTracker.open();
