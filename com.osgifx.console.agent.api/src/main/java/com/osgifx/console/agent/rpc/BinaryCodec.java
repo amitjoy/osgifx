@@ -18,6 +18,8 @@ package com.osgifx.console.agent.rpc;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -42,7 +44,7 @@ import org.osgi.framework.wiring.BundleWiring;
 
 /**
  * A High-Performance, Hybrid (Unsafe + Reflection) binary codec for OSGi DTOs.
- * *
+ *
  * <p>
  * <b>Features:</b>
  * </p>
@@ -87,12 +89,15 @@ public class BinaryCodec {
             }
 
             if (canUseUnsafe) {
-                // Double-check: Try to actually instantiate it
-                selected = new UnsafeStrategy();
+                try {
+                    selected = new UnsafeStrategy();
+                } catch (Throwable t) {
+                    // Unsafe initialization failed (e.g. security restricted), fallback to reflection
+                    t.printStackTrace(); // Optional: log failure
+                }
             }
         } catch (Throwable t) {
-            // Fallback to Reflection if anything fails (SecurityManager, etc.)
-            selected = new ReflectionStrategy();
+            // Fallback to Reflection if anything fails
         }
         strategy = selected;
     }
@@ -237,7 +242,6 @@ public class BinaryCodec {
         }
 
         // Untyped Object Handling (e.g. Map<String, Object>)
-        // Reads the tag to determine the concrete type
         if (type == Object.class) {
             switch (tag) {
                 case BOOL:
@@ -259,7 +263,7 @@ public class BinaryCodec {
                 case STRING:
                     return in.readUTF();
                 case ENUM:
-                    return in.readUTF(); // Unknown enum type, return String
+                    return in.readUTF();
                 case LIST:
                     type = List.class;
                     break;
@@ -294,7 +298,7 @@ public class BinaryCodec {
                 return arr;
             }
 
-            // Set Conversion (Fix for Set<String> return types)
+            // Set Conversion
             Class<?> rawType = (type instanceof Class) ? (Class<?>) type
                     : (type instanceof ParameterizedType) ? (Class<?>) ((ParameterizedType) type).getRawType() : null;
             if (rawType != null && Set.class.isAssignableFrom(rawType)) {
@@ -320,12 +324,10 @@ public class BinaryCodec {
             return map;
         }
 
-        // DTO Handling (Strategy Delegated)
+        // DTO Handling
         if (tag == DTO) {
-            Class<?> clz = (Class<?>) type;
-            // Use strategy to create instance (Unsafe allocates without constructor)
-            Object instance = strategy.newInstance(clz);
-
+            Class<?>        clz       = (Class<?>) type;
+            Object          instance  = strategy.newInstance(clz);
             FieldAccessor[] accessors = getAccessors(clz);
             for (FieldAccessor acc : accessors) {
                 acc.decode(instance, in, this);
@@ -412,243 +414,407 @@ public class BinaryCodec {
     }
 
     // ==================================================================================
-    // UNSAFE IMPLEMENTATION (HIGH PERFORMANCE)
+    // REFLECTIVE UNSAFE IMPLEMENTATION (HIGH PERFORMANCE VIA METHODHANDLES)
     // ==================================================================================
 
-    @SuppressWarnings("restriction")
     static class UnsafeStrategy implements CodecStrategy {
-        private final sun.misc.Unsafe unsafe;
+        private final Object       unsafe;
+        private final MethodHandle allocateInstance;
+        private final MethodHandle objectFieldOffset;
+
+        private final MethodHandle getInt;
+        private final MethodHandle putInt;
+        private final MethodHandle getBoolean;
+        private final MethodHandle putBoolean;
+        private final MethodHandle getLong;
+        private final MethodHandle putLong;
+        private final MethodHandle getFloat;
+        private final MethodHandle putFloat;
+        private final MethodHandle getDouble;
+        private final MethodHandle putDouble;
+        private final MethodHandle getByte;
+        private final MethodHandle putByte;
+        private final MethodHandle getShort;
+        private final MethodHandle putShort;
+        private final MethodHandle getChar;
+        private final MethodHandle putChar;
+        private final MethodHandle getObject;
+        private final MethodHandle putObject;
 
         UnsafeStrategy() throws Exception {
-            Field f = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+            Field    f           = unsafeClass.getDeclaredField("theUnsafe");
             f.setAccessible(true);
-            this.unsafe = (sun.misc.Unsafe) f.get(null);
+            this.unsafe = f.get(null);
+
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+
+            this.allocateInstance  = lookup.unreflect(unsafeClass.getMethod("allocateInstance", Class.class));
+            this.objectFieldOffset = lookup.unreflect(unsafeClass.getMethod("objectFieldOffset", Field.class));
+
+            this.getInt     = lookup.unreflect(unsafeClass.getMethod("getInt", Object.class, long.class));
+            this.putInt     = lookup.unreflect(unsafeClass.getMethod("putInt", Object.class, long.class, int.class));
+            this.getBoolean = lookup.unreflect(unsafeClass.getMethod("getBoolean", Object.class, long.class));
+            this.putBoolean = lookup
+                    .unreflect(unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class));
+            this.getLong    = lookup.unreflect(unsafeClass.getMethod("getLong", Object.class, long.class));
+            this.putLong    = lookup.unreflect(unsafeClass.getMethod("putLong", Object.class, long.class, long.class));
+            this.getFloat   = lookup.unreflect(unsafeClass.getMethod("getFloat", Object.class, long.class));
+            this.putFloat   = lookup
+                    .unreflect(unsafeClass.getMethod("putFloat", Object.class, long.class, float.class));
+            this.getDouble  = lookup.unreflect(unsafeClass.getMethod("getDouble", Object.class, long.class));
+            this.putDouble  = lookup
+                    .unreflect(unsafeClass.getMethod("putDouble", Object.class, long.class, double.class));
+            this.getByte    = lookup.unreflect(unsafeClass.getMethod("getByte", Object.class, long.class));
+            this.putByte    = lookup.unreflect(unsafeClass.getMethod("putByte", Object.class, long.class, byte.class));
+            this.getShort   = lookup.unreflect(unsafeClass.getMethod("getShort", Object.class, long.class));
+            this.putShort   = lookup
+                    .unreflect(unsafeClass.getMethod("putShort", Object.class, long.class, short.class));
+            this.getChar    = lookup.unreflect(unsafeClass.getMethod("getChar", Object.class, long.class));
+            this.putChar    = lookup.unreflect(unsafeClass.getMethod("putChar", Object.class, long.class, char.class));
+            this.getObject  = lookup.unreflect(unsafeClass.getMethod("getObject", Object.class, long.class));
+            this.putObject  = lookup
+                    .unreflect(unsafeClass.getMethod("putObject", Object.class, long.class, Object.class));
         }
 
         @Override
         public Object newInstance(Class<?> clz) throws Exception {
-            return unsafe.allocateInstance(clz); // Skips constructor for speed
+            try {
+                return allocateInstance.invoke(unsafe, clz);
+            } catch (Throwable t) {
+                if (t instanceof Exception)
+                    throw (Exception) t;
+                throw new RuntimeException(t);
+            }
         }
 
         @Override
         public FieldAccessor createAccessor(Field f) {
-            long     offset = unsafe.objectFieldOffset(f);
-            Class<?> type   = f.getType();
-            if (type == int.class)
-                return new UnsafeInt(unsafe, offset);
-            if (type == boolean.class)
-                return new UnsafeBoolean(unsafe, offset);
-            if (type == long.class)
-                return new UnsafeLong(unsafe, offset);
-            if (type == double.class)
-                return new UnsafeDouble(unsafe, offset);
-            if (type == float.class)
-                return new UnsafeFloat(unsafe, offset);
-            if (type == byte.class)
-                return new UnsafeByte(unsafe, offset);
-            if (type == short.class)
-                return new UnsafeShort(unsafe, offset);
-            if (type == char.class)
-                return new UnsafeChar(unsafe, offset);
-            return new UnsafeObject(unsafe, offset, f.getGenericType());
+            try {
+                long     offset = (long) objectFieldOffset.invoke(unsafe, f);
+                Class<?> type   = f.getType();
+
+                if (type == int.class)
+                    return new UnsafeInt(unsafe, offset, getInt, putInt);
+                if (type == boolean.class)
+                    return new UnsafeBoolean(unsafe, offset, getBoolean, putBoolean);
+                if (type == long.class)
+                    return new UnsafeLong(unsafe, offset, getLong, putLong);
+                if (type == double.class)
+                    return new UnsafeDouble(unsafe, offset, getDouble, putDouble);
+                if (type == float.class)
+                    return new UnsafeFloat(unsafe, offset, getFloat, putFloat);
+                if (type == byte.class)
+                    return new UnsafeByte(unsafe, offset, getByte, putByte);
+                if (type == short.class)
+                    return new UnsafeShort(unsafe, offset, getShort, putShort);
+                if (type == char.class)
+                    return new UnsafeChar(unsafe, offset, getChar, putChar);
+                return new UnsafeObject(unsafe, offset, f.getGenericType(), getObject, putObject);
+            } catch (Throwable t) {
+                throw new RuntimeException("Failed to create unsafe accessor for " + f, t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeInt implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeInt(sun.misc.Unsafe u, long o) {
+        UnsafeInt(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(INT);
-            out.writeInt(unsafe.getInt(i, offset));
+            try {
+                out.writeInt((int) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != INT)
                 throw new IOException("Exp INT");
-            unsafe.putInt(i, offset, in.readInt());
+            try {
+                put.invoke(unsafe, i, offset, in.readInt());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeBoolean implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeBoolean(sun.misc.Unsafe u, long o) {
+        UnsafeBoolean(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(BOOL);
-            out.writeBoolean(unsafe.getBoolean(i, offset));
+            try {
+                out.writeBoolean((boolean) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != BOOL)
                 throw new IOException("Exp BOOL");
-            unsafe.putBoolean(i, offset, in.readBoolean());
+            try {
+                put.invoke(unsafe, i, offset, in.readBoolean());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeLong implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeLong(sun.misc.Unsafe u, long o) {
+        UnsafeLong(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(LONG);
-            out.writeLong(unsafe.getLong(i, offset));
+            try {
+                out.writeLong((long) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != LONG)
                 throw new IOException("Exp LONG");
-            unsafe.putLong(i, offset, in.readLong());
+            try {
+                put.invoke(unsafe, i, offset, in.readLong());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeDouble implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeDouble(sun.misc.Unsafe u, long o) {
+        UnsafeDouble(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(DOUBLE);
-            out.writeDouble(unsafe.getDouble(i, offset));
+            try {
+                out.writeDouble((double) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != DOUBLE)
                 throw new IOException("Exp DOUBLE");
-            unsafe.putDouble(i, offset, in.readDouble());
+            try {
+                put.invoke(unsafe, i, offset, in.readDouble());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeFloat implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeFloat(sun.misc.Unsafe u, long o) {
+        UnsafeFloat(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(FLOAT);
-            out.writeFloat(unsafe.getFloat(i, offset));
+            try {
+                out.writeFloat((float) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != FLOAT)
                 throw new IOException("Exp FLOAT");
-            unsafe.putFloat(i, offset, in.readFloat());
+            try {
+                put.invoke(unsafe, i, offset, in.readFloat());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeByte implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeByte(sun.misc.Unsafe u, long o) {
+        UnsafeByte(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(BYTE);
-            out.writeByte(unsafe.getByte(i, offset));
+            try {
+                out.writeByte((byte) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != BYTE)
                 throw new IOException("Exp BYTE");
-            unsafe.putByte(i, offset, in.readByte());
+            try {
+                put.invoke(unsafe, i, offset, in.readByte());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeShort implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeShort(sun.misc.Unsafe u, long o) {
+        UnsafeShort(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(SHORT);
-            out.writeShort(unsafe.getShort(i, offset));
+            try {
+                out.writeShort((short) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != SHORT)
                 throw new IOException("Exp SHORT");
-            unsafe.putShort(i, offset, in.readShort());
+            try {
+                put.invoke(unsafe, i, offset, in.readShort());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeChar implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
+        final Object       unsafe;
+        final long         offset;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeChar(sun.misc.Unsafe u, long o) {
+        UnsafeChar(Object u, long o, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
+            get    = g;
+            put    = p;
         }
 
-        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws IOException {
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(CHAR);
-            out.writeChar(unsafe.getChar(i, offset));
+            try {
+                out.writeChar((char) get.invoke(unsafe, i, offset));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() == CHAR) {
-                unsafe.putChar(i, offset, in.readChar());
+                try {
+                    put.invoke(unsafe, i, offset, in.readChar());
+                } catch (Throwable t) {
+                    throw new RuntimeException(t);
+                }
             } else
                 throw new IOException("Exp CHAR");
         }
     }
 
-    @SuppressWarnings("restriction")
     static class UnsafeObject implements FieldAccessor {
-        final sun.misc.Unsafe unsafe;
-        final long            offset;
-        final Type            type;
+        final Object       unsafe;
+        final long         offset;
+        final Type         type;
+        final MethodHandle get;
+        final MethodHandle put;
 
-        UnsafeObject(sun.misc.Unsafe u, long o, Type t) {
+        UnsafeObject(Object u, long o, Type t, MethodHandle g, MethodHandle p) {
             unsafe = u;
             offset = o;
             type   = t;
+            get    = g;
+            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
-            c.encode(unsafe.getObject(i, offset), out);
+            try {
+                c.encode(get.invoke(unsafe, i, offset), out);
+            } catch (Throwable t) {
+                if (t instanceof Exception)
+                    throw (Exception) t;
+                throw new RuntimeException(t);
+            }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
-            unsafe.putObject(i, offset, c.decode(in, type));
+            try {
+                put.invoke(unsafe, i, offset, c.decode(in, type));
+            } catch (Throwable t) {
+                if (t instanceof Exception)
+                    throw (Exception) t;
+                throw new RuntimeException(t);
+            }
         }
     }
 }
