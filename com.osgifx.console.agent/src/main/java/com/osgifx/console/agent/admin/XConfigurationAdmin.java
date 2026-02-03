@@ -22,7 +22,6 @@ import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
 import static com.osgifx.console.agent.helper.OSGiCompendiumService.CM;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -32,11 +31,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationEvent;
+import org.osgi.service.cm.ConfigurationListener;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
@@ -53,41 +58,140 @@ import com.osgifx.console.agent.helper.Reflect;
 
 import jakarta.inject.Inject;
 
-public final class XConfigurationAdmin {
+public final class XConfigurationAdmin implements ConfigurationListener {
 
-    private final BundleContext      context;
-    private final Object             metatype;
-    private final ConfigurationAdmin configAdmin;
-    private final XComponentAdmin    componentAdmin;
-    private final FluentLogger       logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                                    context;
+    private final XComponentAdmin                                  componentAdmin;
+    private final XMetaTypeAdmin                                   xMetaTypeAdmin;
+    private final FluentLogger                                     logger         = LoggerFactory
+            .getFluentLogger(getClass());
+    private final Map<String, XConfigurationDTO>                   configurations = new ConcurrentHashMap<>();
+    private ServiceRegistration<ConfigurationListener>             registration;
+    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
+    private volatile ConfigurationAdmin                            configAdmin;
+    private ExecutorService                                        executor;
 
     @Inject
     public XConfigurationAdmin(final BundleContext context,
-                               final Object configAdmin,
-                               final Object metatype,
-                               final XComponentAdmin componentAdmin) {
+                               final XComponentAdmin componentAdmin,
+                               final XMetaTypeAdmin xMetaTypeAdmin,
+                               final ExecutorService executor) {
         this.context        = context;
-        this.metatype       = metatype;
-        this.configAdmin    = (ConfigurationAdmin) configAdmin;
         this.componentAdmin = componentAdmin;
+        this.xMetaTypeAdmin = xMetaTypeAdmin;
+        this.executor       = executor;
+    }
+
+    public void init() {
+        configAdminTracker = new ServiceTracker<ConfigurationAdmin, ConfigurationAdmin>(context,
+                                                                                        ConfigurationAdmin.class,
+                                                                                        null) {
+            @Override
+            public ConfigurationAdmin addingService(final ServiceReference<ConfigurationAdmin> reference) {
+                final ConfigurationAdmin service = super.addingService(reference);
+                configAdmin = service;
+                registerConfigListener();
+                processExistingConfigs(service);
+                return service;
+            }
+
+            @Override
+            public void removedService(final ServiceReference<ConfigurationAdmin> reference,
+                                       final ConfigurationAdmin service) {
+                unregisterConfigListener();
+                configurations.clear();
+                configAdmin = null;
+                super.removedService(reference, service);
+            }
+        };
+        configAdminTracker.open();
+    }
+
+    public void stop() {
+        if (configAdminTracker != null) {
+            configAdminTracker.close();
+        }
+    }
+
+    private void registerConfigListener() {
+        if (registration == null) {
+            registration = context.registerService(ConfigurationListener.class, this, null);
+        }
+    }
+
+    private void unregisterConfigListener() {
+        if (registration != null) {
+            registration.unregister();
+            registration = null;
+        }
+    }
+
+    private ConfigurationAdmin getConfigAdmin() {
+        final ConfigurationAdmin service = configAdminTracker.getService();
+        if (service != null) {
+            return service;
+        }
+        return configAdmin;
+    }
+
+    private void processExistingConfigs(final ConfigurationAdmin configAdmin) {
+        try {
+            final Configuration[] configs = configAdmin.listConfigurations(null);
+            if (configs != null) {
+                for (final Configuration config : configs) {
+                    executor.submit(() -> processConfiguration(config));
+                }
+            }
+        } catch (final Exception e) {
+            logger.atError().msg("Error processing existing configurations").throwable(e).log();
+        }
+    }
+
+    private void processConfiguration(final Configuration config) {
+        final String pid = config.getPid();
+        try {
+            final boolean hasMetatype = xMetaTypeAdmin == null ? false : xMetaTypeAdmin.isMetatype(config);
+            if (!hasMetatype) {
+                configurations.put(pid, toConfigDTO(config));
+            } else {
+                configurations.remove(pid);
+            }
+        } catch (final Exception e) {
+            logger.atError().msg("Error processing configuration for PID: " + pid).throwable(e).log();
+        }
+    }
+
+    @Override
+    public void configurationEvent(final ConfigurationEvent event) {
+        final ConfigurationAdmin configAdmin = getConfigAdmin();
+        if (configAdmin == null) {
+            return;
+        }
+        final String pid = event.getPid();
+        if (event.getType() == ConfigurationEvent.CM_DELETED) {
+            configurations.remove(pid);
+        } else if (event.getType() == ConfigurationEvent.CM_UPDATED) {
+            executor.submit(() -> {
+                try {
+                    final Configuration config = configAdmin.getConfiguration(pid, "?");
+                    processConfiguration(config);
+                } catch (final Exception e) {
+                    logger.atError().msg("Error processing configuration event for PID: " + pid).throwable(e).log();
+                }
+            });
+        }
     }
 
     public List<XConfigurationDTO> getConfigurations() {
-        if (configAdmin == null) {
+        if (getConfigAdmin() == null) {
             logger.atWarn().msg(serviceUnavailable(CM)).log();
             return Collections.emptyList();
         }
-        List<XConfigurationDTO> configsWithoutMetatype = null;
-        try {
-            configsWithoutMetatype = findConfigsWithoutMetatype();
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving configurations").throwable(e).log();
-            return Collections.emptyList();
-        }
-        return configsWithoutMetatype;
+        return new ArrayList<>(configurations.values());
     }
 
     public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
+        final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
@@ -111,6 +215,7 @@ public final class XConfigurationAdmin {
     }
 
     public XResultDTO deleteConfiguration(final String pid) {
+        final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
@@ -138,6 +243,7 @@ public final class XConfigurationAdmin {
     }
 
     public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
+        final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
@@ -236,22 +342,6 @@ public final class XConfigurationAdmin {
         } catch (final Exception e) {
             Reflect.on(configuration).call("update", properties).get();
         }
-    }
-
-    private List<XConfigurationDTO> findConfigsWithoutMetatype() throws IOException, InvalidSyntaxException {
-        final List<XConfigurationDTO> dtos    = new ArrayList<>();
-        final Configuration[]         configs = configAdmin.listConfigurations(null);
-        if (configs == null) {
-            return dtos;
-        }
-        for (final Configuration config : configs) {
-            final boolean hasMetatype = metatype == null ? false
-                    : XMetaTypeAdmin.hasMetatype(context, metatype, config);
-            if (!hasMetatype) {
-                dtos.add(toConfigDTO(config));
-            }
-        }
-        return dtos;
     }
 
     private XConfigurationDTO toConfigDTO(final Configuration configuration) {

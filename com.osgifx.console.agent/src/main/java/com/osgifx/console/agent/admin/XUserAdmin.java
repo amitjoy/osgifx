@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.osgi.service.useradmin.Group;
@@ -48,15 +51,16 @@ import jakarta.inject.Inject;
 
 public final class XUserAdmin {
 
-    private final UserAdmin    userAdmin;
-    private final FluentLogger logger = LoggerFactory.getFluentLogger(getClass());
+    private final Supplier<Object> userAdminSupplier;
+    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XUserAdmin(final Object userAdmin) {
-        this.userAdmin = (UserAdmin) userAdmin;
+    public XUserAdmin(final Supplier<Object> userAdminSupplier) {
+        this.userAdminSupplier = userAdminSupplier;
     }
 
     public List<XRoleDTO> getRoles() {
+        final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
             logger.atWarn().msg("UserAdmin is unavailable").log();
             return Collections.emptyList();
@@ -64,7 +68,7 @@ public final class XUserAdmin {
         final List<XRoleDTO> dtos = new ArrayList<>();
         try {
             for (final Role role : userAdmin.getRoles(null)) {
-                dtos.add(toRole(role));
+                dtos.add(toRole(role, new HashSet<>()));
             }
         } catch (final Exception e) {
             // for any exception occurs in remote runtime
@@ -75,6 +79,7 @@ public final class XUserAdmin {
     }
 
     public XResultDTO createRole(final String name, final Type type) {
+        final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
@@ -88,26 +93,24 @@ public final class XUserAdmin {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public XResultDTO updateRole(final XRoleDTO roleDTO) {
+        final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         try {
-            final Role role = getRole(roleDTO);
+            final Role role = getRole(userAdmin, roleDTO);
             if (role == null) {
                 return createResult(ERROR, "The role '" + roleDTO.name + "' could not be found");
             }
-            try {
-                cyclesCache.add(roleDTO.name);
+            final List<String> cyclesCache = new ArrayList<>();
+            cyclesCache.add(roleDTO.name);
 
-                final List<XRoleDTO> allMembers        = mergeMembers(roleDTO.basicMembers, roleDTO.requiredMembers);
-                final boolean        hasCycleInMembers = hasCycleInMembers(allMembers);
+            final List<XRoleDTO> allMembers        = mergeMembers(roleDTO.basicMembers, roleDTO.requiredMembers);
+            final boolean        hasCycleInMembers = hasCycleInMembers(allMembers, cyclesCache);
 
-                if (hasCycleInMembers) {
-                    return createResult(ERROR, "Cyclic members found while updating '" + roleDTO.name + "'");
-                }
-            } finally {
-                cyclesCache.clear();
+            if (hasCycleInMembers) {
+                return createResult(ERROR, "Cyclic members found while updating '" + roleDTO.name + "'");
             }
             // update properties
             final Dictionary          properties    = role.getProperties();
@@ -136,7 +139,7 @@ public final class XUserAdmin {
                 final List<XRoleDTO> newBasicMembers = roleDTO.basicMembers;
                 if (newBasicMembers != null) {
                     newBasicMembers.forEach(m -> {
-                        final Role r = getRole(m);
+                        final Role r = getRole(userAdmin, m);
                         if (r != null) {
                             group.addMember(r);
                         }
@@ -154,7 +157,7 @@ public final class XUserAdmin {
                 final List<XRoleDTO> newRequiredMembers = roleDTO.requiredMembers;
                 if (newRequiredMembers != null) {
                     newRequiredMembers.forEach(m -> {
-                        final Role r = getRole(m);
+                        final Role r = getRole(userAdmin, m);
                         if (r != null) {
                             group.addRequiredMember(r);
                         }
@@ -167,9 +170,7 @@ public final class XUserAdmin {
         }
     }
 
-    List<String> cyclesCache = new ArrayList<>();
-
-    private boolean hasCycleInMembers(final List<XRoleDTO> members) {
+    private boolean hasCycleInMembers(final List<XRoleDTO> members, final List<String> cyclesCache) {
         if (members == null) {
             return false;
         }
@@ -180,7 +181,7 @@ public final class XUserAdmin {
             cyclesCache.add(role.name);
 
             final List<XRoleDTO> allMembers = mergeMembers(role.basicMembers, role.requiredMembers);
-            final boolean        isCycle    = hasCycleInMembers(allMembers);
+            final boolean        isCycle    = hasCycleInMembers(allMembers, cyclesCache);
 
             if (isCycle) {
                 return true;
@@ -190,6 +191,7 @@ public final class XUserAdmin {
     }
 
     public XResultDTO removeRole(final String name) {
+        final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
@@ -199,7 +201,7 @@ public final class XUserAdmin {
                 : createResult(ERROR, "The role '" + name + "' could not be removed");
     }
 
-    private Role getRole(final XRoleDTO role) {
+    private Role getRole(final UserAdmin userAdmin, final XRoleDTO role) {
         return userAdmin.getRole(role.name);
     }
 
@@ -214,16 +216,21 @@ public final class XUserAdmin {
     }
 
     @SuppressWarnings("unchecked")
-    private XRoleDTO toRole(final Role role) {
+    private XRoleDTO toRole(final Role role, final Set<String> visited) {
         final XRoleDTO roleDTO = new XRoleDTO();
 
         roleDTO.name       = role.getName();
         roleDTO.type       = toType(role.getType());
         roleDTO.properties = AgentHelper.valueOf(role.getProperties());
 
+        if (visited.contains(roleDTO.name)) {
+            return roleDTO;
+        }
+        visited.add(roleDTO.name);
+
         if (roleDTO.type == Type.GROUP) {
-            roleDTO.basicMembers    = toBasicMembers(role);
-            roleDTO.requiredMembers = toRequiredMembers(role);
+            roleDTO.basicMembers    = toBasicMembers(role, visited);
+            roleDTO.requiredMembers = toRequiredMembers(role, visited);
         }
         if (roleDTO.type == Type.USER) {
             roleDTO.credentials = AgentHelper.valueOf(((User) role).getCredentials());
@@ -231,20 +238,20 @@ public final class XUserAdmin {
         return roleDTO;
     }
 
-    private List<XRoleDTO> toBasicMembers(final Role role) {
+    private List<XRoleDTO> toBasicMembers(final Role role, final Set<String> visited) {
         final Role[] basicMembers = ((Group) role).getMembers();
         if (basicMembers == null) {
             return null;
         }
-        return Stream.of(basicMembers).map(this::toRole).collect(toList());
+        return Stream.of(basicMembers).map(r -> toRole(r, new HashSet<>(visited))).collect(toList());
     }
 
-    private List<XRoleDTO> toRequiredMembers(final Role role) {
+    private List<XRoleDTO> toRequiredMembers(final Role role, final Set<String> visited) {
         final Role[] requiredMembers = ((Group) role).getRequiredMembers();
         if (requiredMembers == null) {
             return null;
         }
-        return Stream.of(requiredMembers).map(this::toRole).collect(toList());
+        return Stream.of(requiredMembers).map(r -> toRole(r, new HashSet<>(visited))).collect(toList());
     }
 
     private Type toType(final int type) {

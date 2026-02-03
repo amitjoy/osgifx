@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.apache.felix.hc.api.HealthCheck;
 import org.apache.felix.hc.api.Result;
@@ -56,13 +57,13 @@ import jakarta.inject.Inject;
 public final class XHcAdmin {
 
     private final BundleContext       context;
-    private final HealthCheckExecutor felixHcExecutor;
+    private final Supplier<Object> felixHcExecutorSupplier;
     private final FluentLogger        logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XHcAdmin(final BundleContext context, final Object felixHcExecutor) {
-        this.context         = context;
-        this.felixHcExecutor = (HealthCheckExecutor) felixHcExecutor;
+    public XHcAdmin(final BundleContext context, final Supplier<Object> felixHcExecutorSupplier) {
+        this.context                 = context;
+        this.felixHcExecutorSupplier = felixHcExecutorSupplier;
     }
 
     public List<XHealthCheckDTO> getHealthchecks() {
@@ -79,6 +80,7 @@ public final class XHcAdmin {
     }
 
     public List<XHealthCheckResultDTO> executeHealthChecks(List<String> tags, List<String> names) {
+        final HealthCheckExecutor felixHcExecutor = (HealthCheckExecutor) felixHcExecutorSupplier.get();
         if (felixHcExecutor == null) {
             logger.atWarn().msg("Felix HC executor is unavailable to execute health check").log();
             return Collections.emptyList();
