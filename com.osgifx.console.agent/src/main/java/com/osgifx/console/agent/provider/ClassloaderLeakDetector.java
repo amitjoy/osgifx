@@ -174,8 +174,12 @@ public final class ClassloaderLeakDetector implements Runnable {
     private void removeBundle(final BundleReference ref) {
         final BundleInfo bi = bundleInfos.get(ref.bundleId);
 
-        // bi cannot be null
-        bi.decrementUsageCount(ref);
+        if (bi != null) {
+            bi.decrementUsageCount(ref);
+            if (bi.isEmpty()) {
+                bundleInfos.remove(ref.bundleId);
+            }
+        }
         refs.remove(ref);
     }
 
@@ -217,6 +221,10 @@ public final class ClassloaderLeakDetector implements Runnable {
 
         public boolean hasSingleInstance() {
             return classloaderInfos.size() == 1;
+        }
+
+        public boolean isEmpty() {
+            return classloaderInfos.isEmpty();
         }
 
         @Override

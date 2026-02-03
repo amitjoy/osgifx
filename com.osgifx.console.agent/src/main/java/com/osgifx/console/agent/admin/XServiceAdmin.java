@@ -16,22 +16,25 @@
 package com.osgifx.console.agent.admin;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.osgi.framework.Constants.OBJECTCLASS;
-import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.dto.FrameworkDTO;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
@@ -42,23 +45,87 @@ import jakarta.inject.Inject;
 
 public final class XServiceAdmin {
 
-    private final BundleContext context;
-    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
+    private final Map<Long, XServiceDTO>      services = new ConcurrentHashMap<>();
+    private final BundleContext               context;
+    private final FluentLogger                logger   = LoggerFactory.getFluentLogger(getClass());
+    private ServiceTracker<Object, Future<?>> serviceTracker;
+    private ExecutorService                   executor;
 
     @Inject
-    public XServiceAdmin(final BundleContext context) {
-        this.context = context;
+    public XServiceAdmin(final BundleContext context, final ExecutorService executor) {
+        this.context  = context;
+        this.executor = executor;
+    }
+
+    public void init() {
+        try {
+
+            serviceTracker = new ServiceTracker<Object, Future<?>>(context, context.createFilter("(objectClass=*)"),
+                                                                   null) {
+                @Override
+                public Future<?> addingService(final ServiceReference<Object> reference) {
+                    return executor.submit(() -> {
+                        final XServiceDTO dto = toDTO(reference);
+                        services.put(dto.id, dto);
+                    });
+                }
+
+                @Override
+                public void modifiedService(final ServiceReference<Object> reference, final Future<?> future) {
+                    executor.submit(() -> {
+                        final XServiceDTO dto = toDTO(reference);
+                        services.put(dto.id, dto);
+                    });
+                }
+
+                @Override
+                public void removedService(final ServiceReference<Object> reference, final Future<?> future) {
+                    if (future != null && !future.isDone()) {
+                        future.cancel(true);
+                    }
+                    final long id = (Long) reference.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+                    services.remove(id);
+                }
+            };
+            serviceTracker.open();
+        } catch (final InvalidSyntaxException e) {
+            logger.atError().msg("Error occurred while initializing service tracker").throwable(e).log();
+        }
+    }
+
+    public void stop() {
+        if (serviceTracker != null) {
+            serviceTracker.close();
+        }
     }
 
     public List<XServiceDTO> get() {
         requireNonNull(context);
-        try {
-            final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
-            return dto.services.stream().map(s -> toDTO(s, context)).collect(toList());
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving services").throwable(e).log();
-            return Collections.emptyList();
+        return new ArrayList<>(services.values());
+    }
+
+    private XServiceDTO toDTO(final ServiceReference<?> ref) {
+        final ServiceReferenceDTO refDTO = toServiceReferenceDTO(ref);
+        return toDTO(refDTO, context);
+    }
+
+    private ServiceReferenceDTO toServiceReferenceDTO(final ServiceReference<?> ref) {
+        final ServiceReferenceDTO dto = new ServiceReferenceDTO();
+        dto.id     = (Long) ref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+        dto.bundle = ref.getBundle().getBundleId();
+
+        dto.properties = new HashMap<>();
+        for (final String key : ref.getPropertyKeys()) {
+            dto.properties.put(key, ref.getProperty(key));
         }
+
+        final Bundle[] usingBundles = ref.getUsingBundles();
+        if (usingBundles != null) {
+            dto.usingBundles = Stream.of(usingBundles).mapToLong(Bundle::getBundleId).toArray();
+        } else {
+            dto.usingBundles = new long[0];
+        }
+        return dto;
     }
 
     private XServiceDTO toDTO(final ServiceReferenceDTO refDTO, final BundleContext context) {
@@ -110,13 +177,8 @@ public final class XServiceAdmin {
     }
 
     private String bsn(final long id, final BundleContext context) {
-        // @formatter:off
-        return Stream.of(context.getBundles())
-                     .filter(b -> b.getBundleId() == id)
-                     .map(Bundle::getSymbolicName)
-                     .findAny()
-                     .orElse(null);
-        // @formatter:on
+        final Bundle bundle = context.getBundle(id);
+        return bundle == null ? null : bundle.getSymbolicName();
     }
 
 }

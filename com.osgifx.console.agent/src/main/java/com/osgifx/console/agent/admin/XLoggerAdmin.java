@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -51,24 +52,28 @@ import jakarta.inject.Inject;
 
 public final class XLoggerAdmin {
 
-    private final BundleContext context;
-    private final LoggerAdmin   loggerAdmin;
-    private final boolean       isConfigAdminWired;
-    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext    context;
+    private final Supplier<Object> loggerAdminSupplier;
+    private final boolean          isConfigAdminWired;
+    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XLoggerAdmin(final Object loggerAdmin, final PackageWirings packageWirings, final BundleContext context) {
-        this.context       = context;
-        this.loggerAdmin   = (LoggerAdmin) loggerAdmin;
-        isConfigAdminWired = packageWirings.isConfigAdminWired();
+    public XLoggerAdmin(final Supplier<Object> loggerAdminSupplier,
+                        final PackageWirings packageWirings,
+                        final BundleContext context) {
+        this.context             = context;
+        this.loggerAdminSupplier = loggerAdminSupplier;
+        isConfigAdminWired       = packageWirings.isConfigAdminWired();
     }
 
     public List<XBundleLoggerContextDTO> getLoggerContexts() {
+        final LoggerAdmin loggerAdmin = (LoggerAdmin) loggerAdminSupplier.get();
         if (loggerAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return Collections.emptyList();
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();
+        final LoggerContext rootContext = loggerAdmin.getLoggerContext(null);
         for (final Bundle bundle : context.getBundles()) {
             final String        bsn           = bundle.getSymbolicName();
             final LoggerContext loggerContext = loggerAdmin.getLoggerContext(bsn);
@@ -76,7 +81,7 @@ public final class XLoggerAdmin {
             final XBundleLoggerContextDTO bundleLoggerContext = new XBundleLoggerContextDTO();
 
             bundleLoggerContext.name         = bsn;
-            bundleLoggerContext.rootLogLevel = loggerAdmin.getLoggerContext(null).getLogLevels().get(ROOT_LOGGER_NAME);
+            bundleLoggerContext.rootLogLevel = rootContext.getLogLevels().get(ROOT_LOGGER_NAME);
             bundleLoggerContext.logLevels    = loggerContext.getLogLevels();
 
             loggerContexts.add(bundleLoggerContext);
@@ -85,6 +90,7 @@ public final class XLoggerAdmin {
     }
 
     public XResultDTO updateLoggerContext(final String bsn, final Map<String, String> logLevels) {
+        final LoggerAdmin loggerAdmin = (LoggerAdmin) loggerAdminSupplier.get();
         if (loggerAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(LOGGER_ADMIN));
@@ -95,14 +101,16 @@ public final class XLoggerAdmin {
                 return updateLoggerContextPersistently(bsn, logLevels);
             }
             logger.atDebug().msg("Updating logger context non-persistently for '%s'").arg(bsn).log();
-            return updateLoggerContextNonPersistently(bsn, logLevels);
+            return updateLoggerContextNonPersistently(loggerAdmin, bsn, logLevels);
         } catch (final Exception e) {
             logger.atError().msg("The logger context of '%s' could not be updated").arg(bsn).log();
             return createResult(ERROR, "The logger context of '" + bsn + "' could not be updated");
         }
     }
 
-    private XResultDTO updateLoggerContextNonPersistently(final String bsn, final Map<String, String> logLevels) {
+    private XResultDTO updateLoggerContextNonPersistently(final LoggerAdmin loggerAdmin,
+                                                          final String bsn,
+                                                          final Map<String, String> logLevels) {
         final Map<String, LogLevel> levels = toLogLevels(logLevels);
         loggerAdmin.getLoggerContext(bsn).setLogLevels(levels);
         logger.atDebug().msg("The logger context of '%s' has been updated (non-persistently) successfully").arg(bsn)
@@ -120,12 +128,24 @@ public final class XLoggerAdmin {
 
         final ServiceReference<ConfigurationAdmin> serviceReference = context
                 .getServiceReference(ConfigurationAdmin.class);
-        final ConfigurationAdmin                   service          = context.getService(serviceReference);
-        final Configuration                        configuration    = service.getConfiguration(pid, "?");
+        if (serviceReference == null) {
+            return createResult(ERROR, "ConfigurationAdmin service is unavailable");
+        }
+        final ConfigurationAdmin service = context.getService(serviceReference);
+        try {
+            if (service == null) {
+                return createResult(ERROR, "ConfigurationAdmin service is unavailable");
+            }
+            final Configuration configuration = service.getConfiguration(pid, "?");
 
-        configuration.update(new Hashtable<>(configProperties));
-        logger.atDebug().msg("The logger context of '%s' has been updated (persistently) successfully").arg(bsn).log();
-        return createResult(SUCCESS, "The logger context '" + bsn + "' has been updated (persistently) successfully");
+            configuration.update(new Hashtable<>(configProperties));
+            logger.atDebug().msg("The logger context of '%s' has been updated (persistently) successfully").arg(bsn)
+                    .log();
+            return createResult(SUCCESS,
+                    "The logger context '" + bsn + "' has been updated (persistently) successfully");
+        } finally {
+            context.ungetService(serviceReference);
+        }
     }
 
     private Map<String, LogLevel> toLogLevels(final Map<String, String> logLevels) {

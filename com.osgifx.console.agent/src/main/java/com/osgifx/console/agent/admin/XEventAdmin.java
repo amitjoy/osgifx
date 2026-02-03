@@ -16,6 +16,7 @@
 package com.osgifx.console.agent.admin;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -24,19 +25,27 @@ import jakarta.inject.Inject;
 
 public final class XEventAdmin {
 
-    private final EventAdmin eventAdmin;
+    private final Supplier<Object> eventAdminSupplier;
 
     @Inject
-    public XEventAdmin(final Object eventAdmin) {
-        this.eventAdmin = (EventAdmin) eventAdmin;
+    public XEventAdmin(final Supplier<Object> eventAdminSupplier) {
+        this.eventAdminSupplier = eventAdminSupplier;
     }
 
     public void sendEvent(final String topic, final Map<String, Object> properties) {
+        final EventAdmin eventAdmin = (EventAdmin) eventAdminSupplier.get();
+        if (eventAdmin == null) {
+            return;
+        }
         final Event event = new Event(topic, properties);
         eventAdmin.sendEvent(event);
     }
 
     public void postEvent(final String topic, final Map<String, Object> properties) {
+        final EventAdmin eventAdmin = (EventAdmin) eventAdminSupplier.get();
+        if (eventAdmin == null) {
+            return;
+        }
         final Event event = new Event(topic, properties);
         eventAdmin.postEvent(event);
     }

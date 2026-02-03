@@ -33,14 +33,22 @@ import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.U
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
@@ -49,6 +57,8 @@ import org.osgi.service.component.runtime.dto.ReferenceDTO;
 import org.osgi.service.component.runtime.dto.SatisfiedReferenceDTO;
 import org.osgi.service.component.runtime.dto.UnsatisfiedReferenceDTO;
 import org.osgi.util.promise.Promise;
+import org.osgi.util.tracker.BundleTracker;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
@@ -64,39 +74,145 @@ import jakarta.inject.Inject;
 
 public final class XComponentAdmin {
 
-    private final ServiceComponentRuntime scr;
-    private final FluentLogger            logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                                              context;
+    private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
+    private volatile ServiceComponentRuntime                                 scr;
+    private final FluentLogger                                               logger     = LoggerFactory
+            .getFluentLogger(getClass());
+    private final Map<Long, List<XComponentDTO>>                             components = new ConcurrentHashMap<>();
+    private final ExecutorService                                            executor;
+    private BundleTracker<AtomicReference<Future<?>>>                        bundleTracker;
 
     @Inject
-    public XComponentAdmin(final Object scr) {
-        this.scr = (ServiceComponentRuntime) scr;
+    public XComponentAdmin(final BundleContext context, final ExecutorService executor) {
+        this.context  = context;
+        this.executor = executor;
+    }
+
+    public ServiceComponentRuntime getServiceComponentRuntime() {
+        if (scrTracker == null) {
+            return null;
+        }
+        final ServiceComponentRuntime service = scrTracker.getService();
+        if (service != null) {
+            return service;
+        }
+        return scr;
+    }
+
+    public void init() {
+        scrTracker = new ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime>(context,
+                                                                                          ServiceComponentRuntime.class,
+                                                                                          null) {
+            @Override
+            public ServiceComponentRuntime addingService(final ServiceReference<ServiceComponentRuntime> reference) {
+                final ServiceComponentRuntime service = super.addingService(reference);
+                scr = service;
+                openBundleTracker();
+                return service;
+            }
+
+            @Override
+            public void removedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                       final ServiceComponentRuntime service) {
+                closeBundleTracker();
+                scr = null;
+                super.removedService(reference, service);
+            }
+        };
+        scrTracker.open();
+    }
+
+    private void openBundleTracker() {
+        if (bundleTracker == null) {
+            bundleTracker = new BundleTracker<AtomicReference<Future<?>>>(context, Bundle.INSTALLED | Bundle.RESOLVED
+                    | Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING | Bundle.UNINSTALLED, null) {
+                @Override
+                public AtomicReference<Future<?>> addingBundle(final Bundle bundle, final BundleEvent event) {
+                    final AtomicReference<Future<?>> futureRef = new AtomicReference<>();
+                    final Future<?>                  future    = executor.submit(() -> {
+                                                                   final List<XComponentDTO> dtos = processBundle(
+                                                                           bundle);
+                                                                   components.put(bundle.getBundleId(), dtos);
+                                                               });
+                    futureRef.set(future);
+                    return futureRef;
+                }
+
+                @Override
+                public void modifiedBundle(final Bundle bundle,
+                                           final BundleEvent event,
+                                           final AtomicReference<Future<?>> futureRef) {
+                    final Future<?> future = futureRef.get();
+                    if (future != null && !future.isDone()) {
+                        future.cancel(true);
+                    }
+                    components.remove(bundle.getBundleId());
+                    final Future<?> newFuture = executor.submit(() -> {
+                        final List<XComponentDTO> dtos = processBundle(bundle);
+                        components.put(bundle.getBundleId(), dtos);
+                    });
+                    futureRef.set(newFuture);
+                }
+
+                @Override
+                public void removedBundle(final Bundle bundle,
+                                          final BundleEvent event,
+                                          final AtomicReference<Future<?>> futureRef) {
+                    final Future<?> future = futureRef.get();
+                    if (future != null && !future.isDone()) {
+                        future.cancel(true);
+                    }
+                    components.remove(bundle.getBundleId());
+                }
+            };
+            bundleTracker.open();
+        }
+    }
+
+    private void closeBundleTracker() {
+        if (bundleTracker != null) {
+            bundleTracker.close();
+            bundleTracker = null;
+            components.clear();
+        }
+    }
+
+    public void stop() {
+        closeBundleTracker();
+        if (scrTracker != null) {
+            scrTracker.close();
+        }
     }
 
     public List<XComponentDTO> getComponents() {
+        return components.values().stream().flatMap(List::stream).collect(Collectors.toList());
+    }
+
+    private List<XComponentDTO> processBundle(final Bundle bundle) {
+        final List<XComponentDTO>     dtos = new ArrayList<>();
+        final ServiceComponentRuntime scr  = getServiceComponentRuntime();
         if (scr == null) {
-            logger.atWarn().msg(serviceUnavailable(SCR)).log();
-            return Collections.emptyList();
+            return dtos;
         }
-        final List<XComponentDTO> dtos = new ArrayList<>();
         try {
-            for (final ComponentDescriptionDTO compDescDTO : scr.getComponentDescriptionDTOs()) {
+            for (final ComponentDescriptionDTO compDescDTO : scr.getComponentDescriptionDTOs(bundle)) {
                 final Collection<ComponentConfigurationDTO> compConfDTOs = scr
                         .getComponentConfigurationDTOs(compDescDTO);
                 if (compConfDTOs.isEmpty()) {
-                    // this is for use cases when a component doesn't have any
-                    // configuration yet as it is probably disabled
                     dtos.add(toDTO(null, compDescDTO));
                 }
                 dtos.addAll(compConfDTOs.stream().map(dto -> toDTO(dto, compDescDTO)).collect(toList()));
             }
         } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving components").throwable(e).log();
-            return Collections.emptyList();
+            logger.atError().msg("Error occurred while retrieving components for bundle: " + bundle.getBundleId())
+                    .throwable(e).log();
         }
         return dtos;
     }
 
     public XResultDTO enableComponent(final long id) {
+        final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             logger.atWarn().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
@@ -127,6 +243,7 @@ public final class XComponentAdmin {
     }
 
     public XResultDTO enableComponent(final String name) {
+        final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             logger.atWarn().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
@@ -152,6 +269,7 @@ public final class XComponentAdmin {
     }
 
     public XResultDTO disableComponent(final long id) {
+        final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             logger.atWarn().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
@@ -180,6 +298,7 @@ public final class XComponentAdmin {
     }
 
     public XResultDTO disableComponent(final String name) {
+        final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             logger.atWarn().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));

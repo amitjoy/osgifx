@@ -16,7 +16,6 @@
 package com.osgifx.console.agent.admin;
 
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.framework.Bundle.INSTALLED;
 import static org.osgi.framework.Bundle.RESOLVED;
@@ -43,11 +42,14 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -57,6 +59,7 @@ import org.osgi.framework.wiring.BundleRevisions;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
+import org.osgi.util.tracker.BundleTracker;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
@@ -72,15 +75,62 @@ import jakarta.inject.Inject;
 
 public final class XBundleAdmin {
 
+    private final Map<Long, XBundleDTO>     bundles = new ConcurrentHashMap<>();
     private final BundleContext             context;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
+    private BundleTracker<Future<?>>        bundleTracker;
+    private ExecutorService                 executor;
 
     private static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
 
     @Inject
-    public XBundleAdmin(final BundleContext context, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+    public XBundleAdmin(final BundleContext context,
+                        final BundleStartTimeCalculator bundleStartTimeCalculator,
+                        final ExecutorService executor) {
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
+        this.executor                  = executor;
+    }
+
+    public void init() {
+        bundleTracker = new BundleTracker<Future<?>>(context,
+                                                     Bundle.INSTALLED | Bundle.RESOLVED | Bundle.STARTING
+                                                             | Bundle.ACTIVE | Bundle.STOPPING | Bundle.UNINSTALLED,
+                                                     null) {
+            @Override
+            public Future<?> addingBundle(final Bundle bundle, final BundleEvent event) {
+                return executor.submit(() -> processBundleSafely(bundle));
+            }
+
+            @Override
+            public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Future<?> object) {
+                executor.submit(() -> processBundleSafely(bundle));
+            }
+
+            @Override
+            public void removedBundle(final Bundle bundle, final BundleEvent event, final Future<?> object) {
+                if (object != null && !object.isDone()) {
+                    object.cancel(true);
+                }
+                bundles.remove(bundle.getBundleId());
+            }
+        };
+        bundleTracker.open();
+    }
+
+    public void stop() {
+        if (bundleTracker != null) {
+            bundleTracker.close();
+        }
+    }
+
+    private void processBundleSafely(final Bundle bundle) {
+        try {
+            final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator);
+            bundles.put(bundle.getBundleId(), dto);
+        } catch (final Exception e) {
+            logger.atError().msg("Error processing bundle '{}'").arg(bundle.getSymbolicName()).throwable(e).log();
+        }
     }
 
     public List<XBundleDTO> get() {
@@ -88,12 +138,7 @@ public final class XBundleAdmin {
             logger.atWarn().msg("Bundle context is null").log();
             return Collections.emptyList();
         }
-        try {
-            return Stream.of(context.getBundles()).map(b -> toDTO(b, bundleStartTimeCalculator)).collect(toList());
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving bundles").throwable(e).log();
-            return Collections.emptyList();
-        }
+        return new ArrayList<>(bundles.values());
     }
 
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
