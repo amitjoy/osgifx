@@ -5,7 +5,7 @@
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -15,11 +15,15 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -35,80 +39,147 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.wiring.BundleRevision;
-import org.osgi.framework.wiring.BundleWire;
-import org.osgi.framework.wiring.BundleWiring;
+import java.util.function.Supplier;
 
 /**
- * A High-Performance, Hybrid (Unsafe + Reflection) binary codec for OSGi DTOs.
+ * A High-Performance, Hybrid (Unsafe + MethodHandle) binary codec for OSGi DTOs.
  *
  * <p>
  * <b>Features:</b>
  * </p>
  * <ul>
- * <li><b>Adaptive:</b> Automatically detects if {@code sun.misc.Unsafe} is wired in the OSGi environment.</li>
- * <li><b>Schema-less:</b> Removes field names from payload (relies on deterministic field order).</li>
- * <li><b>Zero-Boxing:</b> Primitives are read/written directly without object allocation in Unsafe mode.</li>
- * <li><b>Collection Support:</b> Transparently handles Sets, Lists, Maps, and Arrays.</li>
+ * <li><b>Hybrid Strategy:</b>
+ * <ul>
+ * <li><b>Primary (Unsafe):</b> Uses {@code LambdaMetafactory} wrapping {@code sun.misc.Unsafe} for maximum performance
+ * and private field access.</li>
+ * <li><b>Fallback (Standard):</b> Uses {@code MethodHandle.invokeExact} for fully portable, high-speed access to public
+ * fields (when Unsafe is missing).</li>
+ * </ul>
+ * </li>
+ * <li><b>Schema-less:</b> Removes field names from payload.</li>
+ * <li><b>Zero-Boxing:</b> Primitives are handled efficiently.</li>
+ * <li><b>Portable:</b> Works on all JVMs 1.8+.</li>
  * </ul>
  */
 public class BinaryCodec {
 
-    private static final CodecStrategy                  strategy;
     private static final Map<Class<?>, FieldAccessor[]> accessorCache = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Supplier<?>>     factoryCache  = new ConcurrentHashMap<>();
+    private static final MethodHandles.Lookup           lookup        = MethodHandles.lookup();
 
-    // --- STATIC INITIALIZER: OSGi WIRING CHECK ---
+    // -- Unsafe Capabilities --
+    private static final Object unsafe;
+    // Unsafe Accessors (Only initialized if unsafe != null)
+    private static UnsafeIntReader      GET_INT;
+    private static UnsafeIntWriter      PUT_INT;
+    private static UnsafeLongReader     GET_LONG;
+    private static UnsafeLongWriter     PUT_LONG;
+    private static UnsafeBooleanReader  GET_BOOL;
+    private static UnsafeBooleanWriter  PUT_BOOL;
+    private static UnsafeDoubleReader   GET_DOUBLE;
+    private static UnsafeDoubleWriter   PUT_DOUBLE;
+    private static UnsafeFloatReader    GET_FLOAT;
+    private static UnsafeFloatWriter    PUT_FLOAT;
+    private static UnsafeByteReader     GET_BYTE;
+    private static UnsafeByteWriter     PUT_BYTE;
+    private static UnsafeShortReader    GET_SHORT;
+    private static UnsafeShortWriter    PUT_SHORT;
+    private static UnsafeCharReader     GET_CHAR;
+    private static UnsafeCharWriter     PUT_CHAR;
+    private static UnsafeObjectReader   GET_OBJECT;
+    private static UnsafeObjectWriter   PUT_OBJECT;
+    private static UnsafeOffsetResolver OFFSET_RESOLVER;
+    private static UnsafeAllocator      ALLOCATOR;
+
     static {
-        CodecStrategy selected = new ReflectionStrategy(); // Default to Safe Mode
+        Object u = null;
         try {
-            // Get the Bundle containing this Codec
-            Bundle  bundle       = FrameworkUtil.getBundle(BinaryCodec.class);
-            boolean canUseUnsafe = false;
+            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+            Field    f           = unsafeClass.getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            u = f.get(null);
 
-            if (bundle != null) {
-                // Inspect the Wiring (OSGi Capabilities)
-                BundleWiring wiring = bundle.adapt(BundleWiring.class);
-                if (wiring != null) {
-                    List<BundleWire> imports = wiring.getRequiredWires(BundleRevision.PACKAGE_NAMESPACE);
+            // Initialize Unsafe Lambdas
+            GET_INT         = createAccessor(lookup, unsafeClass, u, "getInt", UnsafeIntReader.class, int.class,
+                    Object.class, long.class);
+            PUT_INT         = createAccessor(lookup, unsafeClass, u, "putInt", UnsafeIntWriter.class, void.class,
+                    Object.class, long.class, int.class);
+            GET_LONG        = createAccessor(lookup, unsafeClass, u, "getLong", UnsafeLongReader.class, long.class,
+                    Object.class, long.class);
+            PUT_LONG        = createAccessor(lookup, unsafeClass, u, "putLong", UnsafeLongWriter.class, void.class,
+                    Object.class, long.class, long.class);
+            GET_BOOL        = createAccessor(lookup, unsafeClass, u, "getBoolean", UnsafeBooleanReader.class,
+                    boolean.class, Object.class, long.class);
+            PUT_BOOL        = createAccessor(lookup, unsafeClass, u, "putBoolean", UnsafeBooleanWriter.class,
+                    void.class, Object.class, long.class, boolean.class);
+            GET_DOUBLE      = createAccessor(lookup, unsafeClass, u, "getDouble", UnsafeDoubleReader.class,
+                    double.class, Object.class, long.class);
+            PUT_DOUBLE      = createAccessor(lookup, unsafeClass, u, "putDouble", UnsafeDoubleWriter.class, void.class,
+                    Object.class, long.class, double.class);
+            GET_FLOAT       = createAccessor(lookup, unsafeClass, u, "getFloat", UnsafeFloatReader.class, float.class,
+                    Object.class, long.class);
+            PUT_FLOAT       = createAccessor(lookup, unsafeClass, u, "putFloat", UnsafeFloatWriter.class, void.class,
+                    Object.class, long.class, float.class);
+            GET_BYTE        = createAccessor(lookup, unsafeClass, u, "getByte", UnsafeByteReader.class, byte.class,
+                    Object.class, long.class);
+            PUT_BYTE        = createAccessor(lookup, unsafeClass, u, "putByte", UnsafeByteWriter.class, void.class,
+                    Object.class, long.class, byte.class);
+            GET_SHORT       = createAccessor(lookup, unsafeClass, u, "getShort", UnsafeShortReader.class, short.class,
+                    Object.class, long.class);
+            PUT_SHORT       = createAccessor(lookup, unsafeClass, u, "putShort", UnsafeShortWriter.class, void.class,
+                    Object.class, long.class, short.class);
+            GET_CHAR        = createAccessor(lookup, unsafeClass, u, "getChar", UnsafeCharReader.class, char.class,
+                    Object.class, long.class);
+            PUT_CHAR        = createAccessor(lookup, unsafeClass, u, "putChar", UnsafeCharWriter.class, void.class,
+                    Object.class, long.class, char.class);
+            GET_OBJECT      = createAccessor(lookup, unsafeClass, u, "getObject", UnsafeObjectReader.class,
+                    Object.class, Object.class, long.class);
+            PUT_OBJECT      = createAccessor(lookup, unsafeClass, u, "putObject", UnsafeObjectWriter.class, void.class,
+                    Object.class, long.class, Object.class);
+            OFFSET_RESOLVER = createAccessor(lookup, unsafeClass, u, "objectFieldOffset", UnsafeOffsetResolver.class,
+                    long.class, Field.class);
+            ALLOCATOR       = createAccessor(lookup, unsafeClass, u, "allocateInstance", UnsafeAllocator.class,
+                    Object.class, Class.class);
 
-                    // Check if we are explicitly wired to 'sun.misc'
-                    // This avoids ClassLoader hacks and respects OSGi security
-                    canUseUnsafe = imports.stream().anyMatch(wire -> "sun.misc"
-                            .equals(wire.getCapability().getAttributes().get(BundleRevision.PACKAGE_NAMESPACE)));
-                }
-            } else {
-                // Fallback for Non-OSGi environments (e.g., Unit Tests)
-                try {
-                    Class.forName("sun.misc.Unsafe");
-                    canUseUnsafe = true;
-                } catch (Throwable ignore) {
-                }
-            }
-
-            if (canUseUnsafe) {
-                try {
-                    selected = new UnsafeStrategy();
-                } catch (Throwable t) {
-                    // Unsafe initialization failed (e.g. security restricted), fallback to reflection
-                    t.printStackTrace(); // Optional: log failure
-                }
-            }
         } catch (Throwable t) {
-            // Fallback to Reflection if anything fails
+            // Unsafe not available - Fallback to Standard Strategy
+            u = null;
         }
-        strategy = selected;
+        unsafe = u;
+    }
+
+    private static <T> T createAccessor(MethodHandles.Lookup lookup,
+                                        Class<?> unsafeClass,
+                                        Object unsafeInstance,
+                                        String methodName,
+                                        Class<T> interfaceType,
+                                        Class<?> returnType,
+                                        Class<?>... parameterTypes) throws Throwable {
+        MethodHandle handle              = lookup.findVirtual(unsafeClass, methodName,
+                MethodType.methodType(returnType, parameterTypes));
+        String       interfaceMethodName = "get";
+        if (methodName.startsWith("put"))
+            interfaceMethodName = "put";
+        if (methodName.equals("allocateInstance"))
+            interfaceMethodName = "allocate";
+        if (methodName.equals("objectFieldOffset"))
+            interfaceMethodName = "offset";
+
+        final String finalInterfaceMethodName = interfaceMethodName;
+
+        MethodType interfaceTypeMethod = Arrays.stream(interfaceType.getMethods())
+                .filter(m -> m.getName().equals(finalInterfaceMethodName)).findFirst()
+                .map(m -> MethodType.methodType(m.getReturnType(), m.getParameterTypes()))
+                .orElseThrow(() -> new IllegalArgumentException("Method " + finalInterfaceMethodName + " not found"));
+
+        CallSite site = LambdaMetafactory.metafactory(lookup, interfaceMethodName,
+                MethodType.methodType(interfaceType, unsafeClass), interfaceTypeMethod, handle, interfaceTypeMethod);
+        return (T) site.getTarget().invoke(unsafeInstance);
     }
 
     // Type Tags
     private static final byte NULL = 0, BOOL = 1, BYTE = 2, SHORT = 3, INT = 4, LONG = 5, FLOAT = 6, DOUBLE = 7,
             STRING = 8, LIST = 9, DTO = 10, ARRAY = 11, ENUM = 12, MAP = 13, CHAR = 14;
-
-    public boolean isUsingUnsafe() {
-        return strategy instanceof UnsafeStrategy;
-    }
 
     // --- ENCODER ---
 
@@ -117,10 +188,7 @@ public class BinaryCodec {
             out.writeByte(NULL);
             return;
         }
-
         Class<?> clz = obj.getClass();
-
-        // Primitive Handling (Standard Java Wrapper Types)
         if (clz == Integer.class) {
             out.writeByte(INT);
             out.writeInt((Integer) obj);
@@ -148,24 +216,16 @@ public class BinaryCodec {
         } else if (clz == Character.class) {
             out.writeByte(CHAR);
             out.writeChar((Character) obj);
-        }
-
-        // Enum Handling
-        else if (clz.isEnum()) {
+        } else if (clz.isEnum()) {
             out.writeByte(ENUM);
             out.writeUTF(((Enum<?>) obj).name());
-        }
-
-        // Collection Handling
-        else if (Collection.class.isAssignableFrom(clz)) {
+        } else if (Collection.class.isAssignableFrom(clz)) {
             out.writeByte(LIST);
             Collection<?> col = (Collection<?>) obj;
             out.writeInt(col.size());
             for (Object item : col)
                 encode(item, out);
-        }
-        // Map Handling
-        else if (Map.class.isAssignableFrom(clz)) {
+        } else if (Map.class.isAssignableFrom(clz)) {
             out.writeByte(MAP);
             Map<?, ?> map = (Map<?, ?>) obj;
             out.writeInt(map.size());
@@ -173,11 +233,8 @@ public class BinaryCodec {
                 encode(entry.getKey(), out);
                 encode(entry.getValue(), out);
             }
-        }
-        // Array Handling
-        else if (clz.isArray()) {
+        } else if (clz.isArray()) {
             if (clz.getComponentType() == byte.class) {
-                // Optimization for byte[] (Common in OSGi)
                 out.writeByte(ARRAY);
                 out.writeUTF("[B");
                 byte[] bytes = (byte[]) obj;
@@ -190,171 +247,207 @@ public class BinaryCodec {
                 for (int i = 0; i < len; i++)
                     encode(Array.get(obj, i), out);
             }
-        }
-        // DTO Handling
-        else {
+        } else {
+            // DTO or POJO
             out.writeByte(DTO);
             FieldAccessor[] accessors = getAccessors(clz);
-            for (FieldAccessor acc : accessors) {
+            for (FieldAccessor acc : accessors)
                 acc.encode(obj, out, this);
-            }
         }
     }
 
-    // --- DECODER ---
+    public <T> T decode(final byte[] data, final Class<T> type) {
+        if (data == null || data.length == 0)
+            return null;
+        try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(data))) {
+            return decode(in, type);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Object decode(DataInputStream in, Type type) throws Exception {
+    @SuppressWarnings({ "unchecked" })
+    public <T> T decode(final DataInputStream in, final Type type) throws Exception {
+        return (T) decodeObject(in, type);
+    }
+
+    private Object decodeObject(DataInputStream in, Type type) throws Exception {
         byte tag = in.readByte();
         if (tag == NULL)
             return null;
 
-        // Primitive/Basic Type Handling based on Class Type
-        if (type instanceof Class) {
-            Class<?> clz = (Class<?>) type;
-            if (clz == Boolean.class || clz == boolean.class)
-                return in.readBoolean();
-            if (clz == Integer.class || clz == int.class)
-                return in.readInt();
-            if (clz == String.class)
-                return in.readUTF();
-            if (clz == Long.class || clz == long.class)
-                return in.readLong();
-            if (clz == Double.class || clz == double.class)
-                return in.readDouble();
-            if (clz == Float.class || clz == float.class)
-                return in.readFloat();
-            if (clz == Byte.class || clz == byte.class)
-                return in.readByte();
-            if (clz == Short.class || clz == short.class)
-                return in.readShort();
-            if (clz == Character.class || clz == char.class)
-                return in.readChar();
-            if (clz.isEnum())
-                return Enum.valueOf((Class<Enum>) clz, in.readUTF());
-            if (clz.isArray() && tag == ARRAY) {
-                in.readUTF(); // Skip type identifier
+        Class<?> rawClass = (type instanceof Class) ? (Class<?>) type
+                : (Class<?>) ((ParameterizedType) type).getRawType();
+
+        switch (tag) {
+            case LIST: {
+                int          size     = in.readInt();
+                List<Object> list     = new ArrayList<>(size);
+                Type         compType = Object.class;
+                if (type instanceof ParameterizedType)
+                    compType = ((ParameterizedType) type).getActualTypeArguments()[0];
+                else if (rawClass.isArray())
+                    compType = rawClass.getComponentType();
+
+                for (int i = 0; i < size; i++)
+                    list.add(decode(in, compType));
+
+                if (rawClass.isArray()) {
+                    Object arr = Array.newInstance((Class<?>) compType, size);
+                    for (int i = 0; i < size; i++)
+                        Array.set(arr, i, list.get(i));
+                    return arr;
+                }
+                if (Set.class.isAssignableFrom(rawClass))
+                    return new LinkedHashSet<>(list);
+                return list;
+            }
+            case MAP: {
+                int                 size  = in.readInt();
+                Map<Object, Object> map   = new LinkedHashMap<>(size);
+                Type                kType = Object.class, vType = Object.class;
+                if (type instanceof ParameterizedType) {
+                    Type[] args = ((ParameterizedType) type).getActualTypeArguments();
+                    kType = args[0];
+                    vType = args[1];
+                }
+                for (int i = 0; i < size; i++)
+                    map.put(decode(in, kType), decode(in, vType));
+                return map;
+            }
+            case ARRAY: {
+                in.readUTF(); // Skip type signature
                 int    len  = in.readInt();
                 byte[] data = new byte[len];
                 in.readFully(data);
                 return data;
             }
+            case DTO: {
+                Object          instance  = getFactory(rawClass).get();
+                FieldAccessor[] accessors = getAccessors(rawClass);
+                for (FieldAccessor acc : accessors)
+                    acc.decode(instance, in, this);
+                return instance;
+            }
+            // Add other primitive cases handled by decodeObject if invoked with Object.class
+            case BOOL:
+                return in.readBoolean();
+            case INT:
+                return in.readInt();
+            case LONG:
+                return in.readLong();
+            case DOUBLE:
+                return in.readDouble();
+            case FLOAT:
+                return in.readFloat();
+            case BYTE:
+                return in.readByte();
+            case SHORT:
+                return in.readShort();
+            case CHAR:
+                return in.readChar();
+            case STRING:
+                return in.readUTF();
+            case ENUM:
+                return in.readUTF();
         }
-
-        // Untyped Object Handling (e.g. Map<String, Object>)
-        if (type == Object.class) {
-            switch (tag) {
-                case BOOL:
-                    return in.readBoolean();
-                case INT:
-                    return in.readInt();
-                case LONG:
-                    return in.readLong();
-                case DOUBLE:
-                    return in.readDouble();
-                case FLOAT:
-                    return in.readFloat();
-                case BYTE:
-                    return in.readByte();
-                case SHORT:
-                    return in.readShort();
-                case CHAR:
-                    return in.readChar();
-                case STRING:
-                    return in.readUTF();
-                case ENUM:
-                    return in.readUTF();
-                case LIST:
-                    type = List.class;
-                    break;
-                case MAP:
-                    type = Map.class;
-                    break;
-            }
-        }
-
-        // Collection Handling
-        if (tag == LIST) {
-            int          size = in.readInt();
-            List<Object> list = new ArrayList<>(size);
-
-            Type itemType = Object.class;
-            if (type instanceof ParameterizedType) {
-                itemType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            } else if (type instanceof Class && ((Class<?>) type).isArray()) {
-                itemType = ((Class<?>) type).getComponentType();
-            }
-
-            for (int i = 0; i < size; i++) {
-                list.add(decode(in, itemType));
-            }
-
-            // Array Conversion
-            if (type instanceof Class && ((Class<?>) type).isArray()) {
-                Class<?> compType = ((Class<?>) type).getComponentType();
-                Object   arr      = Array.newInstance(compType, size);
-                for (int i = 0; i < size; i++)
-                    Array.set(arr, i, list.get(i));
-                return arr;
-            }
-
-            // Set Conversion
-            Class<?> rawType = (type instanceof Class) ? (Class<?>) type
-                    : (type instanceof ParameterizedType) ? (Class<?>) ((ParameterizedType) type).getRawType() : null;
-            if (rawType != null && Set.class.isAssignableFrom(rawType)) {
-                return new LinkedHashSet<>(list);
-            }
-            return list;
-        }
-
-        // Map Handling
-        if (tag == MAP) {
-            int                 size    = in.readInt();
-            Map<Object, Object> map     = new LinkedHashMap<>(size);
-            Type                keyType = Object.class;
-            Type                valType = Object.class;
-            if (type instanceof ParameterizedType) {
-                Type[] args = ((ParameterizedType) type).getActualTypeArguments();
-                keyType = args[0];
-                valType = args[1];
-            }
-            for (int i = 0; i < size; i++) {
-                map.put(decode(in, keyType), decode(in, valType));
-            }
-            return map;
-        }
-
-        // DTO Handling
-        if (tag == DTO) {
-            Class<?>        clz       = (Class<?>) type;
-            Object          instance  = strategy.newInstance(clz);
-            FieldAccessor[] accessors = getAccessors(clz);
-            for (FieldAccessor acc : accessors) {
-                acc.decode(instance, in, this);
-            }
-            return instance;
-        }
-
         throw new IOException("Unknown tag: " + tag);
     }
 
     private FieldAccessor[] getAccessors(Class<?> clz) {
         return accessorCache.computeIfAbsent(clz, c -> {
-            return Arrays.stream(c.getFields()).filter(f -> !Modifier.isStatic(f.getModifiers()))
-                    .sorted(Comparator.comparing(Field::getName)).map(f -> strategy.createAccessor(f))
+            return Arrays.stream(c.getFields()) // Public fields only implies DTO contract is cleaner, but getFields()
+                                                // returns public.
+                    // Wait! Unsafe could read private fields.
+                    // If we use 'unsafe', we should prefer 'getDeclaredFields()', but standard 'getFields()' is
+                    // consistent for DTOs.
+                    // Let's stick to getFields() for now as user DTOs are likely public.
+                    // UPDATE: To mimic Unsafe strategy correctly, we should use getDeclaredFields() if unsafe is
+                    // present?
+                    // No, existing code used getFields() + accessible check logic implicitly or getFields().
+                    // Standard OSGi DTOs use public fields. Let's use getFields() to be safe and spec compliant.
+                    .filter(f -> !Modifier.isStatic(f.getModifiers())).sorted(Comparator.comparing(Field::getName))
+                    .map(f -> unsafe != null ? createUnsafeAccessor(f) : createStandardAccessor(f))
                     .toArray(FieldAccessor[]::new);
         });
     }
 
-    // ==================================================================================
-    // STRATEGY & ACCESSOR INTERFACES
-    // ==================================================================================
-
-    interface CodecStrategy {
-        Object newInstance(Class<?> clz) throws Exception;
-
-        FieldAccessor createAccessor(Field f);
+    private Supplier<?> getFactory(Class<?> clz) {
+        return factoryCache.computeIfAbsent(clz, c -> {
+            try {
+                if (unsafe != null) {
+                    return () -> ALLOCATOR.allocate(c);
+                } else {
+                    MethodHandle ctor = lookup.findConstructor(c, MethodType.methodType(void.class));
+                    CallSite     site = LambdaMetafactory.metafactory(lookup, "get",
+                            MethodType.methodType(Supplier.class), MethodType.methodType(Object.class), ctor,
+                            MethodType.methodType(Object.class));
+                    return (Supplier<?>) site.getTarget().invokeExact();
+                }
+            } catch (Throwable e) {
+                // If standard constructor missing, we can't do much in Standard mode.
+                throw new RuntimeException("Cannot create factory for " + c, e);
+            }
+        });
     }
+
+    // ===================================
+    // FACTORY METHODS
+    // ===================================
+
+    private FieldAccessor createUnsafeAccessor(Field f) {
+        long     offset = OFFSET_RESOLVER.offset(f);
+        Class<?> type   = f.getType();
+        if (type == int.class)
+            return new LambdaInt(offset);
+        if (type == boolean.class)
+            return new LambdaBoolean(offset);
+        if (type == long.class)
+            return new LambdaLong(offset);
+        if (type == double.class)
+            return new LambdaDouble(offset);
+        if (type == float.class)
+            return new LambdaFloat(offset);
+        if (type == byte.class)
+            return new LambdaByte(offset);
+        if (type == short.class)
+            return new LambdaShort(offset);
+        if (type == char.class)
+            return new LambdaChar(offset);
+        return new LambdaObject(offset, f.getGenericType());
+    }
+
+    private FieldAccessor createStandardAccessor(Field f) {
+        try {
+            MethodHandle get  = lookup.unreflectGetter(f);
+            MethodHandle set  = lookup.unreflectSetter(f);
+            Class<?>     type = f.getType();
+
+            if (type == int.class)
+                return new StandardInt(get, set);
+            if (type == boolean.class)
+                return new StandardBoolean(get, set);
+            if (type == long.class)
+                return new StandardLong(get, set);
+            if (type == double.class)
+                return new StandardDouble(get, set);
+            if (type == float.class)
+                return new StandardFloat(get, set);
+            if (type == byte.class)
+                return new StandardByte(get, set);
+            if (type == short.class)
+                return new StandardShort(get, set);
+            if (type == char.class)
+                return new StandardChar(get, set);
+            return new StandardObject(get, set, f.getGenericType());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to access field " + f.getName(), e);
+        }
+    }
+
+    // ===================================
+    // INTERFACES & CLASSES
+    // ===================================
 
     interface FieldAccessor {
         void encode(Object instance, DataOutputStream out, BinaryCodec codec) throws Exception;
@@ -362,457 +455,528 @@ public class BinaryCodec {
         void decode(Object instance, DataInputStream in, BinaryCodec codec) throws Exception;
     }
 
-    // ==================================================================================
-    // REFLECTION IMPLEMENTATION (SAFE FALLBACK)
-    // ==================================================================================
+    // --- UNSAFE IMPLEMENTATIONS (Lambda Wrappers) ---
 
-    static class ReflectionStrategy implements CodecStrategy {
-        @Override
-        public Object newInstance(Class<?> clz) throws Exception {
-            return clz.getDeclaredConstructor().newInstance();
-        }
-
-        @Override
-        public FieldAccessor createAccessor(Field f) {
-            return new ReflAccessor(f);
-        }
+    @FunctionalInterface
+    interface UnsafeIntReader {
+        int get(Object target, long offset);
     }
 
-    static class ReflAccessor implements FieldAccessor {
-        final Field    field;
-        final Class<?> type;
-
-        ReflAccessor(Field f) {
-            this.field = f;
-            this.type  = f.getType();
-        }
-
-        @Override
-        public void encode(Object instance, DataOutputStream out, BinaryCodec codec) throws Exception {
-            if (type == int.class) {
-                out.writeByte(INT);
-                out.writeInt(field.getInt(instance));
-            } else if (type == boolean.class) {
-                out.writeByte(BOOL);
-                out.writeBoolean(field.getBoolean(instance));
-            } else if (type == long.class) {
-                out.writeByte(LONG);
-                out.writeLong(field.getLong(instance));
-            } else if (type == String.class) {
-                out.writeByte(STRING);
-                out.writeUTF((String) field.get(instance));
-            } else {
-                codec.encode(field.get(instance), out);
-            }
-        }
-
-        @Override
-        public void decode(Object instance, DataInputStream in, BinaryCodec codec) throws Exception {
-            Object val = codec.decode(in, field.getGenericType());
-            field.set(instance, val);
-        }
+    @FunctionalInterface
+    interface UnsafeIntWriter {
+        void put(Object target, long offset, int value);
     }
 
-    // ==================================================================================
-    // REFLECTIVE UNSAFE IMPLEMENTATION (HIGH PERFORMANCE VIA METHODHANDLES)
-    // ==================================================================================
-
-    static class UnsafeStrategy implements CodecStrategy {
-        private final Object       unsafe;
-        private final MethodHandle allocateInstance;
-        private final MethodHandle objectFieldOffset;
-
-        private final MethodHandle getInt;
-        private final MethodHandle putInt;
-        private final MethodHandle getBoolean;
-        private final MethodHandle putBoolean;
-        private final MethodHandle getLong;
-        private final MethodHandle putLong;
-        private final MethodHandle getFloat;
-        private final MethodHandle putFloat;
-        private final MethodHandle getDouble;
-        private final MethodHandle putDouble;
-        private final MethodHandle getByte;
-        private final MethodHandle putByte;
-        private final MethodHandle getShort;
-        private final MethodHandle putShort;
-        private final MethodHandle getChar;
-        private final MethodHandle putChar;
-        private final MethodHandle getObject;
-        private final MethodHandle putObject;
-
-        UnsafeStrategy() throws Exception {
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field    f           = unsafeClass.getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            this.unsafe = f.get(null);
-
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-
-            this.allocateInstance  = lookup.unreflect(unsafeClass.getMethod("allocateInstance", Class.class));
-            this.objectFieldOffset = lookup.unreflect(unsafeClass.getMethod("objectFieldOffset", Field.class));
-
-            this.getInt     = lookup.unreflect(unsafeClass.getMethod("getInt", Object.class, long.class));
-            this.putInt     = lookup.unreflect(unsafeClass.getMethod("putInt", Object.class, long.class, int.class));
-            this.getBoolean = lookup.unreflect(unsafeClass.getMethod("getBoolean", Object.class, long.class));
-            this.putBoolean = lookup
-                    .unreflect(unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class));
-            this.getLong    = lookup.unreflect(unsafeClass.getMethod("getLong", Object.class, long.class));
-            this.putLong    = lookup.unreflect(unsafeClass.getMethod("putLong", Object.class, long.class, long.class));
-            this.getFloat   = lookup.unreflect(unsafeClass.getMethod("getFloat", Object.class, long.class));
-            this.putFloat   = lookup
-                    .unreflect(unsafeClass.getMethod("putFloat", Object.class, long.class, float.class));
-            this.getDouble  = lookup.unreflect(unsafeClass.getMethod("getDouble", Object.class, long.class));
-            this.putDouble  = lookup
-                    .unreflect(unsafeClass.getMethod("putDouble", Object.class, long.class, double.class));
-            this.getByte    = lookup.unreflect(unsafeClass.getMethod("getByte", Object.class, long.class));
-            this.putByte    = lookup.unreflect(unsafeClass.getMethod("putByte", Object.class, long.class, byte.class));
-            this.getShort   = lookup.unreflect(unsafeClass.getMethod("getShort", Object.class, long.class));
-            this.putShort   = lookup
-                    .unreflect(unsafeClass.getMethod("putShort", Object.class, long.class, short.class));
-            this.getChar    = lookup.unreflect(unsafeClass.getMethod("getChar", Object.class, long.class));
-            this.putChar    = lookup.unreflect(unsafeClass.getMethod("putChar", Object.class, long.class, char.class));
-            this.getObject  = lookup.unreflect(unsafeClass.getMethod("getObject", Object.class, long.class));
-            this.putObject  = lookup
-                    .unreflect(unsafeClass.getMethod("putObject", Object.class, long.class, Object.class));
-        }
-
-        @Override
-        public Object newInstance(Class<?> clz) throws Exception {
-            try {
-                return allocateInstance.invoke(unsafe, clz);
-            } catch (Throwable t) {
-                if (t instanceof Exception)
-                    throw (Exception) t;
-                throw new RuntimeException(t);
-            }
-        }
-
-        @Override
-        public FieldAccessor createAccessor(Field f) {
-            try {
-                long     offset = (long) objectFieldOffset.invoke(unsafe, f);
-                Class<?> type   = f.getType();
-
-                if (type == int.class)
-                    return new UnsafeInt(unsafe, offset, getInt, putInt);
-                if (type == boolean.class)
-                    return new UnsafeBoolean(unsafe, offset, getBoolean, putBoolean);
-                if (type == long.class)
-                    return new UnsafeLong(unsafe, offset, getLong, putLong);
-                if (type == double.class)
-                    return new UnsafeDouble(unsafe, offset, getDouble, putDouble);
-                if (type == float.class)
-                    return new UnsafeFloat(unsafe, offset, getFloat, putFloat);
-                if (type == byte.class)
-                    return new UnsafeByte(unsafe, offset, getByte, putByte);
-                if (type == short.class)
-                    return new UnsafeShort(unsafe, offset, getShort, putShort);
-                if (type == char.class)
-                    return new UnsafeChar(unsafe, offset, getChar, putChar);
-                return new UnsafeObject(unsafe, offset, f.getGenericType(), getObject, putObject);
-            } catch (Throwable t) {
-                throw new RuntimeException("Failed to create unsafe accessor for " + f, t);
-            }
-        }
+    @FunctionalInterface
+    interface UnsafeLongReader {
+        long get(Object target, long offset);
     }
 
-    static class UnsafeInt implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    @FunctionalInterface
+    interface UnsafeLongWriter {
+        void put(Object target, long offset, long value);
+    }
 
-        UnsafeInt(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+    @FunctionalInterface
+    interface UnsafeBooleanReader {
+        boolean get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeBooleanWriter {
+        void put(Object target, long offset, boolean value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeDoubleReader {
+        double get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeDoubleWriter {
+        void put(Object target, long offset, double value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeFloatReader {
+        float get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeFloatWriter {
+        void put(Object target, long offset, float value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeByteReader {
+        byte get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeByteWriter {
+        void put(Object target, long offset, byte value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeShortReader {
+        short get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeShortWriter {
+        void put(Object target, long offset, short value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeCharReader {
+        char get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeCharWriter {
+        void put(Object target, long offset, char value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeObjectReader {
+        Object get(Object target, long offset);
+    }
+
+    @FunctionalInterface
+    interface UnsafeObjectWriter {
+        void put(Object target, long offset, Object value);
+    }
+
+    @FunctionalInterface
+    interface UnsafeOffsetResolver {
+        long offset(Field f);
+    }
+
+    @FunctionalInterface
+    interface UnsafeAllocator {
+        Object allocate(Class<?> clz);
+    }
+
+    static class LambdaInt implements FieldAccessor {
+        final long offset;
+
+        LambdaInt(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(INT);
-            try {
-                out.writeInt((int) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeInt(GET_INT.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != INT)
-                throw new IOException("Exp INT");
-            try {
-                put.invoke(unsafe, i, offset, in.readInt());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_INT.put(i, offset, in.readInt());
         }
     }
 
-    static class UnsafeBoolean implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaBoolean implements FieldAccessor {
+        final long offset;
 
-        UnsafeBoolean(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaBoolean(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(BOOL);
-            try {
-                out.writeBoolean((boolean) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeBoolean(GET_BOOL.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != BOOL)
-                throw new IOException("Exp BOOL");
-            try {
-                put.invoke(unsafe, i, offset, in.readBoolean());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_BOOL.put(i, offset, in.readBoolean());
         }
     }
 
-    static class UnsafeLong implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaLong implements FieldAccessor {
+        final long offset;
 
-        UnsafeLong(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaLong(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(LONG);
-            try {
-                out.writeLong((long) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeLong(GET_LONG.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != LONG)
-                throw new IOException("Exp LONG");
-            try {
-                put.invoke(unsafe, i, offset, in.readLong());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_LONG.put(i, offset, in.readLong());
         }
     }
 
-    static class UnsafeDouble implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaDouble implements FieldAccessor {
+        final long offset;
 
-        UnsafeDouble(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaDouble(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(DOUBLE);
-            try {
-                out.writeDouble((double) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeDouble(GET_DOUBLE.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != DOUBLE)
-                throw new IOException("Exp DOUBLE");
-            try {
-                put.invoke(unsafe, i, offset, in.readDouble());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_DOUBLE.put(i, offset, in.readDouble());
         }
     }
 
-    static class UnsafeFloat implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaFloat implements FieldAccessor {
+        final long offset;
 
-        UnsafeFloat(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaFloat(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(FLOAT);
-            try {
-                out.writeFloat((float) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeFloat(GET_FLOAT.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != FLOAT)
-                throw new IOException("Exp FLOAT");
-            try {
-                put.invoke(unsafe, i, offset, in.readFloat());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_FLOAT.put(i, offset, in.readFloat());
         }
     }
 
-    static class UnsafeByte implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaByte implements FieldAccessor {
+        final long offset;
 
-        UnsafeByte(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaByte(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(BYTE);
-            try {
-                out.writeByte((byte) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeByte(GET_BYTE.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != BYTE)
-                throw new IOException("Exp BYTE");
-            try {
-                put.invoke(unsafe, i, offset, in.readByte());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_BYTE.put(i, offset, in.readByte());
         }
     }
 
-    static class UnsafeShort implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaShort implements FieldAccessor {
+        final long offset;
 
-        UnsafeShort(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaShort(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(SHORT);
-            try {
-                out.writeShort((short) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeShort(GET_SHORT.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             if (in.readByte() != SHORT)
-                throw new IOException("Exp SHORT");
-            try {
-                put.invoke(unsafe, i, offset, in.readShort());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+                throw new IOException();
+            PUT_SHORT.put(i, offset, in.readShort());
         }
     }
 
-    static class UnsafeChar implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaChar implements FieldAccessor {
+        final long offset;
 
-        UnsafeChar(Object u, long o, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaChar(long o) {
             offset = o;
-            get    = g;
-            put    = p;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             out.writeByte(CHAR);
-            try {
-                out.writeChar((char) get.invoke(unsafe, i, offset));
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
+            out.writeChar(GET_CHAR.get(i, offset));
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
-            if (in.readByte() == CHAR) {
-                try {
-                    put.invoke(unsafe, i, offset, in.readChar());
-                } catch (Throwable t) {
-                    throw new RuntimeException(t);
-                }
-            } else
-                throw new IOException("Exp CHAR");
+            if (in.readByte() != CHAR)
+                throw new IOException();
+            PUT_CHAR.put(i, offset, in.readChar());
         }
     }
 
-    static class UnsafeObject implements FieldAccessor {
-        final Object       unsafe;
-        final long         offset;
-        final Type         type;
-        final MethodHandle get;
-        final MethodHandle put;
+    static class LambdaObject implements FieldAccessor {
+        final long offset;
+        final Type type;
 
-        UnsafeObject(Object u, long o, Type t, MethodHandle g, MethodHandle p) {
-            unsafe = u;
+        LambdaObject(long o, Type t) {
             offset = o;
             type   = t;
-            get    = g;
-            put    = p;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            c.encode(GET_OBJECT.get(i, offset), out);
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            PUT_OBJECT.put(i, offset, c.decode(in, type));
+        }
+    }
+
+    // --- STANDARD IMPLEMENTATIONS (MethodHandle Invocations) ---
+
+    // Note: invokeExact throws Throwable. We wrap it in RuntimeException (or let Exception propagate if compatible).
+
+    static class StandardInt implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardInt(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
         }
 
         public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
             try {
-                c.encode(get.invoke(unsafe, i, offset), out);
+                out.writeByte(INT);
+                out.writeInt((int) get.invokeExact(i));
             } catch (Throwable t) {
-                if (t instanceof Exception)
-                    throw (Exception) t;
                 throw new RuntimeException(t);
             }
         }
 
         public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
             try {
-                put.invoke(unsafe, i, offset, c.decode(in, type));
+                if (in.readByte() != INT)
+                    throw new IOException();
+                set.invokeExact(i, in.readInt());
             } catch (Throwable t) {
-                if (t instanceof Exception)
-                    throw (Exception) t;
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardBoolean implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardBoolean(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(BOOL);
+                out.writeBoolean((boolean) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != BOOL)
+                    throw new IOException();
+                set.invokeExact(i, in.readBoolean());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardLong implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardLong(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(LONG);
+                out.writeLong((long) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != LONG)
+                    throw new IOException();
+                set.invokeExact(i, in.readLong());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardDouble implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardDouble(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(DOUBLE);
+                out.writeDouble((double) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != DOUBLE)
+                    throw new IOException();
+                set.invokeExact(i, in.readDouble());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardFloat implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardFloat(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(FLOAT);
+                out.writeFloat((float) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != FLOAT)
+                    throw new IOException();
+                set.invokeExact(i, in.readFloat());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardByte implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardByte(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(BYTE);
+                out.writeByte((byte) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != BYTE)
+                    throw new IOException();
+                set.invokeExact(i, in.readByte());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardShort implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardShort(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(SHORT);
+                out.writeShort((short) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != SHORT)
+                    throw new IOException();
+                set.invokeExact(i, in.readShort());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardChar implements FieldAccessor {
+        final MethodHandle get, set;
+
+        StandardChar(MethodHandle g, MethodHandle s) {
+            get = g;
+            set = s;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                out.writeByte(CHAR);
+                out.writeChar((char) get.invokeExact(i));
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                if (in.readByte() != CHAR)
+                    throw new IOException();
+                set.invokeExact(i, in.readChar());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+
+    static class StandardObject implements FieldAccessor {
+        final MethodHandle get, set;
+        final Type         type;
+
+        StandardObject(MethodHandle g, MethodHandle s, Type t) {
+            get  = g;
+            set  = s;
+            type = t;
+        }
+
+        public void encode(Object i, DataOutputStream out, BinaryCodec c) throws Exception {
+            try {
+                c.encode(get.invoke(i), out);
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+
+        public void decode(Object i, DataInputStream in, BinaryCodec c) throws Exception {
+            try {
+                set.invoke(i, c.decode(in, type));
+            } catch (Throwable t) {
                 throw new RuntimeException(t);
             }
         }
