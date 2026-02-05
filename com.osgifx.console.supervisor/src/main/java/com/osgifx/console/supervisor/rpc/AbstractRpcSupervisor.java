@@ -38,7 +38,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.condition.Condition;
@@ -229,7 +229,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
     }
 
     public static ExecutorService newFixedThreadPool(final String namingPattern) {
-        final var threadFactory = new Builder().namingPattern(namingPattern).daemon(true).build();
+        final var threadFactory = BasicThreadFactory.builder().namingPattern(namingPattern).daemon(true).build();
         final var executor      = new ThreadPoolExecutor(RPC_POOL_CORE_THREADS_SIZE, RPC_POOL_MAX_THREADS_SIZE,
                                                          RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS, SECONDS,
                                                          new LinkedBlockingQueue<>(), threadFactory);

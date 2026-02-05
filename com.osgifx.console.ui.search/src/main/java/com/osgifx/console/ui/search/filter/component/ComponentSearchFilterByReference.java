@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
@@ -41,7 +41,7 @@ public final class ComponentSearchFilterByReference implements SearchFilter {
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation) {
         return switch (searchOperation) {
             case EQUALS_TO -> component -> component.references.stream()
-                    .anyMatch(ref -> StringUtils.equalsIgnoreCase(ref.name, input.strip()));
+                    .anyMatch(ref -> Strings.CI.contains(ref.name, input.strip()));
             default -> throw new VerifyException("no matching case found");
         };
     }

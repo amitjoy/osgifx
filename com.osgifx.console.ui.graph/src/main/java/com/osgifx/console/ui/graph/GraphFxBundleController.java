@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
@@ -199,8 +199,8 @@ public final class GraphFxBundleController implements GraphController {
         if (filter == null || filter.isBlank()) {
             filteredBundlesList.setPredicate(Predicates.alwaysTrue());
         } else {
-            filteredBundlesList.setPredicate(s -> Stream.of(filter.split("\\|"))
-                    .anyMatch(e -> StringUtils.containsIgnoreCase(s.symbolicName, e)));
+            filteredBundlesList.setPredicate(
+                    s -> Stream.of(filter.split("\\|")).anyMatch(e -> Strings.CI.contains(s.symbolicName, e)));
         }
     }
 
