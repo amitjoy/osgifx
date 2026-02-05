@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
@@ -42,9 +42,9 @@ public final class ComponentSearchFilterByPID implements SearchFilter {
     public Predicate<XComponentDTO> predicate(final String input, final SearchOperation searchOperation) {
         return switch (searchOperation) {
             case EQUALS_TO -> component -> component.configurationPid.stream()
-                    .anyMatch(pid -> StringUtils.equalsIgnoreCase(pid, input.strip()));
+                    .anyMatch(pid -> Strings.CI.contains(pid, input.strip()));
             case CONTAINS -> component -> component.configurationPid.stream()
-                    .anyMatch(pid -> StringUtils.containsIgnoreCase(pid, input.strip()));
+                    .anyMatch(pid -> Strings.CI.contains(pid, input.strip()));
             default -> throw new VerifyException("no matching case found");
         };
     }

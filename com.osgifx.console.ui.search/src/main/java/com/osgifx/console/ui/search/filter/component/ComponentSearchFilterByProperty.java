@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
@@ -49,7 +49,7 @@ public final class ComponentSearchFilterByProperty implements SearchFilter {
             case EQUALS_TO -> component -> //
                 BiStream.from(component.properties) //
                         .anyMatch((k, v) -> //
-                StringUtils.equalsIgnoreCase(k, key) && StringUtils.equalsIgnoreCase(v, value));
+                Strings.CI.contains(k, key) && Strings.CI.contains(v, value));
             default -> throw new VerifyException("no matching case found");
         };
     }
