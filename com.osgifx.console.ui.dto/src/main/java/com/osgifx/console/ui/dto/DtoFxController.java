@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -115,8 +116,8 @@ public final class DtoFxController {
                     if (StringUtils.isBlank(itemText)) {
                         rootItem.setPredicate(null);
                     } else {
-                        rootItem.setPredicate(TreeItemPredicate
-                                .create(item -> StringUtils.containsIgnoreCase(item, itemText.strip())));
+                        rootItem.setPredicate(
+                                TreeItemPredicate.create(item -> Strings.CI.contains(item, itemText.strip())));
                     }
                 });
                 return null;

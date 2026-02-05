@@ -25,7 +25,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.time.DurationUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -63,7 +63,8 @@ public final class ExecutorProvider implements Executor {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 
         final var coreSize      = config.coreSize();
-        final var threadFactory = new Builder().namingPattern("fx-worker-%d").daemon(config.daemon()).build();
+        final var threadFactory = BasicThreadFactory.builder().namingPattern("fx-worker-%d").daemon(config.daemon())
+                .build();
 
         executor = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
         executor.setRemoveOnCancelPolicy(true);
