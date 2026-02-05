@@ -26,6 +26,7 @@ import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.helper.Reflect;
+import com.osgifx.console.agent.provider.BinaryLogBuffer;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -34,17 +35,31 @@ import jakarta.inject.Inject;
 
 public final class OSGiLogListener implements LogListener {
 
-    private final Supervisor                supervisor;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
+    private BinaryLogBuffer                 logBuffer;
+    private Supervisor                      supervisor;
 
     @Inject
-    public OSGiLogListener(final Supervisor supervisor, final BundleStartTimeCalculator bundleStartTimeCalculator) {
-        this.supervisor                = supervisor;
+    public OSGiLogListener(final BundleStartTimeCalculator bundleStartTimeCalculator) {
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
     }
 
+    public void setSupervisor(final Supervisor supervisor) {
+        this.supervisor = supervisor;
+    }
+
+    public void setLogBuffer(final BinaryLogBuffer logBuffer) {
+        this.logBuffer = logBuffer;
+    }
+
     @Override
+    @SuppressWarnings("deprecation")
     public void logged(final LogEntry entry) {
+        if (logBuffer != null) {
+            final String exception = entry.getException() == null ? null : Exceptions.toString(entry.getException());
+            logBuffer.write(entry.getTime(), entry.getBundle().getBundleId(), entry.getLevel(), entry.getMessage(),
+                    exception);
+        }
         if (supervisor != null) {
             final boolean isLoggingEnabled = Boolean.getBoolean(PROPERTY_ENABLE_LOGGING);
             if (isLoggingEnabled) {
