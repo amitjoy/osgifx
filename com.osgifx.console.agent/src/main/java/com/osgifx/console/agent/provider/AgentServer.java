@@ -169,10 +169,12 @@ public final class AgentServer implements Agent, Closeable {
     private RemoteRPC<Agent, Supervisor> remoteRPC;
     private final Map<String, String>    installed  = new HashMap<>();
     private Redirector                   redirector = new NullRedirector();
+    private final BinaryLogBuffer        logBuffer  = new BinaryLogBuffer();
 
     private ServiceTracker<Object, Object> logReaderTracker;
 
     private Closeable              osgiLogListenerCloser;
+    private OSGiLogListener        logListener;
     private ServiceRegistration<?> osgiEventListenerServiceReg;
 
     private final DI           di;
@@ -181,6 +183,22 @@ public final class AgentServer implements Agent, Closeable {
     public AgentServer(final DI di, final RpcType rpcType) {
         this.di      = di;
         this.rpcType = rpcType;
+
+        // Check for Auto-Start of Log Capture
+        if (Boolean.getBoolean(AGENT_AUTO_START_LOG_CAPTURE_KEY)) {
+            // Restore persistence
+            try {
+                if (getContext() != null) { // Might be null if DI not ready?
+                    // Actually BundleContext is needed for dataFile.
+                    // Assuming DI has it if Activator started us.
+                    logBuffer.fromDisk(getContext().getDataFile("osgifx_logs.bin"));
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+            // Register listener immediately
+            osgiLogListenerCloser = initOSGiLogging();
+        }
     }
 
     public BundleContext getContext() {
@@ -518,6 +536,10 @@ public final class AgentServer implements Agent, Closeable {
     public void close() throws IOException {
         try {
             cleanup();
+            // Snapshot logs to disk on close
+            if (getContext() != null) {
+                logBuffer.toDisk(getContext().getDataFile("osgifx_logs.bin"));
+            }
 
             if (logReaderTracker != null) {
                 logReaderTracker.close();
@@ -552,7 +574,22 @@ public final class AgentServer implements Agent, Closeable {
 
         // the following can only be initialized if and only if the RPC link is
         // established
-        osgiLogListenerCloser       = initOSGiLogging();
+
+        // If not already started by auto-start
+        if (osgiLogListenerCloser == null) {
+            // Try to restore logs from previous run (if not done in constructor)
+            try {
+                logBuffer.fromDisk(getContext().getDataFile("osgifx_logs.bin"));
+            } catch (Exception e) {
+                // Ignore if file doesn't exist or corrupted
+            }
+            osgiLogListenerCloser = initOSGiLogging();
+        }
+        // Update supervisor reference
+        if (logListener != null) {
+            logListener.setSupervisor(remoteRPC.getRemote());
+        }
+
         osgiEventListenerServiceReg = initOSGiEventing();
     }
 
@@ -1026,6 +1063,16 @@ public final class AgentServer implements Agent, Closeable {
         return null;
     }
 
+    @Override
+    public byte[] getLogSnapshot(int count) {
+        return logBuffer.getLogSnapshot(count);
+    }
+
+    @Override
+    public byte[] getLogSnapshot(long fromTime, long toTime) {
+        return logBuffer.getLogSnapshot(fromTime, toTime);
+    }
+
     private long getSystemUptime() {
         final boolean isJMXWired = di.getInstance(PackageWirings.class).isJmxWired();
         if (isJMXWired) {
@@ -1098,7 +1145,15 @@ public final class AgentServer implements Agent, Closeable {
     private Closeable initOSGiLogging() {
         final boolean isLogAvailable = di.getInstance(PackageWirings.class).isLogWired();
         if (isLogAvailable) {
-            return trackLogReader(di.getInstance(OSGiLogListener.class));
+            if (logListener == null) {
+                logListener = di.getInstance(OSGiLogListener.class);
+                logListener.setLogBuffer(logBuffer);
+            }
+            // If remote is already known (e.g. late start), set it
+            if (remote != null) {
+                logListener.setSupervisor(remote);
+            }
+            return trackLogReader(logListener);
         }
         logger.atWarn().msg(packageNotWired(LOG)).log();
         return null;

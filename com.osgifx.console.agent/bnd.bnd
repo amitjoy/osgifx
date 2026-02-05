@@ -21,6 +21,9 @@ javac.compliance      : ${javac.source}
                         org.osgi.service.messaging,\
                         org.osgi.util.pushstream,\
                         org.slf4j.api
+-testpath             : \
+                        osgi.enroute.hamcrest.wrapper,\
+                        osgi.enroute.junit.wrapper
 -privatepackage       : \
                         com.osgifx.console.agent.*,\
                         com.osgifx.console.supervisor
