@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
@@ -42,7 +42,7 @@ public final class BundleSearchFilterByUsedService implements SearchFilter {
         return switch (searchOperation) {
             case EQUALS_TO -> bundle -> {
                 final var usedServices = bundle.usedServices;
-                return usedServices.stream().anyMatch(s -> StringUtils.equalsIgnoreCase(s.objectClass, input.strip()));
+                return usedServices.stream().anyMatch(s -> Strings.CI.contains(s.objectClass, input.strip()));
             };
             default -> throw new VerifyException("no matching case found");
         };
