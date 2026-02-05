@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 
 import com.dlsc.formsfx.model.validators.CustomValidator;
@@ -40,7 +40,7 @@ public final class ServiceSearchFilterByRegisteringBundle implements SearchFilte
     @Override
     public Predicate<XServiceDTO> predicate(final String input, final SearchOperation searchOperation) {
         return switch (searchOperation) {
-            case EQUALS_TO -> service -> StringUtils.equalsIgnoreCase(service.registeringBundle, input.strip());
+            case EQUALS_TO -> service -> Strings.CI.contains(service.registeringBundle, input.strip());
             default -> throw new VerifyException("no matching case found");
         };
     }
