@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
@@ -183,8 +182,8 @@ public final class HealthCheckFxController {
         if (filter == null || filter.isBlank()) {
             filteredMetadataList.setPredicate(Predicates.alwaysTrue());
         } else {
-            filteredMetadataList.setPredicate(
-                    s -> Stream.of(filter.split("\\|")).anyMatch(e -> StringUtils.containsIgnoreCase(s, e)));
+            filteredMetadataList.setPredicate(s -> Stream.of(filter.split("\\|"))
+                    .anyMatch(e -> org.apache.commons.lang3.Strings.CI.contains(s, e)));
         }
     }
 
