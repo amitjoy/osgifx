@@ -118,6 +118,11 @@ public interface Agent {
     String AGENT_RPC_TRACE_LOG_KEY = "osgi.fx.agent.rpc.logs.enabled";
 
     /**
+     * The property key to enable auto-start of the log capture mechanism
+     */
+    String AGENT_AUTO_START_LOG_CAPTURE_KEY = "osgi.fx.agent.auto.start.log.capture";
+
+    /**
      * The port for attaching to a remote Gogo CommandSession
      */
     int COMMAND_SESSION = -1;
@@ -623,4 +628,21 @@ public interface Agent {
      * Performs a garbage collection
      */
     void gc() throws Exception;
+
+    /**
+     * Returns a binary snapshot of the last N logs.
+     *
+     * @param count number of logs (0 for all stored logs)
+     * @return the raw byte array containing the binary log entries
+     */
+    byte[] getLogSnapshot(int count);
+
+    /**
+     * Returns a binary snapshot of logs within the timeframe.
+     *
+     * @param fromTime start timestamp
+     * @param toTime end timestamp
+     * @return the raw byte array containing the binary log entries
+     */
+    byte[] getLogSnapshot(long fromTime, long toTime);
 }
