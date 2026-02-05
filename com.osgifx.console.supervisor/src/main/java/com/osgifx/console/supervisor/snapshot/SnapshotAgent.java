@@ -323,6 +323,16 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public byte[] getLogSnapshot(int count) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getLogSnapshot(long fromTime, long toTime) {
+        return new byte[0];
+    }
+
+    @Override
     public boolean isReceivingLogEnabled() {
         return false;
     }
