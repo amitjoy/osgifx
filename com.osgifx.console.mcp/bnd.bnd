@@ -1,0 +1,7 @@
+-buildpath          : \
+                      ${bundles.required},\
+                      com.google.gson,\
+                      io.fusionauth:java-http;packages=*,\
+                      org.osgi.util.converter
+-privatepackage     : com.osgifx.console.mcp.*
+-conditionalpackage : io.fusionauth*
