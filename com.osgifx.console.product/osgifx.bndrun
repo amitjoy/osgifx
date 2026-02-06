@@ -60,6 +60,8 @@ port                              :   1729
                                       bnd.identity;id='org.apache.sling.commons.log',\
                                       bnd.identity;id='org.apache.sling.commons.logservice',\
                                       \
+                                      bnd.identity;id='com.osgifx.console.mcp',\
+                                      \
                                       bnd.identity;id='com.osgifx.console.ui.bundles',\
                                       bnd.identity;id='com.osgifx.console.ui.batchinstall',\
                                       bnd.identity;id='com.osgifx.console.ui.search',\
@@ -123,6 +125,7 @@ install.order                     :   \
 	com.osgifx.console.data.provider;version=snapshot;startlevel=10,\
 	com.osgifx.console.executor;version=snapshot;startlevel=10,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=10,\
+	com.osgifx.console.mcp;version=snapshot;startlevel=10,\
 	com.osgifx.console.smartgraph;version=snapshot;startlevel=10,\
 	com.osgifx.console.supervisor;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.batchinstall;version=snapshot;startlevel=10,\
