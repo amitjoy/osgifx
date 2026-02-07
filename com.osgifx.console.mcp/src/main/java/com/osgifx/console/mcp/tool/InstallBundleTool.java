@@ -12,13 +12,12 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ *******************************************************************************/
 package com.osgifx.console.mcp.tool;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -33,8 +32,8 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
-public class GetRolesTool implements McpTool {
+@McpToolDef(name = "install_bundle", description = "Installs a bundle from a URL. Optional 'location' and 'startLevel'. Returns the Bundle ID.")
+public class InstallBundleTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -49,19 +48,28 @@ public class GetRolesTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder().build();
+        return McpToolSchema.builder().arg("url", "string", "The URL of the bundle to install")
+                .optionalArg("location", "string", "The location string for the bundle (optional)")
+                .optionalArg("startLevel", "integer", "The start level for the bundle (optional)").build();
     }
 
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing GetRolesTool");
+        logger.atInfo().log("Executing InstallBundleTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
-            return Collections.emptyList();
+            return "Agent is not connected";
         }
-        final var roles = agent.getAllRoles();
-        logger.atInfo().log("Retrieved roles: %s", roles.size());
-        return roles;
+
+        final var url      = (String) args.get("url");
+        final var location = (String) args.get("location"); // Can be null, agent accepts null
+
+        try {
+            final var bundleDTO = agent.installFromURL(location, url);
+            return "Bundle installed successfully. ID: " + bundleDTO.id + ", SymbolicName: " + bundleDTO.symbolicName;
+        } catch (Exception e) {
+            return "Error installing bundle from " + url + ": " + e.getMessage();
+        }
     }
 }

@@ -12,7 +12,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ *******************************************************************************/
 package com.osgifx.console.mcp.tool;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
@@ -33,8 +33,8 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
-public class GetRolesTool implements McpTool {
+@McpToolDef(name = "get_bundle_revisions", description = "Retrieves detailed revision info (Import/Export Packages, capabilities) for a bundle. Critical for debugging wiring issues.")
+public class GetBundleRevisionsTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -49,19 +49,27 @@ public class GetRolesTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder().build();
+        return McpToolSchema.builder()
+                .optionalArg("id", "integer", "The ID of the bundle (optional). If omitted, returns all revisions.")
+                .build();
     }
 
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing GetRolesTool");
+        logger.atInfo().log("Executing GetBundleRevisionsTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
             return Collections.emptyList();
         }
-        final var roles = agent.getAllRoles();
-        logger.atInfo().log("Retrieved roles: %s", roles.size());
-        return roles;
+
+        long[] ids = null;
+        if (args.containsKey("id")) {
+            ids = new long[] { ((Number) args.get("id")).longValue() };
+        } else {
+            ids = new long[0]; // Empty array to get all
+        }
+
+        return agent.getBundleRevisons(ids);
     }
 }

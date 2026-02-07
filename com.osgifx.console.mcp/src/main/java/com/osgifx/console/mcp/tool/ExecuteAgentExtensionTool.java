@@ -12,7 +12,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ *******************************************************************************/
 package com.osgifx.console.mcp.tool;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
@@ -33,8 +33,8 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
-public class GetRolesTool implements McpTool {
+@McpToolDef(name = "execute_agent_extension", description = "Executes a named Agent Extension with a context map. Allows triggering arbitrary custom logic.")
+public class ExecuteAgentExtensionTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -49,19 +49,23 @@ public class GetRolesTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder().build();
+        return McpToolSchema.builder().arg("name", "string", "The name of the extension to execute")
+                .optionalArg("context", "object", "The context map to pass to the extension").build();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing GetRolesTool");
+        logger.atInfo().log("Executing ExecuteAgentExtensionTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
-        final var roles = agent.getAllRoles();
-        logger.atInfo().log("Retrieved roles: %s", roles.size());
-        return roles;
+
+        final var name    = (String) args.get("name");
+        final var context = (Map<String, Object>) args.getOrDefault("context", Collections.emptyMap());
+
+        return agent.executeExtension(name, context);
     }
 }
