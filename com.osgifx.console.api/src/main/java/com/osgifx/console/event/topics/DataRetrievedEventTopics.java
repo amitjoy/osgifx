@@ -22,6 +22,7 @@ public final class DataRetrievedEventTopics {
     }
 
     public static final String DATA_RETRIEVED_EVENT_TOPIC_PREFIX    = "com/osgifx/data/retrieved/";
+    public static final String DATA_RETRIEVED_ANY_TOPIC             = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "*";
     public static final String DATA_RETRIEVED_ALL_TOPIC             = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "all";
     public static final String DATA_RETRIEVED_BUNDLES_TOPIC         = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "bundles";
     public static final String DATA_RETRIEVED_COMPONENTS_TOPIC      = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "components";
