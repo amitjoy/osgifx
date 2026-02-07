@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.overview;
 
-import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ANY_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAUSE;
@@ -624,11 +624,12 @@ public final class OverviewFxUI {
      */
     @Inject
     @Optional
-    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ALL_TOPIC) final String data,
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ANY_TOPIC) final String data,
                                             final BorderPane parent) {
         logger.atInfo().log("All data retrieved event received");
         updateStaticOverviewInfo();
         createUIComponents(parent);
+        retrieveRuntimeData();
     }
 
     private void initStatusBar(final BorderPane parent) {
@@ -640,7 +641,18 @@ public final class OverviewFxUI {
             statusBar.addToRight(timelineButton);
             statusBar.addToRight(new Separator(VERTICAL));
             statusBar.addToRight(refreshDelayDialog);
+            statusBar.addToRight(new Separator(VERTICAL));
+            final var refreshButton = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+            statusBar.addToRight(refreshButton);
         }
+    }
+
+    private void refreshData() {
+        dataProvider.retrieveInfo("bundles", true);
+        dataProvider.retrieveInfo("services", true);
+        dataProvider.retrieveInfo("components", true);
+        dataProvider.retrieveInfo("threads", true);
+        dataProvider.retrieveInfo("properties", true);
     }
 
     private void showViewRefreshDelayDialog() {
