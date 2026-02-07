@@ -83,7 +83,7 @@ public class McpServerProvider {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
         logger.atInfo().log("MCP server has been started successfully");
     }
-    
+
     @Deactivate
     void deactivate() {
         logger.atInfo().log("MCP server has been stopped successfully");

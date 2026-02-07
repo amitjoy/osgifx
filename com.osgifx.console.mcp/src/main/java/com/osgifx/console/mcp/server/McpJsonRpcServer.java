@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.google.gson.Gson;
@@ -42,12 +43,17 @@ public class McpJsonRpcServer {
 
     private final Gson                          gson;
     private final Map<String, ToolRegistration> tools = new ConcurrentHashMap<>();
+    private Consumer<String>                    notificationSender;
 
     // MCP Spec Version
     private static final String LATEST_PROTOCOL_VERSION = "2024-11-05";
 
     public McpJsonRpcServer(final Gson gson) {
         this.gson = gson;
+    }
+
+    public void setNotificationSender(final Consumer<String> notificationSender) {
+        this.notificationSender = notificationSender;
     }
 
     // --- API ---
@@ -65,10 +71,20 @@ public class McpJsonRpcServer {
                              final Map<String, Object> inputSchema,
                              final Function<Map<String, Object>, Object> handler) {
         tools.put(name, new ToolRegistration(name, description, inputSchema, handler));
+        notifyToolsListChanged();
     }
 
     public void removeTool(final String name) {
         tools.remove(name);
+        notifyToolsListChanged();
+    }
+
+    private void notifyToolsListChanged() {
+        if (notificationSender != null) {
+            // Notification: { "jsonrpc": "2.0", "method": "notifications/tools/list_changed" }
+            final String notification = "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/tools/list_changed\"}";
+            notificationSender.accept(notification);
+        }
     }
 
     /**
