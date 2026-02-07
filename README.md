@@ -12,87 +12,115 @@
   <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="100" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
   </p>
 
-<img src="screenshots/1.png" />
-<img src="screenshots/2.png" />
-<img src="screenshots/3.png" />
-<img src="screenshots/4.png" />
-<img src="screenshots/5.png" />
-<img src="screenshots/6.png" />
+### ❓ Why OSGi.fx?
+
+**OSGi.fx** is the ultimate remote management tool for your OSGi frameworks. Unlike legacy consoles, it offers a **modern, responsive JavaFX interface** that gives you:
+*   **🚀 Deep Insights:** Visualize bundles, services, users, and components instantly.
+*   **⚡ Real-time Monitoring:** Track threads, heap usage, and logs live.
+*   **�️ Visual Dependencies:** Explore complex relationships with interactive graphs.
+*   **✨ Ease of Use:** Drag-and-drop installs, smart auto-complete, and valid configuration editing.
 
 ------------------------------------------------------------------------------------------------------------
 
-### Tools and Technologies
-
-|                      	|                                             	    |
-|----------------------	|---------------------------------------------	    |
-| Java (Application)    | 21                                         	    |
-| Java (Agent)          | 1.8                                         	    |
-| Rich Client Platform 	| JavaFX 21                                    	    |
-| Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
-| UI Libraries         	| ControlsFX, TilesFX, FormsFX                       |
-| Tools                	| Bndtools 7.0.0                                     |
-
-------------------------------------------------------------------------------------------------------------
-
-### Latest Version
-
-The latest released version: 2.4.4 (Check [Project Website](http://osgifx.com) to download)
+### �📸 Gallery
+<div align="center">
+  <img src="screenshots/1.png" width="45%" />
+  <img src="screenshots/2.png" width="45%" />
+  <img src="screenshots/3.png" width="45%" />
+  <img src="screenshots/4.png" width="45%" />
+  <img src="screenshots/5.png" width="45%" />
+  <img src="screenshots/6.png" width="45%" />
+</div>
 
 ------------------------------------------------------------------------------------------------------------
 
-### Features
+### 🛠️ Tech Stack
 
-|                                                                                                                                                                           |     |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |:-:  |
-| List all installed bundles and fragments                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all exported and imported packages                                                                                                                                         |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all registered services                                                                                                                                                      |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all registered DS components                                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all available system and framework properties                                                                                                                                |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all daemon and non-daemon threads                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Send synchronous or asynchronous events on demand                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Receive events on demand (option to start and stop receiving events)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Receive logs on demand (option to start and stop receiving logs)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Manage R7 Logger Configurations                                                                                   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Execute Gogo command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Execute CLI command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Install or update bundles                                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List available configurations from `ConfigurationAdmin`                                                                                                                             |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List `Metatype` property descriptors                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Start/stop/uninstall bundle or fragment                                                                                                                                           |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Enable/disable DS component                                                                                                                                                       |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Update/delete existing configuration                                                                                                                                               |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Create new configuration using metatype descriptor                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Overview of the remote OSGi framework (memory consumption, uptime, framework information, number of bundles, number of threads, number of services and number of DS components)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Generate dependency graph for bundles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Generate dependency graph for DS components   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Find all cycles between available DS components   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Export generated dependency graph to DOT (GraphViz) format (Right click on generated graph) |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Open Diagnostics (Show application log file)  |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Show suspicious classloader leaks 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Show HTTP runtime components (Servlets, Listeners, Filters, Resources and Error Pages) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install extension (plugin)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List and uninstall already installed extension(s)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Generate OBR XML   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Device Management Tree (DMT) Traversal and Update   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Manage User Admin roles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Execute Felix Healthchecks   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Capture/Read Snapshot   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Display OSGi Runtime DTOs   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Advanced Search   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+| Component | Technology |
+| :--- | :--- |
+| **☕ Java (Application)** | 21 |
+| **☕ Java (Agent)** | 1.8 |
+| **🖥️ Rich Client Platform** | JavaFX 21 |
+| **⚙️ Runtime (Application)** | OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse |
+| **⚙️ Runtime (Agent)** | OSGi R6 |
+| **🎨 UI Libraries** | ControlsFX, TilesFX, FormsFX |
+| **🛠️ Software Tools** | Bndtools 7.2.1 |
+
+------------------------------------------------------------------------------------------------------------
+
+### 🚀 Getting Started
+
+The latest released version is **2.4.4**.
+
+#### 📥 Download & Install
+Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
+
+For detailed instructions, please refer to the **User Guide** on the website.
+
+------------------------------------------------------------------------------------------------------------
+
+### ✨ Features
+
+| Feature | Version | Implemented | Released |
+| :--- | :---: | :---: | :---: |
+| **📦 Bundle Inventory** <br> _View all installed bundles and fragments_ | 2.4.4 | ✅ | 🚀 |
+| **📦 Package Insights** <br> _Explore exported and imported packages_ | 2.4.4 | ✅ | 🚀 |
+| **🛠️ Service Registry** <br> _Inspect all registered OSGi services_ | 2.4.4 | ✅ | 🚀 |
+| **🧩 Component Viewer** <br> _Visualize declarative services (DS) components_ | 2.4.4 | ✅ | 🚀 |
+| **⚙️ System Properties** <br> _Access robust system and framework properties_ | 2.4.4 | ✅ | 🚀 |
+| **🧵 Thread Monitor** <br> _Track daemon and non-daemon threads_ | 2.4.4 | ✅ | 🚀 |
+| **📢 Event Emitter** <br> _Dispatch synchronous or asynchronous events_ | 2.4.4 | ✅ | 🚀 |
+| **👂 Event Listener** <br> _Subscribe to OSGi events in real-time_ | 2.4.4 | ✅ | 🚀 |
+| **📝 Log Stream** <br> _Live streaming of OSGi logs_ | 2.4.4 | ✅ | 🚀 |
+| **logger R7 Logger Config** <br> _Manage OSGi R7 logger levels and configurations_ | 2.4.4 | ✅ | 🚀 |
+| **🐚 Gogo Shell** <br> _Execute Gogo commands remotely_ | 2.4.4 | ✅ | 🚀 |
+| **💻 CLI Executor** <br> _Run system CLI commands directly_ | 2.4.4 | ✅ | 🚀 |
+| **✨ Smart Auto-Complete** <br> _Intelligent suggestion for remote Gogo commands_ | 2.4.4 | ✅ | 🚀 |
+| **📥 Bundle Manager** <br> _Install, update, starting and stopping bundles_ | 2.4.4 | ✅ | 🚀 |
+| **🖱️ Drag & Drop Install** <br> _Effortless bundle installation via drag-and-drop_ | 2.4.4 | ✅ | 🚀 |
+| **🔧 Config Admin** <br> _Manage configurations via `ConfigurationAdmin`_ | 2.4.4 | ✅ | 🚀 |
+| **📋 Metatype Inspector** <br> _Browse OCDs and property descriptors_ | 2.4.4 | ✅ | 🚀 |
+| **⏯️ Bundle Lifecycle** <br> _Start, stop, and uninstall bundles/fragments_ | 2.4.4 | ✅ | 🚀 |
+| **⚡ Component Control** <br> _Enable or disable DS components on the fly_ | 2.4.4 | ✅ | 🚀 |
+| **✏️ Config Editor** <br> _Create, update, and delete configurations_ | 2.4.4 | ✅ | 🚀 |
+| **🏗️ Config Factory** <br> _Instantiate new configurations from factory PIDs_ | 2.4.4 | ✅ | 🚀 |
+| **📊 Runtime Dashboard** <br> _Overview of memory, uptime, bundles, threads, and services_ | 2.4.4 | ✅ | 🚀 |
+| **🕸️ Bundle Graph** <br> _Visualize bundle dependencies interactively_ | 2.4.4 | ✅ | 🚀 |
+| **🔗 Component Graph** <br> _Visualize DS component references and dependencies_ | 2.4.4 | ✅ | 🚀 |
+| **🔄 Cycle Detector** <br> _Identify circular dependencies in DS components_ | 2.4.4 | ✅ | 🚀 |
+| **📤 Graph Export** <br> _Export dependency graphs to DOT (GraphViz) format_ | 2.4.4 | ✅ | 🚀 |
+| **📂 Log Viewer** <br> _Access and analyze application log files_ | 2.4.4 | ✅ | 🚀 |
+| **🕵️ Leak Detector** <br> _Identify suspicious classloader leaks_ | 2.4.4 | ✅ | 🚀 |
+| **🌐 HTTP Runtime** <br> _Inspect Servlets, Filters, and Resources_ | 2.4.4 | ✅ | 🚀 |
+| **📈 Heap Monitor** <br> _Real-time heap usage and GC tracking_ | 2.4.4 | ✅ | 🚀 |
+| **🔌 Extension Manager** <br> _Install and manage external plugins_ | 2.4.4 | ✅ | 🚀 |
+| **🗑️ Extension Uninstaller** <br> _Remove installed extensions easily_ | 2.4.4 | ✅ | 🚀 |
+| **📜 OBR Generator** <br> _Generate OBR XML repositories_ | 2.4.4 | ✅ | 🚀 |
+| **🌲 DMT Explorer** <br> _Traverse and update the Device Management Tree_ | 2.4.4 | ✅ | 🚀 |
+| **👥 User Admin** <br> _Manage roles, users, and groups_ | 2.4.4 | ✅ | 🚀 |
+| **❤️ Health Checks** <br> _Execute and monitor Felix Health Checks_ | 2.4.4 | ✅ | 🚀 |
+| **📸 Snapshot** <br> _Capture and analyze runtime state snapshots_ | 2.4.4 | ✅ | 🚀 |
+| **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
+| **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
+| **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents_ | 2.4.5 | ✅ | 🚧 |
+| **👻 Headless Launch** <br> _Start application without UI via configuration file_ | 2.4.5 | ✅ | 🚧 |
 
 --------------------------------------------------------------------------------------------------------------
 
-### Developer
+### 💡 Troubleshooting & Tips
+
+*   **👻 Headless Mode:** Starting from 2.4.5, need to connect without the UI? Use the `-Dosgifx.config=/path/to/config.json` system property to launch OSGi.fx with a pre-defined connection.
+*   **🤖 AI Assistance:** OSGi.fx 2.4.5 supports the **Model Context Protocol (MCP)**, allowing AI agents to connect to and debug your OSGi runtime directly!
+
+--------------------------------------------------------------------------------------------------------------
+
+### 👨‍💻 Maintainer
 
 Amit Kumar Mondal (admin@amitinside.com)
 
 --------------------------------------------------------------------------------------------------------------
 
-### Contribution [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
+### 🤝 Contributing [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
 
 Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/main/CONTRIBUTING.md)
 
@@ -102,12 +130,10 @@ Want to contribute? Great! Check out [Contribution Guide](https://github.com/ami
 
 --------------------------------------------------------------------------------------------------------------
 
-### License
+### 📄 License
 
 This project is licensed under Apache License Version 2.0 [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 --------------------------------------------------------------------------------------------------------------
 
-### User Guide
 
-For instructions on how to download and install latest version, please refer to the [Project Website](http://osgifx.com).
