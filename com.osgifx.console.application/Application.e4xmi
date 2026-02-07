@@ -82,4 +82,5 @@
   <addons xmi:id="_KtoIsMq7Eey474eteoLOGg" elementId="com.osgifx.console.application.addon.agentconnected" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.addon.AgentConnectedAddon"/>
   <addons xmi:id="_i3pw8GCeEe2X6eso_goi0A" elementId="com.osgifx.console.application.addon.lifecycle" contributionURI="bundleclass://org.eclipse.fx.ui.workbench.services/org.eclipse.fx.ui.workbench.services.lifecycle.LifecycleAddon"/>
   <addons xmi:id="_qlcEAGoKEe21Cs8uJesKFQ" elementId="com.osgifx.console.application.addon.window.resize.disabler" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.addon.WindowResizeDisablerAddon"/>
+  <addons xmi:id="_newHeadlessLaunchAddonId" elementId="com.osgifx.console.application.addon.headless" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.addon.HeadlessLaunchAddon"/>
 </application:Application>
