@@ -139,7 +139,7 @@ public class McpJsonRpcServer {
                 "resources", Map.of("listChanged", false), "prompts", Map.of("listChanged", false));
 
         final var result = Map.of("protocolVersion", LATEST_PROTOCOL_VERSION, "capabilities", capabilities,
-                "serverInfo", Map.of("name", "osgifx", "version", "1.0.0"));
+                "serverInfo", Map.of("name", "OSGi.fx", "version", "1.0.0"));
         return success(req.id, result);
     }
 
@@ -165,7 +165,7 @@ public class McpJsonRpcServer {
             final Object result = tool.handler.apply(args);
 
             // MCP requires 'content' list format
-            final String text = result instanceof String ? (String) result : gson.toJson(result);
+            final String text = result instanceof String string ? string : gson.toJson(result);
 
             return success(req.id, Map.of("content", List.of(Map.of("type", "text", "text", text)), "isError", false));
         } catch (final Exception e) {

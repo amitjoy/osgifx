@@ -33,7 +33,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_services", description = "Returns the detailed information of all services")
+@McpToolDef(name = "list_services", description = "Lists all registered OSGi services with their properties and providing bundles. Use this to debug service availability or dependency issues.")
 public class GetServicesTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)

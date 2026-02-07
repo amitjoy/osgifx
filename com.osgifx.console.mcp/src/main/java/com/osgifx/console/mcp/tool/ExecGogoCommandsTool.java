@@ -33,9 +33,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_exec_gogo_commands", description = "Executes a Gogo shell command. "
-        + "Use this for diagnostics (e.g., 'scr:info', 'inspect'). "
-        + "WARNING: Do not use for system state changes (stop/update) unless explicitly asked.")
+@McpToolDef(name = "run_gogo_command", description = "Executes a raw Gogo shell command. STRICTLY RESERVED for advanced diagnostics or when no specific tool exists. State-changing commands are blocked.")
 public class ExecGogoCommandsTool implements McpTool {
 
     // Blacklist dangerous commands to prevent accidental suicide

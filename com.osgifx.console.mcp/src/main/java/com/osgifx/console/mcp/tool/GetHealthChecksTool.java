@@ -33,7 +33,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_health_checks", description = "Returns the existing Felix healthchecks")
+@McpToolDef(name = "list_health_checks", description = "Lists the status of all registered Health Checks (Felix HC). Does not execute them, only lists known checks.")
 public class GetHealthChecksTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)

@@ -32,7 +32,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_runtime_info", description = "Returns the runtime DTOs")
+@McpToolDef(name = "get_framework_info", description = "Retrieves the full OSGi Core Framework DTO, providing a hierarchical view of the system state (bundles, services, wiring).")
 public class GetRuntimeInfoTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
