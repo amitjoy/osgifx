@@ -33,7 +33,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_configurations", description = "Returns the detailed information of all the configurations")
+@McpToolDef(name = "list_configurations", description = "Lists all OSGi configurations and their properties. Use this to inspect runtime configuration values for services. NOTE: These are different from Java System Properties.")
 public class GetConfigurationsTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
