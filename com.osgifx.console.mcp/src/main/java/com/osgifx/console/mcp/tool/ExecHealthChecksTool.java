@@ -34,7 +34,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_exec_health_checks", description = "Executes the specified healthchecks")
+@McpToolDef(name = "run_health_checks", description = "Runs system health checks. Accepts optional 'tags' or 'names' to filter execution; otherwise runs all checks.")
 public class ExecHealthChecksTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
@@ -51,8 +51,8 @@ public class ExecHealthChecksTool implements McpTool {
     @Override
     public Map<String, Object> inputSchema() {
         return McpToolSchema.builder()
-                .arg("tags", "array", "The tags to execute")
-                .arg("names", "array", "The names to execute")
+                .optionalArgArray("tags", "string", "The tags to execute")
+                .optionalArgArray("names", "string", "The names to execute")
                 .build();
     }
 
@@ -65,8 +65,15 @@ public class ExecHealthChecksTool implements McpTool {
             logger.atWarning().log("Agent is not connected");
             return Collections.emptyList();
         }
-        final var tags  = (List<String>) args.get("tags");
-        final var names = (List<String>) args.get("names");
+        var tags  = (List<String>) args.get("tags");
+        var names = (List<String>) args.get("names");
+
+        if (tags == null) {
+            tags = Collections.emptyList();
+        }
+        if (names == null) {
+            names = Collections.emptyList();
+        }
 
         final var results = agent.executeHealthChecks(tags, names);
         logger.atInfo().log("Executed health checks. Results: %s", results.size());

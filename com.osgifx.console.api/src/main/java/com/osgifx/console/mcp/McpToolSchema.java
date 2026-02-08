@@ -52,7 +52,7 @@ public class McpToolSchema {
      * @return this builder instance
      */
     public McpToolSchema arg(final String name, final String type, final String description) {
-        final var prop = new HashMap<String, String>();
+        final var prop = new HashMap<String, Object>();
         prop.put("type", type);
         prop.put("description", description);
         properties.put(name, prop);
@@ -69,8 +69,43 @@ public class McpToolSchema {
      * @return this builder instance
      */
     public McpToolSchema optionalArg(final String name, final String type, final String description) {
-        final var prop = new HashMap<String, String>();
+        final var prop = new HashMap<String, Object>();
         prop.put("type", type);
+        prop.put("description", description);
+        properties.put(name, prop);
+        return this;
+    }
+
+    /**
+     * Adds a required array argument to the schema.
+     *
+     * @param name The name of the argument.
+     * @param itemType The JSON type of the array items.
+     * @param description A clear description of the argument.
+     * @return this builder instance
+     */
+    public McpToolSchema argArray(final String name, final String itemType, final String description) {
+        final var prop = new HashMap<String, Object>();
+        prop.put("type", "array");
+        prop.put("items", Map.of("type", itemType));
+        prop.put("description", description);
+        properties.put(name, prop);
+        required.add(name);
+        return this;
+    }
+
+    /**
+     * Adds an optional array argument to the schema.
+     *
+     * @param name The name of the argument.
+     * @param itemType The JSON type of the array items.
+     * @param description A clear description of the argument.
+     * @return this builder instance
+     */
+    public McpToolSchema optionalArgArray(final String name, final String itemType, final String description) {
+        final var prop = new HashMap<String, Object>();
+        prop.put("type", "array");
+        prop.put("items", Map.of("type", itemType));
         prop.put("description", description);
         properties.put(name, prop);
         return this;

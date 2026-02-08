@@ -17,6 +17,7 @@ package com.osgifx.console.mcp.server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -139,7 +140,7 @@ public class McpJsonRpcServer {
                 "resources", Map.of("listChanged", false), "prompts", Map.of("listChanged", false));
 
         final var result = Map.of("protocolVersion", LATEST_PROTOCOL_VERSION, "capabilities", capabilities,
-                "serverInfo", Map.of("name", "osgifx", "version", "1.0.0"));
+                "serverInfo", Map.of("name", "OSGi.fx", "version", "1.0.0"));
         return success(req.id, result);
     }
 
@@ -164,8 +165,14 @@ public class McpJsonRpcServer {
         try {
             final Object result = tool.handler.apply(args);
 
-            // MCP requires 'content' list format
-            final String text = result instanceof String ? (String) result : gson.toJson(result);
+            String text;
+            if (result instanceof String string) {
+                text = string;
+            } else if (result instanceof byte[] bytes) {
+                text = Base64.getEncoder().encodeToString(bytes);
+            } else {
+                text = gson.toJson(result);
+            }
 
             return success(req.id, Map.of("content", List.of(Map.of("type", "text", "text", text)), "isError", false));
         } catch (final Exception e) {
