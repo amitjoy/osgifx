@@ -33,10 +33,26 @@
 	"license": "Apache License, Version 2.0",
 	"name": "osgifx",
 	"files": [
-		"jdeploy-bundle"
+		"jdeploy-bundle",
+		"com.osgifx.console.dist/uberjar"
 	],
+	"keywords": [
+		"osgi",
+		"osgi-framework",
+		"remote-management",
+		"javafx",
+		"felix",
+		"equinox"
+	],
+	"bugs": {
+		"url": "https://github.com/amitjoy/osgifx/issues"
+	},
+	"funding": {
+		"type": "github",
+		"url": "https://github.com/sponsors/amitjoy"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"homepage": "http://osgifx.com"
+	"homepage": "https://osgifx.com"
 }
