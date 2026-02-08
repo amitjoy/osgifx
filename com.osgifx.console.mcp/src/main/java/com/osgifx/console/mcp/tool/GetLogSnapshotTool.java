@@ -32,7 +32,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "fetch_log_snapshot", description = "Retrieves system logs. Provide 'fromTime' and 'toTime' (timestamps) for a specific range, OR 'count' for the last N logs. Time range takes precedence.")
+@McpToolDef(name = "fetch_log_snapshot", description = "Retrieves system logs as a Base64 encoded string. Provide 'fromTime' and 'toTime' (timestamps) for a specific range, OR 'count' for the last N logs. Time range takes precedence.")
 public class GetLogSnapshotTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
