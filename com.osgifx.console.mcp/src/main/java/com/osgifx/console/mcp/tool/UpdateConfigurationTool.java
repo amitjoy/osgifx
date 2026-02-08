@@ -12,13 +12,12 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ *******************************************************************************/
 package com.osgifx.console.mcp.tool;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -27,14 +26,15 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.mcp.McpTool;
 import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
-public class GetRolesTool implements McpTool {
+@McpToolDef(name = "update_configuration", description = "Updates or creates an OSGi configuration. Requires 'pid' and 'properties' map.")
+public class UpdateConfigurationTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -49,19 +49,29 @@ public class GetRolesTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder().build();
+        return McpToolSchema.builder().arg("pid", "string", "The configuration PID")
+                .arg("properties", "object", "Map of properties to update").build();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing GetRolesTool");
+        logger.atInfo().log("Executing UpdateConfigurationTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
-            return Collections.emptyList();
+            return "Agent is not connected";
         }
-        final var roles = agent.getAllRoles();
-        logger.atInfo().log("Retrieved roles: %s", roles.size());
-        return roles;
+
+        final var pid        = (String) args.get("pid");
+        final var properties = (Map<String, Object>) args.get("properties");
+
+        final var result  = agent.createOrUpdateConfigurations(Map.of(pid, properties));
+        final var xResult = result.get(pid);
+
+        if (xResult != null && xResult.result == XResultDTO.ERROR) {
+            return "Error updating configuration '" + pid + "': " + xResult.response;
+        }
+        return "Configuration '" + pid + "' updated successfully";
     }
 }

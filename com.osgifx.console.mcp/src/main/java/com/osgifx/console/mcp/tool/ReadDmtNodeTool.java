@@ -32,7 +32,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_read_dmt_node", description = "Returns all the children of the specified DMT node URI")
+@McpToolDef(name = "read_dmt_node", description = "Reads the value and metadata of a specific node in the Device Management Tree (DMT).")
 public class ReadDmtNodeTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
@@ -48,8 +48,7 @@ public class ReadDmtNodeTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder()
-                .arg("rootURI", "string", "The root URI for which the children will be returned")
+        return McpToolSchema.builder().arg("rootURI", "string", "The root URI for which the children will be returned")
                 .build();
     }
 

@@ -32,7 +32,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_log_snapshot", description = "Returns a binary snapshot of the last N logs.")
+@McpToolDef(name = "fetch_log_snapshot", description = "Retrieves system logs as a Base64 encoded string. Provide 'fromTime' and 'toTime' (timestamps) for a specific range, OR 'count' for the last N logs. Time range takes precedence.")
 public class GetLogSnapshotTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
@@ -65,9 +65,9 @@ public class GetLogSnapshotTool implements McpTool {
         final var fromTimeObj = args.get("fromTime");
         final var toTimeObj   = args.get("toTime");
 
-        if (fromTimeObj instanceof Number number && toTimeObj instanceof Number) {
-            final var fromTime = number.longValue();
-            final var toTime   = number.longValue();
+        if (fromTimeObj instanceof Number fromNumber && toTimeObj instanceof Number toNumber) {
+            final var fromTime = fromNumber.longValue();
+            final var toTime   = toNumber.longValue();
 
             final var snapshot = agent.getLogSnapshot(fromTime, toTime);
             logger.atInfo().log("Retrieved log snapshot (time range): %s bytes", snapshot.length);

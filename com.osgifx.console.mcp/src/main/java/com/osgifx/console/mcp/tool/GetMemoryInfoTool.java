@@ -32,7 +32,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_memory_info", description = "Returns the memory information of the remote system")
+@McpToolDef(name = "check_memory_usage", description = "Retrieves a detailed breakdown of JVM memory usage (Heap, Non-Heap, Pools).")
 public class GetMemoryInfoTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)

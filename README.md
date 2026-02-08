@@ -102,7 +102,7 @@ For detailed instructions, please refer to the **User Guide** on the website.
 | **📸 Snapshot** <br> _Capture and analyze runtime state snapshots_ | 2.4.4 | ✅ | 🚀 |
 | **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
 | **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
-| **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents_ | 2.4.5 | ✅ | 🚧 |
+| **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](MCP_SERVER.md)_ | 2.4.5 | ✅ | 🚧 |
 | **👻 Headless Launch** <br> _Start application without UI via configuration file_ | 2.4.5 | ✅ | 🚧 |
 
 --------------------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ For detailed instructions, please refer to the **User Guide** on the website.
 ### 💡 Troubleshooting & Tips
 
 *   **👻 Headless Mode:** Starting from 2.4.5, need to connect without the UI? Use the `-Dosgifx.config=/path/to/config.json` system property to launch OSGi.fx with a pre-defined connection.
-*   **🤖 AI Assistance:** OSGi.fx 2.4.5 supports the **Model Context Protocol (MCP)**, allowing AI agents to connect to and debug your OSGi runtime directly!
+*   **🤖 AI Assistance:** OSGi.fx 2.4.5 supports the **Model Context Protocol (MCP)**, allowing AI agents to connect to and debug your OSGi runtime directly! See the [MCP Server Documentation](MCP_SERVER.md).
 
 --------------------------------------------------------------------------------------------------------------
 

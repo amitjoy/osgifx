@@ -18,7 +18,6 @@ package com.osgifx.console.mcp.tool;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -33,8 +32,8 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
-public class GetRolesTool implements McpTool {
+@McpToolDef(name = "run_garbage_collection", description = "Triggers a System.gc() on the remote JVM. Use this before checking heap usage to get accurate metrics.")
+public class RunGarbageCollectionTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -54,14 +53,14 @@ public class GetRolesTool implements McpTool {
 
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing GetRolesTool");
+        logger.atInfo().log("Executing RunGarbageCollectionTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
-            return Collections.emptyList();
+            return "Agent not connected";
         }
-        final var roles = agent.getAllRoles();
-        logger.atInfo().log("Retrieved roles: %s", roles.size());
-        return roles;
+        agent.gc();
+        return "Garbage collection triggered";
     }
+
 }
