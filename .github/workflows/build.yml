@@ -1,32 +1,70 @@
-name: CI Build
+name: 🔨 CI Build
+
 on:
    push:
+      branches: [main, master]
    pull_request:
+      branches: [main, master]
+
+# Cancel in-progress runs for the same workflow + branch/PR
+concurrency:
+   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+   cancel-in-progress: true
+
+permissions:
+   contents: read
+
 env:
    LC_ALL: en_US.UTF-8
+   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
 jobs:
    build:
-      name: Build
+      name: 🏗️ Build on ${{ matrix.config.os }}
       runs-on: ${{ matrix.config.os }}
       strategy:
+         fail-fast: false  # Don't cancel other jobs if one fails
          matrix:
             config:
             -  os: ubuntu-latest
             -  os: macos-latest
             -  os: windows-latest
+      
       steps:
-      -  name: Git Checkout
-         uses: actions/checkout@v3
-      -  name: Gradle Wrapper Validation
-         uses: gradle/actions/wrapper-validation@v4
-      -  name: Set up Java 21 with JavaFX
-         uses: actions/setup-java@v1
+      -  name: 📥 Checkout code
+         uses: actions/checkout@v6
          with:
+            fetch-depth: 0  # Full history for better caching
+      
+      -  name: 🔒 Validate Gradle wrapper
+         uses: gradle/wrapper-validation-action@v1
+      
+      -  name: ☕ Set up Java 21 with JavaFX
+         uses: actions/setup-java@v5
+         with:
+            distribution: 'zulu'
             java-version: '21'
             java-package: jdk+fx
-      -  name: Build Workspace using Gradle
-         run: ./gradlew build --max-workers=5 --parallel
-      -  name: Resolve Product
+            cache: 'gradle'  # Enable Gradle dependency caching
+      
+      -  name: 🐘 Setup Gradle
+         uses: gradle/actions/setup-gradle@v3
+         with:
+            cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' }}
+      
+      -  name: 🔨 Build workspace
+         run: ./gradlew build --max-workers=5 --parallel --scan
+      
+      -  name: 🔍 Resolve product
          run: ./gradlew :com.osgifx.console.product:resolve.osgifx
-      -  name: Build Executable JAR
+      
+      -  name: 📦 Build executable JAR
          run: ./gradlew :com.osgifx.console.product:export.osgifx
+      
+      -  name: ⬆️ Upload build artifacts
+         if: always() && matrix.config.os == 'ubuntu-latest'
+         uses: actions/upload-artifact@v4
+         with:
+            name: osgifx-jar-${{ github.sha }}
+            path: com.osgifx.console.product/target/distributions/executable/osgifx.jar
+            retention-days: 7
