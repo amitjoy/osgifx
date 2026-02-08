@@ -271,6 +271,7 @@ public class BinaryCodec {
         return (T) decodeObject(in, type);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private Object decodeObject(DataInputStream in, Type type) throws Exception {
         byte tag = in.readByte();
         if (tag == NULL)
@@ -348,8 +349,13 @@ public class BinaryCodec {
                 return in.readChar();
             case STRING:
                 return in.readUTF();
-            case ENUM:
-                return in.readUTF();
+            case ENUM: {
+                final String name = in.readUTF();
+                if (rawClass.isEnum()) {
+                    return Enum.valueOf((Class<Enum>) rawClass, name);
+                }
+                return name;
+            }
         }
         throw new IOException("Unknown tag: " + tag);
     }
