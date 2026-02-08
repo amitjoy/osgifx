@@ -1,0 +1,117 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'org.jreleaser' version '1.14.0'
+}
+
+group = 'com.osgifx'
+version = file("${rootProject.projectDir}/cnf/version/app.version").text.trim().replace('.SNAPSHOT', '')
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// Task to find the uberjar (Exported by Bndtools/Eclipse)
+def uberJarFile = file("${rootProject.projectDir}/com.osgifx.console.product/target/distributions/executable/osgifx.jar")
+
+// Create REQUIRED "Dummy" JARs for Sonatype
+// Sonatype will reject the upload without these
+task sourcesJar(type: Jar) {
+    archiveClassifier = 'sources'
+    from project.rootDir // includes build files/readme as "sources" to satisfy the requirement
+    include 'README.md', 'LICENSE' 
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier = 'javadoc'
+    from project.rootDir 
+    include 'README.md', 'LICENSE'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.osgifx'
+            artifactId = 'osgifx'
+            version = project.version
+            
+            // Enforce the Main Artifact to be your Uberjar
+            // This replaces the default 'jar' task output with your Bndtools export
+            artifact(uberJarFile) {
+                builtBy ':com.osgifx.console.product:export.osgifx' // Ensure export runs first
+            }
+            
+            // Attach the mandatory secondary artifacts
+            artifact sourcesJar
+            artifact javadocJar
+            
+            pom {
+                name = 'OSGi.fx'
+                description = 'An easy-to-use application to manage OSGi frameworks remotely'
+                url = 'https://osgifx.com'
+                inceptionYear = '2021'
+                licenses {
+                    license {
+                        name = 'Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'amitjoy'
+                        name = 'Amit Kumar Mondal'
+                        email = 'admin@amitinside.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/amitjoy/osgifx.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/amitjoy/osgifx.git'
+                    url = 'https://github.com/amitjoy/osgifx'
+                }
+            }
+        }
+    }
+    
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+jreleaser {
+    gitRootSearch = true
+    
+    project {
+        name = 'osgifx'
+        description = 'An easy-to-use application to manage OSGi frameworks remotely'
+        website = 'https://osgifx.com'
+        authors = ['Amit Kumar Mondal']
+        license = 'Apache-2.0'
+        inceptionYear = '2021'
+    }
+    
+    release {
+        github {
+            enabled = false
+        }
+    }
+    
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'RELEASE'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
+}
