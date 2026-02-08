@@ -1,56 +1,96 @@
-name: Release
+name: 🚀 Release
+
 on:
    push:
-      tags: v*.*.*
+      tags: ['v*.*.*']
+
+# Only one release at a time
+concurrency:
+   group: ${{ github.workflow }}
+   cancel-in-progress: false
+
+permissions:
+   contents: write       # For creating releases
+   packages: write       # For publishing packages
+   id-token: write       # For sigstore signing
 
 env:
    LC_ALL: en_US.UTF-8
-   SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-   SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
 jobs:
    release:
+      name: 🎯 Release ${{ github.ref_name }}
       runs-on: ubuntu-latest
+      
       steps:
-      -  name: Git Checkout
-         uses: actions/checkout@v3
-      -  name: Gradle Wrapper Validation
-         uses: gradle/wrapper-validation-action@v1
-      -  name: Set up Java 21 with JavaFX
-         uses: actions/setup-java@v1
+      -  name: 📥 Checkout code
+         uses: actions/checkout@v6
          with:
+            fetch-depth: 0  # Full history for changelog generation
+      
+      -  name: 🔒 Validate Gradle wrapper
+         uses: gradle/wrapper-validation-action@v1
+      
+      -  name: ☕ Set up Java 21 with JavaFX
+         uses: actions/setup-java@v5
+         with:
+            distribution: 'zulu'
             java-version: '21'
             java-package: jdk+fx
-      -  name: Set up Node
-         uses: actions/setup-node@v3
+            cache: 'gradle'
+      
+      -  name: 🐘 Setup Gradle
+         uses: gradle/actions/setup-gradle@v3
          with:
-            node-version: 16.x
-            registry-url: https://registry.npmjs.org
-         env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      -  name: Set up Git Config
+            cache-read-only: false
+      
+      -  name: 📦 Set up Node.js
+         uses: actions/setup-node@v4
+         with:
+            node-version: '20'
+            registry-url: 'https://registry.npmjs.org'
+            cache: 'npm'
+      
+      -  name: ⚙️ Configure Git
          run: |
             git config user.name "GitHub Actions Bot"
-            git config user.email "<>"
-      -  name: Build Workspace using Gradle
-         run: ./gradlew build --max-workers=5 --parallel
-      -  name: Build Executable JAR
-         run: ./gradlew :com.osgifx.console.product:export.osgifx
-      -  name: Copy Executable JAR to Distribution Project
-         run: cp com.osgifx.console.product/target/distributions/executable/osgifx.jar com.osgifx.console.dist/uberjar
-      -  name: Publish Agent API and Implementation Bundles to Maven Central
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      -  name: 🔐 Import GPG key
+         env:
+            GPG_PRIVATE_KEY: ${{ secrets.GPG_SECRET_KEY }}
+            GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+         run: |
+            echo "Importing GPG key..."
+            echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+            echo "GPG key imported successfully"
+      
+      -  name: 🚀 Build and release
          run: ./scripts/release.sh
-      -  name: Publish OSGi.fx to npmjs Registry using jDeploy
+         env:
+            SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+            SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+            JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+            JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+            JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+            JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
+            JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
+      
+      -  name: 📢 Publish to npm
          run: npx jdeploy publish
          env:
             NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      -  name: Copy Agent JAR to Current Directory
-         run: cp com.osgifx.console.agent/target/com.osgifx.console.agent.jar .
-      -  name: Draft GitHub Release
-         uses: softprops/action-gh-release@v1
-         with:
-            tag_name: ${{ github.ref_name }}
-            body_path: changelogs/${{ github.ref_name }}.md
-            token: ${{ secrets.GITHUB_TOKEN }}
-            fail_on_unmatched_files: true
-            files: com.osgifx.console.agent.jar
+      
+      -  name: 📝 Generate release summary
+         if: success()
+         run: |
+            echo "## 🎉 Release ${{ github.ref_name }} Published" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📦 Published Artifacts" >> $GITHUB_STEP_SUMMARY
+            echo "- **Maven Central**: \`com.osgifx:osgifx:${GITHUB_REF_NAME#v}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **npm**: \`osgifx@${GITHUB_REF_NAME#v}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+            echo "- [Maven Central](https://central.sonatype.com/artifact/com.osgifx/osgifx)" >> $GITHUB_STEP_SUMMARY
+            echo "- [npm Package](https://www.npmjs.com/package/osgifx)" >> $GITHUB_STEP_SUMMARY
