@@ -287,14 +287,15 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             }
             if (result.value == null)
                 return null;
+            if (type == byte[].class && !result.exception)
+                return (T) result.value;
+
             try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(result.value));
                     DataInputStream dataIn = new DataInputStream(gzip)) {
                 if (result.exception) {
                     final String msg = (String) codec.decode(dataIn, String.class);
                     throw new RuntimeException(msg);
                 }
-                if (type == byte[].class)
-                    return (T) result.value;
                 return (T) codec.decode(dataIn, type);
             }
         } finally {
