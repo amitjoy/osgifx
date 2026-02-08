@@ -33,7 +33,7 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "osgi_get_classloader_leaks", description = "Returns the list of suspicious bundles causing probable classloader leaks")
+@McpToolDef(name = "analyze_classloader_leaks", description = "Analyzes the heap to identify suspicious bundles that may be retaining classloader references (memory leaks). This is an expensive operation.")
 public class GetClassloaderLeaksTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
