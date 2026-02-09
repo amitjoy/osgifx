@@ -32,11 +32,11 @@ jobs:
       -  name: 🔒 Validate Gradle wrapper
          uses: gradle/wrapper-validation-action@v1
       
-      -  name: ☕ Set up Java 21 with JavaFX
+      -  name: ☕ Set up Java 25 with JavaFX
          uses: actions/setup-java@v5
          with:
             distribution: 'zulu'
-            java-version: '21'
+            java-version: '25'
             java-package: jdk+fx
             cache: 'gradle'
       

@@ -139,7 +139,7 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         dialogPane.getButtonTypes().addAll(saveButtonType);
 
         final var loginButton = (Button) dialogPane.lookupButton(saveButtonType);
-        loginButton.setOnAction(actionEvent -> {
+        loginButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);

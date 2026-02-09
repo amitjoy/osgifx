@@ -97,8 +97,8 @@ public final class LogConfigurationEditorFxController {
     }
 
     private void initButtons() {
-        saveLogConfigButton.setOnAction(event -> saveLogConfig());
-        cancelButton.setOnAction(e -> form.reset());
+        saveLogConfigButton.setOnAction(_ -> saveLogConfig());
+        cancelButton.setOnAction(_ -> form.reset());
         cancelButton.disableProperty().bind(form.changedProperty().not());
         saveLogConfigButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
     }

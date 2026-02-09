@@ -1,15 +1,15 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'org.jreleaser' version '1.14.0'
+    id 'org.jreleaser' version '1.16.0'
 }
 
 group = 'com.osgifx'
 version = file("${rootProject.projectDir}/cnf/version/app.version").text.trim().replace('.SNAPSHOT', '')
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 // Task to find the uberjar (Exported by Bndtools/Eclipse)

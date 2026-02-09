@@ -128,7 +128,7 @@ public final class TerminalFxController {
             }
         };
 
-        task.setOnSucceeded(t -> {
+        task.setOnSucceeded(_ -> {
             output.appendText(task.getValue());
             output.appendText(System.lineSeparator());
             history.add(command);

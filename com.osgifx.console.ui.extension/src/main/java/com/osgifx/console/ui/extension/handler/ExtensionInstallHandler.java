@@ -83,7 +83,7 @@ public final class ExtensionInstallHandler {
                     threadSync.asyncExec(progressDialog::close);
                     FxDialog.showInfoDialog("Extension Installation",
                             "The application must be restarted, therefore, will be shut down right away",
-                            getClass().getClassLoader(), btn -> workbench.restart());
+                            getClass().getClassLoader(), _ -> workbench.restart());
                 }
             };
 
