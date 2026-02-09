@@ -93,7 +93,7 @@ public final class SnapshotImportHandler {
 
                 @Override
                 protected File call() throws Exception {
-                    try (var is = new FileInputStream(snapshot)) {
+                    try (var _ = new FileInputStream(snapshot)) {
                         updateSnapshotLocation(snapshot.getAbsolutePath());
                         supervisorFactory.removeSupervisor(REMOTE_RPC);
                         supervisorFactory.createSupervisor(SNAPSHOT);
@@ -109,7 +109,7 @@ public final class SnapshotImportHandler {
                 }
             };
 
-            task.setOnSucceeded(t -> {
+            task.setOnSucceeded(_ -> {
                 isConnected.publish(true);
                 isSnapshotAgent.publish(true);
                 connectedAgent.publish("Snapshot Agent: " + task.getValue().getName());

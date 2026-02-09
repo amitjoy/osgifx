@@ -46,12 +46,12 @@ public final class SupervisorFactoryProvider implements SupervisorFactory {
             case SNAPSHOT -> SnapshotSupervisor.CONDITION_ID_VALUE;
         };
         registrations.computeIfAbsent(type,
-                key -> OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionIdValue)).run(context));
+                _ -> OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionIdValue)).run(context));
     }
 
     @Override
     public void removeSupervisor(final SupervisorType type) {
-        registrations.computeIfPresent(type, (k, v) -> {
+        registrations.computeIfPresent(type, (_, v) -> {
             v.close();
             return null;
         });

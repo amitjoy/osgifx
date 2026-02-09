@@ -74,7 +74,7 @@ public final class ExtensionsViewDialogController {
 
     private void initContextMenu() {
         final var item = new MenuItem("Uninstall");
-        item.setOnAction(event -> {
+        item.setOnAction(_ -> {
             final var dp = extensionsList.getSelectionModel().getSelectedItem();
             try {
                 final var isRemoved = removeDeploymentPackage(dp);
@@ -90,7 +90,7 @@ public final class ExtensionsViewDialogController {
                         // show information about the restart of the application
                         FxDialog.showInfoDialog(header,
                                 "The application must be restarted, therefore, will be shut down right away",
-                                getClass().getClassLoader(), btn -> workbench.restart());
+                                getClass().getClassLoader(), _ -> workbench.restart());
                     });
                 }
             } catch (final Exception e) {

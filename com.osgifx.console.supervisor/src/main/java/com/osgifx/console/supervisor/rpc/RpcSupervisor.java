@@ -150,7 +150,7 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
             final var lwtTopic = mqttConnection.lwtTopic();
             if (subscriber != null && !Strings.isNullOrEmpty(lwtTopic)) {
-                subscriber.subscribe(lwtTopic).forEach(t -> {
+                subscriber.subscribe(lwtTopic).forEach(_ -> {
                     logger.atInfo().log("Server notified about the disconnection of the remote agent");
                     sendEvent(AGENT_DISCONNECTED_EVENT_TOPIC);
                 });

@@ -101,7 +101,7 @@ public final class DtoFxController {
                         performSearch(root);
                     }
                 });
-                searchBtn.setOnMouseClicked(event -> performSearch(root));
+                searchBtn.setOnMouseClicked(_ -> performSearch(root));
             });
         });
     }

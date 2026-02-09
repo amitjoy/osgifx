@@ -88,7 +88,7 @@ public final class SnapshotCaptureHandler {
             }
         };
 
-        snapshotTask.valueProperty().addListener((ChangeListener<String>) (obs, oldValue, newValue) -> {
+        snapshotTask.valueProperty().addListener((ChangeListener<String>) (_, _, newValue) -> {
             if (newValue != null) {
                 threadSync.asyncExec(() -> {
                     try {

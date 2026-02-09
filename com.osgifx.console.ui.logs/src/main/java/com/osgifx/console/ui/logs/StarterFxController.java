@@ -59,7 +59,7 @@ public final class StarterFxController {
 
     private void initLogsActionTypeButton() {
         logsActionTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
-        logsActionTypeButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+        logsActionTypeButton.getToggleGroup().selectedToggleProperty().addListener((_, oldVal, newVal) -> {
             if (newVal == null) {
                 oldVal.setSelected(true);
             }
@@ -67,8 +67,8 @@ public final class StarterFxController {
     }
 
     private void initButtons() {
-        logsViewButton.setOnMouseClicked(e -> showLogEvents());
-        configurationsViewButton.setOnMouseClicked(e -> showConfigurations());
+        logsViewButton.setOnMouseClicked(_ -> showLogEvents());
+        configurationsViewButton.setOnMouseClicked(_ -> showConfigurations());
     }
 
     private void showLogEvents() {

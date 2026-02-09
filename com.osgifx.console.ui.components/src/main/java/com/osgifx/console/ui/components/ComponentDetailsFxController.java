@@ -243,13 +243,13 @@ public final class ComponentDetailsFxController {
     }
 
     private void registerButtonHandlers(final XComponentDTO component) {
-        enableComponentButton.setOnAction(a -> {
+        enableComponentButton.setOnAction(_ -> {
             logger.atInfo().log("Component enable request has been sent for %s", component.name);
             // to enable a component, we need the name primarily as there is no associated
             // component ID
             commandService.execute(COMPONENT_ENABLE_COMMAND_ID, createCommandMap(component.name, null));
         });
-        disableComponentButton.setOnAction(a -> {
+        disableComponentButton.setOnAction(_ -> {
             logger.atInfo().log("Component disable request has been sent for %s", component.id);
             // to disable a component, we need the id primarily as there is already an
             // associated component ID
@@ -260,8 +260,8 @@ public final class ComponentDetailsFxController {
     private Map<String, Object> createCommandMap(final String name, final String id) {
         final Map<String, Object> properties = Maps.newHashMap();
 
-        properties.computeIfAbsent("name", key -> name);
-        properties.computeIfAbsent("id", key -> id);
+        properties.computeIfAbsent("name", _ -> name);
+        properties.computeIfAbsent("id", _ -> id);
 
         return properties;
     }

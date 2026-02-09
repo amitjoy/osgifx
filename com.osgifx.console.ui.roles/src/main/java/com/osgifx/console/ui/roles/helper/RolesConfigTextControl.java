@@ -90,7 +90,7 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
         fieldLabel    = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
 
-        editableArea.setOnMouseClicked(event -> {
+        editableArea.setOnMouseClicked(_ -> {
             final var dialog     = new PropertiesConfigurationDialog();
             final var properties = RolesHelper.prepareKeyValuePairs(editableArea.getText());
             dialog.init(type, properties);
@@ -179,16 +179,16 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
     public void setupValueChangedListeners() {
         super.setupValueChangedListeners();
 
-        field.multilineProperty().addListener((observable, oldValue, newValue) -> {
+        field.multilineProperty().addListener((_, _, newValue) -> {
             stack.setPrefHeight(newValue ? 80 : 0);
             readOnlyLabel.setPrefHeight(newValue ? 80 : 26);
         });
 
-        field.errorMessagesProperty().addListener(
-                (observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
+        field.errorMessagesProperty()
+                .addListener((_, _, _) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
 
-        editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-        editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
+        editableField.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableField));
+        editableArea.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableArea));
     }
 
     private static class TextAreaMaskSkin extends TextAreaSkin {
@@ -200,7 +200,7 @@ public final class RolesConfigTextControl extends SimpleControl<StringField> {
             final var group = (Group) field.get(this);
             final var text  = (Text) group.getChildren().get(0);
             text.setText(maskText(textArea.textProperty().getValueSafe()));
-            text.textProperty().addListener(o -> text.setText(maskText(textArea.textProperty().getValueSafe())));
+            text.textProperty().addListener(_ -> text.setText(maskText(textArea.textProperty().getValueSafe())));
         }
 
         @Override

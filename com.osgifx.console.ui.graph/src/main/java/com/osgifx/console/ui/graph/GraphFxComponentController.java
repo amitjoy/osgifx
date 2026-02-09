@@ -124,7 +124,7 @@ public final class GraphFxComponentController implements GraphController {
 
     private void initStrategyButton() {
         strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-        strategyButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+        strategyButton.getToggleGroup().selectedToggleProperty().addListener((_, oldVal, newVal) -> {
             if (newVal == null) {
                 oldVal.setSelected(true);
             }
@@ -135,7 +135,7 @@ public final class GraphFxComponentController implements GraphController {
         wiringSelection.getItems().addAll("Find all components that are required by", "Find all component cycles");
         wiringSelection.getSelectionModel().select(0);
         wiringSelection.getSelectionModel().selectedIndexProperty()
-                .addListener((ChangeListener<Number>) (observable, oldValue, newValue) -> {
+                .addListener((ChangeListener<Number>) (_, _, newValue) -> {
                     final var condition = newValue.intValue() == 1;
 
                     searchText.setDisable(condition);
@@ -146,7 +146,7 @@ public final class GraphFxComponentController implements GraphController {
 
     private void addExportToDotContextMenu() {
         final var item = new MenuItem("Export to DOT");
-        item.setOnAction(event -> {
+        item.setOnAction(_ -> {
             final var directoryChooser = new DirectoryChooser();
             final var location         = directoryChooser.showDialog(null);
             if (location == null) {
@@ -175,7 +175,7 @@ public final class GraphFxComponentController implements GraphController {
 
     private void initComponentsList() {
         componentsList.getSelectionModel().setSelectionMode(MULTIPLE);
-        componentsList.setCellFactory(param -> new CheckBoxListCell<>(componentsList::getItemBooleanProperty) {
+        componentsList.setCellFactory(_ -> new CheckBoxListCell<>(componentsList::getItemBooleanProperty) {
             @Override
             public void updateItem(final XComponentDTO component, final boolean empty) {
                 threadSync.asyncExec(() -> super.updateItem(component, empty));
@@ -195,7 +195,7 @@ public final class GraphFxComponentController implements GraphController {
     private FilteredList<XComponentDTO> initSearchFilter(final ObservableList<XComponentDTO> components) {
         final var filteredComponentsList = new FilteredList<>(components, Predicates.alwaysTrue());
         updateFilteredList(filteredComponentsList);
-        searchText.textProperty().addListener(obs -> {
+        searchText.textProperty().addListener(_ -> {
             updateFilteredList(filteredComponentsList);
             searchText.requestFocus();
         });

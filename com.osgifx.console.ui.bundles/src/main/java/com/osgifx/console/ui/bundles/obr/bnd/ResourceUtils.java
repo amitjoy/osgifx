@@ -128,7 +128,7 @@ public final class ResourceUtils {
     public static final Resource DUMMY_RESOURCE      = new ResourceBuilder().build();
     public static final String   WORKSPACE_NAMESPACE = "bnd.workspace.project";
 
-    private static final Converter cnv = new Converter().hook(Version.class, (dest, o) -> toVersion(o));
+    private static final Converter cnv = new Converter().hook(Version.class, (_, o) -> toVersion(o));
 
     public interface IdentityCapability extends Capability {
         public enum Type {
@@ -295,7 +295,7 @@ public final class ResourceUtils {
     @SuppressWarnings("unchecked")
     public static <T extends Capability> T as(final Capability cap, final Class<T> type) {
         return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
-                (target, method, args) -> Capability.class == method.getDeclaringClass()
+                (_, method, args) -> Capability.class == method.getDeclaringClass()
                         ? publicLookup().unreflect(method).bindTo(cap).invokeWithArguments(args)
                         : get(method, cap.getAttributes(), cap.getDirectives(), args));
     }
@@ -303,7 +303,7 @@ public final class ResourceUtils {
     @SuppressWarnings("unchecked")
     public static <T extends Requirement> T as(final Requirement req, final Class<T> type) {
         return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type },
-                (target, method, args) -> Requirement.class == method.getDeclaringClass()
+                (_, method, args) -> Requirement.class == method.getDeclaringClass()
                         ? publicLookup().unreflect(method).bindTo(req).invokeWithArguments(args)
                         : get(method, req.getAttributes(), req.getDirectives(), args));
     }

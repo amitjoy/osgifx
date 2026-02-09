@@ -113,14 +113,14 @@ public final class RuntimeDataProvider implements DataProvider {
             if (isAsync) {
                 final var futures =
                         BiStream.from(infoSuppliers)
-                                .mapValues((k, v) -> executor.runAsync(v::retrieve))
+                                .mapValues((_, v) -> executor.runAsync(v::retrieve))
                                 .collect(BiCollectors.toMap());
 
                 CompletableFuture.allOf(futures.values().toArray(new CompletableFuture[0]))
                                  .thenRunAsync(() -> RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC))
                                  .thenRunAsync(() -> logger.atInfo().log("All runtime informations have been retrieved successfully (async)"));
             } else {
-                infoSuppliers.forEach((k, v) -> v.retrieve());
+                infoSuppliers.forEach((_, v) -> v.retrieve());
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ALL_TOPIC);
                 logger.atInfo().log("All runtime informations have been retrieved successfully (sync)");
             }

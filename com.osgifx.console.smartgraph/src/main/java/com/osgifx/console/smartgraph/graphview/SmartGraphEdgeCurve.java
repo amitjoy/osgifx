@@ -17,7 +17,6 @@ package com.osgifx.console.smartgraph.graphview;
 
 import com.osgifx.console.smartgraph.graph.Edge;
 
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.transform.Rotate;
@@ -154,16 +153,16 @@ public class SmartGraphEdgeCurve<E, V> extends CubicCurve implements SmartGraphE
      * Maybe we can achieve this solely with bindings.
      */
     private void enableListeners() {
-        startXProperty().addListener((final ObservableValue<? extends Number> ov, final Number t, final Number t1) -> {
+        startXProperty().addListener((_, _, _) -> {
             update();
         });
-        startYProperty().addListener((final ObservableValue<? extends Number> ov, final Number t, final Number t1) -> {
+        startYProperty().addListener((_, _, _) -> {
             update();
         });
-        endXProperty().addListener((final ObservableValue<? extends Number> ov, final Number t, final Number t1) -> {
+        endXProperty().addListener((_, _, _) -> {
             update();
         });
-        endYProperty().addListener((final ObservableValue<? extends Number> ov, final Number t, final Number t1) -> {
+        endYProperty().addListener((_, _, _) -> {
             update();
         });
     }

@@ -303,15 +303,15 @@ public final class BundleDetailsFxController {
     }
 
     private void registerButtonHandlers(final XBundleDTO bundle) {
-        startBundleButton.setOnAction(a -> {
+        startBundleButton.setOnAction(_ -> {
             logger.atInfo().log("Bundle start request has been sent for %s", bundle.id);
             commandService.execute(BUNDLE_START_COMMAND_ID, createCommandMap(bundle.id));
         });
-        stopBundleButton.setOnAction(a -> {
+        stopBundleButton.setOnAction(_ -> {
             logger.atInfo().log("Bundle stop request has been sent for %s", bundle.id);
             commandService.execute(BUNDLE_STOP_COMMAND_ID, createCommandMap(bundle.id));
         });
-        uninstallBundleButton.setOnAction(a -> {
+        uninstallBundleButton.setOnAction(_ -> {
             logger.atInfo().log("Bundle uninstall request has been sent for %s", bundle.id);
             commandService.execute(BUNDLE_UNINSTALL_COMMAND_ID, createCommandMap(bundle.id));
         });

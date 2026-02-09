@@ -44,7 +44,7 @@ public final class BatchInstallDialogController {
     @FXML
     public void initialize() {
         logger.atDebug().log("FXML controller has been initialized");
-        artifactsList.setCellFactory(listView -> new ListCell<>() {
+        artifactsList.setCellFactory(_ -> new ListCell<>() {
             @Override
             public void updateItem(final ArtifactDTO artifact, final boolean empty) {
                 super.updateItem(artifact, empty);

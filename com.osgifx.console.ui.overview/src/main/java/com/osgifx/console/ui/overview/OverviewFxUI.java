@@ -181,7 +181,7 @@ public final class OverviewFxUI {
 
         timelineButton.setGraphic(glyph);
         timelineButton.setTooltip(new Tooltip(buttonType.tooltip));
-        timelineButton.setOnMouseClicked(mouseEvent -> {
+        timelineButton.setOnMouseClicked(_ -> {
             if (buttonType == PLAY) {
                 playTimelineAnimation();
             } else {
@@ -209,9 +209,9 @@ public final class OverviewFxUI {
             dataRetrieverTimeline.stop();
         }
         dataRetrieverTimeline = new Timeline(new KeyFrame(Duration.seconds(refreshDelayInSeconds),
-                                                          a -> retrieveRuntimeData()));
+                                                          _ -> retrieveRuntimeData()));
         dataRetrieverTimeline.setCycleCount(CYCLE_COUNT);
-        dataRetrieverTimeline.setOnFinished(event -> {
+        dataRetrieverTimeline.setOnFinished(_ -> {
             updateTimelineButtonTo(PLAY);
             isRealtimeUpdateRunning.set(false);
         });

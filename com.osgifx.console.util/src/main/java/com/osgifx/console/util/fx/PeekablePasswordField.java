@@ -53,7 +53,7 @@ public final class PeekablePasswordField extends PasswordField {
                     setIcon(vDoMask);
                 });
 
-                textField.setOnMouseReleased(event -> {
+                textField.setOnMouseReleased(_ -> {
                     if (!_doMask) {
                         setDoMask(true);
                         setIcon(true);
@@ -69,7 +69,7 @@ public final class PeekablePasswordField extends PasswordField {
                     }
                 });
 
-                textField.setOnMouseExited((final MouseEvent event) -> {
+                textField.setOnMouseExited(_ -> {
                     setDoMask(true);
                     setIcon(true);
                 });

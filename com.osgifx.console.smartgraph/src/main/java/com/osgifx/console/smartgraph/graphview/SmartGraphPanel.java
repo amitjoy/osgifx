@@ -210,7 +210,7 @@ public class SmartGraphPanel<V, E> extends Pane {
         };
 
         this.automaticLayoutProperty = new SimpleBooleanProperty(false);
-        this.automaticLayoutProperty.addListener((observable, oldValue, newValue) -> {
+        this.automaticLayoutProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 timer.start();
             } else {

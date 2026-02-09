@@ -120,13 +120,13 @@ public final class SearchDialog extends Dialog<FilterDTO> {
         GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
-        actorTypeField.selectionProperty().addListener((options, oldValue, newValue) -> {
+        actorTypeField.selectionProperty().addListener((_, _, newValue) -> {
             final var allFilters = filterManager.allFilters();
             final var list       = allFilters.get(newValue).stream()
                     .sorted(Comparator.comparing(SearchFilter::toString)).toList();
             searchFilterTypeField.items(list);
         });
-        searchFilterTypeField.selectionProperty().addListener((options, oldValue, newValue) -> {
+        searchFilterTypeField.selectionProperty().addListener((_, _, newValue) -> {
             final var list = newValue.supportedOperations().stream().toList();
             operationTypeField.items(list);
             userInputField.placeholder(newValue.placeholder());
