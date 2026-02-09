@@ -83,8 +83,8 @@ public final class FxDialog {
         dialogPane.getStylesheets().add(cssResLoader.getResource(STANDARD_CSS).toExternalForm());
         dialogPane.getButtonTypes().setAll(ButtonType.CANCEL);
 
-        task.setOnCancelled(succeeded -> progressDialog.close());
-        progressDialog.setOnCloseRequest(closeRequest -> {
+        task.setOnCancelled(_ -> progressDialog.close());
+        progressDialog.setOnCloseRequest(_ -> {
             if (cancellationRunnable != null) {
                 cancellationRunnable.run();
                 task.cancel(true);

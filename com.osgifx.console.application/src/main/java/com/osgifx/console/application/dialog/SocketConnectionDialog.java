@@ -117,7 +117,7 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         dialogPane.getButtonTypes().addAll(saveButtonType);
 
         final var loginButton = (Button) dialogPane.lookupButton(saveButtonType);
-        loginButton.setOnAction(actionEvent -> {
+        loginButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -144,7 +144,7 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         trustStorePassword.setPromptText(trustStorePasswordCaption);
 
         trustStore.setEditable(false);
-        trustStore.setOnMouseClicked(event -> {
+        trustStore.setOnMouseClicked(_ -> {
             final var trustStoreChooser = new FileChooser();
             trustStoreChooser.getExtensionFilters()
                     .add(new ExtensionFilter("Java Keystore Files (.keystore, .jks)", "*.keystore", "*.jks"));

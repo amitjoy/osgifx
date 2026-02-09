@@ -43,7 +43,7 @@ public final class GameLogic {
 
     public void start() {
         currentTurn = States.X;
-        gridModel.getCells().forEach(cell -> cell.setOnClick(event -> makeTurn(cell.getColumn(), cell.getRow())));
+        gridModel.getCells().forEach(cell -> cell.setOnClick(_ -> makeTurn(cell.getColumn(), cell.getRow())));
     }
 
     private void makeTurn(final int column, final int row) {

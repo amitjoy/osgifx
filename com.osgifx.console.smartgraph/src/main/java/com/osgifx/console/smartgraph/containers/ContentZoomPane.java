@@ -141,7 +141,7 @@ public class ContentZoomPane extends BorderPane {
             }
 
         });
-        setOnMouseReleased((final MouseEvent event) -> getScene().setCursor(Cursor.DEFAULT));
+        setOnMouseReleased(_ -> getScene().setCursor(Cursor.DEFAULT));
         setOnMouseDragged((final MouseEvent event) -> {
             if (event.isSecondaryButtonDown()) {
                 content.setTranslateX(sceneDragContext.translateAnchorX + event.getX() - sceneDragContext.mouseAnchorX);

@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles.handler;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -83,8 +82,7 @@ public final class GenerateObrHandler {
         final var xmlResourceGenerator = new XMLResourceGenerator();
         final var outputFile           = new File(location, IO.prepareFilenameFor("xml"));
 
-        try (final var buffer = new ByteArrayOutputStream();
-                OutputStream fileStream = new FileOutputStream(outputFile)) {
+        try (final OutputStream fileStream = new FileOutputStream(outputFile)) {
             xmlResourceGenerator.resources(resources);
             xmlResourceGenerator.save(fileStream);
             Fx.showSuccessNotification("OBR Successfully Generated", outputFile.getAbsolutePath());

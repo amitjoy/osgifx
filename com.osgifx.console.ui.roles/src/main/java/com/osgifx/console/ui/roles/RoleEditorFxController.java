@@ -101,15 +101,15 @@ public final class RoleEditorFxController {
 
     private void initButtons(final XRoleDTO role) {
         final var roleName = role.name;
-        deleteRoleButton.setOnAction(event -> {
+        deleteRoleButton.setOnAction(_ -> {
             logger.atInfo().log("Role deletion request has been sent for role '%s'", roleName);
             deleteRole(roleName);
         });
-        saveRoleButton.setOnAction(event -> {
+        saveRoleButton.setOnAction(_ -> {
             logger.atInfo().log("Role updation request has been sent for role '%s'", roleName);
             updateRole(role);
         });
-        cancelButton.setOnAction(e -> form.reset());
+        cancelButton.setOnAction(_ -> form.reset());
         cancelButton.disableProperty().bind(form.changedProperty().not());
         saveRoleButton.disableProperty().bind(form.changedProperty().not().or(form.validProperty().not()));
     }

@@ -134,7 +134,7 @@ public final class GogoFxController {
                 return outputText;
             }
         };
-        task.setOnSucceeded(t -> {
+        task.setOnSucceeded(_ -> {
             output.appendText(task.getValue());
             output.appendText(System.lineSeparator());
             history.add(command);
