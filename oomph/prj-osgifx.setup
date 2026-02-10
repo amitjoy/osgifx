@@ -144,19 +144,19 @@
         name="JRE">
       <setupTask
           xsi:type="setup.p2:P2Task"
-          label="JRE21">
+          label="JRE25">
         <requirement
             name="org.eclipse.justj.openjdk.hotspot.jre.full.feature.group"/>
         <repository
-            url="https://download.eclipse.org/justj/jres/21/updates/release"/>
+            url="https://download.eclipse.org/justj/jres/25/updates/release"/>
       </setupTask>
       <setupTask
           xsi:type="jdt:JRETask"
-          version="JavaSE-21"
-          location="${jre.location-21}"
-          name="JRE for JavaSE-21">
+          version="JavaSE-25"
+          location="${jre.location-25}"
+          name="JRE for JavaSE-25">
         <description>Define the JRE needed to compile and run the Java projects of ${scope.project.label}</description>
-        <defaultExecutionEnvironment>JavaSE-21</defaultExecutionEnvironment>
+        <defaultExecutionEnvironment>JavaSE-25</defaultExecutionEnvironment>
       </setupTask>
     </setupTask>
     <setupTask
