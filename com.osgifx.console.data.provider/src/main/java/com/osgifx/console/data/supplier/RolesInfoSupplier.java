@@ -27,6 +27,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -73,7 +75,8 @@ public final class RolesInfoSupplier implements RuntimeInfoSupplier, EventHandle
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
-    private final ObservableList<XRoleDTO> roles = observableArrayList();
+    private final ObservableList<XRoleDTO> roles        = observableArrayList();
+    private final ReentrantLock            retrieveLock = new ReentrantLock();
 
     @Activate
     void activate() {
@@ -81,16 +84,21 @@ public final class RolesInfoSupplier implements RuntimeInfoSupplier, EventHandle
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving roles info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        retrieveLock.lock();
+        try {
+            logger.atInfo().log("Retrieving roles info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            roles.setAll(makeNullSafe(agent.getAllRoles()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ROLES_TOPIC);
+            logger.atInfo().log("Roles info retrieved successfully");
+        } finally {
+            retrieveLock.unlock();
         }
-        roles.setAll(makeNullSafe(agent.getAllRoles()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ROLES_TOPIC);
-        logger.atInfo().log("Roles info retrieved successfully");
     }
 
     @Override

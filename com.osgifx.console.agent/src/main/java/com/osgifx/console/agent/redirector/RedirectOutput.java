@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.osgifx.console.agent.provider.AgentServer;
 
@@ -39,6 +40,7 @@ public final class RedirectOutput extends PrintStream {
     private static final ThreadLocal<Boolean> onStack    = new ThreadLocal<>();
     private TimerTask                         active;
     private String                            lastOutput = "";
+    private final ReentrantLock               lock       = new ReentrantLock();
 
     /**
      * If we do not have an original, we create a null stream because the
@@ -96,32 +98,41 @@ public final class RedirectOutput extends PrintStream {
     }
 
     private void flushConditional() {
-        synchronized (this) {
+        lock.lock();
+        try {
             if (active != null) {
                 return;
             }
             active = new TimerTask() {
                 @Override
                 public void run() {
-                    synchronized (RedirectOutput.this) {
+                    lock.lock();
+                    try {
                         active = null;
+                    } finally {
+                        lock.unlock();
                     }
                     flush();
                 }
             };
             timer.schedule(active, 300);
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void flush() {
         final String output;
-        synchronized (this) {
+        lock.lock();
+        try {
             if (sb.length() == 0) {
                 return;
             }
             output = sb.toString();
             sb     = new StringBuilder();
+        } finally {
+            lock.unlock();
         }
         setLastOutput(output);
         for (final AgentServer agent : agents) {

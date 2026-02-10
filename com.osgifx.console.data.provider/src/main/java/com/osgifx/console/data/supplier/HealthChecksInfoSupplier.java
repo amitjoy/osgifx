@@ -26,6 +26,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -72,6 +74,7 @@ public final class HealthChecksInfoSupplier implements RuntimeInfoSupplier, Even
     private FluentLogger        logger;
 
     private final ObservableList<XHealthCheckDTO> healthchecks = observableArrayList();
+    private final ReentrantLock                   retrieveLock = new ReentrantLock();
 
     @Activate
     void activate() {
@@ -79,16 +82,21 @@ public final class HealthChecksInfoSupplier implements RuntimeInfoSupplier, Even
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving health checks info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        retrieveLock.lock();
+        try {
+            logger.atInfo().log("Retrieving health checks info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            healthchecks.setAll(makeNullSafe(agent.getAllHealthChecks()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HEALTHCHECKS_TOPIC);
+            logger.atInfo().log("Healthchecks info retrieved successfully");
+        } finally {
+            retrieveLock.unlock();
         }
-        healthchecks.setAll(makeNullSafe(agent.getAllHealthChecks()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HEALTHCHECKS_TOPIC);
-        logger.atInfo().log("Healthchecks info retrieved successfully");
     }
 
     @Override

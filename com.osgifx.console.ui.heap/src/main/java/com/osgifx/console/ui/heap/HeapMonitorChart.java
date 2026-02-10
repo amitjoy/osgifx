@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.osgi.framework.FrameworkUtil;
@@ -50,6 +51,7 @@ public final class HeapMonitorChart extends BorderPane {
     private final long startCounter;
     private final long initialUpperBound;
 
+    private final ReentrantLock                             lock;
     private NumberAxis                                      xAxis;
     private final String                                    title;
     private final AtomicLong                                counter;
@@ -65,6 +67,7 @@ public final class HeapMonitorChart extends BorderPane {
                             final long startCounter) {
         this.title               = title;
         this.memoryUsageSupplier = memoryUsageSupplier;
+        this.lock                = new ReentrantLock();
         counter                  = new AtomicLong(startCounter);
         firstUpdateCall          = new AtomicBoolean(true);
         this.startCounter        = startCounter;
@@ -137,42 +140,47 @@ public final class HeapMonitorChart extends BorderPane {
         return chart;
     }
 
-    private synchronized void updateMemoryUsage() {
-        final var memoryUsage = memoryUsageSupplier.get();
-        memoryUsage.thenAccept(usage -> {
-            if (usage == null) {
-                return;
-            }
-            final var used = usage.used / KB_CONVERSION;
-            final var max  = usage.max / KB_CONVERSION;
-
-            Platform.runLater(() -> {
-                counter.set(System.currentTimeMillis());
-
-                if (firstUpdateCall.get()) {
-                    xAxis.setLowerBound(counter.get());
-                    firstUpdateCall.set(false);
+    private void updateMemoryUsage() {
+        lock.lock();
+        try {
+            final var memoryUsage = memoryUsageSupplier.get();
+            memoryUsage.thenAccept(usage -> {
+                if (usage == null) {
+                    return;
                 }
-                yAxis.setUpperBound(Math.max(used, max));
+                final var used = usage.used / KB_CONVERSION;
+                final var max  = usage.max / KB_CONVERSION;
 
-                final var usedHeapSizeList = usageSeries.getData();
-                final var maxHeapSizeList  = maxMemorySeries.getData();
+                Platform.runLater(() -> {
+                    counter.set(System.currentTimeMillis());
 
-                usedHeapSizeList.add(new XYChart.Data<>(counter.get(), used));
-                maxHeapSizeList.add(new XYChart.Data<>(counter.get(), max));
+                    if (firstUpdateCall.get()) {
+                        xAxis.setLowerBound(counter.get());
+                        firstUpdateCall.set(false);
+                    }
+                    yAxis.setUpperBound(Math.max(used, max));
 
-                // if we go over upper bound, delete old data, and change the bounds
-                if (counter.get() > initialUpperBound) {
-                    final var numberNumberData = usedHeapSizeList.get(1);
-                    final var secondValue      = numberNumberData.getXValue();
-                    xAxis.setLowerBound(secondValue.doubleValue());
-                    xAxis.setUpperBound(counter.get());
-                    usedHeapSizeList.remove(0);
-                    maxHeapSizeList.remove(0);
+                    final var usedHeapSizeList = usageSeries.getData();
+                    final var maxHeapSizeList  = maxMemorySeries.getData();
 
-                }
+                    usedHeapSizeList.add(new XYChart.Data<>(counter.get(), used));
+                    maxHeapSizeList.add(new XYChart.Data<>(counter.get(), max));
+
+                    // if we go over upper bound, delete old data, and change the bounds
+                    if (counter.get() > initialUpperBound) {
+                        final var numberNumberData = usedHeapSizeList.get(1);
+                        final var secondValue      = numberNumberData.getXValue();
+                        xAxis.setLowerBound(secondValue.doubleValue());
+                        xAxis.setUpperBound(counter.get());
+                        usedHeapSizeList.remove(0);
+                        maxHeapSizeList.remove(0);
+
+                    }
+                });
             });
-        });
+        } finally {
+            lock.unlock();
+        }
 
     }
 
