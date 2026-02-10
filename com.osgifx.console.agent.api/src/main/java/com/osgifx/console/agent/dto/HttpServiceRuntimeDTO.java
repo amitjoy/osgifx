@@ -19,13 +19,13 @@ import org.osgi.dto.DTO;
 import org.osgi.service.http.runtime.dto.RuntimeDTO;
 
 /**
- * Represents the runtime status and configuration of an HTTP service within 
- * the OSGi framework. This class extends the {@link DTO} class to provide a 
+ * Represents the runtime status and configuration of an HTTP service within
+ * the OSGi framework. This class extends the {@link DTO} class to provide a
  * standardized data transfer object for HTTP service runtime information.
  * <p>
- * The {@code HttpServiceRuntimeDTO} class contains a reference to a {@link RuntimeDTO} 
- * instance, which encapsulates details about the runtime environment of the HTTP 
- * service. It is used to transfer HTTP service runtime data between different 
+ * The {@code HttpServiceRuntimeDTO} class contains a reference to a {@link RuntimeDTO}
+ * instance, which encapsulates details about the runtime environment of the HTTP
+ * service. It is used to transfer HTTP service runtime data between different
  * components or systems in a consistent format.
  * </p>
  */

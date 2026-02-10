@@ -92,7 +92,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         dialogPane.getButtonTypes().addAll(createButtonType);
 
         final var createButton = (Button) dialogPane.lookupButton(createButtonType);
-        createButton.setOnAction(actionEvent -> {
+        createButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -132,7 +132,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
                                       final CustomTextField txtFactoryPid,
                                       final Map<FormContent, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries) {
         final List<ConfigValue> properties = Lists.newArrayList();
-        entries.forEach((k, v) -> {
+        entries.forEach((_, v) -> {
             var configKey   = v.value1.get();
             var configValue = v.value2.get();
             var configType  = v.value3.get();

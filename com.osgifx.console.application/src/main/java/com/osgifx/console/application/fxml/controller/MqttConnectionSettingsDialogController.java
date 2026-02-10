@@ -66,7 +66,7 @@ public final class MqttConnectionSettingsDialogController {
 
         connectionTable.setItems(connectionsProvider.getMqttConnections());
         connectionTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldSettings, newSettings) -> selectedSettings.publish(newSettings));
+                .addListener((_, _, newSettings) -> selectedSettings.publish(newSettings));
 
         TableFilter.forTableView(connectionTable).apply();
         logger.atDebug().log("FXML controller has been initialized");

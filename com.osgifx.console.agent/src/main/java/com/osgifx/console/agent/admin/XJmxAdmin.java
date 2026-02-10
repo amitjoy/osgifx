@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.management.MBeanServer;
 
@@ -39,9 +40,10 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 
 public final class XJmxAdmin {
 
-    private static final String    HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
-    private static volatile Object hotspotMBean;
-    private final FluentLogger     logger            = LoggerFactory.getFluentLogger(getClass());
+    private static final String        HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
+    private static final ReentrantLock initLock          = new ReentrantLock();
+    private static volatile Object     hotspotMBean;
+    private final FluentLogger         logger            = LoggerFactory.getFluentLogger(getClass());
 
     public XHeapUsageDTO init() {
         final XHeapUsageDTO heapUsage = new XHeapUsageDTO();
@@ -128,10 +130,13 @@ public final class XJmxAdmin {
 
     private static void initHotspotMBean() throws Exception {
         if (hotspotMBean == null) {
-            synchronized (XJmxAdmin.class) {
+            initLock.lock();
+            try {
                 if (hotspotMBean == null) {
                     hotspotMBean = getHotspotMBean();
                 }
+            } finally {
+                initLock.unlock();
             }
         }
     }

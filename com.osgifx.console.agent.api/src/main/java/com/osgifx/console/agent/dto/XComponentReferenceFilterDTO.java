@@ -19,12 +19,12 @@ import org.osgi.dto.DTO;
 
 /**
  * Represents a filter for a component reference within the OSGi framework.
- * This class extends the {@link DTO} class to provide a standardized data transfer 
+ * This class extends the {@link DTO} class to provide a standardized data transfer
  * object for defining filters that are applied to component references.
  * <p>
- * The {@code XComponentReferenceFilterDTO} class contains information such as 
- * the component name, the target key for filtering, and the filter expression 
- * to be applied. It is used to specify criteria for selecting or matching 
+ * The {@code XComponentReferenceFilterDTO} class contains information such as
+ * the component name, the target key for filtering, and the filter expression
+ * to be applied. It is used to specify criteria for selecting or matching
  * references in the OSGi service registry.
  * </p>
  */

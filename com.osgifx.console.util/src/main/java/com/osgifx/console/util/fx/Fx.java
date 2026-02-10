@@ -123,7 +123,7 @@ public final class Fx {
     public static <S> void addContextMenuToCopyContent(final TableView<S> table) {
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         final var item = new MenuItem("Copy");
-        item.setOnAction(event -> {
+        item.setOnAction(_ -> {
 
             final Set<Integer> rows = Sets.newTreeSet();
             for (final TablePosition<?, ?> tablePosition : table.getSelectionModel().getSelectedCells()) {
@@ -159,7 +159,7 @@ public final class Fx {
     public static <S> void addContextMenuToCopyContent(final ListView<S> list) {
         list.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         final var item = new MenuItem("Copy");
-        item.setOnAction(event -> {
+        item.setOnAction(_ -> {
             final var strb = new StringBuilder();
             for (final int index : list.getSelectionModel().getSelectedIndices()) {
                 final var content = list.getItems().get(index);
@@ -179,7 +179,7 @@ public final class Fx {
                                              final Predicate<S> predicate,
                                              final Color match,
                                              final Color noMatch) {
-        column.setCellFactory(c -> new TableCell<>() {
+        column.setCellFactory(_ -> new TableCell<>() {
             @Override
             protected void updateItem(final T item, final boolean empty) {
                 super.updateItem(item, empty);
@@ -226,7 +226,7 @@ public final class Fx {
 
         final var button = new Button("", glyph);
         if (job != null) {
-            button.setOnMouseClicked(mouseEvent -> job.run());
+            button.setOnMouseClicked(_ -> job.run());
         }
         if (tooltip != null) {
             button.setTooltip(new Tooltip(tooltip));

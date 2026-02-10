@@ -34,6 +34,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -105,6 +106,7 @@ public class SmartGraphPanel<V, E> extends Pane {
     /*
      * AUTOMATIC LAYOUT RELATED ATTRIBUTES
      */
+    private final ReentrantLock  lock = new ReentrantLock();
     public final BooleanProperty automaticLayoutProperty;
     private AnimationTimer       timer;
     private final double         repulsionForce;
@@ -210,7 +212,7 @@ public class SmartGraphPanel<V, E> extends Pane {
         };
 
         this.automaticLayoutProperty = new SimpleBooleanProperty(false);
-        this.automaticLayoutProperty.addListener((observable, oldValue, newValue) -> {
+        this.automaticLayoutProperty.addListener((_, _, newValue) -> {
             if (newValue) {
                 timer.start();
             } else {
@@ -220,13 +222,18 @@ public class SmartGraphPanel<V, E> extends Pane {
 
     }
 
-    private synchronized void runLayoutIteration() {
-        for (var i = 0; i < AUTOMATIC_LAYOUT_ITERATIONS; i++) {
-            resetForces();
-            computeForces();
-            updateForces();
+    private void runLayoutIteration() {
+        lock.lock();
+        try {
+            for (var i = 0; i < AUTOMATIC_LAYOUT_ITERATIONS; i++) {
+                resetForces();
+                computeForces();
+                updateForces();
+            }
+            applyForces();
+        } finally {
+            lock.unlock();
         }
-        applyForces();
     }
 
     /**
@@ -341,10 +348,15 @@ public class SmartGraphPanel<V, E> extends Pane {
 
     }
 
-    private synchronized void updateNodes() {
-        removeNodes();
-        insertNodes();
-        updateLabels();
+    private void updateNodes() {
+        lock.lock();
+        try {
+            removeNodes();
+            insertNodes();
+            updateLabels();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /*

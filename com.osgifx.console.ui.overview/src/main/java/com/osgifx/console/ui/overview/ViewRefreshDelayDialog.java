@@ -86,7 +86,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
         dialogPane.getButtonTypes().addAll(finishButtonType);
 
         final var finishButton = (Button) dialogPane.lookupButton(finishButtonType);
-        finishButton.setOnAction(actionEvent -> {
+        finishButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);

@@ -129,11 +129,11 @@ public final class ConfigurationEditorFxController {
         final var ocd = config.ocd;
 
         deleteConfigButton.setDisable(isSnapshotAgent || config.location == null || config.isFactory);
-        deleteConfigButton.setOnAction(event -> {
+        deleteConfigButton.setOnAction(_ -> {
             logger.atInfo().log("Configuration delete request has been sent for PID '%s'", pid);
             deleteConfiguration(pid);
         });
-        saveConfigButton.setOnAction(event -> {
+        saveConfigButton.setOnAction(_ -> {
             final var properties   = prepareConfigurationProperties();
             String    effectivePID = null;
             if (pid == null && ocd != null) {
@@ -151,7 +151,7 @@ public final class ConfigurationEditorFxController {
             logger.atInfo().log("Configuration create request has been sent for PID '%s'", effectivePID);
             createOrUpdateConfiguration(effectivePID, properties);
         });
-        cancelButton.setOnAction(e -> form.reset());
+        cancelButton.setOnAction(_ -> form.reset());
 
         final BooleanProperty isSnapshot        = new SimpleBooleanProperty(isSnapshotAgent);
         final var             isSnapshotBinding = new When(isSnapshot).then(true).otherwise(false);

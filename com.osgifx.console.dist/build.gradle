@@ -1,15 +1,15 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'org.jreleaser' version '1.14.0'
+    id 'org.jreleaser' version '1.22.0' apply false
 }
 
 group = 'com.osgifx'
 version = file("${rootProject.projectDir}/cnf/version/app.version").text.trim().replace('.SNAPSHOT', '')
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 // Task to find the uberjar (Exported by Bndtools/Eclipse)
@@ -80,36 +80,40 @@ publishing {
     }
 }
 
-jreleaser {
-    gitRootSearch = true
-    
-    project {
-        name = 'osgifx'
-        description = 'An easy-to-use application to manage OSGi frameworks remotely'
-        website = 'https://osgifx.com'
-        authors = ['Amit Kumar Mondal']
-        license = 'Apache-2.0'
-        inceptionYear = '2021'
-    }
-    
-    release {
-        github {
-            enabled = false
+if (project.hasProperty('jreleaser.enabled')) {
+    apply plugin: 'org.jreleaser'
+
+    jreleaser {
+        gitRootSearch = true
+        
+        project {
+            name = 'OSGi.fx'
+            description = 'An easy-to-use application to manage OSGi frameworks remotely'
+            website = 'https://osgifx.com'
+            authors = ['Amit Kumar Mondal']
+            license = 'Apache-2.0'
+            inceptionYear = '2021'
         }
-    }
-    
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-    
-    deploy {
-        maven {
-            mavenCentral {
-                sonatype {
-                    active = 'RELEASE'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    stagingRepository('build/staging-deploy')
+        
+        release {
+            github {
+                enabled = false
+            }
+        }
+        
+        signing {
+            active = 'ALWAYS'
+            armored = true
+        }
+        
+        deploy {
+            maven {
+                mavenCentral {
+                    sonatype {
+                        active = 'RELEASE'
+                        url = 'https://central.sonatype.com/api/v1/publisher'
+                        stagingRepository('build/staging-deploy')
+                    }
                 }
             }
         }

@@ -18,13 +18,13 @@ package com.osgifx.console.agent.dto;
 import java.util.List;
 
 /**
- * Enum representing various attribute definition types supported in the OSGi 
- * framework. This enum provides types for different data formats such as strings, 
- * integers, booleans, doubles, floats, characters, and longs, including their 
+ * Enum representing various attribute definition types supported in the OSGi
+ * framework. This enum provides types for different data formats such as strings,
+ * integers, booleans, doubles, floats, characters, and longs, including their
  * array and list representations.
  * <p>
- * The {@code XAttributeDefType} enum also includes utility methods to determine 
- * the appropriate type for a given object value and to retrieve the corresponding 
+ * The {@code XAttributeDefType} enum also includes utility methods to determine
+ * the appropriate type for a given object value and to retrieve the corresponding
  * class type for each enum constant.
  * </p>
  */

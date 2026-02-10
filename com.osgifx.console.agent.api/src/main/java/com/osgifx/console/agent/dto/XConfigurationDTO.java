@@ -21,15 +21,15 @@ import java.util.Map;
 import org.osgi.dto.DTO;
 
 /**
- * Represents a configuration object within the OSGi framework. This class extends 
- * the {@link DTO} class to provide a standardized data transfer object for 
+ * Represents a configuration object within the OSGi framework. This class extends
+ * the {@link DTO} class to provide a standardized data transfer object for
  * configuration-related information.
  * <p>
- * The {@code XConfigurationDTO} class contains details such as the PID (Persistent 
- * Identifier), factory PID, location, whether the configuration is a factory or 
- * persisted configuration, and its properties. Additionally, it includes information 
- * about the object class definition and any component reference filters that apply 
- * to the configuration. It is used to transfer configuration data between different 
+ * The {@code XConfigurationDTO} class contains details such as the PID (Persistent
+ * Identifier), factory PID, location, whether the configuration is a factory or
+ * persisted configuration, and its properties. Additionally, it includes information
+ * about the object class definition and any component reference filters that apply
+ * to the configuration. It is used to transfer configuration data between different
  * components or systems in a consistent format.
  * </p>
  */

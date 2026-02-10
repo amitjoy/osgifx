@@ -19,12 +19,12 @@ import org.osgi.dto.DTO;
 
 /**
  * Represents an unsatisfied service reference within the OSGi framework.
- * This class extends the {@link DTO} class to provide a standard data transfer 
+ * This class extends the {@link DTO} class to provide a standard data transfer
  * object for information about service references that are currently unsatisfied.
  * <p>
- * The {@code XUnsatisfiedReferenceDTO} class contains details such as the name of 
- * the unsatisfied reference, the target filter expression, and the object class 
- * associated with the reference. It is used to transfer information about unsatisfied 
+ * The {@code XUnsatisfiedReferenceDTO} class contains details such as the name of
+ * the unsatisfied reference, the target filter expression, and the object class
+ * associated with the reference. It is used to transfer information about unsatisfied
  * service references between different components or systems in a consistent format.
  * </p>
  */

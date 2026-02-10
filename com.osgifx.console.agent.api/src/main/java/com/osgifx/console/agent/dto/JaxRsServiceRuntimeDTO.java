@@ -19,13 +19,13 @@ import org.osgi.dto.DTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 
 /**
- * Represents the runtime status and configuration of a JAX-RS service within 
- * the OSGi framework. This class extends the {@link DTO} class to provide a 
+ * Represents the runtime status and configuration of a JAX-RS service within
+ * the OSGi framework. This class extends the {@link DTO} class to provide a
  * standardized data transfer object for JAX-RS runtime information.
  * <p>
- * The {@code JaxRsServiceRuntimeDTO} class contains details about the JAX-RS 
- * service runtime environment, encapsulated in the {@link RuntimeDTO} instance. 
- * It is used to transfer JAX-RS runtime data between different components or 
+ * The {@code JaxRsServiceRuntimeDTO} class contains details about the JAX-RS
+ * service runtime environment, encapsulated in the {@link RuntimeDTO} instance.
+ * It is used to transfer JAX-RS runtime data between different components or
  * systems in a consistent format.
  * </p>
  */

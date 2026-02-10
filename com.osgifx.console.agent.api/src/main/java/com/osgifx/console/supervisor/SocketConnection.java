@@ -27,9 +27,9 @@ public class SocketConnection {
     // The host address of the socket server
     private final String host;
     // The port number to connect to the socket server
-    private final int    port;
+    private final int port;
     // The connection timeout value
-    private final int    timeout;
+    private final int timeout;
     // The trust store file path for SSL/TLS
     private final String trustStore;
     // The password for the trust store

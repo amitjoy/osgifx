@@ -48,7 +48,7 @@ public final class ConfigurationSearchFilterByProperty implements SearchFilter {
         return switch (searchOperation) {
             case EQUALS_TO -> configuration -> //
                 BiStream.from(configuration.properties) //
-                        .anyMatch((k, v) -> //
+                        .anyMatch((_, v) -> //
                 Strings.CI.contains(v.key, key) && Strings.CI.contains(v.value.toString(), value));
             default -> throw new VerifyException("no matching case found");
         };

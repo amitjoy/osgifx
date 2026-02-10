@@ -83,7 +83,7 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
         fieldLabel    = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
 
-        editableArea.setOnMouseClicked(event -> {
+        editableArea.setOnMouseClicked(_ -> {
             final var dialog = new MultipleCardinalityPropertiesDialog();
             if (StringUtils.isNotBlank(key)) {
                 final var currentValue         = field.getValue();
@@ -177,16 +177,16 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
     public void setupValueChangedListeners() {
         super.setupValueChangedListeners();
 
-        field.multilineProperty().addListener((observable, oldValue, newValue) -> {
+        field.multilineProperty().addListener((_, _, newValue) -> {
             stack.setPrefHeight(newValue ? 80 : 0);
             readOnlyLabel.setPrefHeight(newValue ? 80 : 26);
         });
 
-        field.errorMessagesProperty().addListener(
-                (observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
+        field.errorMessagesProperty()
+                .addListener((_, _, _) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
 
-        editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-        editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
+        editableField.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableField));
+        editableArea.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableArea));
     }
 
 }

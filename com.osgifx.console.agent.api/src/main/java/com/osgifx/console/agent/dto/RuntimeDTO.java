@@ -19,15 +19,15 @@ import org.osgi.dto.DTO;
 import org.osgi.framework.dto.FrameworkDTO;
 
 /**
- * Represents the comprehensive runtime information of various components and 
- * services within the OSGi framework. This class extends the {@link DTO} class 
- * to provide a standardized data transfer object for aggregating runtime details 
+ * Represents the comprehensive runtime information of various components and
+ * services within the OSGi framework. This class extends the {@link DTO} class
+ * to provide a standardized data transfer object for aggregating runtime details
  * of the OSGi environment.
  * <p>
- * The {@code RuntimeDTO} class includes references to runtime details of several 
- * key components, such as the framework itself ({@link FrameworkDTO}), service 
- * components, JAX-RS services, HTTP services, and CDI components. It is used to 
- * transfer an aggregated view of the OSGi runtime state between different components 
+ * The {@code RuntimeDTO} class includes references to runtime details of several
+ * key components, such as the framework itself ({@link FrameworkDTO}), service
+ * components, JAX-RS services, HTTP services, and CDI components. It is used to
+ * transfer an aggregated view of the OSGi runtime state between different components
  * or systems in a consistent format.
  * </p>
  */

@@ -16,45 +16,45 @@
 package com.osgifx.console.agent.dto;
 
 /**
- * Enum representing the different data types that can be used in a DMT (Device 
- * Management Tree) structure within the OSGi framework. These types are utilized 
+ * Enum representing the different data types that can be used in a DMT (Device
+ * Management Tree) structure within the OSGi framework. These types are utilized
  * to define the format and nature of data stored in or retrieved from a DMT node.
  */
 public enum DmtDataType {
 
     /** Base64-encoded binary data. */
     BASE64,
-    
+
     /** Binary data. */
     BINARY,
-    
+
     /** Boolean value (true or false). */
     BOOLEAN,
-    
+
     /** Date value in a standardized format. */
     DATE,
-    
+
     /** Floating-point numeric value. */
     FLOAT,
-    
+
     /** Integer numeric value. */
     INTEGER,
-    
+
     /** Null value, indicating the absence of data. */
     NULL,
-    
+
     /** String value. */
     STRING,
-    
+
     /** Time value in a standardized format. */
     TIME,
-    
+
     /** XML-formatted data. */
     XML,
-    
+
     /** Long numeric value. */
     LONG,
-    
+
     /** Combined date and time value in a standardized format. */
     DATE_TIME
 }

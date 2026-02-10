@@ -98,7 +98,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
         dialogPane.getButtonTypes().addAll(sendButtonType);
 
         final var sendButton = (Button) dialogPane.lookupButton(sendButtonType);
-        sendButton.setOnAction(actionEvent -> {
+        sendButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -134,7 +134,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
                               final ToggleSwitch isSyncToggle,
                               final Map<FormContent, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries) {
         final List<ConfigValue> properties = Lists.newArrayList();
-        entries.forEach((k, v) -> {
+        entries.forEach((_, v) -> {
             var configKey   = v.value1.get();
             var configValue = v.value2.get();
             var configType  = v.value3.get();

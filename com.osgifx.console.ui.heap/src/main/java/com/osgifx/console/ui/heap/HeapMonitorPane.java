@@ -120,8 +120,7 @@ public final class HeapMonitorPane extends BorderPane {
         scrollPane.setFitToWidth(true);
         setCenter(scrollPane);
 
-        final var frame = new KeyFrame(Duration.seconds(REFRESH_DELAY),
-                                       (final var actionEvent) -> updateHeapInformation());
+        final var frame = new KeyFrame(Duration.seconds(REFRESH_DELAY), _ -> updateHeapInformation());
 
         animation = new Timeline();
         animation.getKeyFrames().add(frame);
@@ -262,17 +261,17 @@ public final class HeapMonitorPane extends BorderPane {
         final var garbageCollectBtn = new Button("Garbage Collect");
         garbageCollectBtn.setDisable(true);
         garbageCollectBtn.setMaxWidth(Double.MAX_VALUE);
-        garbageCollectBtn.setOnAction(e -> performGC());
+        garbageCollectBtn.setOnAction(_ -> performGC());
 
         final var heapDumpBtn = new Button("Heap Dump");
         heapDumpBtn.setDisable(!isConnected || isSnapshotAgent);
         heapDumpBtn.setMaxWidth(Double.MAX_VALUE);
-        heapDumpBtn.setOnAction(e -> heapDump());
+        heapDumpBtn.setOnAction(_ -> heapDump());
 
         final var startStopBtn = new Button("Start");
         startStopBtn.setDisable(!isConnected || isSnapshotAgent);
         startStopBtn.setMaxWidth(Double.MAX_VALUE);
-        startStopBtn.setOnAction(e -> {
+        startStopBtn.setOnAction(_ -> {
             switch (animation.getStatus()) {
                 case RUNNING:
                     animation.pause();
@@ -349,7 +348,7 @@ public final class HeapMonitorPane extends BorderPane {
                 }
             }
         };
-        heapdumpTask.valueProperty().addListener((ChangeListener<byte[]>) (obs, oldValue, newValue) -> {
+        heapdumpTask.valueProperty().addListener((ChangeListener<byte[]>) (_, _, newValue) -> {
             if (newValue != null) {
                 threadSync.asyncExec(() -> {
                     try {

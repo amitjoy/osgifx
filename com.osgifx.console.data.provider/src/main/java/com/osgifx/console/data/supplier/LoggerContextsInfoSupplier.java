@@ -27,6 +27,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -74,6 +76,7 @@ public final class LoggerContextsInfoSupplier implements RuntimeInfoSupplier, Ev
     private FluentLogger        logger;
 
     private final ObservableList<XBundleLoggerContextDTO> loggerContexts = observableArrayList();
+    private final ReentrantLock                           retrieveLock   = new ReentrantLock();
 
     @Activate
     void activate() {
@@ -81,16 +84,21 @@ public final class LoggerContextsInfoSupplier implements RuntimeInfoSupplier, Ev
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving logger contexts info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        retrieveLock.lock();
+        try {
+            logger.atInfo().log("Retrieving logger contexts info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            loggerContexts.setAll(makeNullSafe(agent.getBundleLoggerContexts()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC);
+            logger.atInfo().log("Logger contexts info retrieved successfully");
+        } finally {
+            retrieveLock.unlock();
         }
-        loggerContexts.setAll(makeNullSafe(agent.getBundleLoggerContexts()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC);
-        logger.atInfo().log("Logger contexts info retrieved successfully");
     }
 
     @Override

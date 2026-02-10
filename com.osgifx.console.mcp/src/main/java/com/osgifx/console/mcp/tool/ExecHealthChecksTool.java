@@ -50,10 +50,8 @@ public class ExecHealthChecksTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder()
-                .optionalArgArray("tags", "string", "The tags to execute")
-                .optionalArgArray("names", "string", "The names to execute")
-                .build();
+        return McpToolSchema.builder().optionalArgArray("tags", "string", "The tags to execute")
+                .optionalArgArray("names", "string", "The names to execute").build();
     }
 
     @Override

@@ -33,6 +33,7 @@ import java.lang.annotation.Target;
  * This prevents naming conflicts when implementing the {@code McpTool} interface in the same class.
  * <p>
  * Example:
+ * 
  * <pre>
  * &#64;Component
  * &#64;McpToolDef(name = "my_tool", description = "Everything")

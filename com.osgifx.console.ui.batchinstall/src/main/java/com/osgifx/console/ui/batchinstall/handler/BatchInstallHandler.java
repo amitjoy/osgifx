@@ -89,7 +89,7 @@ public final class BatchInstallHandler {
                         return installer.installArtifacts(selectedFeatures.get());
                     }
                 };
-                batchTask.setOnSucceeded(t -> {
+                batchTask.setOnSucceeded(_ -> {
                     final var result = batchTask.getValue();
                     if (result != null) {
                         if (!result.isEmpty()) {

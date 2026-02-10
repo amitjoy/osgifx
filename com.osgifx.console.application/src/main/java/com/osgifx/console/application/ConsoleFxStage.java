@@ -119,7 +119,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         progressText.textProperty().bind(task.messageProperty());
         loadProgress.progressProperty().bind(task.progressProperty());
 
-        task.stateProperty().addListener((observableValue, oldState, newState) -> {
+        task.stateProperty().addListener((_, _, newState) -> {
             if (newState == SUCCEEDED) {
                 loadProgress.progressProperty().unbind();
                 loadProgress.setProgress(1);
@@ -129,7 +129,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 
                 fadeSplash.setFromValue(1.0);
                 fadeSplash.setToValue(0.0);
-                fadeSplash.setOnFinished(actionEvent -> initStage.hide());
+                fadeSplash.setOnFinished(_ -> initStage.hide());
                 fadeSplash.play();
 
                 completionHandler.run();
