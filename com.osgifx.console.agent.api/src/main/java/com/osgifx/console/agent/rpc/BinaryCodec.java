@@ -178,8 +178,21 @@ public class BinaryCodec {
     }
 
     // Type Tags
-    private static final byte NULL = 0, BOOL = 1, BYTE = 2, SHORT = 3, INT = 4, LONG = 5, FLOAT = 6, DOUBLE = 7,
-            STRING = 8, LIST = 9, DTO = 10, ARRAY = 11, ENUM = 12, MAP = 13, CHAR = 14;
+    private static final byte NULL   = 0;
+    private static final byte BOOL   = 1;
+    private static final byte BYTE   = 2;
+    private static final byte SHORT  = 3;
+    private static final byte INT    = 4;
+    private static final byte LONG   = 5;
+    private static final byte FLOAT  = 6;
+    private static final byte DOUBLE = 7;
+    private static final byte STRING = 8;
+    private static final byte LIST   = 9;
+    private static final byte DTO    = 10;
+    private static final byte ARRAY  = 11;
+    private static final byte ENUM   = 12;
+    private static final byte MAP    = 13;
+    private static final byte CHAR   = 14;
 
     // --- ENCODER ---
 
@@ -306,7 +319,8 @@ public class BinaryCodec {
             case MAP: {
                 int                 size  = in.readInt();
                 Map<Object, Object> map   = new LinkedHashMap<>(size);
-                Type                kType = Object.class, vType = Object.class;
+                Type                kType = Object.class;
+                Type                vType = Object.class;
                 if (type instanceof ParameterizedType) {
                     Type[] args = ((ParameterizedType) type).getActualTypeArguments();
                     kType = args[0];
@@ -356,8 +370,9 @@ public class BinaryCodec {
                 }
                 return name;
             }
+            default:
+                throw new IOException("Unknown tag: " + tag);
         }
-        throw new IOException("Unknown tag: " + tag);
     }
 
     private FieldAccessor[] getAccessors(Class<?> clz) {
@@ -733,12 +748,9 @@ public class BinaryCodec {
         }
     }
 
-    // --- STANDARD IMPLEMENTATIONS (MethodHandle Invocations) ---
-
-    // Note: invokeExact throws Throwable. We wrap it in RuntimeException (or let Exception propagate if compatible).
-
     static class StandardInt implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardInt(MethodHandle g, MethodHandle s) {
             get = g;
@@ -766,7 +778,8 @@ public class BinaryCodec {
     }
 
     static class StandardBoolean implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardBoolean(MethodHandle g, MethodHandle s) {
             get = g;
@@ -794,7 +807,8 @@ public class BinaryCodec {
     }
 
     static class StandardLong implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardLong(MethodHandle g, MethodHandle s) {
             get = g;
@@ -822,7 +836,8 @@ public class BinaryCodec {
     }
 
     static class StandardDouble implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardDouble(MethodHandle g, MethodHandle s) {
             get = g;
@@ -850,7 +865,8 @@ public class BinaryCodec {
     }
 
     static class StandardFloat implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardFloat(MethodHandle g, MethodHandle s) {
             get = g;
@@ -878,7 +894,8 @@ public class BinaryCodec {
     }
 
     static class StandardByte implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardByte(MethodHandle g, MethodHandle s) {
             get = g;
@@ -906,7 +923,8 @@ public class BinaryCodec {
     }
 
     static class StandardShort implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardShort(MethodHandle g, MethodHandle s) {
             get = g;
@@ -934,7 +952,8 @@ public class BinaryCodec {
     }
 
     static class StandardChar implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
 
         StandardChar(MethodHandle g, MethodHandle s) {
             get = g;
@@ -962,7 +981,8 @@ public class BinaryCodec {
     }
 
     static class StandardObject implements FieldAccessor {
-        final MethodHandle get, set;
+        final MethodHandle get;
+        final MethodHandle set;
         final Type         type;
 
         StandardObject(MethodHandle g, MethodHandle s, Type t) {

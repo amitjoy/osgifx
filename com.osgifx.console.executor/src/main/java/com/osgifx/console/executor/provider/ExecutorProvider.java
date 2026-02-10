@@ -92,7 +92,7 @@ public final class ExecutorProvider implements Executor {
                         logger.atWarning().log("Virtual executor shut down with %s tasks remaining", remaining.size());
                     }
                 }
-            } catch (InterruptedException e) {
+            } catch (InterruptedException _) {
                 virtualExecutor.shutdownNow();
                 Thread.currentThread().interrupt();
             }
