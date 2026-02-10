@@ -58,7 +58,7 @@ public final class ExecutorProvider implements Executor {
     @Reference
     private LoggerFactory               factory;
     private FluentLogger                logger;
-    private ScheduledThreadPoolExecutor scheduler;      // Platform threads for scheduling
+    private ScheduledThreadPoolExecutor scheduler;       // Platform threads for scheduling
     private ExecutorService             virtualExecutor; // Virtual threads for execution
 
     @Activate
@@ -66,16 +66,12 @@ public final class ExecutorProvider implements Executor {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 
         // Create virtual thread executor for async operations
-        final var virtualThreadFactory = Thread.ofVirtual()
-                .name("fx-virtual-worker-", 0)
-                .factory();
+        final var virtualThreadFactory = Thread.ofVirtual().name("fx-virtual-worker-", 0).factory();
         virtualExecutor = Executors.newThreadPerTaskExecutor(virtualThreadFactory);
 
         // Create small platform thread pool for scheduling (timing-critical operations)
         final var coreSize      = config.coreSize();
-        final var threadFactory = BasicThreadFactory.builder()
-                .namingPattern("fx-scheduler-%d")
-                .daemon(config.daemon())
+        final var threadFactory = BasicThreadFactory.builder().namingPattern("fx-scheduler-%d").daemon(config.daemon())
                 .build();
 
         scheduler = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
@@ -154,7 +150,8 @@ public final class ExecutorProvider implements Executor {
         // Wrap command to execute on virtual thread executor
         final Runnable wrappedCommand = () -> virtualExecutor.execute(command);
 
-        return scheduler.scheduleWithFixedDelay(wrappedCommand, initialDelay.toMillis(), delay.toMillis(), MILLISECONDS);
+        return scheduler.scheduleWithFixedDelay(wrappedCommand, initialDelay.toMillis(), delay.toMillis(),
+                MILLISECONDS);
     }
 
 }

@@ -18,27 +18,27 @@ package com.osgifx.console.agent.rpc.mqtt.api;
 import org.osgi.util.pushstream.PushStream;
 
 /**
- * Represents a subscriber for MQTT version 5 messages. This interface allows for 
- * the implementation of custom functionality to consume messages from specified 
+ * Represents a subscriber for MQTT version 5 messages. This interface allows for
+ * the implementation of custom functionality to consume messages from specified
  * MQTT topics.
  * <p>
- * Implementations of this interface are responsible for subscribing to a given 
- * topic and providing a mechanism to receive and process messages asynchronously 
+ * Implementations of this interface are responsible for subscribing to a given
+ * topic and providing a mechanism to receive and process messages asynchronously
  * using a {@link PushStream}.
  * </p>
  */
 public interface Mqtt5Subscriber {
 
     /**
-     * Subscribes to the specified MQTT topic and returns a {@link PushStream} that 
+     * Subscribes to the specified MQTT topic and returns a {@link PushStream} that
      * allows asynchronous processing of incoming messages from that topic.
      * <p>
-     * The topic parameter identifies the channel to which the subscriber will listen 
+     * The topic parameter identifies the channel to which the subscriber will listen
      * for incoming messages.
      * </p>
      *
      * @param topic the MQTT topic to subscribe to, must not be null or empty
-     * @return a {@link PushStream} instance representing the stream of messages 
+     * @return a {@link PushStream} instance representing the stream of messages
      *         received from the subscribed topic
      * @throws IllegalArgumentException if the topic is null or empty
      */

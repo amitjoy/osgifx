@@ -21,13 +21,13 @@ import org.osgi.dto.DTO;
 
 /**
  * Represents the result of a health check execution within the OSGi framework.
- * This class extends the {@link DTO} class to provide a standardized data 
+ * This class extends the {@link DTO} class to provide a standardized data
  * transfer object for health check result-related information.
  * <p>
- * The {@code XHealthCheckResultDTO} class includes details such as the name and 
- * tags of the health check, a list of individual results, the time taken to 
- * execute the health check, the timestamp when it finished, and whether the 
- * health check execution timed out. It is used to transfer health check results 
+ * The {@code XHealthCheckResultDTO} class includes details such as the name and
+ * tags of the health check, a list of individual results, the time taken to
+ * execute the health check, the timestamp when it finished, and whether the
+ * health check execution timed out. It is used to transfer health check results
  * between different components or systems in a consistent format.
  * </p>
  */
@@ -35,7 +35,7 @@ public class XHealthCheckResultDTO extends DTO {
 
     /**
      * Represents an individual result entry for a health check execution.
-     * This class extends the {@link DTO} class to provide structured information 
+     * This class extends the {@link DTO} class to provide structured information
      * about the outcome of a health check.
      */
     public static class ResultDTO extends DTO {

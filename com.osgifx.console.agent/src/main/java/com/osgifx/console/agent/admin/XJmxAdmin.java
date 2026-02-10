@@ -40,10 +40,10 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 
 public final class XJmxAdmin {
 
-    private static final String         HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
-    private static final ReentrantLock  initLock         = new ReentrantLock();
-    private static volatile Object      hotspotMBean;
-    private final FluentLogger          logger           = LoggerFactory.getFluentLogger(getClass());
+    private static final String        HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";
+    private static final ReentrantLock initLock          = new ReentrantLock();
+    private static volatile Object     hotspotMBean;
+    private final FluentLogger         logger            = LoggerFactory.getFluentLogger(getClass());
 
     public XHeapUsageDTO init() {
         final XHeapUsageDTO heapUsage = new XHeapUsageDTO();

@@ -18,13 +18,13 @@ package com.osgifx.console.agent.dto;
 import org.osgi.dto.DTO;
 
 /**
- * Represents the state and attributes of a thread within the OSGi framework. 
- * This class extends the {@link DTO} class to provide a standard data transfer 
+ * Represents the state and attributes of a thread within the OSGi framework.
+ * This class extends the {@link DTO} class to provide a standard data transfer
  * object for thread-related information.
  * <p>
- * The {@code XThreadDTO} class holds various details about a thread, such as its 
- * name, identifier, priority, state, and whether it is interrupted, alive, daemon, 
- * or deadlocked. It is used for transferring thread data between different components 
+ * The {@code XThreadDTO} class holds various details about a thread, such as its
+ * name, identifier, priority, state, and whether it is interrupted, alive, daemon,
+ * or deadlocked. It is used for transferring thread data between different components
  * or systems in a consistent format.
  * </p>
  */
