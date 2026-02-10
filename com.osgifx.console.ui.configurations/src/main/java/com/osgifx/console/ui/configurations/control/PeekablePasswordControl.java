@@ -128,8 +128,8 @@ public final class PeekablePasswordControl extends SimpleControl<PasswordField> 
     @Override
     public void setupValueChangedListeners() {
         super.setupValueChangedListeners();
-        field.errorMessagesProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-        editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
+        field.errorMessagesProperty().addListener((_, _, _) -> toggleTooltip(editableField));
+        editableField.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableField));
     }
 
     protected String obfuscate(final String input) {

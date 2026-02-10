@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
@@ -48,6 +49,7 @@ public final class GogoRedirector implements Redirector {
     private CommandSession                                     session;
     private final Shell                                        stdin;
     private RedirectOutput                                     stdout;
+    private final ReentrantLock                                lock = new ReentrantLock();
 
     /**
      * Create a redirector
@@ -94,12 +96,17 @@ public final class GogoRedirector implements Redirector {
         }
     }
 
-    private synchronized void openSession(final CommandProcessor replacement) {
-        processor = replacement;
-        final List<AgentServer> agents = Arrays.asList(agentServer);
-        stdout  = new RedirectOutput(agents, null, false);
-        session = processor.createSession(stdin, stdout, stdout);
-        stdin.open(session);
+    private void openSession(final CommandProcessor replacement) {
+        lock.lock();
+        try {
+            processor = replacement;
+            final List<AgentServer> agents = Arrays.asList(agentServer);
+            stdout  = new RedirectOutput(agents, null, false);
+            session = processor.createSession(stdin, stdout, stdout);
+            stdin.open(session);
+        } finally {
+            lock.unlock();
+        }
     }
 
     /*

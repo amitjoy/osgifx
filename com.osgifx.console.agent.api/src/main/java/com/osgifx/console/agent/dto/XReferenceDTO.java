@@ -19,12 +19,12 @@ import org.osgi.dto.DTO;
 
 /**
  * Represents a reference to a service or a component within the OSGi framework.
- * This class extends the {@link DTO} class to provide a standardized data transfer 
+ * This class extends the {@link DTO} class to provide a standardized data transfer
  * object for information related to component references.
  * <p>
- * The {@code XReferenceDTO} class includes details such as the reference name, 
- * interface, cardinality, policy, and methods for binding and unbinding the reference. 
- * It is used to transfer reference data between different components or systems 
+ * The {@code XReferenceDTO} class includes details such as the reference name,
+ * interface, cardinality, policy, and methods for binding and unbinding the reference.
+ * It is used to transfer reference data between different components or systems
  * in a consistent format.
  * </p>
  */

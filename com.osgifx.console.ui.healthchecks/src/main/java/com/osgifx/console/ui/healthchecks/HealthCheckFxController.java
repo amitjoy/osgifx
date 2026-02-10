@@ -117,7 +117,7 @@ public final class HealthCheckFxController {
 
     private void initHcTypeButton() {
         hcTypeButton.getStyleClass().add(STYLE_CLASS_DARK);
-        hcTypeButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+        hcTypeButton.getToggleGroup().selectedToggleProperty().addListener((_, oldVal, newVal) -> {
             if (newVal == null) {
                 oldVal.setSelected(true);
             }
@@ -125,8 +125,8 @@ public final class HealthCheckFxController {
     }
 
     private void initButtons() {
-        nameHcButton.setOnMouseClicked(e -> initNames());
-        tagHcButton.setOnMouseClicked(e -> initTags());
+        nameHcButton.setOnMouseClicked(_ -> initNames());
+        tagHcButton.setOnMouseClicked(_ -> initTags());
         executeHcButton.setDisable(isSnapshotAgent);
     }
 
@@ -170,7 +170,7 @@ public final class HealthCheckFxController {
     private FilteredList<String> initSearchFilter(final ObservableList<String> metadata) {
         final var filteredMetadataList = new FilteredList<>(metadata);
         updateFilteredList(filteredMetadataList);
-        java.util.Optional.of(searchText).ifPresent(st -> searchText.textProperty().addListener(obs -> {
+        java.util.Optional.of(searchText).ifPresent(_ -> searchText.textProperty().addListener(_ -> {
             updateFilteredList(filteredMetadataList);
             searchText.requestFocus();
         }));

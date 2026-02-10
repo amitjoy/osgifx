@@ -78,7 +78,7 @@ public final class LoggerConfigurationDialog extends Dialog<String> {
         dialogPane.getButtonTypes().addAll(finishButtonType);
 
         final var finishButton = (Button) dialogPane.lookupButton(finishButtonType);
-        finishButton.setOnAction(actionEvent -> {
+        finishButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -141,8 +141,8 @@ public final class LoggerConfigurationDialog extends Dialog<String> {
             btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
             btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
 
-            btnAddField.setOnAction(e -> addFieldPair(parent));
-            btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
+            btnAddField.setOnAction(_ -> addFieldPair(parent));
+            btnRemoveField.setOnAction(_ -> removeFieldPair(parent, this));
 
             getChildren().addAll(txtKey, comboBox, btnAddField, btnRemoveField);
 

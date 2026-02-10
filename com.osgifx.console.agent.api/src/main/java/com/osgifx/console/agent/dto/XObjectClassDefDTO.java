@@ -21,13 +21,13 @@ import org.osgi.dto.DTO;
 
 /**
  * Represents an object class definition (OCD) within the OSGi framework.
- * This class extends the {@link DTO} class to provide a standardized data transfer 
- * object for information related to object class definitions, which are used for 
+ * This class extends the {@link DTO} class to provide a standardized data transfer
+ * object for information related to object class definitions, which are used for
  * configuration metadata.
  * <p>
- * The {@code XObjectClassDefDTO} class contains details such as the ID, PID, factory 
- * PID, name, description, descriptor location, and associated attribute definitions. 
- * It is used to transfer object class definition data between different components 
+ * The {@code XObjectClassDefDTO} class contains details such as the ID, PID, factory
+ * PID, name, description, descriptor location, and associated attribute definitions.
+ * It is used to transfer object class definition data between different components
  * or systems in a consistent format.
  * </p>
  */

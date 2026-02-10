@@ -17,6 +17,8 @@ package com.osgifx.console.agent.redirector;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An filter stream that takes a string from the supervisor and then provides it
@@ -26,10 +28,13 @@ import java.io.InputStream;
  */
 public class RedirectInput extends InputStream {
 
-    private InputStream  org;
-    private final byte[] ring = new byte[65536];
-    private int          in;
-    private int          out;
+    private InputStream         org;
+    private final byte[]        ring          = new byte[65536];
+    private int                 in;
+    private int                 out;
+    private final ReentrantLock ringLock      = new ReentrantLock();
+    private final Condition     dataAvailable = ringLock.newCondition();
+    private final ReentrantLock lock          = new ReentrantLock();
 
     /**
      * Create a redirector input stream with an original input stream
@@ -58,10 +63,15 @@ public class RedirectInput extends InputStream {
     /**
      * Provide the string that should be treated as input for the running code.
      */
-    public synchronized void add(final String s) throws IOException {
-        final byte[] bytes = s.getBytes();
-        for (final byte element : bytes) {
-            write(element);
+    public void add(final String s) throws IOException {
+        lock.lock();
+        try {
+            final byte[] bytes = s.getBytes();
+            for (final byte element : bytes) {
+                write(element);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -69,14 +79,17 @@ public class RedirectInput extends InputStream {
      * Write to the ring buffer
      */
     private void write(final byte b) {
-        synchronized (ring) {
+        ringLock.lock();
+        try {
             ring[in] = b;
             in       = (in + 1) % ring.length;
             if (in == out) {
                 // skip oldest output
                 out = (out + 1) % ring.length;
             }
-            ring.notifyAll();
+            dataAvailable.signalAll();
+        } finally {
+            ringLock.unlock();
         }
     }
 
@@ -92,10 +105,11 @@ public class RedirectInput extends InputStream {
     @Override
     public int read() throws IOException {
         System.out.flush();
-        synchronized (ring) {
+        ringLock.lock();
+        try {
             while (in == out) {
                 try {
-                    ring.wait(400);
+                    dataAvailable.await(400, java.util.concurrent.TimeUnit.MILLISECONDS);
                 } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return -1;
@@ -104,6 +118,8 @@ public class RedirectInput extends InputStream {
             final int c = 0xFF & ring[out];
             out = (out + 1) % ring.length;
             return c;
+        } finally {
+            ringLock.unlock();
         }
     }
 

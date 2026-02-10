@@ -29,9 +29,9 @@ public class MqttConnection {
     // The server address of the MQTT broker
     private final String server;
     // The port number to connect to the MQTT broker
-    private final int    port;
+    private final int port;
     // The connection timeout value
-    private final int    timeout;
+    private final int timeout;
     // The username for authentication
     private final String username;
     // The password for authentication

@@ -89,10 +89,10 @@ public final class PropertiesForm {
             final var type = comboBox.getValue();
             node = getFieldByType(type == null ? XAttributeDefType.STRING : type);
 
-            comboBox.getSelectionModel().selectedItemProperty().addListener((opt, oldValue, newValue) -> {
+            comboBox.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
                 final Class<?> clazz   = XAttributeDefType.clazz(newValue);
                 final var      newNode = getFieldByType(newValue);
-                newNode.setOnMouseClicked(e -> {
+                newNode.setOnMouseClicked(_ -> {
                     // multiple cardinality
                     if (clazz == null) {
                         final var dialog = new MultipleCardinalityPropertiesDialog();
@@ -116,8 +116,8 @@ public final class PropertiesForm {
             btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
             btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
 
-            btnAddField.setOnAction(e -> addFieldPair(parent));
-            btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
+            btnAddField.setOnAction(_ -> addFieldPair(parent));
+            btnRemoveField.setOnAction(_ -> removeFieldPair(parent, this));
 
             getChildren().addAll(txtKey, node, comboBox, btnAddField, btnRemoveField);
 

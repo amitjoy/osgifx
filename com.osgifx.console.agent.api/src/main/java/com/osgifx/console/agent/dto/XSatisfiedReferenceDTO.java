@@ -19,13 +19,13 @@ import org.osgi.dto.DTO;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 
 /**
- * Represents a satisfied reference within the OSGi framework. This class extends 
- * the {@link DTO} class to provide a standardized data transfer object for satisfied 
+ * Represents a satisfied reference within the OSGi framework. This class extends
+ * the {@link DTO} class to provide a standardized data transfer object for satisfied
  * service reference-related information.
  * <p>
- * The {@code XSatisfiedReferenceDTO} class includes details such as the reference 
- * name, target, object class, and an array of associated service references. It 
- * is used to transfer information about satisfied references between different 
+ * The {@code XSatisfiedReferenceDTO} class includes details such as the reference
+ * name, target, object class, and an array of associated service references. It
+ * is used to transfer information about satisfied references between different
  * components or systems in a consistent format.
  * </p>
  */

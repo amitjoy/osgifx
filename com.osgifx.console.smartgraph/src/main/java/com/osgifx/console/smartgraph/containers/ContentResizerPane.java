@@ -17,7 +17,6 @@ package com.osgifx.console.smartgraph.containers;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -36,12 +35,11 @@ public class ContentResizerPane extends Pane {
         final var scale = new Scale(1, 1);
         content.getTransforms().add(scale);
 
-        resizeFActor.addListener(
-                (final ObservableValue<? extends Number> observable, final Number oldValue, final Number newValue) -> {
-                    scale.setX(newValue.doubleValue());
-                    scale.setY(newValue.doubleValue());
-                    requestLayout();
-                });
+        resizeFActor.addListener((_, _, newValue) -> {
+            scale.setX(newValue.doubleValue());
+            scale.setY(newValue.doubleValue());
+            requestLayout();
+        });
     }
 
     @Override
