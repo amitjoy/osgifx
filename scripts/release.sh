@@ -74,7 +74,7 @@ echo "🏁 Releasing Bundles"
 ./gradlew :com.osgifx.console.agent.api:release --info
 
 echo "🏁 Releasing Executable JAR to Sonatype"
-./gradlew :com.osgifx.console.dist:publish jreleaserDeploy --info
+./gradlew :com.osgifx.console.dist:publish jreleaserDeploy -Pjreleaser.enabled=true --info
 
 baseline_version=$(cat cnf/version/current.version)
 
