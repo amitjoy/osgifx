@@ -105,6 +105,22 @@ storage.directory               =         ${current.directory}/.osgifx-ws
                                           com.sun.javafx.tk,\
                                           com.sun.javafx.webkit,\
                                           com.sun.webkit,\
+                                          java.lang.annotation,\
+                                          java.lang.invoke,\
+                                          java.lang.runtime,\
+                                          java.net.http,\
+                                          java.nio.file,\
+                                          java.nio.file.attribute,\
+                                          java.nio.file.spi,\
+                                          java.time,\
+                                          java.time.chrono,\
+                                          java.time.format,\
+                                          java.time.temporal,\
+                                          java.time.zone,\
+                                          java.util.function,\
+                                          java.util.stream,\
+                                          javax.net,\
+                                          javax.net.ssl,\
                                           javafx.animation,\
                                           javafx.application,\
                                           javafx.beans,\
