@@ -18,6 +18,7 @@ package com.osgifx.console.executor.provider;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
@@ -27,8 +28,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.apache.commons.lang3.time.DurationUtils;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.service.component.annotations.Activate;
@@ -71,12 +70,9 @@ public final class ExecutorProvider implements Executor {
 
         // Create small platform thread pool for scheduling (timing-critical operations)
         final var coreSize      = config.coreSize();
-        final var threadFactory = BasicThreadFactory.builder().namingPattern("fx-scheduler-%d").daemon(config.daemon())
-                .build();
+        final var threadFactory = Thread.ofPlatform().name("fx-scheduler-", 0).daemon(config.daemon()).factory();
 
         scheduler = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
-        scheduler.setRemoveOnCancelPolicy(true);
-
         logger.atInfo().log("Executor initialized with virtual threads (scheduler threads: %d)", coreSize);
     }
 
@@ -86,7 +82,7 @@ public final class ExecutorProvider implements Executor {
         if (virtualExecutor != null) {
             virtualExecutor.shutdown();
             try {
-                if (!virtualExecutor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                if (!virtualExecutor.awaitTermination(5, SECONDS)) {
                     final var remaining = virtualExecutor.shutdownNow();
                     if (!remaining.isEmpty()) {
                         logger.atWarning().log("Virtual executor shut down with %s tasks remaining", remaining.size());
@@ -129,7 +125,7 @@ public final class ExecutorProvider implements Executor {
         checkNotNull(initialDelay, "The initial delay cannot be null");
         checkNotNull(period, "The period cannot be null");
         checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
-        checkArgument(DurationUtils.isPositive(period), "The period must be positive and more than zero");
+        checkArgument(period.isPositive(), "The period must be positive and more than zero");
 
         // Wrap command to execute on virtual thread executor
         final Runnable wrappedCommand = () -> virtualExecutor.execute(command);
@@ -145,7 +141,7 @@ public final class ExecutorProvider implements Executor {
         checkNotNull(initialDelay, "The initial delay cannot be null");
         checkNotNull(delay, "The delay cannot be null");
         checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
-        checkArgument(DurationUtils.isPositive(delay), "The delay must be positive and more than zero");
+        checkArgument(delay.isPositive(), "The delay must be positive and more than zero");
 
         // Wrap command to execute on virtual thread executor
         final Runnable wrappedCommand = () -> virtualExecutor.execute(command);
