@@ -47,7 +47,7 @@ import org.osgi.service.messaging.MessageContext;
 import org.osgi.service.messaging.MessageContextBuilder;
 import org.osgi.service.messaging.MessagePublisher;
 import org.osgi.service.messaging.MessageSubscription;
-import org.osgi.util.promise.Promise;
+import org.osgi.util.promise.TimeoutException;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.j256.simplelogging.FluentLogger;
@@ -56,6 +56,7 @@ import com.osgifx.console.agent.rpc.BinaryCodec;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
+import in.bytehue.messaging.mqtt5.api.CancellablePromise;
 import in.bytehue.messaging.mqtt5.api.MqttRequestMultiplexer;
 
 /**
@@ -216,11 +217,16 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                                 // The multiplexer uses this context to know where to listen for the reply
                                 MessageContext responseCtx = mcb.channel(pubTopic + "/reply").buildContext();
 
-                                Promise<Message> promise = multiplexer.request(request, responseCtx);
+                                CancellablePromise<Message> promise = multiplexer.request(request, responseCtx);
                                 try {
-                                    // Block for response
-                                    Message responseMsg = promise.getValue();
-                                    return decodeResponse(responseMsg, method.getGenericReturnType());
+                                    // Block for response with timeout (300 seconds, same as SocketRPC)
+                                    Message response = promise.timeout(300_000L).onFailure(failure -> {
+                                        if (failure instanceof TimeoutException) {
+                                            // Explicitly cancel to clean up resources
+                                            promise.cancel();
+                                        }
+                                    }).getValue();
+                                    return decodeResponse(response, method.getGenericReturnType());
                                 } catch (InvocationTargetException e) {
                                     throw new RuntimeException(e);
                                 } catch (InterruptedException e) {
