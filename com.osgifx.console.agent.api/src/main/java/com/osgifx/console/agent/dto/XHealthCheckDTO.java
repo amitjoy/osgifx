@@ -21,13 +21,13 @@ import org.osgi.dto.DTO;
 
 /**
  * Represents the details of a health check service within the OSGi framework.
- * This class extends the {@link DTO} class to provide a standardized data 
+ * This class extends the {@link DTO} class to provide a standardized data
  * transfer object for health check-related information.
  * <p>
- * The {@code XHealthCheckDTO} class includes information such as the service ID, 
- * name, MBean name, scheduling details like cron expression or interval, result 
- * time-to-live (TTL), sticky duration for non-OK results, and associated tags. 
- * It is used to transfer health check data between different components or systems 
+ * The {@code XHealthCheckDTO} class includes information such as the service ID,
+ * name, MBean name, scheduling details like cron expression or interval, result
+ * time-to-live (TTL), sticky duration for non-OK results, and associated tags.
+ * It is used to transfer health check data between different components or systems
  * in a consistent format.
  * </p>
  */

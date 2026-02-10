@@ -73,7 +73,7 @@ public final class XLoggerAdmin {
             return Collections.emptyList();
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();
-        final LoggerContext rootContext = loggerAdmin.getLoggerContext(null);
+        final LoggerContext                 rootContext    = loggerAdmin.getLoggerContext(null);
         for (final Bundle bundle : context.getBundles()) {
             final String        bsn           = bundle.getSymbolicName();
             final LoggerContext loggerContext = loggerAdmin.getLoggerContext(bsn);

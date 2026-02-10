@@ -16,12 +16,12 @@
 package com.osgifx.console.agent.helper;
 
 /**
- * Enum representing various OSGi Compendium Services. Each service is identified 
- * by a key and has a comprehensible name to describe its function within the 
+ * Enum representing various OSGi Compendium Services. Each service is identified
+ * by a key and has a comprehensible name to describe its function within the
  * OSGi framework.
  * <p>
- * The {@code OSGiCompendiumService} enum provides a standard list of OSGi services 
- * used in the framework, such as the Service Component Runtime (SCR), Configuration 
+ * The {@code OSGiCompendiumService} enum provides a standard list of OSGi services
+ * used in the framework, such as the Service Component Runtime (SCR), Configuration
  * Admin (CM), Metatype, DMT Admin, User Admin, Logger Admin, and Event Admin.
  * </p>
  */

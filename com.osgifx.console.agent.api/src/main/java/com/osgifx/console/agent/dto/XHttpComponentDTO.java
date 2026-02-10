@@ -20,13 +20,13 @@ import java.util.List;
 import org.osgi.dto.DTO;
 
 /**
- * Represents an HTTP component within the OSGi framework. This class extends 
- * the {@link DTO} class to provide a standardized data transfer object for HTTP 
+ * Represents an HTTP component within the OSGi framework. This class extends
+ * the {@link DTO} class to provide a standardized data transfer object for HTTP
  * component-related information.
  * <p>
- * The {@code XHttpComponentDTO} class contains details about various types of 
- * HTTP components, such as servlets, filters, listeners, and error pages. It 
- * includes information like component name, service ID, context details, supported 
+ * The {@code XHttpComponentDTO} class contains details about various types of
+ * HTTP components, such as servlets, filters, listeners, and error pages. It
+ * includes information like component name, service ID, context details, supported
  * patterns, and specific settings related to each component type.
  * </p>
  */

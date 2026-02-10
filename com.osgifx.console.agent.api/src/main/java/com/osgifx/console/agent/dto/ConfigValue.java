@@ -17,11 +17,11 @@ package com.osgifx.console.agent.dto;
 
 /**
  * Represents a configuration value consisting of a key, a value, and a type.
- * This class is used to encapsulate the configuration properties that can be 
+ * This class is used to encapsulate the configuration properties that can be
  * serialized to JSON and transferred between components or systems.
  * <p>
- * Each instance of this class holds a single configuration entry, defined by 
- * its key, value, and type, which can be used in different contexts such as 
+ * Each instance of this class holds a single configuration entry, defined by
+ * its key, value, and type, which can be used in different contexts such as
  * configuration management or data exchange.
  * </p>
  */
@@ -46,22 +46,22 @@ public class ConfigValue {
     /**
      * Constructs a new {@code ConfigValue} instance with the specified key, value, and type.
      *
-     * @param key   the key of the configuration entry, must not be null
+     * @param key the key of the configuration entry, must not be null
      * @param value the value associated with the key, can be any object
-     * @param type  the type of the configuration value, must not be null
+     * @param type the type of the configuration value, must not be null
      */
     public ConfigValue(final String key, final Object value, final XAttributeDefType type) {
-        this.key = key;
+        this.key   = key;
         this.value = value;
-        this.type = type;
+        this.type  = type;
     }
 
     /**
      * Factory method to create a new {@code ConfigValue} instance.
      *
-     * @param key   the key of the configuration entry, must not be null
+     * @param key the key of the configuration entry, must not be null
      * @param value the value associated with the key, can be any object
-     * @param type  the type of the configuration value, must not be null
+     * @param type the type of the configuration value, must not be null
      * @return a new {@code ConfigValue} instance with the specified key, value, and type
      */
     public static ConfigValue create(final String key, final Object value, final XAttributeDefType type) {

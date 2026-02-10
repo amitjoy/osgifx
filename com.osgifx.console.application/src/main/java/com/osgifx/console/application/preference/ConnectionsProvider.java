@@ -30,7 +30,7 @@ import javafx.collections.ObservableList;
 @Component(service = ConnectionsProvider.class)
 public final class ConnectionsProvider {
 
-    private final ReentrantLock                               lock              = new ReentrantLock();
+    private final ReentrantLock                              lock              = new ReentrantLock();
     private final ObservableList<SocketConnectionSettingDTO> socketConnections = FXCollections.observableArrayList();
     private final ObservableList<MqttConnectionSettingDTO>   mqttConnections   = FXCollections.observableArrayList();
 

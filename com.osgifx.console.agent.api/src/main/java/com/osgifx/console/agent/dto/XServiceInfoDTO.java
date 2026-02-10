@@ -18,12 +18,12 @@ package com.osgifx.console.agent.dto;
 import org.osgi.dto.DTO;
 
 /**
- * Represents information about a service in the OSGi framework. This class extends 
- * the {@link DTO} class to provide a standard data transfer object for service-related 
+ * Represents information about a service in the OSGi framework. This class extends
+ * the {@link DTO} class to provide a standard data transfer object for service-related
  * information.
  * <p>
- * The {@code XServiceInfoDTO} class holds details such as the unique identifier of the 
- * service and its object class, which can be used for transferring service data between 
+ * The {@code XServiceInfoDTO} class holds details such as the unique identifier of the
+ * service and its object class, which can be used for transferring service data between
  * different components or systems in a consistent format.
  * </p>
  */
