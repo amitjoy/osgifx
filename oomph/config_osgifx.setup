@@ -10,7 +10,7 @@
       label="osgifx Installation">
     <productVersion
         href="index:/org.eclipse.setup#//@productCatalogs[name='org.eclipse.products']/@products[name='epp.package.java']/@versions[name='latest.released']"/>
-    <description>The bnd installation provides cool stuff.</description>
+    <description>The OSGi.fx installation configures Eclipse with bndtools and Java 25 for OSGi development.</description>
   </installation>
   <workspace
       name="osgifx.workspace"
@@ -20,24 +20,27 @@
         id="bndtools-release"
         type="URI"
         name="bndtools-release"
-        value="https://bndtools.jfrog.io/bndtools/update-snapshot"
+        value="https://bndtools.org/bndtools.p2.repo/7.1.0/"
         label="bndtools-release">
       <choice
+          value="https://bndtools.org/bndtools.p2.repo/7.1.0/"
+          label="7.1.0 (Latest)"/>
+      <choice
           value="https://bndtools.org/bndtools.p2.repo/7.0.0/"
-          label="rel 7.0.0"/>
+          label="7.0.0"/>
       <choice
           value="https://bndtools.org/bndtools.p2.repo/6.4.1/"
-          label="rel 6.41"/>
+          label="6.4.1"/>
       <choice
           value="https://bndtools.jfrog.io/bndtools/update-latest"
-          label="release (JFrog)"/>
+          label="Latest (JFrog)"/>
       <choice
           value="https://bndtools.jfrog.io/bndtools/update-snapshot"
-          label="snapshot (JFrog)"/>
+          label="Snapshot (JFrog)"/>
     </setupTask>
     <stream
         href="prj-osgifx.setup#//@streams[name='main']"/>
-    <description>The osgifx workspace provides cool stuff.</description>
+    <description>The OSGi.fx workspace imports and configures all project modules.</description>
   </workspace>
-  <description>The bnd configuration provides cool stuff.</description>
+  <description>The OSGi.fx Oomph configuration automates Eclipse IDE setup for contributors.</description>
 </setup:Configuration>
