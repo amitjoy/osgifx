@@ -38,9 +38,9 @@
 
 | Component | Technology |
 | :--- | :--- |
-| **☕ Java (Application)** | 21 |
+| **☕ Java (Application)** | 25 |
 | **☕ Java (Agent)** | 1.8 |
-| **🖥️ Rich Client Platform** | JavaFX 21 |
+| **🖥️ Rich Client Platform** | JavaFX 25 |
 | **⚙️ Runtime (Application)** | OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse |
 | **⚙️ Runtime (Agent)** | OSGi R6 |
 | **🎨 UI Libraries** | ControlsFX, TilesFX, FormsFX |
