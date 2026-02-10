@@ -36,10 +36,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -74,9 +76,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private R               remote;
     private final Class<R>  remoteClass;
     private ExecutorService executor;
+    private final ReentrantLock outLock = new ReentrantLock();
 
     private static class RpcResult {
-        boolean resolved;
+        final CountDownLatch latch = new CountDownLatch(1);
         byte[]  value;
         boolean exception;
     }
@@ -159,30 +162,35 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized R getRemote() {
+    public R getRemote() {
         if (stopped.get())
             return null;
-        if (remote == null) {
-            remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
-                    (target, method, args) -> {
-                        if (method.getDeclaringClass() == Object.class)
-                            return method.invoke(new Object(), args);
-                        int msgId = -1;
-                        try {
-                            msgId = send(id.getAndIncrement(), method, args);
-                            if (method.getReturnType() == void.class) {
-                                promises.remove(msgId);
-                                return null;
+        outLock.lock();
+        try {
+            if (remote == null) {
+                remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
+                        (target, method, args) -> {
+                            if (method.getDeclaringClass() == Object.class)
+                                return method.invoke(new Object(), args);
+                            int msgId = -1;
+                            try {
+                                msgId = send(id.getAndIncrement(), method, args);
+                                if (method.getReturnType() == void.class) {
+                                    promises.remove(msgId);
+                                    return null;
+                                }
+                                return waitForResult(msgId, method.getGenericReturnType());
+                            } catch (final Exception e) {
+                                if (msgId != -1)
+                                    promises.remove(msgId);
+                                throw Exceptions.unrollCause(e, RuntimeException.class);
                             }
-                            return waitForResult(msgId, method.getGenericReturnType());
-                        } catch (final Exception e) {
-                            if (msgId != -1)
-                                promises.remove(msgId);
-                            throw Exceptions.unrollCause(e, RuntimeException.class);
-                        }
-                    });
+                        });
+            }
+            return remote;
+        } finally {
+            outLock.unlock();
         }
-        return remote;
     }
 
     @Override
@@ -238,7 +246,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private int send(final int msgId, final Method m, Object[] values) throws Exception {
         if (m != null)
             promises.put(msgId, new RpcResult());
-        synchronized (out) {
+        outLock.lock();
+        try {
             out.writeUTF(m != null ? m.getName() : "");
             out.writeInt(msgId);
             if (values == null)
@@ -266,6 +275,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                 }
             }
             out.flush();
+        } finally {
+            outLock.unlock();
         }
         return msgId;
     }
@@ -273,18 +284,13 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     @SuppressWarnings("unchecked")
     private <T> T waitForResult(final int id, final Type type) throws Exception {
         final long      deadlineInMillis = 300_000L;
-        final long      startInNanos     = System.nanoTime();
         final RpcResult result           = promises.get(id);
         try {
-            synchronized (result) {
-                while (!result.resolved) {
-                    long elapsedInNanos = System.nanoTime() - startInNanos;
-                    long delayInMillis  = deadlineInMillis - TimeUnit.NANOSECONDS.toMillis(elapsedInNanos);
-                    if (delayInMillis <= 0L)
-                        return null;
-                    result.wait(delayInMillis);
-                }
-            }
+            // Wait for result with timeout using CountDownLatch
+            boolean completed = result.latch.await(deadlineInMillis, TimeUnit.MILLISECONDS);
+            if (!completed)
+                return null;
+
             if (result.value == null)
                 return null;
             if (type == byte[].class && !result.exception)
@@ -350,12 +356,9 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         }
         final RpcResult result = promises.get(msgId);
         if (result != null) {
-            synchronized (result) {
-                result.value     = data;
-                result.exception = exception;
-                result.resolved  = true;
-                result.notifyAll();
-            }
+            result.value     = data;
+            result.exception = exception;
+            result.latch.countDown(); // Signal completion instead of notifyAll()
         }
     }
 }

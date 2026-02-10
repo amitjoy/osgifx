@@ -25,6 +25,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -68,9 +71,15 @@ public class McpHttpServer {
 
     private HTTPServer httpServer;
 
-    // Tracks active SSE connections (locks mapped to response objects)
-    // We use the lock object as key, and handle the response writing carefully.
-    private final Map<Object, HTTPResponse> activeSseResponses = new ConcurrentHashMap<>();
+    // Tracks active SSE connections with their associated locks and conditions
+    private final Map<ConnectionContext, HTTPResponse> activeSseConnections = new ConcurrentHashMap<>();
+    private final Lock sseConnectionsLock = new ReentrantLock();
+
+    // Helper class to hold lock and condition for each SSE connection
+    private static class ConnectionContext {
+        final Lock lock = new ReentrantLock();
+        final Condition condition = lock.newCondition();
+    }
 
     @Activate
     void activate(final Configuration config) {
@@ -130,13 +139,19 @@ public class McpHttpServer {
             httpServer.close();
             httpServer = null;
         }
-        // Release any blocked threads waiting on SSE connections
-        synchronized (activeSseResponses) {
-            activeSseResponses.keySet().forEach(lock -> {
-                synchronized (lock) {
-                    lock.notifyAll();
+        // Signal all waiting SSE connections to close
+        sseConnectionsLock.lock();
+        try {
+            activeSseConnections.keySet().forEach(ctx -> {
+                ctx.lock.lock();
+                try {
+                    ctx.condition.signalAll();
+                } finally {
+                    ctx.lock.unlock();
                 }
             });
+        } finally {
+            sseConnectionsLock.unlock();
         }
         logger.atInfo().log("MCP HTTP Server stopped");
     }
@@ -152,7 +167,7 @@ public class McpHttpServer {
         final byte[] bytes   = sseData.getBytes(StandardCharsets.UTF_8);
 
         // Iterate safely over active connections
-        activeSseResponses.values().forEach(res -> {
+        activeSseConnections.values().forEach(res -> {
             try {
                 // Note: Writing to the output stream from a different thread while the handlers
                 // are blocked might require the underlying server to support concurrent IO.
@@ -202,18 +217,21 @@ public class McpHttpServer {
             // We just keep the connection open for any potential server-initiated notifications.
 
             // Keep connection open by blocking
-            final Object connectionLock = new Object();
-            activeSseResponses.put(connectionLock, res);
+            final ConnectionContext ctx = new ConnectionContext();
+            activeSseConnections.put(ctx, res);
 
             try {
-                synchronized (connectionLock) {
+                ctx.lock.lock();
+                try {
                     // Wait indefinitely until server stop or client disconnect
-                    connectionLock.wait();
+                    ctx.condition.await();
+                } finally {
+                    ctx.lock.unlock();
                 }
             } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             } finally {
-                activeSseResponses.remove(connectionLock);
+                activeSseConnections.remove(ctx);
             }
         } catch (final IOException e) {
             // Client likely disconnected, which is normal behavior
