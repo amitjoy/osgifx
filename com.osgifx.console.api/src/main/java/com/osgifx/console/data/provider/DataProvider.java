@@ -123,7 +123,8 @@ public interface DataProvider {
     ObservableList<XBundleDTO> leaks();
 
     /**
-     * Returns HTTP runtime information, including lists of all servlets, resources, listeners, filters, and error pages.
+     * Returns HTTP runtime information, including lists of all servlets, resources, listeners, filters, and error
+     * pages.
      *
      * @return the observable list of all HTTP components
      */

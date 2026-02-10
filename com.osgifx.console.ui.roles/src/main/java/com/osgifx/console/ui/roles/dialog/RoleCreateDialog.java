@@ -88,7 +88,7 @@ public final class RoleCreateDialog extends Dialog<RoleDTO> {
         dialogPane.getButtonTypes().addAll(createButtonType);
 
         final var createButton = (Button) dialogPane.lookupButton(createButtonType);
-        createButton.setOnAction(actionEvent -> {
+        createButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);

@@ -123,7 +123,7 @@ public final class GraphFxBundleController implements GraphController {
 
     private void initStrategyButton() {
         strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-        strategyButton.getToggleGroup().selectedToggleProperty().addListener((obsVal, oldVal, newVal) -> {
+        strategyButton.getToggleGroup().selectedToggleProperty().addListener((_, oldVal, newVal) -> {
             if (newVal == null) {
                 oldVal.setSelected(true);
             }
@@ -137,7 +137,7 @@ public final class GraphFxBundleController implements GraphController {
 
     private void addExportToDotContextMenu() {
         final var item = new MenuItem("Export to DOT");
-        item.setOnAction(event -> {
+        item.setOnAction(_ -> {
             final var directoryChooser = new DirectoryChooser();
             final var location         = directoryChooser.showDialog(null);
             if (location == null) {
@@ -166,7 +166,7 @@ public final class GraphFxBundleController implements GraphController {
 
     private void initBundlesList() {
         bundlesList.getSelectionModel().setSelectionMode(MULTIPLE);
-        bundlesList.setCellFactory(param -> new CheckBoxListCell<>(bundlesList::getItemBooleanProperty) {
+        bundlesList.setCellFactory(_ -> new CheckBoxListCell<>(bundlesList::getItemBooleanProperty) {
             @Override
             public void updateItem(final XBundleDTO bundle, final boolean empty) {
                 threadSync.syncExec(() -> super.updateItem(bundle, empty));
@@ -187,7 +187,7 @@ public final class GraphFxBundleController implements GraphController {
     private FilteredList<XBundleDTO> initSearchFilter(final ObservableList<XBundleDTO> bundles) {
         final var filteredBundlesList = new FilteredList<>(bundles, Predicates.alwaysTrue());
         updateFilteredList(filteredBundlesList);
-        searchText.textProperty().addListener(obs -> {
+        searchText.textProperty().addListener(_ -> {
             updateFilteredList(filteredBundlesList);
             searchText.requestFocus();
         });

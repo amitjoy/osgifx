@@ -91,7 +91,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         dialogPane.getButtonTypes().addAll(finishButtonType);
 
         final var finishButton = (Button) dialogPane.lookupButton(finishButtonType);
-        finishButton.setOnAction(actionEvent -> {
+        finishButton.setOnAction(_ -> {
             try {
                 lbMessage.setVisible(false);
                 lbMessage.setManaged(false);
@@ -151,8 +151,8 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
             btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
 
-            btnAddField.setOnAction(e -> addFieldPair(parent, type));
-            btnRemoveField.setOnAction(e -> removeFieldPair(parent, this));
+            btnAddField.setOnAction(_ -> addFieldPair(parent, type));
+            btnRemoveField.setOnAction(_ -> removeFieldPair(parent, this));
 
             getChildren().addAll(node, btnAddField, btnRemoveField);
 
@@ -187,12 +187,11 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
                             default -> "";
                         };
                         txtField.setPromptText(valueCaptionAsInt);
-                        txtField.textProperty()
-                                .addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                                    if (!newValue.matches("\\d*")) {
-                                        txtField.setText(newValue.replaceAll("[^\\d]", ""));
-                                    }
-                                });
+                        txtField.textProperty().addListener((ChangeListener<String>) (_, _, newValue) -> {
+                            if (!newValue.matches("\\d*")) {
+                                txtField.setText(newValue.replaceAll("[^\\d]", ""));
+                            }
+                        });
                         break;
                     case BOOLEAN_ARRAY, BOOLEAN_LIST:
                         final var toggleSwitch = new ToggleSwitch();

@@ -69,7 +69,7 @@ public final class LoggerConfigTextControl extends SimpleControl<StringField> {
         fieldLabel    = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
 
-        editableArea.setOnMouseClicked(event -> {
+        editableArea.setOnMouseClicked(_ -> {
             final var dialog = new LoggerConfigurationDialog();
             final var ll     = prepareLogLevels(LogsHelper.prepareKeyValuePairs(editableArea.getText()));
             dialog.init(ll);
@@ -159,20 +159,20 @@ public final class LoggerConfigTextControl extends SimpleControl<StringField> {
     public void setupValueChangedListeners() {
         super.setupValueChangedListeners();
 
-        field.multilineProperty().addListener((observable, oldValue, newValue) -> {
+        field.multilineProperty().addListener((_, _, newValue) -> {
             stack.setPrefHeight(newValue ? 80 : 0);
             readOnlyLabel.setPrefHeight(newValue ? 80 : 26);
         });
 
-        field.errorMessagesProperty().addListener(
-                (observable, oldValue, newValue) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
+        field.errorMessagesProperty()
+                .addListener((_, _, _) -> toggleTooltip(field.isMultiline() ? editableArea : editableField));
 
-        editableField.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableField));
-        editableArea.focusedProperty().addListener((observable, oldValue, newValue) -> toggleTooltip(editableArea));
+        editableField.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableField));
+        editableArea.focusedProperty().addListener((_, _, _) -> toggleTooltip(editableArea));
     }
 
     private Map<String, LogLevel> prepareLogLevels(final Map<String, String> logLevels) {
-        return BiStream.from(logLevels).mapValues((k, v) -> LogLevel.valueOf(v)).toMap();
+        return BiStream.from(logLevels).mapValues((_, v) -> LogLevel.valueOf(v)).toMap();
     }
 
 }

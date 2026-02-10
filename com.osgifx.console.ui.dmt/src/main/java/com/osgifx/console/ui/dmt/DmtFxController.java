@@ -124,7 +124,7 @@ public final class DmtFxController {
                         performSearch(rootItem);
                     }
                 });
-                searchBtn.setOnMouseClicked(event -> performSearch(rootItem));
+                searchBtn.setOnMouseClicked(_ -> performSearch(rootItem));
             });
         });
 
@@ -230,9 +230,9 @@ public final class DmtFxController {
     private String initItemText(final XDmtNodeDTO node) {
         final Map<String, String> properties = Maps.newHashMap();
 
-        properties.computeIfAbsent("value", e -> node.value);
+        properties.computeIfAbsent("value", _ -> node.value);
         properties.computeIfAbsent("format",
-                e -> java.util.Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
+                _ -> java.util.Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
 
         final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
         final var result             = new StringBuilder(node.uri);

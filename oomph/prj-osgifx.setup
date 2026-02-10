@@ -110,25 +110,6 @@
         option="-perspective"
         value="bndtools.perspective"/>
   </setupTask>
-  <setupTask
-      xsi:type="setup:VariableTask"
-      id="bndtools-release"
-      type="URI"
-      name="bndtools-release"
-      label="bndtools-release">
-    <choice
-        value="https://bndtools.org/bndtools.p2.repo/7.0.0/"
-        label="rel 7.0.0"/>
-    <choice
-        value="https://bndtools.org/bndtools.p2.repo/6.4.1/"
-        label="rel 6.41"/>
-    <choice
-        value="https://bndtools.jfrog.io/bndtools/update-latest"
-        label="release (JFrog)"/>
-    <choice
-        value="https://bndtools.jfrog.io/bndtools/update-snapshot"
-        label="snapshot (JFrog)"/>
-  </setupTask>
   <stream name="main"
       label="main">
     <setupTask
@@ -163,19 +144,19 @@
         name="JRE">
       <setupTask
           xsi:type="setup.p2:P2Task"
-          label="JRE21">
+          label="JRE25">
         <requirement
             name="org.eclipse.justj.openjdk.hotspot.jre.full.feature.group"/>
         <repository
-            url="https://download.eclipse.org/justj/jres/21/updates/release"/>
+            url="https://download.eclipse.org/justj/jres/25/updates/release"/>
       </setupTask>
       <setupTask
           xsi:type="jdt:JRETask"
-          version="JavaSE-21"
-          location="${jre.location-21}"
-          name="JRE for JavaSE-21">
+          version="JavaSE-25"
+          location="${jre.location-25}"
+          name="JRE for JavaSE-25">
         <description>Define the JRE needed to compile and run the Java projects of ${scope.project.label}</description>
-        <defaultExecutionEnvironment>JavaSE-21</defaultExecutionEnvironment>
+        <defaultExecutionEnvironment>JavaSE-25</defaultExecutionEnvironment>
       </setupTask>
     </setupTask>
     <setupTask
@@ -190,11 +171,11 @@
       <setupTask
           xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.codegen.targetPlatform"
-          value="17"/>
+          value="25"/>
       <setupTask
           xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.compliance"
-          value="17"/>
+          value="25"/>
       <setupTask
           xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.problem.enablePreviewFeatures"
@@ -206,7 +187,7 @@
       <setupTask
           xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.jdt.core/org.eclipse.jdt.core.compiler.source"
-          value="17"/>
+          value="25"/>
     </setupTask>
     <setupTask
         xsi:type="setup:CompoundTask"
@@ -236,5 +217,5 @@
   <logicalProjectContainer
       xsi:type="setup:ProjectCatalog"
       href="index:/org.eclipse.setup#//@projectCatalogs[name='com.github']"/>
-  <description>amitjoy/osgifx provides cool stuff.</description>
+  <description>OSGi.fx is a JavaFX-based desktop application for managing and monitoring OSGi frameworks.</description>
 </setup:Project>

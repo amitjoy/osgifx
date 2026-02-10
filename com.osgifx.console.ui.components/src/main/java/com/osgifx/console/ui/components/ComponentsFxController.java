@@ -151,7 +151,7 @@ public final class ComponentsFxController {
                      .from(property)
                      .ifPresent(e -> Substring.first("=")
                                               .splitThenTrim(e)
-                                              .ifPresent((n, k) -> value.set(k)));
+                                              .ifPresent((_, k) -> value.set(k)));
             // @formatter:on
         }
         return value;
