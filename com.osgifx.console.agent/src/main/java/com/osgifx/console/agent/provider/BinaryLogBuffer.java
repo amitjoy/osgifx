@@ -249,14 +249,114 @@ public class BinaryLogBuffer {
     public byte[] getLogSnapshot(long fromTime, long toTime) {
         lock.lock();
         try {
-            if (writeCount == 0)
+            if (writeCount == 0) {
                 return new byte[0];
+            }
 
-            // Placeholder for complex time slicing logic.
-            // For simplicity in this first iteration, we just return empty.
-            return new byte[0];
+            // Two-pass algorithm to minimize allocations
+            // Pass 1: Calculate total size and identify valid entries
+            int totalSize = 0;
+            // Iterate backward from most recent entry
+            long entriesToCheck = Math.min(writeCount, indexCapacity);
+            // Stores the start offset of each matching entry
+            // Optimization: Reusing the existing index concept, but since we can't easily store a dynamic list of
+            // matching offsets without allocation, we'll re-scan in Pass 2.
+            // But wait, re-scanning 1024 items is cheap (CPU) compared to allocation (Memory).
+            // So we'll just find the start and end logical indices.
+
+            // Logical index of the most recent entry
+            long newestLogicalIndex = writeCount - 1;
+
+            long startMatchIndex = -1;
+            long endMatchIndex   = -1;
+
+            // backward scan to find range
+            for (long i = 0; i < entriesToCheck; i++) {
+                long logicalIndex = newestLogicalIndex - i;
+                int  offset       = index[(int) (logicalIndex % indexCapacity)];
+
+                if (offset == -1) {
+                    continue; // Should not happen given writeCount logic, but safe guard
+                }
+
+                long timestamp = readLong(offset);
+
+                if (timestamp > toTime) {
+                    continue; // Too new
+                }
+                if (timestamp < fromTime) {
+                    break; // Too old, and since we iterate backward, all subsequent are also too old
+                }
+
+                // Match!
+                if (endMatchIndex == -1) {
+                    endMatchIndex = logicalIndex; // First match (newest in range)
+                }
+                startMatchIndex = logicalIndex; // Update last match (oldest in range)
+
+                // Calculate size
+                // Entry size = 28 (header) + msgLen + excLen
+                int msgLen = readInt(offset + 20);
+                int excLen = readInt(offset + 24);
+                totalSize += (28 + msgLen + excLen);
+            }
+
+            if (startMatchIndex == -1) {
+                return new byte[0];
+            }
+
+            // Pass 2: Allocate and copy
+            byte[] result  = new byte[totalSize];
+            int    destPos = 0;
+
+            // Iterate forward from oldest match to newest match
+            // Note: startMatchIndex is the *oldest* logical index (smaller value)
+            // endMatchIndex is the *newest* logical index (larger value)
+            for (long i = startMatchIndex; i <= endMatchIndex; i++) {
+                int offset = index[(int) (i % indexCapacity)];
+                int msgLen = readInt(offset + 20);
+                int excLen = readInt(offset + 24);
+                int length = 28 + msgLen + excLen;
+
+                copyRange(offset, length, result, destPos);
+                destPos += length;
+            }
+
+            return result;
+
         } finally {
             lock.unlock();
+        }
+    }
+
+    // --- Reader Helpers for Circular Buffer ---
+
+    private long readLong(int offset) {
+        long v = 0;
+        for (int i = 0; i < 8; i++) {
+            v <<= 8;
+            v  |= (data[(offset + i) % capacity] & 0xFF);
+        }
+        return v;
+    }
+
+    private int readInt(int offset) {
+        int v = 0;
+        for (int i = 0; i < 4; i++) {
+            v <<= 8;
+            v  |= (data[(offset + i) % capacity] & 0xFF);
+        }
+        return v;
+    }
+
+    private void copyRange(int srcOffset, int length, byte[] dest, int destOffset) {
+        int availableToEnd = capacity - srcOffset;
+        if (availableToEnd >= length) {
+            System.arraycopy(data, srcOffset, dest, destOffset, length);
+        } else {
+            // Wrapped
+            System.arraycopy(data, srcOffset, dest, destOffset, availableToEnd);
+            System.arraycopy(data, 0, dest, destOffset + availableToEnd, length - availableToEnd);
         }
     }
 
