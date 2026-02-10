@@ -19,6 +19,8 @@ import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.ui.services.theme.Stylesheet;
 import org.eclipse.fx.ui.services.theme.Theme;
 import org.eclipse.fx.ui.theme.AbstractTheme;
@@ -30,6 +32,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = Theme.class)
 public final class DefaultTheme extends AbstractTheme {
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     @Activate
     public DefaultTheme(final BundleContext context) {
         super("theme.default", "Default Theme", context.getBundle().getResource(STANDARD_CSS));
@@ -37,14 +41,24 @@ public final class DefaultTheme extends AbstractTheme {
 
     @Override
     @Reference(cardinality = MULTIPLE, policy = DYNAMIC)
-    public synchronized void registerStylesheet(final Stylesheet stylesheet) {
-        super.registerStylesheet(stylesheet);
+    public void registerStylesheet(final Stylesheet stylesheet) {
+        lock.lock();
+        try {
+            super.registerStylesheet(stylesheet);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
-    public synchronized void unregisterStylesheet(final Stylesheet stylesheet) {
-        // required for bnd, otherwise, it will report that unbind method is missing
-        super.unregisterStylesheet(stylesheet);
+    public void unregisterStylesheet(final Stylesheet stylesheet) {
+        lock.lock();
+        try {
+            // required for bnd, otherwise, it will report that unbind method is missing
+            super.unregisterStylesheet(stylesheet);
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

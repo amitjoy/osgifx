@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.aries.component.dsl.OSGiResult;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -84,6 +85,7 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
     private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
     private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
+    private final ReentrantLock          mqttLock         = new ReentrantLock();
 
     @Reference
     private LoggerFactory factory;
@@ -229,17 +231,27 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     }
 
     @Override
-    public synchronized void onConnected(final MqttClientConnectedContext context) {
-        logger.atInfo().log("Successfully connected to '%s'", context.getClientConfig().getServerHost());
-        mqttConnectionPromise.complete(true);
+    public void onConnected(final MqttClientConnectedContext context) {
+        mqttLock.lock();
+        try {
+            logger.atInfo().log("Successfully connected to '%s'", context.getClientConfig().getServerHost());
+            mqttConnectionPromise.complete(true);
+        } finally {
+            mqttLock.unlock();
+        }
     }
 
     @Override
-    public synchronized void onDisconnected(final MqttClientDisconnectedContext context) {
-        logger.atInfo().log("Successfully disconnected from '%s'", context.getClientConfig().getServerHost());
-        final Throwable cause = context.getCause();
-        if (mqttConnectionPromise != null && cause != null) {
-            mqttConnectionPromise.completeExceptionally(cause);
+    public void onDisconnected(final MqttClientDisconnectedContext context) {
+        mqttLock.lock();
+        try {
+            logger.atInfo().log("Successfully disconnected from '%s'", context.getClientConfig().getServerHost());
+            final Throwable cause = context.getCause();
+            if (mqttConnectionPromise != null && cause != null) {
+                mqttConnectionPromise.completeExceptionally(cause);
+            }
+        } finally {
+            mqttLock.unlock();
         }
     }
 

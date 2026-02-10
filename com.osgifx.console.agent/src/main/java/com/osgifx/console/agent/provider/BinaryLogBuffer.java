@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A fixed-size circular buffer for storing logs in a packed binary format.
@@ -45,6 +46,8 @@ public class BinaryLogBuffer {
     private int  head       = 0;
     private long writeCount = 0;
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     public BinaryLogBuffer() {
         this(DEFAULT_BUFFER_SIZE, DEFAULT_INDEX_SIZE);
     }
@@ -60,48 +63,58 @@ public class BinaryLogBuffer {
     /**
      * Writes a log entry into the circular buffer.
      */
-    public synchronized void write(long timestamp, long bundleId, int level, String message, String exception) {
-        byte[] msgBytes = message != null ? message.getBytes(StandardCharsets.UTF_8) : new byte[0];
-        byte[] excBytes = exception != null ? exception.getBytes(StandardCharsets.UTF_8) : new byte[0];
+    public void write(long timestamp, long bundleId, int level, String message, String exception) {
+        lock.lock();
+        try {
+            byte[] msgBytes = message != null ? message.getBytes(StandardCharsets.UTF_8) : new byte[0];
+            byte[] excBytes = exception != null ? exception.getBytes(StandardCharsets.UTF_8) : new byte[0];
 
-        // Header: Time(8) + Bundle(8) + Lvl(4) + MsgLen(4) + ExcLen(4) = 28 bytes
+            // Header: Time(8) + Bundle(8) + Lvl(4) + MsgLen(4) + ExcLen(4) = 28 bytes
 
-        // 1. Record index
-        index[(int) (writeCount % indexCapacity)] = head;
+            // 1. Record index
+            index[(int) (writeCount % indexCapacity)] = head;
 
-        // 2. Write Data (Handle wrapping)
-        writeLong(timestamp);
-        writeLong(bundleId);
-        writeInt(level);
-        writeInt(msgBytes.length);
-        writeInt(excBytes.length);
-        writeBytes(msgBytes);
-        writeBytes(excBytes);
+            // 2. Write Data (Handle wrapping)
+            writeLong(timestamp);
+            writeLong(bundleId);
+            writeInt(level);
+            writeInt(msgBytes.length);
+            writeInt(excBytes.length);
+            writeBytes(msgBytes);
+            writeBytes(excBytes);
 
-        writeCount++;
+            writeCount++;
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
      * Retrieves the last N logs as a raw byte array.
      */
-    public synchronized byte[] getLogSnapshot(int count) {
-        if (count <= 0 || count > indexCapacity) {
-            count = indexCapacity;
-        }
-        if (writeCount == 0) {
-            return new byte[0];
-        }
+    public byte[] getLogSnapshot(int count) {
+        lock.lock();
+        try {
+            if (count <= 0 || count > indexCapacity) {
+                count = indexCapacity;
+            }
+            if (writeCount == 0) {
+                return new byte[0];
+            }
 
-        long actualCount = Math.min(count, writeCount);
-        int  startIndex  = (int) ((writeCount - actualCount) % indexCapacity);
-        int  startOffset = index[startIndex];
+            long actualCount = Math.min(count, writeCount);
+            int  startIndex  = (int) ((writeCount - actualCount) % indexCapacity);
+            int  startOffset = index[startIndex];
 
-        if (startOffset == -1) {
-            // Should not happen if logic is correct, but safe fallback
-            return new byte[0];
+            if (startOffset == -1) {
+                // Should not happen if logic is correct, but safe fallback
+                return new byte[0];
+            }
+
+            return readFrom(startOffset);
+        } finally {
+            lock.unlock();
         }
-
-        return readFrom(startOffset);
     }
 
     /**
@@ -178,41 +191,51 @@ public class BinaryLogBuffer {
 
     // --- Persistence ---
 
-    public synchronized void toDisk(File file) throws IOException {
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(file))) {
-            dos.writeInt(head);
-            dos.writeLong(writeCount);
-            dos.writeInt(data.length);
-            dos.write(data);
-            // We generally assume index size is constant, but could save it too
-            dos.writeInt(index.length);
-            for (int i : index) {
-                dos.writeInt(i);
+    public void toDisk(File file) throws IOException {
+        lock.lock();
+        try {
+            try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(file))) {
+                dos.writeInt(head);
+                dos.writeLong(writeCount);
+                dos.writeInt(data.length);
+                dos.write(data);
+                // We generally assume index size is constant, but could save it too
+                dos.writeInt(index.length);
+                for (int i : index) {
+                    dos.writeInt(i);
+                }
             }
+        } finally {
+            lock.unlock();
         }
     }
 
-    public synchronized void fromDisk(File file) throws IOException {
-        if (!file.exists()) {
-            return;
-        }
-        try (DataInputStream dis = new DataInputStream(new FileInputStream(file))) {
-            head       = dis.readInt();
-            writeCount = dis.readLong();
-            int savedDataLen = dis.readInt();
-            if (savedDataLen != capacity) {
-                // Buffer size changed, invalidate cache
+    public void fromDisk(File file) throws IOException {
+        lock.lock();
+        try {
+            if (!file.exists()) {
                 return;
             }
-            dis.readFully(data);
+            try (DataInputStream dis = new DataInputStream(new FileInputStream(file))) {
+                head       = dis.readInt();
+                writeCount = dis.readLong();
+                int savedDataLen = dis.readInt();
+                if (savedDataLen != capacity) {
+                    // Buffer size changed, invalidate cache
+                    return;
+                }
+                dis.readFully(data);
 
-            int savedIndexLen = dis.readInt();
-            if (savedIndexLen != indexCapacity) {
-                return;
+                int savedIndexLen = dis.readInt();
+                if (savedIndexLen != indexCapacity) {
+                    return;
+                }
+                for (int i = 0; i < indexCapacity; i++) {
+                    index[i] = dis.readInt();
+                }
             }
-            for (int i = 0; i < indexCapacity; i++) {
-                index[i] = dis.readInt();
-            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -223,13 +246,18 @@ public class BinaryLogBuffer {
      * A simplified approach for time range is iterating the index ring from (writeCount - 1) backwards
      * checking timestamps until we find the range. Since index size is small (1024), iteration is cheap.
      */
-    public synchronized byte[] getLogSnapshot(long fromTime, long toTime) {
-        if (writeCount == 0)
-            return new byte[0];
+    public byte[] getLogSnapshot(long fromTime, long toTime) {
+        lock.lock();
+        try {
+            if (writeCount == 0)
+                return new byte[0];
 
-        // Placeholder for complex time slicing logic.
-        // For simplicity in this first iteration, we just return empty.
-        return new byte[0];
+            // Placeholder for complex time slicing logic.
+            // For simplicity in this first iteration, we just return empty.
+            return new byte[0];
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

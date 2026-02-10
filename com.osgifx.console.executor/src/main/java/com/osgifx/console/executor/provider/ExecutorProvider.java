@@ -21,6 +21,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Supplier;
@@ -46,8 +48,8 @@ public final class ExecutorProvider implements Executor {
 
     @ObjectClassDefinition(name = "Executor Configuration")
     public @interface Configuration {
-        @AttributeDefinition(description = "The minimum number of threads allocated to this pool", required = false)
-        int coreSize() default 30;
+        @AttributeDefinition(description = "The minimum number of scheduler threads (default 2 for virtual thread architecture)", required = false)
+        int coreSize() default 2;
 
         @AttributeDefinition(description = "If this flag is set to true the containing thread pool will use daemon threads.", required = false)
         boolean daemon() default true;
@@ -56,38 +58,71 @@ public final class ExecutorProvider implements Executor {
     @Reference
     private LoggerFactory               factory;
     private FluentLogger                logger;
-    private ScheduledThreadPoolExecutor executor;
+    private ScheduledThreadPoolExecutor scheduler;      // Platform threads for scheduling
+    private ExecutorService             virtualExecutor; // Virtual threads for execution
 
     @Activate
     void activate(final Configuration config) {
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
 
+        // Create virtual thread executor for async operations
+        final var virtualThreadFactory = Thread.ofVirtual()
+                .name("fx-virtual-worker-", 0)
+                .factory();
+        virtualExecutor = Executors.newThreadPerTaskExecutor(virtualThreadFactory);
+
+        // Create small platform thread pool for scheduling (timing-critical operations)
         final var coreSize      = config.coreSize();
-        final var threadFactory = BasicThreadFactory.builder().namingPattern("fx-worker-%d").daemon(config.daemon())
+        final var threadFactory = BasicThreadFactory.builder()
+                .namingPattern("fx-scheduler-%d")
+                .daemon(config.daemon())
                 .build();
 
-        executor = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
-        executor.setRemoveOnCancelPolicy(true);
+        scheduler = new ScheduledThreadPoolExecutor(coreSize, threadFactory);
+        scheduler.setRemoveOnCancelPolicy(true);
+
+        logger.atInfo().log("Executor initialized with virtual threads (scheduler threads: %d)", coreSize);
     }
 
     @Deactivate
     void deactivate() {
-        final var running = executor.shutdownNow();
-        if (!running.isEmpty()) {
-            logger.atWarning().log("Shutting down while %s tasks are running", running.size());
+        // Shutdown virtual executor first
+        if (virtualExecutor != null) {
+            virtualExecutor.shutdown();
+            try {
+                if (!virtualExecutor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                    final var remaining = virtualExecutor.shutdownNow();
+                    if (!remaining.isEmpty()) {
+                        logger.atWarning().log("Virtual executor shut down with %s tasks remaining", remaining.size());
+                    }
+                }
+            } catch (InterruptedException e) {
+                virtualExecutor.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // Shutdown scheduler
+        if (scheduler != null) {
+            final var running = scheduler.shutdownNow();
+            if (!running.isEmpty()) {
+                logger.atWarning().log("Scheduler shut down while %s tasks are running", running.size());
+            }
         }
     }
 
     @Override
     public CompletableFuture<Void> runAsync(final Runnable command) {
         checkNotNull(command, "Task cannot be null");
-        return CompletableFuture.runAsync(command, executor);
+        // Execute on virtual thread executor
+        return CompletableFuture.runAsync(command, virtualExecutor);
     }
 
     @Override
     public <U> CompletableFuture<U> supplyAsync(final Supplier<U> supplier) {
         checkNotNull(supplier, "Supplier cannot be null");
-        return CompletableFuture.supplyAsync(supplier, executor);
+        // Execute on virtual thread executor
+        return CompletableFuture.supplyAsync(supplier, virtualExecutor);
     }
 
     @Override
@@ -100,7 +135,10 @@ public final class ExecutorProvider implements Executor {
         checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
         checkArgument(DurationUtils.isPositive(period), "The period must be positive and more than zero");
 
-        return executor.scheduleAtFixedRate(command, initialDelay.toMillis(), period.toMillis(), MILLISECONDS);
+        // Wrap command to execute on virtual thread executor
+        final Runnable wrappedCommand = () -> virtualExecutor.execute(command);
+
+        return scheduler.scheduleAtFixedRate(wrappedCommand, initialDelay.toMillis(), period.toMillis(), MILLISECONDS);
     }
 
     @Override
@@ -113,7 +151,10 @@ public final class ExecutorProvider implements Executor {
         checkArgument(!initialDelay.isNegative(), "The initial delay must not be negative");
         checkArgument(DurationUtils.isPositive(delay), "The delay must be positive and more than zero");
 
-        return executor.scheduleWithFixedDelay(command, initialDelay.toMillis(), delay.toMillis(), MILLISECONDS);
+        // Wrap command to execute on virtual thread executor
+        final Runnable wrappedCommand = () -> virtualExecutor.execute(command);
+
+        return scheduler.scheduleWithFixedDelay(wrappedCommand, initialDelay.toMillis(), delay.toMillis(), MILLISECONDS);
     }
 
 }

@@ -23,6 +23,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
@@ -59,7 +61,8 @@ public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHand
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
 
-    private final ObservableList<XThreadDTO> threads = observableArrayList();
+    private final ObservableList<XThreadDTO> threads      = observableArrayList();
+    private final ReentrantLock              retrieveLock = new ReentrantLock();
 
     @Activate
     void activate() {
@@ -67,16 +70,21 @@ public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHand
     }
 
     @Override
-    public synchronized void retrieve() {
-        logger.atInfo().log("Retrieving threads info from remote runtime");
-        final var agent = supervisor.getAgent();
-        if (agent == null) {
-            logger.atWarning().log("Agent not connected");
-            return;
+    public void retrieve() {
+        retrieveLock.lock();
+        try {
+            logger.atInfo().log("Retrieving threads info from remote runtime");
+            final var agent = supervisor.getAgent();
+            if (agent == null) {
+                logger.atWarning().log("Agent not connected");
+                return;
+            }
+            threads.setAll(makeNullSafe(agent.getAllThreads()));
+            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_THREADS_TOPIC);
+            logger.atInfo().log("Threads info retrieved successfully");
+        } finally {
+            retrieveLock.unlock();
         }
-        threads.setAll(makeNullSafe(agent.getAllThreads()));
-        RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_THREADS_TOPIC);
-        logger.atInfo().log("Threads info retrieved successfully");
     }
 
     @Override

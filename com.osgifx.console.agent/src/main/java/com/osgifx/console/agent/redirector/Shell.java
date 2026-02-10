@@ -17,6 +17,7 @@ package com.osgifx.console.agent.redirector;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.felix.service.command.CommandSession;
 import org.apache.felix.service.command.Converter;
@@ -26,9 +27,10 @@ import org.apache.felix.service.command.Converter;
  */
 public final class Shell extends RedirectInput {
 
-    CommandSession session;
-    PrintStream    out;
-    boolean        running;
+    CommandSession      session;
+    PrintStream         out;
+    boolean             running;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public void open(final CommandSession session) {
         this.session = session;
@@ -61,23 +63,28 @@ public final class Shell extends RedirectInput {
     }
 
     @Override
-    public synchronized void add(final String s) throws IOException {
-        if (running) {
-            super.add(s);
-        } else {
-            running = true;
-            try {
-                final Object result = session.execute(s);
-                if (result != null) {
-                    out.println(session.format(result, Converter.INSPECT));
+    public void add(final String s) throws IOException {
+        lock.lock();
+        try {
+            if (running) {
+                super.add(s);
+            } else {
+                running = true;
+                try {
+                    final Object result = session.execute(s);
+                    if (result != null) {
+                        out.println(session.format(result, Converter.INSPECT));
+                    }
+                } catch (final Exception e) {
+                    e.printStackTrace(out);
+                } finally {
+                    running = false;
                 }
-            } catch (final Exception e) {
-                e.printStackTrace(out);
-            } finally {
-                running = false;
+                out.flush();
+                prompt();
             }
-            out.flush();
-            prompt();
+        } finally {
+            lock.unlock();
         }
     }
 

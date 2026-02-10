@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -88,6 +89,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private R                     remote;
     private final Class<R>        remoteClass;
     private final ExecutorService executor;
+    private final ReentrantLock   remoteLock = new ReentrantLock();
 
     @SuppressWarnings("unchecked")
     public MqttRPC(final BundleContext bundleContext,
@@ -184,51 +186,56 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized R getRemote() {
+    public R getRemote() {
         if (stopped.get())
             return null;
 
-        if (remote == null) {
-            remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
-                    (target, method, args) -> {
-                        if (method.getDeclaringClass() == Object.class) {
-                            return method.invoke(this, args);
-                        }
-
-                        // Encode Request
-                        byte[] payload = encodeRequest(method, args);
-
-                        // Check Service Availability
-                        MqttRequestMultiplexer multiplexer = multiplexerTracker.getService();
-                        if (multiplexer == null) {
-                            throw new IOException("MqttRequestMultiplexer is unavailable");
-                        }
-
-                        // uild & Send using Fresh ContextBuilder
-                        return withMessageContextBuilder(mcb -> {
-                            Message request = mcb.channel(pubTopic).correlationId(UUID.randomUUID().toString())
-                                    .content(ByteBuffer.wrap(payload)).buildMessage();
-
-                            // The multiplexer uses this context to know where to listen for the reply
-                            MessageContext responseCtx = mcb.channel(pubTopic + "/reply").buildContext();
-
-                            Promise<Message> promise = multiplexer.request(request, responseCtx);
-                            try {
-                                // Block for response
-                                Message responseMsg = promise.getValue();
-                                return decodeResponse(responseMsg, method.getGenericReturnType());
-                            } catch (InvocationTargetException e) {
-                                throw new RuntimeException(e);
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                                throw new RuntimeException("RPC Interrupted", e);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
+        remoteLock.lock();
+        try {
+            if (remote == null) {
+                remote = (R) Proxy.newProxyInstance(remoteClass.getClassLoader(), new Class<?>[] { remoteClass },
+                        (target, method, args) -> {
+                            if (method.getDeclaringClass() == Object.class) {
+                                return method.invoke(this, args);
                             }
+
+                            // Encode Request
+                            byte[] payload = encodeRequest(method, args);
+
+                            // Check Service Availability
+                            MqttRequestMultiplexer multiplexer = multiplexerTracker.getService();
+                            if (multiplexer == null) {
+                                throw new IOException("MqttRequestMultiplexer is unavailable");
+                            }
+
+                            // Build & Send using Fresh ContextBuilder
+                            return withMessageContextBuilder(mcb -> {
+                                Message request = mcb.channel(pubTopic).correlationId(UUID.randomUUID().toString())
+                                        .content(ByteBuffer.wrap(payload)).buildMessage();
+
+                                // The multiplexer uses this context to know where to listen for the reply
+                                MessageContext responseCtx = mcb.channel(pubTopic + "/reply").buildContext();
+
+                                Promise<Message> promise = multiplexer.request(request, responseCtx);
+                                try {
+                                    // Block for response
+                                    Message responseMsg = promise.getValue();
+                                    return decodeResponse(responseMsg, method.getGenericReturnType());
+                                } catch (InvocationTargetException e) {
+                                    throw new RuntimeException(e);
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                    throw new RuntimeException("RPC Interrupted", e);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
                         });
-                    });
+            }
+            return remote;
+        } finally {
+            remoteLock.unlock();
         }
-        return remote;
     }
 
     private byte[] encodeRequest(Method method, Object[] args) throws IOException {
