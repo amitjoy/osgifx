@@ -18,11 +18,11 @@ package com.osgifx.console.agent.dto;
 import org.osgi.dto.DTO;
 
 /**
- * Represents a result within the OSGi framework. This class extends the {@link DTO} 
+ * Represents a result within the OSGi framework. This class extends the {@link DTO}
  * class to provide a standardized data transfer object for result-related information.
  * <p>
- * The {@code XResultDTO} class includes details such as the result status and a 
- * response message. It is used to transfer result data between different components 
+ * The {@code XResultDTO} class includes details such as the result status and a
+ * response message. It is used to transfer result data between different components
  * or systems in a consistent format.
  * </p>
  */

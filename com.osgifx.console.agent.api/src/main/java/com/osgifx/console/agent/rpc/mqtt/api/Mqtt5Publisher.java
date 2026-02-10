@@ -16,26 +16,26 @@
 package com.osgifx.console.agent.rpc.mqtt.api;
 
 /**
- * Represents a publisher for MQTT version 5 messages. This interface allows for 
- * the implementation of custom functionality to publish MQTT messages to a specified 
+ * Represents a publisher for MQTT version 5 messages. This interface allows for
+ * the implementation of custom functionality to publish MQTT messages to a specified
  * topic.
  * <p>
- * Implementations of this interface are responsible for publishing a given message 
+ * Implementations of this interface are responsible for publishing a given message
  * to the associated MQTT topic defined within the message.
  * </p>
  */
 public interface Mqtt5Publisher {
 
     /**
-     * Publishes the specified MQTT message to the topic defined in the 
+     * Publishes the specified MQTT message to the topic defined in the
      * {@link Mqtt5Message}.
      * <p>
-     * The topic and other parameters necessary for the message are encapsulated 
+     * The topic and other parameters necessary for the message are encapsulated
      * within the {@link Mqtt5Message} object.
      * </p>
      *
      * @param message the {@link Mqtt5Message} to be published, containing the topic
-     *                and message payload
+     *            and message payload
      * @throws IllegalArgumentException if the message is null or invalid
      */
     void publish(Mqtt5Message message);

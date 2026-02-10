@@ -72,16 +72,16 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             .withInitial(() -> new ByteArrayOutputStream(4096));
     private final Map<String, Method>                methodCache = new HashMap<>();
 
-    private L               local;
-    private R               remote;
-    private final Class<R>  remoteClass;
-    private ExecutorService executor;
+    private L                   local;
+    private R                   remote;
+    private final Class<R>      remoteClass;
+    private ExecutorService     executor;
     private final ReentrantLock outLock = new ReentrantLock();
 
     private static class RpcResult {
         final CountDownLatch latch = new CountDownLatch(1);
-        byte[]  value;
-        boolean exception;
+        byte[]               value;
+        boolean              exception;
     }
 
     private static Socket configureSocket(Socket socket) throws IOException {

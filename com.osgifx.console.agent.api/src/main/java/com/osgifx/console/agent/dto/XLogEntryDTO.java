@@ -18,12 +18,12 @@ package com.osgifx.console.agent.dto;
 import org.osgi.dto.DTO;
 
 /**
- * Represents a log entry within the OSGi framework. This class extends the {@link DTO} 
+ * Represents a log entry within the OSGi framework. This class extends the {@link DTO}
  * class to provide a standardized data transfer object for log entry-related information.
  * <p>
- * The {@code XLogEntryDTO} class includes details such as the bundle that generated 
- * the log entry, the log level, the message, any associated exception, the timestamp 
- * of when the log was recorded, and additional information about the thread and logger 
+ * The {@code XLogEntryDTO} class includes details such as the bundle that generated
+ * the log entry, the log level, the message, any associated exception, the timestamp
+ * of when the log was recorded, and additional information about the thread and logger
  * involved.
  * </p>
  */

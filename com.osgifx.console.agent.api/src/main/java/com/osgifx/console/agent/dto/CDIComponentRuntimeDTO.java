@@ -22,15 +22,15 @@ import org.osgi.service.cdi.runtime.dto.ContainerDTO;
 import org.osgi.service.cdi.runtime.dto.template.ContainerTemplateDTO;
 
 /**
- * Represents the runtime state and configuration of CDI (Contexts and Dependency 
- * Injection) components within the OSGi framework. This class extends the 
- * {@link DTO} class to provide a standardized data transfer object for CDI component 
+ * Represents the runtime state and configuration of CDI (Contexts and Dependency
+ * Injection) components within the OSGi framework. This class extends the
+ * {@link DTO} class to provide a standardized data transfer object for CDI component
  * runtime information.
  * <p>
- * The {@code CDIComponentRuntimeDTO} class contains collections of {@link ContainerDTO} 
- * instances, which represent the current state of CDI containers, and 
- * {@link ContainerTemplateDTO} instances, which define the template configurations 
- * for these containers. It is used to transfer CDI component runtime data between 
+ * The {@code CDIComponentRuntimeDTO} class contains collections of {@link ContainerDTO}
+ * instances, which represent the current state of CDI containers, and
+ * {@link ContainerTemplateDTO} instances, which define the template configurations
+ * for these containers. It is used to transfer CDI component runtime data between
  * different components or systems in a consistent format.
  * </p>
  */
@@ -39,7 +39,10 @@ public class CDIComponentRuntimeDTO extends DTO {
     /** A collection of {@link ContainerDTO} instances representing the current state of CDI containers. */
     public Collection<ContainerDTO> containers;
 
-    /** A collection of {@link ContainerTemplateDTO} instances representing the template configurations of CDI containers. */
+    /**
+     * A collection of {@link ContainerTemplateDTO} instances representing the template configurations of CDI
+     * containers.
+     */
     public Collection<ContainerTemplateDTO> containerTemplates;
 
 }

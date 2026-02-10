@@ -27,9 +27,9 @@ import org.apache.felix.service.command.Converter;
  */
 public final class Shell extends RedirectInput {
 
-    CommandSession      session;
-    PrintStream         out;
-    boolean             running;
+    CommandSession              session;
+    PrintStream                 out;
+    boolean                     running;
     private final ReentrantLock lock = new ReentrantLock();
 
     public void open(final CommandSession session) {

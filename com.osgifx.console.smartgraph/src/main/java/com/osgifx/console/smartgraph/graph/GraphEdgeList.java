@@ -37,7 +37,7 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
      * inner classes are defined at the end of the class, so are the auxiliary
      * methods
      */
-    private final ReentrantLock        lock = new ReentrantLock();
+    private final ReentrantLock      lock = new ReentrantLock();
     private final Map<V, Vertex<V>>  vertices;
     private final Map<E, Edge<E, V>> edges;
 
@@ -134,8 +134,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public Edge<E, V> insertEdge(final Vertex<V> u,
-                                              final Vertex<V> v,
-                                              final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+                                 final Vertex<V> v,
+                                 final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
         lock.lock();
         try {
             if (existsEdgeWith(edgeElement)) {
@@ -155,8 +155,8 @@ public class GraphEdgeList<V, E> implements Graph<V, E> {
 
     @Override
     public Edge<E, V> insertEdge(final V vElement1,
-                                              final V vElement2,
-                                              final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+                                 final V vElement2,
+                                 final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
         lock.lock();
         try {
             if (existsEdgeWith(edgeElement)) {

@@ -28,13 +28,13 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class RedirectInput extends InputStream {
 
-    private InputStream             org;
-    private final byte[]            ring = new byte[65536];
-    private int                     in;
-    private int                     out;
-    private final ReentrantLock     ringLock = new ReentrantLock();
-    private final Condition         dataAvailable = ringLock.newCondition();
-    private final ReentrantLock     lock = new ReentrantLock();
+    private InputStream         org;
+    private final byte[]        ring          = new byte[65536];
+    private int                 in;
+    private int                 out;
+    private final ReentrantLock ringLock      = new ReentrantLock();
+    private final Condition     dataAvailable = ringLock.newCondition();
+    private final ReentrantLock lock          = new ReentrantLock();
 
     /**
      * Create a redirector input stream with an original input stream

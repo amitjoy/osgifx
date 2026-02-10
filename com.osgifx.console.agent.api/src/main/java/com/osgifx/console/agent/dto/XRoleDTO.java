@@ -21,12 +21,12 @@ import java.util.Map;
 import org.osgi.dto.DTO;
 
 /**
- * Represents a role within the OSGi framework, which can be a user, group, or 
- * default role. This class extends the {@link DTO} class to provide a standard 
+ * Represents a role within the OSGi framework, which can be a user, group, or
+ * default role. This class extends the {@link DTO} class to provide a standard
  * data transfer object for roles and their associated properties.
  * <p>
- * The {@code XRoleDTO} class holds information about the role type, name, properties, 
- * credentials, and members (both basic and required). It is used for transferring 
+ * The {@code XRoleDTO} class holds information about the role type, name, properties,
+ * credentials, and members (both basic and required). It is used for transferring
  * role data between different components or systems in a consistent format.
  * </p>
  */

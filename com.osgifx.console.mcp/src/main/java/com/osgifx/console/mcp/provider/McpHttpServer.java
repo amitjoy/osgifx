@@ -73,11 +73,11 @@ public class McpHttpServer {
 
     // Tracks active SSE connections with their associated locks and conditions
     private final Map<ConnectionContext, HTTPResponse> activeSseConnections = new ConcurrentHashMap<>();
-    private final Lock sseConnectionsLock = new ReentrantLock();
+    private final Lock                                 sseConnectionsLock   = new ReentrantLock();
 
     // Helper class to hold lock and condition for each SSE connection
     private static class ConnectionContext {
-        final Lock lock = new ReentrantLock();
+        final Lock      lock      = new ReentrantLock();
         final Condition condition = lock.newCondition();
     }
 

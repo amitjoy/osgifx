@@ -38,7 +38,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
      * inner classes are defined at the end of the class, so are the auxiliary
      * methods
      */
-    private final ReentrantLock        lock = new ReentrantLock();
+    private final ReentrantLock      lock = new ReentrantLock();
     private final Map<V, Vertex<V>>  vertices;
     private final Map<E, Edge<E, V>> edges;
 
@@ -102,8 +102,8 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public Edge<E, V> insertEdge(final Vertex<V> outbound,
-                                              final Vertex<V> inbound,
-                                              final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+                                 final Vertex<V> inbound,
+                                 final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
         lock.lock();
         try {
             if (existsEdgeWith(edgeElement)) {
@@ -125,8 +125,8 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public Edge<E, V> insertEdge(final V outboundElement,
-                                              final V inboundElement,
-                                              final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
+                                 final V inboundElement,
+                                 final E edgeElement) throws InvalidVertexException, InvalidEdgeException {
         lock.lock();
         try {
             if (existsEdgeWith(edgeElement)) {
@@ -186,7 +186,7 @@ public class DigraphEdgeList<V, E> implements Digraph<V, E> {
 
     @Override
     public Vertex<V> opposite(final Vertex<V> v,
-                                           final Edge<E, V> e) throws InvalidVertexException, InvalidEdgeException {
+                              final Edge<E, V> e) throws InvalidVertexException, InvalidEdgeException {
         lock.lock();
         try {
             checkVertex(v);

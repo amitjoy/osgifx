@@ -133,8 +133,8 @@ public final class XDtoAdmin {
         final ServiceComponentRuntimeDTO dto = new ServiceComponentRuntimeDTO();
 
         dto.componentDescriptionDTOs   = scr.getComponentDescriptionDTOs();
-        dto.componentConfigurationDTOs = dto.componentDescriptionDTOs.stream()
-                .map(scr::getComponentConfigurationDTOs).flatMap(Collection::stream).collect(toList());
+        dto.componentConfigurationDTOs = dto.componentDescriptionDTOs.stream().map(scr::getComponentConfigurationDTOs)
+                .flatMap(Collection::stream).collect(toList());
 
         return dto;
     }

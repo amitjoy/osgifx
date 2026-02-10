@@ -48,9 +48,7 @@ public class UninstallBundleTool implements McpTool {
 
     @Override
     public Map<String, Object> inputSchema() {
-        return McpToolSchema.builder()
-                .arg("id", "integer", "The ID of the bundle to uninstall")
-                .build();
+        return McpToolSchema.builder().arg("id", "integer", "The ID of the bundle to uninstall").build();
     }
 
     @Override
@@ -61,7 +59,7 @@ public class UninstallBundleTool implements McpTool {
             logger.atWarning().log("Agent is not connected");
             return "Agent is not connected";
         }
-        final var id = ((Number) args.get("id")).longValue();
+        final var id    = ((Number) args.get("id")).longValue();
         final var error = agent.uninstall(id);
 
         if (error != null) {

@@ -85,7 +85,7 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
     private final List<EventListener>    eventListeners    = Lists.newCopyOnWriteArrayList();
     private final List<LogEntryListener> logEntryListeners = Lists.newCopyOnWriteArrayList();
-    private final ReentrantLock          mqttLock         = new ReentrantLock();
+    private final ReentrantLock          mqttLock          = new ReentrantLock();
 
     @Reference
     private LoggerFactory factory;

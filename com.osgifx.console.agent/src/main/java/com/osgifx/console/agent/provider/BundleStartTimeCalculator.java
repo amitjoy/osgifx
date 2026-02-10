@@ -116,7 +116,7 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
             lock.unlock();
         }
     }
-    
+
     public Optional<BundleStartDuration> getBundleStartDuration(long bundleId) {
         return Optional.ofNullable(bundleToStartTime.get(bundleId)).map(StartTime::toBundleStartDuration);
     }

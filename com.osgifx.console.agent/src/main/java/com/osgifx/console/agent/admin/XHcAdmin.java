@@ -56,9 +56,9 @@ import jakarta.inject.Inject;
 
 public final class XHcAdmin {
 
-    private final BundleContext       context;
+    private final BundleContext    context;
     private final Supplier<Object> felixHcExecutorSupplier;
-    private final FluentLogger        logger = LoggerFactory.getFluentLogger(getClass());
+    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XHcAdmin(final BundleContext context, final Supplier<Object> felixHcExecutorSupplier) {

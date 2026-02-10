@@ -21,13 +21,13 @@ import java.util.Map;
 import org.osgi.dto.DTO;
 
 /**
- * Represents the details and runtime state of a component within the OSGi 
- * framework. This class extends the {@link DTO} class to provide a standardized 
+ * Represents the details and runtime state of a component within the OSGi
+ * framework. This class extends the {@link DTO} class to provide a standardized
  * data transfer object for component-related information.
  * <p>
- * The {@code XComponentDTO} class contains information such as the component's 
- * identifier, name, state, properties, references, lifecycle methods, and any 
- * related errors or failures. It is used to transfer component data between 
+ * The {@code XComponentDTO} class contains information such as the component's
+ * identifier, name, state, properties, references, lifecycle methods, and any
+ * related errors or failures. It is used to transfer component data between
  * different components or systems in a consistent format.
  * </p>
  */
