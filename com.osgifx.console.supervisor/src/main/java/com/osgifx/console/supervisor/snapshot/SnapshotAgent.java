@@ -148,6 +148,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public List<String> searchBundleResources(final long bundleId, final String pattern) {
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<XBundleDTO> getAllBundles() {
         return snapshotDTO.bundles;
     }
