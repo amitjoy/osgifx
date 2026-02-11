@@ -72,6 +72,12 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 | **`get_bundle_revisions`** | Retrieves detailed revision info (wiring/capabilities) for a bundle. |
 | **`delete_configuration`** | Deletes an OSGi configuration by PID. |
 | **`execute_agent_extension`** | Executes a named Agent Extension with a context map. |
+| **`search_bundle_resources`** | Searches for resources in a bundle using a glob pattern. |
+| **`list_health_checks`** | Lists the status of all registered Health Checks (Felix HC). |
+| **`get_logger_contexts`** | Lists the Logger Context configuration for bundles, showing effective log levels. |
+| **`list_user_admin_roles`** | Lists all configured user roles and permissions from the UserAdmin service. |
+| **`list_gogo_commands`** | Lists all available Gogo shell commands across all scopes. |
+| **`get_framework_info`** | Retrieves the full OSGi Core Framework DTO, providing a hierarchical view of the system state. |
 
 ## System Prompt / Guiding Principles
 
