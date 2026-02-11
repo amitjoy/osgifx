@@ -789,6 +789,12 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
+    public Collection<String> searchBundleResources(final long bundleId, final String pattern) {
+        requireNonNull(pattern, "Pattern cannot be null");
+        return di.getInstance(XBundleAdmin.class).searchBundleResources(bundleId, pattern);
+    }
+
+    @Override
     public XResultDTO createOrUpdateConfiguration(final String pid, final List<ConfigValue> newProperties) {
         requireNonNull(newProperties, "Configuration properties cannot be null");
 

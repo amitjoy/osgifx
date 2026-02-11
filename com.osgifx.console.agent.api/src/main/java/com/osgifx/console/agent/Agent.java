@@ -645,4 +645,13 @@ public interface Agent {
      * @return the raw byte array containing the binary log entries
      */
     byte[] getLogSnapshot(long fromTime, long toTime);
+
+    /**
+     * Searches for resources in the specified bundle using the given pattern.
+     *
+     * @param bundleId the bundle ID
+     * @param pattern the pattern to search for
+     * @return the list of resources
+     */
+    Collection<String> searchBundleResources(long bundleId, String pattern);
 }
