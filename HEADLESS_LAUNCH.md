@@ -13,6 +13,24 @@ To use this feature, you need to provide a JSON configuration file via the `osgi
 java -Dosgifx.config=/path/to/config.json -jar osgifx.jar
 ```
 
+### Using Launch Script
+
+You can also use the `RunOSGiFx` script which simplifies the process by handling all modularity flags for you.
+
+**Prerequisites:**
+1.  Download `RunOSGiFx` locally.
+2.  Make it executable: `chmod u+x RunOSGiFx`.
+
+**Usage:**
+
+```bash
+# Run with local JAR
+./RunOSGiFx --jar path/to/osgifx.jar -Dosgifx.config=/path/to/config.json
+
+# Run with auto-download from Maven
+./RunOSGiFx --gav com.osgifx:osgifx-console:LATEST -Dosgifx.config=/path/to/config.json
+```
+
 ## Configuration Format
 
 The configuration file must be a valid JSON file. You can configure either a **Socket** connection or an **MQTT** connection.
