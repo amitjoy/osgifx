@@ -5,7 +5,8 @@ plugins {
 }
 
 group = 'com.osgifx'
-version = file("${rootProject.projectDir}/cnf/version/app.version").text.trim().replace('.SNAPSHOT', '')
+def appVersion = file("${rootProject.projectDir}/cnf/version/app.version").text.trim().replace('.SNAPSHOT', '')
+version = appVersion
 
 java {
     sourceCompatibility = JavaVersion.VERSION_25
@@ -97,7 +98,10 @@ if (project.hasProperty('jreleaser.enabled')) {
         
         release {
             github {
-                enabled = false
+                enabled = true
+                changelog {
+                    external = "${rootProject.projectDir}/changelogs/v${appVersion}.md"
+                }
             }
         }
         
