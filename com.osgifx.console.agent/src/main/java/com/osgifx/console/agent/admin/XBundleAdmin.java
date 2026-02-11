@@ -35,11 +35,13 @@ import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
 import java.io.File;
+import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -139,6 +141,27 @@ public final class XBundleAdmin {
             return Collections.emptyList();
         }
         return new ArrayList<>(bundles.values());
+    }
+
+    public List<String> searchBundleResources(final long bundleId, final String pattern) {
+        if (context == null) {
+            logger.atWarn().msg("Bundle context is null").log();
+            return Collections.emptyList();
+        }
+        final Bundle bundle = context.getBundle(bundleId);
+        if (bundle == null) {
+            logger.atWarn().msg("Bundle with ID '{}' not found").arg(bundleId).log();
+            return Collections.emptyList();
+        }
+        final List<String>     resources = new ArrayList<>();
+        final Enumeration<URL> entries   = bundle.findEntries("/", pattern, true);
+
+        if (entries != null) {
+            while (entries.hasMoreElements()) {
+                resources.add(entries.nextElement().getPath());
+            }
+        }
+        return resources;
     }
 
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
