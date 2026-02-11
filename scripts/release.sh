@@ -49,6 +49,9 @@ echo "🏁 Updating Version"
 version_without_snapshot=${version%".SNAPSHOT"}
 echo $version_without_snapshot > cnf/version/app.version
 
+echo "🏁 Updating package.json Version"
+npm version $version_without_snapshot --no-git-tag-version
+
 echo "🏁 Committing Changes"
 git add .
 git commit -m "🏁 REL v$version_without_snapshot Preparation"
@@ -59,24 +62,7 @@ git tag v$version_without_snapshot
 echo "🏁 Pushing Tag: v$version_without_snapshot"
 git push origin v$version_without_snapshot
 
-echo "🏁 Building Bundles"
-./gradlew clean build --info
-
-echo "🏁 Exporting Executable JAR"
-./gradlew :com.osgifx.console.product:export.osgifx --info
-
-echo "🏁 Cleaning Sonatype Staging Folders"
-rm -rf cnf/cache/sonatype-release/* 2>/dev/null || true
-rm -rf cnf/target/sonatype-staging/* 2>/dev/null || true
-
-echo "🏁 Releasing Bundles"
-./gradlew :com.osgifx.console.agent:release --info
-./gradlew :com.osgifx.console.agent.api:release --info
-
-echo "🏁 Releasing Executable JAR to Sonatype"
-./gradlew :com.osgifx.console.dist:publish jreleaserDeploy -Pjreleaser.enabled=true --info
-
-baseline_version=$(cat cnf/version/current.version)
+baseline_version=$version_without_snapshot
 
 echo "🏁 Updating OSGi.fx Snapshot Version to $next_version"
 echo "🏁 Updating OSGi.fx Baseline Version to $baseline_version"
@@ -84,9 +70,15 @@ echo "🏁 Updating OSGi.fx Baseline Version to $baseline_version"
 echo $next_version.SNAPSHOT > cnf/version/app.version
 echo $baseline_version > cnf/version/baseline.version
 
-npm version $1 --no-git-tag-version
+echo "🏁 Updating package.json Version to Next Snapshot"
+# npm version doesn't support -SNAPSHOT suffixes nicely for semver sometimes, but usually valid.
+# Ideally we keep package.json in sync.
+npm version $next_version-SNAPSHOT --no-git-tag-version || echo "Warning: Could not update package.json to snapshot version"
 
 echo "🏁 Committing the changes to current branch"
 
 git add .
 git commit -m "🏁 Next Development Cycle Preparation"
+
+echo "🏁 Pushing to remote"
+git push
