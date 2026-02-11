@@ -19,15 +19,22 @@ storage.directory               =         ${current.directory}/.osgifx-ws
 -runproperties.storage          =         launch.storage.dir=${storage.directory},\
                                           org.osgi.framework.storage=${storage.directory}
 
--runvm                          =         --add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED,\
-                                          --add-exports=javafx.base/com.sun.javafx.runtime=ALL-UNNAMED,\
-                                          --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,\
-                                          --add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED,\
-                                          --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED,\
-                                          --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,\
-                                          --add-exports=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED,\
-                                          --add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED,\
-                                          --add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED
+fx.exports                      =         javafx.base/com.sun.javafx.event,\
+                                          javafx.base/com.sun.javafx.runtime,\
+                                          javafx.graphics/com.sun.glass.ui,\
+                                          javafx.graphics/com.sun.javafx.scene,\
+                                          javafx.graphics/com.sun.javafx.application,\
+                                          javafx.graphics/com.sun.javafx.css
+
+fx.opens                        =         javafx.graphics/javafx.scene,\
+                                          javafx.controls/javafx.scene.control.skin,\
+                                          javafx.graphics/com.sun.glass.ui
+
+Add-Exports                     =         ${join; ;${fx.exports}}
+Add-Opens                       =         ${join; ;${fx.opens}}
+
+-runvm                          =         ${template;fx.exports;--add-exports=${@}=ALL-UNNAMED},\
+                                          ${template;fx.opens;--add-opens=${@}=ALL-UNNAMED}
 
 -runproperties.equinox          =         osgi.instance.area.default=${storage.directory}
 

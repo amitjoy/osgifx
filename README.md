@@ -55,7 +55,7 @@ The latest released version is **2.4.4**.
 #### 📥 Download & Install
 Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
 
-For detailed instructions, please refer to the **User Guide** on the website.
+For detailed instructions, please refer to the **User Guide** on the website or check our local [User Guide](GUIDE.md).
 
 ------------------------------------------------------------------------------------------------------------
 
