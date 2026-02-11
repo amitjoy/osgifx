@@ -1,0 +1,201 @@
+///usr/bin/env java --source 25 "$0" "$@" ; exit $?
+
+/*******************************************************************************
+ * Copyright 2021-2026 Amit Kumar Mondal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+public class RunOSGiFx {
+
+    private static final String MAVEN_CENTRAL      = "https://repo1.maven.org/maven2/";
+    private static final String SONATYPE_SNAPSHOTS = "https://oss.sonatype.org/content/repositories/snapshots/";
+
+    private static final List<String> JAVA_FX_FLAGS = List.of(
+            "--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED",
+            "--add-exports=javafx.base/com.sun.javafx.runtime=ALL-UNNAMED",
+            "--add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+            "--add-exports=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED",
+            "--add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+            "--add-exports=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED",
+            "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED",
+            "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
+            "--add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED");
+
+    public static void main(String[] args) {
+        try {
+            validateJavaVersion();
+
+            String       jarPath     = null;
+            String       gav         = null;
+            List<String> jvmArgs     = new ArrayList<>();
+            List<String> programArgs = new ArrayList<>();
+
+            for (int i = 0; i < args.length; i++) {
+                String arg = args[i];
+                if ("--jar".equals(arg)) {
+                    if (i + 1 < args.length) {
+                        jarPath = args[++i];
+                    } else {
+                        failFast("Missing value for --jar");
+                    }
+                } else if ("--gav".equals(arg)) {
+                    if (i + 1 < args.length) {
+                        gav = args[++i];
+                    } else {
+                        failFast("Missing value for --gav");
+                    }
+                } else {
+                    if (isJvmArg(arg)) {
+                        jvmArgs.add(arg);
+                    } else {
+                        programArgs.add(arg);
+                    }
+                }
+            }
+
+            if (jarPath == null && gav == null) {
+                failFast("Neither --jar nor --gav specified. Please provide one.");
+            }
+
+            Path executableJar;
+            if (jarPath != null) {
+                executableJar = Path.of(jarPath);
+                if (!Files.exists(executableJar)) {
+                    failFast("Specified JAR does not exist: " + jarPath);
+                }
+            } else {
+                executableJar = downloadArtifact(gav);
+            }
+
+            launch(executableJar, jvmArgs, programArgs);
+
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("Cause: " + e.getCause().getMessage());
+            }
+            System.exit(1);
+        }
+    }
+
+    private static boolean isJvmArg(String arg) {
+        return arg.startsWith("-D") ||
+               arg.startsWith("-X") ||
+               arg.startsWith("-ea") ||
+               arg.startsWith("-da") ||
+               arg.startsWith("-agent") ||
+               arg.startsWith("-javaagent") ||
+               arg.startsWith("--add-") ||
+               arg.startsWith("--module-") ||
+               arg.startsWith("--enable-preview");
+    }
+
+    private static void validateJavaVersion() {
+        int version = Runtime.version().feature();
+        if (version < 25) {
+            failFast("Java 25 or higher is required. Current version: " + version);
+        }
+    }
+
+    private static void failFast(String message) {
+        System.err.println("FAILURE: " + message);
+        System.err.println("Usage:");
+        System.err.println("  ./RunOSGiFx --jar <path/to/jar> [args...]");
+        System.err.println("  ./RunOSGiFx --gav <group:artifact:version> [args...]");
+        System.exit(1);
+    }
+
+    private static Path downloadArtifact(String gav) throws IOException, InterruptedException {
+        String[] parts = gav.split(":");
+        if (parts.length != 3) {
+            failFast("Invalid GAV format. Expected group:artifact:version, got: " + gav);
+        }
+
+        String group    = parts[0];
+        String artifact = parts[1];
+        String version  = parts[2];
+
+        String repo = version.endsWith("-SNAPSHOT") ? SONATYPE_SNAPSHOTS : MAVEN_CENTRAL;
+        String path = group.replace('.', '/') + "/" + artifact + "/" + version + "/" + artifact + "-" + version
+                + ".jar";
+        URI    uri  = URI.create(repo + path);
+
+        System.out.println("Downloading " + gav + " from " + uri + "...");
+
+        Path tempFile = Files.createTempFile("osgifx-download-", ".jar");
+
+        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(10)).build();
+
+        HttpRequest               request  = HttpRequest.newBuilder(uri).GET().build();
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+
+        if (response.statusCode() != 200) {
+            Files.deleteIfExists(tempFile);
+            failFast("Failed to download artifact. HTTP " + response.statusCode() + " from " + uri);
+        }
+
+        try (InputStream in = response.body()) {
+            Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        tempFile.toFile().deleteOnExit();
+
+        System.out.println("Downloaded to " + tempFile.toAbsolutePath());
+        return tempFile;
+    }
+
+    private static void launch(Path jar, List<String> jvmArgs, List<String> programArgs) throws IOException, InterruptedException {
+        String javaHome = System.getProperty("java.home");
+        Path   javaBin  = Path.of(javaHome, "bin", "java");
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            javaBin = Path.of(javaHome, "bin", "java.exe");
+        }
+
+        List<String> command = new ArrayList<>();
+        command.add(javaBin.toAbsolutePath().toString());
+
+        command.addAll(jvmArgs);
+        command.addAll(JAVA_FX_FLAGS);
+        command.add("-jar");
+        command.add(jar.toAbsolutePath().toString());
+        command.addAll(programArgs);
+
+        System.out.println("Launching OSGi.fx...");
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.inheritIO();
+
+        Process process  = pb.start();
+        int     exitCode = process.waitFor();
+
+        if (exitCode != 0) {
+            System.err.println("OSGi.fx exited with code " + exitCode);
+            System.exit(exitCode);
+        }
+    }
+}
