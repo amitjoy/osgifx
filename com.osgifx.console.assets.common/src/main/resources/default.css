@@ -1,10 +1,50 @@
-.root {
-    -fx-font-size  : 11.0pt;
+.label,
+.button,
+.toggle-button,
+.radio-button,
+.check-box,
+.text-input,
+.text-area,
+.password-field,
+.choice-box,
+.combo-box,
+.list-cell,
+.tree-cell,
+.table-cell,
+.tree-table-cell,
+.tab-pane>.tab-header-area>.headers-region>.tab>.tab-container>.tab-label,
+.titled-pane>.title,
+.menu-button,
+.menu,
+.menu-item,
+.context-menu,
+.tooltip,
+.hyperlink,
+.column-header,
+.menu-bar {
+    -fx-font-size: 11.0pt;
+    -fx-font-family: 'Gill Sans';
+}
+
+.status-bar,
+.dialog-pane,
+.toggle-switch,
+.check-list-cell,
+.table-view,
+.list-view,
+.tree-view,
+.split-pane,
+.check-list-view,
+.hyperlink-label,
+.list-selection-view,
+.segmented-button-bar,
+.text {
+    -fx-font-size: 11.0pt;
     -fx-font-family: 'Gill Sans';
 }
 
 .MWindow {
-	-light-black: rgb(74.0, 75.0, 78.0);
+    -light-black: rgb(74.0, 75.0, 78.0);
     -dark-highlight: rgb(87.0, 89.0, 92.0);
     -dark-black: rgb(39.0, 40.0, 40.0);
     -darkest-black: rgb(5.0, 5.0, 5.0);
@@ -40,4 +80,10 @@
 
 .split-pane *.split-pane-divider {
     -fx-padding: 0.0 1.0 0.0 1.0;
+}
+
+.glyph-font,
+.glyph-font .text {
+    -fx-font-family: 'FontAwesome';
+    -fx-font-size: 11.0pt;
 }
