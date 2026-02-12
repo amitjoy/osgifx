@@ -25,7 +25,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Throwables;
-import com.osgifx.console.agent.Agent;
+
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
@@ -56,13 +56,12 @@ public final class TerminalFxController {
     @Inject
     @Named("is_snapshot_agent")
     private boolean         isSnapshotAgent;
-    private Agent           agent;
     private int             historyPointer;
 
     @FXML
     public void initialize() {
         historyPointer = 0;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
+        if (supervisor == null || supervisor.getAgent() == null) {
             logger.atWarning().log("Agent not connected");
             return;
         }
@@ -120,10 +119,11 @@ public final class TerminalFxController {
             protected String call() throws Exception {
                 String outputText;
                 try {
+                    final var currentAgent = supervisor != null ? supervisor.getAgent() : null;
                     if (isSnapshotAgent) {
                         logger.atWarning().log("No command execution in snapshot agent mode");
                         outputText = "You cannot execute command in snapshot agent mode";
-                    } else if (agent == null || (outputText = agent.execCliCommand(command)) == null) {
+                    } else if (currentAgent == null || (outputText = currentAgent.execCliCommand(command)) == null) {
                         logger.atWarning().log("Agent is not connected");
                         outputText = "Agent is not connected";
                     } else {
