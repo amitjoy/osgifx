@@ -16,14 +16,13 @@
 package com.osgifx.console.ui.graph;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.DefaultEdge;
 
 import com.osgifx.console.smartgraph.graph.DigraphEdgeList;
-import com.osgifx.console.smartgraph.graph.Edge;
 import com.osgifx.console.smartgraph.graph.Graph;
-import com.osgifx.console.smartgraph.graph.Vertex;
 
 public final class FxComponentGraph {
 
@@ -42,69 +41,51 @@ public final class FxComponentGraph {
     }
 
     private Graph<ComponentVertex, String> buildGraph(final org.jgrapht.Graph<ComponentVertex, DefaultEdge> jgraph) {
-        final Graph<ComponentVertex, String> graph = new DigraphEdgeList<>();
+        final Graph<ComponentVertex, String> graph      = new DigraphEdgeList<>();
+        final var                            addedEdges = new HashSet<String>();
+
         for (final DefaultEdge edge : jgraph.edgeSet()) {
             final var source = jgraph.getEdgeSource(edge);
             final var target = jgraph.getEdgeTarget(edge);
+
             if (graph.vertices().stream().noneMatch(v -> v.element().equals(source))) {
                 graph.insertVertex(source);
             }
             if (graph.vertices().stream().noneMatch(v -> v.element().equals(target))) {
                 graph.insertVertex(target);
             }
-            if (!containsEdge(graph.edges(), source, target)) {
-                graph.insertEdge(source, target, source + "->" + target);
+            final var edgeId = source + "->" + target;
+            if (!addedEdges.contains(edgeId)) {
+                graph.insertEdge(source, target, edgeId);
+                addedEdges.add(edgeId);
             }
         }
         return graph;
     }
 
     private Graph<ComponentVertex, String> buildGraph(final Collection<GraphPath<ComponentVertex, DefaultEdge>> graphPaths) {
-        final Graph<ComponentVertex, String> graph = new DigraphEdgeList<>();
+        final Graph<ComponentVertex, String> graph      = new DigraphEdgeList<>();
+        final var                            addedEdges = new java.util.HashSet<String>();
+
         for (final GraphPath<ComponentVertex, DefaultEdge> path : graphPaths) {
             for (final DefaultEdge edge : path.getEdgeList()) {
                 final var source = path.getGraph().getEdgeSource(edge);
                 final var target = path.getGraph().getEdgeTarget(edge);
+
                 if (graph.vertices().stream().noneMatch(v -> v.element().equals(source))) {
                     graph.insertVertex(source);
                 }
                 if (graph.vertices().stream().noneMatch(v -> v.element().equals(target))) {
                     graph.insertVertex(target);
                 }
-                if (!containsEdge(graph.edges(), source, target)) {
-                    graph.insertEdge(source, target, source + "->" + target);
+                final var edgeId = source + "->" + target;
+                if (!addedEdges.contains(edgeId)) {
+                    graph.insertEdge(source, target, edgeId);
+                    addedEdges.add(edgeId);
                 }
             }
         }
         return graph;
-    }
-
-    private boolean containsEdge(final Collection<Edge<String, ComponentVertex>> edges,
-                                 final ComponentVertex source,
-                                 final ComponentVertex target) {
-        var isEdgeFound = false;
-        for (final Edge<String, ComponentVertex> edge : edges) {
-            var isEdgeSourceFound = false;
-            var isEdgeTargetFound = false;
-            for (final Vertex<ComponentVertex> vertex : edge.vertices()) {
-                if (isSameVertex(vertex, source)) {
-                    isEdgeSourceFound = true;
-                }
-            }
-            for (final Vertex<ComponentVertex> vertex : edge.vertices()) {
-                if (isSameVertex(vertex, target)) {
-                    isEdgeTargetFound = true;
-                }
-            }
-            if (isEdgeSourceFound && isEdgeTargetFound) {
-                isEdgeFound = true;
-            }
-        }
-        return isEdgeFound;
-    }
-
-    private boolean isSameVertex(final Vertex<ComponentVertex> vertex, final ComponentVertex check) {
-        return vertex.element().equals(check);
     }
 
 }
