@@ -31,6 +31,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -49,7 +51,6 @@ import com.osgifx.console.smartgraph.graph.Edge;
 import com.osgifx.console.smartgraph.graph.Graph;
 import com.osgifx.console.smartgraph.graph.Vertex;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -62,6 +63,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
 
 /**
  * JavaFX {@link Pane} that is capable of plotting a {@link Graph} or
@@ -108,7 +110,6 @@ public class SmartGraphPanel<V, E> extends Pane {
      */
     private final ReentrantLock  lock = new ReentrantLock();
     public final BooleanProperty automaticLayoutProperty;
-    private AnimationTimer       timer;
     private final double         repulsionForce;
     private final double         attractionForce;
     private final double         attractionScale;
@@ -146,8 +147,12 @@ public class SmartGraphPanel<V, E> extends Pane {
      * @param theGraph underlying graph
      * @param placementStrategy placement strategy, null for default
      */
+    private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    private volatile boolean      running;
+    private double                scale    = 1.0;
+
     public SmartGraphPanel(final Graph<V, E> theGraph, final SmartPlacementStrategy placementStrategy) {
-        this(theGraph, null, placementStrategy);
+        this(theGraph, new SmartGraphProperties(), placementStrategy);
     }
 
     /**
@@ -203,37 +208,72 @@ public class SmartGraphPanel<V, E> extends Pane {
         enableDoubleClickListener();
 
         // automatic layout initializations
-        timer = new AnimationTimer() {
-
-            @Override
-            public void handle(final long now) {
-                runLayoutIteration();
-            }
-        };
-
         this.automaticLayoutProperty = new SimpleBooleanProperty(false);
         this.automaticLayoutProperty.addListener((_, _, newValue) -> {
             if (newValue) {
-                timer.start();
+                startLayoutLoop();
             } else {
-                timer.stop();
+                stopLayoutLoop();
             }
         });
 
+        this.setOnScroll(event -> {
+            if (event.isControlDown()) {
+                final double zoomFactor = 1.2;
+                final double deltaY     = event.getDeltaY();
+                if (deltaY < 0) {
+                    scale /= zoomFactor;
+                } else {
+                    scale *= zoomFactor;
+                }
+                final Scale newScale = new Scale();
+                newScale.setPivotX(event.getX());
+                newScale.setPivotY(event.getY());
+                newScale.setX(scale);
+                newScale.setY(scale);
+
+                this.getTransforms().add(newScale);
+                event.consume();
+            }
+        });
+    }
+
+    private void startLayoutLoop() {
+        if (running) {
+            return;
+        }
+        running = true;
+        executor.submit(() -> {
+            while (running) {
+                try {
+                    runLayoutIteration();
+                    // Optional: throttle if needed, but physics usually runs as fast as possible or with small sleep
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    running = false;
+                } catch (Exception e) {
+                    // log error
+                    Logger.getLogger(SmartGraphPanel.class.getName()).log(Level.SEVERE, "Error in layout loop", e);
+                }
+            }
+        });
+    }
+
+    private void stopLayoutLoop() {
+        running = false;
+        executor.shutdownNow(); // Attempt to stop any running tasks
     }
 
     private void runLayoutIteration() {
-        lock.lock();
-        try {
-            for (var i = 0; i < AUTOMATIC_LAYOUT_ITERATIONS; i++) {
-                resetForces();
-                computeForces();
-                updateForces();
-            }
-            applyForces();
-        } finally {
-            lock.unlock();
+        // compute forces (Physics can be heavy, run in VT)
+        for (var i = 0; i < AUTOMATIC_LAYOUT_ITERATIONS; i++) {
+            resetForces();
+            computeForces();
+            updateForces();
         }
+        // apply forces (UI updates must be on FX thread)
+        Platform.runLater(this::applyForces);
     }
 
     /**
@@ -263,7 +303,7 @@ public class SmartGraphPanel<V, E> extends Pane {
             // apply random placement
             new SmartRandomPlacementStrategy().place(width, height, this.theGraph, this.vertexNodes.values());
             // start automatic layout
-            timer.start();
+            startLayoutLoop();
         }
         this.initialized = true;
     }
