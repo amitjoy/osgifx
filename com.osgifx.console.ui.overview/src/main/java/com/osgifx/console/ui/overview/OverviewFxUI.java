@@ -108,6 +108,7 @@ public final class OverviewFxUI {
     @Inject
     private IEclipseContext   eclipseContext;
 
+    private Tile clockTile;
     private Tile noOfThreadsTile;
     private Tile runtimeInfoTile;
     private Tile noOfBundlesTile;
@@ -137,10 +138,6 @@ public final class OverviewFxUI {
     @Focus
     public void onFocus(final BorderPane parent) {
         if (isRealtimeUpdateRunning.get()) {
-            // This is required as a workaround to ensure that after the tab gets focused,
-            // the CSS overridden problem gets overridden once again with the TileFX
-            // embedded CSS and the number tiles are shown properly
-            createTiles(parent);
             initTimeline();
             updateTimelineButtonTo(PAUSE);
         }
@@ -149,6 +146,7 @@ public final class OverviewFxUI {
     @PreDestroy
     public void destroy() {
         dataRetrieverTimeline.stop();
+        cleanupTiles();
     }
 
     enum TimelineButtonType {
@@ -193,7 +191,6 @@ public final class OverviewFxUI {
     private void playTimelineAnimation() {
         isRealtimeUpdateRunning.set(true);
         updateTimelineButtonTo(PAUSE);
-        createTiles(parent);
         dataRetrieverTimeline.play();
     }
 
@@ -349,7 +346,7 @@ public final class OverviewFxUI {
 
     private void createTiles(final BorderPane parent) {
         // @formatter:off
-        final var clockTile = TileBuilder.create()
+        clockTile = TileBuilder.create()
                                          .skinType(SkinType.CLOCK)
                                          .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                          .title("Today")
@@ -626,9 +623,9 @@ public final class OverviewFxUI {
     @Optional
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ANY_TOPIC) final String data,
                                             final BorderPane parent) {
-        logger.atInfo().log("All data retrieved event received");
+        logger.atDebug().log("Data retrieved event received");
         updateStaticOverviewInfo();
-        createUIComponents(parent);
+        initStatusBar(parent);
         retrieveRuntimeData();
     }
 
@@ -653,6 +650,20 @@ public final class OverviewFxUI {
         dataProvider.retrieveInfo("components", true);
         dataProvider.retrieveInfo("threads", true);
         dataProvider.retrieveInfo("properties", true);
+    }
+
+    /**
+     * Stops internal timer/animation threads of existing tiles before they are
+     * replaced by new instances. This prevents thread leaks from TilesFX tiles
+     * that spawn background threads for clock updates and gauge animations.
+     */
+    private void cleanupTiles() {
+        if (clockTile != null) {
+            clockTile.setRunning(false);
+        }
+        if (availableMemoryTile != null) {
+            availableMemoryTile.setAnimated(false);
+        }
     }
 
     private void showViewRefreshDelayDialog() {

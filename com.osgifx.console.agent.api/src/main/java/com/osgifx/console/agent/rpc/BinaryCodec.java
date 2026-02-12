@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -178,21 +180,22 @@ public class BinaryCodec {
     }
 
     // Type Tags
-    private static final byte NULL   = 0;
-    private static final byte BOOL   = 1;
-    private static final byte BYTE   = 2;
-    private static final byte SHORT  = 3;
-    private static final byte INT    = 4;
-    private static final byte LONG   = 5;
-    private static final byte FLOAT  = 6;
-    private static final byte DOUBLE = 7;
-    private static final byte STRING = 8;
-    private static final byte LIST   = 9;
-    private static final byte DTO    = 10;
-    private static final byte ARRAY  = 11;
-    private static final byte ENUM   = 12;
-    private static final byte MAP    = 13;
-    private static final byte CHAR   = 14;
+    private static final byte NULL         = 0;
+    private static final byte BOOL         = 1;
+    private static final byte BYTE         = 2;
+    private static final byte SHORT        = 3;
+    private static final byte INT          = 4;
+    private static final byte LONG         = 5;
+    private static final byte FLOAT        = 6;
+    private static final byte DOUBLE       = 7;
+    private static final byte STRING       = 8;
+    private static final byte LIST         = 9;
+    private static final byte DTO          = 10;
+    private static final byte ARRAY        = 11;
+    private static final byte ENUM         = 12;
+    private static final byte MAP          = 13;
+    private static final byte CHAR         = 14;
+    private static final byte STRING_LARGE = 15;
 
     // --- ENCODER ---
 
@@ -206,8 +209,16 @@ public class BinaryCodec {
             out.writeByte(INT);
             out.writeInt((Integer) obj);
         } else if (clz == String.class) {
-            out.writeByte(STRING);
-            out.writeUTF((String) obj);
+            String s = (String) obj;
+            if (s.length() > 20000) {
+                out.writeByte(STRING_LARGE);
+                byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+                out.writeInt(bytes.length);
+                out.write(bytes);
+            } else {
+                out.writeByte(STRING);
+                out.writeUTF(s);
+            }
         } else if (clz == Boolean.class) {
             out.writeByte(BOOL);
             out.writeBoolean((Boolean) obj);
@@ -324,6 +335,21 @@ public class BinaryCodec {
         }
     }
 
+    /**
+     * A lightweight ByteArrayOutputStream that exposes the internal buffer
+     * to avoid defensive copies via {@code toByteArray()}.
+     */
+    public static class FastByteArrayOutputStream extends ByteArrayOutputStream {
+        public FastByteArrayOutputStream(int size) {
+            super(size);
+        }
+
+        /** Returns the internal buffer directly (no copy). Valid bytes: [0, size()). */
+        public byte[] getBuffer() {
+            return buf;
+        }
+    }
+
     @SuppressWarnings({ "unchecked" })
     public <T> T decode(final DataInputStream in, final Type type) throws Exception {
         return (T) decodeObject(in, type);
@@ -408,6 +434,12 @@ public class BinaryCodec {
                 return in.readChar();
             case STRING:
                 return in.readUTF();
+            case STRING_LARGE: {
+                int    len   = in.readInt();
+                byte[] bytes = new byte[len];
+                in.readFully(bytes);
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
             case ENUM: {
                 final String name = in.readUTF();
                 if (rawClass.isEnum()) {

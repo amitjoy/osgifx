@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.mqtt;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -54,6 +52,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
+import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
+import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -80,12 +80,12 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final FluentLogger  logger  = LoggerFactory.getFluentLogger(getClass());
 
     // Optimization: Shared Codec & Buffers
-    private static final BinaryCodec                 codec       = new BinaryCodec();
-    private final ThreadLocal<ByteArrayOutputStream> buffer      = ThreadLocal
-            .withInitial(() -> new ByteArrayOutputStream(4096));
-    private final ThreadLocal<ByteArrayOutputStream> argBuffer   = ThreadLocal
-            .withInitial(() -> new ByteArrayOutputStream(1024));
-    private final Map<String, Method>                methodCache = new HashMap<>();
+    private static final BinaryCodec                     codec       = new BinaryCodec();
+    private final ThreadLocal<FastByteArrayOutputStream> buffer      = ThreadLocal
+            .withInitial(() -> new FastByteArrayOutputStream(4096));
+    private final ThreadLocal<FastByteArrayOutputStream> argBuffer   = ThreadLocal
+            .withInitial(() -> new FastByteArrayOutputStream(1024));
+    private final Map<String, Method>                    methodCache = new HashMap<>();
 
     private final L               local;
     private R                     remote;
@@ -246,13 +246,13 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     }
 
     private byte[] encodeRequest(Method method, Object[] args) throws IOException {
-        final ByteArrayOutputStream bout = buffer.get();
+        final FastByteArrayOutputStream bout = buffer.get();
         return adaptivelyCompress(bout, out -> {
             out.writeUTF(method.getName());
             if (args != null) {
                 out.writeShort(args.length);
                 for (Object arg : args) {
-                    final ByteArrayOutputStream argBout = argBuffer.get();
+                    final FastByteArrayOutputStream argBout = argBuffer.get();
                     argBout.reset();
                     try (DataOutputStream argOut = new DataOutputStream(argBout)) {
                         try {
@@ -261,9 +261,9 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                             throw new IOException(e);
                         }
                     }
-                    byte[] argBytes = argBout.toByteArray();
-                    out.writeInt(argBytes.length);
-                    out.write(argBytes);
+                    int argLen = argBout.size();
+                    out.writeInt(argLen);
+                    out.write(argBout.getBuffer(), 0, argLen);
                 }
             } else {
                 out.writeShort(0);
@@ -271,26 +271,34 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         });
     }
 
-    private byte[] adaptivelyCompress(ByteArrayOutputStream bout,
+    private byte[] adaptivelyCompress(FastByteArrayOutputStream bout,
                                       IOConsumer<DataOutputStream> writer) throws IOException {
         // 1. Write to buffer uncompressed first
         bout.reset();
         try (DataOutputStream out = new DataOutputStream(bout)) {
             writer.accept(out);
         }
-        byte[] rawData = bout.toByteArray();
+        int rawLength = bout.size();
 
         // 2. Decide whether to compress
-        if (rawData.length >= 1024) {
+        if (rawLength >= 1024) {
+            byte[] rawData = new byte[rawLength];
+            System.arraycopy(bout.getBuffer(), 0, rawData, 0, rawLength);
             bout.reset();
             try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
                     DataOutputStream out = new DataOutputStream(gzip)) {
                 out.write(rawData);
                 gzip.finish();
             }
-            return bout.toByteArray();
+            // Return compressed data
+            byte[] compressed = new byte[bout.size()];
+            System.arraycopy(bout.getBuffer(), 0, compressed, 0, bout.size());
+            return compressed;
         }
-        return rawData;
+        // Return a copy of raw data (since buffer will be reused)
+        byte[] result = new byte[rawLength];
+        System.arraycopy(bout.getBuffer(), 0, result, 0, rawLength);
+        return result;
     }
 
     @FunctionalInterface
@@ -310,7 +318,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         byte[]     data    = new byte[payload.remaining()];
         payload.get(data);
 
-        InputStream source = new ByteArrayInputStream(data);
+        InputStream source = new FastByteArrayInputStream(data);
         if (isGzip(data)) {
             source = new GZIPInputStream(source);
         }
@@ -337,7 +345,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             String       methodName;
             List<byte[]> rawArgs = new ArrayList<>();
 
-            InputStream source = new ByteArrayInputStream(data);
+            InputStream source = new FastByteArrayInputStream(data);
             if (isGzip(data)) {
                 source = new GZIPInputStream(source);
             }
@@ -362,7 +370,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             if (m != null) {
                 Object[] args = new Object[rawArgs.size()];
                 for (int i = 0; i < args.length; i++) {
-                    try (DataInputStream argIn = new DataInputStream(new ByteArrayInputStream(rawArgs.get(i)))) {
+                    try (DataInputStream argIn = new DataInputStream(new FastByteArrayInputStream(rawArgs.get(i)))) {
                         args[i] = codec.decode(argIn, m.getGenericParameterTypes()[i]);
                     }
                 }
@@ -397,8 +405,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             try {
                 // Use Helper to get FRESH builder
                 withMessageContextBuilder(mcb -> {
-                    ByteArrayOutputStream bout = buffer.get();
-                    byte[]                payload;
+                    FastByteArrayOutputStream bout = buffer.get();
+                    byte[]                    payload;
                     try {
                         payload = adaptivelyCompress(bout, out -> {
                             out.writeBoolean(isError);

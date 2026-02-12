@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.redirector;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -86,7 +88,7 @@ public final class RedirectOutput extends PrintStream {
         if (onStack.get() == null) {
             onStack.set(true);
             try {
-                sb.append(new String(b, off, len)); // default encoding!
+                sb.append(new String(b, off, len, UTF_8)); // explicit UTF-8 encoding
                 flushConditional();
             } catch (final Exception e) {
             } finally {
