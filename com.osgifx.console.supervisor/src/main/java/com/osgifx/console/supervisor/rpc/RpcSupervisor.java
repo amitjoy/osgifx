@@ -266,32 +266,28 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     public void setStdin(final InputStream in) throws Exception {
         final var isr = new InputStreamReader(in);
 
-        final Thread stdin = new Thread("stdin") {
-            @Override
-            public void run() {
-                final var sb = new StringBuilder();
-                while (!isInterrupted()) {
-                    try {
-                        if (isr.ready()) {
-                            final var read = isr.read();
-                            if (read < 0) {
-                                return;
-                            }
-                            sb.append((char) read);
-                        } else if (sb.length() == 0) {
-                            sleep(100);
-                        } else {
-                            getAgent().stdin(sb.toString());
-                            sb.setLength(0);
+        Thread.ofVirtual().name("stdin").start(() -> {
+            final var sb = new StringBuilder();
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    if (isr.ready()) {
+                        final var read = isr.read();
+                        if (read < 0) {
+                            return;
                         }
-                    } catch (final Exception e) {
-                        Thread.currentThread().interrupt();
-                        e.printStackTrace();
+                        sb.append((char) read);
+                    } else if (sb.isEmpty()) {
+                        Thread.sleep(100);
+                    } else {
+                        getAgent().stdin(sb.toString());
+                        sb.setLength(0);
                     }
+                } catch (final Exception e) {
+                    Thread.currentThread().interrupt();
+                    e.printStackTrace();
                 }
             }
-        };
-        stdin.start();
+        });
     }
 
     public void setStreams(final Appendable out, final Appendable err) throws Exception {
