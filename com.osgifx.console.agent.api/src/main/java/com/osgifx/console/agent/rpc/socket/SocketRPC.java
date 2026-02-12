@@ -17,7 +17,6 @@ package com.osgifx.console.agent.rpc.socket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -48,6 +47,8 @@ import java.util.zip.GZIPOutputStream;
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
+import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
+import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -67,10 +68,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
 
     // Optimization: Shared Codec & Reuse Buffers
-    private static final BinaryCodec                 codec       = new BinaryCodec();
-    private final ThreadLocal<ByteArrayOutputStream> buffer      = ThreadLocal
-            .withInitial(() -> new ByteArrayOutputStream(4096));
-    private final Map<String, Method>                methodCache = new HashMap<>();
+    private static final BinaryCodec                     codec       = new BinaryCodec();
+    private final ThreadLocal<FastByteArrayOutputStream> buffer      = ThreadLocal
+            .withInitial(() -> new FastByteArrayOutputStream(4096));
+    private final Map<String, Method>                    methodCache = new HashMap<>();
 
     private L                   local;
     private R                   remote;
@@ -266,37 +267,48 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     out.writeInt(data.length);
                     out.write(data);
                 } else {
-                    final ByteArrayOutputStream bout = buffer.get();
+                    final FastByteArrayOutputStream bout = buffer.get();
                     bout.reset();
                     // Adaptive Compression: Serialize first, then decide
                     // We use a temporary DataOutputStream wrapper around the buffer
                     try (DataOutputStream dataOut = new DataOutputStream(bout)) {
                         codec.encode(value, dataOut);
                     }
-                    final byte[] rawData = bout.toByteArray();
+                    final int    length    = bout.size();
+                    final byte[] rawBuffer = bout.getBuffer();
 
-                    if (rawData.length >= 1024) {
+                    if (length >= 1024) {
                         // Compress if >= 1KB
-                        bout.reset();
-                        try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
+                        // Reuse the buffer for output? No, we need input.
+                        // We can't reuse 'bout' for output because we are reading from it (conceptually).
+                        // Actually 'bout' holds the raw data.
+                        // We need a NEW buffer for compressed data?
+                        // Or we can write to 'out' directly (chunked)?
+                        // The protocol sends length + data.
+                        // GZIP output length is unknown until finished.
+                        // So we MUST buffer GZIP output.
+
+                        // We need a separate buffer for compression to avoid overwriting raw data while reading it?
+                        // 'gzip.write' consumes input.
+                        // If we use a separate ByteArrayOutputStream for compression.
+                        try (ByteArrayOutputStream compOut = new ByteArrayOutputStream(length / 2); // Estimate
+                                GZIPOutputStream gzip = new GZIPOutputStream(compOut);
                                 DataOutputStream dataOut = new DataOutputStream(gzip)) {
-                            // Re-encoding or writing raw bytes?
-                            // We already encoded to rawData.
-                            // Writing rawData to GZIP output is efficient.
-                            gzip.write(rawData);
+                            gzip.write(rawBuffer, 0, length);
                             gzip.finish();
+
+                            final byte[] compressedData = compOut.toByteArray();
+                            out.writeInt(compressedData.length);
+                            out.write(compressedData);
                         }
-                        final byte[] compressedData = bout.toByteArray();
-                        out.writeInt(compressedData.length);
-                        out.write(compressedData);
                     } else {
-                        // Send raw
-                        out.writeInt(rawData.length);
-                        out.write(rawData);
+                        // Send raw - Zero Copy from buffer
+                        out.writeInt(length);
+                        out.write(rawBuffer, 0, length);
                     }
 
-                    if (rawData.length > 1024 * 1024)
-                        buffer.set(new ByteArrayOutputStream(4096));
+                    if (length > 1024 * 1024)
+                        buffer.set(new FastByteArrayOutputStream(4096));
                 }
             }
             out.flush();
@@ -321,7 +333,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             if (type == byte[].class && !result.exception)
                 return (T) result.value;
 
-            InputStream source = new ByteArrayInputStream(result.value);
+            InputStream source = new FastByteArrayInputStream(result.value);
             if (isGzip(result.value)) {
                 source = new GZIPInputStream(source);
             }
@@ -352,7 +364,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     parameters[i] = args.get(i);
                 } else {
                     final byte[] argData = args.get(i);
-                    InputStream  source  = new ByteArrayInputStream(argData);
+                    InputStream  source  = new FastByteArrayInputStream(argData);
                     if (isGzip(argData)) {
                         source = new GZIPInputStream(source);
                     }
