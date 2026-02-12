@@ -430,16 +430,16 @@ public final class AgentServer implements Agent, Closeable {
                     .setThreadFactory(r -> new Thread(r, COMMAND_EXECUTOR_DEFAULT_THREAD_NAME)).get();
             final ByteArrayOutputStream       outputStream  = new ByteArrayOutputStream();
             final PumpStreamHandler           streamHandler = new PumpStreamHandler(outputStream);
-
-            executor.setExitValue(1);
             executor.setWatchdog(watchdog);
             executor.setStreamHandler(streamHandler);
             executor.execute(cmdLine, resultHandler);
             resultHandler.waitFor(RESULT_TIMEOUT);
 
             return outputStream.toString();
-        } catch (final Exception e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
+            return Exceptions.toString(e);
+        } catch (final Exception e) {
             return Exceptions.toString(e);
         }
     }
