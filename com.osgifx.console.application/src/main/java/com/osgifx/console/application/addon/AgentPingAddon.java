@@ -34,6 +34,8 @@ import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.google.mu.util.concurrent.Retryer;
+import com.google.mu.util.concurrent.Retryer.Delay;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
@@ -42,6 +44,10 @@ public final class AgentPingAddon {
 
     private static final Duration INITIAL_DELAY = Duration.ofSeconds(0);
     private static final Duration MAX_DELAY     = Duration.ofSeconds(5);
+
+    private static final int    PING_RETRY_LIMIT      = 3;
+    private static final double PING_RETRY_MULTIPLIER = 1.5d;
+    private static final long   PING_RETRY_DELAY_MS   = 1_000L;
 
     @Log
     @Inject
@@ -81,9 +87,15 @@ public final class AgentPingAddon {
         if (supervisor.getType() == SOCKET_RPC) {
             future = executor.scheduleWithFixedDelay(() -> {
                 try {
-                    supervisor.getAgent().ping();
-                } catch (final Exception e) {
-                    logger.atWarning().log("Agent ping request did not succeed");
+                    new Retryer()
+                            .upon(Exception.class, Delay.ofMillis(PING_RETRY_DELAY_MS)
+                                    .exponentialBackoff(PING_RETRY_MULTIPLIER, PING_RETRY_LIMIT))
+                            .retryBlockingly(() -> {
+                                supervisor.getAgent().ping();
+                                return null;
+                            });
+                } catch (final Exception _) {
+                    logger.atWarning().log("Agent ping request did not succeed after %d retries", PING_RETRY_LIMIT);
                     eventBroker.post(AGENT_DISCONNECTED_EVENT_TOPIC, "");
 
                     isConnected.publish(false);
