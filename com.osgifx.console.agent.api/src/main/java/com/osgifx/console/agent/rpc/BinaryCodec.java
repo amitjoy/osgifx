@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -331,6 +332,21 @@ public class BinaryCodec {
         @Override
         public int available() {
             return count - pos;
+        }
+    }
+
+    /**
+     * A lightweight ByteArrayOutputStream that exposes the internal buffer
+     * to avoid defensive copies via {@code toByteArray()}.
+     */
+    public static class FastByteArrayOutputStream extends ByteArrayOutputStream {
+        public FastByteArrayOutputStream(int size) {
+            super(size);
+        }
+
+        /** Returns the internal buffer directly (no copy). Valid bytes: [0, size()). */
+        public byte[] getBuffer() {
+            return buf;
         }
     }
 
