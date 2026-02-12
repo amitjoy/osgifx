@@ -22,7 +22,6 @@ import static com.hivemq.client.mqtt.mqtt5.message.connect.Mqtt5ConnectRestricti
 import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_RECEIVE;
 import static com.osgifx.console.supervisor.rpc.AbstractRpcSupervisor.MqttConfig.MAX_CONCURRENT_MSG_TO_SEND;
 import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LISTENER_FILTER;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
@@ -31,14 +30,12 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.condition.Condition;
@@ -100,10 +97,6 @@ public abstract class AbstractRpcSupervisor<S, A> {
     private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
     private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5d;
 
-    private static final int RPC_POOL_CORE_THREADS_SIZE          = 10;
-    private static final int RPC_POOL_MAX_THREADS_SIZE           = 30;
-    private static final int RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS = 60;
-
     private A                 agent;
     protected int             port;
     protected int             timeout;
@@ -139,7 +132,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
                         final var socket = sf == null ? new Socket() : sf.createSocket();
                         socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
 
-                        final var executor = newFixedThreadPool("fx-supervisor-socket-%d");
+                        final var executor = newFixedThreadPool("fx-supervisor-socket-");
                         remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
                         this.setRemoteRPC(remoteRPC);
                         remoteRPC.open();
@@ -200,7 +193,7 @@ public abstract class AbstractRpcSupervisor<S, A> {
         final var result = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, conditionID))
                 .run(bundleContext);
 
-        final var executor = newFixedThreadPool("fx-supervisor-mqtt-%d");
+        final var executor = newFixedThreadPool("fx-supervisor-mqtt-");
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
                                   executor);
         this.setRemoteRPC(remoteRPC);
@@ -229,12 +222,8 @@ public abstract class AbstractRpcSupervisor<S, A> {
     }
 
     public static ExecutorService newFixedThreadPool(final String namingPattern) {
-        final var threadFactory = BasicThreadFactory.builder().namingPattern(namingPattern).daemon(true).build();
-        final var executor      = new ThreadPoolExecutor(RPC_POOL_CORE_THREADS_SIZE, RPC_POOL_MAX_THREADS_SIZE,
-                                                         RPC_POOL_KEEP_ALIVE_TIME_IN_SECONDS, SECONDS,
-                                                         new LinkedBlockingQueue<>(), threadFactory);
-        executor.allowCoreThreadTimeOut(true);
-        return executor;
+        final var threadFactory = Thread.ofVirtual().name(namingPattern, 0).factory();
+        return Executors.newThreadPerTaskExecutor(threadFactory);
     }
 
 }
