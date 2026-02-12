@@ -184,7 +184,11 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                             } catch (final Exception e) {
                                 if (msgId != -1)
                                     promises.remove(msgId);
-                                throw Exceptions.unrollCause(e, RuntimeException.class);
+                                final Throwable cause = Exceptions.unrollCause(e, RuntimeException.class);
+                                if (cause instanceof RuntimeException) {
+                                    throw (RuntimeException) cause;
+                                }
+                                throw new RuntimeException(cause);
                             }
                         });
             }
@@ -252,6 +256,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     }
 
     private int send(final int msgId, final Method m, Object[] values) throws Exception {
+        if (stopped.get())
+            throw new IOException("RPC channel is closed");
         if (m != null)
             promises.put(msgId, new RpcResult());
         outLock.lock();
