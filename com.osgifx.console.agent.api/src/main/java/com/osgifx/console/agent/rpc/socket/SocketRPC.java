@@ -243,6 +243,13 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         return methodCache.get(cmd + "#" + count);
     }
 
+    private boolean isGzip(byte[] bytes) {
+        if (bytes == null || bytes.length < 2) {
+            return false;
+        }
+        return (bytes[0] == (byte) 0x1f) && (bytes[1] == (byte) 0x8b);
+    }
+
     private int send(final int msgId, final Method m, Object[] values) throws Exception {
         if (m != null)
             promises.put(msgId, new RpcResult());
@@ -261,16 +268,34 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                 } else {
                     final ByteArrayOutputStream bout = buffer.get();
                     bout.reset();
-                    try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
-                            DataOutputStream dataOut = new DataOutputStream(gzip)) {
+                    // Adaptive Compression: Serialize first, then decide
+                    // We use a temporary DataOutputStream wrapper around the buffer
+                    try (DataOutputStream dataOut = new DataOutputStream(bout)) {
                         codec.encode(value, dataOut);
-                        dataOut.flush();
-                        gzip.finish();
                     }
-                    final byte[] data = bout.toByteArray();
-                    out.writeInt(data.length);
-                    out.write(data);
-                    if (data.length > 1024 * 1024)
+                    final byte[] rawData = bout.toByteArray();
+
+                    if (rawData.length >= 1024) {
+                        // Compress if >= 1KB
+                        bout.reset();
+                        try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
+                                DataOutputStream dataOut = new DataOutputStream(gzip)) {
+                            // Re-encoding or writing raw bytes?
+                            // We already encoded to rawData.
+                            // Writing rawData to GZIP output is efficient.
+                            gzip.write(rawData);
+                            gzip.finish();
+                        }
+                        final byte[] compressedData = bout.toByteArray();
+                        out.writeInt(compressedData.length);
+                        out.write(compressedData);
+                    } else {
+                        // Send raw
+                        out.writeInt(rawData.length);
+                        out.write(rawData);
+                    }
+
+                    if (rawData.length > 1024 * 1024)
                         buffer.set(new ByteArrayOutputStream(4096));
                 }
             }
@@ -296,8 +321,12 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             if (type == byte[].class && !result.exception)
                 return (T) result.value;
 
-            try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(result.value));
-                    DataInputStream dataIn = new DataInputStream(gzip)) {
+            InputStream source = new ByteArrayInputStream(result.value);
+            if (isGzip(result.value)) {
+                source = new GZIPInputStream(source);
+            }
+
+            try (DataInputStream dataIn = new DataInputStream(source)) {
                 if (result.exception) {
                     final String msg = (String) codec.decode(dataIn, String.class);
                     throw new RuntimeException(msg);
@@ -322,8 +351,13 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                 if (type == byte[].class) {
                     parameters[i] = args.get(i);
                 } else {
-                    try (GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(args.get(i)));
-                            DataInputStream dataIn = new DataInputStream(gzip)) {
+                    final byte[] argData = args.get(i);
+                    InputStream  source  = new ByteArrayInputStream(argData);
+                    if (isGzip(argData)) {
+                        source = new GZIPInputStream(source);
+                    }
+
+                    try (DataInputStream dataIn = new DataInputStream(source)) {
                         parameters[i] = codec.decode(dataIn, m.getGenericParameterTypes()[i]);
                     }
                 }
@@ -358,7 +392,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         if (result != null) {
             result.value     = data;
             result.exception = exception;
-            result.latch.countDown(); // Signal completion instead of notifyAll()
+            // Signal completion instead of notifyAll()
+            result.latch.countDown();
         }
     }
 }
