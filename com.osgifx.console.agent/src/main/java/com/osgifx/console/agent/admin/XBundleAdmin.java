@@ -211,12 +211,19 @@ public final class XBundleAdmin {
             logger.atDebug().msg("Bundle context is null for '{}'").arg(bsn).log();
             return -1L;
         }
-        final File storage = bundleContext.getDataFile("");
-        if (storage == null) {
-            logger.atDebug().msg("Bundle storage is null for '{}'").arg(bsn).log();
+        try {
+            final File storage = bundleContext.getDataFile("");
+            if (storage == null) {
+                logger.atDebug().msg("Bundle storage is null for '{}'").arg(bsn).log();
+                return -1L;
+            }
+            return storage.length();
+        } catch (final IllegalStateException e) {
+            // BundleContext can become invalid between the null check above and
+            // getDataFile() call during framework shutdown — this is expected
+            logger.atDebug().msg("Bundle context invalidated during shutdown for '{}'").arg(bsn).log();
             return -1L;
         }
-        return storage.length();
     }
 
     /**
