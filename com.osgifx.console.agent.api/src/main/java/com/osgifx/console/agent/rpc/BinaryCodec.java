@@ -15,10 +15,10 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
@@ -272,10 +272,55 @@ public class BinaryCodec {
     public <T> T decode(final byte[] data, final Class<T> type) {
         if (data == null || data.length == 0)
             return null;
-        try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(data))) {
+        // Optimization: Use FastByteArrayInputStream to avoid synchronized overhead of ByteArrayInputStream
+        // and reduce strict object creation if we expand this to a pool later.
+        // For now, it simply replaces ByteArrayInputStream with a lighter version.
+        try (DataInputStream in = new DataInputStream(new FastByteArrayInputStream(data))) {
             return decode(in, type);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * A lightweight, non-synchronized ByteArrayInputStream alternative.
+     */
+    public static class FastByteArrayInputStream extends InputStream {
+        protected byte[] buf;
+        protected int    pos;
+        protected int    count;
+
+        public FastByteArrayInputStream(byte[] buf) {
+            this.buf   = buf;
+            this.pos   = 0;
+            this.count = buf.length;
+        }
+
+        @Override
+        public int read() {
+            return (pos < count) ? (buf[pos++] & 0xff) : -1;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) {
+            if (pos >= count) {
+                return -1;
+            }
+            int avail = count - pos;
+            if (len > avail) {
+                len = avail;
+            }
+            if (len <= 0) {
+                return 0;
+            }
+            System.arraycopy(buf, pos, b, off, len);
+            pos += len;
+            return len;
+        }
+
+        @Override
+        public int available() {
+            return count - pos;
         }
     }
 

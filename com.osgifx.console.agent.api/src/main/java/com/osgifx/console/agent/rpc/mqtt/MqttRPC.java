@@ -21,6 +21,7 @@ import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -246,34 +247,62 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
     private byte[] encodeRequest(Method method, Object[] args) throws IOException {
         final ByteArrayOutputStream bout = buffer.get();
-        bout.reset();
-
-        try (GZIPOutputStream gzip = new GZIPOutputStream(bout); DataOutputStream out = new DataOutputStream(gzip)) {
-
+        return adaptivelyCompress(bout, out -> {
             out.writeUTF(method.getName());
-            if (args == null)
-                args = new Object[0];
-            out.writeShort(args.length);
-
-            for (Object arg : args) {
-                // Encode each arg to temp buffer to get length
-                final ByteArrayOutputStream argBout = argBuffer.get();
-                argBout.reset();
-                try (DataOutputStream argOut = new DataOutputStream(argBout)) {
-                    try {
-                        codec.encode(arg, argOut);
-                    } catch (Exception e) {
-                        throw new IOException("Failed to encode argument", e);
+            if (args != null) {
+                out.writeShort(args.length);
+                for (Object arg : args) {
+                    final ByteArrayOutputStream argBout = argBuffer.get();
+                    argBout.reset();
+                    try (DataOutputStream argOut = new DataOutputStream(argBout)) {
+                        try {
+                            codec.encode(arg, argOut);
+                        } catch (Exception e) {
+                            throw new IOException(e);
+                        }
                     }
+                    byte[] argBytes = argBout.toByteArray();
+                    out.writeInt(argBytes.length);
+                    out.write(argBytes);
                 }
-                byte[] argBytes = argBout.toByteArray();
-                out.writeInt(argBytes.length);
-                out.write(argBytes);
+            } else {
+                out.writeShort(0);
             }
-            out.flush();
-            gzip.finish();
+        });
+    }
+
+    private byte[] adaptivelyCompress(ByteArrayOutputStream bout,
+                                      IOConsumer<DataOutputStream> writer) throws IOException {
+        // 1. Write to buffer uncompressed first
+        bout.reset();
+        try (DataOutputStream out = new DataOutputStream(bout)) {
+            writer.accept(out);
         }
-        return bout.toByteArray();
+        byte[] rawData = bout.toByteArray();
+
+        // 2. Decide whether to compress
+        if (rawData.length >= 1024) {
+            bout.reset();
+            try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
+                    DataOutputStream out = new DataOutputStream(gzip)) {
+                out.write(rawData);
+                gzip.finish();
+            }
+            return bout.toByteArray();
+        }
+        return rawData;
+    }
+
+    @FunctionalInterface
+    private interface IOConsumer<T> {
+        void accept(T t) throws IOException;
+    }
+
+    private boolean isGzip(byte[] bytes) {
+        if (bytes == null || bytes.length < 2) {
+            return false;
+        }
+        return (bytes[0] == (byte) 0x1f) && (bytes[1] == (byte) 0x8b);
     }
 
     private Object decodeResponse(Message msg, Type returnType) throws Exception {
@@ -281,7 +310,12 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         byte[]     data    = new byte[payload.remaining()];
         payload.get(data);
 
-        try (DataInputStream in = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(data)))) {
+        InputStream source = new ByteArrayInputStream(data);
+        if (isGzip(data)) {
+            source = new GZIPInputStream(source);
+        }
+
+        try (DataInputStream in = new DataInputStream(source)) {
             boolean isError = in.readBoolean();
             if (isError) {
                 String errorMsg = (String) codec.decode(in, String.class);
@@ -303,7 +337,12 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             String       methodName;
             List<byte[]> rawArgs = new ArrayList<>();
 
-            try (DataInputStream in = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(data)))) {
+            InputStream source = new ByteArrayInputStream(data);
+            if (isGzip(data)) {
+                source = new GZIPInputStream(source);
+            }
+
+            try (DataInputStream in = new DataInputStream(source)) {
                 methodName = in.readUTF();
                 int count = in.readShort();
                 for (int i = 0; i < count; i++) {
@@ -359,24 +398,26 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 // Use Helper to get FRESH builder
                 withMessageContextBuilder(mcb -> {
                     ByteArrayOutputStream bout = buffer.get();
-                    bout.reset();
-                    try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
-                            DataOutputStream out = new DataOutputStream(gzip)) {
-
-                        out.writeBoolean(isError);
-                        if (isError) {
-                            codec.encode(errorMsg, out);
-                        } else {
-                            codec.encode(result, out);
-                        }
-                        out.flush();
-                        gzip.finish();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Encoding failed", e);
+                    byte[]                payload;
+                    try {
+                        payload = adaptivelyCompress(bout, out -> {
+                            out.writeBoolean(isError);
+                            try {
+                                if (isError) {
+                                    codec.encode(errorMsg, out);
+                                } else {
+                                    codec.encode(result, out);
+                                }
+                            } catch (Exception e) {
+                                throw new IOException(e);
+                            }
+                        });
+                    } catch (IOException e) {
+                        throw new RuntimeException("Compression failed", e);
                     }
 
                     Message responseMsg = mcb.channel(topic).correlationId(correlationId)
-                            .content(ByteBuffer.wrap(bout.toByteArray())).buildMessage();
+                            .content(ByteBuffer.wrap(payload)).buildMessage();
 
                     publisherOpt.get().publish(responseMsg);
                     return null;
