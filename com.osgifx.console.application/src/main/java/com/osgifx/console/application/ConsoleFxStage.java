@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.application;
 
-import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.concurrent.Worker.State.SUCCEEDED;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
@@ -30,13 +29,14 @@ import org.osgi.framework.FrameworkUtil;
 import javafx.animation.FadeTransition;
 import javafx.application.HostServices;
 import javafx.concurrent.Task;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
@@ -47,11 +47,11 @@ import javafx.util.Duration;
 public final class ConsoleFxStage extends DefaultJFXApp {
 
     private static final String SPLASH_IMAGE = "/graphic/images/splash.png";
+    private static final String SPLASH_CSS   = "/css/splash.css";
 
     private Stage        initStage;
-    private VBox         splashLayout;
+    private StackPane    splashLayout;
     private ProgressBar  loadProgress;
-    private Label        progressText;
     private final Bundle applicationBundle;
 
     private static final double SPLASH_WIDTH  = 695d;
@@ -68,14 +68,23 @@ public final class ConsoleFxStage extends DefaultJFXApp {
 
         loadProgress = new ProgressBar();
         loadProgress.setPrefWidth(SPLASH_WIDTH - 20);
-        progressText = new Label("");
-        splashLayout = new VBox();
-        splashLayout.setSpacing(2);
+        loadProgress.setPrefHeight(10);
+        loadProgress.setProgress(0);
 
-        splashLayout.getChildren().addAll(splash, loadProgress, progressText);
-        progressText.setAlignment(Pos.CENTER);
-        splashLayout.setStyle("-fx-padding: 5; -fx-background-color: cornsilk; -fx-border-width:5; -fx-border-color: "
-                + "linear-gradient(to bottom, chocolate, derive(chocolate, 50%));");
+        loadProgress.setMaxWidth(Double.MAX_VALUE); // Let it fill the width completely within padding
+
+        final var progressBox = new VBox();
+        progressBox.getChildren().add(loadProgress);
+        progressBox.setAlignment(Pos.BOTTOM_CENTER);
+        progressBox.setMaxWidth(SPLASH_WIDTH - 20); // Constrain width slightly to ensure padding
+        progressBox.setPadding(new Insets(0, 0, 2, 0)); // 2px from bottom
+        progressBox.getStyleClass().add("progress-box"); // For gradient background
+
+        splashLayout = new StackPane();
+        splashLayout.getChildren().addAll(splash, progressBox);
+        StackPane.setAlignment(progressBox, Pos.BOTTOM_CENTER);
+
+        splashLayout.getStyleClass().add("splash-layout");
         splashLayout.setEffect(new DropShadow());
     }
 
@@ -91,11 +100,12 @@ public final class ConsoleFxStage extends DefaultJFXApp {
             @Override
             protected Void call() throws InterruptedException {
                 updateMessage("Initializing Console . . .");
-                for (var i = 0; i < 5; i++) {
-                    Thread.sleep(400);
-                    updateProgress(i + 1L, 5);
+                // Fluid animation: 100 steps of 20ms = 2 seconds
+                for (var i = 0; i < 100; i++) {
+                    Thread.sleep(20);
+                    updateProgress(i + 1L, 100);
                 }
-                Thread.sleep(400);
+                Thread.sleep(200);
                 updateMessage("Console Initialized.");
                 return null;
             }
@@ -116,7 +126,6 @@ public final class ConsoleFxStage extends DefaultJFXApp {
     }
 
     private void showSplash(final Stage initStage, final Task<?> task, final Runnable completionHandler) {
-        progressText.textProperty().bind(task.messageProperty());
         loadProgress.progressProperty().bind(task.progressProperty());
 
         task.stateProperty().addListener((_, _, newState) -> {
@@ -139,7 +148,7 @@ public final class ConsoleFxStage extends DefaultJFXApp {
         final var splashScene = new Scene(splashLayout, TRANSPARENT);
         final var bounds      = Screen.getPrimary().getBounds();
 
-        splashScene.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
+        splashScene.getStylesheets().add(getClass().getResource(SPLASH_CSS).toExternalForm());
 
         initStage.setScene(splashScene);
         initStage.setX(bounds.getMinX() + bounds.getWidth() / 2d - SPLASH_WIDTH / 2d);
