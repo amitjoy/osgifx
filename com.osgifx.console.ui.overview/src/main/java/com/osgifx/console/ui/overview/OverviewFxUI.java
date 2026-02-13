@@ -20,8 +20,6 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOP
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAUSE;
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PLAY;
-import static eu.hansolo.tilesfx.colors.Bright.GREEN;
-import static eu.hansolo.tilesfx.colors.Bright.RED;
 import static java.util.Objects.requireNonNullElse;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static javafx.geometry.Orientation.VERTICAL;
@@ -95,6 +93,8 @@ public final class OverviewFxUI {
     private static final double TILE_HEIGHT   = 220;
     private static final double REFRESH_DELAY = 5;
     private static final int    CYCLE_COUNT   = 5;
+    private static final Color  MUTED_GREEN   = Color.web("#3EB16E");
+    private static final Color  MUTED_RED     = Color.web("#CE4844");
 
     @Log
     @Inject
@@ -123,8 +123,8 @@ public final class OverviewFxUI {
 
     // New Tiles
     private Tile noOfConfigurationsTile;
-    private Tile noOfPackagesTile;
     private Tile noOfLeaksTile;
+    private Tile deadlockedThreadsTile;
 
     // New Tiles
     private Tile bundleStateTile;
@@ -238,16 +238,23 @@ public final class OverviewFxUI {
 
         noOfServicesTile.setValue(runtimeInfo.noOfServices());
         noOfConfigurationsTile.setValue(runtimeInfo.noOfConfigurations());
-        noOfPackagesTile.setValue(runtimeInfo.noOfPackages());
         
         final var leaks = runtimeInfo.noOfLeaks();
         noOfLeaksTile.setValue(leaks);
-        noOfLeaksTile.setBackgroundColor(leaks > 0 ? RED : GREEN);
+
+        // Update Deadlocked Threads Tile
+        final var deadlockedThreads = runtimeInfo.noOfDeadlockedThreads();
+        deadlockedThreadsTile.setValue(deadlockedThreads);
 
         // Update Log Error Tile
         final var logErrors = runtimeInfo.noOfLogErrors();
         logErrorTile.setValue(logErrors);
-        logErrorTile.setBackgroundColor(logErrors > 0 ? RED : GREEN);
+
+        if (isConnected) {
+            noOfLeaksTile.setBackgroundColor(leaks > 0 ? MUTED_RED : MUTED_GREEN);
+            deadlockedThreadsTile.setBackgroundColor(deadlockedThreads > 0 ? MUTED_RED : MUTED_GREEN);
+            logErrorTile.setBackgroundColor(logErrors > 0 ? MUTED_RED : MUTED_GREEN);
+        }
 
         // Update Bundle State Tile
         final List<ChartData> bundleStateData = runtimeInfo.bundleStates().entrySet().stream()
@@ -431,15 +438,12 @@ public final class OverviewFxUI {
         // Count Configurations
         final var noOfConfigurations = dataProvider.configurations().size();
 
-        // Count Packages
-        final var noOfPackages = dataProvider.packages().size();
-
         return new OverviewInfo(cachedStaticOverviewInfo.frameworkBsn, cachedStaticOverviewInfo.frameworkVersion,
                                 cachedStaticOverviewInfo.frameworkStartLevel, cachedStaticOverviewInfo.osName,
                                 cachedStaticOverviewInfo.osVersion, cachedStaticOverviewInfo.osArchitecture,
                                 cachedStaticOverviewInfo.javaVersion, cachedStaticOverviewInfo.noOfServices, memoryInfo,
                                 bundleStates, threadStates, componentStates, (int) logErrors, noOfConfigurations,
-                                noOfPackages, noOfLeaks);
+                                noOfLeaks, (int) dataProvider.threads().stream().filter(t -> t.isDeadlocked).count());
     }
 
     private void createUIComponents(final BorderPane parent) {
@@ -478,24 +482,24 @@ public final class OverviewFxUI {
                                       .roundedCorners(false)
                                       .decimals(0)
                                       .build();
-                                      
-         noOfPackagesTile = TileBuilder.create()
-                                      .skinType(SkinType.NUMBER)
-                                      .numberFormat(new DecimalFormat("#"))
-                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                      .title("Packages")
-                                      .text("Number of exported packages")
-                                      .textVisible(true)
-                                      .roundedCorners(false)
-                                      .decimals(0)
-                                      .build();
-                                      
+
          noOfLeaksTile = TileBuilder.create()
                                       .skinType(SkinType.NUMBER)
                                       .numberFormat(new DecimalFormat("#"))
                                       .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                       .title("Classloader Leaks")
                                       .text("Number of classloader leaks")
+                                      .textVisible(true)
+                                      .roundedCorners(false)
+                                      .decimals(0)
+                                      .build();
+
+         deadlockedThreadsTile = TileBuilder.create()
+                                      .skinType(SkinType.NUMBER)
+                                      .numberFormat(new DecimalFormat("#"))
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                      .title("Deadlocked Threads")
+                                      .text("Number of deadlocked threads")
                                       .textVisible(true)
                                       .roundedCorners(false)
                                       .decimals(0)
@@ -582,14 +586,14 @@ public final class OverviewFxUI {
                                            uptimeTile,
                                            memoryConsumptionTile,
                                            memoryHistoryTile,
-                                           noOfServicesTile,
-                                           noOfConfigurationsTile,
-                                           noOfPackagesTile,
-                                           logErrorTile,
                                            bundleStateTile,
                                            componentStateTile,
                                            threadStateTile,
-                                           noOfLeaksTile);
+                                           noOfServicesTile,
+                                           deadlockedThreadsTile,
+                                           noOfLeaksTile,
+                                           logErrorTile,
+                                           noOfConfigurationsTile);
         // @formatter:on
         pane.setHgap(5);
         pane.setVgap(5);
@@ -714,8 +718,8 @@ public final class OverviewFxUI {
                                 Map<String, Long> componentStates,
                                 int noOfLogErrors,
                                 int noOfConfigurations,
-                                int noOfPackages,
-                                int noOfLeaks) {
+                                int noOfLeaks,
+                                int noOfDeadlockedThreads) {
         public OverviewInfo() {
             this("", "", "", "", "", "", "", 0, completedFuture(new XMemoryInfoDTO()), Map.of(), Map.of(), Map.of(), 0,
                  0, 0, 0);

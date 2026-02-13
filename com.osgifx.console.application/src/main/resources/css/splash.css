@@ -1,0 +1,50 @@
+.root {
+    -fx-background-color: transparent;
+}
+
+.splash-layout {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-border-color: #D2691E;
+    /* Chocolate */
+    -fx-border-width: 2;
+    -fx-border-style: solid inside;
+    -fx-border-radius: 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 10, 0, 0, 0);
+}
+
+.progress-box {
+    /* Removed gradient background for cleaner look, text shadow handles contrast */
+}
+
+.progress-bar {
+    -fx-pref-height: 10px;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+    -fx-padding: 0;
+}
+
+.progress-bar .track {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    /* Slightly lighter track for better contrast on dark image */
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+}
+
+.progress-bar .bar {
+    -fx-background-color: linear-gradient(to right, #FFA500, #FF4500);
+    /* Orange to Red-Orange */
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 165, 0, 0.4), 10, 0, 0, 0);
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-family: "Gill Sans";
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 2, 0, 0, 1);
+    -fx-font-weight: bold;
+}
