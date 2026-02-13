@@ -45,6 +45,12 @@ public class RunOSGiFx {
             "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
             "--add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED");
 
+    private static final List<String> JAVA_25_FLAGS = List.of(
+            "-XX:+UseCompactObjectHeaders",
+            "-XX:+UseShenandoahGC",
+            "-XX:ShenandoahGCMode=generational",
+            "-XX:MaxRAMPercentage=50.0");
+
     public static void main(String[] args) {
         try {
             validateJavaVersion();
@@ -181,6 +187,7 @@ public class RunOSGiFx {
 
         command.addAll(jvmArgs);
         command.addAll(JAVA_FX_FLAGS);
+        command.addAll(JAVA_25_FLAGS);
         command.add("-jar");
         command.add(jar.toAbsolutePath().toString());
         command.addAll(programArgs);
