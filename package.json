@@ -19,7 +19,11 @@
 			"--add-exports javafx.graphics/com.sun.javafx.css=ALL-UNNAMED",
 			"--add-opens javafx.graphics/javafx.scene=ALL-UNNAMED",
 			"--add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED",
-			"--add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED"
+			"--add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED",
+			"-XX:+UseCompactObjectHeaders",
+			"-XX:+UseShenandoahGC",
+			"-XX:ShenandoahGCMode=generational",
+			"-XX:MaxRAMPercentage=50.0"
 		],
 		"javaVersion": "25",
 		"jar": "com.osgifx.console.dist/uberjar/osgifx.jar",
