@@ -1,7 +1,7 @@
 -runrepos                       =         Workspace, Runtime, e(fx)clipse, Local
 -runfw                          =         org.eclipse.osgi;version=latest
 -runkeep                        =         ${is;${driver};gradle}
--runtrace                       =         true 
+-runtrace                       =         true
 -runee                          =         JavaSE-25
 -runsystemcapabilities          =         ${native_capability},\
                                           osgi.ee;osgi.ee="JavaSE/compact1";version:List<Version>="1.8",\
@@ -34,7 +34,11 @@ Add-Exports                     =         ${join; ;${fx.exports}}
 Add-Opens                       =         ${join; ;${fx.opens}}
 
 -runvm                          =         ${template;fx.exports;--add-exports=${@}=ALL-UNNAMED},\
-                                          ${template;fx.opens;--add-opens=${@}=ALL-UNNAMED}
+                                          ${template;fx.opens;--add-opens=${@}=ALL-UNNAMED},\
+                                          -XX:+UseCompactObjectHeaders,\
+                                          -XX:+UseShenandoahGC,\
+                                          -XX:ShenandoahGCMode=generational,\
+                                          -XX:MaxRAMPercentage=50.0
 
 -runproperties.equinox          =         osgi.instance.area.default=${storage.directory}
 
