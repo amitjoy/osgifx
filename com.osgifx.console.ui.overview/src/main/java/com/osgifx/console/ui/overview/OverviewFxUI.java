@@ -26,11 +26,13 @@ import static javafx.geometry.Orientation.VERTICAL;
 
 import java.text.DecimalFormat;
 import java.time.LocalTime;
-import java.util.Locale;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -57,6 +59,7 @@ import com.osgifx.console.util.fx.Fx;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.Tile.SkinType;
 import eu.hansolo.tilesfx.TileBuilder;
+import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
 import eu.hansolo.tilesfx.tools.FlowGridPane;
@@ -65,6 +68,10 @@ import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.chart.AreaChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -78,7 +85,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Stop;
 import javafx.util.Duration;
 
 public final class OverviewFxUI {
@@ -87,6 +93,8 @@ public final class OverviewFxUI {
     private static final double TILE_HEIGHT   = 220;
     private static final double REFRESH_DELAY = 5;
     private static final int    CYCLE_COUNT   = 5;
+    private static final Color  MUTED_GREEN   = Color.web("#3EB16E");
+    private static final Color  MUTED_RED     = Color.web("#CE4844");
 
     @Log
     @Inject
@@ -108,15 +116,25 @@ public final class OverviewFxUI {
     @Inject
     private IEclipseContext   eclipseContext;
 
-    private Tile clockTile;
-    private Tile noOfThreadsTile;
     private Tile runtimeInfoTile;
-    private Tile noOfBundlesTile;
     private Tile noOfServicesTile;
-    private Tile noOfComponentsTile;
     private Tile memoryConsumptionTile;
-    private Tile availableMemoryTile;
     private Tile uptimeTile;
+
+    // New Tiles
+    private Tile noOfConfigurationsTile;
+    private Tile noOfLeaksTile;
+    private Tile deadlockedThreadsTile;
+
+    // New Tiles
+    private Tile bundleStateTile;
+    private Tile memoryHistoryTile;
+    private Tile threadStateTile;
+    private Tile logErrorTile;
+    private Tile componentStateTile;
+
+    // Chart Data Series
+    private XYChart.Series<String, Number> memoryDataSeries;
 
     private Button   timelineButton;
     private Timeline dataRetrieverTimeline;
@@ -218,24 +236,62 @@ public final class OverviewFxUI {
         // @formatter:off
         final var runtimeInfo = retrieveRuntimeInfo();
 
-        noOfBundlesTile.setValue(runtimeInfo.noOfInstalledBundles());
         noOfServicesTile.setValue(runtimeInfo.noOfServices());
-        noOfComponentsTile.setValue(runtimeInfo.noOfComponents());
-        noOfThreadsTile.setValue(runtimeInfo.noOfThreads());
+        noOfConfigurationsTile.setValue(runtimeInfo.noOfConfigurations());
+        
+        final var leaks = runtimeInfo.noOfLeaks();
+        noOfLeaksTile.setValue(leaks);
+
+        // Update Deadlocked Threads Tile
+        final var deadlockedThreads = runtimeInfo.noOfDeadlockedThreads();
+        deadlockedThreadsTile.setValue(deadlockedThreads);
+
+        // Update Log Error Tile
+        final var logErrors = runtimeInfo.noOfLogErrors();
+        logErrorTile.setValue(logErrors);
+
+        if (isConnected) {
+            noOfLeaksTile.setBackgroundColor(leaks > 0 ? MUTED_RED : MUTED_GREEN);
+            deadlockedThreadsTile.setBackgroundColor(deadlockedThreads > 0 ? MUTED_RED : MUTED_GREEN);
+            logErrorTile.setBackgroundColor(logErrors > 0 ? MUTED_RED : MUTED_GREEN);
+        }
+
+        // Update Bundle State Tile
+        final List<ChartData> bundleStateData = runtimeInfo.bundleStates().entrySet().stream()
+                .map(entry -> new ChartData(entry.getKey(), entry.getValue(), getBundleStateColor(entry.getKey())))
+                .toList();
+        bundleStateTile.setChartData(bundleStateData);
+
+        // Update Thread State Tile
+        final List<ChartData> threadStateData = runtimeInfo.threadStates().entrySet().stream()
+                .map(entry -> new ChartData(entry.getKey(), entry.getValue(), getThreadStateColor(entry.getKey())))
+                .toList();
+        threadStateTile.setChartData(threadStateData);
+
+        // Update Component State Tile
+        final List<ChartData> componentStateData = runtimeInfo.componentStates().entrySet().stream()
+                .map(entry -> new ChartData(entry.getKey(), entry.getValue(), getComponentStateColor(entry.getKey())))
+                .toList();
+        componentStateTile.setChartData(componentStateData);
 
         final var memoryInfo = runtimeInfo.memoryInfo();
 
         memoryInfo.thenAccept(info -> {
             final var freeMemoryInBytes  = info.freeMemory;
             final var totalMemoryInBytes = info.totalMemory;
-            final var freeMemoryInMB     = toMB(freeMemoryInBytes);
-            final var totalMemoryInMB    = toMB(totalMemoryInBytes);
+            final var usedMemoryInMB     = toMB(totalMemoryInBytes - freeMemoryInBytes);
 
-            threadSync.asyncExec(() -> {
-                availableMemoryTile.setValue(freeMemoryInMB);
-                availableMemoryTile.setMaxValue(totalMemoryInMB);
-                availableMemoryTile.setThreshold(totalMemoryInMB * .8);
+            threadSync.asyncExec(() -> { 
 
+                // Update Memory History Tile
+                final var timestamp = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                memoryDataSeries.getData().add(new XYChart.Data<>(timestamp, usedMemoryInMB));
+                
+                // Keep only last 20 data points
+                if (memoryDataSeries.getData().size() > 20) {
+                    memoryDataSeries.getData().remove(0);
+                }
+                
                 var memoryConsumptionInfoInPercentage = 0D;
                 if (totalMemoryInBytes != 0) {
                     memoryConsumptionInfoInPercentage = (totalMemoryInBytes - freeMemoryInBytes) * 100D
@@ -261,9 +317,43 @@ public final class OverviewFxUI {
         // @formatter:on
     }
 
+    private Color getBundleStateColor(String state) {
+        return switch (state.toUpperCase()) {
+            case "ACTIVE" -> Bright.GREEN;
+            case "RESOLVED" -> Bright.ORANGE;
+            case "INSTALLED" -> Bright.RED;
+            case "STARTING" -> Bright.YELLOW;
+            case "STOPPING" -> Color.MAGENTA;
+            case "UNINSTALLED" -> Dark.RED;
+            default -> Tile.GRAY;
+        };
+    }
+
+    private Color getThreadStateColor(String state) {
+        return switch (state.toUpperCase()) {
+            case "RUNNABLE" -> Bright.GREEN;
+            case "BLOCKED" -> Bright.RED;
+            case "WAITING" -> Bright.ORANGE;
+            case "TIMED_WAITING" -> Bright.YELLOW;
+            case "TERMINATED" -> Tile.GRAY;
+            case "NEW" -> Bright.BLUE;
+            default -> Tile.GRAY;
+        };
+    }
+
+    private Color getComponentStateColor(String state) {
+        return switch (state.toUpperCase()) {
+            case "ACTIVE" -> Bright.GREEN;
+            case "UNSATISFIED_REFERENCE" -> Bright.RED;
+            case "UNSATISFIED_CONFIGURATION" -> Bright.ORANGE;
+            case "SATISFIED" -> Bright.GREEN;
+            default -> Tile.GRAY;
+        };
+    }
+
     private void updateStaticOverviewInfo() {
         if (!isConnected) {
-            cachedStaticOverviewInfo = new StaticOverviewInfo("", "", "", "", "", "", "", 0, 0, 0, 0);
+            cachedStaticOverviewInfo = new StaticOverviewInfo("", "", "", "", "", "", "", 0);
             return;
         }
         // @formatter:off
@@ -311,15 +401,11 @@ public final class OverviewFxUI {
                                                                   .findAny()
                                                                   .orElse("");
 
-        final var noOfThreads          = dataProvider.threads().size();
-        final var noOfInstalledBundles = dataProvider.bundles().size();
         final var noOfServices         = dataProvider.services().size();
-        final var noOfComponents       = dataProvider.components().size();
         // @formatter:on
 
         cachedStaticOverviewInfo = new StaticOverviewInfo(frameworkBsn, frameworkVersion, frameworkStartLevel, osName,
-                                                          osVersion, osArchitecture, javaVersion, noOfThreads,
-                                                          noOfInstalledBundles, noOfServices, noOfComponents);
+                                                          osVersion, osArchitecture, javaVersion, noOfServices);
     }
 
     private OverviewInfo retrieveRuntimeInfo() {
@@ -331,12 +417,33 @@ public final class OverviewFxUI {
         }
         final var memoryInfo = requireNonNullElse(dataProvider.memory(), completedFuture(new XMemoryInfoDTO()));
 
+        // Calculate Bundle States
+        final Map<String, Long> bundleStates = dataProvider.bundles().stream()
+                .collect(Collectors.groupingBy(b -> b.state, Collectors.counting()));
+
+        // Calculate Thread States
+        final Map<String, Long> threadStates = dataProvider.threads().stream()
+                .collect(Collectors.groupingBy(t -> t.state, Collectors.counting()));
+
+        // Calculate Component States
+        final Map<String, Long> componentStates = dataProvider.components().stream()
+                .collect(Collectors.groupingBy(c -> c.state, Collectors.counting()));
+
+        // Count Log Errors
+        final long logErrors = dataProvider.logs().stream().filter(l -> "ERROR".equalsIgnoreCase(l.level)).count();
+
+        // Count Leaks
+        final var noOfLeaks = dataProvider.leaks().size();
+
+        // Count Configurations
+        final var noOfConfigurations = dataProvider.configurations().size();
+
         return new OverviewInfo(cachedStaticOverviewInfo.frameworkBsn, cachedStaticOverviewInfo.frameworkVersion,
                                 cachedStaticOverviewInfo.frameworkStartLevel, cachedStaticOverviewInfo.osName,
                                 cachedStaticOverviewInfo.osVersion, cachedStaticOverviewInfo.osArchitecture,
-                                cachedStaticOverviewInfo.javaVersion, cachedStaticOverviewInfo.noOfThreads,
-                                cachedStaticOverviewInfo.noOfInstalledBundles, cachedStaticOverviewInfo.noOfServices,
-                                cachedStaticOverviewInfo.noOfComponents, memoryInfo);
+                                cachedStaticOverviewInfo.javaVersion, cachedStaticOverviewInfo.noOfServices, memoryInfo,
+                                bundleStates, threadStates, componentStates, (int) logErrors, noOfConfigurations,
+                                noOfLeaks, (int) dataProvider.threads().stream().filter(t -> t.isDeadlocked).count());
     }
 
     private void createUIComponents(final BorderPane parent) {
@@ -346,45 +453,12 @@ public final class OverviewFxUI {
 
     private void createTiles(final BorderPane parent) {
         // @formatter:off
-        clockTile = TileBuilder.create()
-                                         .skinType(SkinType.CLOCK)
-                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                         .title("Today")
-                                         .dateVisible(true)
-                                         .locale(Locale.UK)
-                                         .running(true)
-                                         .styleClass("overview")
-                                         .roundedCorners(false)
-                                         .build();
-
-        noOfThreadsTile = TileBuilder.create()
-                                     .skinType(SkinType.NUMBER)
-                                     .numberFormat(new DecimalFormat("#"))
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("Threads")
-                                     .text("Number of threads")
-                                     .textVisible(true)
-                                     .decimals(0)
-                                     .roundedCorners(false)
-                                     .build();
-
         runtimeInfoTile = TileBuilder.create()
                                      .skinType(SkinType.CUSTOM)
                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Runtime Information")
                                      .text("")
                                      .roundedCorners(false)
-                                     .build();
-
-        noOfBundlesTile = TileBuilder.create()
-                                     .skinType(SkinType.NUMBER)
-                                     .numberFormat(new DecimalFormat("#"))
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                     .title("Bundles")
-                                     .text("Number of installed bundles")
-                                     .textVisible(true)
-                                     .roundedCorners(false)
-                                     .decimals(0)
                                      .build();
 
         noOfServicesTile = TileBuilder.create()
@@ -397,17 +471,39 @@ public final class OverviewFxUI {
                                       .roundedCorners(false)
                                       .decimals(0)
                                       .build();
+                                      
+        noOfConfigurationsTile = TileBuilder.create()
+                                      .skinType(SkinType.NUMBER)
+                                      .numberFormat(new DecimalFormat("#"))
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                      .title("Configurations")
+                                      .text("Number of configurations")
+                                      .textVisible(true)
+                                      .roundedCorners(false)
+                                      .decimals(0)
+                                      .build();
 
-        noOfComponentsTile = TileBuilder.create()
-                                        .skinType(SkinType.NUMBER)
-                                        .numberFormat(new DecimalFormat("#"))
-                                        .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                        .title("Components")
-                                        .text("Number of registered components")
-                                        .textVisible(true)
-                                        .roundedCorners(false)
-                                        .decimals(0)
-                                        .build();
+         noOfLeaksTile = TileBuilder.create()
+                                      .skinType(SkinType.NUMBER)
+                                      .numberFormat(new DecimalFormat("#"))
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                      .title("Classloader Leaks")
+                                      .text("Number of classloader leaks")
+                                      .textVisible(true)
+                                      .roundedCorners(false)
+                                      .decimals(0)
+                                      .build();
+
+         deadlockedThreadsTile = TileBuilder.create()
+                                      .skinType(SkinType.NUMBER)
+                                      .numberFormat(new DecimalFormat("#"))
+                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                      .title("Deadlocked Threads")
+                                      .text("Number of deadlocked threads")
+                                      .textVisible(true)
+                                      .roundedCorners(false)
+                                      .decimals(0)
+                                      .build();
 
         memoryConsumptionTile = TileBuilder.create()
                                            .skinType(SkinType.PERCENTAGE)
@@ -415,31 +511,6 @@ public final class OverviewFxUI {
                                            .title("JVM Memory Consumption Percentage")
                                            .roundedCorners(false)
                                            .build();
-
-        availableMemoryTile = TileBuilder.create()
-                                         .skinType(SkinType.BAR_GAUGE)
-                                         .prefSize(TILE_WIDTH, TILE_HEIGHT)
-                                         .minValue(0)
-                                         .startFromZero(true)
-                                         .thresholdVisible(true)
-                                         .title("JVM Allocated Memory")
-                                         .unit("MB")
-                                         .text("Allocated memory of the remote runtime")
-                                         .gradientStops(
-                                                 new Stop(0, Bright.BLUE),
-                                                 new Stop(0.1, Bright.BLUE_GREEN),
-                                                 new Stop(0.2, Bright.GREEN),
-                                                 new Stop(0.3, Bright.GREEN_YELLOW),
-                                                 new Stop(0.4, Bright.YELLOW),
-                                                 new Stop(0.5, Bright.YELLOW_ORANGE),
-                                                 new Stop(0.6, Bright.ORANGE),
-                                                 new Stop(0.7, Bright.ORANGE_RED),
-                                                 new Stop(0.8, Bright.RED),
-                                                 new Stop(1.0, Dark.RED))
-                                         .strokeWithGradient(true)
-                                         .animated(true)
-                                         .roundedCorners(false)
-                                         .build();
 
         uptimeTile = TileBuilder.create()
                                 .skinType(SkinType.TIME)
@@ -450,17 +521,79 @@ public final class OverviewFxUI {
                                 .roundedCorners(false)
                                 .duration(LocalTime.of(0, 0, 0))
                                 .build();
+        
+        // Bundle State Tile
+        bundleStateTile = TileBuilder.create()
+                                     .skinType(SkinType.DONUT_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("Bundle States")
+                                     .roundedCorners(false)
+                                     .build();
+        
+        // Thread State Tile
+        threadStateTile = TileBuilder.create()
+                                     .skinType(SkinType.DONUT_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("Thread States")
+                                     .roundedCorners(false)
+                                     .build();
+        
+        // Memory History Tile
+        final var xAxis = new CategoryAxis();
+        final var yAxis = new NumberAxis();
+        yAxis.setLabel("Memory (MB)");
+        
+        final var areaChart = new AreaChart<>(xAxis, yAxis);
+        areaChart.setLegendVisible(false);
+        areaChart.setCreateSymbols(false);
+        
+        memoryDataSeries = new XYChart.Series<>();
+        memoryDataSeries.setName("Heap Usage");
+        areaChart.getData().add(memoryDataSeries);
 
-        final var pane = new FlowGridPane(3, 3,
-                                           clockTile,
+        memoryHistoryTile = TileBuilder.create()
+                                       .skinType(SkinType.CUSTOM)
+                                       .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                       .title("Heap Memory Usage (MB)")
+                                       .text("Tracked over time")
+                                       .graphic(areaChart)
+                                       .roundedCorners(false)
+                                       .build();
+        
+        // Log Error Tile
+        logErrorTile = TileBuilder.create()
+                                  .skinType(SkinType.NUMBER)
+                                  .numberFormat(new DecimalFormat("#"))
+                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                  .title("Error Logs")
+                                  .text("Count of ERROR logs")
+                                  .textVisible(true)
+                                  .decimals(0)
+                                  .decimals(0)
+                                  .roundedCorners(false)
+                                  .build();
+
+        // Component State Tile
+        componentStateTile = TileBuilder.create()
+                                     .skinType(SkinType.DONUT_CHART)
+                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
+                                     .title("Component States")
+                                     .roundedCorners(false)
+                                     .build();
+
+        final var pane = new FlowGridPane(4, 3,
                                            runtimeInfoTile,
-                                           noOfThreadsTile,
-                                           noOfBundlesTile,
-                                           noOfServicesTile,
-                                           noOfComponentsTile,
+                                           uptimeTile,
                                            memoryConsumptionTile,
-                                           availableMemoryTile,
-                                           uptimeTile);
+                                           memoryHistoryTile,
+                                           bundleStateTile,
+                                           componentStateTile,
+                                           threadStateTile,
+                                           noOfServicesTile,
+                                           deadlockedThreadsTile,
+                                           noOfLeaksTile,
+                                           logErrorTile,
+                                           noOfConfigurationsTile);
         // @formatter:on
         pane.setHgap(5);
         pane.setVgap(5);
@@ -568,10 +701,7 @@ public final class OverviewFxUI {
                                       String osVersion,
                                       String osArchitecture,
                                       String javaVersion,
-                                      int noOfThreads,
-                                      int noOfInstalledBundles,
-                                      int noOfServices,
-                                      int noOfComponents) {
+                                      int noOfServices) {
     }
 
     private record OverviewInfo(String frameworkBsn,
@@ -581,13 +711,18 @@ public final class OverviewFxUI {
                                 String osVersion,
                                 String osArchitecture,
                                 String javaVersion,
-                                int noOfThreads,
-                                int noOfInstalledBundles,
                                 int noOfServices,
-                                int noOfComponents,
-                                CompletableFuture<XMemoryInfoDTO> memoryInfo) {
+                                CompletableFuture<XMemoryInfoDTO> memoryInfo,
+                                Map<String, Long> bundleStates,
+                                Map<String, Long> threadStates,
+                                Map<String, Long> componentStates,
+                                int noOfLogErrors,
+                                int noOfConfigurations,
+                                int noOfLeaks,
+                                int noOfDeadlockedThreads) {
         public OverviewInfo() {
-            this("", "", "", "", "", "", "", 0, 0, 0, 0, completedFuture(new XMemoryInfoDTO()));
+            this("", "", "", "", "", "", "", 0, completedFuture(new XMemoryInfoDTO()), Map.of(), Map.of(), Map.of(), 0,
+                 0, 0, 0);
         }
     }
 
@@ -614,11 +749,6 @@ public final class OverviewFxUI {
         createPeriodicTaskToSetRuntimeInfo(REFRESH_DELAY);
     }
 
-    /*
-     * This is only required as a workaround to ensure that after the progress
-     * dialog is closed, the CSS overridden problem gets overridden once again with
-     * the TileFX embedded CSS and the number tiles are shown properly
-     */
     @Inject
     @Optional
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_ANY_TOPIC) final String data,
@@ -650,6 +780,11 @@ public final class OverviewFxUI {
         dataProvider.retrieveInfo("components", true);
         dataProvider.retrieveInfo("threads", true);
         dataProvider.retrieveInfo("properties", true);
+        dataProvider.retrieveInfo("logs", true);
+        dataProvider.retrieveInfo("memory", true);
+        dataProvider.retrieveInfo("configurations", true);
+        dataProvider.retrieveInfo("packages", true);
+        dataProvider.retrieveInfo("leaks", true);
     }
 
     /**
@@ -658,11 +793,8 @@ public final class OverviewFxUI {
      * that spawn background threads for clock updates and gauge animations.
      */
     private void cleanupTiles() {
-        if (clockTile != null) {
-            clockTile.setRunning(false);
-        }
-        if (availableMemoryTile != null) {
-            availableMemoryTile.setAnimated(false);
+        if (memoryHistoryTile != null) {
+            memoryHistoryTile.setAnimated(false);
         }
     }
 
