@@ -28,8 +28,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -84,7 +82,6 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     private FluentLogger                logger;
     private volatile ScheduledFuture<?> future;
     private Configuration               configuration;
-    private final Lock                  lock = new ReentrantLock();
 
     private final ObservableList<XEventDTO> events = observableArrayList();
 
@@ -113,24 +110,14 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     @Override
     public void onEvent(final XEventDTO event) {
         if (future == null) {
-            executor.scheduleWithFixedDelay(() -> {
-                lock.lock();
-                try {
-                    final var size = events.size();
-                    if (size > CACHE_INVALIDATE_THRESHOLD) {
-                        events.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
-                    }
-                } finally {
-                    lock.unlock();
+            executor.scheduleWithFixedDelay(() -> threadSync.asyncExec(() -> {
+                final var size = events.size();
+                if (size > CACHE_INVALIDATE_THRESHOLD) {
+                    events.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
                 }
-            }, Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
+            }), Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
         }
-        lock.lock();
-        try {
-            events.add(event);
-        } finally {
-            lock.unlock();
-        }
+        threadSync.asyncExec(() -> events.add(event));
     }
 
     @Override

@@ -78,15 +78,18 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving configurations info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            configurations.setAll(makeNullSafe(agent.getAllConfigurations()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
-            logger.atInfo().log("Configurations info retrieved successfully");
+            logger.atInfo().log("Retrieving configurations info from remote runtime");
+            final var data = makeNullSafe(agent.getAllConfigurations());
+            threadSync.asyncExec(() -> {
+                configurations.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);
+                logger.atInfo().log("Configurations info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }

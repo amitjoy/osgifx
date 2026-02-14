@@ -85,15 +85,18 @@ public final class HttpComponentsInfoSupplier implements RuntimeInfoSupplier, Ev
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving HTTP components info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            httpComponents.setAll(makeNullSafe(agent.getHttpComponents()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HTTP_TOPIC);
-            logger.atInfo().log("HTTP components info retrieved successfully");
+            logger.atInfo().log("Retrieving HTTP components info from remote runtime");
+            final var data = makeNullSafe(agent.getHttpComponents());
+            threadSync.asyncExec(() -> {
+                httpComponents.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HTTP_TOPIC);
+                logger.atInfo().log("HTTP components info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }
