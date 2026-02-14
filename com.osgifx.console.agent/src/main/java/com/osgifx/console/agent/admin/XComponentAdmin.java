@@ -22,32 +22,30 @@ import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
 import static com.osgifx.console.agent.helper.OSGiCompendiumService.SCR;
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.ACTIVE;
 import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.SATISFIED;
 import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.UNSATISFIED_CONFIGURATION;
 import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.UNSATISFIED_REFERENCE;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
@@ -58,229 +56,282 @@ import org.osgi.service.component.runtime.dto.SatisfiedReferenceDTO;
 import org.osgi.service.component.runtime.dto.UnsatisfiedReferenceDTO;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
-import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XReferenceDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
-import com.osgifx.console.agent.helper.Reflect;
 
 import jakarta.inject.Inject;
 
 public final class XComponentAdmin {
 
-    private final BundleContext                                              context;
-    private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
-    private volatile ServiceComponentRuntime                                 scr;
-    private final FluentLogger                                               logger        = LoggerFactory
-            .getFluentLogger(getClass());
-    private volatile Map<Long, List<XComponentDTO>>                          components    = emptyMap();
-    private final ExecutorService                                            executor;
-    private final AtomicReference<Future<?>>                                 refreshFuture = new AtomicReference<>();
-    private final ServiceListener                                            scrListener;
+    // --- Tuning ---
+    private static final long DEBOUNCE_DELAY_MS = 200;
+    private static final long MAX_WAIT_MS       = 5000;
 
-    @Inject
-    public XComponentAdmin(final BundleContext context, final ExecutorService executor) {
-        this.context     = context;
-        this.executor    = executor;
-        this.scrListener = event -> {
-                             // We only care about modifications (service.changecount)
-                             // The filter ensures we only get SCR events.
-                             if (event.getType() == ServiceEvent.MODIFIED) {
-                                 triggerRefresh();
-                             }
-                         };
+    // --- Optimized Reflection Handles (Init Once, Use Forever) ---
+    private static final MethodHandle FAILURE_GETTER;
+    private static final MethodHandle PARAMETER_GETTER;
+    private static final MethodHandle COLLECTION_TYPE_GETTER;
+
+    static {
+        MethodHandles.Lookup lookup         = MethodHandles.publicLookup();
+        MethodHandle         failure        = null;
+        MethodHandle         parameter      = null;
+        MethodHandle         collectionType = null;
+        try {
+            // Attempt to resolve R7+ fields safely
+            failure        = lookup.findGetter(ComponentConfigurationDTO.class, "failure", String.class);
+            parameter      = lookup.findGetter(ReferenceDTO.class, "parameter", Integer.class);
+            collectionType = lookup.findGetter(ReferenceDTO.class, "collectionType", String.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            // Fields not present (Older OSGi R6 environment), handles remain null
+        }
+        FAILURE_GETTER         = failure;
+        PARAMETER_GETTER       = parameter;
+        COLLECTION_TYPE_GETTER = collectionType;
     }
 
-    public ServiceComponentRuntime getServiceComponentRuntime() {
-        if (scrTracker == null) {
-            return null;
-        }
-        final ServiceComponentRuntime service = scrTracker.getService();
-        if (service != null) {
-            return service;
-        }
-        return scr;
+    // --- State Management ---
+    // Volatile allows lock-free reads. Readers always see a consistent map.
+    private volatile Map<Long, List<XComponentDTO>> components = Collections.emptyMap();
+
+    // Concurrency controls
+    private final AtomicLong                          lastChangeCount    = new AtomicLong(-1);     // Last *Processed*
+    private final AtomicLong                          pendingChangeCount = new AtomicLong(-1);     // Latest *Requested*
+    private final AtomicLong                          lastEventTime      = new AtomicLong(0);
+    private final AtomicLong                          deadline           = new AtomicLong(0);
+    private final AtomicReference<ScheduledFuture<?>> scheduledTask      = new AtomicReference<>();
+
+    // --- Infrastructure ---
+    private final BundleContext                                              context;
+    private final ScheduledExecutorService                                   executor;
+    private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
+    private final FluentLogger                                               logger = LoggerFactory
+            .getFluentLogger(getClass());
+
+    @Inject
+    public XComponentAdmin(final BundleContext context, final ScheduledExecutorService executor) {
+        this.context  = context;
+        this.executor = executor;
     }
 
     public void init() {
-        scrTracker = new ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime>(context,
-                                                                                          ServiceComponentRuntime.class,
-                                                                                          null) {
-            @Override
-            public ServiceComponentRuntime addingService(final ServiceReference<ServiceComponentRuntime> reference) {
-                final ServiceComponentRuntime service = super.addingService(reference);
-                scr = service;
-                try {
-                    // Filter ensures we only listen to SCR service events
-                    context.addServiceListener(scrListener,
-                            "(objectClass=" + ServiceComponentRuntime.class.getName() + ")");
-                } catch (Exception e) {
-                    logger.atError().msg("Failed to add SCR listener").throwable(e).log();
-                }
-                triggerRefresh();
-                return service;
-            }
+        scrTracker = new ServiceTracker<>(context, ServiceComponentRuntime.class,
+                                          new ServiceTrackerCustomizer<ServiceComponentRuntime, ServiceComponentRuntime>() {
 
-            @Override
-            public void removedService(final ServiceReference<ServiceComponentRuntime> reference,
-                                       final ServiceComponentRuntime service) {
-                context.removeServiceListener(scrListener);
-                scr        = null;
-                components = emptyMap();
-                super.removedService(reference, service);
-            }
-        };
+                                              @Override
+                                              public ServiceComponentRuntime addingService(final ServiceReference<ServiceComponentRuntime> reference) {
+                                                  final ServiceComponentRuntime service = context.getService(reference);
+                                                  // Trigger immediate update on start
+                                                  scheduleUpdate(getChangeCount(reference));
+                                                  return service;
+                                              }
+
+                                              @Override
+                                              public void modifiedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                                                          final ServiceComponentRuntime service) {
+                                                  // This is the heartbeat of the system.
+                                                  // Every time 'service.changecount' increments, the timer is reset.
+                                                  scheduleUpdate(getChangeCount(reference));
+                                              }
+
+                                              @Override
+                                              public void removedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                                                         final ServiceComponentRuntime service) {
+                                                  // Critical: Clear cache immediately if SCR stops.
+                                                  // Prevents UI from showing "ghost" components that no longer exist.
+                                                  components = Collections.emptyMap();
+                                                  context.ungetService(reference);
+                                              }
+                                          });
         scrTracker.open();
-    }
-
-    private void triggerRefresh() {
-        if (scr == null) {
-            return;
-        }
-        refreshFuture.getAndUpdate(old -> {
-            if (old != null && !old.isDone()) {
-                old.cancel(true);
-            }
-            return executor.submit(this::processAllBundles);
-        });
-    }
-
-    private void processAllBundles() {
-        final ServiceComponentRuntime currentScr = scr;
-        if (currentScr == null) {
-            return;
-        }
-        try {
-            // Bulk fetch all components (Optimized: 1 service call)
-            Collection<ComponentDescriptionDTO> allDescriptions = currentScr.getComponentDescriptionDTOs();
-
-            // Group by Bundle ID
-            Map<Long, List<XComponentDTO>> newComponents = new ConcurrentHashMap<>();
-
-            for (ComponentDescriptionDTO desc : allDescriptions) {
-                if (Thread.currentThread().isInterrupted()) {
-                    return; // Fast exit if cancelled
-                }
-                try {
-                    // Fetch configurations for this description
-                    Collection<ComponentConfigurationDTO> configs = currentScr.getComponentConfigurationDTOs(desc);
-
-                    List<XComponentDTO> dtos;
-                    if (configs.isEmpty()) {
-                        dtos = new ArrayList<>();
-                        dtos.add(toDTO(null, desc));
-                    } else {
-                        dtos = configs.stream().map(config -> toDTO(config, desc)).collect(Collectors.toList());
-                    }
-
-                    // Add to map (grouping by bundle ID)
-                    newComponents.computeIfAbsent(desc.bundle.id, k -> new ArrayList<>()).addAll(dtos);
-
-                } catch (Exception e) {
-                    logger.atError().msg("Error processing component description: " + desc.name).throwable(e).log();
-                }
-            }
-            components = newComponents;
-        } catch (Exception e) {
-            logger.atError().msg("Error retrieving component descriptions from SCR").throwable(e).log();
-        }
     }
 
     public void stop() {
         if (scrTracker != null) {
             scrTracker.close();
         }
-        context.removeServiceListener(scrListener);
+        final ScheduledFuture<?> task = scheduledTask.get();
+        if (task != null) {
+            task.cancel(true);
+        }
     }
 
+    // --- Adaptive Scheduler (Lock-Free) ---
+    private void scheduleUpdate(final long changeCount) {
+        final long now = System.currentTimeMillis();
+        lastEventTime.set(now);
+        pendingChangeCount.set(changeCount);
+
+        // 1. Initialize Deadline if not set (CAS ensures we only set it on the FIRST event of a burst)
+        deadline.compareAndSet(0, now + MAX_WAIT_MS);
+
+        // 2. Ensure a Checker Task is running
+        scheduledTask.updateAndGet(current -> {
+            if (current != null && !current.isDone()) {
+                // Task is already running/scheduled. It will see the updated 'lastEventTime'
+                // and reschedule itself if necessary.
+                return current;
+            }
+            // No task running. Schedule one.
+            return executor.schedule(this::checkAndRun, DEBOUNCE_DELAY_MS, MILLISECONDS);
+        });
+    }
+
+    // --- The Checker Logic ---
+    private void checkAndRun() {
+        final long now             = System.currentTimeMillis();
+        final long lastEvent       = lastEventTime.get();
+        final long currentDeadline = deadline.get();
+
+        final long silence   = now - lastEvent;
+        final long remaining = currentDeadline - now;
+        final long delay     = DEBOUNCE_DELAY_MS - silence;
+
+        // Condition to RUN: Silence achieved OR Deadline exceeded
+        if (delay <= 0 || remaining <= 0) {
+            performSnapshot(pendingChangeCount.get());
+
+            // Cleanup
+            deadline.set(0);
+
+            // Race Condition Check:
+            // If a new event came in *while* we were running (or just before we cleared deadline),
+            // 'lastEventTime' would be > 'now' (approx).
+            // We must insure we don't drop that event.
+            if (lastEventTime.get() > now) {
+                // Reschedule to handle the pending event
+                scheduledTask.set(executor.schedule(this::checkAndRun, DEBOUNCE_DELAY_MS, MILLISECONDS));
+            }
+        } else {
+            // Not ready yet. Reschedule for the remaining wait time.
+            // We take the smaller of (Debounce Delay) or (Deadline).
+            final long wait = Math.max(1, Math.min(delay, remaining));
+            scheduledTask.set(executor.schedule(this::checkAndRun, wait, MILLISECONDS));
+        }
+    }
+
+    // --- Optimized Snapshot Execution ---
+    private void performSnapshot(final long changeCount) {
+        final ServiceComponentRuntime scr = getServiceComponentRuntime();
+        if (scr == null) {
+            return;
+        }
+
+        try {
+            final Map<Long, List<XComponentDTO>> newSnapshot = new HashMap<>();
+
+            // Optimization: Iterate descriptions directly
+            for (final ComponentDescriptionDTO desc : scr.getComponentDescriptionDTOs()) {
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+
+                // Optimization: Pre-size list to avoid resizing (heuristic: typical bundle has 1-5 components)
+                final List<XComponentDTO> dtos = new ArrayList<>(5);
+
+                final Collection<ComponentConfigurationDTO> configs = scr.getComponentConfigurationDTOs(desc);
+                if (configs.isEmpty()) {
+                    dtos.add(toDTO(null, desc));
+                } else {
+                    for (final ComponentConfigurationDTO config : configs) {
+                        dtos.add(toDTO(config, desc));
+                    }
+                }
+                newSnapshot.put(desc.bundle.id, dtos);
+            }
+
+            this.components = Collections.unmodifiableMap(newSnapshot);
+            lastChangeCount.set(changeCount);
+
+        } catch (final Exception e) {
+            logger.atError().msg("SCR Snapshot failed").throwable(e).log();
+        } finally {
+            deadline.set(0);
+        }
+    }
+
+    // --- Lock-Free ---
     public List<XComponentDTO> getComponents() {
+        // Fast. Non-blocking. Thread-safe.
         return components.values().stream().flatMap(List::stream).collect(Collectors.toList());
     }
 
-    public XResultDTO enableComponent(final long id) {
-        final ServiceComponentRuntime scr = getServiceComponentRuntime();
-        if (scr == null) {
-            logger.atWarn().msg(serviceUnavailable(SCR)).log();
-            return createResult(SKIPPED, serviceUnavailable(SCR));
-        }
-        final StringBuilder                       builder         = new StringBuilder();
-        final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
-
-        for (final ComponentDescriptionDTO dto : descriptionDTOs) {
-            final Collection<ComponentConfigurationDTO> configurationDTOs = scr.getComponentConfigurationDTOs(dto);
-            for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
-                if (configDTO.id == id) {
-                    try {
-                        final Promise<Void> promise = scr.enableComponent(dto);
-                        promise.getValue();
-                    } catch (final Exception e) {
-                        builder.append(e.getMessage()).append(System.lineSeparator());
-                    }
-                    final String response = builder.toString();
-                    return response.isEmpty()
-                            ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully enabled")
-                            : createResult(ERROR, response);
-                }
-            }
-        }
-        return createResult(SUCCESS, "Component with id '" + id
-                + "' has not been found. Probably the component has not yet been enabled and that's why there is no associated id yet. "
-                + "Try to disable the component by name.");
+    public ServiceComponentRuntime getServiceComponentRuntime() {
+        return scrTracker == null ? null : scrTracker.getService();
     }
 
-    public XResultDTO enableComponent(final String name) {
-        final ServiceComponentRuntime scr = getServiceComponentRuntime();
-        if (scr == null) {
-            logger.atWarn().msg(serviceUnavailable(SCR)).log();
-            return createResult(SKIPPED, serviceUnavailable(SCR));
-        }
-        final StringBuilder                       builder         = new StringBuilder();
-        final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
+    // Helper to read property
+    private long getChangeCount(final ServiceReference<?> ref) {
+        final Object prop = ref.getProperty("service.changecount");
+        return prop instanceof Long ? (Long) prop : 0L;
+    }
 
-        for (final ComponentDescriptionDTO dto : descriptionDTOs) {
-            if (dto.name.equals(name)) {
-                try {
-                    final Promise<Void> promise = scr.enableComponent(dto);
-                    promise.getValue();
-                } catch (final Exception e) {
-                    builder.append(e.getMessage()).append(System.lineSeparator());
-                }
-                final String response = builder.toString();
-                return response.isEmpty()
-                        ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully enabled")
-                        : createResult(ERROR, response);
-            }
-        }
-        return createResult(SUCCESS, "Component with name '" + name + "' has not been found");
+    // --- Optimized Enable/Disable (Scope Narrowing) ---
+
+    public XResultDTO enableComponent(final long id) {
+        return toggleComponent(id, true);
     }
 
     public XResultDTO disableComponent(final long id) {
+        return toggleComponent(id, false);
+    }
+
+    private XResultDTO toggleComponent(final long id, final boolean enable) {
         final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             logger.atWarn().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
-        final StringBuilder                       builder         = new StringBuilder();
-        final Collection<ComponentDescriptionDTO> descriptionDTOs = scr.getComponentDescriptionDTOs();
+
+        // Optimization 1: Locate cached info
+        final XComponentDTO cachedDto = findCachedDTO(id);
+
+        Collection<ComponentDescriptionDTO> descriptionDTOs = null;
+
+        // Optimization 2: Surgical Lookup
+        if (cachedDto != null) {
+            final Bundle bundle = context.getBundle(cachedDto.registeringBundleId);
+            if (bundle != null) {
+                descriptionDTOs = scr.getComponentDescriptionDTOs(bundle);
+            }
+        }
+
+        // Fallback: Full scan if cache is stale or missing
+        if (descriptionDTOs == null) {
+            descriptionDTOs = scr.getComponentDescriptionDTOs();
+        }
+
+        final StringBuilder builder = new StringBuilder();
 
         for (final ComponentDescriptionDTO dto : descriptionDTOs) {
+            // Optimization 3: NAME CHECK
+            // If we found the cached DTO, we KNOW the component name.
+            // Skip all descriptions that don't match.
+            if (cachedDto != null && !dto.name.equals(cachedDto.name)) {
+                continue;
+            }
+
+            // Only fetch configs for the matching description (or all if cache missed)
             final Collection<ComponentConfigurationDTO> configurationDTOs = scr.getComponentConfigurationDTOs(dto);
             for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
                 if (configDTO.id == id) {
                     try {
-                        final Promise<Void> promise = scr.disableComponent(dto);
-                        promise.getValue();
+                        final Promise<Void> promise = enable ? scr.enableComponent(dto) : scr.disableComponent(dto);
+                        promise.getValue(); // Blocks intentionally (User Action)
                     } catch (final Exception e) {
                         builder.append(e.getMessage()).append(System.lineSeparator());
                     }
+                    final String action   = enable ? "enabled" : "disabled";
                     final String response = builder.toString();
                     return response.isEmpty()
-                            ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully disabled")
+                            ? createResult(SUCCESS, "Component with id '" + id + "' has been successfully " + action)
                             : createResult(ERROR, response);
                 }
             }
@@ -288,7 +339,26 @@ public final class XComponentAdmin {
         return createResult(SUCCESS, "Component with id '" + id + "' has not been found");
     }
 
+    private XComponentDTO findCachedDTO(final long componentId) {
+        for (final List<XComponentDTO> list : components.values()) {
+            for (final XComponentDTO dto : list) {
+                if (dto.id == componentId) {
+                    return dto;
+                }
+            }
+        }
+        return null;
+    }
+
+    public XResultDTO enableComponent(final String name) {
+        return toggleComponent(name, true);
+    }
+
     public XResultDTO disableComponent(final String name) {
+        return toggleComponent(name, false);
+    }
+
+    private XResultDTO toggleComponent(final String name, final boolean enable) {
         final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             logger.atWarn().msg(serviceUnavailable(SCR)).log();
@@ -300,70 +370,93 @@ public final class XComponentAdmin {
         for (final ComponentDescriptionDTO dto : descriptionDTOs) {
             if (dto.name.equals(name)) {
                 try {
-                    final Promise<Void> promise = scr.disableComponent(dto);
+                    final Promise<Void> promise = enable ? scr.enableComponent(dto) : scr.disableComponent(dto);
                     promise.getValue();
                 } catch (final Exception e) {
                     builder.append(e.getMessage()).append(System.lineSeparator());
                 }
+                final String action   = enable ? "enabled" : "disabled";
                 final String response = builder.toString();
                 return response.isEmpty()
-                        ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully disabled")
+                        ? createResult(SUCCESS, "Component with name '" + name + "' has been successfully " + action)
                         : createResult(ERROR, response);
             }
         }
         return createResult(SUCCESS, "Component with name '" + name + "' has not been found");
     }
 
+    // --- Optimized DTO Conversion (No Streams) ---
     private XComponentDTO toDTO(final ComponentConfigurationDTO compConfDTO,
                                 final ComponentDescriptionDTO compDescDTO) {
-        final XComponentDTO  dto      = new XComponentDTO();
-        final XBundleInfoDTO bInfoDTO = new XBundleInfoDTO();
+        final XComponentDTO dto = new XComponentDTO();
 
-        bInfoDTO.id           = compDescDTO.bundle.id;
-        bInfoDTO.symbolicName = compDescDTO.bundle.symbolicName;
+        // Bundle Info
+        dto.registeringBundle   = compDescDTO.bundle.symbolicName;
+        dto.registeringBundleId = compDescDTO.bundle.id;
 
-        dto.id                  = Optional.ofNullable(compConfDTO).map(a -> a.id).orElse(-1L);
+        // Basics
+        dto.id                  = (compConfDTO != null) ? compConfDTO.id : -1L;
         dto.name                = compDescDTO.name;
-        dto.state               = Optional.ofNullable(compConfDTO).map(a -> mapToState(a.state)).orElse("DISABLED");
-        dto.registeringBundle   = bInfoDTO.symbolicName;
-        dto.registeringBundleId = bInfoDTO.id;
+        dto.state               = (compConfDTO != null) ? mapToState(compConfDTO.state) : "DISABLED";
         dto.factory             = compDescDTO.factory;
         dto.scope               = compDescDTO.scope;
         dto.implementationClass = compDescDTO.implementationClass;
         dto.configurationPolicy = compDescDTO.configurationPolicy;
-        dto.serviceInterfaces   = Stream.of(compDescDTO.serviceInterfaces).collect(toList());
-        dto.configurationPid    = Stream.of(compDescDTO.configurationPid).collect(toList());
 
-        // @formatter:off
-        dto.properties          = Optional.ofNullable(compConfDTO)
-                                          .map(a -> a.properties.entrySet().stream()
-                                          .collect(toMap(Map.Entry::getKey, e -> arrayToString(e.getValue()))))
-                                          .orElse(emptyMap());
-        dto.references          = Stream.of(compDescDTO.references).map(this::toRef).collect(toList());
-       // @formatter:on
+        // Lists (Copy without Streams)
+        dto.serviceInterfaces = listFromArray(compDescDTO.serviceInterfaces);
+        dto.configurationPid  = listFromArray(compDescDTO.configurationPid);
 
-        final String failure = getR7field(compConfDTO, "failure");
-        dto.failure = Optional.ofNullable(failure).orElse("");
+        // Properties (Optimization: Simple Loop)
+        if (compConfDTO != null && compConfDTO.properties != null) {
+            final int                 size  = compConfDTO.properties.size();
+            final Map<String, String> props = new HashMap<>((int) (size / 0.75f) + 1);
+            for (final Map.Entry<String, Object> entry : compConfDTO.properties.entrySet()) {
+                props.put(entry.getKey(), arrayToString(entry.getValue()));
+            }
+            dto.properties = props;
+        } else {
+            dto.properties = emptyMap();
+        }
 
+        // References (Optimization: Loop instead of Stream)
+        if (compDescDTO.references != null) {
+            final List<XReferenceDTO> refs = new ArrayList<>(compDescDTO.references.length);
+            for (final ReferenceDTO ref : compDescDTO.references) {
+                refs.add(toRef(ref));
+            }
+            dto.references = refs;
+        } else {
+            dto.references = new ArrayList<>();
+        }
+
+        // R7 Field Access (Fast MethodHandle)
+        dto.failure    = getR7FieldString(compConfDTO, FAILURE_GETTER);
         dto.activate   = compDescDTO.activate;
         dto.deactivate = compDescDTO.deactivate;
         dto.modified   = compDescDTO.modified;
 
-        // @formatter:off
-        dto.satisfiedReferences   = Stream.of(
-                                        Optional.ofNullable(compConfDTO)
-                                                .map(a -> a.satisfiedReferences)
-                                                .orElse(new SatisfiedReferenceDTO[0]))
-                                          .map(this::toXS)
-                                          .collect(toList());
+        // Satisfied References (Optimization: Loop)
+        if (compConfDTO != null && compConfDTO.satisfiedReferences != null) {
+            final List<XSatisfiedReferenceDTO> sats = new ArrayList<>(compConfDTO.satisfiedReferences.length);
+            for (final SatisfiedReferenceDTO ref : compConfDTO.satisfiedReferences) {
+                sats.add(toXS(ref));
+            }
+            dto.satisfiedReferences = sats;
+        } else {
+            dto.satisfiedReferences = new ArrayList<>();
+        }
 
-        dto.unsatisfiedReferences = Stream.of(
-                                        Optional.ofNullable(compConfDTO)
-                                                .map(a -> a.unsatisfiedReferences)
-                                                .orElse(new UnsatisfiedReferenceDTO[0]))
-                                          .map(this::toXUS)
-                                          .collect(toList());
-        // @formatter:on
+        // Unsatisfied References (Optimization: Loop)
+        if (compConfDTO != null && compConfDTO.unsatisfiedReferences != null) {
+            final List<XUnsatisfiedReferenceDTO> unsats = new ArrayList<>(compConfDTO.unsatisfiedReferences.length);
+            for (final UnsatisfiedReferenceDTO ref : compConfDTO.unsatisfiedReferences) {
+                unsats.add(toXUS(ref));
+            }
+            dto.unsatisfiedReferences = unsats;
+        } else {
+            dto.unsatisfiedReferences = new ArrayList<>();
+        }
 
         return dto;
     }
@@ -385,51 +478,40 @@ public final class XComponentAdmin {
         }
     }
 
-    private XSatisfiedReferenceDTO toXS(final SatisfiedReferenceDTO dto) {
-        final XSatisfiedReferenceDTO xsr = new XSatisfiedReferenceDTO();
+    // --- Helpers without Streams ---
 
-        xsr.name              = dto.name;
-        xsr.target            = dto.target;
-        xsr.objectClass       = prepareObjectClass(dto.boundServices);
-        xsr.serviceReferences = dto.boundServices;
-
-        return xsr;
+    private List<String> listFromArray(final String[] arr) {
+        if (arr == null) {
+            return new ArrayList<>();
+        }
+        // Use Arrays.asList but wrap in ArrayList to ensure mutable/serializable if needed
+        return new ArrayList<>(Arrays.asList(arr));
     }
 
-    private XUnsatisfiedReferenceDTO toXUS(final UnsatisfiedReferenceDTO dto) {
-        final XUnsatisfiedReferenceDTO uxsr = new XUnsatisfiedReferenceDTO();
-
-        uxsr.name        = dto.name;
-        uxsr.target      = dto.target;
-        uxsr.objectClass = prepareObjectClass(dto.targetServices);
-
-        return uxsr;
-    }
-
-    private String prepareObjectClass(final ServiceReferenceDTO[] services) {
-        if (services == null) {
+    private String getR7FieldString(final Object target, final MethodHandle getter) {
+        if (target == null || getter == null) {
             return "";
         }
-        final Set<String> finalList = new HashSet<>();
-        for (final ServiceReferenceDTO dto : services) {
-            if (dto != null) {
-                final String[] objectClass = (String[]) dto.properties.get(OBJECTCLASS);
-                finalList.addAll(Arrays.asList(objectClass));
-            }
+        try {
+            return (String) getter.invoke(target);
+        } catch (final Throwable e) {
+            return "";
         }
-        return String.join(", ", finalList);
     }
 
-    private String arrayToString(final Object value) {
-        if (value instanceof String[]) {
-            return Arrays.asList((String[]) value).toString();
+    private Integer getR7FieldInt(final Object target, final MethodHandle getter) {
+        if (target == null || getter == null) {
+            return null;
         }
-        return value.toString();
+        try {
+            return (Integer) getter.invoke(target);
+        } catch (final Throwable e) {
+            return null;
+        }
     }
 
     private XReferenceDTO toRef(final ReferenceDTO reference) {
         final XReferenceDTO ref = new XReferenceDTO();
-
         ref.name          = reference.name;
         ref.interfaceName = reference.interfaceName;
         ref.cardinality   = reference.cardinality;
@@ -443,24 +525,92 @@ public final class XComponentAdmin {
         ref.fieldOption   = reference.fieldOption;
         ref.scope         = reference.scope;
 
-        final Integer parameter = getR7field(reference, "parameter");
-        ref.parameter = parameter;
-
-        final String collectionType = getR7field(reference, "collectionType");
-        ref.collectionType = collectionType;
-
+        // Fast R7 access
+        ref.parameter      = getR7FieldInt(reference, PARAMETER_GETTER);
+        ref.collectionType = getR7FieldString(reference, COLLECTION_TYPE_GETTER);
         return ref;
     }
 
-    private <T> T getR7field(final Object object, final String fieldName) {
-        if (object == null) {
-            return null;
+    private XSatisfiedReferenceDTO toXS(final SatisfiedReferenceDTO dto) {
+        final XSatisfiedReferenceDTO xsr = new XSatisfiedReferenceDTO();
+        xsr.name              = dto.name;
+        xsr.target            = dto.target;
+        xsr.objectClass       = prepareObjectClass(dto.boundServices);
+        xsr.serviceReferences = dto.boundServices;
+        return xsr;
+    }
+
+    private XUnsatisfiedReferenceDTO toXUS(final UnsatisfiedReferenceDTO dto) {
+        final XUnsatisfiedReferenceDTO uxsr = new XUnsatisfiedReferenceDTO();
+        uxsr.name        = dto.name;
+        uxsr.target      = dto.target;
+        uxsr.objectClass = prepareObjectClass(dto.targetServices);
+        return uxsr;
+    }
+
+    private String prepareObjectClass(final ServiceReferenceDTO[] services) {
+        if (services == null || services.length == 0) {
+            return "";
         }
-        try {
-            return Reflect.on(object).field(fieldName).get();
-        } catch (final Exception e) {
-            return null;
+
+        // Optimization: Use ArrayList + StringBuilder instead of HashSet + String.join
+        // This avoids calculating hash codes for object classes (which are just strings)
+        final List<String> allClasses = new ArrayList<>();
+        for (final ServiceReferenceDTO dto : services) {
+            if (dto.properties != null) {
+                final Object objClass = dto.properties.get(OBJECTCLASS);
+                if (objClass instanceof String[]) {
+                    for (final String s : (String[]) objClass) {
+                        // Linear scan for small lists (1-3 items) is faster than Hash
+                        if (!allClasses.contains(s)) {
+                            allClasses.add(s);
+                        }
+                    }
+                }
+            }
         }
+
+        // Fast String Join
+        if (allClasses.isEmpty()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < allClasses.size(); i++) {
+            sb.append(allClasses.get(i));
+            if (i < allClasses.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+
+    // Optimization: Handle primitive arrays robustly
+    private String arrayToString(final Object value) {
+        if (value == null) {
+            return "null";
+        }
+        if (value.getClass().isArray()) {
+            if (value instanceof Object[]) {
+                return Arrays.deepToString((Object[]) value);
+            } else if (value instanceof int[]) {
+                return Arrays.toString((int[]) value);
+            } else if (value instanceof long[]) {
+                return Arrays.toString((long[]) value);
+            } else if (value instanceof boolean[]) {
+                return Arrays.toString((boolean[]) value);
+            } else if (value instanceof double[]) {
+                return Arrays.toString((double[]) value);
+            } else if (value instanceof float[]) {
+                return Arrays.toString((float[]) value);
+            } else if (value instanceof short[]) {
+                return Arrays.toString((short[]) value);
+            } else if (value instanceof byte[]) {
+                return Arrays.toString((byte[]) value);
+            } else if (value instanceof char[]) {
+                return Arrays.toString((char[]) value);
+            }
+        }
+        return value.toString();
     }
 
 }

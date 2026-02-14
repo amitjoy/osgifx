@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Stream;
 
 import org.osgi.dto.DTO;
@@ -69,8 +69,8 @@ public final class DIModule {
 
     private final Set<String>                           gogoCommands    = new CopyOnWriteArraySet<>();
     private final Map<String, AgentExtension<DTO, DTO>> agentExtensions = new ConcurrentHashMap<>();
-    private final ExecutorService                       executor        = Executors
-            .newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final ScheduledExecutorService              executor        = Executors
+            .newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     private BundleStartTimeCalculator bundleStartTimeCalculator;
     private XBundleAdmin              xBundleAdmin;
@@ -93,14 +93,15 @@ public final class DIModule {
         bundleStartTimeCalculator = new BundleStartTimeCalculator(context);
         di.bindInstance(BundleStartTimeCalculator.class, bundleStartTimeCalculator);
 
+        xComponentAdmin = new XComponentAdmin(context, executor);
+        di.bindInstance(XComponentAdmin.class, xComponentAdmin);
+        xComponentAdmin.init();
+
         xBundleAdmin = new XBundleAdmin(context, bundleStartTimeCalculator, executor);
         di.bindInstance(XBundleAdmin.class, xBundleAdmin);
 
         xServiceAdmin = new XServiceAdmin(context, executor);
         di.bindInstance(XServiceAdmin.class, xServiceAdmin);
-
-        xComponentAdmin = new XComponentAdmin(context, executor);
-        di.bindInstance(XComponentAdmin.class, xComponentAdmin);
 
         xMetaTypeAdmin = new XMetaTypeAdmin(context, executor);
         di.bindInstance(XMetaTypeAdmin.class, xMetaTypeAdmin);
@@ -132,6 +133,9 @@ public final class DIModule {
     }
 
     public void stop() {
+        if (xComponentAdmin != null) {
+            xComponentAdmin.stop();
+        }
         if (xBundleAdmin != null) {
             xBundleAdmin.stop();
         }
