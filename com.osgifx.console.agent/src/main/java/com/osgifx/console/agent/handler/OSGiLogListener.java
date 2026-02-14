@@ -17,6 +17,9 @@ package com.osgifx.console.agent.handler;
 
 import static com.osgifx.console.agent.provider.AgentServer.PROPERTY_ENABLE_LOGGING;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Optional;
 
 import org.osgi.service.log.LogEntry;
@@ -24,8 +27,6 @@ import org.osgi.service.log.LogListener;
 
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
-import com.osgifx.console.agent.dto.XResultDTO;
-import com.osgifx.console.agent.helper.Reflect;
 import com.osgifx.console.agent.provider.BinaryLogBuffer;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.supervisor.Supervisor;
@@ -34,6 +35,24 @@ import aQute.bnd.exceptions.Exceptions;
 import jakarta.inject.Inject;
 
 public final class OSGiLogListener implements LogListener {
+
+    // --- Optimized Reflection Handles (Init Once, Use Forever) ---
+    private static final MethodHandle GET_THREAD_INFO;
+    private static final MethodHandle GET_LOGGER_NAME;
+
+    static {
+        final MethodHandles.Lookup lookup        = MethodHandles.publicLookup();
+        MethodHandle               getThreadInfo = null;
+        MethodHandle               getLoggerName = null;
+        try {
+            getThreadInfo = lookup.findVirtual(LogEntry.class, "getThreadInfo", MethodType.methodType(String.class));
+            getLoggerName = lookup.findVirtual(LogEntry.class, "getLoggerName", MethodType.methodType(String.class));
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            // Methods not present (Older OSGi R6 environment), handles remain null
+        }
+        GET_THREAD_INFO = getThreadInfo;
+        GET_LOGGER_NAME = getLoggerName;
+    }
 
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
     private BinaryLogBuffer                 logBuffer;
@@ -80,19 +99,8 @@ public final class OSGiLogListener implements LogListener {
         dto.exception = Optional.ofNullable(entry.getException()).map(Exceptions::toString).orElse(null);
         dto.loggedAt  = entry.getTime();
 
-        final XResultDTO threadInfoResult = executeR7method(entry, "getThreadInfo");
-        final int        resultThreadInfo = threadInfoResult.result;
-
-        if (resultThreadInfo == XResultDTO.SUCCESS) {
-            dto.threadInfo = threadInfoResult.response;
-        }
-
-        final XResultDTO loggerNameResult = executeR7method(entry, "getLoggerName");
-        final int        resultLoggerName = loggerNameResult.result;
-
-        if (resultLoggerName == XResultDTO.SUCCESS) {
-            dto.logger = threadInfoResult.response;
-        }
+        dto.threadInfo = safeInvoke(entry, GET_THREAD_INFO);
+        dto.logger     = safeInvoke(entry, GET_LOGGER_NAME);
 
         return dto;
     }
@@ -116,15 +124,15 @@ public final class OSGiLogListener implements LogListener {
         }
     }
 
-    private XResultDTO executeR7method(final Object object, final String methodName) {
-        final XResultDTO dto = new XResultDTO();
-        try {
-            dto.response = Reflect.on(object).call(methodName).get();
-            dto.result   = XResultDTO.SUCCESS;
-        } catch (final Exception e) {
-            dto.result = XResultDTO.ERROR;
+    private String safeInvoke(final LogEntry entry, final MethodHandle handle) {
+        if (handle == null) {
+            return null;
         }
-        return dto;
+        try {
+            return (String) handle.invoke(entry);
+        } catch (final Throwable e) {
+            return null;
+        }
     }
 
 }
