@@ -87,15 +87,18 @@ public final class LoggerContextsInfoSupplier implements RuntimeInfoSupplier, Ev
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving logger contexts info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            loggerContexts.setAll(makeNullSafe(agent.getBundleLoggerContexts()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC);
-            logger.atInfo().log("Logger contexts info retrieved successfully");
+            logger.atInfo().log("Retrieving logger contexts info from remote runtime");
+            final var data = makeNullSafe(agent.getBundleLoggerContexts());
+            threadSync.asyncExec(() -> {
+                loggerContexts.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC);
+                logger.atInfo().log("Logger contexts info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }

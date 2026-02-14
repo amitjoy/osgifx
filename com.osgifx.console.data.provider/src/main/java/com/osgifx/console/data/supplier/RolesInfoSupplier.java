@@ -87,15 +87,18 @@ public final class RolesInfoSupplier implements RuntimeInfoSupplier, EventHandle
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving roles info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            roles.setAll(makeNullSafe(agent.getAllRoles()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ROLES_TOPIC);
-            logger.atInfo().log("Roles info retrieved successfully");
+            logger.atInfo().log("Retrieving roles info from remote runtime");
+            final var data = makeNullSafe(agent.getAllRoles());
+            threadSync.asyncExec(() -> {
+                roles.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_ROLES_TOPIC);
+                logger.atInfo().log("Roles info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }
