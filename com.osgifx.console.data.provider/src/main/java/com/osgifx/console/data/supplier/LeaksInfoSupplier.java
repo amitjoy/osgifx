@@ -77,15 +77,18 @@ public final class LeaksInfoSupplier implements RuntimeInfoSupplier, EventHandle
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving classloader leaks info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            leaks.setAll(makeNullSafe(agent.getClassloaderLeaks()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LEAKS_TOPIC);
-            logger.atInfo().log("Classloader leaks info retrieved successfully");
+            logger.atInfo().log("Retrieving classloader leaks info from remote runtime");
+            final var data = makeNullSafe(agent.getClassloaderLeaks());
+            threadSync.asyncExec(() -> {
+                leaks.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_LEAKS_TOPIC);
+                logger.atInfo().log("Classloader leaks info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }

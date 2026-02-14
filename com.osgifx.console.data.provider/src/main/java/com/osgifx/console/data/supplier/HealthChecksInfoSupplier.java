@@ -85,15 +85,18 @@ public final class HealthChecksInfoSupplier implements RuntimeInfoSupplier, Even
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving health checks info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            healthchecks.setAll(makeNullSafe(agent.getAllHealthChecks()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HEALTHCHECKS_TOPIC);
-            logger.atInfo().log("Healthchecks info retrieved successfully");
+            logger.atInfo().log("Retrieving health checks info from remote runtime");
+            final var data = makeNullSafe(agent.getAllHealthChecks());
+            threadSync.asyncExec(() -> {
+                healthchecks.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_HEALTHCHECKS_TOPIC);
+                logger.atInfo().log("Healthchecks info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }

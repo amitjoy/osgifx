@@ -85,15 +85,18 @@ public final class ComponentsInfoSupplier implements RuntimeInfoSupplier, EventH
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving components info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            components.setAll(makeNullSafe(agent.getAllComponents()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_COMPONENTS_TOPIC);
-            logger.atInfo().log("Components info retrieved successfully");
+            logger.atInfo().log("Retrieving components info from remote runtime");
+            final var data = makeNullSafe(agent.getAllComponents());
+            threadSync.asyncExec(() -> {
+                components.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_COMPONENTS_TOPIC);
+                logger.atInfo().log("Components info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }
