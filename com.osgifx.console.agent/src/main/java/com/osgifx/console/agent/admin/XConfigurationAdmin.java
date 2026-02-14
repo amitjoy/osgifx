@@ -22,6 +22,9 @@ import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
 import static com.osgifx.console.agent.helper.OSGiCompendiumService.CM;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -54,7 +57,6 @@ import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
-import com.osgifx.console.agent.helper.Reflect;
 
 import jakarta.inject.Inject;
 
@@ -70,6 +72,21 @@ public final class XConfigurationAdmin implements ConfigurationListener {
     private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
     private volatile ConfigurationAdmin                            configAdmin;
     private ExecutorService                                        executor;
+
+    // --- Optimized Reflection Handles (Init Once, Use Forever) ---
+    private static final MethodHandle UPDATE_IF_DIFFERENT;
+
+    static {
+        final MethodHandles.Lookup lookup            = MethodHandles.publicLookup();
+        MethodHandle               updateIfDifferent = null;
+        try {
+            updateIfDifferent = lookup.findVirtual(Configuration.class, "updateIfDifferent",
+                    MethodType.methodType(boolean.class, Dictionary.class));
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            // Method not present (Older OSGi R6 environment), handle remains null
+        }
+        UPDATE_IF_DIFFERENT = updateIfDifferent;
+    }
 
     @Inject
     public XConfigurationAdmin(final BundleContext context,
@@ -335,12 +352,20 @@ public final class XConfigurationAdmin implements ConfigurationListener {
         return dto;
     }
 
-    private void executeUpdate(final Configuration configuration, final Map<String, Object> newProperties) {
+    private void executeUpdate(final Configuration configuration,
+                               final Map<String, Object> newProperties) throws Exception {
         final Dictionary<String, Object> properties = new Hashtable<>(newProperties);
-        try {
-            Reflect.on(configuration).call("updateIfDifferent", properties).get();
-        } catch (final Exception e) {
-            Reflect.on(configuration).call("update", properties).get();
+        if (UPDATE_IF_DIFFERENT != null) {
+            try {
+                UPDATE_IF_DIFFERENT.invoke(configuration, properties);
+            } catch (final Throwable e) {
+                if (e instanceof Exception) {
+                    throw (Exception) e;
+                }
+                throw new RuntimeException(e);
+            }
+        } else {
+            configuration.update(properties);
         }
     }
 
