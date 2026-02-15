@@ -218,7 +218,10 @@ public final class XComponentAdmin {
     }
 
     // --- Optimized Snapshot Execution ---
-    private void performSnapshot(final long changeCount) {
+    private synchronized void performSnapshot(final long changeCount) {
+        if (changeCount != -1 && changeCount <= lastChangeCount.get()) {
+            return;
+        }
         final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
             return;
@@ -244,7 +247,7 @@ public final class XComponentAdmin {
                         dtos.add(toDTO(config, desc));
                     }
                 }
-                newSnapshot.put(desc.bundle.id, dtos);
+                newSnapshot.computeIfAbsent(desc.bundle.id, k -> new ArrayList<>()).addAll(dtos);
             }
 
             this.components = Collections.unmodifiableMap(newSnapshot);
@@ -325,6 +328,7 @@ public final class XComponentAdmin {
                     try {
                         final Promise<Void> promise = enable ? scr.enableComponent(dto) : scr.disableComponent(dto);
                         promise.getValue(); // Blocks intentionally (User Action)
+                        performSnapshot(pendingChangeCount.get());
                     } catch (final Exception e) {
                         builder.append(e.getMessage()).append(System.lineSeparator());
                     }
@@ -372,6 +376,7 @@ public final class XComponentAdmin {
                 try {
                     final Promise<Void> promise = enable ? scr.enableComponent(dto) : scr.disableComponent(dto);
                     promise.getValue();
+                    performSnapshot(pendingChangeCount.get());
                 } catch (final Exception e) {
                     builder.append(e.getMessage()).append(System.lineSeparator());
                 }
