@@ -85,15 +85,18 @@ public final class ServicesInfoSupplier implements RuntimeInfoSupplier, EventHan
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving services info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent is not connected");
                 return;
             }
-            services.setAll(makeNullSafe(agent.getAllServices()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_SERVICES_TOPIC);
-            logger.atInfo().log("Services info retrieved successfully");
+            logger.atInfo().log("Retrieving services info from remote runtime");
+            final var data = makeNullSafe(agent.getAllServices());
+            threadSync.asyncExec(() -> {
+                services.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_SERVICES_TOPIC);
+                logger.atInfo().log("Services info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }

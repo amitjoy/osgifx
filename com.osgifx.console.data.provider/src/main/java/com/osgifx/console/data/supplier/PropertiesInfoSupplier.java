@@ -73,15 +73,18 @@ public final class PropertiesInfoSupplier implements RuntimeInfoSupplier, EventH
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving properties info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            properties.setAll(makeNullSafe(agent.getAllProperties()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
-            logger.atInfo().log("Properties info retrieved successfully");
+            logger.atInfo().log("Retrieving properties info from remote runtime");
+            final var data = makeNullSafe(agent.getAllProperties());
+            threadSync.asyncExec(() -> {
+                properties.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PROPERTIES_TOPIC);
+                logger.atInfo().log("Properties info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }
