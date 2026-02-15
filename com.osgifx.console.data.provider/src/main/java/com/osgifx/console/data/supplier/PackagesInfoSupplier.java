@@ -84,15 +84,18 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving packages info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            packages.setAll(preparePackages(agent.getAllBundles()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
-            logger.atInfo().log("Packages info retrieved successfully");
+            logger.atInfo().log("Retrieving packages info from remote runtime");
+            final var data = preparePackages(agent.getAllBundles());
+            threadSync.asyncExec(() -> {
+                packages.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);
+                logger.atInfo().log("Packages info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }
