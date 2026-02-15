@@ -25,8 +25,6 @@ import static org.osgi.service.component.annotations.ReferencePolicyOption.GREED
 
 import java.time.Duration;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -72,7 +70,6 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
     private volatile Supervisor         supervisor;
     private FluentLogger                logger;
     private volatile ScheduledFuture<?> future;
-    private final Lock                  lock = new ReentrantLock();
 
     private final ObservableList<XLogEntryDTO> logs = observableArrayList();
 
@@ -99,24 +96,14 @@ public final class LogsInfoSupplier implements RuntimeInfoSupplier, LogEntryList
     @Override
     public void logged(final XLogEntryDTO logEntry) {
         if (future == null) {
-            executor.scheduleWithFixedDelay(() -> {
-                lock.lock();
-                try {
-                    final var size = logs.size();
-                    if (size > CACHE_INVALIDATE_THRESHOLD) {
-                        logs.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
-                    }
-                } finally {
-                    lock.unlock();
+            executor.scheduleWithFixedDelay(() -> threadSync.asyncExec(() -> {
+                final var size = logs.size();
+                if (size > CACHE_INVALIDATE_THRESHOLD) {
+                    logs.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
                 }
-            }, Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
+            }), Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
         }
-        lock.lock();
-        try {
-            logs.add(logEntry);
-        } finally {
-            lock.unlock();
-        }
+        threadSync.asyncExec(() -> logs.add(logEntry));
     }
 
     @Override

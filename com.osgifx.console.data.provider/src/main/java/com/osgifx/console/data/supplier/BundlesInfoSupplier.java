@@ -77,15 +77,18 @@ public final class BundlesInfoSupplier implements RuntimeInfoSupplier, EventHand
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving bundles info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            bundles.setAll(makeNullSafe(agent.getAllBundles()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
-            logger.atInfo().log("Bundles info retrieved successfully");
+            logger.atInfo().log("Retrieving bundles info from remote runtime");
+            final var data = makeNullSafe(agent.getAllBundles());
+            threadSync.asyncExec(() -> {
+                bundles.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_BUNDLES_TOPIC);
+                logger.atInfo().log("Bundles info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }

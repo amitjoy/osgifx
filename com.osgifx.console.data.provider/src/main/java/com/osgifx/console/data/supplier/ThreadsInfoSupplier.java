@@ -73,15 +73,18 @@ public final class ThreadsInfoSupplier implements RuntimeInfoSupplier, EventHand
     public void retrieve() {
         retrieveLock.lock();
         try {
-            logger.atInfo().log("Retrieving threads info from remote runtime");
             final var agent = supervisor.getAgent();
             if (agent == null) {
                 logger.atWarning().log("Agent not connected");
                 return;
             }
-            threads.setAll(makeNullSafe(agent.getAllThreads()));
-            RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_THREADS_TOPIC);
-            logger.atInfo().log("Threads info retrieved successfully");
+            logger.atInfo().log("Retrieving threads info from remote runtime");
+            final var data = makeNullSafe(agent.getAllThreads());
+            threadSync.asyncExec(() -> {
+                threads.setAll(data);
+                RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_THREADS_TOPIC);
+                logger.atInfo().log("Threads info retrieved successfully");
+            });
         } finally {
             retrieveLock.unlock();
         }
