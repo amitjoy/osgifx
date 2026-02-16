@@ -33,8 +33,8 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component(service = McpTool.class)
-@McpToolDef(name = "search_bundle_resources", description = "Searches for resources in a bundle using a glob pattern")
-public class SearchBundleResourcesTool implements McpTool {
+@McpToolDef(name = "find_bundle_entries", description = "Finds files strictly inside the bundle (and its attached fragments)")
+public class FindBundleEntriesTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -50,21 +50,25 @@ public class SearchBundleResourcesTool implements McpTool {
     @Override
     public Map<String, Object> inputSchema() {
         return McpToolSchema.builder().arg("bundleId", "integer", "The ID of the bundle")
-                .arg("pattern", "string", "The glob pattern to search for (e.g., 'META-INF/*.xml')").build();
+                .arg("path", "string", "The path to start searching (default: '/')")
+                .arg("pattern", "string", "The glob pattern to search for (default: '*')")
+                .arg("recursive", "boolean", "Recursively search subdirectories (default: true)").build();
     }
 
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing SearchBundleResourcesTool");
+        logger.atInfo().log("Executing FindBundleEntriesTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
             return Collections.emptyList();
         }
 
-        final var bundleId = ((Number) args.get("bundleId")).longValue();
-        final var pattern  = (String) args.get("pattern");
+        final var bundleId  = ((Number) args.get("bundleId")).longValue();
+        final var path      = (String) args.getOrDefault("path", "/");
+        final var pattern   = (String) args.getOrDefault("pattern", "*");
+        final var recursive = (boolean) args.getOrDefault("recursive", true);
 
-        return agent.searchBundleResources(bundleId, pattern);
+        return agent.findBundleEntries(bundleId, path, pattern, recursive);
     }
 }

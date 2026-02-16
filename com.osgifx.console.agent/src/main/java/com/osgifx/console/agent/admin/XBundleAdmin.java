@@ -143,7 +143,10 @@ public final class XBundleAdmin {
         return new ArrayList<>(bundles.values());
     }
 
-    public List<String> searchBundleResources(final long bundleId, final String pattern) {
+    public List<String> findEntries(final long bundleId,
+                                    final String path,
+                                    final String pattern,
+                                    final boolean recursive) {
         if (context == null) {
             logger.atWarn().msg("Bundle context is null").log();
             return Collections.emptyList();
@@ -154,7 +157,7 @@ public final class XBundleAdmin {
             return Collections.emptyList();
         }
         final List<String>     resources = new ArrayList<>();
-        final Enumeration<URL> entries   = bundle.findEntries("/", pattern, true);
+        final Enumeration<URL> entries   = bundle.findEntries(path, pattern, recursive);
 
         if (entries != null) {
             while (entries.hasMoreElements()) {
@@ -162,6 +165,24 @@ public final class XBundleAdmin {
             }
         }
         return resources;
+    }
+
+    public List<String> listResources(final long bundleId, final String path, final String pattern, final int options) {
+        if (context == null) {
+            logger.atWarn().msg("Bundle context is null").log();
+            return Collections.emptyList();
+        }
+        final Bundle bundle = context.getBundle(bundleId);
+        if (bundle == null) {
+            logger.atWarn().msg("Bundle with ID '{}' not found").arg(bundleId).log();
+            return Collections.emptyList();
+        }
+        final BundleWiring wiring = bundle.adapt(BundleWiring.class);
+        if (wiring == null) {
+            logger.atWarn().msg("Bundle wiring is null for bundle '{}'").arg(bundleId).log();
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(wiring.listResources(path, pattern, options));
     }
 
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
