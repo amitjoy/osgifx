@@ -647,11 +647,26 @@ public interface Agent {
     byte[] getLogSnapshot(long fromTime, long toTime);
 
     /**
-     * Searches for resources in the specified bundle using the given pattern.
+     * Searches strictly inside the bundle JAR and its attached fragments.
+     * strict wrapper for Bundle.findEntries()
      *
      * @param bundleId the bundle ID
-     * @param pattern the pattern to search for
-     * @return the list of resources
+     * @param path the path to start searching (e.g., "/icons")
+     * @param pattern the file pattern (e.g., "*.png")
+     * @param recursive true to recurse into subdirectories
+     * @return list of resource paths
      */
-    Collection<String> searchBundleResources(long bundleId, String pattern);
+    Collection<String> findBundleEntries(long bundleId, String path, String pattern, boolean recursive);
+
+    /**
+     * Searches the bundle's class space (including imports).
+     * strict wrapper for BundleWiring.listResources()
+     *
+     * @param bundleId the bundle ID
+     * @param path the path to start searching (e.g., "com/example/service")
+     * @param pattern the file pattern (e.g., "*.class")
+     * @param options bitwise options (1=LOCAL, 2=RECURSE)
+     * @return list of resource paths
+     */
+    Collection<String> listBundleResources(long bundleId, String path, String pattern, int options);
 }
