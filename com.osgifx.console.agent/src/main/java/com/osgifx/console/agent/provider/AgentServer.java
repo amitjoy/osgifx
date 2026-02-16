@@ -789,9 +789,23 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
-    public Collection<String> searchBundleResources(final long bundleId, final String pattern) {
+    public Collection<String> findBundleEntries(final long bundleId,
+                                                final String path,
+                                                final String pattern,
+                                                final boolean recursive) {
+        requireNonNull(path, "Path cannot be null");
         requireNonNull(pattern, "Pattern cannot be null");
-        return di.getInstance(XBundleAdmin.class).searchBundleResources(bundleId, pattern);
+        return di.getInstance(XBundleAdmin.class).findEntries(bundleId, path, pattern, recursive);
+    }
+
+    @Override
+    public Collection<String> listBundleResources(final long bundleId,
+                                                  final String path,
+                                                  final String pattern,
+                                                  final int options) {
+        requireNonNull(path, "Path cannot be null");
+        requireNonNull(pattern, "Pattern cannot be null");
+        return di.getInstance(XBundleAdmin.class).listResources(bundleId, path, pattern, options);
     }
 
     @Override
