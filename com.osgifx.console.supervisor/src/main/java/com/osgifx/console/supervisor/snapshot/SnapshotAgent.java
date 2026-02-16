@@ -148,7 +148,18 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
-    public List<String> searchBundleResources(final long bundleId, final String pattern) {
+    public List<String> findBundleEntries(final long bundleId,
+                                          final String path,
+                                          final String pattern,
+                                          final boolean recursive) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> listBundleResources(final long bundleId,
+                                            final String path,
+                                            final String pattern,
+                                            final int options) {
         return Collections.emptyList();
     }
 
