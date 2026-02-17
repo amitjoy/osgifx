@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
-  Copyright 2021-2025 Amit Kumar Mondal
+  Copyright 2021-2026 Amit Kumar Mondal
   
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License.  You may obtain a copy
@@ -14,176 +15,78 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.components.ReferenceDetailsFxController">
+<GridPane hgap="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.components.ReferenceDetailsFxController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.0" minWidth="10.0" prefWidth="235.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="589.0" minWidth="10.0" prefWidth="565.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
   </rowConstraints>
    <children>
-      <Label text="Name" GridPane.halignment="RIGHT">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Interface Name" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Cardinality" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Policy" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Policy Option" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Target" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Bind" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Unbind" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Updated" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Field" GridPane.halignment="RIGHT" GridPane.rowIndex="9">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Field Option" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Scope" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="nameLabel" text="Label" GridPane.columnIndex="1">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="interfaceLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="cardinalityLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="policyLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="policyOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="targetLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="unbindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="updatedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="fieldLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="fieldOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="scopeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="bindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Parameter" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
-         <GridPane.margin>
-            <Insets right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="parameterLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Collection Type" GridPane.halignment="RIGHT" GridPane.rowIndex="13">
-         <padding>
-            <Insets right="50.0" />
-         </padding>
-      </Label>
-      <Label fx:id="collectionTypeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13">
-         <padding>
-            <Insets left="20.0" />
-         </padding>
-      </Label>
+      <Label style="-fx-font-weight: bold;" text="Name" GridPane.halignment="RIGHT" />
+      <Label fx:id="nameLabel" text="Label" GridPane.columnIndex="1" />
+      
+      <Label style="-fx-font-weight: bold;" text="Interface Name" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+      <Label fx:id="interfaceLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      
+      <Label style="-fx-font-weight: bold;" text="Cardinality" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+      <Label fx:id="cardinalityLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      
+      <Label style="-fx-font-weight: bold;" text="Policy" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+      <Label fx:id="policyLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      
+      <Label style="-fx-font-weight: bold;" text="Policy Option" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+      <Label fx:id="policyOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      
+      <Label style="-fx-font-weight: bold;" text="Target" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+      <Label fx:id="targetLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      
+      <Label style="-fx-font-weight: bold;" text="Bind" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
+      <Label fx:id="bindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      
+      <Label style="-fx-font-weight: bold;" text="Unbind" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+      <Label fx:id="unbindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+      
+      <Label style="-fx-font-weight: bold;" text="Updated" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
+      <Label fx:id="updatedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+      
+      <Label style="-fx-font-weight: bold;" text="Field" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
+      <Label fx:id="fieldLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+      
+      <Label style="-fx-font-weight: bold;" text="Field Option" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
+      <Label fx:id="fieldOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+      
+      <Label style="-fx-font-weight: bold;" text="Scope" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
+      <Label fx:id="scopeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+      
+      <Label style="-fx-font-weight: bold;" text="Parameter" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
+      <Label fx:id="parameterLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+      
+      <Label style="-fx-font-weight: bold;" text="Collection Type" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
+      <Label fx:id="collectionTypeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13" />
    </children>
    <padding>
-      <Insets bottom="20.0" top="20.0" />
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
 </GridPane>

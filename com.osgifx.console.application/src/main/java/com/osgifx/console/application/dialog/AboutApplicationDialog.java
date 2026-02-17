@@ -28,7 +28,6 @@ import com.osgifx.console.util.fx.Fx;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.image.ImageView;
 import javafx.stage.StageStyle;
 
 public final class AboutApplicationDialog extends Dialog<Void> {
@@ -44,12 +43,8 @@ public final class AboutApplicationDialog extends Dialog<Void> {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
 
-        dialogPane.setPrefHeight(200);
-        dialogPane.setPrefWidth(400);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(getClass().getResource("/graphic/images/about.png").toString()));
-        dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
-        dialogPane.setHeaderText("About OSGi.fx");
+        dialogPane.getButtonTypes().addAll(ButtonType.CLOSE);
 
         final var content = Fx.loadFXML(loader, context, "/fxml/about-application-dialog.fxml");
         dialogPane.setContent(content);
