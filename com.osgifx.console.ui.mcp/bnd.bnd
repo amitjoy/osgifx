@@ -1,0 +1,16 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+Model-Fragment: fragment.e4xmi;apply=always
+-includeresource    : \
+					  fragment.e4xmi = fragment.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic,\
+					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
+-buildpath          : \
+                      ${bundles.required},\
+                      com.google.gson
+-privatepackage     : com.osgifx.console.ui.mcp.*
+Import-Package      : \
+                      org.controlsfx.glyphfont,\
+                      org.controlsfx.control,\
+                      *

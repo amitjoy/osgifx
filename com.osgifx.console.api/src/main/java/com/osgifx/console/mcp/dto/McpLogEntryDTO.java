@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * the License at:
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -13,6 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("1.3.0")
-package com.osgifx.console.util.fx;
+package com.osgifx.console.mcp.dto;
+
+import org.osgi.dto.DTO;
+
+public class McpLogEntryDTO extends DTO {
+
+    public long           timestamp;
+    public McpLogEntryType type;
+    public String         content;
+
+}

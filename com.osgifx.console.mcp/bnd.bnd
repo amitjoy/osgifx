@@ -3,5 +3,8 @@
                       com.google.gson,\
                       io.fusionauth:java-http;packages=*,\
                       org.osgi.util.converter
+-exportpackage      : \
+                      com.osgifx.console.mcp.server,\
+                      com.osgifx.console.mcp.provider
 -privatepackage     : com.osgifx.console.mcp.*
 -conditionalpackage : io.fusionauth*
