@@ -18,61 +18,33 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 <?import org.controlsfx.control.HyperlinkLabel?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="400.0" style="-fx-font-size: 10pt;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.application.fxml.controller.AboutApplicationDialogController">
-   <children> 
-      <GridPane layoutY="69.0" prefHeight="225.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="68.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="46.0" minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="54.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="59.0" minHeight="10.0" prefHeight="59.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements" wrappingWidth="341.22393798828125" GridPane.columnSpan="2" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets left="20.0" right="30.0" top="-5.0" />
-               </GridPane.margin>
-            </Text>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <HyperlinkLabel fx:id="appDetails" text="Version ${appVersion}, [${appLink}]">
-                     <VBox.margin>
-                        <Insets left="20.0" />
-                     </VBox.margin>
-                  </HyperlinkLabel>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Developed by Amit Kumar Mondal">
-                     <VBox.margin>
-                        <Insets left="20.0" />
-                     </VBox.margin>
-                  </Text>
-                  <Text fx:id="javaVersionTxt" strokeType="OUTSIDE" strokeWidth="0.0" text="Running on Java ${javaVersion} and JavaFX ${javafxVersion}">
-                     <VBox.margin>
-                        <Insets left="20.0" />
-                     </VBox.margin>
-                  </Text>
-               </children>
-               <padding>
-                  <Insets top="10.0" />
-               </padding>
-            </VBox>
-            <Label fx:id="eclipseLink" prefHeight="48.0" prefWidth="343.0" text="This product includes softwares developed by other open source foundations including the Eclipse Foundation" wrapText="true" GridPane.columnSpan="2" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets left="20.0" right="25.0" />
-               </GridPane.margin>
-            </Label>
-         </children>
-      </GridPane>
+<VBox alignment="CENTER" fillWidth="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.application.fxml.controller.AboutApplicationDialogController">
+   <children>
+      <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../graphic/images/about.png" />
+         </image>
+      </ImageView>
+      <Label style="-fx-font-weight: bold; -fx-font-size: 18px;" text="OSGi.fx Console" />
+      <HyperlinkLabel fx:id="appDetails" text="Version ${appVersion} | [${appLink}]" />
+      <Label text="Developed by Amit Kumar Mondal" />
+      <Text fx:id="javaVersionTxt" strokeType="OUTSIDE" strokeWidth="0.0" text="Running on Java ${javaVersion} and JavaFX ${javafxVersion}" />
+      <Separator prefWidth="200.0">
+         <VBox.margin>
+            <Insets bottom="10.0" top="10.0" />
+         </VBox.margin>
+      </Separator>
+      <Label alignment="CENTER" prefWidth="500.0" text="Licensed to the Apache Software Foundation (ASF)" textAlignment="CENTER" wrapText="true" style="-fx-font-size: 11px;" />
+      <Label fx:id="eclipseLink" alignment="CENTER" prefWidth="500.0" text="This product includes software developed by other open source foundations including the Eclipse Foundation" textAlignment="CENTER" wrapText="true" style="-fx-font-size: 11px;" />
    </children>
-</AnchorPane>
+   <padding>
+      <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+   </padding>
+</VBox>
