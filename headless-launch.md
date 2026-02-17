@@ -42,7 +42,8 @@ You can also use the `RunOSGiFx` script which simplifies the process by handling
 ```
 
 > [!IMPORTANT]
-> Do not use `java -jar` directly to call the jar as you might need to set lots of JPMS related flags manually yourself.
+> Avoid using `java -jar` directly, as it requires manual configuration of complex JPMS flags. Use the module-aware launcher `RunOSGiFx`.
+
 ---
 
 ## Configuration Format

@@ -76,6 +76,10 @@ To secure sockets, set:
 
 **2. MQTT Connection**
 Install `in.bytehue.messaging.mqtt5.provider.jar`.
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; align-items: center;">
+  <a href="https://central.sonatype.com/artifact/in.bytehue/in.bytehue.messaging.mqtt5.provider/1.1.0" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">Download MQTT JAR</a>
+  <a href="https://github.com/amitjoy/osgi-messaging" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">OSGi Messaging Project</a>
+</div>
 *   Configure `in.bytehue.messaging.client` PID.
 *   Set Agent Properties:
     *   `osgi.fx.agent.mqtt.pubtopic`: Topic for agent responses.
@@ -99,7 +103,7 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 | **📢 Event Emitter** <br> _Dispatch synchronous or asynchronous events_ | 2.4.4 | ✅ | 🚀 |
 | **👂 Event Listener** <br> _Subscribe to OSGi events in real-time_ | 2.4.4 | ✅ | 🚀 |
 | **📝 Log Stream** <br> _Live streaming of OSGi logs_ | 2.4.4 | ✅ | 🚀 |
-| **logger R7 Logger Config** <br> _Manage OSGi R7 logger levels and configurations_ | 2.4.4 | ✅ | 🚀 |
+| **🎛️ R7 Logger Config** <br> _Manage OSGi R7 logger levels and configurations_ | 2.4.4 | ✅ | 🚀 |
 | **🐚 Gogo Shell** <br> _Execute Gogo commands remotely_ | 2.4.4 | ✅ | 🚀 |
 | **💻 CLI Executor** <br> _Run system CLI commands directly_ | 2.4.4 | ✅ | 🚀 |
 | **✨ Smart Auto-Complete** <br> _Intelligent suggestion for remote Gogo commands_ | 2.4.4 | ✅ | 🚀 |
@@ -139,8 +143,7 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 #### Batch Operations
 You can install multiple bundles and create multiple configurations in one go.
 1.  Select `Actions -> Batch Install`.
-2.  Choose a directory containing your JARs and JSON configuration files.
-    *   *Note:* JSON files must comply with the [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html).
+2.  Choose a directory containing your JARs and JSON configuration files. (*Note:* JSON files must comply with the [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html).)
 3.  Select which resources to process from the list.
 
 #### Extension System
@@ -171,4 +174,4 @@ Want to contribute? Great! Check out our **[Development Guide](/development)** f
 
 ### 📄 License
 
-This project is licensed under Apache License Version 2.0 [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+This project is licensed under Apache License Version 2.0
