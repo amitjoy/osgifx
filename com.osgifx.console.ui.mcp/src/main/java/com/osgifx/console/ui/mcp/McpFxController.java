@@ -147,6 +147,7 @@ public final class McpFxController {
         schemaColumn.setCellValueFactory(cellData -> cellData.getValue().schemaProperty());
 
         toolsTable.setItems(tools);
+        Fx.addContextMenuToCopyContent(toolsTable);
         TableFilter.forTableView(toolsTable).lazy(true).apply();
     }
 
@@ -156,6 +157,7 @@ public final class McpFxController {
         contentColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
 
         logsTable.setItems(logs);
+        Fx.addContextMenuToCopyContent(logsTable);
         TableFilter.forTableView(logsTable).lazy(true).apply();
     }
 
