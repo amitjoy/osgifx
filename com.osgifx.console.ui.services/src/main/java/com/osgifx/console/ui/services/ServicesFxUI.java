@@ -156,11 +156,19 @@ public final class ServicesFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+            final var infoNode = Fx.initStatusBarButton(this::showInfo, "Info", "INFO");
+            statusBar.addToRight(infoNode);
+            statusBar.addToRight(new Separator(VERTICAL));
+            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
             if (!isSnapshotAgent) {
-                statusBar.addToRight(node);
+                statusBar.addToRight(refreshNode);
             }
         }
+    }
+
+    private void showInfo() {
+        FxDialog.showInfoDialog("Service Color Information", "Violet colored entries are OSGi SCR components.",
+                getClass().getClassLoader());
     }
 
     private void initSearchFilterResetButton(final String description) {
