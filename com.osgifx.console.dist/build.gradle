@@ -40,7 +40,7 @@ publishing {
             // Enforce the Main Artifact to be your Uberjar
             // This replaces the default 'jar' task output with your Bndtools export
             artifact(uberJarFile) {
-                builtBy ':com.osgifx.console.product:export.osgifx' // Ensure export runs first
+                builtBy(rootProject.findProject(':com.osgifx.console.product').tasks.named('export.osgifx'))
             }
             
             // Attach the mandatory secondary artifacts
