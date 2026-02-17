@@ -75,6 +75,10 @@ jobs:
             echo "Importing GPG key..."
             echo "$GPG_PRIVATE_KEY" | gpg --batch --import
             echo "GPG key imported successfully"
+            mkdir -p ~/.gnupg
+            echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+            echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+            echo "GPG configured for loopback"
       
       -  name: 🐘 Build Bundles
          run: ./gradlew clean build --info

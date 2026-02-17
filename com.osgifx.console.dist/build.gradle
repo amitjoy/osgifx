@@ -120,7 +120,7 @@ if (project.hasProperty('jreleaser.enabled')) {
                     sonatype {
                         active = 'RELEASE'
                         url = 'https://central.sonatype.com/api/v1/publisher'
-                        stagingRepository('build/staging-deploy')
+                        stagingRepository('target/staging-deploy')
                     }
                 }
             }
