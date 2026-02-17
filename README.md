@@ -50,7 +50,7 @@
 
 ### 🚀 Getting Started
 
-The latest released version is **2.4.4**.
+The latest released version is **2.4.5**.
 
 #### 📥 Download & Install
 Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
@@ -102,8 +102,8 @@ For detailed instructions, please refer to the **User Guide** on the website or 
 | **📸 Snapshot** <br> _Capture and analyze runtime state snapshots_ | 2.4.4 | ✅ | 🚀 |
 | **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
 | **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
-| **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](MCP_SERVER.md)_ | 2.4.5 | ✅ | 🚧 |
-| **👻 Headless Launch** <br> _Start application with pre-configured connection_ | 2.4.5 | ✅ | 🚧 |
+| **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](MCP_SERVER.md)_ | 2.4.5 | ✅ | 🚀 |
+| **👻 Headless Launch** <br> _Start application with pre-configured connection_ | 2.4.5 | ✅ | 🚀 |
 
 --------------------------------------------------------------------------------------------------------------
 
