@@ -1,6 +1,8 @@
 name: 🚀 Release (npm Only)
 
 on:
+   push:
+       branches: ['release/*']
    workflow_dispatch:
 
 # Only one release at a time
