@@ -19,6 +19,7 @@
 *   **⚡ Real-time Monitoring:** Track threads, heap usage, and logs live.
 *   **�️ Visual Dependencies:** Explore complex relationships with interactive graphs.
 *   **✨ Ease of Use:** Drag-and-drop installs, smart auto-complete, and valid configuration editing.
+*   **🤖 AI Ready:** Built-in Model Context Protocol (MCP) server for seamless AI agent integration.
 
 ------------------------------------------------------------------------------------------------------------
 
