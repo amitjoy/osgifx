@@ -1,15 +1,7 @@
-name: 🚀 Release
+name: 🚀 Release (npm Only)
 
 on:
-   push:
-      tags: ['v*.*.*']
    workflow_dispatch:
-      inputs:
-         dry_run:
-            description: 'Dry Run'
-            required: true
-            default: false
-            type: boolean
 
 # Only one release at a time
 concurrency:
@@ -27,14 +19,10 @@ env:
 
 jobs:
    release:
-      name: 🎯 Release ${{ github.ref_name }}
+      name: 🎯 Release npm ${{ github.ref_name }}
       runs-on: ubuntu-latest
       
       steps:
-      -  name: 🔍 Check Dry Run Status
-         if: ${{ inputs.dry_run == true }}
-         run: echo "::notice title=Dry Run::DRY RUN MODE ACTIVE - No artifacts will be published"
-
       -  name: 📥 Checkout code
          uses: actions/checkout@v6
          with:
@@ -67,52 +55,11 @@ jobs:
             git config user.name "GitHub Actions Bot"
             git config user.email "github-actions[bot]@users.noreply.github.com"
       
-      -  name: 🔐 Import GPG key
-         env:
-            GPG_PRIVATE_KEY: ${{ secrets.GPG_SECRET_KEY }}
-            GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-         run: |
-            echo "Importing GPG key..."
-            echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-            echo "GPG key imported successfully"
-            mkdir -p ~/.gnupg
-            echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-            echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-            echo "GPG configured for loopback"
-      
       -  name: 🐘 Build Bundles
          run: ./gradlew clean build --info
 
       -  name: 📦 Export Executable JAR
          run: ./gradlew :com.osgifx.console.product:export.osgifx --info
-
-      -  name: 🧹 Clean Sonatype Staging
-         run: |
-            rm -rf cnf/cache/sonatype-release/* 2>/dev/null || true
-            rm -rf cnf/target/sonatype-staging/* 2>/dev/null || true
-
-      -  name: 🚀 Release Bundles
-         if: ${{ inputs.dry_run != true }}
-         run: |
-            export GPG_TTY=$(tty)
-            ./gradlew :com.osgifx.console.agent:release --info
-            ./gradlew :com.osgifx.console.agent.api:release --info
-         env:
-            GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-            SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-            SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-
-      -  name: 🚀 Publish to Maven Central & GitHub
-         run: ./gradlew :com.osgifx.console.dist:publish jreleaserDeploy -Pjreleaser.enabled=true -Pjreleaser.dryrun=${{ inputs.dry_run }} --info
-         env:
-            SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-            SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-            JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-            JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-            JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-            JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.GPG_PUBLIC_KEY }}
-            JRELEASER_GPG_SECRET_KEY: ${{ secrets.GPG_SECRET_KEY }}
-            JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       -  name: 📦 Copy Uberjar for jdeploy
          run: |
