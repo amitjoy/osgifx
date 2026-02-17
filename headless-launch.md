@@ -38,9 +38,11 @@ You can also use the `RunOSGiFx` script which simplifies the process by handling
 ./RunOSGiFx --jar path/to/osgifx.jar -Dosgifx.config=/path/to/config.json
 
 # Run with auto-download from Maven
-./RunOSGiFx --gav com.osgifx:osgifx-console:LATEST -Dosgifx.config=/path/to/config.json
+./RunOSGiFx --gav com.osgifx:osgifx:2.4.5 -Dosgifx.config=/path/to/config.json
 ```
 
+> [!IMPORTANT]
+> Do not use `java -jar` directly to call the jar as you might need to set lots of JPMS related flags manually yourself.
 ---
 
 ## Configuration Format
