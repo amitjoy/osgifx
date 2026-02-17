@@ -13,6 +13,10 @@ To use this feature, you need to provide a JSON configuration file via the `osgi
 java -Dosgifx.config=/path/to/config.json -jar osgifx.jar
 ```
 
+<div style="text-align: left; margin: 1.5rem 0;">
+  <a href="https://central.sonatype.com/artifact/com.osgifx/osgifx/2.4.5" class="btn btn-secondary">Download Headless JAR</a>
+</div>
+
 ### Using Launch Script
 
 You can also use the `RunOSGiFx` script which simplifies the process by handling all modularity flags for you.
