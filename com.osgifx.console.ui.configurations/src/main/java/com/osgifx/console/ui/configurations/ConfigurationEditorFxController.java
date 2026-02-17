@@ -76,10 +76,17 @@ import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.TextAlignment;
 
 public final class ConfigurationEditorFxController {
 
@@ -122,6 +129,157 @@ public final class ConfigurationEditorFxController {
         formRenderer = createForm(config);
         initButtons(config);
         rootPanel.setCenter(formRenderer);
+
+        // Start trying to fix the layout once the scene is attached
+        if (formRenderer.getScene() != null) {
+            scheduleLayoutFix(formRenderer, 0);
+        } else {
+            formRenderer.sceneProperty().addListener((_, _, newScene) -> {
+                if (newScene != null) {
+                    scheduleLayoutFix(formRenderer, 0);
+                }
+            });
+        }
+    }
+
+    private void scheduleLayoutFix(final Node node, final int attempt) {
+        if (attempt > 50) {
+            logger.atWarning().log("Could not find GridPanes after 50 attempts");
+            dumpHierarchy(node, "");
+            return;
+        }
+
+        // Try lookupAll first
+        var grids = Lists.newArrayList(node.lookupAll(".grid-pane"));
+
+        // Backup: Recursive search if lookupAll fails or returns non-GridPanes
+        if (grids.isEmpty()) {
+            grids.addAll(findAllGridPanesRecursively(node));
+        }
+
+        if (!grids.isEmpty()) {
+            applyGridConstraints(grids);
+        } else {
+            // Retry after 200ms
+            final var timer = new javafx.animation.PauseTransition(javafx.util.Duration.millis(200));
+            timer.setOnFinished(_ -> scheduleLayoutFix(node, attempt + 1));
+            timer.play();
+        }
+    }
+
+    private List<GridPane> findAllGridPanesRecursively(final Node node) {
+        final List<GridPane> results = Lists.newArrayList();
+        if (node instanceof GridPane grid) {
+            results.add(grid);
+        }
+        if (node instanceof final Parent parent) {
+            for (final Node child : parent.getChildrenUnmodifiable()) {
+                results.addAll(findAllGridPanesRecursively(child));
+            }
+        }
+        return results;
+    }
+
+    private void applyGridConstraints(final List<Node> grids) {
+        logger.atInfo().log("Found %d GridPanes to apply column constraints", grids.size());
+
+        for (final var item : grids) {
+            if (item instanceof GridPane grid) {
+                grid.setHgap(5); // Reduced gap to 5 based on user feedback
+
+                // Clear RowConstraints to allow rows to grow vertically (for text wrapping)
+                grid.getRowConstraints().clear();
+
+                // Remove fixed column constraints to allow natural sizing based on content
+                grid.getColumnConstraints().clear();
+
+                // Identify rows with inputs and map them
+                final Map<Integer, Node> rowInputs = Maps.newHashMap();
+                for (final Node child : grid.getChildren()) {
+                    if (!child.getStyleClass().contains("formsfx-label")
+                            && !(child instanceof javafx.scene.text.Text)) {
+                        Integer rowIndex = GridPane.getRowIndex(child);
+                        if (rowIndex == null) {
+                            rowIndex = 0;
+                        }
+                        rowInputs.putIfAbsent(rowIndex, child);
+                    }
+                }
+
+                // Force labels to wrap text and align left
+                for (final Node child : grid.getChildren()) {
+                    Integer rowIndex = GridPane.getRowIndex(child);
+                    if (rowIndex == null) {
+                        rowIndex = 0;
+                    }
+
+                    if (child instanceof javafx.scene.control.Label label
+                            && label.getStyleClass().contains("formsfx-label")) {
+                        label.setWrapText(true);
+                        label.setMinHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+                        label.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+                        label.setMaxHeight(Double.MAX_VALUE);
+
+                        // Determine alignment based on row content
+                        final Node inputInRow = rowInputs.get(rowIndex);
+
+                        // Check if input is a CheckBox
+                        boolean isCheckBox = false;
+                        if (inputInRow != null) {
+                            isCheckBox = inputInRow instanceof javafx.scene.control.CheckBox;
+                            if (!isCheckBox && inputInRow instanceof Parent p) {
+                                isCheckBox = p.lookup(".check-box") != null;
+                            }
+                        }
+
+                        // Left Align
+                        label.setAlignment(Pos.TOP_LEFT);
+                        label.setTextAlignment(TextAlignment.LEFT);
+                        label.setMaxWidth(Double.MAX_VALUE);
+                        GridPane.setHalignment(label, HPos.LEFT);
+                        GridPane.setFillWidth(label, true);
+
+                        // Vertical Alignment Adjustment
+                        if (isCheckBox) {
+                            label.setPadding(new Insets(0, 0, 0, 0)); // No padding needed for centered checkbox
+                            GridPane.setValignment(label, VPos.CENTER);
+                        } else {
+                            label.setPadding(new Insets(3, 0, 0, 0)); // Top padding to match text baseline
+                            GridPane.setValignment(label, VPos.TOP);
+                        }
+                    }
+                }
+
+                // Enforce a symmetric 12-column grid
+                // Columns 0,1 (Label 1) and 6,7 (Label 2) get 17.5% each (35% total per label)
+                // Remaining columns (Inputs) get 3.75% each (15% total per input in 2-col layout)
+                // This ensures VERY wide labels (preventing trimming) while keeping hgaps consistent
+                final List<ColumnConstraints> constraints = Lists.newArrayList();
+
+                for (int i = 0; i < 12; i++) {
+                    final var col = new ColumnConstraints();
+                    if (i == 0 || i == 1 || i == 6 || i == 7) {
+                        col.setPercentWidth(17.5);
+                    } else {
+                        col.setPercentWidth(3.75);
+                    }
+                    constraints.add(col);
+                }
+
+                grid.getColumnConstraints().clear();
+                grid.getColumnConstraints().addAll(constraints);
+            }
+        }
+    }
+
+    private void dumpHierarchy(final Node node, final String indent) {
+        logger.atInfo().log("%s%s (id=%s, styleClass=%s)", indent, node.getClass().getSimpleName(), node.getId(),
+                node.getStyleClass());
+        if (node instanceof final Parent parent) {
+            for (final Node child : parent.getChildrenUnmodifiable()) {
+                dumpHierarchy(child, indent + "  ");
+            }
+        }
     }
 
     private void initButtons(final XConfigurationDTO config) {
@@ -205,12 +363,7 @@ public final class ConfigurationEditorFxController {
         final var formGroups = createGroups(config);
         form = Form.of(formGroups.toArray(new Group[0])).title("Configuration Properties");
         final var renderer = new FormRenderer(form);
-
-        GridPane.setColumnSpan(renderer, 2);
-        GridPane.setRowIndex(renderer, 3);
-        GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
-        GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
-
+        renderer.getStylesheets().add(getClass().getResource("/css/configurations.css").toExternalForm());
         return renderer;
     }
 
