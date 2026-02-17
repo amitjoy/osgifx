@@ -1,182 +1,174 @@
 ---
 layout: default
+title: Home
 ---
 
-OSGi.fx is an easy-to-use application to remotely manage OSGi frameworks. Similar to Felix web console, this is an endeavour for desktop application users to provide all the necessary functionalities to remotely manage OSGi runtimes.
+<div style="text-align: center; margin-bottom: 0;">
+  <img width="300" alt="OSGi.fx Logo" src="assets/img/logo.png" style="box-shadow: none; border-radius: 0;" />
+  <br/>
+  <p style="font-size: 1.25rem; color: var(--text-light); margin-top: 1rem; margin-bottom: 0;">An easy-to-use desktop application to manage OSGi frameworks remotely</p>
+</div>
 
-#### Application Screenshots
+### ❓ Why OSGi.fx?
 
+**OSGi.fx** is the ultimate remote management tool for your OSGi frameworks. Unlike legacy consoles, it offers a **modern, responsive JavaFX interface** and **AI-driven capabilities** that give you:
+*   **🚀 Deep Insights:** Visualize bundles, services, users, and components instantly.
+*   **⚡ Real-time Monitoring:** Track threads, heap usage, and logs live.
+*   **🕸️ Visual Dependencies:** Explore complex relationships with interactive graphs.
+*   **✨ Ease of Use:** Drag-and-drop installs, smart auto-complete, and valid configuration editing.
+*   **🤖 AI Ready:** Built-in **Model Context Protocol (MCP)** server for seamless AI agent integration.
 
-<img src="screenshots/1.png" />
-<img src="screenshots/2.png" />
-<img src="screenshots/3.png" />
-<img src="screenshots/4.png" />
-<img src="screenshots/5.png" />
-<img src="screenshots/6.png" />
+---
 
---------------------------------------------------------------------------------------------------------------
+### 📸 Gallery
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 2rem 0;">
+  <img src="screenshots/1.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/2.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/3.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/4.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/5.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/6.png" width="45%" style="border: 1px solid #e2e8f0;" />
+</div>
 
-#### Implemented Features
+---
 
-|                                                                                                                                                                           |     |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |:-:  |
-| List all installed bundles and fragments                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all exported and imported packages                                                                                                                                         |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all registered services                                                                                                                                                      |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all registered DS components                                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all available system and framework properties                                                                                                                                |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List all daemon and non-daemon threads                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Send synchronous or asynchronous events on demand                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Receive events on demand (option to start and stop receiving events)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Receive logs on demand (option to start and stop receiving logs)                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Manage R7 Logger Configurations                                                                                   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Execute Gogo command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Execute CLI command                                                                                                                                                              |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Auto-completion of all available remote Gogo commands during command execution                                                                                                    |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Install or update bundles                                                                                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Drag and drop support of bundles (on Install Bundle Dialog) while installing or updating                                                                                          |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List available configurations from `ConfigurationAdmin`                                                                                                                             |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List `Metatype` property descriptors                                                                                                                                            |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Start/stop/uninstall bundle or fragment                                                                                                                                           |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Enable/disable DS component                                                                                                                                                       |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Update/delete existing configuration                                                                                                                                               |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Create new configuration using metatype descriptor                                                                                                                                 |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Overview of the remote OSGi framework (memory consumption, uptime, framework information, number of bundles, number of threads, number of services and number of DS components)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Generate dependency graph for bundles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Generate dependency graph for DS components   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Find all cycles between available DS components   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Export generated dependency graph to DOT (GraphViz) format (Right click on generated graph) |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Open Diagnostics (Show application log file)  |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Show suspicious classloader leaks 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Show HTTP runtime components (Servlets, Listeners, Filters, Resources and Error Pages) 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Shows heap usage over time and the count of garbage collections 	|  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png) 	|
-| Install extension (plugin)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| List and uninstall already installed feature(s)   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Generate OBR XML   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Device Management Tree (DMT) Traversal and Update   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Manage User Admin Roles   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Execute Felix Healthchecks   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Capture/Read Snapshot   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Display OSGi Runtime DTOs   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
-| Advanced Search   |  ![done](https://user-images.githubusercontent.com/13380182/138339309-19f097f7-0f8d-4df9-8c58-c98f0a9acc60.png)   |
+### 🛠️ Tech Stack
 
+| Component | Technology |
+| :--- | :--- |
+| **☕ Java (Application)** | 25 |
+| **☕ Java (Agent)** | 1.8 |
+| **🖥️ Rich Client Platform** | JavaFX 25 |
+| **⚙️ Runtime (Application)** | OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse |
+| **⚙️ Runtime (Agent)** | OSGi R6 |
+| **🎨 UI Libraries** | ControlsFX, TilesFX, FormsFX |
+| **🛠️ Software Tools** | Bndtools 7.2.1 |
 
-#### Tools and Technologies
+---
 
-|                      	|                                             	|
-|----------------------	|---------------------------------------------	|
-| Java (Application)    | 21                                         	|
-| Java (Agent)          | 1.8                                         	|
-| Rich Client Platform 	| JavaFX 21                                    	|
-| Runtime Frameworks   	| OSGi R8 (Equinox), Eclipse 4 (e4), e(fx)clipse 	|
-| UI Libraries         	| ControlsFX, TilesFX, FormsFX                  |
-| Tools                	| Bndtools 6.4.0                                 |
+### 🚀 Getting Started
 
---------------------------------------------------------------------------------------------------------------
+The latest released version is **2.4.5**.
 
-#### Important Notes for Download and Update
+#### 📥 Download & Install
+Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
 
-* The application is distributed through [jdeploy](https://www.jdeploy.com) enabling developers to distribute native applications effortlessly
-* Note that, the required VM will directly be downloaded while installing the application using `jdeploy`
-* Also note that, if the auto-update feature is enabled, every new version will be automatically downloaded while starting the application
-* Due to the update of the application, the application might not work expectedly as the old bundle cache (OSGi storage) still exists. That's why, make sure to delete the existing OSGi storage area located in `~/.osgifx-ws`
+> [!IMPORTANT]
+> **Important Notes for Download and Update:**
+> *   The required VM will directly be downloaded while installing the application using `jdeploy`.
+> *   If the auto-update feature is enabled, every new version will be automatically downloaded while starting the application.
+> *   **Upgrade Note:** Due to the update, the application might not work as expected as the old bundle cache (OSGi storage) still exists. Ensure you delete the existing OSGi storage area located in `~/.osgifx-ws`.
 
---------------------------------------------------------------------------------------------------------------
+#### Remote Agent Setup
 
-#### Minimum Requirements for Runtime Agent
+> [!NOTE]
+> **Minimum Requirements:** Java 1.8 & OSGi R6.
 
-1. Java 1.8
-2. OSGi R6
-3. Install `com.osgifx.console.agent.jar` from maven central
+To manage an OSGi framework, install the `com.osgifx.console.agent` bundle.
 
-##### Socket
+**1. Socket Connection**
+Set `osgi.fx.agent.socket.port` system property in the runtime (e.g., `2000` or `0.0.0.0:2000`).
 
-Set `osgi.fx.agent.socket.port` system property in the runtime. Note that, you can either set the property to any port e.g. `2000` or `0.0.0.0:2000`. The latter one will allow remote connections whereas the former one will only allow connections from `localhost`.
+**Secure Sockets (SSL):**
+To secure sockets, set:
+*   `osgi.fx.agent.socket.secure=true`
+*   `osgi.fx.agent.socket.secure.sslcontext.filter=my_sslcontext` (filter for SSLContext service)
 
-Note that, if you want to secure sockets, you additionally need to set `osgi.fx.agent.socket.secure` property to `true` and set `osgi.fx.agent.socket.secure.sslcontext.filter` property to any value you like (this is not an LDAP filter but will be used in a LDAP filter), for example: `osgi.fx.agent.socket.secure.sslcontext.filter=my_sslcontext`. For secure communication, you also need to generate your truststore as well which you need to configure in the OSGi.fx application as well.
+**2. MQTT Connection**
+Install `in.bytehue.messaging.mqtt5.provider.jar`.
+*   Configure `in.bytehue.messaging.client` PID.
+*   Set Agent Properties:
+    *   `osgi.fx.agent.mqtt.pubtopic`: Topic for agent responses.
+    *   `osgi.fx.agent.mqtt.subtopic`: Topic for agent requests.
 
-##### MQTT
+**OAuth Support:**
+You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx application settings.
 
-To use MQTT, you have to install the `in.bytehue.messaging.mqtt5.provider.jar` from [OSGi Messaging](https://github.com/amitjoy/osgi-messaging). This project implements the draft OSGi messaging specification. Note that, you have to configure the `in.bytehue.messaging.client` PID in configuration admin for this library to work. You can find the relevant configurations in the project's README. Also note that, you have to specify `maximumPacketSize` and `sendMaximumPacketSize` to `268435456` in the configuration. It denotes that the client will be able to send and receive packets of `256 MB` in size. Note that, you have to download this JAR from `Github Packages`.
+---
 
-Additionally, you also have to set `osgi.fx.agent.mqtt.pubtopic` property where the agent will send the responses to and set the `osgi.fx.agent.mqtt.subtopic` property where the agent will receive the requests from. 
+### ✨ Features
 
-Note that, in several scenarios, people tend to use OAuth tokens to be retrieved from authorization server and use the token as the password for the MQTT connection. To support this, you can also configure the token configuration in the OSGi.fx application and leave the `Password` field empty. Note that, the token configuration must be provided as a valid JSON in the following format:
+| Feature | Version | Implemented | Released |
+| :--- | :---: | :---: | :---: |
+| **📦 Bundle Inventory** <br> _View all installed bundles and fragments_ | 2.4.4 | ✅ | 🚀 |
+| **📦 Package Insights** <br> _Explore exported and imported packages_ | 2.4.4 | ✅ | 🚀 |
+| **🛠️ Service Registry** <br> _Inspect all registered OSGi services_ | 2.4.4 | ✅ | 🚀 |
+| **🧩 Component Viewer** <br> _Visualize declarative services (DS) components_ | 2.4.4 | ✅ | 🚀 |
+| **⚙️ System Properties** <br> _Access robust system and framework properties_ | 2.4.4 | ✅ | 🚀 |
+| **🧵 Thread Monitor** <br> _Track daemon and non-daemon threads_ | 2.4.4 | ✅ | 🚀 |
+| **📢 Event Emitter** <br> _Dispatch synchronous or asynchronous events_ | 2.4.4 | ✅ | 🚀 |
+| **👂 Event Listener** <br> _Subscribe to OSGi events in real-time_ | 2.4.4 | ✅ | 🚀 |
+| **📝 Log Stream** <br> _Live streaming of OSGi logs_ | 2.4.4 | ✅ | 🚀 |
+| **logger R7 Logger Config** <br> _Manage OSGi R7 logger levels and configurations_ | 2.4.4 | ✅ | 🚀 |
+| **🐚 Gogo Shell** <br> _Execute Gogo commands remotely_ | 2.4.4 | ✅ | 🚀 |
+| **💻 CLI Executor** <br> _Run system CLI commands directly_ | 2.4.4 | ✅ | 🚀 |
+| **✨ Smart Auto-Complete** <br> _Intelligent suggestion for remote Gogo commands_ | 2.4.4 | ✅ | 🚀 |
+| **📥 Bundle Manager** <br> _Install, update, starting and stopping bundles_ | 2.4.4 | ✅ | 🚀 |
+| **🖱️ Drag & Drop Install** <br> _Effortless bundle installation via drag-and-drop_ | 2.4.4 | ✅ | 🚀 |
+| **🔧 Config Admin** <br> _Manage configurations via `ConfigurationAdmin`_ | 2.4.4 | ✅ | 🚀 |
+| **📋 Metatype Inspector** <br> _Browse OCDs and property descriptors_ | 2.4.4 | ✅ | 🚀 |
+| **⏯️ Bundle Lifecycle** <br> _Start, stop, and uninstall bundles/fragments_ | 2.4.4 | ✅ | 🚀 |
+| **⚡ Component Control** <br> _Enable or disable DS components on the fly_ | 2.4.4 | ✅ | 🚀 |
+| **✏️ Config Editor** <br> _Create, update, and delete configurations_ | 2.4.4 | ✅ | 🚀 |
+| **🏗️ Config Factory** <br> _Instantiate new configurations from factory PIDs_ | 2.4.4 | ✅ | 🚀 |
+| **📊 Runtime Dashboard** <br> _Overview of memory, uptime, bundles, threads, and services_ | 2.4.4 | ✅ | 🚀 |
+| **🕸️ Bundle Graph** <br> _Visualize bundle dependencies interactively_ | 2.4.4 | ✅ | 🚀 |
+| **🔗 Component Graph** <br> _Visualize DS component references and dependencies_ | 2.4.4 | ✅ | 🚀 |
+| **🔄 Cycle Detector** <br> _Identify circular dependencies in DS components_ | 2.4.4 | ✅ | 🚀 |
+| **📤 Graph Export** <br> _Export dependency graphs to DOT (GraphViz) format_ | 2.4.4 | ✅ | 🚀 |
+| **📂 Log Viewer** <br> _Access and analyze application log files_ | 2.4.4 | ✅ | 🚀 |
+| **🕵️ Leak Detector** <br> _Identify suspicious classloader leaks_ | 2.4.4 | ✅ | 🚀 |
+| **🌐 HTTP Runtime** <br> _Inspect Servlets, Filters, and Resources_ | 2.4.4 | ✅ | 🚀 |
+| **📈 Heap Monitor** <br> _Real-time heap usage and GC tracking_ | 2.4.4 | ✅ | 🚀 |
+| **🔌 Extension Manager** <br> _Install and manage external plugins_ | 2.4.4 | ✅ | 🚀 |
+| **🗑️ Extension Uninstaller** <br> _Remove installed extensions easily_ | 2.4.4 | ✅ | 🚀 |
+| **📜 OBR Generator** <br> _Generate OBR XML repositories_ | 2.4.4 | ✅ | 🚀 |
+| **🌲 DMT Explorer** <br> _Traverse and update the Device Management Tree_ | 2.4.4 | ✅ | 🚀 |
+| **👥 User Admin** <br> _Manage roles, users, and groups_ | 2.4.4 | ✅ | 🚀 |
+| **❤️ Health Checks** <br> _Execute and monitor Felix Health Checks_ | 2.4.4 | ✅ | 🚀 |
+| **📸 Snapshot** <br> _Capture and analyze runtime state snapshots_ | 2.4.4 | ✅ | 🚀 |
+| **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
+| **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
+| **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](/mcp-server)_ | 2.4.5 | ✅ | 🚀 |
+| **👻 Headless Launch** <br> _Start application with pre-configured connection_ | 2.4.5 | ✅ | 🚀 |
 
-```json
-{
-	"authServerURL": "",
-	"clientId": "",
-	"clientSecret": "",
-	"audience": "",
-	"scope": ""
-}
-```
+---
 
-You can also ignore the `clientId` in which scenario, the application will use the configured MQTT client ID as the client ID for retrieving the token. Once the OAuth POST request is sent to the authorization server, the server should respond with a JSON having the following format:
+### Advanced Capabilities
 
-```json
-{
-	"access_token": "",
-	"expires_in": 100 (only integer value is supported here)
-}
-```
+#### Batch Operations
+You can install multiple bundles and create multiple configurations in one go.
+1.  Select `Actions -> Batch Install`.
+2.  Choose a directory containing your JARs and JSON configuration files.
+    *   *Note:* JSON files must comply with the [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html).
+3.  Select which resources to process from the list.
 
-Once this is configured, the OSGi.fx application will automatically retrieve the token for every session and authenticate with the broker.
+#### Extension System
+OSGi.fx is extensible. You can build your own plugins using OSGi and JavaFX.
+*   **[Read the Extension Development Guide](/extension-dev)**
+*   See the [Tic-Tac-Toe Extension](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe) for a complete sample.
 
---------------------------------------------------------------------------------------------------------------
+---
 
-#### Batch Install
+### 💡 Troubleshooting & Tips
 
-You can also install multiple bundles and create multiple configurations in one go. For that, you have to select the directory after clicking on `Batch Install` from the `Actions` menu. Note that, you should keep all bundles and configuration JSON files in the selected directory. The `Batch Install` will list only the JARs and JSON files from the directory. You can then choose from the list which JARs to install and which configurations to create.
+*   **👻 Headless Mode:** Starting from 2.4.5, need to connect without the connection wizard? Use the `-Dosgifx.config=/path/to/config.json` system property to launch OSGi.fx with a pre-defined connection. See the [Headless Launch Documentation](/headless-launch).
+*   **🤖 AI Assistance:** OSGi.fx 2.4.5 supports the **Model Context Protocol (MCP)**, allowing AI agents to connect to and debug your OSGi runtime directly! See the [MCP Server Documentation](/mcp-server).
 
-Note that, the configuration JSON files need to comply with [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html)
+---
 
---------------------------------------------------------------------------------------------------------------
-
-#### Extension Development
-
-External plugins or extensions can easily be developed for `OSGi.fx`. Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. As a starting point, please have a look at the sample [Tic-Tac-Toe](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe). Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily leverage their modular capabilities to build your own extensions.
-
-Once the extension is developed, you can test it by installing it from the `Help -> Install Extension` menu option.
-
-Note that, to develop an extension, you need to provide OSGi Deployment Package archive. Have a look at [OSGi Deployment Admin Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.deploymentadmin.html) on how to prepare such deployment packages.
-
-For ease of development, you can use the OSGi.fx workspace to further develop your own extensions as the workspace comprises a new bnd plugin which will enable you to automatically generate a deployment package from a bndrun file. As an example, please refer to the sample [Tic-Tac-Toe extension](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe).
-
---------------------------------------------------------------------------------------------------------------
-
-#### Project Import for Development
-
-1. Install Java 17 JDK Distribution (including JavaFX modules) in your machine (Currently I am using [Zulu Distribution](https://www.azul.com/downloads/?version=java-17-lts&package=jdk-fx) that includes JavaFX modules already)
-2. Set the newly installed JDK 17 to your `JAVA_HOME`
-3. Install `Eclipse IDE for RCP/RAP Developers` and make sure your Eclipse installation uses the currently installed JDK to start with
-4. Install `Bndtools` and `e(fx)clipse` from Eclipse Marketplace
-5. Go to `Java` -> `Compiler` in Eclipse Preferences and set `Compiler Compliance Level` to `17`
-6. Go to `Java` -> `Installed JREs` and select the newly installed JDK with JavaFX modules
-7. Go to `Java` -> `Installed JREs` -> `Execution Environments` and select `JavaSE-17` and choose the recently installed Java 17 JRE that includes JavaFX modules
-8. Import all the projects (`File -> Import -> General -> Existing Projects into Workspace` and select `Search for nested projects`)
-
---------------------------------------------------------------------------------------------------------------
-
-#### Building from Source
-
-Run `./gradlew clean build` in the project root directory
-
---------------------------------------------------------------------------------------------------------------
-
-#### Developer
+### 👨💻 Maintainer
 
 [Amit Kumar Mondal](https://github.com/amitjoy) (admin@amitinside.com)
 
---------------------------------------------------------------------------------------------------------------
+---
 
-#### Contribution
+### 🤝 Contributing
 
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
+Want to contribute? Great! Check out our **[Development Guide](/development)** for instructions on building from source and setting up your IDE.
 
---------------------------------------------------------------------------------------------------------------
+---
 
-#### License
+### 📄 License
 
-[![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+This project is licensed under Apache License Version 2.0 [![License](http://img.shields.io/badge/license-Apache-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)

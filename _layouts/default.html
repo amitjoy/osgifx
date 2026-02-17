@@ -1,56 +1,77 @@
 <!DOCTYPE html>
-<html lang="{{ site.lang | default: "en-US" }}">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="{{ site.lang | default: " en-US" }}">
 
-{% seo %}
-    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
-    <!--[if lt IE 9]>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{{ "/favicon.png" | relative_url }}">
+
+  {% seo %}
+  <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+  <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
-    {% include head-custom.html %}
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <!-- h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1 -->
+  {% include head-custom.html %}
+</head>
 
-        {% if site.logo %}
-          <img src="{{site.logo | relative_url}}" alt="Logo" />
-        {% endif %}
-
-        <p>{{ site.description | default: site.github.project_tagline }}</p>
-
-        {% if site.github.is_project_page %}
-        <!-- p class="view"><a href="{{ site.github.repository_url }}">View Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p -->
-        {% endif %}
-
-        {% if site.github.is_user_page %}
-        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
-        {% endif %}
-
-        {% if site.show_downloads %}
-        <ul class="downloads">
-          <li><a href="{{ site.agent.url }}">Download <strong>Agent</strong></a></li>
-          <li><a href="{{ site.jdeploy.url }}">Download <strong>OSGi.fx</strong></a></li>
-          <li><a href="{{ site.github.repository_url }}"> Repo <strong>GitHub</strong></a></li>
+<body>
+  <header>
+    <div class="header-container">
+      <h1>
+        <a href="{{ "/" | relative_url }}">
+          {{ site.title | default: site.github.repository_name }}
+        </a>
+      </h1>
+      <nav>
+        <ul>
+          <li><a href="{{ "/" | relative_url }}">Home</a></li>
+          <li><a href="{{ "/mcp-server" | relative_url }}">MCP Server</a></li>
+          <li><a href="{{ "/extension-dev" | relative_url }}">Extensions</a></li>
+          <li><a href="{{ "/development" | relative_url }}">Development</a></li>
+          <li><a href="{{ "/headless-launch" | relative_url }}">Headless Launch</a></li>
+          <li><a href="{{ site.github_url | default: site.github.repository_url }}" target="_blank" rel="noopener"><i class="fab fa-github"></i>
+              GitHub</a></li>
         </ul>
-        {% endif %}
-      </header>
-      <section>
-
-      {{ content }}
-
-      </section>
-      <!-- footer>
-        {% if site.github.is_project_page %}
-        <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-        {% endif %}
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer -->
+      </nav>
     </div>
-    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
-  </body>
+  </header>
+
+  {% if page.url == "/" %}
+  <div class="hero">
+    <div class="wrapper">
+      <h1>Manage OSGi Runtimes<br><span style="color: var(--primary-color);">Remotely & Efficiently</span></h1>
+      <p>{{ site.description }}</p>
+      <div class="hero-actions">
+        <a href="{{ site.jdeploy.url }}" class="btn btn-primary">Download App</a>
+        <a href="{{ site.agent.url }}" class="btn btn-secondary">Get Agent</a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="wrapper">
+    <section>
+      {{ content }}
+    </section>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="copyright">
+        &copy; {{ site.time | date: '%Y' }} OSGi.fx. Licensed under Apache 2.0.
+        {% if site.github.is_project_page %}
+        <span class="separator">&bull;</span> Maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a>
+        {% endif %}
+      </div>
+      <div class="social-links">
+        <a href="{{ site.github_url | default: site.github.repository_url }}" aria-label="GitHub" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  <script src="{{ "/assets/js/github-alerts.js" | relative_url }}"></script>
+</body>
+
 </html>
