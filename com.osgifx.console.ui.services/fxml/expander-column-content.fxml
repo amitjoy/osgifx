@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
   Copyright 2021-2025 Amit Kumar Mondal
   
@@ -14,6 +15,7 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -23,85 +25,43 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.services.ServiceDetailsFxController">
+<GridPane hgap="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.services.ServiceDetailsFxController">
   <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.0" minWidth="10.0" prefWidth="235.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="589.0" minWidth="10.0" prefWidth="565.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="250.0" minHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="44.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="200.0" vgrow="SOMETIMES" />
-      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="200.0" vgrow="ALWAYS" />
+    <RowConstraints minHeight="200.0" vgrow="ALWAYS" />
   </rowConstraints>
    <children>
-      <Label text="ID" GridPane.halignment="RIGHT">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Registering Bundle Symbolic Name" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Registering Bundle ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Properties" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
-         <GridPane.margin>
-            <Insets left="20.0" right="50.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="idLabel" text="Label" GridPane.columnIndex="1">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="bundleBsnLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label fx:id="bundleIdLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </Label>
-      <TableView fx:id="propertiesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
+      <Label style="-fx-font-weight: bold;" text="ID" GridPane.halignment="RIGHT" />
+      <Label fx:id="idLabel" text="Label" GridPane.columnIndex="1" />
+      
+      <Label style="-fx-font-weight: bold;" text="Registering Bundle Symbolic Name" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+      <Label fx:id="bundleBsnLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      
+      <Label style="-fx-font-weight: bold;" text="Registering Bundle ID" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+      <Label fx:id="bundleIdLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      
+      <Label style="-fx-font-weight: bold;" text="Properties" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+      <TableView fx:id="propertiesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No associated properties" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="propertiesTableColumn1" prefWidth="259.0" />
-          <TableColumn fx:id="propertiesTableColumn2" minWidth="0.0" prefWidth="290.0" />
+          <TableColumn fx:id="propertiesTableColumn1" prefWidth="259.0" text="Key" />
+          <TableColumn fx:id="propertiesTableColumn2" minWidth="0.0" prefWidth="290.0" text="Value" />
         </columns>
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
       </TableView>
-      <ListView fx:id="objectClassesList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.vgrow="ALWAYS">
-         <GridPane.margin>
-            <Insets left="20.0" />
-         </GridPane.margin>
-      </ListView>
-      <Label text="Registered Object Classes" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-         <padding>
-            <Insets right="50.0" />
-         </padding>
-      </Label>
+      
+      <Label style="-fx-font-weight: bold;" text="Registered Object Classes" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+      <ListView fx:id="objectClassesList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
    </children>
    <padding>
-      <Insets bottom="20.0" top="20.0" />
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
 </GridPane>
