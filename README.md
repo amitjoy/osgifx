@@ -9,7 +9,7 @@
   <a href="https://github.com/amitjoy/osgifx"><img width="80" alt="logo" src="https://img.shields.io/github/forks/amitjoy/osgifx?style=social" /></a>
   <a href="#license"><img width="110" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
   <img width="130" alt="logo" src="https://github.com/amitjoy/osgifx/actions/workflows/build.yml/badge.svg" />
-  <a href="https://github.com/amitjoy/osgifx-console/releases/"><img width="100" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx-console?include_prereleases&sort=semver" /></a>
+  <a href="https://github.com/amitjoy/osgifx/releases/"><img width="100" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx?include_prereleases&sort=semver" /></a>
   </p>
 
 ### ❓ Why OSGi.fx?
@@ -121,9 +121,9 @@ Amit Kumar Mondal (admin@amitinside.com)
 
 --------------------------------------------------------------------------------------------------------------
 
-### 🤝 Contributing [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx-console/issues)
+### 🤝 Contributing [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/amitjoy/osgifx/issues)
 
-Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx-console/blob/main/CONTRIBUTING.md)
+Want to contribute? Great! Check out [Contribution Guide](https://github.com/amitjoy/osgifx/blob/main/CONTRIBUTING.md)
 
 <a href="eclipse+installer:https://raw.githubusercontent.com/amitjoy/osgifx/refs/heads/main/oomph/config_osgifx.setup">
             <img src="https://img.shields.io/static/v1?logo=eclipseide&label=eclipse%20for%20osgifx&message=branch%20:%20main&style=for-the-badge&logoColor=white&labelColor=963508&color=gray"
