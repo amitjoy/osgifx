@@ -4,9 +4,13 @@ title: MCP Server
 permalink: /mcp-server
 ---
 
-# OSGi.fx Console MCP Server
+# Model Context Protocol (MCP)
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that connects LLMs (like Claude) to a running OSGi framework. This allows you to diagnose, monitor, and debug remote OSGi runtimes using natural language.
+
+<div style="text-align: center; margin: 2rem 0;">
+  <img src="screenshots/7.png" alt="OSGi.fx MCP Server" style="border: 1px solid #e2e8f0; border-radius: 0.5rem; max-width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
+</div>
 
 ---
 
@@ -28,6 +32,14 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that 
     <div class="feature-card">
         <h3>⚡ Log Analysis</h3>
         <p>Fetch and filter logs by time range or count.</p>
+    </div>
+    <div class="feature-card">
+        <h3>🛠️ Full Control</h3>
+        <p>Start/stop bundles, toggle components, and update configurations (when permitted).</p>
+    </div>
+    <div class="feature-card">
+        <h3>🔌 Extensibility</h3>
+        <p>Run custom Agent Extensions to interact with your specific domain logic.</p>
     </div>
 </div>
 
@@ -55,9 +67,15 @@ The MCP server is built into the **OSGi.fx** application.
 
 ### 3. Client Configuration (SSE)
 
-Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Events (SSE).
+Configure your MCP client (e.g., Claude Desktop, Windsurf, Antigravity) to connect via Server-Sent Events (SSE).
 
-**Example Configuration:**
+**Common Configuration Files:**
+*   **Claude Desktop:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+*   **Windsurf:** `~/.codeium/windsurf/mcp_config.json`
+*   **GitHub Copilot:** `~/.config/github-copilot/mcp.json`
+*   **Antigravity:** `~/.gemini/antigravity/mcp_config.json`
+
+**Configuration JSON:**
 
 ```json
 {
@@ -141,7 +159,7 @@ When configuring your LLM (e.g., Claude), provides these principles to ensure sa
 ## Troubleshooting
 
 **"Agent is not connected"**
-Ensure the OSGi Agent bundle is installed and running on the target framework and that the supervisor is configured to connect to the correct host/port.
+Ensure the OSGi Agent bundle is installed and running on the target framework and that **the OSGi.fx app** is configured to connect to the correct host/port.
 
 **"Tool execution timed out"**
-Heavy operations like `analyze_classloader_leaks` or `capture_heap_dump` may take time. Ask the model to wait or try again.
+Heavy operations like `capture_heap_dump` may take time. Ask the model to wait or try again.
