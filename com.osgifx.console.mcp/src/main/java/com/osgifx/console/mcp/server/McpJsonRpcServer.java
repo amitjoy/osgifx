@@ -45,12 +45,26 @@ public class McpJsonRpcServer {
     private final Gson                          gson;
     private final Map<String, ToolRegistration> tools = new ConcurrentHashMap<>();
     private Consumer<String>                    notificationSender;
+    // Circular buffer for logs
+    private final List<McpLogEntry> logs  = new ArrayList<>();
+    private static final int        LIMIT = 100;
 
     // MCP Spec Version
     private static final String LATEST_PROTOCOL_VERSION = "2024-11-05";
 
     public McpJsonRpcServer(final Gson gson) {
         this.gson = gson;
+    }
+
+    public synchronized void addLog(final McpLogEntry.Type type, final String content) {
+        if (logs.size() >= LIMIT) {
+            logs.remove(0);
+        }
+        logs.add(new McpLogEntry(type, content));
+    }
+
+    public synchronized List<McpLogEntry> getLogs() {
+        return new ArrayList<>(logs);
     }
 
     public void setNotificationSender(final Consumer<String> notificationSender) {
@@ -80,6 +94,14 @@ public class McpJsonRpcServer {
         notifyToolsListChanged();
     }
 
+    public List<Map<String, Object>> getTools() {
+        final List<Map<String, Object>> toolList = new ArrayList<>();
+        for (final ToolRegistration t : tools.values()) {
+            toolList.add(Map.of("name", t.name, "description", t.description, "inputSchema", t.inputSchema));
+        }
+        return toolList;
+    }
+
     private void notifyToolsListChanged() {
         if (notificationSender != null) {
             // Notification: { "jsonrpc": "2.0", "method": "notifications/tools/list_changed" }
@@ -95,40 +117,56 @@ public class McpJsonRpcServer {
      * @return A JSON string response (success, error, or null if no response needed).
      */
     public String handleMessage(final String jsonBody) {
+        addLog(McpLogEntry.Type.REQUEST, jsonBody);
         JsonRpc.Request req;
         try {
             req = gson.fromJson(jsonBody, JsonRpc.Request.class);
         } catch (final Exception e) {
-            return error(null, -32700, "Parse error");
+            final var error = error(null, -32700, "Parse error");
+            addLog(McpLogEntry.Type.RESPONSE, error);
+            return error;
         }
 
         try {
+            String response;
             switch (req.method) {
                 // HANDSHAKE: Client says "Hello"
                 case "initialize":
-                    return handleInitialize(req);
+                    response = handleInitialize(req);
+                    break;
 
                 // HANDSHAKE: Client says "I got your hello"
                 case "notifications/initialized":
-                    return null; // No response allowed for notifications
+                    response = null; // No response allowed for notifications
+                    break;
 
                 // DISCOVERY: Client asks "What can you do?"
                 case "tools/list":
-                    return handleListTools(req);
+                    response = handleListTools(req);
+                    break;
 
                 // EXECUTION: Client says "Do this"
                 case "tools/call":
-                    return handleToolCall(req);
+                    response = handleToolCall(req);
+                    break;
 
                 case "ping":
-                    return success(req.id, Map.of());
+                    response = success(req.id, Map.of());
+                    break;
 
                 default:
                     // If it's a notification (no ID), ignore it. If request, send error.
-                    return req.id == null ? null : error(req.id, -32601, "Method not found: " + req.method);
+                    response = req.id == null ? null : error(req.id, -32601, "Method not found: " + req.method);
+                    break;
             }
+            if (response != null) {
+                addLog(McpLogEntry.Type.RESPONSE, response);
+            }
+            return response;
         } catch (final Exception e) {
-            return error(req.id, -32000, "Server error: " + e.getMessage());
+            final var error = error(req.id, -32000, "Server error: " + e.getMessage());
+            addLog(McpLogEntry.Type.RESPONSE, error);
+            return error;
         }
     }
 

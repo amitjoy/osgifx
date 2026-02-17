@@ -14,5 +14,5 @@
  * the License.
  ******************************************************************************/
 @org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("1.3.0")
-package com.osgifx.console.util.fx;
+@org.osgi.annotation.versioning.Version("1.0.0")
+package com.osgifx.console.mcp.data;
