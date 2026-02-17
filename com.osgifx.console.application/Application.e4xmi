@@ -14,7 +14,6 @@
       </children>
       <children xsi:type="menu:Menu" xmi:id="_lYLcgCCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.actions" label="Action">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_sk720MNnEeynHblGyo61Iw" elementId="com.osgifx.console.application.handledmenuitem.refresh" label="Refresh Views" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/refresh.png" tooltip="Refreshes the views by retrieving the current state of the remote runtime" command="_IPypwMNnEeynHblGyo61Iw"/>
-        <children xsi:type="menu:DynamicMenuContribution" xmi:id="_AKlJ8ANEEfGftZ66nN4SZg" elementId="com.osgifx.console.application.menu.mcp.actions" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.McpMenuContributionHandler"/>
       </children>
       <children xsi:type="menu:Menu" xmi:id="_zHSQ0CCVEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menu.help" label="Help">
         <children xsi:type="menu:DirectMenuItem" xmi:id="_vzJVkCFQEeyZSsScTJ7-zg" elementId="com.osgifx.console.application.menuitem.about" label="About OSGi.fx" iconURI="platform:/plugin/com.osgifx.console.application/graphic/icons/about.png" tooltip="Shows information about OSGi.fx" contributionURI="bundleclass://com.osgifx.console.application/com.osgifx.console.application.handler.AboutApplicationHandler"/>

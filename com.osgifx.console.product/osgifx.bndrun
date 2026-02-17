@@ -61,12 +61,14 @@ port                              :   1729
                                       bnd.identity;id='org.apache.sling.commons.logservice',\
                                       \
                                       bnd.identity;id='com.osgifx.console.mcp',\
+                                      bnd.identity;id='com.osgifx.console.ui.mcp',\
                                       \
                                       bnd.identity;id='com.osgifx.console.ui.bundles',\
                                       bnd.identity;id='com.osgifx.console.ui.batchinstall',\
                                       bnd.identity;id='com.osgifx.console.ui.search',\
                                       bnd.identity;id='com.osgifx.console.ui.components',\
                                       bnd.identity;id='com.osgifx.console.ui.configurations',\
+                                      bnd.identity;id='com.osgifx.console.ui.mcp',\
                                       bnd.identity;id='com.osgifx.console.ui.dmt',\
                                       bnd.identity;id='com.osgifx.console.ui.events',\
                                       bnd.identity;id='com.osgifx.console.ui.extension',\
@@ -112,6 +114,7 @@ install.order                     :   \
                                       com.osgifx.console.ui.roles,\
                                       com.osgifx.console.ui.dto,\
                                       com.osgifx.console.ui.dmt,\
+                                      com.osgifx.console.ui.mcp,\
                                       com.osgifx.console.ui.healthchecks
 
 -runbundles.X    	              :   ${install.order}

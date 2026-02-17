@@ -15,11 +15,20 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that 
 The MCP server is built into the **OSGi.fx** application.
 
 1.  Launch **OSGi.fx**.
-2.  Connect to your remote OSGi framework.
-3.  Go to the **Actions** menu and select **Start MCP Server**.
-4.  The server will start on port `8080` (default) or your configured port.
+2.  Connect to your remote OSGi framework (Agent).
+3.  Navigate to the **MCP** tab.
+4.  Click **Start MCP Server**.
+    *   *Note:* The button is disabled if the agent is not connected.
+5.  The server will start on port `8080` (default) or your configured port.
 
-### 2. Client Configuration (SSE)
+### 2. Server Management
+*   **Start/Stop:** Use the toggle button to control the server.
+    *   **Auto-Stop:** The server automatically stops if the connection to the OSGi Agent is lost.
+*   **Logs:**
+    *   **Refresh Logs:** Updates the log view (only enabled when server is running).
+    *   **Clear Logs:** Clears the current log view.
+
+### 3. Client Configuration (SSE)
 
 Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Events (SSE).
 

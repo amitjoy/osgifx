@@ -1,0 +1,17 @@
+.formsfx-label {
+    -fx-wrap-text: true;
+}
+
+.formsfx-group-title {
+    -fx-font-size: 1.2em;
+    font-size: 1.2em;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10 0 10 0;
+    padding: 10 0 10 0;
+}
+
+.formsfx-section {
+    -fx-padding: 10;
+    padding: 10;
+}
