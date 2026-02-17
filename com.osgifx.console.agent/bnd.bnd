@@ -20,7 +20,7 @@ javac.compliance      : ${javac.source}
                         org.osgi.service.log,\
                         org.osgi.service.messaging,\
                         org.osgi.util.pushstream,\
-                        org.slf4j.api
+                        slf4j.api
 -testpath             : \
                         osgi.enroute.hamcrest.wrapper,\
                         osgi.enroute.junit.wrapper
