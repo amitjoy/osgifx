@@ -50,7 +50,7 @@ version_without_snapshot=${version%".SNAPSHOT"}
 echo $version_without_snapshot > cnf/version/app.version
 
 echo "🏁 Updating package.json Version"
-npm version $version_without_snapshot --no-git-tag-version
+npm version $version_without_snapshot --no-git-tag-version  --allow-same-version
 
 echo "🏁 Committing Changes"
 git add .
