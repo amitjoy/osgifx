@@ -18,6 +18,8 @@ package com.osgifx.console.mcp.provider;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -37,6 +39,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.osgifx.console.mcp.data.McpDataProvider;
+import com.osgifx.console.mcp.dto.McpLogEntryDTO;
+import com.osgifx.console.mcp.dto.McpLogEntryType;
+import com.osgifx.console.mcp.dto.McpToolDTO;
 import com.osgifx.console.mcp.McpTool;
 import com.osgifx.console.mcp.server.McpJsonRpcServer;
 
@@ -46,8 +52,8 @@ import com.osgifx.console.mcp.server.McpJsonRpcServer;
  * This component listens for any service registered with the {@link McpTool} interface
  * and registers them as tools in the embedded MCP server.
  */
-@Component(service = McpServerProvider.class)
-public class McpServerProvider {
+@Component(service = { McpServerProvider.class, McpDataProvider.class })
+public class McpServerProvider implements McpDataProvider {
 
     @interface ToolProps {
         String mcp_tool_name();
@@ -134,5 +140,35 @@ public class McpServerProvider {
 
     public McpJsonRpcServer getServer() {
         return internalServer;
+    }
+
+    @Override
+    public List<McpToolDTO> tools() {
+        final var              registeredTools = internalServer.getTools();
+        final List<McpToolDTO> toolDTOs        = new ArrayList<>();
+        for (final var tool : registeredTools) {
+            final var dto = new McpToolDTO();
+            dto.name        = (String) tool.get("name");
+            dto.description = (String) tool.get("description");
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> schema = (Map<String, Object>) tool.get("inputSchema");
+            dto.inputSchema = schema;
+            toolDTOs.add(dto);
+        }
+        return toolDTOs;
+    }
+
+    @Override
+    public List<McpLogEntryDTO> logs() {
+        final var                  entries = internalServer.getLogs();
+        final List<McpLogEntryDTO> logDTOs = new ArrayList<>();
+        for (final var entry : entries) {
+            final var dto = new McpLogEntryDTO();
+            dto.timestamp = entry.getTimestamp();
+            dto.type      = McpLogEntryType.valueOf(entry.getType().name());
+            dto.content   = entry.getContent();
+            logDTOs.add(dto);
+        }
+        return logDTOs;
     }
 }

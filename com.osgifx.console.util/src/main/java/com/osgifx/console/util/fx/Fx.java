@@ -15,6 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -26,6 +29,8 @@ import org.osgi.framework.BundleContext;
 
 import com.google.common.collect.Sets;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -49,6 +54,9 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 public final class Fx {
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+            .withZone(ZoneId.systemDefault());
 
     private Fx() {
         throw new IllegalAccessError("Cannot be instantiated");
@@ -206,6 +214,10 @@ public final class Fx {
         placeholder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.POWER_OFF));
 
         table.setPlaceholder(placeholder);
+    }
+
+    public static StringProperty formatTime(final long timestamp) {
+        return new SimpleStringProperty(TIME_FORMATTER.format(Instant.ofEpochMilli(timestamp)));
     }
 
     public static Node initStatusBarButton(final Runnable job, final String tooltip, final String fontawesomeGlyphID) {

@@ -13,6 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("1.3.0")
-package com.osgifx.console.util.fx;
+package com.osgifx.console.mcp.dto;
+
+public enum McpLogEntryType {
+    REQUEST,
+    RESPONSE
+}
