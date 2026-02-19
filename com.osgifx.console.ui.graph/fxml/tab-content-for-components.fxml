@@ -21,6 +21,9 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.SegmentedButton?>
 <?import org.controlsfx.glyphfont.Glyph?>
@@ -29,46 +32,31 @@
    <items>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>
-            <BorderPane prefHeight="49.0" prefWidth="248.0" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets />
-               </BorderPane.margin>
-               <left>
-                  <SegmentedButton fx:id="strategyButton" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets left="5.0" top="5.0" />
-                     </BorderPane.margin>
-                     <buttons>
-                     	<ToggleButton fx:id="circularStrategyButton" selected="true" text="Circular" />
-                     	<ToggleButton fx:id="randomStrategyButton" text="Random" />
-                     </buttons>
-                   </SegmentedButton>
-               </left>
-               <right>
-                  <Button mnemonicParsing="false" onAction="#generateGraph" prefHeight="40.0" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets right="5.0" top="5.0" />
-                     </BorderPane.margin>
-                     <graphic>
-        				<Glyph fontFamily="FontAwesome" icon="PLAY" />
-    				 </graphic>
-                  </Button>
-               </right>
-               <center>
-                  <Button mnemonicParsing="false" onAction="#deselectAll" prefHeight="40.0" prefWidth="140.0" text="Deselect All" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </BorderPane.margin>
-                  </Button>
-               </center>
-               <bottom>
-                  <ChoiceBox fx:id="wiringSelection" prefHeight="30.0" prefWidth="360.0" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </BorderPane.margin>
-                  </ChoiceBox>
-               </bottom>
-            </BorderPane>
+            <VBox spacing="5.0" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="5.0">
+                     <children>
+                        <SegmentedButton fx:id="strategyButton">
+                           <buttons>
+                           	<ToggleButton fx:id="circularStrategyButton" selected="true" text="Circular" />
+                           	<ToggleButton fx:id="randomStrategyButton" text="Random" />
+                           </buttons>
+                        </SegmentedButton>
+                        <Button mnemonicParsing="false" onAction="#deselectAll" text="Deselect All" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#generateGraph" prefHeight="27.0">
+                           <graphic>
+              				<Glyph fontFamily="FontAwesome" icon="PLAY" />
+          				 </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <ChoiceBox fx:id="wiringSelection" maxWidth="1.7976931348623157E308" />
+               </children>
+            </VBox>
          </top>
          <center>
             <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -76,7 +64,7 @@
                   <CheckListView fx:id="componentsList" prefHeight="498.0" prefWidth="245.0" BorderPane.alignment="CENTER" />
                </center>
                <top>
-                   <TextField fx:id="searchText" prefHeight="30.0" prefWidth="360.0" promptText="Search Filter" BorderPane.alignment="CENTER">
+                   <TextField fx:id="searchText" maxWidth="1.7976931348623157E308" prefHeight="30.0" promptText="Search Filter" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" />
                      </BorderPane.margin></TextField>

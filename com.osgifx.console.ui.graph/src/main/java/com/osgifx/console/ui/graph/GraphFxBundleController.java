@@ -17,6 +17,7 @@ package com.osgifx.console.ui.graph;
 
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
+import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 
 import java.io.File;
@@ -240,6 +241,7 @@ public final class GraphFxBundleController implements GraphController {
                 progressPane.setVisible(false);
                 graphPane.setCenter(graphView);
                 graphView.init();
+                graphView.setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
             }
         };
         graphPane.setCenter(progressPane);

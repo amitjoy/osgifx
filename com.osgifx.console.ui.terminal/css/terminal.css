@@ -1,0 +1,53 @@
+.root {
+    -fx-base: #2b2b2b;
+    -fx-background-color: #2b2b2b;
+    background-color: #2b2b2b;
+}
+
+.text-area {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #f0f0f0;
+    -fx-background-color: #2b2b2b;
+    background-color: #2b2b2b;
+    -fx-control-inner-background: #2b2b2b;
+    -fx-highlight-fill: #444444;
+    -fx-highlight-text-fill: #ffffff;
+    -fx-prompt-text-fill: #808080;
+}
+
+.text-area .content {
+    -fx-background-color: #2b2b2b;
+    background-color: #2b2b2b;
+}
+
+.text-field {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #00ff00;
+    /* Hacker-like green for input */
+    -fx-background-color: #3c3f41;
+    background-color: #3c3f41;
+    -fx-prompt-text-fill: #808080;
+    -fx-border-color: #555555;
+    border-color: #555555;
+    -fx-border-width: 1px 0px 0px 0px;
+    /* Top border only to separate from output */
+    border-width: 1px 0px 0px 0px;
+    -fx-padding: 5 10 5 10;
+    padding: 5px 10px 5px 10px;
+}
+
+.text-field:focused {
+    -fx-background-color: #3c3f41;
+    background-color: #3c3f41;
+    -fx-border-color: #007acc;
+    /* Blue border when focused */
+    border-color: #007acc;
+    -fx-border-width: 1px 0px 0px 0px;
+    border-width: 1px 0px 0px 0px;
+}

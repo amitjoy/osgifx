@@ -23,6 +23,9 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.SegmentedButton?>
 <?import org.controlsfx.glyphfont.Glyph?>
@@ -31,39 +34,30 @@
    <items>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>
-            <BorderPane prefHeight="49.0" prefWidth="248.0" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets />
-               </BorderPane.margin>
-               <left>
-                  <SegmentedButton fx:id="hcTypeButton" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets left="5.0" top="5.0" />
-                     </BorderPane.margin>
-                     <buttons>
-                     	<ToggleButton fx:id="nameHcButton" selected="true" text="Names" />
-                     	<ToggleButton fx:id="tagHcButton" text="Tags" />
-                     </buttons>
-                   </SegmentedButton>
-               </left>
-               <right>
-                  <Button fx:id="executeHcButton" mnemonicParsing="false" onAction="#executeHc" prefHeight="27.0" prefWidth="17.0" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets right="5.0" top="5.0" />
-                     </BorderPane.margin>
-                     <graphic>
-        				<Glyph fontFamily="FontAwesome" icon="PLAY" />
-    				 </graphic>
-                  </Button>
-               </right>
-               <center>
-                  <Button fx:id="deselectAllButton" mnemonicParsing="false" onAction="#deselectAll" prefHeight="27.0" prefWidth="107.0" text="Deselect All" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets left="5.0" right="5.0" top="5.0" />
-                     </BorderPane.margin>
-                  </Button>
-               </center>
-            </BorderPane>
+            <VBox spacing="5.0" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="5.0">
+                     <children>
+                        <SegmentedButton fx:id="hcTypeButton">
+                           <buttons>
+                           	<ToggleButton fx:id="nameHcButton" selected="true" text="Names" />
+                           	<ToggleButton fx:id="tagHcButton" text="Tags" />
+                           </buttons>
+                        </SegmentedButton>
+                        <Button fx:id="deselectAllButton" mnemonicParsing="false" onAction="#deselectAll" text="Deselect All" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="executeHcButton" mnemonicParsing="false" onAction="#executeHc" prefHeight="27.0" prefWidth="17.0">
+                           <graphic>
+              				<Glyph fontFamily="FontAwesome" icon="PLAY" />
+          				 </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
          </top>
          <center>
             <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -71,7 +65,7 @@
                   <CheckListView fx:id="hcMetadataList" prefHeight="514.0" prefWidth="232.0" BorderPane.alignment="CENTER" />
                </center>
                <top>
-                  <TextField fx:id="searchText" prefHeight="30.0" prefWidth="360.0" promptText="Search Filter" BorderPane.alignment="CENTER">
+                  <TextField fx:id="searchText" maxWidth="1.7976931348623157E308" prefHeight="30.0" promptText="Search Filter" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" />
                      </BorderPane.margin></TextField>

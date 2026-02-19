@@ -14,23 +14,15 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
-<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 
-<SplitPane dividerPositions="0.06" orientation="VERTICAL" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.terminal.TerminalFxController">
-  <items>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="100.0">
-         <children>
-            <TextField fx:id="input" onKeyPressed="#handleInput" prefHeight="26.0" prefWidth="598.0" promptText="Type CLI Command and Press Return" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-    </AnchorPane>
-    <AnchorPane styleClass="console" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-    	<children>
-            <TextArea editable="false" fx:id="output" prefHeight="354.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            </TextArea>
-         </children>
-    </AnchorPane>
-  </items>
-</SplitPane>
+<BorderPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.terminal.TerminalFxController" stylesheets="@../css/terminal.css">
+    <center>
+        <TextArea editable="false" fx:id="output" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" wrapText="true" />
+    </center>
+    <bottom>
+        <TextField fx:id="input" onKeyPressed="#handleInput" prefHeight="30.0" promptText="Type CLI Command ... (Press 'Enter' to execute, 'Up/Down' for history)" BorderPane.alignment="CENTER" />
+    </bottom>
+</BorderPane>
