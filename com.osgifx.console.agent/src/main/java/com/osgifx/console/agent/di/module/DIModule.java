@@ -75,9 +75,9 @@ public final class DIModule {
     private BundleStartTimeCalculator bundleStartTimeCalculator;
     private XBundleAdmin              xBundleAdmin;
     private XServiceAdmin             xServiceAdmin;
-    private XConfigurationAdmin       xConfigurationAdmin;
-    private XComponentAdmin           xComponentAdmin;
-    private XMetaTypeAdmin            xMetaTypeAdmin;
+    private Object                    xConfigurationAdmin;
+    private Object                    xComponentAdmin;
+    private Object                    xMetaTypeAdmin;
 
     public DIModule(final BundleContext context) {
         di           = new DI();
@@ -90,12 +90,17 @@ public final class DIModule {
     public void start() throws Exception {
         initServiceTrackers();
 
+        final PackageWirings wirings = di.getInstance(PackageWirings.class);
+
         bundleStartTimeCalculator = new BundleStartTimeCalculator(context);
         di.bindInstance(BundleStartTimeCalculator.class, bundleStartTimeCalculator);
 
-        xComponentAdmin = new XComponentAdmin(context, executor);
-        di.bindInstance(XComponentAdmin.class, xComponentAdmin);
-        xComponentAdmin.init();
+        // --- Eagerly instantiated admins (guarded by PackageWirings) ---
+
+        if (wirings.isScrWired()) {
+            xComponentAdmin = new XComponentAdmin(context, executor);
+            di.bindInstance(XComponentAdmin.class, (XComponentAdmin) xComponentAdmin);
+        }
 
         xBundleAdmin = new XBundleAdmin(context, bundleStartTimeCalculator, executor);
         di.bindInstance(XBundleAdmin.class, xBundleAdmin);
@@ -103,38 +108,65 @@ public final class DIModule {
         xServiceAdmin = new XServiceAdmin(context, executor);
         di.bindInstance(XServiceAdmin.class, xServiceAdmin);
 
-        xMetaTypeAdmin = new XMetaTypeAdmin(context, executor);
-        di.bindInstance(XMetaTypeAdmin.class, xMetaTypeAdmin);
+        if (wirings.isMetatypeWired() && wirings.isConfigAdminWired()) {
+            xMetaTypeAdmin = new XMetaTypeAdmin(context, executor);
+            di.bindInstance(XMetaTypeAdmin.class, (XMetaTypeAdmin) xMetaTypeAdmin);
+        }
 
-        xConfigurationAdmin = new XConfigurationAdmin(context, xComponentAdmin, xMetaTypeAdmin, executor);
-        di.bindInstance(XConfigurationAdmin.class, xConfigurationAdmin);
+        if (wirings.isConfigAdminWired()) {
+            xConfigurationAdmin = new XConfigurationAdmin(context, (XComponentAdmin) xComponentAdmin,
+                                                          (XMetaTypeAdmin) xMetaTypeAdmin, executor);
+            di.bindInstance(XConfigurationAdmin.class, (XConfigurationAdmin) xConfigurationAdmin);
+        }
 
         // initialize the trackers
         xBundleAdmin.init();
         xServiceAdmin.init();
-        xComponentAdmin.init();
-        xConfigurationAdmin.init();
-        xMetaTypeAdmin.init();
+        if (xComponentAdmin != null) {
+            ((XComponentAdmin) xComponentAdmin).init();
+        }
+        if (xConfigurationAdmin != null) {
+            ((XConfigurationAdmin) xConfigurationAdmin).init();
+        }
+        if (xMetaTypeAdmin != null) {
+            ((XMetaTypeAdmin) xMetaTypeAdmin).init();
+        }
 
-        di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(() -> dmtAdminTracker.getService()));
-        di.bindProvider(XDtoAdmin.class,
-                () -> new XDtoAdmin(context, () -> xComponentAdmin.getServiceComponentRuntime(),
-                                    () -> jaxrsServiceRuntimeTracker.getService(),
-                                    () -> httpServiceRuntimeTracker.getService(),
-                                    () -> cdiServiceRuntimeTracker.getService(), di.getInstance(PackageWirings.class)));
-        di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(() -> eventAdminTracker.getService()));
-        di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, () -> felixHcExecutorTracker.getService()));
-        di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(() -> httpServiceRuntimeTracker.getService()));
-        di.bindProvider(XUserAdmin.class, () -> new XUserAdmin(() -> userAdminTracker.getService()));
-        di.bindProvider(XLoggerAdmin.class, () -> new XLoggerAdmin(() -> loggerAdminTracker.getService(),
-                                                                   di.getInstance(PackageWirings.class), context));
+        // --- Lazily bound admins (guarded by PackageWirings) ---
+
+        if (wirings.isDmtAdminWired()) {
+            di.bindProvider(XDmtAdmin.class, () -> new XDmtAdmin(() -> dmtAdminTracker.getService()));
+        }
+        if (wirings.isScrWired()) {
+            di.bindProvider(XDtoAdmin.class,
+                    () -> new XDtoAdmin(context, () -> ((XComponentAdmin) xComponentAdmin).getServiceComponentRuntime(),
+                                        () -> jaxrsServiceRuntimeTracker.getService(),
+                                        () -> httpServiceRuntimeTracker.getService(),
+                                        () -> cdiServiceRuntimeTracker.getService(), wirings));
+        }
+        if (wirings.isEventAdminWired()) {
+            di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(() -> eventAdminTracker.getService()));
+        }
+        if (wirings.isFelixHcWired()) {
+            di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, () -> felixHcExecutorTracker.getService()));
+        }
+        if (wirings.isHttpServiceRuntimeWired()) {
+            di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(() -> httpServiceRuntimeTracker.getService()));
+        }
+        if (wirings.isUserAdminWired()) {
+            di.bindProvider(XUserAdmin.class, () -> new XUserAdmin(() -> userAdminTracker.getService()));
+        }
+        if (wirings.isR7LoggerAdminWired()) {
+            di.bindProvider(XLoggerAdmin.class,
+                    () -> new XLoggerAdmin(() -> loggerAdminTracker.getService(), wirings, context));
+        }
         di.bindInstance(Set.class, gogoCommands);
         di.bindInstance(Map.class, agentExtensions);
     }
 
     public void stop() {
         if (xComponentAdmin != null) {
-            xComponentAdmin.stop();
+            ((XComponentAdmin) xComponentAdmin).stop();
         }
         if (xBundleAdmin != null) {
             xBundleAdmin.stop();
@@ -143,10 +175,10 @@ public final class DIModule {
             xServiceAdmin.stop();
         }
         if (xConfigurationAdmin != null) {
-            xConfigurationAdmin.stop();
+            ((XConfigurationAdmin) xConfigurationAdmin).stop();
         }
         if (xMetaTypeAdmin != null) {
-            xMetaTypeAdmin.stop();
+            ((XMetaTypeAdmin) xMetaTypeAdmin).stop();
         }
         dmtAdminTracker.close();
         userAdminTracker.close();
