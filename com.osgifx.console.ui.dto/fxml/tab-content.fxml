@@ -24,9 +24,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.dto.DtoFxController">
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.dto.DtoFxController">
    <children>
-      <HBox prefHeight="26.0" prefWidth="900.0">
+      <HBox>
          <children>
             <TextField fx:id="searchBox" prefHeight="35.0" prefWidth="500.0" promptText="Search Filter" HBox.hgrow="ALWAYS">
                <HBox.margin>
@@ -43,7 +43,7 @@
             </Button>
          </children>
       </HBox>
-      <VBox prefHeight="600.0" prefWidth="900.0">
+      <VBox VBox.vgrow="ALWAYS">
          <children>
          	 <TreeView fx:id="dtoTree" VBox.vgrow="ALWAYS" />
          </children>
