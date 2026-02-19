@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>OSGi.fx Dependency Graph</title>
+    <script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Edge lines */
+        .edge-line {
+            fill: none;
+            stroke: #94a3b8;
+            stroke-width: 1.5;
+            transition: all 0.2s ease;
+        }
+
+        .edge-line.highlighted {
+            stroke: #e11d48;
+            stroke-width: 2.5;
+        }
+
+        .edge-line.faded {
+            opacity: 0.1;
+        }
+
+        /* Arrow markers */
+        .arrow-marker {
+            fill: #94a3b8;
+            transition: all 0.2s ease;
+        }
+
+        .arrow-marker.highlighted {
+            fill: #e11d48;
+        }
+
+        /* Node rectangles */
+        .node-rect {
+            stroke-width: 1;
+            stroke: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            filter: url(#drop-shadow);
+            transition: filter 0.2s ease, stroke-width 0.2s ease;
+            fill: url(#gradient-default);
+        }
+
+        .node-rect:hover {
+            filter: url(#drop-shadow-hover);
+        }
+
+        .node-rect.root {
+            fill: url(#gradient-root);
+            stroke: #4f46e5;
+        }
+
+        .node-rect.selected {
+            fill: url(#gradient-selected);
+            stroke: #f59e0b;
+            stroke-width: 2.5;
+        }
+
+        .node-rect.highlighted {
+            fill: url(#gradient-highlighted);
+            stroke: #e11d48;
+            stroke-width: 2.5;
+        }
+
+        .node-rect.neighbor {
+            fill: url(#gradient-neighbor);
+            stroke: #10b981;
+            stroke-width: 2;
+        }
+
+        .node-rect.faded {
+            opacity: 0.15;
+            filter: none;
+        }
+
+        /* Node labels */
+        .node-label {
+            fill: #ffffff;
+            font-size: 10.5px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: central;
+            pointer-events: none;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: 0.2px;
+        }
+
+        .node-label.faded {
+            opacity: 0.12;
+        }
+
+        /* Info panel */
+        #info-panel {
+            display: none;
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #212529;
+            font-size: 12px;
+            max-width: 350px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        #info-panel .label {
+            color: #0d6efd;
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        #info-panel .detail {
+            color: #495057;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Stats bar */
+        #stats-bar {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: #6c757d;
+            font-size: 11px;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Loading overlay */
+        #loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 249, 250, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        #loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid #dee2e6;
+            border-top-color: #0d6efd;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <svg id="graph-svg"></svg>
+    <div id="info-panel">
+        <div class="label" id="info-label"></div>
+        <div class="detail" id="info-detail"></div>
+    </div>
+    <div id="stats-bar"></div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div>Rendering graph...</div>
+    </div>
+
+    <script>
+        var graphData = { nodes: [], edges: [] };
+        var currentLayout = 'dagre';
+        var svg, mainGroup, zoom;
+        var nodeCount = 0, edgeCount = 0;
+
+        function initSVG() {
+            svg = d3.select('#graph-svg');
+            svg.selectAll('*').remove();
+
+            // Arrow marker definition
+            var defs = svg.append('defs');
+
+            // Drop shadow filters (Tailwind shadow-md and shadow-xl)
+            var shadow = defs.append('filter').attr('id', 'drop-shadow').attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
+            shadow.append('feDropShadow').attr('dx', '0').attr('dy', '4').attr('stdDeviation', '4').attr('flood-color', 'rgba(0,0,0,0.1)');
+
+            var shadowHover = defs.append('filter').attr('id', 'drop-shadow-hover').attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
+            shadowHover.append('feDropShadow').attr('dx', '0').attr('dy', '10').attr('stdDeviation', '10').attr('flood-color', 'rgba(0,0,0,0.15)');
+
+            // Node gradients (Tailwind colors)
+            function addGradient(id, topColor, bottomColor) {
+                var g = defs.append('linearGradient').attr('id', id).attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+                g.append('stop').attr('offset', '0%').attr('stop-color', topColor);
+                g.append('stop').attr('offset', '100%').attr('stop-color', bottomColor);
+            }
+            addGradient('gradient-default', '#334155', '#0f172a');    // Slate 700 to 900
+            addGradient('gradient-root', '#6366f1', '#4338ca');       // Indigo 500 to 700
+            addGradient('gradient-selected', '#f59e0b', '#b45309');   // Amber 500 to 700
+            addGradient('gradient-highlighted', '#fb7185', '#e11d48');// Rose 400 to 600
+            addGradient('gradient-neighbor', '#34d399', '#059669');   // Emerald 400 to 600
+
+            defs.append('marker')
+                .attr('id', 'arrowhead')
+                .attr('viewBox', '0 0 10 7')
+                .attr('refX', 10)
+                .attr('refY', 3.5)
+                .attr('markerWidth', 10)
+                .attr('markerHeight', 7)
+                .attr('orient', 'auto')
+                .append('polygon')
+                .attr('points', '0 0, 10 3.5, 0 7')
+                .attr('class', 'arrow-marker');
+
+            defs.append('marker')
+                .attr('id', 'arrowhead-highlighted')
+                .attr('viewBox', '0 0 10 7')
+                .attr('refX', 10)
+                .attr('refY', 3.5)
+                .attr('markerWidth', 10)
+                .attr('markerHeight', 7)
+                .attr('orient', 'auto')
+                .append('polygon')
+                .attr('points', '0 0, 10 3.5, 0 7')
+                .attr('class', 'arrow-marker highlighted');
+
+            mainGroup = svg.append('g').attr('class', 'graph-container');
+
+            // D3 zoom/pan
+            zoom = d3.zoom()
+                .scaleExtent([0.05, 8])
+                .on('zoom', function (event) {
+                    mainGroup.attr('transform', event.transform);
+                });
+            svg.call(zoom);
+
+            // Click background to clear highlights
+            svg.on('click', function (event) {
+                if (event.target === svg.node()) {
+                    clearHighlight();
+                    hideNodeInfo();
+                }
+            });
+        }
+
+        function measureTextWidth(text, fontSize) {
+            // Approximate: ~6px per character at 10px font
+            return Math.max(text.length * 6.2 + 16, 60);
+        }
+
+        function computeLayout(layoutName) {
+            var g = new dagre.graphlib.Graph();
+            g.setGraph({
+                rankdir: layoutName === 'breadthfirst' ? 'TB' : 'TB',
+                nodesep: 25,
+                edgesep: 15,
+                ranksep: 55,
+                marginx: 20,
+                marginy: 20
+            });
+            g.setDefaultEdgeLabel(function () { return {}; });
+
+            // Size each node based on label text
+            graphData.nodes.forEach(function (n) {
+                var w = measureTextWidth(n.label, 10);
+                g.setNode(n.id, { label: n.label, width: w, height: 28 });
+            });
+
+            graphData.edges.forEach(function (e) {
+                g.setEdge(e.source, e.target);
+            });
+
+            if (layoutName === 'circle') {
+                // Manual circle layout
+                var cx = 400, cy = 300;
+                var count = graphData.nodes.length;
+                var radius = Math.max(count * 25, 150);
+                graphData.nodes.forEach(function (n, i) {
+                    var angle = (2 * Math.PI * i) / count;
+                    n.x = cx + radius * Math.cos(angle);
+                    n.y = cy + radius * Math.sin(angle);
+                    n.w = measureTextWidth(n.label, 10);
+                    n.h = 28;
+                });
+            } else {
+                dagre.layout(g);
+                graphData.nodes.forEach(function (n) {
+                    var node = g.node(n.id);
+                    if (node) {
+                        n.x = node.x;
+                        n.y = node.y;
+                        n.w = node.width;
+                        n.h = node.height;
+                    }
+                });
+            }
+
+            // Compute edge points
+            graphData.edges.forEach(function (e) {
+                var srcNode = graphData.nodes.find(function (n) { return n.id === e.source; });
+                var tgtNode = graphData.nodes.find(function (n) { return n.id === e.target; });
+                if (srcNode && tgtNode) {
+                    e.points = computeEdgeEndpoints(srcNode, tgtNode);
+                }
+            });
+        }
+
+        function computeEdgeEndpoints(src, tgt) {
+            // Compute line from center of src to center of tgt,
+            // clipped to the border of each rounded rectangle
+            var dx = tgt.x - src.x;
+            var dy = tgt.y - src.y;
+            var len = Math.sqrt(dx * dx + dy * dy);
+            if (len === 0) return { x1: src.x, y1: src.y, x2: tgt.x, y2: tgt.y };
+            var ux = dx / len, uy = dy / len;
+
+            // Clip at source border
+            var srcClipX = clipToRect(ux, uy, src.w / 2, src.h / 2);
+            var srcClipY = clipToRect(uy, ux, src.h / 2, src.w / 2);
+            var srcDist = Math.min(
+                Math.abs(ux) > 0.001 ? Math.abs((src.w / 2) / ux) : 9999,
+                Math.abs(uy) > 0.001 ? Math.abs((src.h / 2) / uy) : 9999
+            );
+
+            // Clip at target border
+            var tgtDist = Math.min(
+                Math.abs(ux) > 0.001 ? Math.abs((tgt.w / 2) / ux) : 9999,
+                Math.abs(uy) > 0.001 ? Math.abs((tgt.h / 2) / uy) : 9999
+            );
+
+            return {
+                x1: src.x + ux * srcDist,
+                y1: src.y + uy * srcDist,
+                x2: tgt.x - ux * (tgtDist + 4),
+                y2: tgt.y - uy * (tgtDist + 4)
+            };
+        }
+
+        function clipToRect(uPrimary, uSecondary, halfPrimary, halfSecondary) {
+            if (Math.abs(uPrimary) < 0.001) return 9999;
+            return Math.abs(halfPrimary / uPrimary);
+        }
+
+        function render() {
+            mainGroup.selectAll('*').remove();
+
+            // Draw edges first (below nodes)
+            var edgeGroup = mainGroup.append('g').attr('class', 'edges');
+            edgeGroup.selectAll('line')
+                .data(graphData.edges)
+                .enter()
+                .append('line')
+                .attr('class', 'edge-line')
+                .attr('x1', function (d) { return d.points ? d.points.x1 : 0; })
+                .attr('y1', function (d) { return d.points ? d.points.y1 : 0; })
+                .attr('x2', function (d) { return d.points ? d.points.x2 : 0; })
+                .attr('y2', function (d) { return d.points ? d.points.y2 : 0; })
+                .attr('marker-end', 'url(#arrowhead)')
+                .attr('data-source', function (d) { return d.source; })
+                .attr('data-target', function (d) { return d.target; });
+
+            // Draw nodes
+            var nodeGroup = mainGroup.append('g').attr('class', 'nodes');
+            var nodes = nodeGroup.selectAll('g')
+                .data(graphData.nodes)
+                .enter()
+                .append('g')
+                .attr('class', 'node')
+                .attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+                .on('click', function (event, d) {
+                    event.stopPropagation();
+                    onNodeClick(d);
+                });
+
+            // Determine root nodes (no incoming edges)
+            var targetIds = {};
+            graphData.edges.forEach(function (e) { targetIds[e.target] = true; });
+
+            nodes.append('rect')
+                .attr('class', function (d) {
+                    return 'node-rect' + (targetIds[d.id] ? '' : ' root');
+                })
+                .attr('x', function (d) { return -(d.w || 60) / 2; })
+                .attr('y', function (d) { return -(d.h || 28) / 2; })
+                .attr('width', function (d) { return d.w || 60; })
+                .attr('height', function (d) { return d.h || 28; })
+                .attr('rx', 6)
+                .attr('ry', 6)
+                .attr('data-id', function (d) { return d.id; });
+
+            nodes.append('text')
+                .attr('class', 'node-label')
+                .attr('dy', '0')
+                .text(function (d) {
+                    return d.label.length > 30 ? d.label.substring(0, 28) + '...' : d.label;
+                });
+
+            // Node drag behavior
+            var drag = d3.drag()
+                .on('start', function (event, d) {
+                    d3.select(this).raise();
+                })
+                .on('drag', function (event, d) {
+                    d.x = event.x;
+                    d.y = event.y;
+                    d3.select(this).attr('transform', 'translate(' + d.x + ',' + d.y + ')');
+                    updateEdgesForNode(d.id);
+                })
+                .on('end', function (event, d) { /* nothing special */ });
+
+            nodes.call(drag);
+
+            updateStats();
+        }
+
+        function updateEdgesForNode(nodeId) {
+            d3.selectAll('.edge-line').each(function () {
+                var el = d3.select(this);
+                var src = el.attr('data-source');
+                var tgt = el.attr('data-target');
+                if (src === nodeId || tgt === nodeId) {
+                    var srcNode = graphData.nodes.find(function (n) { return n.id === src; });
+                    var tgtNode = graphData.nodes.find(function (n) { return n.id === tgt; });
+                    if (srcNode && tgtNode) {
+                        var pts = computeEdgeEndpoints(srcNode, tgtNode);
+                        el.attr('x1', pts.x1).attr('y1', pts.y1)
+                            .attr('x2', pts.x2).attr('y2', pts.y2);
+                    }
+                }
+            });
+        }
+
+        function onNodeClick(d) {
+            clearHighlight();
+
+            // Highlight clicked node
+            d3.selectAll('.node-rect[data-id="' + d.id + '"]').classed('highlighted', true);
+
+            // Find connected edges and neighbor nodes
+            var neighborIds = {};
+            d3.selectAll('.edge-line').each(function () {
+                var el = d3.select(this);
+                var src = el.attr('data-source');
+                var tgt = el.attr('data-target');
+                if (src === d.id || tgt === d.id) {
+                    el.classed('highlighted', true);
+                    el.attr('marker-end', 'url(#arrowhead-highlighted)');
+                    neighborIds[src === d.id ? tgt : src] = true;
+                } else {
+                    el.classed('faded', true);
+                }
+            });
+
+            // Highlight neighbors, fade others
+            d3.selectAll('.node-rect').each(function () {
+                var el = d3.select(this);
+                var id = el.attr('data-id');
+                if (id === d.id) return;
+                if (neighborIds[id]) {
+                    el.classed('neighbor', true);
+                } else {
+                    el.classed('faded', true);
+                }
+            });
+            d3.selectAll('.node-label').each(function () {
+                var el = d3.select(this);
+                var parentId = d3.select(this.parentNode).select('rect').attr('data-id');
+                if (parentId !== d.id && !neighborIds[parentId]) {
+                    el.classed('faded', true);
+                }
+            });
+
+            showNodeInfo(d);
+        }
+
+        function clearHighlight() {
+            d3.selectAll('.node-rect').classed('highlighted neighbor faded selected', false);
+            d3.selectAll('.node-label').classed('faded', false);
+            d3.selectAll('.edge-line')
+                .classed('highlighted faded', false)
+                .attr('marker-end', 'url(#arrowhead)');
+        }
+
+        function showNodeInfo(d) {
+            document.getElementById('info-label').textContent = d.label;
+            var incoming = graphData.edges.filter(function (e) { return e.target === d.id; }).length;
+            var outgoing = graphData.edges.filter(function (e) { return e.source === d.id; }).length;
+            document.getElementById('info-detail').textContent =
+                'Incoming: ' + incoming + '  |  Outgoing: ' + outgoing;
+            document.getElementById('info-panel').style.display = 'block';
+        }
+
+        function hideNodeInfo() {
+            document.getElementById('info-panel').style.display = 'none';
+        }
+
+        function updateStats() {
+            document.getElementById('stats-bar').textContent =
+                nodeCount + ' nodes · ' + edgeCount + ' edges';
+        }
+
+        // === Public API ===
+
+        function loadGraph(jsonString) {
+            var overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('active');
+            setTimeout(function () {
+                try {
+                    var elements = JSON.parse(jsonString);
+                    graphData = { nodes: [], edges: [] };
+                    elements.forEach(function (el) {
+                        if (el.data.source && el.data.target) {
+                            graphData.edges.push({
+                                source: el.data.source,
+                                target: el.data.target
+                            });
+                        } else {
+                            graphData.nodes.push({
+                                id: el.data.id,
+                                label: el.data.label || el.data.id,
+                                bsn: el.data.bsn || ''
+                            });
+                        }
+                    });
+                    nodeCount = graphData.nodes.length;
+                    edgeCount = graphData.edges.length;
+                    initSVG();
+                    runLayout(currentLayout);
+                } catch (e) {
+                    console.error('Graph load error:', e);
+                } finally {
+                    overlay.classList.remove('active');
+                }
+            }, 50);
+            return 'ok';
+        }
+
+        function runLayout(name) {
+            currentLayout = name;
+            computeLayout(name);
+            render();
+            fitGraph();
+            return 'ok';
+        }
+
+        function setLayout(name) { return runLayout(name); }
+
+        function zoomIn() {
+            if (!svg) return;
+            svg.transition().duration(200).call(zoom.scaleBy, 1.4);
+            return 'ok';
+        }
+
+        function zoomOut() {
+            if (!svg) return;
+            svg.transition().duration(200).call(zoom.scaleBy, 0.7);
+            return 'ok';
+        }
+
+        function fitGraph() {
+            if (!svg || !mainGroup) return;
+            var bounds = mainGroup.node().getBBox();
+            if (bounds.width === 0 || bounds.height === 0) return;
+
+            var svgEl = svg.node();
+            var fullWidth = svgEl.clientWidth || svgEl.parentNode.clientWidth || 800;
+            var fullHeight = svgEl.clientHeight || svgEl.parentNode.clientHeight || 600;
+            var padding = 40;
+
+            var scale = Math.min(
+                (fullWidth - padding * 2) / bounds.width,
+                (fullHeight - padding * 2) / bounds.height
+            );
+            scale = Math.min(scale, 1.5); // Don't zoom in too much for small graphs
+
+            var tx = fullWidth / 2 - scale * (bounds.x + bounds.width / 2);
+            var ty = fullHeight / 2 - scale * (bounds.y + bounds.height / 2);
+
+            svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+            return 'ok';
+        }
+
+        function highlightNodeById(nodeId) {
+            var nodeData = graphData.nodes.find(function (n) { return n.id === nodeId; });
+            if (nodeData) {
+                onNodeClick(nodeData);
+
+                // Center on node
+                var svgEl = svg.node();
+                var w = svgEl.clientWidth || 800;
+                var h = svgEl.clientHeight || 600;
+                var scale = 1.2;
+                var tx = w / 2 - scale * nodeData.x;
+                var ty = h / 2 - scale * nodeData.y;
+                svg.transition().duration(300)
+                    .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+                return 'found';
+            }
+            return 'not found';
+        }
+
+        function getGraphPNG() {
+            // SVG-based export — return SVG as data URI
+            if (!svg) return '';
+            var svgEl = svg.node();
+            var serializer = new XMLSerializer();
+            var svgStr = serializer.serializeToString(svgEl);
+            return btoa(unescape(encodeURIComponent(svgStr)));
+        }
+
+        function markSelectedNodes(idsJson) {
+            try {
+                var ids = JSON.parse(idsJson);
+                d3.selectAll('.node-rect').classed('selected', false);
+                if (ids && ids.length) {
+                    ids.forEach(function (id) {
+                        d3.selectAll('.node-rect[data-id="' + id + '"]').classed('selected', true);
+                    });
+                }
+                return 'ok';
+            } catch (e) {
+                console.error('Error marking selected nodes:', e);
+                return 'error';
+            }
+        }
+
+        function getNodeCount() { return nodeCount; }
+        function getEdgeCount() { return edgeCount; }
+    </script>
+</body>
+
+</html>
