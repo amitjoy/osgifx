@@ -1,20 +1,22 @@
 Bundle-SymbolicName : ${p}; singleton:=true
 Model-Fragment: fragment.e4xmi;apply=always
 -includeresource    : \
-					  fragment.e4xmi = fragment.e4xmi,\
-					  css = css,\
-					  fxml = fxml,\
-					  graphic = graphic,\
-					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
+				      fragment.e4xmi = fragment.e4xmi,\
+				      css = css,\
+				      fxml = fxml,\
+				      graphic = graphic,\
+				      web = src/main/resources/web,\
+				      css/ = @${repo;com.osgifx.console.assets.common}!/default.css
 -buildpath          : \
                       ${bundles.required},\
-                      com.osgifx.console.smartgraph;version=snapshot,\
                       org.jgrapht.core,\
                       org.jgrapht.io
 -privatepackage     : \
                       org.jgrapht.*,\
                       com.osgifx.console.ui.graph
 Import-Package      : \
+                      javafx.scene.web,\
+                      javafx.concurrent,\
                       org.controlsfx.control,\
                       org.controlsfx.glyphfont,\
                       !org.antlr.*,\
