@@ -129,7 +129,6 @@ install.order                     :   \
 	com.osgifx.console.executor;version=snapshot;startlevel=10,\
 	com.osgifx.console.launcher;version=snapshot;startlevel=10,\
 	com.osgifx.console.mcp;version=snapshot;startlevel=10,\
-	com.osgifx.console.smartgraph;version=snapshot;startlevel=10,\
 	com.osgifx.console.supervisor;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.batchinstall;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.extension;version=snapshot;startlevel=10,\
