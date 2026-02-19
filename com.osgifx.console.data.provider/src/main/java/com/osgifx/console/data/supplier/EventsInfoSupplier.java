@@ -109,13 +109,15 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     @Override
     public void onEvent(final XEventDTO event) {
-        if (future == null) {
-            executor.scheduleWithFixedDelay(() -> threadSync.asyncExec(() -> {
-                final var size = events.size();
-                if (size > CACHE_INVALIDATE_THRESHOLD) {
-                    events.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
-                }
-            }), Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
+        synchronized (this) {
+            if (future == null) {
+                future = executor.scheduleWithFixedDelay(() -> threadSync.asyncExec(() -> {
+                    final var size = events.size();
+                    if (size > CACHE_INVALIDATE_THRESHOLD) {
+                        events.remove(CACHE_INVALIDATE_RANGE_START, CACHE_INVALIDATE_RANGE_END);
+                    }
+                }), Duration.ofSeconds(CACHE_INVALIDATE_INITIAL_DELAY), Duration.ofSeconds(CACHE_INVALIDATE_DELAY));
+            }
         }
         threadSync.asyncExec(() -> events.add(event));
     }

@@ -26,9 +26,10 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.fx.ui.workbench.renderers.base.widget.WWindow;
 import org.osgi.service.event.Event;
 
+import javafx.application.Platform;
 import javafx.stage.Stage;
 
-public final class WindowResizeDisablerAddon {
+public final class MaximizeWindowAddon {
 
     private static final String MAIN_WINDOW_ID = "com.osgifx.console.window.main";
 
@@ -39,12 +40,12 @@ public final class WindowResizeDisablerAddon {
 
     @Inject
     @Optional
-    public void onActivate(@EventTopic(UIEvents.UILifeCycle.ACTIVATE) final Event event) {
+    public void onAppStartupComplete(@EventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) final Event event) {
         try {
             final var window = (MWindow) modelService.find(MAIN_WINDOW_ID, application);
             final var stage  = (Stage) ((WWindow<?>) window.getWidget()).getWidget();
-            stage.setResizable(false);
-        } catch (final Exception e) {
+            Platform.runLater(() -> stage.setMaximized(true));
+        } catch (final Exception _) {
             // ignore
         }
     }
