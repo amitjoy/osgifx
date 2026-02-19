@@ -62,7 +62,9 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
-import eu.hansolo.tilesfx.tools.FlowGridPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.RowConstraints;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -89,8 +91,7 @@ import javafx.util.Duration;
 
 public final class OverviewFxUI {
 
-    private static final double TILE_WIDTH    = 500;
-    private static final double TILE_HEIGHT   = 220;
+
     private static final double REFRESH_DELAY = 5;
     private static final int    CYCLE_COUNT   = 5;
     private static final Color  MUTED_GREEN   = Color.web("#3EB16E");
@@ -455,7 +456,6 @@ public final class OverviewFxUI {
         // @formatter:off
         runtimeInfoTile = TileBuilder.create()
                                      .skinType(SkinType.CUSTOM)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Runtime Information")
                                      .text("")
                                      .roundedCorners(false)
@@ -464,7 +464,6 @@ public final class OverviewFxUI {
         noOfServicesTile = TileBuilder.create()
                                       .skinType(SkinType.NUMBER)
                                       .numberFormat(new DecimalFormat("#"))
-                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                       .title("Services")
                                       .text("Number of registered services")
                                       .textVisible(true)
@@ -475,7 +474,6 @@ public final class OverviewFxUI {
         noOfConfigurationsTile = TileBuilder.create()
                                       .skinType(SkinType.NUMBER)
                                       .numberFormat(new DecimalFormat("#"))
-                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                       .title("Configurations")
                                       .text("Number of configurations")
                                       .textVisible(true)
@@ -486,7 +484,6 @@ public final class OverviewFxUI {
          noOfLeaksTile = TileBuilder.create()
                                       .skinType(SkinType.NUMBER)
                                       .numberFormat(new DecimalFormat("#"))
-                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                       .title("Classloader Leaks")
                                       .text("Number of classloader leaks")
                                       .textVisible(true)
@@ -497,7 +494,6 @@ public final class OverviewFxUI {
          deadlockedThreadsTile = TileBuilder.create()
                                       .skinType(SkinType.NUMBER)
                                       .numberFormat(new DecimalFormat("#"))
-                                      .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                       .title("Deadlocked Threads")
                                       .text("Number of deadlocked threads")
                                       .textVisible(true)
@@ -507,14 +503,12 @@ public final class OverviewFxUI {
 
         memoryConsumptionTile = TileBuilder.create()
                                            .skinType(SkinType.PERCENTAGE)
-                                           .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                            .title("JVM Memory Consumption Percentage")
                                            .roundedCorners(false)
                                            .build();
 
         uptimeTile = TileBuilder.create()
                                 .skinType(SkinType.TIME)
-                                .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                 .title("Uptime")
                                 .text("Uptime of the remote runtime")
                                 .textVisible(true)
@@ -525,7 +519,6 @@ public final class OverviewFxUI {
         // Bundle State Tile
         bundleStateTile = TileBuilder.create()
                                      .skinType(SkinType.DONUT_CHART)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Bundle States")
                                      .roundedCorners(false)
                                      .build();
@@ -533,7 +526,6 @@ public final class OverviewFxUI {
         // Thread State Tile
         threadStateTile = TileBuilder.create()
                                      .skinType(SkinType.DONUT_CHART)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Thread States")
                                      .roundedCorners(false)
                                      .build();
@@ -553,7 +545,6 @@ public final class OverviewFxUI {
 
         memoryHistoryTile = TileBuilder.create()
                                        .skinType(SkinType.CUSTOM)
-                                       .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                        .title("Heap Memory Usage (MB)")
                                        .text("Tracked over time")
                                        .graphic(areaChart)
@@ -564,7 +555,6 @@ public final class OverviewFxUI {
         logErrorTile = TileBuilder.create()
                                   .skinType(SkinType.NUMBER)
                                   .numberFormat(new DecimalFormat("#"))
-                                  .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                   .title("Error Logs")
                                   .text("Count of ERROR logs")
                                   .textVisible(true)
@@ -576,29 +566,38 @@ public final class OverviewFxUI {
         // Component State Tile
         componentStateTile = TileBuilder.create()
                                      .skinType(SkinType.DONUT_CHART)
-                                     .prefSize(TILE_WIDTH, TILE_HEIGHT)
                                      .title("Component States")
                                      .roundedCorners(false)
                                      .build();
 
-        final var pane = new FlowGridPane(4, 3,
-                                           runtimeInfoTile,
-                                           uptimeTile,
-                                           memoryConsumptionTile,
-                                           memoryHistoryTile,
-                                           bundleStateTile,
-                                           componentStateTile,
-                                           threadStateTile,
-                                           noOfServicesTile,
-                                           deadlockedThreadsTile,
-                                           noOfLeaksTile,
-                                           logErrorTile,
-                                           noOfConfigurationsTile);
-        // @formatter:on
+        final var pane = new GridPane();
+        pane.add(runtimeInfoTile, 0, 0);
+        pane.add(uptimeTile, 1, 0);
+        pane.add(memoryConsumptionTile, 2, 0);
+        pane.add(memoryHistoryTile, 3, 0);
+
+        pane.add(bundleStateTile, 0, 1);
+        pane.add(componentStateTile, 1, 1);
+        pane.add(threadStateTile, 2, 1);
+        pane.add(noOfServicesTile, 3, 1);
+
+        pane.add(deadlockedThreadsTile, 0, 2);
+        pane.add(noOfLeaksTile, 1, 2);
+        pane.add(logErrorTile, 2, 2);
+        pane.add(noOfConfigurationsTile, 3, 2);
+
+        final var columnConstraints = new ColumnConstraints();
+        columnConstraints.setPercentWidth(25);
+
+        final var rowConstraints = new RowConstraints();
+        rowConstraints.setPercentHeight(33);
+
+        pane.getColumnConstraints().addAll(columnConstraints, columnConstraints, columnConstraints, columnConstraints);
+        pane.getRowConstraints().addAll(rowConstraints, rowConstraints, rowConstraints);
+
         pane.setHgap(5);
         pane.setVgap(5);
         pane.setAlignment(Pos.CENTER);
-        pane.setCenterShape(true);
         pane.setPadding(new Insets(5));
         pane.setBackground(new Background(new BackgroundFill(Color.web("#F1F1F1"), CornerRadii.EMPTY, Insets.EMPTY)));
 
