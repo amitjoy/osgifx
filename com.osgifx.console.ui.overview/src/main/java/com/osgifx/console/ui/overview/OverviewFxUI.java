@@ -49,8 +49,6 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
-import com.google.common.collect.Maps;
-import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -87,6 +85,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public final class OverviewFxUI {
@@ -306,15 +306,15 @@ public final class OverviewFxUI {
             });
         });
 
+        final var osDisplay = runtimeInfo.osName().isEmpty() ? ""
+                : runtimeInfo.osName() + " " + runtimeInfo.osVersion();
         runtimeInfoTile.setGraphic(
                 createRuntimeTable(
                         runtimeInfo.frameworkBsn(),
                         runtimeInfo.frameworkVersion(),
-                        runtimeInfo.frameworkStartLevel(),
-                        runtimeInfo.osName(),
-                        runtimeInfo.osVersion(),
-                        runtimeInfo.osArchitecture(),
-                        runtimeInfo.javaVersion()));
+                        runtimeInfo.javaVersion(),
+                        osDisplay,
+                        runtimeInfo.osArchitecture()));
         // @formatter:on
     }
 
@@ -606,71 +606,52 @@ public final class OverviewFxUI {
 
     private Node createRuntimeTable(final String frameworkBsn,
                                     final String frameworkVersion,
-                                    final String frameworkStartLevel,
-                                    final String osName,
-                                    final String osVersion,
-                                    final String osArchitecture,
-                                    final String javaVersion) {
-        final var name = new Label("");
-        name.setTextFill(Tile.FOREGROUND);
-        name.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(name, Priority.NEVER);
+                                    final String javaVersion,
+                                    final String os,
+                                    final String osArchitecture) {
+        final var container = new VBox();
+        container.setSpacing(12);
+        container.setAlignment(Pos.CENTER);
+        container.setPadding(new Insets(10, 15, 10, 15));
 
-        final var spacer = new Region();
-        spacer.setPrefSize(5, 5);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        final String[][] entries = {
+                { "CUBES",     "Framework",      frameworkBsn },
+                { "TAG",       "Version",        frameworkVersion },
+                { "COFFEE",    "Java",           javaVersion },
+                { "DESKTOP",   "OS",             os },
+                { "SERVER",    "Architecture",   osArchitecture }
+        };
 
-        final var views = new Label("");
-        views.setTextFill(Tile.FOREGROUND);
-        views.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setHgrow(views, Priority.NEVER);
+        for (final var entry : entries) {
+            container.getChildren().add(createInfoRow(entry[0], entry[1], entry[2]));
+        }
 
-        final var header = new HBox(5, name, spacer, views);
-        header.setAlignment(Pos.CENTER_LEFT);
-        header.setFillHeight(true);
-
-        final var dataTable = new VBox(0, header);
-        dataTable.setFillWidth(true);
-
-        // @formatter:off
-        final Map<String, String> runtimeInfo =
-                Map.of(
-                        "Framework", frameworkBsn,
-                        "Framework Version", frameworkVersion,
-                        "Framework Start Level", frameworkStartLevel,
-                        "Java Version", javaVersion,
-                        "OS Name", osName,
-                        "OS Version", osVersion,
-                        "OS Architecture", osArchitecture);
-        // @formatter:on
-
-        final Map<String, String> filteredMap = Maps.newTreeMap();
-        filteredMap.putAll(runtimeInfo);
-
-        BiStream.from(filteredMap).mapToObj(this::getTileTableInfo).forEach(n -> dataTable.getChildren().add(n));
-        return dataTable;
+        return container;
     }
 
-    private HBox getTileTableInfo(final String property, final String value) {
-        final var propertyLabel = new Label(property);
-        propertyLabel.setTextFill(Tile.FOREGROUND);
-        propertyLabel.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(propertyLabel, Priority.NEVER);
+    private Node createInfoRow(final String iconName, final String label, final String value) {
+        final var icon = new Glyph("FontAwesome", iconName);
+        icon.setTextFill(Color.web("#81D4FA"));
+        icon.setFontSize(14);
+        icon.setPrefWidth(20);
+        icon.setAlignment(Pos.CENTER);
+
+        final var keyLabel = new Label(label);
+        keyLabel.setTextFill(Tile.FOREGROUND);
+        keyLabel.setFont(Font.font("System", FontWeight.BOLD, 12));
 
         final var spacer = new Region();
-        spacer.setPrefSize(5, 5);
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        final var valueLabel = new Label(value);
-        valueLabel.setTextFill(Tile.FOREGROUND);
-        valueLabel.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setHgrow(valueLabel, Priority.NEVER);
+        final var valLabel = new Label(value);
+        valLabel.setTextFill(Color.web("#E0F7FA"));
+        valLabel.setFont(Font.font("Monospace", 13));
+        valLabel.setPadding(new Insets(2, 6, 2, 6));
+        valLabel.setBackground(new Background(new BackgroundFill(Color.web("#263238"), new CornerRadii(4), Insets.EMPTY)));
 
-        final var hBox = new HBox(5, propertyLabel, spacer, valueLabel);
-        hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setFillHeight(true);
-
-        return hBox;
+        final var row = new HBox(10, icon, keyLabel, spacer, valLabel);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
     }
 
     private long toMB(final long sizeInBytes) {
