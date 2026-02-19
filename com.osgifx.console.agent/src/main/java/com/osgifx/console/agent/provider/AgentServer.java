@@ -1059,7 +1059,12 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public RuntimeDTO getRuntimeDTO() {
-        return di.getInstance(XDtoAdmin.class).runtime();
+        final boolean isScrWired = di.getInstance(PackageWirings.class).isScrWired();
+        if (isScrWired) {
+            return di.getInstance(XDtoAdmin.class).runtime();
+        }
+        logger.atWarn().msg(packageNotWired(SCR)).log();
+        return null;
     }
 
     @Override
