@@ -156,11 +156,19 @@ public final class BundlesFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
+            final var infoNode = Fx.initStatusBarButton(this::showInfo, "Info", "INFO");
+            statusBar.addToRight(infoNode);
+            statusBar.addToRight(new Separator(VERTICAL));
             final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
         }
+    }
+
+    private void showInfo() {
+        FxDialog.showInfoDialog("Bundle Color Information", "Slate Blue colored entries are fragments.",
+                getClass().getClassLoader());
     }
 
     private void initSearchFilterResetButton(final String description) {

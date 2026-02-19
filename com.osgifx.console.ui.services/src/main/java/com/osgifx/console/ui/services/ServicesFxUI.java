@@ -167,7 +167,7 @@ public final class ServicesFxUI {
     }
 
     private void showInfo() {
-        FxDialog.showInfoDialog("Service Color Information", "Violet colored entries are OSGi SCR components.",
+        FxDialog.showInfoDialog("Service Color Information", "Slate Blue colored entries are OSGi SCR components.",
                 getClass().getClassLoader());
     }
 
