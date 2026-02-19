@@ -55,7 +55,7 @@ is.snapshot                           =         ${endswith;${trim;${OSGifx-Versi
 -pom                                  =         ${if;${is.snapshot};false;true}
 -groupid                              =         com.osgifx
 
--baselinerepo                         =         Release
+-baselinerepo                         =         Baseline
 -releaserepo                          =         Release
 
 Git-Descriptor                        =         ${system-allow-fail;git describe --dirty --always --abbrev=9}
@@ -82,21 +82,28 @@ Git-SHA                               =         ${system-allow-fail;git rev-list
 		  releaseUrl                  =        ${sonatype.portal.api}; \
 		  snapshotUrl                 =        ${sonatype.portal.snapshot}; \
           name                        =        Release; \
-		  index                       =        ${.}/maven/release.maven; \
           noupdateOnRelease           =        true; \
           local                       =        ${.}/target/sonatype-staging; \
           sonatypeMode                =        autopublish
 
--plugin.4.efxclipse                   =         \
+-plugin.4.Baseline                    =        \
+    aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		  releaseUrl                  =        ${sonatype.portal.api}; \
+		  snapshotUrl                 =        ${sonatype.portal.snapshot}; \
+          name                        =        Baseline; \
+		  index                       =        ${.}/maven/release.maven; \
+          noupdateOnRelease           =        true
+
+-plugin.5.efxclipse                   =         \
     aQute.bnd.repository.osgi.OSGiRepository;\
 		  locations                   =         ${efxclipse.url};\
 		  name                        =         e(fx)clipse
 
--plugin.5.Local                       =         \
+-plugin.6.Local                       =         \
     aQute.bnd.deployer.repository.LocalIndexedRepo; \
           name                        =         Local; \
           pretty                      =         true; \
           local                       =         ${build}/local
 
--plugin.6.osgi.dp.exporter            =         com.osgifx.console.bnd.dp.packager.DeploymentPackageExporter
+-plugin.7.osgi.dp.exporter            =         com.osgifx.console.bnd.dp.packager.DeploymentPackageExporter
 -pluginpath                           =         ${build}/plugin/com.osgifx.console.bnd.dp.packager.jar
