@@ -17,12 +17,11 @@ package com.osgifx.console.ui.graph;
 
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
-import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
-import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
@@ -31,12 +30,12 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.Strings;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
-import org.controlsfx.control.SegmentedButton;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
+import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
@@ -46,10 +45,6 @@ import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
-import com.osgifx.console.smartgraph.graphview.SmartCircularSortedPlacementStrategy;
-import com.osgifx.console.smartgraph.graphview.SmartGraphPanel;
-import com.osgifx.console.smartgraph.graphview.SmartPlacementStrategy;
-import com.osgifx.console.smartgraph.graphview.SmartRandomPlacementStrategy;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.beans.value.ChangeListener;
@@ -62,7 +57,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
@@ -71,32 +65,29 @@ public final class GraphFxComponentController implements GraphController {
 
     @Log
     @Inject
-    private FluentLogger                 logger;
+    private FluentLogger                        logger;
     @Inject
-    private Executor                     executor;
+    private Executor                            executor;
     @FXML
-    private SegmentedButton              strategyButton;
+    private TextField                           searchText;
     @FXML
-    private TextField                    searchText;
+    private CheckListView<XComponentDTO>        componentsList;
     @FXML
-    private ToggleButton                 circularStrategyButton;
+    private ChoiceBox<String>                   wiringSelection;
     @FXML
-    private ToggleButton                 randomStrategyButton;
+    private ChoiceBox<String>                   layoutSelection;
     @FXML
-    private CheckListView<XComponentDTO> componentsList;
-    @FXML
-    private ChoiceBox<String>            wiringSelection;
-    @FXML
-    private BorderPane                   graphPane;
+    private BorderPane                          graphPane;
     @Inject
-    private DataProvider                 dataProvider;
+    private DataProvider                        dataProvider;
     @Inject
-    private ThreadSynchronize            threadSync;
+    private ThreadSynchronize                   threadSync;
     @Inject
-    private RuntimeComponentGraph        runtimeGraph;
-    private MaskerPane                   progressPane;
-    private FxComponentGraph             fxGraph;
-    private Future<?>                    graphGenFuture;
+    private RuntimeComponentGraph               runtimeGraph;
+    private MaskerPane                          progressPane;
+    private WebGraphView                        graphView;
+    private Future<?>                           graphGenFuture;
+    private Graph<ComponentVertex, DefaultEdge> currentGraph;
 
     @FXML
     public void initialize() {
@@ -104,8 +95,8 @@ public final class GraphFxComponentController implements GraphController {
             addExportToDotContextMenu();
             initComponentsList();
             progressPane = new MaskerPane();
-            initStrategyButton();
             initWiringSelection();
+            initLayoutSelection();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
@@ -123,15 +114,6 @@ public final class GraphFxComponentController implements GraphController {
         return Type.COMPONENTS;
     }
 
-    private void initStrategyButton() {
-        strategyButton.getStyleClass().add(STYLE_CLASS_DARK);
-        strategyButton.getToggleGroup().selectedToggleProperty().addListener((_, oldVal, newVal) -> {
-            if (newVal == null) {
-                oldVal.setSelected(true);
-            }
-        });
-    }
-
     private void initWiringSelection() {
         wiringSelection.getItems().addAll("Find all components that are required by", "Find all component cycles");
         wiringSelection.getSelectionModel().select(0);
@@ -145,9 +127,30 @@ public final class GraphFxComponentController implements GraphController {
                 });
     }
 
+    private void initLayoutSelection() {
+        layoutSelection.getItems().addAll("Dagre (Hierarchical)", "Breadthfirst", "Cose (Force-Directed)", "Circle");
+        layoutSelection.getSelectionModel().select(0);
+        layoutSelection.getSelectionModel().selectedIndexProperty().addListener((_, _, newValue) -> {
+            if (graphView != null) {
+                final var layoutName = getLayoutName(newValue.intValue());
+                graphView.setLayout(layoutName);
+            }
+        });
+    }
+
+    private String getLayoutName(final int index) {
+        return switch (index) {
+            case 0 -> "dagre";
+            case 1 -> "breadthfirst";
+            case 2 -> "cose";
+            case 3 -> "circle";
+            default -> "dagre";
+        };
+    }
+
     private void addExportToDotContextMenu() {
-        final var item = new MenuItem("Export to DOT");
-        item.setOnAction(_ -> {
+        final var exportDot = new MenuItem("Export to DOT");
+        exportDot.setOnAction(_ -> {
             final var directoryChooser = new DirectoryChooser();
             final var location         = directoryChooser.showDialog(null);
             if (location == null) {
@@ -158,16 +161,18 @@ public final class GraphFxComponentController implements GraphController {
                     () -> Fx.showSuccessNotification("DOT (GraphViz) Export", "Graph has been successfully exported"));
         });
         final var menu = new ContextMenu();
-        menu.getItems().add(item);
+        menu.getItems().add(exportDot);
         graphPane.setOnContextMenuRequested(e -> menu.show(graphPane.getCenter(), e.getScreenX(), e.getScreenY()));
     }
 
     private void exportToDOT(final File location) {
+        if (currentGraph == null) {
+            return;
+        }
         final var exporter = new DOTExporter<ComponentVertex, DefaultEdge>(ComponentVertex::toDotID);
         try {
-            final Graph<ComponentVertex, DefaultEdge> jGraph  = GraphHelper.toJGraphT(fxGraph.graph);
-            final var                                 dotFile = new File(location, generateDotFileName("Components"));
-            exporter.exportGraph(jGraph, dotFile);
+            final var dotFile = new File(location, generateDotFileName("Components"));
+            exporter.exportGraph(currentGraph, dotFile);
         } catch (final ExportException e) {
             logger.atError().withException(e).log("Cannot export the graph to '%s'", location);
             throw e;
@@ -234,23 +239,32 @@ public final class GraphFxComponentController implements GraphController {
                             selectedComponents);
                     final Collection<GraphPath<ComponentVertex, DefaultEdge>> dependencies = runtimeGraph
                             .getAllServiceComponentsThatAreRequiredBy(selectedComponents);
-                    fxGraph = new FxComponentGraph(dependencies);
+                    currentGraph = mergePathsToGraph(dependencies);
                 } else {
                     logger.atDebug().log("Generating service component cycles");
-                    final var graph = runtimeGraph.getAllCycles();
-                    fxGraph = new FxComponentGraph(graph);
+                    currentGraph = runtimeGraph.getAllCycles();
                 }
                 return null;
             }
 
             @Override
             protected void succeeded() {
-                final var graphView = new SmartGraphPanel<>(fxGraph.graph, getStrategy());
-                graphView.setPrefSize(800, 520);
+                final var json = GraphJsonConverter.toJson(currentGraph, ComponentVertex::toDotID,
+                        ComponentVertex::name);
+
+                graphView = new WebGraphView();
                 progressPane.setVisible(false);
                 graphPane.setCenter(graphView);
-                graphView.init();
-                graphView.setPrefSize(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE);
+                graphView.loadGraph(json);
+
+                // Highlight initially selected components
+                final List<String> selectedIds = selectedComponents.stream()
+                        .map(c -> ComponentVertex.DOT_ID_FUNCTION.apply(c.name)).toList();
+                graphView.markSelectedNodes(selectedIds);
+
+                // Apply selected layout
+                final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
+                graphView.setLayout(getLayoutName(layoutIndex));
             }
         };
         graphPane.setCenter(progressPane);
@@ -261,15 +275,45 @@ public final class GraphFxComponentController implements GraphController {
     }
 
     @FXML
+    private void zoomIn(final ActionEvent event) {
+        if (graphView != null) {
+            graphView.zoomIn();
+        }
+    }
+
+    @FXML
+    private void zoomOut(final ActionEvent event) {
+        if (graphView != null) {
+            graphView.zoomOut();
+        }
+    }
+
+    @FXML
+    private void fitToScreen(final ActionEvent event) {
+        if (graphView != null) {
+            graphView.fitToScreen();
+        }
+    }
+
+    @FXML
     private void deselectAll(final ActionEvent event) {
         componentsList.getCheckModel().clearChecks();
     }
 
-    private SmartPlacementStrategy getStrategy() {
-        if (randomStrategyButton.isSelected()) {
-            return new SmartRandomPlacementStrategy();
+    private static Graph<ComponentVertex, DefaultEdge> mergePathsToGraph(final Collection<GraphPath<ComponentVertex, DefaultEdge>> graphPaths) {
+        final Graph<ComponentVertex, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+        for (final GraphPath<ComponentVertex, DefaultEdge> path : graphPaths) {
+            for (final DefaultEdge edge : path.getEdgeList()) {
+                final var source = path.getGraph().getEdgeSource(edge);
+                final var target = path.getGraph().getEdgeTarget(edge);
+                graph.addVertex(source);
+                graph.addVertex(target);
+                if (!graph.containsEdge(source, target)) {
+                    graph.addEdge(source, target);
+                }
+            }
         }
-        return new SmartCircularSortedPlacementStrategy();
+        return graph;
     }
 
 }

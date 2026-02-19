@@ -18,28 +18,10 @@ package com.osgifx.console.ui.graph;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-
-import com.osgifx.console.smartgraph.graph.Edge;
-import com.osgifx.console.smartgraph.graph.Graph;
-
 public final class GraphHelper {
 
     private GraphHelper() {
         throw new IllegalAccessError("Cannot be instantiated");
-    }
-
-    public static <V> org.jgrapht.Graph<V, DefaultEdge> toJGraphT(final Graph<V, String> smartGraph) {
-        final org.jgrapht.Graph<V, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-        smartGraph.vertices().forEach(v -> graph.addVertex(v.element()));
-        for (final Edge<String, V> edge : smartGraph.edges()) {
-            final var vertices = edge.vertices();
-            if (vertices[0] != null && vertices[1].element() != null) {
-                graph.addEdge(vertices[0].element(), vertices[1].element());
-            }
-        }
-        return graph;
     }
 
     public static String generateDotFileName(final String prefix) {
