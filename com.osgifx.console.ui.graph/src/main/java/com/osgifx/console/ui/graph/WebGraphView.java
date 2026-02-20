@@ -40,6 +40,7 @@ public final class WebGraphView extends BorderPane {
 
     public WebGraphView() {
         webView   = new WebView();
+        webView.setContextMenuEnabled(false);
         webEngine = webView.getEngine();
         setCenter(webView);
 
