@@ -201,6 +201,10 @@ public final class AgentServer implements Agent, Closeable {
         }
     }
 
+    public RpcType getRpcType() {
+        return rpcType;
+    }
+
     public BundleContext getContext() {
         return di.getInstance(BundleContext.class);
     }

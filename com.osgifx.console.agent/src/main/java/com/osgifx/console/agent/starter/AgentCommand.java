@@ -82,9 +82,9 @@ public final class AgentCommand {
      * Stops the socket agent and clears the related system properties.
      */
     public void stopSocket() {
-        System.setProperty(AGENT_SOCKET_PORT_KEY, "");
-        System.setProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY, "");
-        System.setProperty(AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY, "");
+        System.clearProperty(AGENT_SOCKET_PORT_KEY);
+        System.clearProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY);
+        System.clearProperty(AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY);
 
         try {
             activator.stopSocketAgent();
@@ -132,9 +132,9 @@ public final class AgentCommand {
      * Stops the MQTT agent and clears the related system properties.
      */
     public void stopMqtt() {
-        System.setProperty(AGENT_MQTT_PROVIDER_KEY, "");
-        System.setProperty(AGENT_MQTT_PUB_TOPIC_KEY, "");
-        System.setProperty(AGENT_MQTT_SUB_TOPIC_KEY, "");
+        System.clearProperty(AGENT_MQTT_PROVIDER_KEY);
+        System.clearProperty(AGENT_MQTT_PUB_TOPIC_KEY);
+        System.clearProperty(AGENT_MQTT_SUB_TOPIC_KEY);
 
         try {
             activator.stopMqttAgent();
