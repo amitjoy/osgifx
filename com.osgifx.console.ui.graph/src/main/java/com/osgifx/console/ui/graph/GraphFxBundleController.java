@@ -213,6 +213,7 @@ public final class GraphFxBundleController implements GraphController {
     @FXML
     private void generateGraph(final ActionEvent event) {
         logger.atInfo().log("Generating graph for bundles");
+        final var selection       = wiringSelection.getSelectionModel().getSelectedIndex();
         final var selectedBundles = Lists.newArrayList(bundlesList.getCheckModel().getCheckedItems());
         if (selectedBundles.isEmpty()) {
             logger.atInfo().log("No bundle has been selected. Skipped graph generation.");
@@ -223,8 +224,6 @@ public final class GraphFxBundleController implements GraphController {
 
             @Override
             protected Void call() throws Exception {
-                progressPane.setVisible(true);
-                final var selection = wiringSelection.getSelectionModel().getSelectedIndex();
 
                 final Collection<GraphPath<BundleVertex, DefaultEdge>> dependencies;
                 if (selection == 0) {
@@ -259,7 +258,14 @@ public final class GraphFxBundleController implements GraphController {
                 final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
                 graphView.setLayout(getLayoutName(layoutIndex));
             }
+
+            @Override
+            protected void failed() {
+                logger.atError().withException(getException()).log("Graph generation failed");
+                progressPane.setVisible(false);
+            }
         };
+        progressPane.setVisible(true);
         graphPane.setCenter(progressPane);
         if (graphGenFuture != null) {
             graphGenFuture.cancel(true);
