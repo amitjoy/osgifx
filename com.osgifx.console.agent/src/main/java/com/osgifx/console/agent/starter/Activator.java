@@ -19,6 +19,7 @@ import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_DEFAULT_VALUE;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_KEY;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.MQTT_RPC;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -43,6 +46,7 @@ import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.di.module.DIModule;
+import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.helper.ThreadFactoryBuilder;
 import com.osgifx.console.agent.provider.AgentServer;
 import com.osgifx.console.agent.provider.ClassloaderLeakDetector;
@@ -80,31 +84,95 @@ public final class Activator extends Thread implements BundleActivator {
     private final FluentLogger      logger = LoggerFactory.getFluentLogger(getClass());
     private final List<AgentServer> agents = new CopyOnWriteArrayList<>();
 
+    private volatile boolean isSocketAgentRunning = false;
+    private volatile boolean isMqttAgentRunning   = false;
+
+    private ExecutorService              mqttExecutor;
+    private RemoteRPC<Agent, Supervisor> mqttRpc;
+    private AgentServer                  mqttAgentServer;
+
     @Override
     public void start(final BundleContext bundleContext) throws Exception {
         module = new DIModule(bundleContext);
         module.di().getInstance(ClassloaderLeakDetector.class).start();
+        module.start(); // Start DIModule and ServiceTrackers unconditionally for fast connection times
 
-        try {
-            final SocketContext socketContext = new SocketContext(bundleContext);
-            serverSocket = socketContext.getSocket();
-            start();
+        registerAgentCommand(bundleContext);
 
-            logger.atInfo().msg("[OSGi.fx] Socket agent configured").log();
-            logger.atInfo().msg("[OSGi.fx] Host: {}").arg(socketContext.host()).log();
-            logger.atInfo().msg("[OSGi.fx] Port: {}").arg(socketContext.port()).log();
-        } catch (final IllegalArgumentException e) {
-            logger.atInfo().msg("[OSGi.fx] Socket agent not configured").log();
+        if (isSocketConfigured(bundleContext)) {
+            startSocketAgent();
+        } else {
+            logger.atInfo()
+                    .msg("[OSGi.fx] Socket agent dormant. Awaiting 'osgifx:agent startSocket' or system properties.")
+                    .log();
         }
-        module.start();
 
-        final String mqttProviderProperty = bundleContext.getProperty(AGENT_MQTT_PROVIDER_KEY);
+        if (isMqttConfigured(bundleContext)) {
+            startMqttAgent();
+        } else {
+            logger.atInfo().msg("[OSGi.fx] MQTT agent dormant. Awaiting 'osgifx:agent startMqtt' or system properties.")
+                    .log();
+        }
+    }
+
+    private void registerAgentCommand(final BundleContext bundleContext) {
+        final Dictionary<String, Object> props = new Hashtable<>();
+        props.put("osgi.command.scope", "agent");
+        props.put("osgi.command.function",
+                new String[] { "startSocket", "stopSocket", "startMqtt", "stopMqtt", "status" });
+        bundleContext.registerService(Object.class.getName(), new AgentCommand(this, bundleContext), props);
+    }
+
+    private boolean isSocketConfigured(final BundleContext bundleContext) {
+        final String port = AgentHelper.getProperty(AGENT_SOCKET_PORT_KEY, bundleContext);
+        return port != null && !port.trim().isEmpty();
+    }
+
+    private boolean isMqttConfigured(final BundleContext bundleContext) {
+        final String provider = AgentHelper.getProperty(AGENT_MQTT_PROVIDER_KEY, bundleContext);
+        return provider != null && !provider.trim().isEmpty();
+    }
+
+    public synchronized void startSocketAgent() throws Exception {
+        if (isSocketAgentRunning) {
+            logger.atInfo().msg("[OSGi.fx] Socket agent is already running.").log();
+            return;
+        }
+
+        final SocketContext socketContext = new SocketContext(module.di().getInstance(BundleContext.class));
+        serverSocket = socketContext.getSocket();
+        start(); // starts the thread for accepting socket connections
+
+        isSocketAgentRunning = true;
+        logger.atInfo().msg("[OSGi.fx] Socket agent configured").log();
+        logger.atInfo().msg("[OSGi.fx] Host: {}").arg(socketContext.host()).log();
+        logger.atInfo().msg("[OSGi.fx] Port: {}").arg(socketContext.port()).log();
+    }
+
+    public synchronized void stopSocketAgent() throws Exception {
+        if (!isSocketAgentRunning) {
+            return;
+        }
+        interrupt(); // interrupt the socket accept thread
+        IO.close(serverSocket);
+        isSocketAgentRunning = false;
+        logger.atInfo().msg("[OSGi.fx] Socket agent stopped").log();
+    }
+
+    public synchronized void startMqttAgent() throws Exception {
+        if (isMqttAgentRunning) {
+            logger.atInfo().msg("[OSGi.fx] MQTT agent is already running.").log();
+            return;
+        }
+
+        final BundleContext bundleContext        = module.di().getInstance(BundleContext.class);
+        final String        mqttProviderProperty = AgentHelper.getProperty(AGENT_MQTT_PROVIDER_KEY, bundleContext);
         if (mqttProviderProperty == null) {
             logger.atInfo().msg("[OSGi.fx] MQTT agent not configured").log();
             return;
         }
-        final String pubTopic = bundleContext.getProperty(AGENT_MQTT_PUB_TOPIC_KEY);
-        final String subTopic = bundleContext.getProperty(AGENT_MQTT_SUB_TOPIC_KEY);
+        final String pubTopic = AgentHelper.getProperty(AGENT_MQTT_PUB_TOPIC_KEY, bundleContext);
+        final String subTopic = AgentHelper.getProperty(AGENT_MQTT_SUB_TOPIC_KEY, bundleContext);
 
         if (pubTopic == null || pubTopic.isEmpty() || subTopic == null || subTopic.isEmpty()) {
             logger.atWarn().msg("[OSGi.fx] MQTT agent topics not configured").log();
@@ -126,23 +194,56 @@ public final class Activator extends Thread implements BundleActivator {
             logger.atInfo().msg("[OSGi.fx] Custom messaging provider configured for MQTT communication").log();
         }
 
-        final AgentServer agentServer = new AgentServer(module.di(), MQTT_RPC);
-        agents.add(agentServer);
+        mqttAgentServer = new AgentServer(module.di(), MQTT_RPC);
+        agents.add(mqttAgentServer);
 
-        final ExecutorService              executor = newFixedThreadPool();
-        final RemoteRPC<Agent, Supervisor> mqttRPC  = new MqttRPC<>(bundleContext, Supervisor.class, agentServer,
-                                                                    pubTopic, subTopic, executor);
+        mqttExecutor = newFixedThreadPool();
+        mqttRpc      = new MqttRPC<>(bundleContext, Supervisor.class, mqttAgentServer, pubTopic, subTopic,
+                                     mqttExecutor);
 
-        module.bindInstance(AgentServer.class, agentServer);
-        module.bindInstance(RemoteRPC.class, mqttRPC);
-        module.bindInstance(Supervisor.class, mqttRPC.getRemote());
+        module.bindInstance(AgentServer.class, mqttAgentServer);
+        module.bindInstance(RemoteRPC.class, mqttRpc);
+        module.bindInstance(Supervisor.class, mqttRpc.getRemote());
 
-        mqttRPC.open();
-        agentServer.setEndpoint(mqttRPC);
+        mqttRpc.open();
+        mqttAgentServer.setEndpoint(mqttRpc);
 
+        isMqttAgentRunning = true;
         logger.atInfo().msg("[OSGi.fx] MQTT agent configured").log();
         logger.atInfo().msg("[OSGi.fx] PUB Topic: {}").arg(pubTopic).log();
         logger.atInfo().msg("[OSGi.fx] SUB Topic: {}").arg(subTopic).log();
+    }
+
+    public synchronized void stopMqttAgent() throws Exception {
+        if (!isMqttAgentRunning) {
+            return;
+        }
+        if (mqttRpc != null) {
+            try {
+                mqttRpc.close();
+            } catch (Exception e) {
+                logger.atWarn().msg("[OSGi.fx] Error closing MQTT RPC").throwable(e).log();
+            }
+            mqttRpc = null;
+        }
+        if (mqttExecutor != null) {
+            mqttExecutor.shutdownNow();
+            mqttExecutor = null;
+        }
+        if (mqttAgentServer != null) {
+            agents.remove(mqttAgentServer);
+            mqttAgentServer = null;
+        }
+        isMqttAgentRunning = false;
+        logger.atInfo().msg("[OSGi.fx] MQTT agent stopped").log();
+    }
+
+    public boolean isSocketAgentRunning() {
+        return isSocketAgentRunning;
+    }
+
+    public boolean isMqttAgentRunning() {
+        return isMqttAgentRunning;
     }
 
     @Override
@@ -194,8 +295,8 @@ public final class Activator extends Thread implements BundleActivator {
 
     @Override
     public void stop(final BundleContext context) throws Exception {
-        interrupt();
-        IO.close(serverSocket);
+        stopSocketAgent();
+        stopMqttAgent();
         agents.forEach(IO::close);
         module.di().getInstance(ClassloaderLeakDetector.class).stop();
         module.stop();
