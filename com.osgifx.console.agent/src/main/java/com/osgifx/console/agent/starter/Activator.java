@@ -155,6 +155,17 @@ public final class Activator extends Thread implements BundleActivator {
         }
         interrupt(); // interrupt the socket accept thread
         IO.close(serverSocket);
+
+        // Close all active socket agents so it actually disconnects
+        agents.stream().filter(a -> a.getRpcType() == SOCKET_RPC).forEach(a -> {
+            try {
+                IO.close(a);
+            } catch (Exception e) {
+                // ignore
+            }
+        });
+        agents.removeIf(a -> a.getRpcType() == SOCKET_RPC);
+
         isSocketAgentRunning = false;
         logger.atInfo().msg("[OSGi.fx] Socket agent stopped").log();
     }
@@ -230,10 +241,16 @@ public final class Activator extends Thread implements BundleActivator {
             mqttExecutor.shutdownNow();
             mqttExecutor = null;
         }
-        if (mqttAgentServer != null) {
-            agents.remove(mqttAgentServer);
-            mqttAgentServer = null;
-        }
+        // Close all active MQTT agents so it actually disconnects
+        agents.stream().filter(a -> a.getRpcType() == MQTT_RPC).forEach(a -> {
+            try {
+                IO.close(a);
+            } catch (Exception e) {
+                // ignore
+            }
+        });
+        agents.removeIf(a -> a.getRpcType() == MQTT_RPC);
+        mqttAgentServer    = null;
         isMqttAgentRunning = false;
         logger.atInfo().msg("[OSGi.fx] MQTT agent stopped").log();
     }
