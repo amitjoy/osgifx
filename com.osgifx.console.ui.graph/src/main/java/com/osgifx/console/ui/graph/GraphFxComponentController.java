@@ -232,7 +232,6 @@ public final class GraphFxComponentController implements GraphController {
 
             @Override
             protected Void call() throws Exception {
-                progressPane.setVisible(true);
 
                 if (selection == 0) {
                     logger.atDebug().log("Generating all graph paths for service components that are required by '%s'",
@@ -266,7 +265,14 @@ public final class GraphFxComponentController implements GraphController {
                 final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
                 graphView.setLayout(getLayoutName(layoutIndex));
             }
+
+            @Override
+            protected void failed() {
+                logger.atError().withException(getException()).log("Graph generation failed");
+                progressPane.setVisible(false);
+            }
         };
+        progressPane.setVisible(true);
         graphPane.setCenter(progressPane);
         if (graphGenFuture != null) {
             graphGenFuture.cancel(true);
