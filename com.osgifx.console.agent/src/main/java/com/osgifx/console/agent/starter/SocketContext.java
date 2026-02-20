@@ -34,6 +34,7 @@ import org.osgi.framework.ServiceReference;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
+import com.osgifx.console.agent.helper.AgentHelper;
 
 public final class SocketContext {
 
@@ -56,11 +57,11 @@ public final class SocketContext {
     }
 
     public ServerSocket getSocket() throws Exception {
-        final String secureCommunicationEnabled = bundleContext.getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY);
+        final String secureCommunicationEnabled = AgentHelper.getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY, bundleContext);
         if (Boolean.parseBoolean(secureCommunicationEnabled)) {
             logger.atInfo().msg("Secure communication enabled").log();
-            final String sslContextFilter = bundleContext
-                    .getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY);
+            final String sslContextFilter = AgentHelper
+                    .getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_SSL_CONTEXT_FILTER_KEY, bundleContext);
             if (sslContextFilter == null) {
                 logger.atWarn().msg("SSL context LDAP filter is not set for secure communication").log();
                 final SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
@@ -84,8 +85,8 @@ public final class SocketContext {
     }
 
     private void extractSpec() {
-        final String portKey    = bundleContext.getProperty(AGENT_SOCKET_PORT_KEY);
-        final String portKeyOld = bundleContext.getProperty("osgi.fx.agent.port"); // backward compatibility
+        final String portKey    = AgentHelper.getProperty(AGENT_SOCKET_PORT_KEY, bundleContext);
+        final String portKeyOld = AgentHelper.getProperty("osgi.fx.agent.port", bundleContext); // backward compatibility
         if (portKey == null && portKeyOld == null) {
             throw new IllegalArgumentException("Socket port not defined");
         }
