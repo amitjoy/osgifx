@@ -26,6 +26,8 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
 
+import org.osgi.framework.BundleContext;
+
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 
@@ -33,6 +35,20 @@ public final class AgentHelper {
 
     private AgentHelper() {
         throw new IllegalAccessError("Cannot be instantiated");
+    }
+
+    /**
+     * Resolves a property by first checking System properties (to allow dynamic
+     * overrides via Gogo shell commands), then falling back to the OSGi framework properties.
+     * 
+     * @param key the property key
+     * @param bundleContext the bundle context
+     * @return the property value, or null if not found
+     */
+    public static String getProperty(final String key, final BundleContext bundleContext) {
+        final String fromSystem = System.getProperty(key);
+        return fromSystem != null && !fromSystem.trim().isEmpty() ? fromSystem 
+               : bundleContext != null ? bundleContext.getProperty(key) : null;
     }
 
     public static XResultDTO createResult(final int result, final String response) {
