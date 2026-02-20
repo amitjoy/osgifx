@@ -133,11 +133,13 @@ public final class RuntimeBundleGraph {
             final var target              = new BundleVertex(b.symbolicName, b.id);
             final var isTargetVertexAdded = graph.addVertex(target);
             if (isTargetVertexAdded) {
-                processedBundles.add(source.toString());
+                processedBundles.add(target.toString());
             }
             graph.addEdge(source, target);
             final var dto = bundleMap.get(target.toString());
-            prepareGraph(dto, graph, strategy, processedBundles);
+            if (dto != null) {
+                prepareGraph(dto, graph, strategy, processedBundles);
+            }
         }
     }
 
