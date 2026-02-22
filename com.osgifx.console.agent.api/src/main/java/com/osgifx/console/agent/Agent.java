@@ -123,6 +123,26 @@ public interface Agent {
     String AGENT_AUTO_START_LOG_CAPTURE_KEY = "osgi.fx.agent.auto.start.log.capture";
 
     /**
+     * The property key to enable CLI command execution. Defaults to {@code true}.
+     */
+    String AGENT_CLI_ENABLED_KEY = "osgi.fx.agent.cli.enabled";
+
+    /**
+     * The property key to specify the allowlist for CLI command execution. Defaults to {@code *}.
+     */
+    String AGENT_CLI_ALLOWLIST_KEY = "osgi.fx.agent.cli.allowlist";
+
+    /**
+     * The property key to enable Gogo command execution. Defaults to {@code true}.
+     */
+    String AGENT_GOGO_ENABLED_KEY = "osgi.fx.agent.gogo.enabled";
+
+    /**
+     * The property key to specify the allowlist for Gogo command execution. Defaults to {@code *}.
+     */
+    String AGENT_GOGO_ALLOWLIST_KEY = "osgi.fx.agent.gogo.allowlist";
+
+    /**
      * The port for attaching to a remote Gogo CommandSession
      */
     int COMMAND_SESSION = -1;
