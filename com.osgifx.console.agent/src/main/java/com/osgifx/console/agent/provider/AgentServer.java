@@ -372,6 +372,11 @@ public final class AgentServer implements Agent, Closeable {
     public String execGogoCommand(final String command) throws Exception {
         requireNonNull(command, "Gogo command cannot be null");
 
+        final String verification = verifyCommand("Gogo", command, AGENT_GOGO_ENABLED_KEY, AGENT_GOGO_ALLOWLIST_KEY);
+        if (verification != null) {
+            return verification;
+        }
+
         redirect(COMMAND_SESSION);
         stdin(command);
         final PrintStream ps = redirector.getOut();
@@ -416,6 +421,11 @@ public final class AgentServer implements Agent, Closeable {
     public String execCliCommand(final String command) {
         requireNonNull(command, "CLI command cannot be null");
 
+        final String verification = verifyCommand("CLI", command, AGENT_CLI_ENABLED_KEY, AGENT_CLI_ALLOWLIST_KEY);
+        if (verification != null) {
+            return verification;
+        }
+
         final List<String> commandEntries = new ArrayList<>();
         if (OS.isFamilyWindows()) {
             commandEntries.add("cmd.exe");
@@ -446,6 +456,32 @@ public final class AgentServer implements Agent, Closeable {
         } catch (final Exception e) {
             return Exceptions.toString(e);
         }
+    }
+
+    private String verifyCommand(final String type,
+                                 final String command,
+                                 final String enabledKey,
+                                 final String allowlistKey) {
+        final BundleContext context    = getContext();
+        final String        configured = context.getProperty(enabledKey);
+        final boolean       isEnabled  = configured != null ? Boolean.parseBoolean(configured) : true;
+        if (!isEnabled) {
+            return type + " command execution is disabled";
+        }
+        final String allowlistRaw = context.getProperty(allowlistKey);
+        final String allowlist    = allowlistRaw != null ? allowlistRaw : "*";
+        if ("*".equals(allowlist)) {
+            return null;
+        }
+        final String[] allowedCommands = allowlist.split(",");
+        final String   baseCommand     = command.trim().split("\\s+")[0];
+
+        for (String allowedCommand : allowedCommands) {
+            if (baseCommand.equals(allowedCommand.trim())) {
+                return null;
+            }
+        }
+        return type + " command '" + baseCommand + "' is not allowed";
     }
 
     private List<String> parseCommand(String command, final List<String> commandEntries) {
