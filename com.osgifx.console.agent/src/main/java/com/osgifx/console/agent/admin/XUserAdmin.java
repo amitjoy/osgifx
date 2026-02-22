@@ -67,8 +67,11 @@ public final class XUserAdmin {
         }
         final List<XRoleDTO> dtos = new ArrayList<>();
         try {
-            for (final Role role : userAdmin.getRoles(null)) {
-                dtos.add(toRole(role, new HashSet<>()));
+            final Role[] roles = userAdmin.getRoles(null);
+            if (roles != null) {
+                for (final Role role : roles) {
+                    dtos.add(toRole(role, new HashSet<>()));
+                }
             }
         } catch (final Exception e) {
             // for any exception occurs in remote runtime
