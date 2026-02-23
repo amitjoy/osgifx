@@ -29,6 +29,7 @@ import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
@@ -129,6 +130,13 @@ public interface DataProvider {
      * @return the observable list of all HTTP components
      */
     ObservableList<XHttpComponentDTO> httpComponents();
+
+    /**
+     * Returns JAX-RS runtime information, including lists of all applications, extensions, resources, and failed ones.
+     *
+     * @return the observable list of all JAX-RS components
+     */
+    ObservableList<XJaxRsComponentDTO> jaxRsComponents();
 
     /**
      * Returns the Felix health checks.

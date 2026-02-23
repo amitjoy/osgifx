@@ -49,7 +49,10 @@ public enum OSGiCompendiumService {
     EVENT_ADMIN("Event Admin"),
 
     /** HTTP Runtime service. */
-    HTTP_RUNTIME("HTTP Runtime");
+    HTTP_RUNTIME("HTTP Runtime"),
+
+    /** JAX-RS Runtime service. */
+    JAX_RS_RUNTIME("JAX-RS Runtime");
 
     /** The comprehensible name of the OSGi compendium service. */
     public final String comprehensibleName;

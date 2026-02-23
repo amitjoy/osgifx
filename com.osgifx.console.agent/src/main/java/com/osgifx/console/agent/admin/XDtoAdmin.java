@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -91,7 +92,7 @@ public final class XDtoAdmin {
         // @formatter:off
         dto.containerTemplates = Stream.of(context.getBundles())
                                        .map(cdi::getContainerTemplateDTO)
-                                       .filter(java.util.Objects::nonNull)
+                                       .filter(Objects::nonNull)
                                        .collect(toList());
         // @formatter:on
 
