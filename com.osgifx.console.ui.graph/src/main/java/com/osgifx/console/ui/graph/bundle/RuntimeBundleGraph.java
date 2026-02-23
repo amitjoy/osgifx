@@ -17,9 +17,13 @@ package com.osgifx.console.ui.graph.bundle;
 
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -37,6 +41,7 @@ import org.jgrapht.traverse.BreadthFirstIterator;
 import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.ui.graph.GraphEdge;
 
 @Creatable
 public final class RuntimeBundleGraph {
@@ -45,11 +50,13 @@ public final class RuntimeBundleGraph {
     private DataProvider dataProvider;
 
     private Graph<BundleVertex, DefaultEdge> graph;
+    private Graph<BundleVertex, GraphEdge>   serviceGraph;
 
     @PostConstruct
     public void init() {
         final var bundles = dataProvider.bundles();
-        graph = buildGraph(bundles);
+        graph        = buildGraph(bundles);
+        serviceGraph = buildServiceGraph(bundles);
     }
 
     @Inject
@@ -70,9 +77,21 @@ public final class RuntimeBundleGraph {
         return new AsSubgraph<>(graph, vertices);
     }
 
-    private Set<BundleVertex> getVertices(final Collection<XBundleDTO> bundles,
-                                          final Graph<BundleVertex, DefaultEdge> graph,
-                                          final boolean isTransitive) {
+    public Graph<BundleVertex, GraphEdge> getAllBundlesThatUseServicesFrom(final Collection<XBundleDTO> bundles,
+                                                                           final boolean isTransitive) {
+        final var vertices = getVertices(bundles, new EdgeReversedGraph<>(serviceGraph), isTransitive);
+        return new AsSubgraph<>(serviceGraph, vertices);
+    }
+
+    public Graph<BundleVertex, GraphEdge> getAllBundlesThatProvideServicesTo(final Collection<XBundleDTO> bundles,
+                                                                             final boolean isTransitive) {
+        final var vertices = getVertices(bundles, serviceGraph, isTransitive);
+        return new AsSubgraph<>(serviceGraph, vertices);
+    }
+
+    private <E extends DefaultEdge> Set<BundleVertex> getVertices(final Collection<XBundleDTO> bundles,
+                                                                  final Graph<BundleVertex, E> graph,
+                                                                  final boolean isTransitive) {
         final Set<BundleVertex> vertices = Sets.newHashSet();
         for (final XBundleDTO bundle : bundles) {
             final var vertex = new BundleVertex(bundle.symbolicName, bundle.id);
@@ -82,7 +101,7 @@ public final class RuntimeBundleGraph {
                     new BreadthFirstIterator<>(graph, vertex).forEachRemaining(vertices::add);
                 } else {
                     // Direct neighbors only
-                    for (final DefaultEdge edge : graph.outgoingEdgesOf(vertex)) {
+                    for (final E edge : graph.outgoingEdgesOf(vertex)) {
                         vertices.add(graph.getEdgeTarget(edge));
                     }
                 }
@@ -101,6 +120,45 @@ public final class RuntimeBundleGraph {
                     final var target = new BundleVertex(d.symbolicName, d.id);
                     graph.addVertex(target);
                     graph.addEdge(source, target);
+                });
+            }
+        });
+        return graph;
+    }
+
+    private Graph<BundleVertex, GraphEdge> buildServiceGraph(final List<XBundleDTO> bundles) {
+        final Graph<BundleVertex, GraphEdge> graph            = new DefaultDirectedGraph<>(GraphEdge.class);
+        final Map<Long, BundleVertex>        serviceProviders = new HashMap<>();
+
+        // 1. Create vertices and map service IDs to providers
+        bundles.forEach(b -> {
+            final var vertex = new BundleVertex(b.symbolicName, b.id);
+            graph.addVertex(vertex);
+            if (b.registeredServices != null) {
+                b.registeredServices.forEach(s -> serviceProviders.put(s.id, vertex));
+            }
+        });
+
+        // 2. Create edges from consumers to providers
+        bundles.forEach(consumer -> {
+            if (consumer.usedServices != null) {
+                final var consumerVertex = new BundleVertex(consumer.symbolicName, consumer.id);
+                // Collect all services consumed by this bundle from specific providers
+                final Map<BundleVertex, List<String>> edgesToCreate = new HashMap<>();
+
+                consumer.usedServices.forEach(s -> {
+                    final var providerVertex = serviceProviders.get(s.id);
+                    // Avoid self-references to prevent graph loops
+                    if (providerVertex != null && !providerVertex.equals(consumerVertex)) {
+                        edgesToCreate.computeIfAbsent(providerVertex, _ -> new ArrayList<>()).add(s.objectClass);
+                    }
+                });
+
+                // Create aggregated edges
+                edgesToCreate.forEach((provider, classes) -> {
+                    final var label = classes.stream().distinct().sorted().collect(Collectors.joining(", "));
+                    final var edge  = new GraphEdge(label);
+                    graph.addEdge(consumerVertex, provider, edge);
                 });
             }
         });

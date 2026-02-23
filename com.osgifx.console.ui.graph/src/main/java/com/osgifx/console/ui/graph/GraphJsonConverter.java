@@ -51,10 +51,10 @@ public final class GraphJsonConverter {
      * @param <V> vertex type
      * @return JSON string of graph elements
      */
-    public static <V> String toJson(final Graph<V, DefaultEdge> graph,
-                                    final Function<V, String> idMapper,
-                                    final Function<V, String> labelMapper,
-                                    final java.util.function.Predicate<V> isSelected) {
+    public static <V, E extends DefaultEdge> String toJson(final Graph<V, E> graph,
+                                                           final Function<V, String> idMapper,
+                                                           final Function<V, String> labelMapper,
+                                                           final java.util.function.Predicate<V> isSelected) {
         final var elements  = Lists.<String> newArrayList();
         var       edgeIndex = 0;
 
@@ -68,11 +68,15 @@ public final class GraphJsonConverter {
         }
 
         // Add edges
-        for (final DefaultEdge edge : graph.edgeSet()) {
+        for (final E edge : graph.edgeSet()) {
             final var source = escapeJson(idMapper.apply(graph.getEdgeSource(edge)));
             final var target = escapeJson(idMapper.apply(graph.getEdgeTarget(edge)));
+            var       label  = "";
+            if (edge instanceof GraphEdge) {
+                label = escapeJson(((GraphEdge) edge).getLabel());
+            }
             elements.add("{ \"data\": { \"id\": \"e" + edgeIndex++ + "\", \"source\": \"" + source
-                    + "\", \"target\": \"" + target + "\" } }");
+                    + "\", \"target\": \"" + target + "\", \"label\": \"" + label + "\" } }");
         }
 
         return "[\n" + String.join(",\n", elements) + "\n]";
