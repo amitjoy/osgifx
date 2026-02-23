@@ -27,7 +27,7 @@
 
 <BorderPane fx:id="root" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.mcp.McpFxController">
    <top>
-      <HBox alignment="CENTER_LEFT" spacing="10.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="actionButton" mnemonicParsing="false" text="Start MCP Server" />
             <Button fx:id="refreshLogsButton" mnemonicParsing="false" onAction="#refreshLogs" text="Refresh Logs" />
