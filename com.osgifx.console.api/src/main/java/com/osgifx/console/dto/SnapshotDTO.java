@@ -29,6 +29,7 @@ import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
@@ -80,6 +81,9 @@ public class SnapshotDTO extends DTO {
 
     /** A list of bundle logger context data transfer objects. */
     public List<XBundleLoggerContextDTO> bundleLoggerContexts;
+
+    /** A list of JAX-RS component data transfer objects. */
+    public List<XJaxRsComponentDTO> jaxRsComponents;
 
     /** A data transfer object representing the heap usage. */
     public XHeapUsageDTO heapUsage;

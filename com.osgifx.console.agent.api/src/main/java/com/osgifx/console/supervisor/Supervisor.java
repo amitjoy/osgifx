@@ -15,10 +15,13 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor;
 
+import java.util.List;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 
 /**
@@ -134,6 +137,15 @@ public interface Supervisor {
      * @param logEntryListener the log consumer to deregister
      */
     void removeOSGiLogListener(LogEntryListener logEntryListener);
+
+    /**
+     * Returns the list of registered JAX-RS Whiteboard components in the runtime
+     *
+     * @return the list of JAX-RS components
+     */
+    default List<XJaxRsComponentDTO> getJaxRsComponents() {
+        return getAgent() == null ? java.util.Collections.emptyList() : getAgent().getJaxRsComponents();
+    }
 
     /**
      * Returns the associated agent

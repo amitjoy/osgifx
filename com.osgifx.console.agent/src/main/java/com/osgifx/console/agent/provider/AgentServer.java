@@ -26,6 +26,7 @@ import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.HC;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.HTTP;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.JAX_RS;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.JMX;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.LOG;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.R7_LOGGER;
@@ -102,6 +103,7 @@ import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
+import com.osgifx.console.agent.admin.XJaxRsAdmin;
 import com.osgifx.console.agent.admin.XJmxAdmin;
 import com.osgifx.console.agent.admin.XLogReaderAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
@@ -123,6 +125,7 @@ import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -1084,6 +1087,16 @@ public final class AgentServer implements Agent, Closeable {
             return di.getInstance(XHttpAdmin.class).runtime();
         }
         logger.atWarn().msg(packageNotWired(HTTP)).log();
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<XJaxRsComponentDTO> getJaxRsComponents() {
+        final boolean isJaxRsServiceRuntimeWired = di.getInstance(PackageWirings.class).isJaxRsWired();
+        if (isJaxRsServiceRuntimeWired) {
+            return di.getInstance(XJaxRsAdmin.class).getJaxRsComponents();
+        }
+        logger.atWarn().msg(packageNotWired(JAX_RS)).log();
         return Collections.emptyList();
     }
 
