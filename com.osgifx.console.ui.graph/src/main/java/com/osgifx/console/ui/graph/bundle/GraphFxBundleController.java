@@ -13,47 +13,52 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.graph;
+package com.osgifx.console.ui.graph.bundle;
 
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.Strings;
-import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.nio.Attribute;
+import org.jgrapht.nio.DefaultAttribute;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.graph.GraphController;
+import com.osgifx.console.ui.graph.GraphEdge;
+import com.osgifx.console.ui.graph.GraphJsonConverter;
+import com.osgifx.console.ui.graph.WebGraphView;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -64,29 +69,34 @@ public final class GraphFxBundleController implements GraphController {
 
     @Log
     @Inject
-    private FluentLogger                     logger;
+    private FluentLogger                               logger;
     @Inject
-    private Executor                         executor;
+    private Executor                                   executor;
     @FXML
-    private TextField                        searchText;
+    private TextField                                  searchText;
     @FXML
-    private CheckListView<XBundleDTO>        bundlesList;
+    private ListView<BundleItem>                       bundlesList;
     @FXML
-    private ChoiceBox<String>                wiringSelection;
+    private ChoiceBox<String>                          wiringSelection;
     @FXML
-    private ChoiceBox<String>                layoutSelection;
+    private ChoiceBox<String>                          layoutSelection;
     @FXML
-    private BorderPane                       graphPane;
+    private CheckBox                                   transitiveView;
+    @FXML
+    private CheckBox                                   showSelectedOnlyView;
+    @FXML
+    private BorderPane                                 graphPane;
     @Inject
-    private DataProvider                     dataProvider;
+    private DataProvider                               dataProvider;
     @Inject
-    private ThreadSynchronize                threadSync;
+    private ThreadSynchronize                          threadSync;
     @Inject
-    private RuntimeBundleGraph               runtimeGraph;
-    private MaskerPane                       progressPane;
-    private WebGraphView                     graphView;
-    private Future<?>                        graphGenFuture;
-    private Graph<BundleVertex, DefaultEdge> currentGraph;
+    private RuntimeBundleGraph                         runtimeGraph;
+    private MaskerPane                                 progressPane;
+    private WebGraphView                               graphView;
+    private Future<?>                                  graphGenFuture;
+    private Graph<BundleVertex, ? extends DefaultEdge> currentGraph;
+    private ObservableList<BundleItem>                 masterBundleList;
 
     @FXML
     public void initialize() {
@@ -114,7 +124,8 @@ public final class GraphFxBundleController implements GraphController {
     }
 
     private void initWiringSelection() {
-        wiringSelection.getItems().addAll("Find all bundles that are required by", "Find all bundles that require");
+        wiringSelection.getItems().addAll("Find all bundles that are required by", "Find all bundles that require",
+                "Find all bundles that use services from", "Find all bundles that provide services to");
         wiringSelection.getSelectionModel().select(0);
     }
 
@@ -156,14 +167,24 @@ public final class GraphFxBundleController implements GraphController {
         graphPane.setOnContextMenuRequested(e -> menu.show(graphPane.getCenter(), e.getScreenX(), e.getScreenY()));
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void exportToDOT(final File location) {
         if (currentGraph == null) {
             return;
         }
         final var exporter = new DOTExporter<BundleVertex, DefaultEdge>(BundleVertex::toDotID);
+        exporter.setEdgeAttributeProvider(e -> {
+            final Map<String, Attribute> attributes = new HashMap<>();
+            if (e instanceof GraphEdge) {
+                attributes.put("label", DefaultAttribute.createAttribute(((GraphEdge) e).getLabel()));
+            }
+            return attributes;
+        });
         try {
             final var dotFile = new File(location, generateDotFileName("Bundles"));
-            exporter.exportGraph(currentGraph, dotFile);
+            // Cast to raw Graph first to bypass generic type checks, then to the specific type expected by exporter
+            // This is safe because we are only reading from the graph and GraphEdge extends DefaultEdge
+            exporter.exportGraph((Graph) currentGraph, dotFile);
         } catch (final ExportException e) {
             logger.atError().withException(e).log("Cannot export the graph to '%s'", location);
             throw e;
@@ -172,49 +193,57 @@ public final class GraphFxBundleController implements GraphController {
 
     private void initBundlesList() {
         bundlesList.getSelectionModel().setSelectionMode(MULTIPLE);
-        bundlesList.setCellFactory(_ -> new CheckBoxListCell<>(bundlesList::getItemBooleanProperty) {
-            @Override
-            public void updateItem(final XBundleDTO bundle, final boolean empty) {
-                threadSync.syncExec(() -> super.updateItem(bundle, empty));
-                if (empty || bundle == null) {
-                    threadSync.syncExec(() -> setText(null));
-                } else {
-                    threadSync.syncExec(() -> setText(bundle.symbolicName));
-                }
-            }
-        });
-        final var bundles             = dataProvider.bundles();
-        final var filteredBundlesList = initSearchFilter(bundles);
+        bundlesList.setCellFactory(CheckBoxListCell.forListView(BundleItem::selectedProperty));
 
-        bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.symbolicName)));
+        final var bundles = dataProvider.bundles();
+        masterBundleList = FXCollections.observableArrayList(bundles.stream().map(BundleItem::new).toList());
+
+        final var filteredBundlesList = initSearchFilter(masterBundleList);
+
+        bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.getBundle().symbolicName)));
         logger.atInfo().log("Bundles list has been initialized");
     }
 
-    private FilteredList<XBundleDTO> initSearchFilter(final ObservableList<XBundleDTO> bundles) {
+    private FilteredList<BundleItem> initSearchFilter(final ObservableList<BundleItem> bundles) {
         final var filteredBundlesList = new FilteredList<>(bundles, Predicates.alwaysTrue());
         updateFilteredList(filteredBundlesList);
         searchText.textProperty().addListener(_ -> {
             updateFilteredList(filteredBundlesList);
             searchText.requestFocus();
         });
+        showSelectedOnlyView.selectedProperty().addListener((_, _, _) -> updateFilteredList(filteredBundlesList));
         return filteredBundlesList;
     }
 
-    private void updateFilteredList(final FilteredList<XBundleDTO> filteredBundlesList) {
-        final var filter = searchText.getText();
-        if (filter == null || filter.isBlank()) {
-            filteredBundlesList.setPredicate(Predicates.alwaysTrue());
-        } else {
-            filteredBundlesList.setPredicate(
-                    s -> Stream.of(filter.split("\\|")).anyMatch(e -> Strings.CI.contains(s.symbolicName, e)));
-        }
+    private void updateFilteredList(final FilteredList<BundleItem> filteredBundlesList) {
+        final var filter           = searchText.getText();
+        final var showSelectedOnly = showSelectedOnlyView.isSelected();
+        final var predicate        = new java.util.function.Predicate<BundleItem>() {
+                                       @Override
+                                       public boolean test(final BundleItem item) {
+                                           final var isSelected = item.isSelected();
+                                           if (showSelectedOnly && !isSelected) {
+                                               return false;
+                                           }
+                                           if (filter == null || filter.isBlank()) {
+                                               return true;
+                                           }
+                                           return Stream.of(filter.split("\\|")).anyMatch(
+                                                   e -> Strings.CI.contains(item.getBundle().symbolicName, e));
+                                       }
+                                   };
+        filteredBundlesList.setPredicate(predicate);
     }
 
     @FXML
     private void generateGraph(final ActionEvent event) {
         logger.atInfo().log("Generating graph for bundles");
-        final var selection       = wiringSelection.getSelectionModel().getSelectedIndex();
-        final var selectedBundles = Lists.newArrayList(bundlesList.getCheckModel().getCheckedItems());
+        final var selection    = wiringSelection.getSelectionModel().getSelectedIndex();
+        final var isTransitive = transitiveView.isSelected();
+
+        final var selectedBundles = Lists.newArrayList(
+                masterBundleList.stream().filter(BundleItem::isSelected).map(BundleItem::getBundle).toList());
+
         if (selectedBundles.isEmpty()) {
             logger.atInfo().log("No bundle has been selected. Skipped graph generation.");
             return;
@@ -224,35 +253,47 @@ public final class GraphFxBundleController implements GraphController {
 
             @Override
             protected Void call() throws Exception {
-
-                final Collection<GraphPath<BundleVertex, DefaultEdge>> dependencies;
-                if (selection == 0) {
-                    logger.atInfo().log("Generating all graph paths for bundles that are required by '%s'",
-                            selectedBundles);
-                    dependencies = runtimeGraph.getAllBundlesThatAreRequiredBy(selectedBundles);
-                } else {
-                    logger.atInfo().log("Generating all graph paths for bundles that require '%s'", selectedBundles);
-                    dependencies = runtimeGraph.getAllBundlesThatRequire(selectedBundles);
+                switch (selection) {
+                    case 0 -> {
+                        logger.atInfo().log("Generating all graph paths for bundles that are required by '%s'",
+                                selectedBundles);
+                        currentGraph = runtimeGraph.getAllBundlesThatAreRequiredBy(selectedBundles, isTransitive);
+                    }
+                    case 1 -> {
+                        logger.atInfo().log("Generating all graph paths for bundles that require '%s'",
+                                selectedBundles);
+                        currentGraph = runtimeGraph.getAllBundlesThatRequire(selectedBundles, isTransitive);
+                    }
+                    case 2 -> {
+                        logger.atInfo().log("Generating all graph paths for bundles that use services from '%s'",
+                                selectedBundles);
+                        currentGraph = runtimeGraph.getAllBundlesThatUseServicesFrom(selectedBundles, isTransitive);
+                    }
+                    case 3 -> {
+                        logger.atInfo().log("Generating all graph paths for bundles that provide services to '%s'",
+                                selectedBundles);
+                        currentGraph = runtimeGraph.getAllBundlesThatProvideServicesTo(selectedBundles, isTransitive);
+                    }
+                    default -> {
+                    }
                 }
-                // Merge all paths into a single JGraphT graph
-                currentGraph = mergePathsToGraph(dependencies);
                 return null;
             }
 
             @Override
+            @SuppressWarnings({ "rawtypes", "unchecked" })
             protected void succeeded() {
-                final var json = GraphJsonConverter.toJson(currentGraph, BundleVertex::toDotID,
-                        BundleVertex::symbolicName);
+                final var selectedIds = selectedBundles.stream()
+                        .map(b -> BundleVertex.DOT_ID_FUNCTION.apply(b.symbolicName, b.id)).toList();
+
+                final var json = GraphJsonConverter.toJson((Graph) currentGraph, BundleVertex::toDotID,
+                        BundleVertex::symbolicName, v -> selectedIds.contains(v.toDotID()));
 
                 graphView = new WebGraphView();
                 progressPane.setVisible(false);
                 graphPane.setCenter(graphView);
-                graphView.loadGraph(json);
 
-                // Highlight initially selected bundles
-                final List<String> selectedIds = selectedBundles.stream()
-                        .map(b -> BundleVertex.DOT_ID_FUNCTION.apply(b.symbolicName, b.id)).toList();
-                graphView.markSelectedNodes(selectedIds);
+                graphView.loadGraph(json);
 
                 // Apply selected layout
                 final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
@@ -296,23 +337,9 @@ public final class GraphFxBundleController implements GraphController {
 
     @FXML
     private void deselectAll(final ActionEvent event) {
-        bundlesList.getCheckModel().clearChecks();
-    }
-
-    private static Graph<BundleVertex, DefaultEdge> mergePathsToGraph(final Collection<GraphPath<BundleVertex, DefaultEdge>> graphPaths) {
-        final Graph<BundleVertex, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-        for (final GraphPath<BundleVertex, DefaultEdge> path : graphPaths) {
-            for (final DefaultEdge edge : path.getEdgeList()) {
-                final var source = path.getGraph().getEdgeSource(edge);
-                final var target = path.getGraph().getEdgeTarget(edge);
-                graph.addVertex(source);
-                graph.addVertex(target);
-                if (!graph.containsEdge(source, target)) {
-                    graph.addEdge(source, target);
-                }
-            }
+        if (masterBundleList != null) {
+            masterBundleList.forEach(b -> b.setSelected(false));
         }
-        return graph;
     }
 
 }
