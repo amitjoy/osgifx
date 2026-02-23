@@ -13,23 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.graph;
+package com.osgifx.console.ui.graph.component;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
-public record BundleVertex(String symbolicName, long id) {
+public record ComponentVertex(String name) {
 
-    public static final BiFunction<String, Long, String> VERTEX_ID_FUNCTION = (bsn, id) -> bsn + ":" + id;
-    public static final BiFunction<String, Long, String> DOT_ID_FUNCTION = (bsn, id) -> (bsn + '_' + id)
-            .replaceAll("[^a-zA-Z0-9]", "_");
+    public static final Function<String, String> VERTEX_ID_FUNCTION = Function.identity();
+    public static final UnaryOperator<String> DOT_ID_FUNCTION = name -> name.replaceAll("[^a-zA-Z0-9]", "_");
 
     @Override
     public String toString() {
-        return VERTEX_ID_FUNCTION.apply(symbolicName, id);
+        return name;
     }
 
     public String toDotID() {
-        return DOT_ID_FUNCTION.apply(symbolicName, id);
+        return DOT_ID_FUNCTION.apply(name);
     }
 
 }

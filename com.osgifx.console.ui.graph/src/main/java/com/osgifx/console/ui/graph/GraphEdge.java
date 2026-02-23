@@ -15,21 +15,25 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph;
 
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import org.jgrapht.graph.DefaultEdge;
 
-public record ComponentVertex(String name) {
+public class GraphEdge extends DefaultEdge {
 
-    public static final Function<String, String> VERTEX_ID_FUNCTION = Function.identity();
-    public static final UnaryOperator<String> DOT_ID_FUNCTION = name -> name.replaceAll("[^a-zA-Z0-9]", "_");
+    private static final long serialVersionUID = 1L;
+
+    private final String label;
+
+    public GraphEdge(final String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 
     @Override
     public String toString() {
-        return name;
-    }
-
-    public String toDotID() {
-        return DOT_ID_FUNCTION.apply(name);
+        return label;
     }
 
 }

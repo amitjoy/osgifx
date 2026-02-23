@@ -62,6 +62,7 @@ import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.framework.wiring.dto.BundleRevisionDTO;
 import org.osgi.util.tracker.BundleTracker;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
@@ -77,11 +78,12 @@ import jakarta.inject.Inject;
 
 public final class XBundleAdmin {
 
-    private final Map<Long, XBundleDTO>     bundles = new ConcurrentHashMap<>();
-    private final BundleContext             context;
-    private final BundleStartTimeCalculator bundleStartTimeCalculator;
-    private BundleTracker<Future<?>>        bundleTracker;
-    private ExecutorService                 executor;
+    private final Map<Long, XBundleDTO>       bundles = new ConcurrentHashMap<>();
+    private final BundleContext               context;
+    private final BundleStartTimeCalculator   bundleStartTimeCalculator;
+    private BundleTracker<Future<?>>          bundleTracker;
+    private ServiceTracker<Object, Future<?>> serviceTracker;
+    private ExecutorService                   executor;
 
     private static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
 
@@ -118,11 +120,37 @@ public final class XBundleAdmin {
             }
         };
         bundleTracker.open();
+
+        try {
+            serviceTracker = new ServiceTracker<Object, Future<?>>(context, context.createFilter("(objectClass=*)"),
+                                                                   null) {
+                @Override
+                public Future<?> addingService(final ServiceReference<Object> reference) {
+                    return executor.submit(() -> handleServiceChange(reference));
+                }
+
+                @Override
+                public void modifiedService(final ServiceReference<Object> reference, final Future<?> object) {
+                    executor.submit(() -> handleServiceChange(reference));
+                }
+
+                @Override
+                public void removedService(final ServiceReference<Object> reference, final Future<?> object) {
+                    executor.submit(() -> handleServiceRemoval(reference));
+                }
+            };
+            serviceTracker.open();
+        } catch (final Exception e) {
+            logger.atError().msg("Error occurred while initializing service tracker").throwable(e).log();
+        }
     }
 
     public void stop() {
         if (bundleTracker != null) {
             bundleTracker.close();
+        }
+        if (serviceTracker != null) {
+            serviceTracker.close();
         }
     }
 
@@ -132,6 +160,48 @@ public final class XBundleAdmin {
             bundles.put(bundle.getBundleId(), dto);
         } catch (final Exception e) {
             logger.atError().msg("Error processing bundle '{}'").arg(bundle.getSymbolicName()).throwable(e).log();
+        }
+    }
+
+    private void handleServiceChange(final ServiceReference<Object> reference) {
+        // Update provider
+        final Bundle provider = reference.getBundle();
+        if (provider != null) {
+            updateServices(provider);
+        }
+        // Update consumers
+        final Bundle[] usingBundles = reference.getUsingBundles();
+        if (usingBundles != null) {
+            for (final Bundle bundle : usingBundles) {
+                updateServices(bundle);
+            }
+        }
+    }
+
+    private void handleServiceRemoval(final ServiceReference<Object> reference) {
+        final Long serviceId = (Long) reference.getProperty(SERVICE_ID);
+        // We cannot rely on reference.getBundle() or reference.getUsingBundles() as the service is already unregistered
+        // So we assume that any bundle that has this service in its registered or used list needs an update
+        bundles.values().stream().filter(dto -> hasService(dto, serviceId)).forEach(dto -> {
+            final Bundle bundle = context.getBundle(dto.id);
+            if (bundle != null) {
+                updateServices(bundle);
+            }
+        });
+    }
+
+    private boolean hasService(final XBundleDTO dto, final long serviceId) {
+        if (dto.registeredServices != null && dto.registeredServices.stream().anyMatch(s -> s.id == serviceId)) {
+            return true;
+        }
+        return dto.usedServices != null && dto.usedServices.stream().anyMatch(s -> s.id == serviceId);
+    }
+
+    private void updateServices(final Bundle bundle) {
+        final XBundleDTO dto = bundles.get(bundle.getBundleId());
+        if (dto != null) {
+            dto.registeredServices = getRegisteredServices(bundle);
+            dto.usedServices       = getUsedServices(bundle);
         }
     }
 

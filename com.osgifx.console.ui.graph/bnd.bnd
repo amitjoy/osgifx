@@ -13,7 +13,7 @@ Model-Fragment: fragment.e4xmi;apply=always
                       org.jgrapht.io
 -privatepackage     : \
                       org.jgrapht.*,\
-                      com.osgifx.console.ui.graph
+                      com.osgifx.console.ui.graph.*
 Import-Package      : \
                       javafx.scene.web,\
                       javafx.concurrent,\

@@ -31,7 +31,7 @@
             fill: none;
             stroke: #94a3b8;
             stroke-width: 1.5;
-            transition: all 0.2s ease;
+            transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease;
         }
 
         .edge-line.highlighted {
@@ -67,10 +67,12 @@
             filter: url(#drop-shadow-hover);
         }
 
+        /* 
         .node-rect.root {
             fill: url(#gradient-root);
             stroke: #4f46e5;
-        }
+        } 
+        */
 
         .node-rect.selected {
             fill: url(#gradient-selected);
@@ -93,6 +95,21 @@
         .node-rect.faded {
             opacity: 0.15;
             filter: none;
+        }
+
+        /* Edge labels */
+        .edge-label {
+            fill: #64748b;
+            font-size: 9px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            text-anchor: middle;
+            dominant-baseline: central;
+            paint-order: stroke;
+            stroke: #f8fafc;
+            stroke-width: 3px;
+            stroke-linecap: butt;
+            stroke-linejoin: miter;
+            pointer-events: none;
         }
 
         /* Node labels */
@@ -390,6 +407,7 @@
                 .enter()
                 .append('line')
                 .attr('class', 'edge-line')
+                .attr('id', function (d) { return 'edge-line-' + d.id; })
                 .attr('x1', function (d) { return d.points ? d.points.x1 : 0; })
                 .attr('y1', function (d) { return d.points ? d.points.y1 : 0; })
                 .attr('x2', function (d) { return d.points ? d.points.x2 : 0; })
@@ -397,6 +415,19 @@
                 .attr('marker-end', 'url(#arrowhead)')
                 .attr('data-source', function (d) { return d.source; })
                 .attr('data-target', function (d) { return d.target; });
+
+            // Draw edge labels
+            var edgeLabelGroup = mainGroup.append('g').attr('class', 'edge-labels');
+            edgeLabelGroup.selectAll('text')
+                .data(graphData.edges)
+                .enter()
+                .append('text')
+                .attr('class', 'edge-label')
+                .attr('id', function (d) { return 'edge-label-' + d.id; })
+                .text(function (d) { return d.label; })
+                .attr('x', function (d) { return d.points ? (d.points.x1 + d.points.x2) / 2 : 0; })
+                .attr('y', function (d) { return d.points ? (d.points.y1 + d.points.y2) / 2 : 0; })
+                .attr('opacity', function (d) { return d.label ? 1 : 0; });
 
             // Draw nodes
             var nodeGroup = mainGroup.append('g').attr('class', 'nodes');
@@ -417,7 +448,7 @@
 
             nodes.append('rect')
                 .attr('class', function (d) {
-                    return 'node-rect' + (targetIds[d.id] ? '' : ' root');
+                    return 'node-rect' + (d.selected ? ' selected' : '');
                 })
                 .attr('x', function (d) { return -(d.w || 60) / 2; })
                 .attr('y', function (d) { return -(d.h || 28) / 2; })
@@ -453,7 +484,7 @@
         }
 
         function updateEdgesForNode(nodeId) {
-            d3.selectAll('.edge-line').each(function () {
+            d3.selectAll('.edge-line').each(function (d) { // d is bound data
                 var el = d3.select(this);
                 var src = el.attr('data-source');
                 var tgt = el.attr('data-target');
@@ -464,6 +495,13 @@
                         var pts = computeEdgeEndpoints(srcNode, tgtNode);
                         el.attr('x1', pts.x1).attr('y1', pts.y1)
                             .attr('x2', pts.x2).attr('y2', pts.y2);
+                        
+                        // Update associated label using ID lookup (O(1))
+                        if (d.id) {
+                            d3.select('#edge-label-' + d.id)
+                                .attr('x', (pts.x1 + pts.x2) / 2)
+                                .attr('y', (pts.y1 + pts.y2) / 2);
+                        }
                     }
                 }
             });
@@ -550,14 +588,17 @@
                     elements.forEach(function (el) {
                         if (el.data.source && el.data.target) {
                             graphData.edges.push({
+                                id: el.data.id,
                                 source: el.data.source,
-                                target: el.data.target
+                                target: el.data.target,
+                                label: el.data.label || ''
                             });
                         } else {
                             graphData.nodes.push({
                                 id: el.data.id,
                                 label: el.data.label || el.data.id,
-                                bsn: el.data.bsn || ''
+                                bsn: el.data.bsn || '',
+                                selected: el.data.selected === true
                             });
                         }
                     });
@@ -649,7 +690,7 @@
 
         function markSelectedNodes(idsJson) {
             try {
-                var ids = JSON.parse(idsJson);
+                var ids = JSON.parse(idsJson) || [];
                 d3.selectAll('.node-rect').classed('selected', false);
                 if (ids && ids.length) {
                     ids.forEach(function (id) {

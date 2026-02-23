@@ -13,48 +13,48 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.graph;
+package com.osgifx.console.ui.graph.component;
 
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.Strings;
-import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.nio.ExportException;
 import org.jgrapht.nio.dot.DOTExporter;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.graph.GraphController;
+import com.osgifx.console.ui.graph.GraphJsonConverter;
+import com.osgifx.console.ui.graph.WebGraphView;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -71,11 +71,15 @@ public final class GraphFxComponentController implements GraphController {
     @FXML
     private TextField                           searchText;
     @FXML
-    private CheckListView<XComponentDTO>        componentsList;
+    private ListView<ComponentItem>             componentsList;
     @FXML
     private ChoiceBox<String>                   wiringSelection;
     @FXML
     private ChoiceBox<String>                   layoutSelection;
+    @FXML
+    private CheckBox                            transitiveView;
+    @FXML
+    private CheckBox                            showSelectedOnlyView;
     @FXML
     private BorderPane                          graphPane;
     @Inject
@@ -88,6 +92,7 @@ public final class GraphFxComponentController implements GraphController {
     private WebGraphView                        graphView;
     private Future<?>                           graphGenFuture;
     private Graph<ComponentVertex, DefaultEdge> currentGraph;
+    private ObservableList<ComponentItem>       masterComponentList;
 
     @FXML
     public void initialize() {
@@ -123,7 +128,11 @@ public final class GraphFxComponentController implements GraphController {
 
                     searchText.setDisable(condition);
                     componentsList.setDisable(condition);
-                    componentsList.getCheckModel().clearChecks();
+                    if (masterComponentList != null) {
+                        masterComponentList.forEach(c -> c.setSelected(false));
+                    }
+                    transitiveView.setDisable(condition);
+                    showSelectedOnlyView.setDisable(condition);
                 });
     }
 
@@ -181,48 +190,57 @@ public final class GraphFxComponentController implements GraphController {
 
     private void initComponentsList() {
         componentsList.getSelectionModel().setSelectionMode(MULTIPLE);
-        componentsList.setCellFactory(_ -> new CheckBoxListCell<>(componentsList::getItemBooleanProperty) {
-            @Override
-            public void updateItem(final XComponentDTO component, final boolean empty) {
-                threadSync.asyncExec(() -> super.updateItem(component, empty));
-                if (empty || component == null) {
-                    threadSync.asyncExec(() -> setText(null));
-                } else {
-                    threadSync.asyncExec(() -> setText(component.name));
-                }
-            }
-        });
-        final var components             = dataProvider.components();
-        final var filteredComponentsList = initSearchFilter(components);
-        componentsList.setItems(filteredComponentsList.sorted(Comparator.comparing(b -> b.name)));
+        componentsList.setCellFactory(CheckBoxListCell.forListView(ComponentItem::selectedProperty));
+
+        final var components = dataProvider.components();
+        masterComponentList = FXCollections.observableArrayList(components.stream().map(ComponentItem::new).toList());
+
+        final var filteredComponentsList = initSearchFilter(masterComponentList);
+
+        componentsList.setItems(filteredComponentsList.sorted(Comparator.comparing(b -> b.getComponent().name)));
         logger.atInfo().log("Components list has been initialized");
     }
 
-    private FilteredList<XComponentDTO> initSearchFilter(final ObservableList<XComponentDTO> components) {
+    private FilteredList<ComponentItem> initSearchFilter(final ObservableList<ComponentItem> components) {
         final var filteredComponentsList = new FilteredList<>(components, Predicates.alwaysTrue());
         updateFilteredList(filteredComponentsList);
         searchText.textProperty().addListener(_ -> {
             updateFilteredList(filteredComponentsList);
             searchText.requestFocus();
         });
+        showSelectedOnlyView.selectedProperty().addListener((_, _, _) -> updateFilteredList(filteredComponentsList));
         return filteredComponentsList;
     }
 
-    private void updateFilteredList(final FilteredList<XComponentDTO> filteredComponentsList) {
-        final var filter = searchText.getText();
-        if (filter == null || filter.isBlank()) {
-            filteredComponentsList.setPredicate(Predicates.alwaysTrue());
-        } else {
-            filteredComponentsList
-                    .setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> Strings.CI.contains(s.name, e)));
-        }
+    private void updateFilteredList(final FilteredList<ComponentItem> filteredComponentsList) {
+        final var filter           = searchText.getText();
+        final var showSelectedOnly = showSelectedOnlyView.isSelected();
+        final var predicate        = new java.util.function.Predicate<ComponentItem>() {
+                                       @Override
+                                       public boolean test(final ComponentItem item) {
+                                           final var isSelected = item.isSelected();
+                                           if (showSelectedOnly && !isSelected) {
+                                               return false;
+                                           }
+                                           if (filter == null || filter.isBlank()) {
+                                               return true;
+                                           }
+                                           return Stream.of(filter.split("\\|"))
+                                                   .anyMatch(e -> Strings.CI.contains(item.getComponent().name, e));
+                                       }
+                                   };
+        filteredComponentsList.setPredicate(predicate);
     }
 
     @FXML
     private void generateGraph(final ActionEvent event) {
         logger.atInfo().log("Generating graph for components");
-        final var selection          = wiringSelection.getSelectionModel().getSelectedIndex();
-        final var selectedComponents = Lists.newArrayList(componentsList.getCheckModel().getCheckedItems());
+        final var selection    = wiringSelection.getSelectionModel().getSelectedIndex();
+        final var isTransitive = transitiveView.isSelected();
+
+        final var selectedComponents = Lists.newArrayList(masterComponentList.stream().filter(ComponentItem::isSelected)
+                .map(ComponentItem::getComponent).toList());
+
         if (selectedComponents.isEmpty() && selection == 0) {
             logger.atInfo().log("No component has been selected. Skipped graph generation.");
             return;
@@ -236,9 +254,8 @@ public final class GraphFxComponentController implements GraphController {
                 if (selection == 0) {
                     logger.atDebug().log("Generating all graph paths for service components that are required by '%s'",
                             selectedComponents);
-                    final Collection<GraphPath<ComponentVertex, DefaultEdge>> dependencies = runtimeGraph
-                            .getAllServiceComponentsThatAreRequiredBy(selectedComponents);
-                    currentGraph = mergePathsToGraph(dependencies);
+                    currentGraph = runtimeGraph.getAllServiceComponentsThatAreRequiredBy(selectedComponents,
+                            isTransitive);
                 } else {
                     logger.atDebug().log("Generating service component cycles");
                     currentGraph = runtimeGraph.getAllCycles();
@@ -248,18 +265,16 @@ public final class GraphFxComponentController implements GraphController {
 
             @Override
             protected void succeeded() {
+                final var selectedIds = selectedComponents.stream()
+                        .map(c -> ComponentVertex.DOT_ID_FUNCTION.apply(c.name)).toList();
+
                 final var json = GraphJsonConverter.toJson(currentGraph, ComponentVertex::toDotID,
-                        ComponentVertex::name);
+                        ComponentVertex::name, v -> selectedIds.contains(v.toDotID()));
 
                 graphView = new WebGraphView();
                 progressPane.setVisible(false);
                 graphPane.setCenter(graphView);
                 graphView.loadGraph(json);
-
-                // Highlight initially selected components
-                final List<String> selectedIds = selectedComponents.stream()
-                        .map(c -> ComponentVertex.DOT_ID_FUNCTION.apply(c.name)).toList();
-                graphView.markSelectedNodes(selectedIds);
 
                 // Apply selected layout
                 final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
@@ -303,23 +318,9 @@ public final class GraphFxComponentController implements GraphController {
 
     @FXML
     private void deselectAll(final ActionEvent event) {
-        componentsList.getCheckModel().clearChecks();
-    }
-
-    private static Graph<ComponentVertex, DefaultEdge> mergePathsToGraph(final Collection<GraphPath<ComponentVertex, DefaultEdge>> graphPaths) {
-        final Graph<ComponentVertex, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-        for (final GraphPath<ComponentVertex, DefaultEdge> path : graphPaths) {
-            for (final DefaultEdge edge : path.getEdgeList()) {
-                final var source = path.getGraph().getEdgeSource(edge);
-                final var target = path.getGraph().getEdgeTarget(edge);
-                graph.addVertex(source);
-                graph.addVertex(target);
-                if (!graph.containsEdge(source, target)) {
-                    graph.addEdge(source, target);
-                }
-            }
+        if (masterComponentList != null) {
+            masterComponentList.forEach(c -> c.setSelected(false));
         }
-        return graph;
     }
 
 }
