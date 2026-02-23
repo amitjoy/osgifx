@@ -342,4 +342,11 @@ public final class GraphFxBundleController implements GraphController {
         }
     }
 
+    @FXML
+    private void selectAll(final ActionEvent event) {
+        if (masterBundleList != null) {
+            masterBundleList.forEach(b -> b.setSelected(true));
+        }
+    }
+
 }
