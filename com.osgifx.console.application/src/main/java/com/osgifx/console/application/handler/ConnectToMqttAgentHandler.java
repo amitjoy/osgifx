@@ -51,7 +51,10 @@ import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.util.Duration;
 
 public final class ConnectToMqttAgentHandler {
 
@@ -111,17 +114,32 @@ public final class ConnectToMqttAgentHandler {
         }
         final var selectedButton = result.get();
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.ADD_CONNECTION)) {
-            addConnection();
+            final var isAdded = addConnection();
             removeCurrentSelection();
+            if (isAdded) {
+                final var pause = new PauseTransition(Duration.seconds(3));
+                pause.setOnFinished(_ -> Platform.runLater(this::execute));
+                pause.play();
+            }
             return;
         }
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.EDIT_CONNECTION)) {
-            editConnection(selectedSettings.getValue());
+            final var isEdited = editConnection(selectedSettings.getValue());
+            if (isEdited) {
+                final var pause = new PauseTransition(Duration.seconds(3));
+                pause.setOnFinished(_ -> Platform.runLater(this::execute));
+                pause.play();
+            }
             return;
         }
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.REMOVE_CONNECTION)) {
-            removeConnection();
+            final var isRemoved = removeConnection();
             removeCurrentSelection();
+            if (isRemoved) {
+                final var pause = new PauseTransition(Duration.seconds(3));
+                pause.setOnFinished(_ -> Platform.runLater(this::execute));
+                pause.play();
+            }
             return;
         }
         if (selectedButton == connectToAgentDialog.getButtonType(ActionType.CONNECT)) {
@@ -139,7 +157,7 @@ public final class ConnectToMqttAgentHandler {
         return !isConnected.getValue();
     }
 
-    private void addConnection() {
+    private boolean addConnection() {
         logger.atInfo().log("'%s'-'addConnection(..)' event has been invoked", getClass().getSimpleName());
 
         final var connectionDialog = new MqttConnectionDialog();
@@ -154,10 +172,12 @@ public final class ConnectToMqttAgentHandler {
             triggerCommand(dto, "ADD");
             logger.atInfo().log("ADD command has been invoked for %s", dto);
             Fx.showSuccessNotification("Connection Settings", "New connection settings has been added successfully");
+            return true;
         }
+        return false;
     }
 
-    private void editConnection(final MqttConnectionSettingDTO setting) {
+    private boolean editConnection(final MqttConnectionSettingDTO setting) {
         logger.atInfo().log("'%s'-'editConnection(..)' event has been invoked", getClass().getSimpleName());
 
         final var connectionDialog = new MqttConnectionDialog();
@@ -172,19 +192,22 @@ public final class ConnectToMqttAgentHandler {
             triggerCommand(dto, "EDIT");
             logger.atInfo().log("EDIT command has been invoked for %s", dto);
             Fx.showSuccessNotification("Connection Settings", "Connection settings has been updated successfully");
+            return true;
         }
+        return false;
     }
 
-    private void removeConnection() {
+    private boolean removeConnection() {
         logger.atInfo().log("'%s'-'removeConnection(..)' event has been invoked", getClass().getSimpleName());
         final MqttConnectionSettingDTO settings = selectedSettings.getValue();
         if (settings == null) {
             logger.atInfo().log("No connection setting has been selected");
-            return;
+            return false;
         }
         triggerCommand(settings, "REMOVE");
         logger.atInfo().log("REMOVE command has been invoked for %s", settings);
         Fx.showSuccessNotification("Connection Settings", "Connection settings has been removed successfully");
+        return true;
     }
 
     private void connectAgent() {
