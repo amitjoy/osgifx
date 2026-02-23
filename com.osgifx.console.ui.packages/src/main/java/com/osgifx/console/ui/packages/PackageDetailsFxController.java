@@ -76,7 +76,12 @@ public final class PackageDetailsFxController {
         importersTable.setItems(FXCollections.observableArrayList(pkg.importers));
 
         TableFilter.forTableView(exportersTable).apply();
+        exportersTable.getSortOrder().add(exportersTableBsnColumn);
+        exportersTable.sort();
+
         TableFilter.forTableView(importersTable).apply();
+        importersTable.getSortOrder().add(importersTableBsnColumn);
+        importersTable.sort();
 
         Fx.addContextMenuToCopyContent(exportersTable);
         Fx.addContextMenuToCopyContent(importersTable);
