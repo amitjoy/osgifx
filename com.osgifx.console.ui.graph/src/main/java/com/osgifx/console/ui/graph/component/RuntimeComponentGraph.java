@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.graph;
+package com.osgifx.console.ui.graph.component;
 
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
 
@@ -30,11 +30,11 @@ import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
 import org.jgrapht.alg.cycle.TarjanSimpleCycles;
-import org.jgrapht.alg.shortestpath.AllDirectedPaths;
+import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.traverse.BreadthFirstIterator;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 
 import com.google.common.collect.Lists;
@@ -42,18 +42,18 @@ import com.google.common.collect.Sets;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.data.provider.DataProvider;
-import com.osgifx.console.ui.graph.RuntimeComponentGraph.CircularLinkedList.Node;
+import com.osgifx.console.ui.graph.component.RuntimeComponentGraph.CircularLinkedList.Node;
 
 @Creatable
 public final class RuntimeComponentGraph {
 
     @Inject
     private DataProvider                        dataProvider;
-    private Graph<ComponentVertex, DefaultEdge> requirerGraph;
+    private Graph<ComponentVertex, DefaultEdge> graph;
 
     @PostConstruct
     public void init() {
-        requirerGraph = buildGraph(dataProvider.components());
+        graph = buildGraph(dataProvider.components());
     }
 
     @Inject
@@ -62,26 +62,35 @@ public final class RuntimeComponentGraph {
         init();
     }
 
-    public List<GraphPath<ComponentVertex, DefaultEdge>> getAllServiceComponentsThatAreRequiredBy(final Collection<XComponentDTO> components) {
-        if (components.isEmpty()) {
-            return List.of();
-        }
+    public Graph<ComponentVertex, DefaultEdge> getAllServiceComponentsThatAreRequiredBy(final Collection<XComponentDTO> components,
+                                                                                        final boolean isTransitive) {
+        final var vertices = getVertices(components, graph, isTransitive);
+        return new AsSubgraph<>(graph, vertices);
+    }
+
+    private Set<ComponentVertex> getVertices(final Collection<XComponentDTO> components,
+                                             final Graph<ComponentVertex, DefaultEdge> graph,
+                                             final boolean isTransitive) {
         final Set<ComponentVertex> vertices = Sets.newHashSet();
         for (final XComponentDTO component : components) {
-            final var componentVertex = toVertex(component);
-            if (requirerGraph.containsVertex(componentVertex)) {
-                final var vertex = requirerGraph.vertexSet().stream().filter(componentVertex::equals).findAny()
-                        .orElse(null);
+            final var vertex = toVertex(component);
+            if (graph.containsVertex(vertex)) {
                 vertices.add(vertex);
+                if (isTransitive) {
+                    new BreadthFirstIterator<>(graph, vertex).forEachRemaining(vertices::add);
+                } else {
+                    for (final DefaultEdge edge : graph.outgoingEdgesOf(vertex)) {
+                        vertices.add(graph.getEdgeTarget(edge));
+                    }
+                }
             }
         }
-        final var paths = new AllDirectedPaths<>(requirerGraph);
-        return paths.getAllPaths(vertices, requirerGraph.vertexSet(), true, null);
+        return vertices;
     }
 
     @SuppressWarnings("unused")
     public Graph<ComponentVertex, DefaultEdge> getAllCycles() {
-        final var                                 tarjan = new TarjanSimpleCycles<>(requirerGraph);
+        final var                                 tarjan = new TarjanSimpleCycles<>(graph);
         final var                                 cycles = tarjan.findSimpleCycles();
         final Graph<ComponentVertex, DefaultEdge> graph  = new DefaultDirectedGraph<>(DefaultEdge.class);
 
