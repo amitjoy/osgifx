@@ -72,6 +72,8 @@ public final class ServiceDetailsFxController {
         objectClassesList.getItems().addAll(service.types);
 
         TableFilter.forTableView(propertiesTable).apply();
+        propertiesTable.getSortOrder().add(propertiesTableColumn1);
+        propertiesTable.sort();
 
         Fx.addContextMenuToCopyContent(propertiesTable);
         Fx.addContextMenuToCopyContent(objectClassesList);
