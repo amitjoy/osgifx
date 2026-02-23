@@ -23,7 +23,7 @@
 
 <BorderPane fx:id="rootPanel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.logs.LogConfigurationEditorFxController">
    <bottom>
-      <HBox BorderPane.alignment="CENTER">
+      <HBox BorderPane.alignment="CENTER" spacing="5.0">
          <children>
             <Button fx:id="saveLogConfigButton" mnemonicParsing="false">
            	   <HBox.margin>
@@ -38,9 +38,6 @@
                <graphic>
         		  <Glyph fontFamily="FontAwesome" icon="CLOSE" />
     		   </graphic>
-               <HBox.margin>
-                  <Insets left="10.0" />
-               </HBox.margin>
                <tooltip><Tooltip text="Cancel" /></tooltip>
             </Button>
          </children>

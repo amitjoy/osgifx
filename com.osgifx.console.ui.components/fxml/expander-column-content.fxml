@@ -58,7 +58,7 @@
     <RowConstraints minHeight="200.0" vgrow="ALWAYS" />
   </rowConstraints>
    <children>
-      <HBox spacing="20.0" GridPane.columnSpan="2">
+      <HBox spacing="5.0" GridPane.columnSpan="2">
          <children>
             <Button fx:id="enableComponentButton" mnemonicParsing="false">
                <graphic>
