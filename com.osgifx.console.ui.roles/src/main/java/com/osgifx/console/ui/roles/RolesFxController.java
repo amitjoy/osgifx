@@ -103,6 +103,8 @@ public final class RolesFxController {
 
         table.setItems(dataProvider.roles());
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(roleNameColumn);
+        table.sort();
     }
 
 }

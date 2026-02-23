@@ -125,6 +125,8 @@ public final class ServicesFxController {
         table.setItems(filteredList);
 
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(objectClassColumn);
+        table.sort();
     }
 
     @Inject

@@ -132,6 +132,8 @@ public final class ComponentsFxController {
         table.setItems(filteredList);
 
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(componentNameColumn);
+        table.sort();
     }
 
     @Inject
