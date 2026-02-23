@@ -52,7 +52,7 @@
       </ToggleSwitch>
       <Button fx:id="fileChooser" mnemonicParsing="false" onAction="#chooseBundle" prefHeight="28.0" prefWidth="78.0" text="Choose" GridPane.columnIndex="1">
          <GridPane.margin>
-            <Insets left="10.0" right="50.0" />
+            <Insets left="10.0" right="20.0" />
          </GridPane.margin>
       </Button>
       <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;">
