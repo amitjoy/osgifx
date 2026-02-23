@@ -323,4 +323,11 @@ public final class GraphFxComponentController implements GraphController {
         }
     }
 
+    @FXML
+    private void selectAll(final ActionEvent event) {
+        if (masterComponentList != null) {
+            masterComponentList.forEach(c -> c.setSelected(true));
+        }
+    }
+
 }
