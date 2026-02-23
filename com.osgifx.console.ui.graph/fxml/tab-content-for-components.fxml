@@ -16,6 +16,7 @@
 -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
@@ -25,10 +26,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import org.controlsfx.control.CheckListView?>
+<?import javafx.scene.control.ListView?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<SplitPane dividerPositions="0.27728285077951004" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.graph.GraphFxComponentController">
+<SplitPane dividerPositions="0.27728285077951004" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.graph.component.GraphFxComponentController">
    <items>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>
@@ -50,13 +51,15 @@
                   </HBox>
                   <ChoiceBox fx:id="wiringSelection" maxWidth="1.7976931348623157E308" />
                   <ChoiceBox fx:id="layoutSelection" maxWidth="1.7976931348623157E308" />
+                  <CheckBox fx:id="transitiveView" mnemonicParsing="false" selected="true" text="Transitive" />
+                  <CheckBox fx:id="showSelectedOnlyView" mnemonicParsing="false" text="Show Selected Only" />
                </children>
             </VBox>
          </top>
          <center>
             <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <center>
-                  <CheckListView fx:id="componentsList" prefHeight="498.0" prefWidth="245.0" BorderPane.alignment="CENTER" />
+                  <ListView fx:id="componentsList" prefHeight="498.0" prefWidth="245.0" BorderPane.alignment="CENTER" />
                </center>
                <top>
                    <TextField fx:id="searchText" maxWidth="1.7976931348623157E308" prefHeight="30.0" promptText="Search Filter" BorderPane.alignment="CENTER">
