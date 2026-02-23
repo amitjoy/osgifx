@@ -40,19 +40,26 @@
                <children>
                   <HBox alignment="CENTER_LEFT" spacing="5.0">
                      <children>
+                        <Button mnemonicParsing="false" onAction="#selectAll" text="Select All" />
                         <Button mnemonicParsing="false" onAction="#deselectAll" text="Deselect All" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" onAction="#generateGraph" prefHeight="27.0">
                            <graphic>
               				<Glyph fontFamily="FontAwesome" icon="PLAY" />
           				 </graphic>
+                           <tooltip>
+                              <Tooltip text="Generate Graph" />
+                           </tooltip>
                         </Button>
                      </children>
                   </HBox>
                   <ChoiceBox fx:id="wiringSelection" maxWidth="1.7976931348623157E308" />
-                  <ChoiceBox fx:id="layoutSelection" maxWidth="1.7976931348623157E308" />
-                  <CheckBox fx:id="transitiveView" mnemonicParsing="false" selected="true" text="Transitive" />
-                  <CheckBox fx:id="showSelectedOnlyView" mnemonicParsing="false" text="Show Selected Only" />
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <CheckBox fx:id="transitiveView" mnemonicParsing="false" selected="true" text="Transitive" />
+                        <CheckBox fx:id="showSelectedOnlyView" mnemonicParsing="false" text="Show Selected Only" />
+                     </children>
+                  </HBox>
                </children>
             </VBox>
          </top>
@@ -74,6 +81,7 @@
          <top>
             <HBox alignment="CENTER_RIGHT" spacing="3.0" style="-fx-padding: 3;">
                <children>
+                  <ChoiceBox fx:id="layoutSelection" />
                   <Button mnemonicParsing="false" onAction="#zoomIn">
                      <graphic>
                         <Glyph fontFamily="FontAwesome" icon="SEARCH_PLUS" />
