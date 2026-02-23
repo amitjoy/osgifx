@@ -32,6 +32,7 @@
             stroke: #94a3b8;
             stroke-width: 1.5;
             transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
         }
 
         .edge-line.highlighted {
@@ -97,20 +98,7 @@
             filter: none;
         }
 
-        /* Edge labels */
-        .edge-label {
-            fill: #64748b;
-            font-size: 9px;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            text-anchor: middle;
-            dominant-baseline: central;
-            paint-order: stroke;
-            stroke: #f8fafc;
-            stroke-width: 3px;
-            stroke-linecap: butt;
-            stroke-linejoin: miter;
-            pointer-events: none;
-        }
+        /* Edge labels - REMOVED */
 
         /* Node labels */
         .node-label {
@@ -156,6 +144,48 @@
             color: #495057;
             line-height: 1.5;
             white-space: pre-wrap;
+        }
+
+        /* Legend panel */
+        #legend-panel {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 11px;
+            color: #495057;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            z-index: 1000;
+            pointer-events: none; /* Let clicks pass through if needed, though usually buttons capture them */
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .legend-hint {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+            font-style: italic;
+            color: #6c757d;
         }
 
         /* Stats bar */
@@ -219,6 +249,23 @@
         <div class="detail" id="info-detail"></div>
     </div>
     <div id="stats-bar"></div>
+    <div id="legend-panel">
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(to bottom, #f59e0b, #b45309);"></div>
+            <span>Selected</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(to bottom, #fb7185, #e11d48);"></div>
+            <span>Focused</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(to bottom, #34d399, #059669);"></div>
+            <span>Neighbor</span>
+        </div>
+        <div class="legend-item legend-hint">
+            Click lines to view<br>service details
+        </div>
+    </div>
     <div id="loading-overlay">
         <div class="spinner"></div>
         <div>Rendering graph...</div>
@@ -414,20 +461,11 @@
                 .attr('y2', function (d) { return d.points ? d.points.y2 : 0; })
                 .attr('marker-end', 'url(#arrowhead)')
                 .attr('data-source', function (d) { return d.source; })
-                .attr('data-target', function (d) { return d.target; });
-
-            // Draw edge labels
-            var edgeLabelGroup = mainGroup.append('g').attr('class', 'edge-labels');
-            edgeLabelGroup.selectAll('text')
-                .data(graphData.edges)
-                .enter()
-                .append('text')
-                .attr('class', 'edge-label')
-                .attr('id', function (d) { return 'edge-label-' + d.id; })
-                .text(function (d) { return d.label; })
-                .attr('x', function (d) { return d.points ? (d.points.x1 + d.points.x2) / 2 : 0; })
-                .attr('y', function (d) { return d.points ? (d.points.y1 + d.points.y2) / 2 : 0; })
-                .attr('opacity', function (d) { return d.label ? 1 : 0; });
+                .attr('data-target', function (d) { return d.target; })
+                .on('click', function (event, d) {
+                    event.stopPropagation();
+                    onEdgeClick(d);
+                });
 
             // Draw nodes
             var nodeGroup = mainGroup.append('g').attr('class', 'nodes');
@@ -495,13 +533,6 @@
                         var pts = computeEdgeEndpoints(srcNode, tgtNode);
                         el.attr('x1', pts.x1).attr('y1', pts.y1)
                             .attr('x2', pts.x2).attr('y2', pts.y2);
-                        
-                        // Update associated label using ID lookup (O(1))
-                        if (d.id) {
-                            d3.select('#edge-label-' + d.id)
-                                .attr('x', (pts.x1 + pts.x2) / 2)
-                                .attr('y', (pts.y1 + pts.y2) / 2);
-                        }
                     }
                 }
             });
@@ -546,8 +577,34 @@
                     el.classed('faded', true);
                 }
             });
-
+            
             showNodeInfo(d);
+        }
+
+        function onEdgeClick(d) {
+            clearHighlight();
+
+            // Highlight clicked edge
+            d3.select('#edge-line-' + d.id).classed('highlighted', true)
+                .attr('marker-end', 'url(#arrowhead-highlighted)');
+            
+            // Highlight source and target nodes as neighbors
+            d3.selectAll('.node-rect[data-id="' + d.source + '"]').classed('neighbor', true);
+            d3.selectAll('.node-rect[data-id="' + d.target + '"]').classed('neighbor', true);
+            
+            // Fade other edges
+            d3.selectAll('.edge-line').classed('faded', function(e) { return e.id !== d.id; });
+            
+            // Fade other nodes
+            d3.selectAll('.node-rect').classed('faded', function(n) { 
+                return n.id !== d.source && n.id !== d.target;
+            });
+            d3.selectAll('.node-label').classed('faded', function(n) {
+                 var nodeId = d3.select(this.parentNode).select('rect').attr('data-id');
+                 return nodeId !== d.source && nodeId !== d.target;
+            });
+            
+            showEdgeInfo(d);
         }
 
         function clearHighlight() {
@@ -565,6 +622,16 @@
             document.getElementById('info-detail').textContent =
                 'Incoming: ' + incoming + '  |  Outgoing: ' + outgoing;
             document.getElementById('info-panel').style.display = 'block';
+        }
+        
+        function showEdgeInfo(d) {
+             document.getElementById('info-label').textContent = 'Edge Connection';
+             var text = d.label || 'No details';
+             if (text.includes(',')) {
+                 text = text.split(',').map(s => s.trim()).join('\n');
+             }
+             document.getElementById('info-detail').textContent = text;
+             document.getElementById('info-panel').style.display = 'block';
         }
 
         function hideNodeInfo() {
