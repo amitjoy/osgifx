@@ -130,6 +130,8 @@ public final class BundlesFxController {
         table.setItems(filteredList);
 
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(symbolicNameColumn);
+        table.sort();
     }
 
     @Inject

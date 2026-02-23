@@ -72,6 +72,8 @@ public final class PropertiesFxController {
 
         propertyTable.setItems(dataProvider.properties());
         TableFilter.forTableView(propertyTable).lazy(true).apply();
+        propertyTable.getSortOrder().add(propertyName);
+        propertyTable.sort();
     }
 
 }

@@ -75,6 +75,8 @@ public final class LeaksFxController {
 
         table.setItems(dataProvider.leaks());
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(bsnColumn);
+        table.sort();
     }
 
 }
