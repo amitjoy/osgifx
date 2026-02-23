@@ -126,6 +126,8 @@ public final class HttpFxController {
 
         table.setItems(dataProvider.httpComponents());
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(componentColumn);
+        table.sort();
     }
 
 }

@@ -65,6 +65,8 @@ public final class EventDetailsFxController {
         propertiesKeyTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getKey()));
         propertiesValueTableColumn.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getValue()));
         propertiesTable.setItems(FXCollections.observableArrayList(event.properties.entrySet()));
+        propertiesTable.getSortOrder().add(propertiesKeyTableColumn);
+        propertiesTable.sort();
 
         Fx.addContextMenuToCopyContent(propertiesTable);
     }

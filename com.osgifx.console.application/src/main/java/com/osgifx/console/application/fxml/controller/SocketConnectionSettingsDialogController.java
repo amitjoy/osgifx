@@ -65,6 +65,8 @@ public final class SocketConnectionSettingsDialogController {
                 .addListener((_, _, newSettings) -> selectedSettings.publish(newSettings));
 
         TableFilter.forTableView(connectionTable).apply();
+        connectionTable.getSortOrder().add(nameColumn);
+        connectionTable.sort();
         logger.atDebug().log("FXML controller has been initialized");
     }
 

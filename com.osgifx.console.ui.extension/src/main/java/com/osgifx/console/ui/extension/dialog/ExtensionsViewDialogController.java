@@ -69,6 +69,9 @@ public final class ExtensionsViewDialogController {
         displayNameColumn.setCellValueFactory(new DTOCellValueFactory<>("displayName", String.class));
         versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
+        extensionsList.getSortOrder().add(nameColumn);
+        extensionsList.sort();
+
         initContextMenu();
     }
 

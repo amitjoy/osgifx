@@ -238,6 +238,8 @@ public final class ComponentDetailsFxController {
         }
 
         referencesTable.setItems(FXCollections.observableArrayList(component.references));
+        referencesTable.getSortOrder().add(nameColumn);
+        referencesTable.sort();
 
         areReferenceTableNodesLoader.set(true);
     }
@@ -268,9 +270,18 @@ public final class ComponentDetailsFxController {
 
     private void applyTableFilters() {
         TableFilter.forTableView(referencesTable).apply();
+
         TableFilter.forTableView(propertiesTable).apply();
+        propertiesTable.getSortOrder().add(propertiesTableColumn1);
+        propertiesTable.sort();
+
         TableFilter.forTableView(boundServicesTable).apply();
+        boundServicesTable.getSortOrder().add(boundServicesNameColumn);
+        boundServicesTable.sort();
+
         TableFilter.forTableView(unboundServicesTable).apply();
+        unboundServicesTable.getSortOrder().add(unboundServicesNameColumn);
+        unboundServicesTable.sort();
     }
 
 }

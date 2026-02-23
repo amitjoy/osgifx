@@ -319,14 +319,40 @@ public final class BundleDetailsFxController {
 
     private void applyTableFilters() {
         TableFilter.forTableView(exportedPackagesNameTable).apply();
+        exportedPackagesNameTable.getSortOrder().add(exportedPackagesNameTableColumn);
+        exportedPackagesNameTable.sort();
+
         TableFilter.forTableView(registeredServicesTable).apply();
+        registeredServicesTable.getSortOrder().add(registeredServicesIdTableColumn);
+        registeredServicesTable.sort();
+
         TableFilter.forTableView(manifestHeadersTable).apply();
+        manifestHeadersTable.getSortOrder().add(manifestHeadersTableColumn1);
+        manifestHeadersTable.sort();
+
         TableFilter.forTableView(importedPackagesTable).apply();
+        importedPackagesTable.getSortOrder().add(importedPackagesNameTableColumn);
+        importedPackagesTable.sort();
+
         TableFilter.forTableView(wiredBundlesAsProviderTable).apply();
+        wiredBundlesAsProviderTable.getSortOrder().add(wiredBundlesAsProviderBsnTableColumn);
+        wiredBundlesAsProviderTable.sort();
+
         TableFilter.forTableView(wiredBundlesAsRequirerTable).apply();
+        wiredBundlesAsRequirerTable.getSortOrder().add(wiredBundlesAsRequirerBsnTableColumn);
+        wiredBundlesAsRequirerTable.sort();
+
         TableFilter.forTableView(usedServicesTable).apply();
+        usedServicesTable.getSortOrder().add(usedServicesIdTableColumn);
+        usedServicesTable.sort();
+
         TableFilter.forTableView(hostBundlesTable).apply();
+        hostBundlesTable.getSortOrder().add(hostBundlesBsnTableColumn);
+        hostBundlesTable.sort();
+
         TableFilter.forTableView(attachedFragmentsTable).apply();
+        attachedFragmentsTable.getSortOrder().add(attachedFragmentsBsnTableColumn);
+        attachedFragmentsTable.sort();
     }
 
     private Map<String, Object> createCommandMap(final long value) {
