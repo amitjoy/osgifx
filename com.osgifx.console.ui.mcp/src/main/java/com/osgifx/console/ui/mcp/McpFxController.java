@@ -149,6 +149,8 @@ public final class McpFxController {
         toolsTable.setItems(tools);
         Fx.addContextMenuToCopyContent(toolsTable);
         TableFilter.forTableView(toolsTable).lazy(true).apply();
+        toolsTable.getSortOrder().add(nameColumn);
+        toolsTable.sort();
     }
 
     private void initLogsTable() {
@@ -159,6 +161,9 @@ public final class McpFxController {
         logsTable.setItems(logs);
         Fx.addContextMenuToCopyContent(logsTable);
         TableFilter.forTableView(logsTable).lazy(true).apply();
+        timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
+        logsTable.getSortOrder().add(timestampColumn);
+        logsTable.sort();
     }
 
     private void updateTools() {

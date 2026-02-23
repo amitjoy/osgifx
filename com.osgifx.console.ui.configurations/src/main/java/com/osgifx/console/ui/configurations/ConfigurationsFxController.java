@@ -130,6 +130,8 @@ public final class ConfigurationsFxController {
         table.setItems(filteredList);
 
         TableFilter.forTableView(table).lazy(true).apply();
+        table.getSortOrder().add(pidColumn);
+        table.sort();
     }
 
     @Inject
