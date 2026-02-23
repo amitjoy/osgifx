@@ -25,7 +25,7 @@
 
 <BorderPane fx:id="rootPanel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.roles.RoleEditorFxController">
    <bottom>
-      <HBox spacing="20.0" BorderPane.alignment="CENTER">
+      <HBox spacing="5.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="saveRoleButton" mnemonicParsing="false">
                <graphic>
