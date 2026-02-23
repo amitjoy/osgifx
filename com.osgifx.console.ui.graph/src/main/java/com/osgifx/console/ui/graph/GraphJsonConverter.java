@@ -39,28 +39,32 @@ public final class GraphJsonConverter {
      * 
      * <pre>
      * [
-     *   { "data": { "id": "...", "label": "..." } },                    // nodes
-     *   { "data": { "id": "e0", "source": "...", "target": "..." } }    // edges
+     *   { "data": { "id": "...", "label": "...", "selected": true/false } },    // nodes
+     *   { "data": { "id": "e0", "source": "...", "target": "..." } }            // edges
      * ]
      * </pre>
      *
      * @param graph the JGraphT graph
      * @param idMapper maps a vertex to a unique ID string
      * @param labelMapper maps a vertex to a display label
+     * @param isSelected predicate to determine if a vertex is selected
      * @param <V> vertex type
      * @return JSON string of graph elements
      */
     public static <V> String toJson(final Graph<V, DefaultEdge> graph,
                                     final Function<V, String> idMapper,
-                                    final Function<V, String> labelMapper) {
+                                    final Function<V, String> labelMapper,
+                                    final java.util.function.Predicate<V> isSelected) {
         final var elements  = Lists.<String> newArrayList();
         var       edgeIndex = 0;
 
         // Add nodes
         for (final V vertex : graph.vertexSet()) {
-            final var id    = escapeJson(idMapper.apply(vertex));
-            final var label = escapeJson(labelMapper.apply(vertex));
-            elements.add("{ \"data\": { \"id\": \"" + id + "\", \"label\": \"" + label + "\" } }");
+            final var id       = escapeJson(idMapper.apply(vertex));
+            final var label    = escapeJson(labelMapper.apply(vertex));
+            final var selected = isSelected.test(vertex);
+            elements.add("{ \"data\": { \"id\": \"" + id + "\", \"label\": \"" + label + "\", \"selected\": " + selected
+                    + " } }");
         }
 
         // Add edges
