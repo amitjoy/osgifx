@@ -551,7 +551,7 @@
         }
 
         function clearHighlight() {
-            d3.selectAll('.node-rect').classed('highlighted neighbor faded selected', false);
+            d3.selectAll('.node-rect').classed('highlighted neighbor faded', false);
             d3.selectAll('.node-label').classed('faded', false);
             d3.selectAll('.edge-line')
                 .classed('highlighted faded', false)
