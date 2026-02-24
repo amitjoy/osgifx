@@ -103,6 +103,8 @@ For detailed instructions, please refer to the **User Guide** on the website or 
 | **📸 Snapshot** <br> _Capture and analyze runtime state snapshots_ | 2.4.4 | ✅ | 🚀 |
 | **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
 | **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
+| **🌐 JAX-RS View** <br> _Inspect JAX-RS Applications, Resources, and Extensions_ | 2.4.6 | ✅ | 🚧 |
+| **📦 CDI View** <br> _Inspect CDI Containers, Components, and Extensions_ | 2.4.6 | ✅ | 🚧 |
 | **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](MCP_SERVER.md)_ | 2.4.5 | ✅ | 🚀 |
 | **👻 Headless Launch** <br> _Start application with pre-configured connection_ | 2.4.5 | ✅ | 🚀 |
 

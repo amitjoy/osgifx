@@ -21,6 +21,7 @@ import static com.osgifx.console.agent.dto.XResultDTO.SUCCESS;
 import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.packageNotWired;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
+import static com.osgifx.console.agent.provider.PackageWirings.Type.CDI;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.CM;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.DMT;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.EVENT_ADMIN;
@@ -96,6 +97,7 @@ import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.admin.XBundleAdmin;
+import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
@@ -118,6 +120,7 @@ import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -1097,6 +1100,16 @@ public final class AgentServer implements Agent, Closeable {
             return di.getInstance(XJaxRsAdmin.class).getJaxRsComponents();
         }
         logger.atWarn().msg(packageNotWired(JAX_RS)).log();
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<XCdiContainerDTO> getCdiContainers() {
+        final boolean isCdiServiceRuntimeWired = di.getInstance(PackageWirings.class).isCDIWired();
+        if (isCdiServiceRuntimeWired) {
+            return di.getInstance(XCdiAdmin.class).getCdiContainers();
+        }
+        logger.atWarn().msg(packageNotWired(CDI)).log();
         return Collections.emptyList();
     }
 

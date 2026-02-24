@@ -38,6 +38,7 @@ import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
+import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XJaxRsAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
@@ -156,6 +157,9 @@ public final class DIModule {
         }
         if (wirings.isJaxRsWired()) {
             di.bindProvider(XJaxRsAdmin.class, () -> new XJaxRsAdmin(() -> jaxrsServiceRuntimeTracker.getService()));
+        }
+        if (wirings.isCDIWired()) {
+            di.bindProvider(XCdiAdmin.class, () -> new XCdiAdmin(() -> cdiServiceRuntimeTracker.getService()));
         }
         if (wirings.isUserAdminWired()) {
             di.bindProvider(XUserAdmin.class, () -> new XUserAdmin(() -> userAdminTracker.getService()));

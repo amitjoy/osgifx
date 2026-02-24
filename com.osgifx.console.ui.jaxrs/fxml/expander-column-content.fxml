@@ -14,7 +14,31 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane fx:id="rootPanel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.jaxrs.JaxRsDetailsFxController">
-</BorderPane>
+<TabPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.jaxrs.JaxRsDetailsFxController">
+  <tabs>
+    <Tab text="Info">
+      <content>
+        <BorderPane fx:id="infoPane" prefHeight="200.0" prefWidth="200.0" />
+      </content>
+    </Tab>
+    <Tab text="Resource Methods">
+      <content>
+        <TableView fx:id="methodsTable" prefHeight="200.0" prefWidth="200.0">
+          <columns>
+            <TableColumn fx:id="methodColumn" prefWidth="100.0" text="Method" />
+            <TableColumn fx:id="pathColumn" prefWidth="250.0" text="Path" />
+            <TableColumn fx:id="consumesColumn" prefWidth="150.0" text="Consumes" />
+            <TableColumn fx:id="producesColumn" prefWidth="150.0" text="Produces" />
+            <TableColumn fx:id="nameBindingsColumn" prefWidth="200.0" text="Name Bindings" />
+          </columns>
+        </TableView>
+      </content>
+    </Tab>
+  </tabs>
+</TabPane>

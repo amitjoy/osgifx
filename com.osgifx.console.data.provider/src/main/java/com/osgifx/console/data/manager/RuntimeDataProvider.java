@@ -23,6 +23,7 @@ import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.data.supplier.HealthChecksInfoSupplier.HEALTHCHECKS_ID;
 import static com.osgifx.console.data.supplier.HttpComponentsInfoSupplier.HTTP_ID;
 import static com.osgifx.console.data.supplier.JaxRsComponentsInfoSupplier.JAXRS_ID;
+import static com.osgifx.console.data.supplier.CdiContainersInfoSupplier.CDI_ID;
 import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
 import static com.osgifx.console.data.supplier.LoggerContextsInfoSupplier.LOGGER_CONTEXTS_ID;
 import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
@@ -55,6 +56,7 @@ import com.google.mu.util.stream.BiStream;
 import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -194,6 +196,11 @@ public final class RuntimeDataProvider implements DataProvider {
     @Override
     public ObservableList<XJaxRsComponentDTO> jaxRsComponents() {
         return (ObservableList<XJaxRsComponentDTO>) supply(JAXRS_ID);
+    }
+
+    @Override
+    public ObservableList<XCdiContainerDTO> cdiContainers() {
+        return (ObservableList<XCdiContainerDTO>) supply(CDI_ID);
     }
 
     @Override
