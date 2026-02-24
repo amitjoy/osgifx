@@ -32,14 +32,15 @@ import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
-import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -623,6 +624,13 @@ public interface Agent {
      * @return the list of all JAX-RS components
      */
     List<XJaxRsComponentDTO> getJaxRsComponents();
+
+    /**
+     * Returns the CDI runtime information
+     *
+     * @return the list of all CDI containers
+     */
+    List<XCdiContainerDTO> getCdiContainers();
 
     /**
      * Returns the bundle logger contexts (only valid for OSGi R7)
