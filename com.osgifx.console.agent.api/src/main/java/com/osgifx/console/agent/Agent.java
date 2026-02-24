@@ -33,6 +33,7 @@ import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -615,6 +616,13 @@ public interface Agent {
      * @return the list of all HTTP components
      */
     List<XHttpComponentDTO> getHttpComponents();
+
+    /**
+     * Returns the JAX-RS runtime information
+     *
+     * @return the list of all JAX-RS components
+     */
+    List<XJaxRsComponentDTO> getJaxRsComponents();
 
     /**
      * Returns the bundle logger contexts (only valid for OSGi R7)

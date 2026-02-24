@@ -78,6 +78,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.graph',\
                                       bnd.identity;id='com.osgifx.console.ui.heap',\
                                       bnd.identity;id='com.osgifx.console.ui.http',\
+                                      bnd.identity;id='com.osgifx.console.ui.jaxrs',\
                                       bnd.identity;id='com.osgifx.console.ui.leaks',\
                                       bnd.identity;id='com.osgifx.console.ui.overview',\
                                       bnd.identity;id='com.osgifx.console.ui.packages',\
@@ -111,6 +112,7 @@ install.order                     :   \
                                       com.osgifx.console.ui.heap,\
                                       com.osgifx.console.ui.leaks,\
                                       com.osgifx.console.ui.http,\
+                                      com.osgifx.console.ui.jaxrs,\
                                       com.osgifx.console.ui.roles,\
                                       com.osgifx.console.ui.dto,\
                                       com.osgifx.console.ui.dmt,\
@@ -134,6 +136,7 @@ install.order                     :   \
 	com.osgifx.console.ui.extension;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.search;version=snapshot;startlevel=10,\
 	com.osgifx.console.ui.snapshot;version=snapshot;startlevel=10,\
+	com.osgifx.console.ui.jaxrs;version=snapshot;startlevel=10,\
 	com.osgifx.console.util;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.formsfx;version=snapshot;startlevel=10,\
 	com.osgifx.console.wrapper.mug;version=snapshot;startlevel=10,\
