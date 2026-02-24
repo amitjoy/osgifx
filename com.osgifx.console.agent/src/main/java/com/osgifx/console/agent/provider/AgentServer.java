@@ -477,6 +477,9 @@ public final class AgentServer implements Agent, Closeable {
         final String allowlistRaw = context.getProperty(allowlistKey);
         final String allowlist    = allowlistRaw != null ? allowlistRaw : "*";
         if ("*".equals(allowlist)) {
+            logger.atWarn().msg(
+                    "Notice: In the absence of a defined allowlist, all commands are currently permitted. It is highly encouraged to set '{}'.")
+                    .arg(allowlistKey).log();
             return null;
         }
         final String[] allowedCommands = allowlist.split(",");
