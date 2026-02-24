@@ -22,6 +22,7 @@ import org.osgi.annotation.versioning.ProviderType;
 import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
@@ -137,6 +138,13 @@ public interface DataProvider {
      * @return the observable list of all JAX-RS components
      */
     ObservableList<XJaxRsComponentDTO> jaxRsComponents();
+
+    /**
+     * Returns CDI runtime information, including lists of all containers, applications, extensions, and configurations.
+     *
+     * @return the observable list of all CDI containers
+     */
+    ObservableList<XCdiContainerDTO> cdiContainers();
 
     /**
      * Returns the Felix health checks.

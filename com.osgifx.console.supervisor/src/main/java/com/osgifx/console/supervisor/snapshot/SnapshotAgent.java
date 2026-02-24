@@ -45,6 +45,7 @@ import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -317,6 +318,11 @@ public final class SnapshotAgent implements Agent {
     @Override
     public List<XJaxRsComponentDTO> getJaxRsComponents() {
         return snapshotDTO.jaxRsComponents;
+    }
+
+    @Override
+    public List<XCdiContainerDTO> getCdiContainers() {
+        return snapshotDTO.cdiContainers;
     }
 
     @Override

@@ -38,6 +38,7 @@ public final class PackageWirings {
         R7_LOGGER("R7 Logger"),
         HTTP("HTTP"),
         JAX_RS("JAX-RS"),
+        CDI("CDI"),
         JMX("JMX"),
         HC("Felix Healthcheck");
 
