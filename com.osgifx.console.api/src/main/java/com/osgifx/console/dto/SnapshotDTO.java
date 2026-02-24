@@ -28,6 +28,7 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -84,6 +85,9 @@ public class SnapshotDTO extends DTO {
 
     /** A list of JAX-RS component data transfer objects. */
     public List<XJaxRsComponentDTO> jaxRsComponents;
+
+    /** A list of CDI container data transfer objects. */
+    public List<XCdiContainerDTO> cdiContainers;
 
     /** A data transfer object representing the heap usage. */
     public XHeapUsageDTO heapUsage;

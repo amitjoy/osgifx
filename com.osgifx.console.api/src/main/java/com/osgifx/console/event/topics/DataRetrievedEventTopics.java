@@ -32,6 +32,7 @@ public final class DataRetrievedEventTopics {
             + "healthchecks";
     public static final String DATA_RETRIEVED_HTTP_TOPIC            = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "http";
     public static final String DATA_RETRIEVED_JAXRS_TOPIC           = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "jaxrs";
+    public static final String DATA_RETRIEVED_CDI_TOPIC             = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "cdi";
     public static final String DATA_RETRIEVED_LEAKS_TOPIC           = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "leaks";
     public static final String DATA_RETRIEVED_LOGGER_CONTEXTS_TOPIC = DATA_RETRIEVED_EVENT_TOPIC_PREFIX
             + "loggerContexts";
