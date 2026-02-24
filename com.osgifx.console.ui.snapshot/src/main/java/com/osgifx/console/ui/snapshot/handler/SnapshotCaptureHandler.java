@@ -126,6 +126,7 @@ public final class SnapshotCaptureHandler {
         dto.classloaderLeaks     = agent.getClassloaderLeaks();
         dto.httpComponents       = agent.getHttpComponents();
         dto.bundleLoggerContexts = agent.getBundleLoggerContexts();
+        dto.jaxRsComponents      = agent.getJaxRsComponents();
         dto.heapUsage            = agent.getHeapUsage();
         dto.runtime              = agent.getRuntimeDTO();
 
