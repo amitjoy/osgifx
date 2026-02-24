@@ -15,11 +15,13 @@
  ******************************************************************************/
 package com.osgifx.console.supervisor;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
 
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -144,7 +146,16 @@ public interface Supervisor {
      * @return the list of JAX-RS components
      */
     default List<XJaxRsComponentDTO> getJaxRsComponents() {
-        return getAgent() == null ? java.util.Collections.emptyList() : getAgent().getJaxRsComponents();
+        return getAgent() == null ? Collections.emptyList() : getAgent().getJaxRsComponents();
+    }
+
+    /**
+     * Returns the list of registered CDI containers in the runtime
+     *
+     * @return the list of CDI containers
+     */
+    default List<XCdiContainerDTO> getCdiContainers() {
+        return getAgent() == null ? Collections.emptyList() : getAgent().getCdiContainers();
     }
 
     /**
