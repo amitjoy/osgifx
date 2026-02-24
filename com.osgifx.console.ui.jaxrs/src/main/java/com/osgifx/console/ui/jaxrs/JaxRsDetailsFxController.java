@@ -28,9 +28,15 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
+import com.osgifx.console.agent.dto.XResourceMethodInfoDTO;
+import com.osgifx.console.util.fx.DTOCellValueFactory;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 
@@ -38,9 +44,24 @@ public final class JaxRsDetailsFxController {
 
     @Log
     @Inject
-    private FluentLogger logger;
+    private FluentLogger                                logger;
     @FXML
-    private BorderPane   rootPanel;
+    private TabPane                                     rootPane;
+    @FXML
+    private BorderPane                                  infoPane;
+    @FXML
+    private TableView<XResourceMethodInfoDTO>           methodsTable;
+    @FXML
+    private TableColumn<XResourceMethodInfoDTO, String> methodColumn;
+    @FXML
+    private TableColumn<XResourceMethodInfoDTO, String> pathColumn;
+    @FXML
+    private TableColumn<XResourceMethodInfoDTO, String> consumesColumn;
+    @FXML
+    private TableColumn<XResourceMethodInfoDTO, String> producesColumn;
+    @FXML
+    private TableColumn<XResourceMethodInfoDTO, String> nameBindingsColumn;
+
     private FormRenderer formRenderer;
 
     @FXML
@@ -50,10 +71,26 @@ public final class JaxRsDetailsFxController {
 
     void initControls(final XJaxRsComponentDTO jaxrsComponent) {
         if (formRenderer != null) {
-            rootPanel.getChildren().remove(formRenderer);
+            infoPane.getChildren().remove(formRenderer);
         }
         formRenderer = createForm(jaxrsComponent);
-        rootPanel.setCenter(formRenderer);
+        infoPane.setCenter(formRenderer);
+
+        methodColumn.setCellValueFactory(new DTOCellValueFactory<>("method", String.class));
+        pathColumn.setCellValueFactory(new DTOCellValueFactory<>("path", String.class));
+        consumesColumn.setCellValueFactory(
+                new DTOCellValueFactory<>("consumingMimeType", String.class, s -> s.consumingMimeType == null ? ""
+                        : String.join(", ", s.consumingMimeType)));
+        producesColumn.setCellValueFactory(
+                new DTOCellValueFactory<>("producingMimeType", String.class, s -> s.producingMimeType == null ? ""
+                        : String.join(", ", s.producingMimeType)));
+        nameBindingsColumn.setCellValueFactory(
+                new DTOCellValueFactory<>("nameBindings", String.class,
+                                          s -> s.nameBindings == null ? "" : String.join(", ", s.nameBindings)));
+
+        methodsTable.setItems(FXCollections
+                .observableArrayList(jaxrsComponent.resourceMethods == null ? java.util.Collections.emptyList()
+                        : jaxrsComponent.resourceMethods));
     }
 
     private FormRenderer createForm(final XJaxRsComponentDTO jaxrsComponent) {
