@@ -36,7 +36,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.TabPane;
 
 public final class CdiFxController {
 
@@ -74,7 +74,7 @@ public final class CdiFxController {
     }
 
     private void createControls() {
-        final var expandedNode   = (BorderPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
+        final var expandedNode   = (TabPane) Fx.loadFXML(loader, context, "/fxml/expander-column-content.fxml");
         final var controller     = (CdiDetailsFxController) loader.getController();
         final var expanderColumn = new TableRowExpanderColumn<XCdiContainerDTO>(current -> {
                                      if (previouslyExpanded != null
