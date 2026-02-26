@@ -112,6 +112,7 @@ public final class HeapMonitorPane extends BorderPane {
 
     @PostConstruct
     public void init() {
+        memoryUsageCharts.clear();
         setTop(createControlPanel());
 
         final var box        = createMainContent();
