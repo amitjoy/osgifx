@@ -155,6 +155,8 @@ import aQute.lib.converter.TypeReference;
 
 public final class AgentServer implements Agent, Closeable {
 
+    private static final String LOG_FILE = "osgifx_logs.bin";
+
     public enum RpcType {
         MQTT_RPC,
         SOCKET_RPC
@@ -194,10 +196,8 @@ public final class AgentServer implements Agent, Closeable {
         if (Boolean.getBoolean(AGENT_AUTO_START_LOG_CAPTURE_KEY)) {
             // Restore persistence
             try {
-                if (getContext() != null) { // Might be null if DI not ready?
-                    // Actually BundleContext is needed for dataFile.
-                    // Assuming DI has it if Activator started us.
-                    logBuffer.fromDisk(getContext().getDataFile("osgifx_logs.bin"));
+                if (getContext() != null) {
+                    logBuffer.fromDisk(getContext().getDataFile(LOG_FILE));
                 }
             } catch (Exception e) {
                 // Ignore
@@ -335,6 +335,11 @@ public final class AgentServer implements Agent, Closeable {
             revisions.add(bwd);
         }
         return revisions;
+    }
+
+    @Override
+    public String getBundleDataFile(final long id, final String fileName) throws Exception {
+        return di.getInstance(XBundleAdmin.class).getDataFile(id, fileName);
     }
 
     @Override
@@ -587,7 +592,7 @@ public final class AgentServer implements Agent, Closeable {
             cleanup();
             // Snapshot logs to disk on close
             if (getContext() != null) {
-                logBuffer.toDisk(getContext().getDataFile("osgifx_logs.bin"));
+                logBuffer.toDisk(getContext().getDataFile(LOG_FILE));
             }
 
             if (logReaderTracker != null) {
@@ -628,7 +633,7 @@ public final class AgentServer implements Agent, Closeable {
         if (osgiLogListenerCloser == null) {
             // Try to restore logs from previous run (if not done in constructor)
             try {
-                logBuffer.fromDisk(getContext().getDataFile("osgifx_logs.bin"));
+                logBuffer.fromDisk(getContext().getDataFile(LOG_FILE));
             } catch (Exception e) {
                 // Ignore if file doesn't exist or corrupted
             }
