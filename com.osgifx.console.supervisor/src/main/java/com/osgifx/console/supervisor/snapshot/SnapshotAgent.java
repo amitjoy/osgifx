@@ -120,6 +120,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public String getBundleDataFile(final long id, final String fileName) throws Exception {
+        return null;
+    }
+
+    @Override
     public boolean redirect(final int port) throws Exception {
         return false;
     }
