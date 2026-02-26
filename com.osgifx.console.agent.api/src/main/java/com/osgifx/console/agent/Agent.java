@@ -240,6 +240,26 @@ public interface Agent {
     List<BundleRevisionDTO> getBundleRevisons(final long... bundleId) throws Exception;
 
     /**
+     * Retrieves the content of a file from the specified bundle's persistent
+     * storage area ({@code BundleContext.getDataFile()}).
+     * <p>
+     * The {@code fileName} is resolved relative to the bundle's private data
+     * directory. Path traversal sequences (e.g., {@code ".."}) are not permitted
+     * and will result in an {@link IllegalArgumentException}.
+     *
+     * @param id the bundle ID
+     * @param fileName the name of the file to retrieve, relative to the bundle's
+     *            data area (cannot be {@code null})
+     * @return the content of the file as a string, or {@code null} if the bundle
+     *         does not exist, does not have an active {@code BundleContext}, or
+     *         the specified file does not exist
+     * @throws IllegalArgumentException if {@code fileName} contains path traversal
+     *             sequences
+     * @throws Exception if an error occurs while reading the file
+     */
+    String getBundleDataFile(long id, String fileName) throws Exception;
+
+    /**
      * Redirect I/O from port. Port can be {@link #CONSOLE},
      * {@link #COMMAND_SESSION}, {@link #NONE}, or a TCP Telnet port.
      *
