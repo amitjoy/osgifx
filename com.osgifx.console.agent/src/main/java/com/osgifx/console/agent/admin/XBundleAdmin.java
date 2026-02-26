@@ -74,6 +74,7 @@ import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator.BundleStartDuration;
 
+import aQute.lib.io.IO;
 import jakarta.inject.Inject;
 
 public final class XBundleAdmin {
@@ -253,6 +254,31 @@ public final class XBundleAdmin {
             return Collections.emptyList();
         }
         return new ArrayList<>(wiring.listResources(path, pattern, options));
+    }
+
+    public String getDataFile(final long bundleId, final String fileName) throws Exception {
+        if (context == null) {
+            logger.atWarn().msg("Bundle context is null").log();
+            return null;
+        }
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException("Path traversal is not allowed in fileName");
+        }
+        final Bundle bundle = context.getBundle(bundleId);
+        if (bundle == null) {
+            logger.atWarn().msg("Bundle with ID '{}' not found").arg(bundleId).log();
+            return null;
+        }
+        final BundleContext bundleContext = bundle.getBundleContext();
+        if (bundleContext == null) {
+            logger.atWarn().msg("Bundle '{}' does not have an active BundleContext").arg(bundleId).log();
+            return null;
+        }
+        final File dataFile = bundleContext.getDataFile(fileName);
+        if (dataFile == null || !dataFile.exists() || !dataFile.isFile()) {
+            return null;
+        }
+        return IO.collect(dataFile);
     }
 
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {

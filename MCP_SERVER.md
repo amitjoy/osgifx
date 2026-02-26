@@ -83,6 +83,7 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 | **`execute_agent_extension`** | Executes a named Agent Extension with a context map. |
 | **`find_bundle_entries`** | Finds files strictly inside the bundle (and its attached fragments). |
 | **`list_bundle_resources`** | Finds resources in the bundle's classpath (includes imports). |
+| **`get_bundle_data_file`** | Retrieves the content of a file from a bundle's persistent storage area. |
 | **`list_health_checks`** | Lists the status of all registered Health Checks (Felix HC). |
 | **`get_logger_contexts`** | Lists the Logger Context configuration for bundles, showing effective log levels. |
 | **`list_user_admin_roles`** | Lists all configured user roles and permissions from the UserAdmin service. |
