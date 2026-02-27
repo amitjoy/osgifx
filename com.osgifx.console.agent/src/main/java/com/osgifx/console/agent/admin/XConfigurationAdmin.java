@@ -237,26 +237,17 @@ public final class XConfigurationAdmin implements ConfigurationListener {
             logger.atWarn().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
-        XResultDTO result = null;
         try {
-            final Configuration[] configs = configAdmin.listConfigurations(null);
-            if (configs == null) {
+            final Configuration configuration = configAdmin.getConfiguration(pid, "?");
+            if (configuration.getProperties() == null) {
                 return createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
             }
-            for (final Configuration configuration : configs) {
-                if (configuration.getPid().equals(pid)) {
-                    configuration.delete();
-                    result = createResult(SUCCESS, "Configuration with PID '" + pid + "' has been deleted");
-                }
-            }
-            if (result == null) {
-                result = createResult(SUCCESS, "Configuration with PID '" + pid + "' cannot be found");
-            }
+            configuration.delete();
+            return createResult(SUCCESS, "Configuration with PID '" + pid + "' has been deleted");
         } catch (final Exception e) {
-            result = createResult(ERROR,
+            return createResult(ERROR,
                     "Configuration with PID '" + pid + "' cannot be deleted due to " + e.getMessage());
         }
-        return result;
     }
 
     public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
@@ -315,23 +306,22 @@ public final class XConfigurationAdmin implements ConfigurationListener {
         return hasConfigPID || hasFactoryPID;
     }
 
-    private List<XComponentReferenceFilterDTO> findUnsatisfiedReferenceFilters(final XComponentDTO component,
-                                                                               final XConfigurationDTO configuration) {
-        final List<XComponentReferenceFilterDTO> satisfiedReferenceFilters = new ArrayList<>();
-        for (final XSatisfiedReferenceDTO satisfiedReference : component.satisfiedReferences) {
-            satisfiedReferenceFilters.add(toComponentRefFilter(component.name, satisfiedReference.name, configuration));
-        }
-        return satisfiedReferenceFilters;
-    }
-
     private List<XComponentReferenceFilterDTO> findSatisfiedReferenceFilters(final XComponentDTO component,
                                                                              final XConfigurationDTO configuration) {
-        final List<XComponentReferenceFilterDTO> unsatisfiedReferenceFilters = new ArrayList<>();
-        for (final XUnsatisfiedReferenceDTO unsatisfiedReference : component.unsatisfiedReferences) {
-            unsatisfiedReferenceFilters
-                    .add(toComponentRefFilter(component.name, unsatisfiedReference.name, configuration));
+        final List<XComponentReferenceFilterDTO> referenceFilters = new ArrayList<>();
+        for (final XSatisfiedReferenceDTO satisfiedReference : component.satisfiedReferences) {
+            referenceFilters.add(toComponentRefFilter(component.name, satisfiedReference.name, configuration));
         }
-        return unsatisfiedReferenceFilters;
+        return referenceFilters;
+    }
+
+    private List<XComponentReferenceFilterDTO> findUnsatisfiedReferenceFilters(final XComponentDTO component,
+                                                                               final XConfigurationDTO configuration) {
+        final List<XComponentReferenceFilterDTO> referenceFilters = new ArrayList<>();
+        for (final XUnsatisfiedReferenceDTO unsatisfiedReference : component.unsatisfiedReferences) {
+            referenceFilters.add(toComponentRefFilter(component.name, unsatisfiedReference.name, configuration));
+        }
+        return referenceFilters;
     }
 
     private XComponentReferenceFilterDTO toComponentRefFilter(final String componentName,
@@ -372,10 +362,10 @@ public final class XConfigurationAdmin implements ConfigurationListener {
     private XConfigurationDTO toConfigDTO(final Configuration configuration) {
         final XConfigurationDTO dto = new XConfigurationDTO();
 
-        dto.pid         = Optional.ofNullable(configuration).map(Configuration::getPid).orElse(null);
-        dto.factoryPid  = Optional.ofNullable(configuration).map(Configuration::getFactoryPid).orElse(null);
+        dto.pid         = configuration.getPid();
+        dto.factoryPid  = configuration.getFactoryPid();
         dto.properties  = prepareConfiguration(configuration);
-        dto.location    = Optional.ofNullable(configuration).map(Configuration::getBundleLocation).orElse(null);
+        dto.location    = configuration.getBundleLocation();
         dto.isPersisted = true;
 
         return dto;
