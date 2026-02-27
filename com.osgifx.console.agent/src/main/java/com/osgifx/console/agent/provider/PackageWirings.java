@@ -17,6 +17,9 @@ package com.osgifx.console.agent.provider;
 
 import static org.osgi.framework.namespace.PackageNamespace.PACKAGE_NAMESPACE;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
@@ -24,6 +27,11 @@ import org.osgi.framework.wiring.BundleWiring;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+/**
+ * Lazily caches package-wiring checks so that repeated RPC calls do not
+ * re-walk the entire wiring list on every invocation. Wiring results are
+ * stable between bundle refresh/update cycles, so caching is safe.
+ */
 @Singleton
 public final class PackageWirings {
 
@@ -49,7 +57,8 @@ public final class PackageWirings {
         }
     }
 
-    private final BundleContext context;
+    private final BundleContext        context;
+    private final Map<String, Boolean> cache = new ConcurrentHashMap<>();
 
     @Inject
     public PackageWirings(final BundleContext context) {
@@ -57,6 +66,16 @@ public final class PackageWirings {
     }
 
     public boolean isWired(final String packageName) {
+        final Boolean cached = cache.get(packageName);
+        if (cached != null) {
+            return cached;
+        }
+        final boolean result = checkWiring(packageName);
+        cache.put(packageName, result);
+        return result;
+    }
+
+    private boolean checkWiring(final String packageName) {
         final BundleWiring wiring = context.getBundle().adapt(BundleWiring.class);
         for (final BundleWire wire : wiring.getRequiredWires(PACKAGE_NAMESPACE)) {
             final String       pkgName        = (String) wire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
