@@ -15,9 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static java.util.stream.Collectors.toList;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,7 +72,7 @@ public final class XPropertyAdmin {
             final XPropertyDTO dto   = createPropertyDTO(key, value, XPropertyType.SYSTEM);
             allProperties.put(key, dto);
         }
-        return allProperties.values().stream().collect(toList());
+        return new ArrayList<>(allProperties.values());
     }
 
     private XPropertyDTO createPropertyDTO(final String name, final String value, final XPropertyType type) {

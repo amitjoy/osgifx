@@ -35,7 +35,6 @@ import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
@@ -689,13 +688,14 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     private Set<Bundle> findBundles(final String bsn, final Version version) {
-        // @formatter:off
-        return Stream.of(di.getInstance(BundleContext.class)
-                     .getBundles())
-                     .filter(b -> bsn.equals(b.getSymbolicName()))
-                     .filter(b -> version == null || version.equals(b.getVersion()))
-                     .collect(toSet());
-        // @formatter:on
+        final Bundle[]    bundles = di.getInstance(BundleContext.class).getBundles();
+        final Set<Bundle> result  = new HashSet<>(4);
+        for (final Bundle b : bundles) {
+            if (bsn.equals(b.getSymbolicName()) && (version == null || version.equals(b.getVersion()))) {
+                result.add(b);
+            }
+        }
+        return result;
     }
 
     private String getLocation(final byte[] data) throws IOException {
