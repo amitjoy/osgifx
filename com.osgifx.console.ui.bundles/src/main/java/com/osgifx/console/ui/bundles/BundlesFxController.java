@@ -15,8 +15,13 @@
  ******************************************************************************/
 package com.osgifx.console.ui.bundles;
 
+import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_INSTALLED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_BUNDLE_FILTER_EVENT_TOPIC;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.function.Predicate;
 
 import javax.inject.Inject;
@@ -25,62 +30,270 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
+import org.osgi.resource.Resource;
 
+import com.google.common.io.Files;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.dto.SearchFilterDTO;
+import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.batchinstall.dialog.ArtifactInstaller;
+import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog;
+import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
+import com.osgifx.console.ui.bundles.obr.bnd.ResourceBuilder;
+import com.osgifx.console.ui.bundles.obr.bnd.XMLResourceGenerator;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
+import com.osgifx.console.util.fx.FxDialog;
+
+import com.osgifx.console.util.io.IO;
 
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
 
 public final class BundlesFxController {
 
+    private static final String BATCH_HEADER = "Installing artifacts from directory";
+
     @Log
     @Inject
-    private FluentLogger                     logger;
+    private FluentLogger          logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                       loader;
+    private FXMLLoader            loader;
     @FXML
-    private TableView<XBundleDTO>            table;
+    private TableView<XBundleDTO> table;
     @Inject
     @OSGiBundle
-    private BundleContext                    context;
+    private BundleContext         context;
     @Inject
     @Named("is_connected")
-    private boolean                          isConnected;
+    private boolean               isConnected;
     @Inject
-    private DataProvider                     dataProvider;
+    @Named("is_snapshot_agent")
+    private boolean               isSnapshotAgent;
+    @Inject
+    private DataProvider          dataProvider;
+    @Inject
+    private IEclipseContext       eclipseContext;
+    @Inject
+    private Executor              executor;
+    @Inject
+    @Optional
+    private Supervisor            supervisor;
+    @Inject
+    private ThreadSynchronize     threadSync;
+    @Inject
+    private IEventBroker          eventBroker;
+    @Inject
+    @Optional
+    private ArtifactInstaller     installer;
+    @FXML
+    private Button                installBundleButton;
+    @FXML
+    private Button                batchInstallButton;
+    @FXML
+    private Button                generateObrButton;
+
     private FilteredList<XBundleDTO>         filteredList;
     private TableRowDataFeatures<XBundleDTO> previouslyExpanded;
 
     @FXML
     public void initialize() {
+        initButtonIcons();
         if (!isConnected) {
             Fx.addTablePlaceholderWhenDisconnected(table);
+            updateButtonStates();
             return;
         }
         try {
             createControls();
             Fx.disableSelectionModel(table);
+            updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    @FXML
+    public void installOrUpdateBundle() {
+        final var dialog = new BundleInstallDialog();
+
+        ContextInjectionFactory.inject(dialog, eclipseContext);
+        logger.atInfo().log("Injected install bundle dialog to eclipse context");
+        dialog.init();
+
+        final var remoteInstall = dialog.showAndWait();
+        if (remoteInstall.isPresent()) {
+            final Task<Void> installTask = new Task<>() {
+
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var dto        = remoteInstall.get();
+                        final var file       = dto.file();
+                        final var startLevel = dto.startLevel();
+                        if (file == null) {
+                            return null;
+                        }
+                        logger.atInfo().log("Selected file to install or update as bundle: %s", file);
+
+                        final var agent  = supervisor.getAgent();
+                        final var bundle = agent.installWithData(null, Files.toByteArray(file), startLevel);
+                        if (bundle == null) {
+                            logger.atError().log("Bundle cannot be installed or updated");
+                            return null;
+                        }
+                        logger.atInfo().log("Bundle has been installed or updated: %s", bundle);
+                        if (dto.startBundle()) {
+                            agent.start(bundle.id);
+                            logger.atInfo().log("Bundle has been started: %s", bundle);
+                        }
+                        eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, bundle.symbolicName);
+                        threadSync.asyncExec(() -> Fx.showSuccessNotification("Remote Bundle Install",
+                                bundle.symbolicName + " successfully installed/updated"));
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Bundle cannot be installed or updated");
+                        threadSync.asyncExec(() -> Fx.showErrorNotification("Remote Bundle Install",
+                                "Bundle cannot be installed/updated"));
+                    }
+                    return null;
+                }
+            };
+            executor.runAsync(installTask);
+        }
+    }
+
+    @FXML
+    public void batchInstall() {
+        final var directoryChooser = new DirectoryChooser();
+        final var directory        = directoryChooser.showDialog(null);
+
+        if (directory != null) {
+            final var dialog = new BatchInstallDialog();
+
+            ContextInjectionFactory.inject(dialog, eclipseContext);
+            logger.atDebug().log("Injected batch install dialog to eclipse context");
+            dialog.init(directory);
+
+            dialog.traverseDirectoryForFiles();
+            final var selectedFeatures = dialog.showAndWait();
+            if (selectedFeatures.isPresent()) {
+                final Task<String> batchTask = new Task<>() {
+
+                    @Override
+                    protected String call() throws Exception {
+                        return installer.installArtifacts(selectedFeatures.get());
+                    }
+                };
+                batchTask.setOnSucceeded(_ -> {
+                    final var result = batchTask.getValue();
+                    if (result != null) {
+                        if (!result.isEmpty()) {
+                            threadSync.asyncExec(() -> {
+                                FxDialog.showErrorDialog(BATCH_HEADER, result, getClass().getClassLoader());
+                            });
+                        } else {
+                            eventBroker.post(BUNDLE_INSTALLED_EVENT_TOPIC, "");
+                            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, "");
+                        }
+                    }
+                });
+                final var taskFuture = executor.runAsync(batchTask).exceptionally(e -> {
+                    threadSync.asyncExec(
+                            () -> FxDialog.showExceptionDialog(e, BundlesFxController.class.getClassLoader()));
+                    return null;
+                });
+                FxDialog.showProgressDialog(BATCH_HEADER, batchTask, getClass().getClassLoader(),
+                        () -> taskFuture.cancel(true));
+            }
+        }
+    }
+
+    @FXML
+    public void generateObr() {
+        final var directoryChooser = new DirectoryChooser();
+        final var location         = directoryChooser.showDialog(null);
+        if (location == null) {
+            return;
+        }
+        exportOBR(location);
+    }
+
+    private void exportOBR(final File location) {
+        final var resources = dataProvider.bundles().stream().map(this::toResource).toList();
+        if (resources.isEmpty()) {
+            logger.atInfo().log("Resources are empty");
+            return;
+        }
+        final var xmlResourceGenerator = new XMLResourceGenerator();
+        final var outputFile           = new File(location, IO.prepareFilenameFor("xml"));
+
+        try (final OutputStream fileStream = new FileOutputStream(outputFile)) {
+            xmlResourceGenerator.resources(resources);
+            xmlResourceGenerator.save(fileStream);
+            Fx.showSuccessNotification("OBR Successfully Generated", outputFile.getAbsolutePath());
+            logger.atInfo().log("OBR XML has been successfully generated - '%s'", outputFile);
+        } catch (final Exception e) {
+            FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+            logger.atError().withException(e).log("OBR XML cannot be generated");
+        }
+    }
+
+    private Resource toResource(final XBundleDTO bundle) {
+        try {
+            final var builder = new ResourceBuilder();
+            builder.addCapabilities(bundle.bundleRevision.capabilities);
+            builder.addRequirements(bundle.bundleRevision.requirements);
+            return builder.build();
+        } catch (final Exception e) {
+            throw org.eclipse.fx.core.ExceptionUtils.wrap(e);
+        }
+    }
+
+    private void initButtonIcons() {
+        installBundleButton.setGraphic(createIcon("/graphic/icons/install.png"));
+        batchInstallButton.setGraphic(createIcon("/graphic/icons/directory.png"));
+        generateObrButton.setGraphic(createIcon("/graphic/icons/obr.png"));
+    }
+
+    private void updateButtonStates() {
+        final var disableActions = !isConnected || isSnapshotAgent;
+        installBundleButton.setDisable(disableActions);
+        batchInstallButton.setDisable(disableActions);
+        generateObrButton.setDisable(disableActions);
+    }
+
+    private ImageView createIcon(final String path) {
+        final var image     = new Image(getClass().getResourceAsStream(path));
+        final var imageView = new ImageView(image);
+        imageView.setFitHeight(16.0);
+        imageView.setFitWidth(16.0);
+        imageView.setPreserveRatio(true);
+        return imageView;
     }
 
     private void createControls() {
