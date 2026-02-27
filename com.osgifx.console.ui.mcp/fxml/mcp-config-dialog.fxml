@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" fillWidth="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="550.0" spacing="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+   <children>
+      <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../graphic/images/about.png" />
+         </image>
+      </ImageView>
+      <Label style="-fx-font-weight: bold; -fx-font-size: 18px;" text="Configure MCP Client" />
+      <Label text="Add the following JSON configuration to your MCP client settings" />
+      <Label text="(e.g. Claude Desktop, Cursor, Windsurf, VS Code etc.)" />
+      <TextArea editable="false" prefWidth="480.0" prefHeight="160.0" style="-fx-focus-color: transparent; -fx-faint-focus-color: transparent;" stylesheets="@../css/no-scroll.css" text="{&#10;   &quot;OSGifx&quot;: {&#10;      &quot;serverUrl&quot;: &quot;http://localhost:8080/mcp&quot;,&#10;      &quot;type&quot;: &quot;sse&quot;,&#10;      &quot;disabled&quot;: false,&#10;      &quot;disabledTools&quot;: []&#10;   }&#10;}">
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+      </TextArea>
+   </children>
+   <padding>
+      <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+   </padding>
+</VBox>
