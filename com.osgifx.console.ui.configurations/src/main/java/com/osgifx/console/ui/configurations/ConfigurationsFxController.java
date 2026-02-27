@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.configurations;
 
+import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC;
 
 import java.util.function.Predicate;
@@ -22,12 +23,17 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -36,14 +42,22 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.dto.SearchFilterDTO;
+import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.configurations.converter.ConfigurationManager;
+import com.osgifx.console.ui.configurations.dialog.ConfigurationCreateDialog;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
+import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 
@@ -51,36 +65,130 @@ public final class ConfigurationsFxController {
 
     @Log
     @Inject
-    private FluentLogger                            logger;
+    private FluentLogger                 logger;
     @Inject
     @LocalInstance
-    private FXMLLoader                              loader;
+    private FXMLLoader                   loader;
     @FXML
-    private TableView<XConfigurationDTO>            table;
+    private TableView<XConfigurationDTO> table;
     @Inject
     @OSGiBundle
-    private BundleContext                           context;
+    private BundleContext                context;
     @Inject
     @Named("is_connected")
-    private boolean                                 isConnected;
+    private boolean                      isConnected;
     @Inject
-    private DataProvider                            dataProvider;
+    @Named("is_snapshot_agent")
+    private boolean                      isSnapshotAgent;
+    @Inject
+    private DataProvider                 dataProvider;
+    @Inject
+    private IEclipseContext              eclipseContext;
+    @Inject
+    private Executor                     executor;
+    @Inject
+    private ThreadSynchronize            threadSync;
+    @Inject
+    private IEventBroker                 eventBroker;
+    @Inject
+    private ConfigurationManager         configManager;
+    @FXML
+    private Button                       addConfigButton;
+
     private FilteredList<XConfigurationDTO>         filteredList;
     private TableRowDataFeatures<XConfigurationDTO> previouslyExpanded;
 
     @FXML
     public void initialize() {
+        initButtonIcons();
         if (!isConnected) {
             Fx.addTablePlaceholderWhenDisconnected(table);
+            updateButtonStates();
             return;
         }
         try {
             createControls();
             Fx.disableSelectionModel(table);
+            updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    @FXML
+    public void addNewConfiguration() {
+        final var dialog = new ConfigurationCreateDialog();
+        ContextInjectionFactory.inject(dialog, eclipseContext);
+        logger.atInfo().log("Injected configuration create dialog to eclipse context");
+        dialog.init();
+
+        final var configuration = dialog.showAndWait();
+        if (configuration.isPresent()) {
+            final Task<Void> createTask = new Task<>() {
+
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var dto        = configuration.get();
+                        final var pid        = dto.pid();
+                        final var factoryPid = dto.factoryPid();
+                        final var properties = dto.properties();
+
+                        if (StringUtils.isBlank(pid) && StringUtils.isBlank(factoryPid) || properties == null) {
+                            return null;
+                        }
+
+                        final boolean result;
+                        final String  effectivePID;
+
+                        if (StringUtils.isNotBlank(pid)) {
+                            effectivePID = pid.strip();
+                            result       = configManager.createOrUpdateConfiguration(effectivePID, properties);
+                        } else if (StringUtils.isNotBlank(factoryPid)) {
+                            effectivePID = factoryPid.strip();
+                            result       = configManager.createFactoryConfiguration(effectivePID, properties);
+                        } else {
+                            return null;
+                        }
+
+                        if (result) {
+                            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, effectivePID);
+                            threadSync.asyncExec(() -> Fx.showSuccessNotification("New Configuration",
+                                    "Configuration - '" + effectivePID + "' has been successfully created"));
+                            logger.atInfo().log("Configuration - '%s' has been successfully created", effectivePID);
+                        } else {
+                            threadSync.asyncExec(() -> Fx.showErrorNotification("New Configuration",
+                                    "Configuration - '" + effectivePID + "' could not be created"));
+                            logger.atWarning().log("Configuration - '%s' could not be created", effectivePID);
+                        }
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Configuration could not be created");
+                        threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                    }
+                    return null;
+                }
+            };
+            executor.runAsync(createTask);
+        }
+    }
+
+    private void initButtonIcons() {
+        addConfigButton.setGraphic(createIcon("/graphic/icons/new-config.png"));
+    }
+
+    private void updateButtonStates() {
+        final var disableActions = !isConnected || isSnapshotAgent;
+        addConfigButton.setDisable(disableActions);
+    }
+
+    private ImageView createIcon(final String path) {
+        final var image     = new Image(getClass().getResourceAsStream(path));
+        final var imageView = new ImageView(image);
+        imageView.setFitHeight(16.0);
+        imageView.setFitWidth(16.0);
+        imageView.setPreserveRatio(true);
+        return imageView;
     }
 
     private void createControls() {

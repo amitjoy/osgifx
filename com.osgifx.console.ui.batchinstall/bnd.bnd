@@ -12,5 +12,7 @@ Model-Fragment      : fragment.e4xmi
                       org.apache.felix.cm.json,\
                       org.eclipse.osgi;version=latest,\
                       org.glassfish.jakarta.json
+Export-Package      : com.osgifx.console.ui.batchinstall.handler,\
+                      com.osgifx.console.ui.batchinstall.dialog
 -privatepackage     : com.osgifx.console.ui.batchinstall.*
 Import-Package      : org.controlsfx.control, *
