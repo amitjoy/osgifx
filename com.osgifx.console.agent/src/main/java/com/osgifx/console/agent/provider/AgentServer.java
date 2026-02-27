@@ -35,7 +35,6 @@ import static com.osgifx.console.agent.provider.PackageWirings.Type.SCR;
 import static com.osgifx.console.agent.provider.PackageWirings.Type.USER_ADMIN;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.BUNDLE_VERSION;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
@@ -238,17 +237,21 @@ public final class AgentServer implements Agent, Closeable {
             result.result = XResultDTO.ERROR;
         } finally {
             result.response = b.toString();
-            // if there are no errors at all, perform the refresh operation
+        }
+        if (result.result != XResultDTO.ERROR) {
             if (result.response.isEmpty()) {
+                result.result = XResultDTO.SUCCESS;
+                // if there are no errors at all, perform the refresh operation
                 try {
                     // this sometimes causes https://issues.apache.org/jira/browse/FELIX-3414
                     refresh(true);
                 } catch (final Exception e) {
                     Thread.currentThread().interrupt();
                 }
+            } else {
+                result.result = XResultDTO.ERROR;
             }
         }
-        result.result = XResultDTO.SUCCESS;
         return result;
     }
 
@@ -270,10 +273,14 @@ public final class AgentServer implements Agent, Closeable {
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
+            if (bundle == null) {
+                sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
             try {
                 bundle.start();
             } catch (final BundleException e) {
-                sb.append(e.getMessage()).append("\n");
+                sb.append(e.getMessage()).append('\n');
             }
         }
         return sb.length() == 0 ? null : sb.toString();
@@ -286,10 +293,14 @@ public final class AgentServer implements Agent, Closeable {
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
+            if (bundle == null) {
+                sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
             try {
                 bundle.stop();
             } catch (final BundleException e) {
-                sb.append(e.getMessage()).append("\n");
+                sb.append(e.getMessage()).append('\n');
             }
         }
         return sb.length() == 0 ? null : sb.toString();
@@ -302,11 +313,15 @@ public final class AgentServer implements Agent, Closeable {
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
+            if (bundle == null) {
+                sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
             try {
                 bundle.uninstall();
                 installed.remove(bundle.getLocation());
             } catch (final BundleException e) {
-                sb.append(e.getMessage()).append("\n");
+                sb.append(e.getMessage()).append('\n');
             }
         }
         return sb.length() == 0 ? null : sb.toString();
@@ -689,13 +704,14 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     private Set<Bundle> findBundles(final String bsn, final Version version) {
-        // @formatter:off
-        return Stream.of(di.getInstance(BundleContext.class)
-                     .getBundles())
-                     .filter(b -> bsn.equals(b.getSymbolicName()))
-                     .filter(b -> version == null || version.equals(b.getVersion()))
-                     .collect(toSet());
-        // @formatter:on
+        final Bundle[]    bundles = di.getInstance(BundleContext.class).getBundles();
+        final Set<Bundle> result  = new HashSet<>(4);
+        for (final Bundle b : bundles) {
+            if (bsn.equals(b.getSymbolicName()) && (version == null || version.equals(b.getVersion()))) {
+                result.add(b);
+            }
+        }
+        return result;
     }
 
     private String getLocation(final byte[] data) throws IOException {

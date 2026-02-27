@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -534,16 +536,17 @@ public final class XBundleAdmin {
                 return Collections.emptyList();
             }
             final List<XBundleInfoDTO> bundles       = new ArrayList<>();
+            final Set<Long>            seenIds       = new HashSet<>();
             final List<BundleWire>     providedWires = bundleWiring.getProvidedWires(null);
 
             for (final BundleWire wire : providedWires) {
                 final BundleRevision requirer = wire.getRequirer();
-                final XBundleInfoDTO dto      = new XBundleInfoDTO();
+                final long           id       = requirer.getBundle().getBundleId();
 
-                dto.id           = requirer.getBundle().getBundleId();
-                dto.symbolicName = requirer.getSymbolicName();
-
-                if (!containsWire(bundles, dto.symbolicName, dto.id)) {
+                if (seenIds.add(id)) {
+                    final XBundleInfoDTO dto = new XBundleInfoDTO();
+                    dto.id           = id;
+                    dto.symbolicName = requirer.getSymbolicName();
                     bundles.add(dto);
                 }
             }
@@ -562,16 +565,17 @@ public final class XBundleAdmin {
                 return Collections.emptyList();
             }
             final List<XBundleInfoDTO> bundles       = new ArrayList<>();
-            final List<BundleWire>     requierdWires = bundleWiring.getRequiredWires(null);
+            final Set<Long>            seenIds       = new HashSet<>();
+            final List<BundleWire>     requiredWires = bundleWiring.getRequiredWires(null);
 
-            for (final BundleWire wire : requierdWires) {
+            for (final BundleWire wire : requiredWires) {
                 final BundleRevision provider = wire.getProvider();
-                final XBundleInfoDTO dto      = new XBundleInfoDTO();
+                final long           id       = provider.getBundle().getBundleId();
 
-                dto.id           = provider.getBundle().getBundleId();
-                dto.symbolicName = provider.getSymbolicName();
-
-                if (!containsWire(bundles, dto.symbolicName, dto.id)) {
+                if (seenIds.add(id)) {
+                    final XBundleInfoDTO dto = new XBundleInfoDTO();
+                    dto.id           = id;
+                    dto.symbolicName = provider.getSymbolicName();
                     bundles.add(dto);
                 }
             }
@@ -583,10 +587,6 @@ public final class XBundleAdmin {
         }
     }
 
-    private static boolean containsWire(final List<XBundleInfoDTO> bundles, final String bsn, final long id) {
-        return bundles.stream().anyMatch(b -> b.symbolicName.equals(bsn) && b.id == id);
-    }
-
     private static List<XPackageDTO> getImportedPackages(final Bundle bundle) {
         try {
             final BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
@@ -595,13 +595,14 @@ public final class XBundleAdmin {
             }
             final List<BundleWire>  bundleWires      = bundleWiring.getRequiredWires(PACKAGE_NAMESPACE);
             final List<XPackageDTO> importedPackages = new ArrayList<>();
+            final Set<String>       seenPackages     = new HashSet<>();
 
             for (final BundleWire bundleWire : bundleWires) {
                 final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
                 final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
                 final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
 
-                if (!hasPackage(importedPackages, pkg, version)) {
+                if (seenPackages.add(pkg + ":" + version)) {
                     final XPackageDTO dto = new XPackageDTO();
 
                     dto.name    = pkg;
@@ -627,13 +628,14 @@ public final class XBundleAdmin {
             }
             final List<BundleWire>  bundleWires      = bundleWiring.getProvidedWires(PACKAGE_NAMESPACE);
             final List<XPackageDTO> exportedPackages = new ArrayList<>();
+            final Set<String>       seenPackages     = new HashSet<>();
 
             for (final BundleWire bundleWire : bundleWires) {
                 final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
                 final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
                 final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
 
-                if (!hasPackage(exportedPackages, pkg, version)) {
+                if (seenPackages.add(pkg + ":" + version)) {
                     final XPackageDTO dto = new XPackageDTO();
 
                     dto.name    = pkg;
@@ -649,10 +651,6 @@ public final class XBundleAdmin {
                     .arg(bundle.getSymbolicName()).throwable(e).log();
             return Collections.emptyList();
         }
-    }
-
-    private static boolean hasPackage(final List<XPackageDTO> packages, final String name, final String version) {
-        return packages.stream().anyMatch(o -> o.name.equals(name) && o.version.equals(version));
     }
 
     private static String findState(final int state) {
@@ -676,8 +674,7 @@ public final class XBundleAdmin {
     }
 
     private static String getHeader(final Bundle bundle, final String header) {
-        final Map<String, String> headers = toMap(bundle.getHeaders());
-        return headers.get(header);
+        return bundle.getHeaders().get(header);
     }
 
     private static Map<String, String> toMap(final Dictionary<String, String> dictionary) {
