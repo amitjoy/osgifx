@@ -53,8 +53,34 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
 
 /**
- * An agent runs on remote OSGi framework and provides the means to control this
- * framework
+ * The {@code Agent} interface defines the remote-management contract for an OSGi
+ * framework. An agent implementation runs inside a target OSGi runtime and exposes
+ * operations—such as bundle lifecycle management, configuration administration,
+ * log inspection, and diagnostics—to a remote {@code Supervisor} (the OSGi.fx desktop
+ * console).
+ *
+ * <h2>Communication Channels</h2>
+ * The agent supports two RPC transports:
+ * <ul>
+ *   <li><b>Socket</b> – configured via {@link #AGENT_SOCKET_PORT_KEY}. A plain or
+ *       TLS-secured TCP connection.</li>
+ *   <li><b>MQTT 5</b> – configured via {@link #AGENT_MQTT_PROVIDER_KEY},
+ *       {@link #AGENT_MQTT_PUB_TOPIC_KEY}, and {@link #AGENT_MQTT_SUB_TOPIC_KEY}.
+ *       Supports OSGi Messaging or custom {@link Mqtt5Publisher}/{@link Mqtt5Subscriber}
+ *       implementations.</li>
+ * </ul>
+ *
+ * <h2>Graceful Degradation</h2>
+ * Methods that depend on optional OSGi compendium services (ConfigAdmin, SCR, EventAdmin,
+ * UserAdmin, DMT Admin, etc.) return empty collections or {@code SKIPPED} results when the
+ * required service is not wired into the runtime. This allows the agent to operate on
+ * minimal OSGi runtimes—including constrained/embedded devices—without forcing the
+ * installation of unused services.
+ *
+ * <h2>Thread Safety</h2>
+ * Implementations must be safe for concurrent use from multiple RPC handler threads.
+ *
+ * @since 1.0
  */
 @ProviderType
 public interface Agent {
@@ -315,7 +341,7 @@ public interface Agent {
     void enableReceivingEvent();
 
     /**
-     * Disables receiving logs from remote agent
+     * Disables receiving events from remote agent
      */
     void disableReceivingEvent();
 
@@ -690,39 +716,45 @@ public interface Agent {
      *
      * @param count number of logs (0 for all stored logs)
      * @return the raw byte array containing the binary log entries
+     * @since 11.0
      */
     byte[] getLogSnapshot(int count);
 
     /**
      * Returns a binary snapshot of logs within the timeframe.
      *
-     * @param fromTime start timestamp
-     * @param toTime end timestamp
+     * @param fromTime start timestamp (epoch millis, inclusive)
+     * @param toTime end timestamp (epoch millis, inclusive)
      * @return the raw byte array containing the binary log entries
+     * @since 11.0
      */
     byte[] getLogSnapshot(long fromTime, long toTime);
 
     /**
      * Searches strictly inside the bundle JAR and its attached fragments.
-     * strict wrapper for Bundle.findEntries()
+     * <p>
+     * This is a strict wrapper for {@code Bundle.findEntries()}.
      *
      * @param bundleId the bundle ID
-     * @param path the path to start searching (e.g., "/icons")
-     * @param pattern the file pattern (e.g., "*.png")
-     * @param recursive true to recurse into subdirectories
-     * @return list of resource paths
+     * @param path the path to start searching (e.g., {@code "/icons"})
+     * @param pattern the file pattern (e.g., {@code "*.png"})
+     * @param recursive {@code true} to recurse into subdirectories
+     * @return list of resource paths (can be empty)
+     * @since 11.0
      */
     Collection<String> findBundleEntries(long bundleId, String path, String pattern, boolean recursive);
 
     /**
      * Searches the bundle's class space (including imports).
-     * strict wrapper for BundleWiring.listResources()
+     * <p>
+     * This is a strict wrapper for {@code BundleWiring.listResources()}.
      *
      * @param bundleId the bundle ID
-     * @param path the path to start searching (e.g., "com/example/service")
-     * @param pattern the file pattern (e.g., "*.class")
-     * @param options bitwise options (1=LOCAL, 2=RECURSE)
-     * @return list of resource paths
+     * @param path the path to start searching (e.g., {@code "com/example/service"})
+     * @param pattern the file pattern (e.g., {@code "*.class"})
+     * @param options bitwise options ({@code 1}=LOCAL, {@code 2}=RECURSE)
+     * @return list of resource paths (can be empty)
+     * @since 11.0
      */
     Collection<String> listBundleResources(long bundleId, String path, String pattern, int options);
 }
