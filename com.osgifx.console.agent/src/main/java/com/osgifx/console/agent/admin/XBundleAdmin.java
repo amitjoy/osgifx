@@ -674,8 +674,7 @@ public final class XBundleAdmin {
     }
 
     private static String getHeader(final Bundle bundle, final String header) {
-        final Map<String, String> headers = toMap(bundle.getHeaders());
-        return headers.get(header);
+        return bundle.getHeaders().get(header);
     }
 
     private static Map<String, String> toMap(final Dictionary<String, String> dictionary) {

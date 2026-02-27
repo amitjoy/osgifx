@@ -174,9 +174,9 @@ public final class RedirectOutput extends PrintStream {
     }
 
     private void setLastOutput(String out) {
-        if (!"".equals(out) && out != null) {
+        if (out != null && !out.isEmpty()) {
             out = out.replaceAll("^>.*$", "");
-            if (!"".equals(out) && !out.startsWith("true")) {
+            if (!out.isEmpty() && !out.startsWith("true")) {
                 lastOutput = out;
             }
         }
