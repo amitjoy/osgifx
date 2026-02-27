@@ -237,17 +237,21 @@ public final class AgentServer implements Agent, Closeable {
             result.result = XResultDTO.ERROR;
         } finally {
             result.response = b.toString();
-            // if there are no errors at all, perform the refresh operation
+        }
+        if (result.result != XResultDTO.ERROR) {
             if (result.response.isEmpty()) {
+                result.result = XResultDTO.SUCCESS;
+                // if there are no errors at all, perform the refresh operation
                 try {
                     // this sometimes causes https://issues.apache.org/jira/browse/FELIX-3414
                     refresh(true);
                 } catch (final Exception e) {
                     Thread.currentThread().interrupt();
                 }
+            } else {
+                result.result = XResultDTO.ERROR;
             }
         }
-        result.result = XResultDTO.SUCCESS;
         return result;
     }
 
@@ -269,10 +273,14 @@ public final class AgentServer implements Agent, Closeable {
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
+            if (bundle == null) {
+                sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
             try {
                 bundle.start();
             } catch (final BundleException e) {
-                sb.append(e.getMessage()).append("\n");
+                sb.append(e.getMessage()).append('\n');
             }
         }
         return sb.length() == 0 ? null : sb.toString();
@@ -285,10 +293,14 @@ public final class AgentServer implements Agent, Closeable {
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
+            if (bundle == null) {
+                sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
             try {
                 bundle.stop();
             } catch (final BundleException e) {
-                sb.append(e.getMessage()).append("\n");
+                sb.append(e.getMessage()).append('\n');
             }
         }
         return sb.length() == 0 ? null : sb.toString();
@@ -301,11 +313,15 @@ public final class AgentServer implements Agent, Closeable {
         final StringBuilder sb = new StringBuilder();
         for (final long id : ids) {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
+            if (bundle == null) {
+                sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
             try {
                 bundle.uninstall();
                 installed.remove(bundle.getLocation());
             } catch (final BundleException e) {
-                sb.append(e.getMessage()).append("\n");
+                sb.append(e.getMessage()).append('\n');
             }
         }
         return sb.length() == 0 ? null : sb.toString();
