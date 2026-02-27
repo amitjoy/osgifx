@@ -5,8 +5,6 @@
 > [!NOTE]
 > "Headless" in this context means "without the connection wizard UI", not necessarily without any UI at all. The main application window will still open after connection.
 
-![Headless Launch](screenshots/7.png)
-
 ## How to Use
 
 To use this feature, you need to provide a JSON configuration file via the `osgifx.config` system property when launching the application.
