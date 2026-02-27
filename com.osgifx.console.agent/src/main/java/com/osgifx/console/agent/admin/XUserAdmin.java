@@ -106,7 +106,7 @@ public final class XUserAdmin {
             if (role == null) {
                 return createResult(ERROR, "The role '" + roleDTO.name + "' could not be found");
             }
-            final List<String> cyclesCache = new ArrayList<>();
+            final Set<String> cyclesCache = new HashSet<>();
             cyclesCache.add(roleDTO.name);
 
             final List<XRoleDTO> allMembers        = mergeMembers(roleDTO.basicMembers, roleDTO.requiredMembers);
@@ -173,7 +173,7 @@ public final class XUserAdmin {
         }
     }
 
-    private boolean hasCycleInMembers(final List<XRoleDTO> members, final List<String> cyclesCache) {
+    private boolean hasCycleInMembers(final List<XRoleDTO> members, final Set<String> cyclesCache) {
         if (members == null) {
             return false;
         }
