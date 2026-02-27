@@ -2,6 +2,8 @@
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that connects LLMs (like Claude) to a running OSGi framework. This allows you to diagnose, monitor, and debug remote OSGi runtimes using natural language.
 
+![MCP Server](screenshots/7.png)
+
 ## Features
 
 * **🔍 Deep Diagnostics:** Inspect bundles, services, components (DS), and configurations.
