@@ -9,7 +9,8 @@ Model-Fragment      : fragment.e4xmi
 -buildpath          : \
                       ${bundles.required},\
                       biz.aQute.bndlib;packages=*,\
-                      biz.aQute.bnd.util;packages=*
+                      biz.aQute.bnd.util;packages=*,\
+                      com.osgifx.console.ui.batchinstall
 -privatepackage     : com.osgifx.console.ui.bundles.*
 -conditionalpackage : aQute.* 
 Import-Package      : \
