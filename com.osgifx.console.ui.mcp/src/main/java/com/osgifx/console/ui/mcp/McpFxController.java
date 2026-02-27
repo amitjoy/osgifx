@@ -27,6 +27,7 @@ import javax.inject.Named;
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
@@ -41,6 +42,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.mcp.data.McpDataProvider;
+import com.osgifx.console.ui.mcp.dialog.McpConfigDialog;
 import com.osgifx.console.ui.mcp.dto.McpLogDTO;
 import com.osgifx.console.ui.mcp.dto.McpToolDTO;
 import com.osgifx.console.util.fx.Fx;
@@ -53,6 +55,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
 public final class McpFxController {
@@ -71,6 +75,8 @@ public final class McpFxController {
     private Button                          refreshLogsButton;
     @FXML
     private Button                          clearLogsButton;
+    @FXML
+    private Button                          configInfoButton;
     @FXML
     private Label                           statusLabel;
     @FXML
@@ -97,6 +103,8 @@ public final class McpFxController {
     @OSGiBundle
     private BundleContext     bundleContext;
     @Inject
+    private IEclipseContext   eclipseContext;
+    @Inject
     private ThreadSynchronize threadSync;
     @Inject
     @Named("is_connected")
@@ -111,6 +119,7 @@ public final class McpFxController {
 
     @FXML
     public void initialize() {
+        initButtonIcons();
         if (!isConnected) {
             Fx.addTablePlaceholderWhenDisconnected(toolsTable);
             Fx.addTablePlaceholderWhenDisconnected(logsTable);
@@ -139,6 +148,12 @@ public final class McpFxController {
             logger.atError().withException(e).log("FXML controller could not be initialized");
             Fx.showErrorNotification("Model Context Protocol", "MCP UI controller initialization failed");
         }
+    }
+
+    private void initButtonIcons() {
+        clearLogsButton.setGraphic(createIcon("/graphic/icons/clear.png"));
+        refreshLogsButton.setGraphic(createIcon("/graphic/icons/refresh.png"));
+        configInfoButton.setGraphic(createIcon("/graphic/icons/about.png"));
     }
 
     private void initToolsTable() {
@@ -195,6 +210,7 @@ public final class McpFxController {
             statusLabel.setText("Status: RUNNING");
             statusLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
             actionButton.setText("Stop MCP Server");
+            actionButton.setGraphic(createIcon("/graphic/icons/stop.png"));
             actionButton.setOnAction(_ -> stopServer());
             refreshLogsButton.setDisable(false);
             clearLogsButton.setDisable(false);
@@ -202,6 +218,7 @@ public final class McpFxController {
             statusLabel.setText("Status: STOPPED");
             statusLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             actionButton.setText("Start MCP Server");
+            actionButton.setGraphic(createIcon("/graphic/icons/start.png"));
             actionButton.setOnAction(_ -> startServer());
             refreshLogsButton.setDisable(true);
             clearLogsButton.setDisable(true);
@@ -251,6 +268,25 @@ public final class McpFxController {
         logs.clear();
         // Ideally clear server logs too if we had an API for that
         Fx.showSuccessNotification("MCP Logs", "Log list has been cleared");
+    }
+
+    @FXML
+    private void showConfigInfo() {
+        final var dialog = new McpConfigDialog();
+        org.eclipse.e4.core.contexts.ContextInjectionFactory.inject(dialog, eclipseContext);
+        logger.atDebug().log("Injected MCP config dialog to eclipse context");
+
+        dialog.init();
+        dialog.showAndWait();
+    }
+
+    private ImageView createIcon(final String path) {
+        final var image     = new Image(getClass().getResourceAsStream(path));
+        final var imageView = new ImageView(image);
+        imageView.setFitHeight(16.0);
+        imageView.setFitWidth(16.0);
+        imageView.setPreserveRatio(true);
+        return imageView;
     }
 
     @Inject
