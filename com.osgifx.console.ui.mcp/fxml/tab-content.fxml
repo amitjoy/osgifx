@@ -32,6 +32,7 @@
             <Button fx:id="actionButton" mnemonicParsing="false" text="Start MCP Server" />
             <Button fx:id="refreshLogsButton" mnemonicParsing="false" onAction="#refreshLogs" text="Refresh Logs" />
             <Button fx:id="clearLogsButton" mnemonicParsing="false" onAction="#clearLogs" text="Clear Logs" />
+            <Button fx:id="configInfoButton" mnemonicParsing="false" onAction="#showConfigInfo" text="Configuration Info" />
             <Label fx:id="statusLabel" text="Status: STOPPED" />
          </children>
          <padding>
