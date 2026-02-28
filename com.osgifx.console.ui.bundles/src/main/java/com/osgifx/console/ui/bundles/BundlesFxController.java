@@ -52,6 +52,7 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.batchinstall.dialog.ArtifactInstaller;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog;
 import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
+import com.osgifx.console.ui.bundles.dialog.BatchInstallIntroDialog;
 import com.osgifx.console.ui.bundles.obr.bnd.ResourceBuilder;
 import com.osgifx.console.ui.bundles.obr.bnd.XMLResourceGenerator;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
@@ -189,8 +190,17 @@ public final class BundlesFxController {
 
     @FXML
     public void batchInstall() {
-        final var directoryChooser = new DirectoryChooser();
-        final var directory        = directoryChooser.showDialog(null);
+        final var introDialog = new BatchInstallIntroDialog();
+        ContextInjectionFactory.inject(introDialog, eclipseContext);
+        logger.atDebug().log("Injected batch install intro dialog to eclipse context");
+        introDialog.init();
+
+        final var introResult = introDialog.showAndWait();
+        if (introResult.isEmpty()) {
+            return;
+        }
+
+        final var directory = introResult.get();
 
         if (directory != null) {
             final var dialog = new BatchInstallDialog();
