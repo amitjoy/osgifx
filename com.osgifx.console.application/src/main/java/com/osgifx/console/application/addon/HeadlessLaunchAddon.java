@@ -145,6 +145,13 @@ public final class HeadlessLaunchAddon {
             logger.atWarning().log("MQTT configuration is missing");
             return;
         }
+        final var gson           = new Gson();
+        String    tokenConfigStr = null;
+        if (headlessConfig.mqtt.tokenConfig instanceof String s) {
+            tokenConfigStr = s;
+        } else if (headlessConfig.mqtt.tokenConfig != null) {
+            tokenConfigStr = gson.toJson(headlessConfig.mqtt.tokenConfig);
+        }
         // @formatter:off
         final var mqttConnection = MqttConnection
                 .builder()
@@ -154,7 +161,7 @@ public final class HeadlessLaunchAddon {
                 .timeout(headlessConfig.mqtt.timeout)
                 .username(headlessConfig.mqtt.username)
                 .password(headlessConfig.mqtt.password)
-                .tokenConfig(null) // Token config not yet supported in CLI JSON for simplicity, can be added if needed
+                .tokenConfig(tokenConfigStr)
                 .pubTopic(headlessConfig.mqtt.pubTopic)
                 .subTopic(headlessConfig.mqtt.subTopic)
                 .lwtTopic(headlessConfig.mqtt.lwtTopic)
