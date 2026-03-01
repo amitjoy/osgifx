@@ -119,7 +119,7 @@ For detailed setup instructions, see the [User Guide](GUIDE.md).
 | **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
 | **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
 | **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](MCP_SERVER.md)_ | 2.4.5 | ✅ | 🚀 |
-| **👻 Headless Launch** <br> _Start application with pre-configured connection_ | 2.4.5 | ✅ | 🚀 |
+| **👻 Headless Launch** <br> _Start application with pre-configured connection. [Read More](HEADLESS_LAUNCH.md)_ | 2.4.5 | ✅ | 🚀 |
 | **🌐 JAX-RS View** <br> _Inspect JAX-RS Applications, Resources, and Extensions_ | 3.0.0 | ✅ | 🚧 |
 | **📦 CDI View** <br> _Inspect CDI Containers, Components, and Extensions_ | 3.0.0 | ✅ | 🚧 |
 | **🔐 Authentication & Security** <br> _Password authentication with AES-256 encryption, TLS/SSL, and OAuth/Token support_ | 3.0.0 | ✅ | 🚧 |
