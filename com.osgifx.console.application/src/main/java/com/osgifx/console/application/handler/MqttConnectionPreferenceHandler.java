@@ -24,6 +24,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import com.google.common.base.Strings;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.preferences.Preference;
@@ -35,6 +36,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
+import com.osgifx.console.application.preference.CredentialManager;
 
 public final class MqttConnectionPreferenceHandler {
 
@@ -46,6 +48,8 @@ public final class MqttConnectionPreferenceHandler {
     private Value<String>       settings;
     @Inject
     private ConnectionsProvider connectionsProvider;
+    @Inject
+    private CredentialManager   credentialManager;
 
     @PostConstruct
     public void init() {
@@ -62,20 +66,29 @@ public final class MqttConnectionPreferenceHandler {
                         @Named("type") final String type,
                         @Named("username") @Optional final String username,
                         @Named("password") @Optional final String password,
+                        @Named("requiresAuthentication") @Optional final String requiresAuthentication,
+                        @Named("savePassword") @Optional final String savePassword,
                         @Named("tokenConfig") @Optional final String tokenConfig,
                         @Named("pubTopic") @Optional final String pubTopic,
                         @Named("subTopic") @Optional final String subTopic,
                         @Named("lwtTopic") @Optional final String lwtTopic) {
 
-        final var gson        = new Gson();
-        final var connections = getStoredValues();
-        final var dto         = new MqttConnectionSettingDTO(id, name, clientId, server, Ints.tryParse(port),
-                                                             Ints.tryParse(timeout), username, password, tokenConfig,
-                                                             pubTopic, subTopic, lwtTopic);
+        final var gson                     = new Gson();
+        final var connections              = getStoredValues();
+        final var dtRequiresAuthentication = Boolean.parseBoolean(requiresAuthentication);
+        final var dtSavePassword           = Boolean.parseBoolean(savePassword);
+        final var dto                      = new MqttConnectionSettingDTO(id, name, clientId, server,
+                                                                          Ints.tryParse(port), Ints.tryParse(timeout),
+                                                                          username, password, dtRequiresAuthentication,
+                                                                          dtSavePassword, tokenConfig, pubTopic,
+                                                                          subTopic, lwtTopic);
 
         if ("ADD".equals(type)) {
             connections.add(dto);
             connectionsProvider.addMqttConnection(dto);
+            if (dtSavePassword && !Strings.isNullOrEmpty(password)) {
+                credentialManager.savePassword(id, password);
+            }
             logger.atInfo().log("New connection has been added: %s", dto);
         } else if ("EDIT".equals(type)) {
             // @formatter:off
@@ -88,10 +101,18 @@ public final class MqttConnectionPreferenceHandler {
                 connections.set(index, dto);
             }
             connectionsProvider.updateMqttConnection(dto);
+            if (dtSavePassword) {
+                if (!Strings.isNullOrEmpty(password)) {
+                    credentialManager.savePassword(id, password);
+                }
+            } else {
+                credentialManager.removePassword(id);
+            }
             logger.atInfo().log("Existing connection has been updated: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
             connectionsProvider.removeMqttConnection(dto);
+            credentialManager.removePassword(id);
             logger.atInfo().log("Existing connection has been deleted: %s", dto);
         } else {
             logger.atWarning().log("Cannot execute command with type '%s'", type);

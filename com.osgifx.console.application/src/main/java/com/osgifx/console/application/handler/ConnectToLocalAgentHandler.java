@@ -15,9 +15,12 @@
  ******************************************************************************/
 package com.osgifx.console.application.handler;
 
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PASSWORD_KEY;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.REMOTE_RPC;
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
+
+import java.net.ConnectException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,6 +29,7 @@ import org.controlsfx.dialog.ProgressDialog;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -34,6 +38,7 @@ import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.SocketConnection;
@@ -48,6 +53,9 @@ public final class ConnectToLocalAgentHandler {
     @Log
     @Inject
     private FluentLogger               logger;
+    @Inject
+    @OSGiBundle
+    private BundleContext              context;
     @Inject
     private Executor                   executor;
     @Inject
@@ -106,10 +114,24 @@ public final class ConnectToLocalAgentHandler {
                             .host(localAgentHost)
                             .port(localAgentPort)
                             .timeout(localAgentTimeout)
+                            .password(context.getProperty(AGENT_SOCKET_PASSWORD_KEY))
                             .build();
                     // @formatter:on
 
                     supervisor.connect(socketConnection);
+
+                    try {
+                        final var isPinged = supervisor.getAgent().ping();
+                        if (!isPinged) {
+                            throw new ConnectException("Agent health check failed: Local agent is not responding");
+                        }
+                    } catch (final RuntimeException e) {
+                        if (e.getMessage() != null && e.getMessage().contains("RPC channel closed")) {
+                            throw new ConnectException("Connection closed immediately after handshake: Local agent encountered an error during initialization");
+                        }
+                        throw e;
+                    }
+
                     logger.atInfo().log("Successfully connected to local agent on %s:%s", localAgentHost,
                             localAgentPort);
                     return null;
@@ -133,7 +155,7 @@ public final class ConnectToLocalAgentHandler {
                 logger.atInfo().log("Agent connected event has been sent for local agent on %s:%s", localAgentHost,
                         localAgentPort);
 
-                final var connection = "[SOCKET] " + localAgentHost + ":" + localAgentPort;
+                final var connection = "Local Agent";
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
