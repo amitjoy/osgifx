@@ -24,6 +24,18 @@ Set the `osgi.fx.agent.socket.port` system property in your runtime.
 *   `2000`: Allows connections only from localhost.
 *   `0.0.0.0:2000`: Allows remote connections.
 
+**Password Authentication:**
+To require password authentication for socket connections:
+1.  Set the `osgi.fx.agent.socket.password` system property on the agent:
+    ```bash
+    -Dosgi.fx.agent.socket.password=your-secure-password
+    ```
+2.  In the OSGi.fx Client connection settings:
+    *   Check **"Requires Authentication"**
+    *   Enter the matching password
+    *   Optionally check **"Save Password"** to store credentials securely (encrypted with AES-256)
+3.  If password is not saved, you'll be prompted each time you connect.
+
 **Secure Configuration (SSL/TLS):**
 To secure the socket connection:
 1.  Set `osgi.fx.agent.socket.secure=true`.
@@ -43,6 +55,14 @@ To use MQTT, install `in.bytehue.messaging.mqtt5.provider.jar` (from OSGi Messag
 Set the following system properties:
 *   `osgi.fx.agent.mqtt.pubtopic`: Topic where the agent sends responses.
 *   `osgi.fx.agent.mqtt.subtopic`: Topic where the agent receives requests.
+
+**Username/Password Authentication:**
+For MQTT brokers requiring authentication:
+1.  In the OSGi.fx Client connection settings:
+    *   Check **"Requires Authentication"**
+    *   Enter your MQTT broker username and password
+    *   Optionally check **"Save Password"** to store credentials securely (encrypted with AES-256)
+2.  If password is not saved, you'll be prompted each time you connect.
 
 **OAuth/Token Authentication:**
 If your MQTT broker requires OAuth tokens:

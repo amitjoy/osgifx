@@ -25,6 +25,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
+import com.google.common.base.Strings;
 import org.eclipse.fx.core.log.Log;
 import org.eclipse.fx.core.preferences.Preference;
 import org.eclipse.fx.core.preferences.Value;
@@ -35,6 +36,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.application.preference.ConnectionsProvider;
+import com.osgifx.console.application.preference.CredentialManager;
 
 public final class SocketConnectionPreferenceHandler {
 
@@ -46,6 +48,8 @@ public final class SocketConnectionPreferenceHandler {
     private Value<String>       settings;
     @Inject
     private ConnectionsProvider connectionsProvider;
+    @Inject
+    private CredentialManager   credentialManager;
 
     @PostConstruct
     public void init() {
@@ -60,16 +64,29 @@ public final class SocketConnectionPreferenceHandler {
                         @Named("timeout") final String timeout,
                         @Named("type") final String type,
                         @Named("truststore") @Optional final String truststore,
-                        @Named("truststorePassword") @Optional final String truststorePassword) {
+                        @Named("truststorePassword") @Optional final String truststorePassword,
+                        @Named("password") @Optional final String password,
+                        @Named("requiresAuthentication") @Optional final String requiresAuthentication,
+                        @Named("savePassword") @Optional final String savePassword) {
 
-        final var gson        = new Gson();
-        final var connections = getStoredValues();
-        final var dto         = new SocketConnectionSettingDTO(id, name, host, Ints.tryParse(port),
-                                                               Ints.tryParse(timeout), truststore, truststorePassword);
+        final var gson                     = new Gson();
+        final var connections              = getStoredValues();
+        final var dtRequiresAuthentication = Boolean.parseBoolean(requiresAuthentication);
+        final var dtSavePassword           = Boolean.parseBoolean(savePassword);
+        final var dto                      = new SocketConnectionSettingDTO(id, name, host, Ints.tryParse(port),
+                                                                            Ints.tryParse(timeout), truststore,
+                                                                            truststorePassword, password,
+                                                                            dtRequiresAuthentication, dtSavePassword);
 
         if ("ADD".equals(type)) {
             connections.add(dto);
             connectionsProvider.addSocketConnection(dto);
+            if (dtSavePassword && !Strings.isNullOrEmpty(password)) {
+                credentialManager.savePassword(id, password);
+            }
+            if (dtSavePassword && !Strings.isNullOrEmpty(truststorePassword)) {
+                credentialManager.saveTrustStorePassword(id, truststorePassword);
+            }
             logger.atInfo().log("New connection has been added: %s", dto);
         } else if ("EDIT".equals(type)) {
             // @formatter:off
@@ -82,10 +99,26 @@ public final class SocketConnectionPreferenceHandler {
                 connections.set(index, dto);
             }
             connectionsProvider.updateSocketConnection(dto);
+            if (dtSavePassword) {
+                if (!Strings.isNullOrEmpty(password)) {
+                    credentialManager.savePassword(id, password);
+                }
+            } else {
+                credentialManager.removePassword(id);
+            }
+            if (dtSavePassword) {
+                if (!Strings.isNullOrEmpty(truststorePassword)) {
+                    credentialManager.saveTrustStorePassword(id, truststorePassword);
+                }
+            } else {
+                credentialManager.removeTrustStorePassword(id);
+            }
             logger.atInfo().log("Existing connection has been updated: %s", dto);
         } else if ("REMOVE".equals(type)) {
             connections.remove(dto);
             connectionsProvider.removeSocketConnection(dto);
+            credentialManager.removePassword(id);
+            credentialManager.removeTrustStorePassword(id);
             logger.atInfo().log("Existing connection has been deleted: %s", dto);
         } else {
             logger.atWarning().log("Cannot execute command with type '%s'", type);

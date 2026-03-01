@@ -18,6 +18,7 @@ package com.osgifx.console.application.ui;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javafx.geometry.Orientation.VERTICAL;
 import static javafx.scene.paint.Color.GREEN;
+import static javafx.scene.paint.Color.RED;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 import javax.inject.Inject;
@@ -64,8 +65,9 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         final String statusBarText;
         if (connectedAgent != null) {
             glyph.color(GREEN);
-            statusBarText = "Connected to " + connectedAgent;
+            statusBarText = connectedAgent;
         } else {
+            glyph.color(RED);
             statusBarText = "Disconnected";
         }
         statusBar.setText(statusBarText);

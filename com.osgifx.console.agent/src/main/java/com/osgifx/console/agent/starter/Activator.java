@@ -19,12 +19,15 @@ import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_DEFAULT_VALUE;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PROVIDER_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_PUB_TOPIC_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_MQTT_SUB_TOPIC_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PASSWORD_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_SOCKET_PORT_KEY;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.MQTT_RPC;
 import static com.osgifx.console.agent.provider.AgentServer.RpcType.SOCKET_RPC;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.osgi.framework.Constants.BUNDLE_ACTIVATOR;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -270,6 +273,36 @@ public final class Activator extends Thread implements BundleActivator {
                 try {
                     final Socket socket = serverSocket.accept();
                     // timeout to get interrupts
+                    socket.setSoTimeout(5000);
+
+                    final BundleContext bundleContext = module.di().getInstance(BundleContext.class);
+                    final String        password      = AgentHelper.getProperty(AGENT_SOCKET_PASSWORD_KEY,
+                            bundleContext);
+
+                    if (password != null && !password.trim().isEmpty()) {
+                        try {
+                            final DataInputStream  in               = new DataInputStream(socket.getInputStream());
+                            final DataOutputStream out              = new DataOutputStream(socket.getOutputStream());
+                            final String           receivedPassword = in.readUTF();
+
+                            if (!password.equals(receivedPassword)) {
+                                out.writeUTF("AUTH_FAILED");
+                                out.flush();
+                                logger.atWarn().msg("[OSGi.fx] Authentication failed from {}")
+                                        .arg(socket.getInetAddress()).log();
+                                IO.close(socket);
+                                continue;
+                            }
+                            out.writeUTF("AUTH_OK");
+                            out.flush();
+                        } catch (Exception e) {
+                            logger.atWarn().msg("[OSGi.fx] Authentication error from {}").arg(socket.getInetAddress())
+                                    .throwable(e).log();
+                            IO.close(socket);
+                            continue;
+                        }
+                    }
+
                     socket.setSoTimeout(1000);
 
                     // create a new agent, and link it up.
