@@ -62,7 +62,7 @@ For detailed instructions, please refer to the **User Guide** on the website or 
 
 ### 🔐 Authentication & Security
 
-OSGi.fx supports **secure connections** with password authentication and TLS/SSL encryption for both Socket and MQTT protocols.
+Starting from **3.0.0**, OSGi.fx supports **secure connections** with password authentication and TLS/SSL encryption for both Socket and MQTT protocols.
 
 **Key Features:**
 - 🔒 Password-protected connections with AES-256 encrypted credential storage
