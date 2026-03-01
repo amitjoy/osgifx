@@ -48,6 +48,7 @@ The configuration file must be a valid JSON file. You can configure either a **S
     "host": "localhost",
     "port": 4567,
     "timeout": 10000,
+    "password": "mypassword",
     "trustStorePath": "/path/to/truststore",
     "trustStorePassword": "password"
   }
@@ -60,6 +61,7 @@ The configuration file must be a valid JSON file. You can configure either a **S
 | `host` | String | The hostname or IP address of the OSGi agent |
 | `port` | Number | The port number of the OSGi agent |
 | `timeout` | Number | Connection timeout in milliseconds |
+| `password` | String | (Optional) Authentication password |
 | `trustStorePath` | String | (Optional) Path to the SSL truststore |
 | `trustStorePassword` | String | (Optional) Password for the SSL truststore |
 
@@ -75,6 +77,13 @@ The configuration file must be a valid JSON file. You can configure either a **S
     "clientId": "osgifx-client",
     "username": "myuser",
     "password": "mypassword",
+    "tokenConfig": {
+      "authServerURL": "https://auth.server/token",
+      "clientId": "osgifx-client",
+      "clientSecret": "secret",
+      "audience": "osgifx",
+      "scope": "openid"
+    },
     "pubTopic": "osgifx/pub",
     "subTopic": "osgifx/sub",
     "lwtTopic": "osgifx/lwt"
@@ -91,6 +100,7 @@ The configuration file must be a valid JSON file. You can configure either a **S
 | `clientId` | String | MQTT Client ID |
 | `username` | String | (Optional) MQTT username |
 | `password` | String | (Optional) MQTT password |
+| `tokenConfig` | Object | (Optional) OAuth2 configuration object |
 | `pubTopic` | String | Topic to publish requests to |
 | `subTopic` | String | Topic to subscribe for responses |
 | `lwtTopic` | String | Last Will and Testament topic |
