@@ -25,9 +25,13 @@ import static com.osgifx.console.supervisor.rpc.RpcSupervisor.MQTT_CONNECTION_LI
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -122,15 +126,43 @@ public abstract class AbstractRpcSupervisor<S, A> {
                     try {
                         SSLSocketFactory sf = null;
                         if (socketConnection.trustStore() != null && socketConnection.trustStorePassword() != null) {
-                            System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
-                            System.setProperty("javax.net.ssl.trustStorePassword",
-                                    socketConnection.trustStorePassword());
-                            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+                            try {
+                                System.setProperty("javax.net.ssl.trustStore", socketConnection.trustStore());
+                                System.setProperty("javax.net.ssl.trustStorePassword",
+                                        socketConnection.trustStorePassword());
+                                System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
-                            sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                                sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                            } catch (final Exception e) {
+                                throw new ConnectException("SSL/TLS configuration failed: " + e.getMessage());
+                            }
                         }
                         final var socket = sf == null ? new Socket() : sf.createSocket();
-                        socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
+                        try {
+                            socket.connect(new InetSocketAddress(host, port), Math.max(timeout, 0));
+                        } catch (final SocketTimeoutException _) {
+                            throw new ConnectException("Connection timeout: Unable to reach " + host + ":" + port
+                                    + " (check if agent is running and network is accessible)");
+                        } catch (final ConnectException _) {
+                            throw new ConnectException("Connection refused: Agent not listening on " + host + ":" + port
+                                    + " (check if agent is running)");
+                        } catch (final UnknownHostException _) {
+                            throw new ConnectException("Unknown host: Cannot resolve hostname '" + host + "'");
+                        }
+
+                        final var password = socketConnection.password();
+                        if (!Strings.isNullOrEmpty(password)) {
+                            socket.setSoTimeout(5000);
+                            final var out = new DataOutputStream(socket.getOutputStream());
+                            final var in = new DataInputStream(socket.getInputStream());
+                            out.writeUTF(password);
+                            out.flush();
+                            final var response = in.readUTF();
+                            if (!"AUTH_OK".equals(response)) {
+                                throw new ConnectException("Authentication failed: Invalid password or agent not configured for authentication");
+                            }
+                            socket.setSoTimeout(0); // infinite timeout after handshake
+                        }
 
                         final var executor = newFixedThreadPool("fx-supervisor-socket-");
                         remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);

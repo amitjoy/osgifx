@@ -35,6 +35,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.primitives.Ints;
+import com.osgifx.console.application.preference.CredentialManager;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.scene.control.Button;
@@ -53,6 +54,8 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
     private FluentLogger      logger;
     @Inject
     private ThreadSynchronize threadSync;
+    @Inject
+    private CredentialManager credentialManager;
 
     public void init(final MqttConnectionSettingDTO setting) {
         final var dialogPane = getDialogPane();
@@ -95,7 +98,42 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
 
         final var password = (CustomPasswordField) TextFields.createClearablePasswordField();
         password.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
-        Optional.ofNullable(setting).ifPresent(s -> password.setText(s.password));
+
+        final var requiresAuthentication = new javafx.scene.control.CheckBox("Requires Authentication");
+        Optional.ofNullable(setting).ifPresent(s -> requiresAuthentication.setSelected(s.requiresAuthentication));
+
+        final var savePassword = new javafx.scene.control.CheckBox("Save Password");
+        Optional.ofNullable(setting).ifPresent(s -> savePassword.setSelected(s.savePassword));
+
+        // Binding 1: If password field is not empty, auto-select requiresAuthentication and savePassword
+        password.textProperty().addListener((_, _, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                requiresAuthentication.setSelected(true);
+                savePassword.setSelected(true);
+            }
+        });
+
+        // Binding 2: If requiresAuthentication is unchecked, clear password and uncheck savePassword
+        requiresAuthentication.selectedProperty().addListener((_, _, newVal) -> {
+            if (!newVal) {
+                password.clear();
+                savePassword.setSelected(false);
+            }
+        });
+
+        // Binding 3: If savePassword is unchecked, clear password field
+        savePassword.selectedProperty().addListener((_, _, newVal) -> {
+            if (!newVal) {
+                password.clear();
+            }
+        });
+
+        // Binding 4: password field enabled only when requiresAuth checked AND savePassword checked
+        password.disableProperty()
+                .bind(requiresAuthentication.selectedProperty().not().or(savePassword.selectedProperty().not()));
+
+        // Binding 5: savePassword enabled only when requiresAuth is checked
+        savePassword.disableProperty().bind(requiresAuthentication.selectedProperty().not());
 
         final var tokenConfig = (CustomTextField) TextFields.createClearableTextField();
         tokenConfig.setLeft(new ImageView(getClass().getResource("/graphic/icons/username.png").toExternalForm()));
@@ -128,6 +166,8 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         content.getChildren().add(timeout);
         content.getChildren().add(username);
         content.getChildren().add(password);
+        content.getChildren().add(requiresAuthentication);
+        content.getChildren().add(savePassword);
         content.getChildren().add(tokenConfig);
         content.getChildren().add(pubTopic);
         content.getChildren().add(subTopic);
@@ -175,6 +215,13 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
         subTopic.setPromptText(subTopicCaption);
         lwtTopic.setPromptText(lwtTopicCaption);
 
+        Optional.ofNullable(setting).ifPresent(s -> {
+            var savedPassword = credentialManager.getPassword(s.id);
+            if (savedPassword != null) {
+                password.setPromptText("(Saved - leave empty to keep)");
+            }
+        });
+
         final var validationSupport = new ValidationSupport();
         threadSync.asyncExec(() -> {
             final var requiredFormat       = "'%s' is required";
@@ -213,23 +260,28 @@ public final class MqttConnectionDialog extends Dialog<MqttConnectionSettingDTO>
 
             verify(p != null && t != null, "Port and timeout formats are not compliant");
             if (setting != null) {
-                setting.name        = name.getText();
-                setting.clientId    = clientId.getText();
-                setting.server      = server.getText();
-                setting.port        = p;
-                setting.timeout     = t;
-                setting.username    = username.getText();
-                setting.password    = password.getText();
-                setting.tokenConfig = tokenConfig.getText();
-                setting.pubTopic    = pubTopic.getText();
-                setting.subTopic    = subTopic.getText();
-                setting.lwtTopic    = lwtTopic.getText();
+                setting.name                   = name.getText();
+                setting.clientId               = clientId.getText();
+                setting.server                 = server.getText();
+                setting.port                   = p;
+                setting.timeout                = t;
+                setting.username               = username.getText();
+                setting.password               = password.getText();
+                setting.requiresAuthentication = requiresAuthentication.isSelected();
+                setting.savePassword           = savePassword.isSelected();
+                setting.tokenConfig            = tokenConfig.getText();
+                setting.pubTopic               = pubTopic.getText();
+                setting.subTopic               = subTopic.getText();
+                setting.lwtTopic               = lwtTopic.getText();
 
                 return setting;
             }
-            return new MqttConnectionSettingDTO(name.getText(), clientId.getText(), server.getText(), p, t,
-                                                username.getText(), password.getText(), tokenConfig.getText(),
-                                                pubTopic.getText(), subTopic.getText(), lwtTopic.getText());
+            return new MqttConnectionSettingDTO(name.getText(), clientId.getText(), server.getText(),
+                                                Ints.tryParse(port.getText()), Ints.tryParse(timeout.getText()),
+                                                username.getText(), password.getText(),
+                                                requiresAuthentication.isSelected(), savePassword.isSelected(),
+                                                tokenConfig.getText(), pubTopic.getText(), subTopic.getText(),
+                                                lwtTopic.getText());
         });
     }
 

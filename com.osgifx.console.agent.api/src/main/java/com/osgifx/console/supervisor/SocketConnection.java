@@ -34,6 +34,8 @@ public class SocketConnection {
     private final String trustStore;
     // The password for the trust store
     private final String trustStorePassword;
+    // The password for authentication
+    private final String password;
 
     /**
      * Private constructor to enforce the use of the builder for object creation.
@@ -42,12 +44,14 @@ public class SocketConnection {
                              final int port,
                              final int timeout,
                              final String trustStore,
-                             final String trustStorePassword) {
+                             final String trustStorePassword,
+                             final String password) {
         this.host               = host;
         this.port               = port;
         this.timeout            = timeout;
         this.trustStore         = trustStore;
         this.trustStorePassword = trustStorePassword;
+        this.password           = password;
     }
 
     // Getter methods for each field
@@ -72,6 +76,10 @@ public class SocketConnection {
         return trustStorePassword;
     }
 
+    public String password() {
+        return password;
+    }
+
     /**
      * Returns a new builder instance for constructing a SocketConnection.
      */
@@ -89,6 +97,7 @@ public class SocketConnection {
         private int    timeout;
         private String trustStore;
         private String trustStorePassword;
+        private String password;
 
         /**
          * Sets the host field and returns the builder instance.
@@ -139,10 +148,18 @@ public class SocketConnection {
         }
 
         /**
+         * Sets the password field and returns the builder instance.
+         */
+        public SocketConnectionBuilder password(final String password) {
+            this.password = password;
+            return this;
+        }
+
+        /**
          * Builds and returns a SocketConnection instance with the specified parameters.
          */
         public SocketConnection build() {
-            return new SocketConnection(host, port, timeout, trustStore, trustStorePassword);
+            return new SocketConnection(host, port, timeout, trustStore, trustStorePassword, password);
         }
     }
 }

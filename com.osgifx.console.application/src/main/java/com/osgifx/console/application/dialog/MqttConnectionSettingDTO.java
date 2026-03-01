@@ -24,18 +24,20 @@ import com.google.common.base.MoreObjects;
 
 public final class MqttConnectionSettingDTO {
 
-    public String id;
-    public String name;
-    public String clientId;
-    public String server;
-    public int    port;
-    public int    timeout;
-    public String username;
-    public String password;
-    public String tokenConfig;
-    public String pubTopic;
-    public String subTopic;
-    public String lwtTopic;
+    public String           id;
+    public String           name;
+    public String           clientId;
+    public String           server;
+    public int              port;
+    public int              timeout;
+    public String           username;
+    public transient String password;
+    public boolean          requiresAuthentication;
+    public boolean          savePassword;
+    public String           tokenConfig;
+    public String           pubTopic;
+    public String           subTopic;
+    public String           lwtTopic;
 
     public MqttConnectionSettingDTO() {
         // needed for GSON
@@ -48,12 +50,14 @@ public final class MqttConnectionSettingDTO {
                                     final int timeout,
                                     final String username,
                                     final String password,
+                                    final boolean requiresAuthentication,
+                                    final boolean savePassword,
                                     final String tokenConfig,
                                     final String pubTopic,
                                     final String subTopic,
                                     final String lwtTopic) {
-        this(UUID.randomUUID().toString(), name, clientId, server, port, timeout, username, password, tokenConfig,
-             pubTopic, subTopic, lwtTopic);
+        this(UUID.randomUUID().toString(), name, clientId, server, port, timeout, username, password,
+             requiresAuthentication, savePassword, tokenConfig, pubTopic, subTopic, lwtTopic);
     }
 
     public MqttConnectionSettingDTO(final String id,
@@ -64,22 +68,26 @@ public final class MqttConnectionSettingDTO {
                                     final int timeout,
                                     final String username,
                                     final String password,
+                                    final boolean requiresAuthentication,
+                                    final boolean savePassword,
                                     final String tokenConfig,
                                     final String pubTopic,
                                     final String subTopic,
                                     final String lwtTopic) {
-        this.id          = id;
-        this.name        = name;
-        this.clientId    = clientId;
-        this.server      = server;
-        this.port        = port;
-        this.timeout     = timeout;
-        this.username    = username;
-        this.password    = password;
-        this.tokenConfig = tokenConfig;
-        this.pubTopic    = pubTopic;
-        this.subTopic    = subTopic;
-        this.lwtTopic    = lwtTopic;
+        this.id                     = id;
+        this.name                   = name;
+        this.clientId               = clientId;
+        this.server                 = server;
+        this.port                   = port;
+        this.timeout                = timeout;
+        this.username               = username;
+        this.password               = password;
+        this.requiresAuthentication = requiresAuthentication;
+        this.savePassword           = savePassword;
+        this.tokenConfig            = tokenConfig;
+        this.pubTopic               = pubTopic;
+        this.subTopic               = subTopic;
+        this.lwtTopic               = lwtTopic;
     }
 
     @Override
@@ -94,6 +102,8 @@ public final class MqttConnectionSettingDTO {
                          .append(timeout)
                          .append(username)
                          .append(password)
+                         .append(requiresAuthentication)
+                         .append(savePassword)
                          .append(tokenConfig)
                          .append(pubTopic)
                          .append(subTopic)
@@ -121,6 +131,8 @@ public final class MqttConnectionSettingDTO {
                            .append(timeout, other.timeout)
                            .append(username, other.username)
                            .append(password, other.password)
+                           .append(requiresAuthentication, other.requiresAuthentication)
+                           .append(savePassword, other.savePassword)
                            .append(tokenConfig, other.tokenConfig)
                            .append(pubTopic, other.pubTopic)
                            .append(subTopic, other.subTopic)
@@ -140,6 +152,8 @@ public final class MqttConnectionSettingDTO {
                                .add("port", port)
                                .add("timeout", timeout)
                                .add("username", username)
+                               .add("requiresAuthentication", requiresAuthentication)
+                               .add("savePassword", savePassword)
                                .add("tokenConfig", tokenConfig)
                                .add("pubTopic", pubTopic)
                                .add("subTopic", subTopic)

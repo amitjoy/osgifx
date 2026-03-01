@@ -20,6 +20,7 @@ import static com.osgifx.console.supervisor.factory.SupervisorFactory.Supervisor
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static javafx.scene.control.ButtonType.CANCEL;
 
+import java.net.ConnectException;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -42,8 +43,10 @@ import org.eclipse.fx.core.log.Log;
 import com.google.common.collect.Maps;
 import com.osgifx.console.application.dialog.ConnectToSocketAgentDialog;
 import com.osgifx.console.application.dialog.ConnectToSocketAgentDialog.ActionType;
+import com.osgifx.console.application.dialog.PasswordPromptDialog;
 import com.osgifx.console.application.dialog.SocketConnectionDialog;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.preference.CredentialManager;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.Supervisor;
@@ -97,6 +100,8 @@ public final class ConnectToSocketAgentHandler {
     private ContextBoundValue<SocketConnectionSettingDTO> selectedSettings;
     @Inject
     private SupervisorFactory                             supervisorFactory;
+    @Inject
+    private CredentialManager                             credentialManager;
     private ProgressDialog                                progressDialog;
 
     @Execute
@@ -217,6 +222,37 @@ public final class ConnectToSocketAgentHandler {
             logger.atInfo().log("No connection setting has been selected");
             return;
         }
+
+        var password = credentialManager.getPassword(settings.id);
+        if (password == null && settings.requiresAuthentication) {
+            // Authentication required but password not saved - prompt user
+            final var passwordDialog = new PasswordPromptDialog();
+            ContextInjectionFactory.inject(passwordDialog, context);
+            passwordDialog.init();
+            final var result = passwordDialog.showAndWait();
+            if (!result.isPresent()) {
+                logger.atInfo().log("Password prompt cancelled");
+                return;
+            }
+            password = result.get();
+        }
+        final var finalPassword = password;
+
+        var trustStorePassword = credentialManager.getTrustStorePassword(settings.id);
+        if (trustStorePassword == null && settings.requiresAuthentication && settings.trustStorePath != null) {
+            // Authentication required but truststore password not saved - prompt user
+            final var passwordDialog = new PasswordPromptDialog();
+            ContextInjectionFactory.inject(passwordDialog, context);
+            passwordDialog.init();
+            final var result = passwordDialog.showAndWait();
+            if (!result.isPresent()) {
+                logger.atInfo().log("Truststore password prompt cancelled");
+                return;
+            }
+            trustStorePassword = result.get();
+        }
+        final var finalTrustStorePassword = trustStorePassword;
+
         logger.atInfo().log("Selected connection: %s", selectedSettings);
         final Task<Void> connectTask = new Task<>() {
 
@@ -232,13 +268,31 @@ public final class ConnectToSocketAgentHandler {
                             .builder()
                             .host(settings.host)
                             .port(settings.port)
+                            .password(finalPassword)
                             .timeout(settings.timeout)
                             .truststore(settings.trustStorePath)
-                            .truststorePass(settings.trustStorePassword)
+                            .truststorePass(finalTrustStorePassword)
                             .build();
                     // @formatter:on
 
                     supervisor.connect(socketConnection);
+
+                    try {
+                        final var isPinged = supervisor.getAgent().ping();
+                        if (!isPinged) {
+                            throw new ConnectException("Agent health check failed: Connection established but agent is not responding");
+                        }
+                    } catch (final RuntimeException e) {
+                        if (e.getMessage() != null && e.getMessage().contains("RPC channel closed")) {
+                            if (finalPassword != null && !finalPassword.isEmpty()) {
+                                throw new ConnectException("Connection closed immediately after handshake: Likely authentication failure (check password and agent configuration)");
+                            } else {
+                                throw new ConnectException("Connection closed immediately after handshake: Agent may require authentication or encountered an error");
+                            }
+                        }
+                        throw e;
+                    }
+
                     logger.atInfo().log("Successfully connected to %s", settings);
                     return null;
                 } catch (final InterruptedException e) {
@@ -260,7 +314,7 @@ public final class ConnectToSocketAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", settings);
-                final var connection = "[SOCKET] " + settings.host + ":" + settings.port;
+                final var connection = settings.name + " (Socket)";
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
@@ -286,6 +340,9 @@ public final class ConnectToSocketAgentHandler {
         properties.put("type", type);
         properties.put("truststore", dto.trustStorePath);
         properties.put("truststorePassword", dto.trustStorePassword);
+        properties.put("password", dto.password);
+        properties.put("requiresAuthentication", String.valueOf(dto.requiresAuthentication));
+        properties.put("savePassword", String.valueOf(dto.savePassword));
 
         commandService.execute(COMMAND_ID_MANAGE_CONNECTION, properties);
     }

@@ -143,11 +143,16 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     public void close() throws IOException {
         if (stopped.getAndSet(true))
             return;
-        if (local instanceof Closeable)
+        if (local instanceof Closeable) {
             try {
                 ((Closeable) local).close();
             } catch (Exception e) {
             }
+        }
+        terminate("RPC channel closed");
+    }
+
+    protected void terminate(final String message) {
         try {
             if (in != null)
                 in.close();
@@ -159,6 +164,20 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         } catch (Exception e) {
         }
         executor.shutdownNow();
+
+        final FastByteArrayOutputStream bout = new FastByteArrayOutputStream(256);
+        try (DataOutputStream dataOut = new DataOutputStream(bout)) {
+            codec.encode(message, dataOut);
+        } catch (Exception e) {
+            // ignore
+        }
+        final byte[] errorData = bout.toByteArray();
+        for (final RpcResult result : promises.values()) {
+            result.exception = true;
+            result.value     = errorData;
+            result.latch.countDown();
+        }
+        promises.clear();
     }
 
     @Override
@@ -231,17 +250,14 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             } catch (SocketTimeoutException ee) {
                 // Ignore
             } catch (Exception ee) {
-                terminate();
+                terminate("RPC channel closed: " + ee.getMessage());
                 return;
             }
         }
     }
 
     protected void terminate() {
-        try {
-            close();
-        } catch (IOException e) {
-        }
+        terminate("RPC channel closed");
     }
 
     private Method getMethod(final String cmd, final int count) {

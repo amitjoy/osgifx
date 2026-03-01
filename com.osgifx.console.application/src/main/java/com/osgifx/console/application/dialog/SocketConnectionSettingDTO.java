@@ -24,13 +24,16 @@ import com.google.common.base.MoreObjects;
 
 public final class SocketConnectionSettingDTO {
 
-    public String id;
-    public String name;
-    public String host;
-    public int    port;
-    public int    timeout;
-    public String trustStorePath;
-    public String trustStorePassword;
+    public String           id;
+    public String           name;
+    public String           host;
+    public int              port;
+    public int              timeout;
+    public String           trustStorePath;
+    public transient String trustStorePassword;
+    public transient String password;
+    public boolean          requiresAuthentication;
+    public boolean          savePassword;
 
     public SocketConnectionSettingDTO() {
         // needed for GSON
@@ -41,8 +44,12 @@ public final class SocketConnectionSettingDTO {
                                       final int port,
                                       final int timeout,
                                       final String trustStorePath,
-                                      final String trustStorePassword) {
-        this(UUID.randomUUID().toString(), name, host, port, timeout, trustStorePath, trustStorePassword);
+                                      final String trustStorePassword,
+                                      final String password,
+                                      final boolean requiresAuthentication,
+                                      final boolean savePassword) {
+        this(UUID.randomUUID().toString(), name, host, port, timeout, trustStorePath, trustStorePassword, password,
+             requiresAuthentication, savePassword);
     }
 
     public SocketConnectionSettingDTO(final String id,
@@ -51,14 +58,20 @@ public final class SocketConnectionSettingDTO {
                                       final int port,
                                       final int timeout,
                                       final String trustStorePath,
-                                      final String trustStorePassword) {
-        this.id                 = id;
-        this.name               = name;
-        this.host               = host;
-        this.port               = port;
-        this.timeout            = timeout;
-        this.trustStorePath     = trustStorePath;
-        this.trustStorePassword = trustStorePassword;
+                                      final String trustStorePassword,
+                                      final String password,
+                                      final boolean requiresAuthentication,
+                                      final boolean savePassword) {
+        this.id                     = id;
+        this.name                   = name;
+        this.host                   = host;
+        this.port                   = port;
+        this.timeout                = timeout;
+        this.trustStorePath         = trustStorePath;
+        this.trustStorePassword     = trustStorePassword;
+        this.password               = password;
+        this.requiresAuthentication = requiresAuthentication;
+        this.savePassword           = savePassword;
     }
 
     @Override
@@ -72,6 +85,9 @@ public final class SocketConnectionSettingDTO {
                          .append(timeout)
                          .append(trustStorePath)
                          .append(trustStorePassword)
+                         .append(password)
+                         .append(requiresAuthentication)
+                         .append(savePassword)
                      .toHashCode();
         // @formatter:on
     }
@@ -94,6 +110,9 @@ public final class SocketConnectionSettingDTO {
                            .append(timeout, other.timeout)
                            .append(trustStorePassword, other.trustStorePassword)
                            .append(trustStorePath, other.trustStorePath)
+                           .append(password, other.password)
+                           .append(requiresAuthentication, other.requiresAuthentication)
+                           .append(savePassword, other.savePassword)
                        .isEquals();
         // @formatter:on
     }
@@ -108,6 +127,8 @@ public final class SocketConnectionSettingDTO {
                                .add("port", port)
                                .add("timeout", timeout)
                                .add("trustStorePath", trustStorePath)
+                               .add("requiresAuthentication", requiresAuthentication)
+                               .add("savePassword", savePassword)
                           .toString();
         // @formatter:on
     }

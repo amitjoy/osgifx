@@ -42,8 +42,8 @@ startlevels                       :   com.osgifx.console.agent;startlevel=1,\
 # the following configuration is used to ensure that MQTT client will not be automatically enabled
 -runproperties.mqtt.init.config   :   configurator.initial='{\
                                         ":configurator:version":"1.0",\
-                                        ":configurator:symbolic-name":"com.osgifx.config.init",\
-                                        "in.bytehue.messaging.client":{"osgi.ds.satisfying.condition.target":"(osgi.condition.id=unresolvable)"}\
+                                        ":configurator:symbolic-name":"com.osgifx.mqtt5.config.init",\
+                                        "in.bytehue.messaging.client":{"osgi.ds.satisfying.condition.target":"(osgi.condition.id=unresolvable)","activeMode":false}\
                                       }'
 
 # Ramanujan's Number

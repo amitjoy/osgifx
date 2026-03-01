@@ -128,6 +128,7 @@ public final class HeadlessLaunchAddon {
                 .host(headlessConfig.socket.host)
                 .port(headlessConfig.socket.port)
                 .timeout(headlessConfig.socket.timeout)
+                .password(headlessConfig.socket.password)
                 .truststore(headlessConfig.socket.trustStorePath)
                 .truststorePass(headlessConfig.socket.trustStorePassword)
                 .build();
@@ -136,7 +137,7 @@ public final class HeadlessLaunchAddon {
         supervisor.connect(socketConnection);
         logger.atInfo().log("Successfully connected to Socket Agent at %s:%s", headlessConfig.socket.host,
                 headlessConfig.socket.port);
-        broadcastConnection("[SOCKET] " + headlessConfig.socket.host + ":" + headlessConfig.socket.port);
+        broadcastConnection("Headless Socket Agent");
     }
 
     private void connectMqtt() throws Exception {
@@ -163,7 +164,7 @@ public final class HeadlessLaunchAddon {
         supervisor.connect(mqttConnection);
         logger.atInfo().log("Successfully connected to MQTT Agent at %s:%s", headlessConfig.mqtt.server,
                 headlessConfig.mqtt.port);
-        broadcastConnection("[MQTT] " + headlessConfig.mqtt.server + ":" + headlessConfig.mqtt.port);
+        broadcastConnection("Headless MQTT Agent");
     }
 
     private void broadcastConnection(final String connectionString) {
