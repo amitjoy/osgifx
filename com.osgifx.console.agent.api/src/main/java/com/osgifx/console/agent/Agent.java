@@ -101,6 +101,11 @@ public interface Agent {
     String AGENT_SOCKET_PORT_KEY = "osgi.fx.agent.socket.port";
 
     /**
+     * The property key to set the agent's authentication password.
+     */
+    String AGENT_SOCKET_PASSWORD_KEY = "osgi.fx.agent.socket.password";
+
+    /**
      * The property key to enable secure agent communication.
      */
     String AGENT_SOCKET_SECURE_COMMUNICATION_KEY = "osgi.fx.agent.socket.secure";

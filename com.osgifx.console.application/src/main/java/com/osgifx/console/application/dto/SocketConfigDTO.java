@@ -25,6 +25,7 @@ public class SocketConfigDTO {
     public int    timeout;
     public String trustStorePath;
     public String trustStorePassword;
+    public String password;
 
     @Override
     public String toString() {
