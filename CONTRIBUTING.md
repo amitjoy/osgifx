@@ -82,13 +82,13 @@ You do this by adding the `-s` flag when you make the commit(s), e.g.
 
 ## Importing projects in Eclipse IDE
 
-* Install `Java 17` JDK Distribution (including JavaFX modules) in your machine (Currently I am using [Zulu Distribution](https://www.azul.com/downloads/?version=java-17-lts&package=jdk-fx#zulu) that includes JavaFX modules already)
-* Set the newly installed `Java 17` to your `JAVA_HOME`
-* Install `Eclipse IDE for RCP/RAP Developers` and make sure your Eclipse installation uses the currently installed `Java 17` to start with
+* Install `Java 25` JDK Distribution (including JavaFX modules) in your machine (Currently I am using [Zulu Distribution](https://www.azul.com/downloads/?version=java-25-lts&package=jdk-fx#zulu) that includes JavaFX modules already)
+* Set the newly installed `Java 25` to your `JAVA_HOME`
+* Install `Eclipse IDE for RCP/RAP Developers` and make sure your Eclipse installation uses the currently installed `Java 25` to start with
 * Install `Bndtools`, `e(fx)clipse`, and `SonarLint` from Eclipse Marketplace
-* Go to `Java ⇢ Compiler` in `Eclipse Preferences` and set `Compiler Compliance Level` to `17`
+* Go to `Java ⇢ Compiler` in `Eclipse Preferences` and set `Compiler Compliance Level` to `25`
 * Go to `Java ⇢ Installed JREs` and select the newly installed JDK with JavaFX modules
-* Go to `Java ⇢ Installed JREs ⇢ Execution Environments` and select `JavaSE-17` and choose the recently installed `Java 17 JRE` that includes `JavaFX` modules
+* Go to `Java ⇢ Installed JREs ⇢ Execution Environments` and select `JavaSE-25` and choose the recently installed `Java 25 JRE` that includes `JavaFX` modules
 * Go to `Java ⇢ Code Style ⇢ Formatter ⇢ Import` and select the `formatter.xml` stored in the project's root directory
 * Import all the projects (`File ⇢ Import ⇢ General ⇢ Existing Projects into Workspace` and select `Search for nested projects`)
 

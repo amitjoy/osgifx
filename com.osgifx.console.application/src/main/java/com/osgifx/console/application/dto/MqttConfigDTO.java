@@ -26,6 +26,7 @@ public class MqttConfigDTO {
     public String clientId;
     public String username;
     public String password;
+    public Object tokenConfig;
     public String pubTopic;
     public String subTopic;
     public String lwtTopic;
