@@ -20,6 +20,7 @@ import static com.osgifx.console.supervisor.factory.SupervisorFactory.Supervisor
 import static com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType.SNAPSHOT;
 import static javafx.scene.control.ButtonType.CANCEL;
 
+import java.net.ConnectException;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -38,12 +39,16 @@ import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.google.common.collect.Maps;
 import com.osgifx.console.application.dialog.ConnectToMqttAgentDialog;
 import com.osgifx.console.application.dialog.ConnectToMqttAgentDialog.ActionType;
 import com.osgifx.console.application.dialog.MqttConnectionDialog;
 import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
+import com.osgifx.console.application.dialog.PasswordPromptDialog;
+import com.osgifx.console.application.preference.CredentialManager;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.Supervisor;
@@ -51,6 +56,7 @@ import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import in.bytehue.messaging.mqtt5.api.MqttClient;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -97,6 +103,8 @@ public final class ConnectToMqttAgentHandler {
     private ContextBoundValue<MqttConnectionSettingDTO> selectedSettings;
     @Inject
     private SupervisorFactory                           supervisorFactory;
+    @Inject
+    private CredentialManager                           credentialManager;
     private ProgressDialog                              progressDialog;
 
     @Execute
@@ -217,6 +225,22 @@ public final class ConnectToMqttAgentHandler {
             logger.atInfo().log("No connection setting has been selected");
             return;
         }
+
+        var password = credentialManager.getPassword(settings.id);
+        if (password == null && settings.requiresAuthentication) {
+            // Authentication required but password not saved - prompt user
+            final var passwordDialog = new PasswordPromptDialog();
+            ContextInjectionFactory.inject(passwordDialog, context);
+            passwordDialog.init();
+            final var result = passwordDialog.showAndWait();
+            if (!result.isPresent()) {
+                logger.atInfo().log("Password prompt cancelled");
+                return;
+            }
+            password = result.get();
+        }
+        final var finalPassword = password;
+
         logger.atInfo().log("Selected connection: %s", selectedSettings);
         final Task<Void> connectTask = new Task<>() {
 
@@ -234,7 +258,7 @@ public final class ConnectToMqttAgentHandler {
                             .server(settings.server)
                             .port(settings.port)
                             .username(settings.username)
-                            .password(settings.password)
+                            .password(finalPassword)
                             .tokenConfig(settings.tokenConfig)
                             .timeout(settings.timeout)
                             .pubTopic(settings.pubTopic)
@@ -244,6 +268,37 @@ public final class ConnectToMqttAgentHandler {
                     // @formatter:on
 
                     supervisor.connect(mqttConnection);
+
+                    final var bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+                    final var tracker       = new ServiceTracker<MqttClient, MqttClient>(bundleContext,
+                                                                                         MqttClient.class.getName(),
+                                                                                         null);
+                    tracker.open();
+                    final var client = tracker.waitForService(settings.timeout == 0 ? 5000 : settings.timeout);
+                    if (client != null) {
+                        try {
+                            client.connect().get(); // wait for connection
+                        } catch (final Exception e) {
+                            throw new ConnectException("MQTT connection failed: " + e.getMessage()
+                                    + " (check broker address, credentials, and network)");
+                        }
+                    } else {
+                        throw new ConnectException("MQTT client service is not available in the OSGi runtime");
+                    }
+                    tracker.close();
+
+                    try {
+                        final var isPinged = supervisor.getAgent().ping();
+                        if (!isPinged) {
+                            throw new ConnectException("Agent health check failed: MQTT connected but agent is not responding");
+                        }
+                    } catch (final RuntimeException e) {
+                        if (e.getMessage() != null && e.getMessage().contains("RPC channel closed")) {
+                            throw new ConnectException("Connection closed immediately after MQTT handshake: Check agent configuration and MQTT broker settings");
+                        }
+                        throw e;
+                    }
+
                     logger.atInfo().log("Successfully connected to %s", settings);
                     return null;
                 } catch (final InterruptedException e) {
@@ -265,7 +320,7 @@ public final class ConnectToMqttAgentHandler {
             @Override
             protected void succeeded() {
                 logger.atInfo().log("Agent connected event has been sent for %s", settings);
-                final var connection = "[MQTT] " + settings.server + ":" + settings.port;
+                final var connection = settings.name + " (MQTT)";
 
                 eventBroker.post(AGENT_CONNECTED_EVENT_TOPIC, connection);
                 connectedAgent.publish(connection);
@@ -292,6 +347,8 @@ public final class ConnectToMqttAgentHandler {
         properties.put("type", type);
         properties.put("username", dto.username);
         properties.put("password", dto.password);
+        properties.put("requiresAuthentication", String.valueOf(dto.requiresAuthentication));
+        properties.put("savePassword", String.valueOf(dto.savePassword));
         properties.put("tokenConfig", dto.tokenConfig);
         properties.put("pubTopic", dto.pubTopic);
         properties.put("subTopic", dto.subTopic);
