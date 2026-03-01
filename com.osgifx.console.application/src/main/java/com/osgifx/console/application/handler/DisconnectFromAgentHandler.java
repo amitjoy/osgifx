@@ -21,6 +21,10 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import org.osgi.framework.FrameworkUtil;
+
+import in.bytehue.messaging.mqtt5.api.MqttClient;
+
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -67,6 +71,22 @@ public final class DisconnectFromAgentHandler {
     @Execute
     public void execute() {
         try {
+            final var bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+            if (bundleContext != null) {
+                final var ref = bundleContext.getServiceReference(MqttClient.class);
+                if (ref != null) {
+                    final var client = bundleContext.getService(ref);
+                    if (client != null) {
+                        try {
+                            client.disconnect();
+                        } catch (final Exception e) {
+                            logger.atWarning().withException(e).log("Failed to disconnect MQTT client");
+                        }
+                        bundleContext.ungetService(ref);
+                    }
+                }
+            }
+
             supervisor.disconnect();
             Stream.of(SupervisorType.values()).forEach(type -> supervisorFactory.removeSupervisor(type));
 

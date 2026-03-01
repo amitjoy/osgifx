@@ -35,8 +35,10 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.primitives.Ints;
+import com.osgifx.console.application.preference.CredentialManager;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -55,6 +57,8 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
     private FluentLogger      logger;
     @Inject
     private ThreadSynchronize threadSync;
+    @Inject
+    private CredentialManager credentialManager;
 
     public void init(final SocketConnectionSettingDTO setting) {
         final var dialogPane = getDialogPane();
@@ -94,7 +98,51 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         final var trustStorePassword = (CustomPasswordField) TextFields.createClearablePasswordField();
         trustStorePassword
                 .setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
-        Optional.ofNullable(setting).ifPresent(s -> trustStorePassword.setText(s.trustStorePassword));
+
+        final var password = (CustomPasswordField) TextFields.createClearablePasswordField();
+        password.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
+
+        final var requiresAuthentication = new javafx.scene.control.CheckBox("Requires Authentication");
+        Optional.ofNullable(setting).ifPresent(s -> requiresAuthentication.setSelected(s.requiresAuthentication));
+
+        final var savePassword = new javafx.scene.control.CheckBox("Save Password");
+        Optional.ofNullable(setting).ifPresent(s -> savePassword.setSelected(s.savePassword));
+
+        // Binding 1: If password field is not empty, auto-select requiresAuthentication and savePassword
+        password.textProperty().addListener((_, _, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                requiresAuthentication.setSelected(true);
+                savePassword.setSelected(true);
+            }
+        });
+
+        // Binding 2: If requiresAuthentication is unchecked, clear password and uncheck savePassword
+        requiresAuthentication.selectedProperty().addListener((_, _, newVal) -> {
+            if (!newVal) {
+                password.clear();
+                savePassword.setSelected(false);
+            }
+        });
+
+        // Binding 3: If savePassword is unchecked, clear password field
+        savePassword.selectedProperty().addListener((_, _, newVal) -> {
+            if (!newVal) {
+                password.clear();
+            }
+        });
+
+        // Binding 4: password field enabled only when requiresAuth checked AND savePassword checked
+        password.disableProperty()
+                .bind(requiresAuthentication.selectedProperty().not().or(savePassword.selectedProperty().not()));
+
+        // Binding 5: savePassword enabled only when requiresAuth is checked
+        savePassword.disableProperty().bind(requiresAuthentication.selectedProperty().not());
+
+        // Binding 6: trustStorePassword enabled only when trustStore location is provided
+        trustStorePassword.disableProperty()
+                .bind(Bindings.createBooleanBinding(
+                        () -> trustStore.getAccessibleText() == null || trustStore.getAccessibleText().isEmpty(),
+                        trustStore.accessibleTextProperty()));
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -110,6 +158,9 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         content.getChildren().add(timeout);
         content.getChildren().add(trustStore);
         content.getChildren().add(trustStorePassword);
+        content.getChildren().add(password);
+        content.getChildren().add(requiresAuthentication);
+        content.getChildren().add(savePassword);
 
         dialogPane.setContent(content);
 
@@ -135,6 +186,7 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         final var timeoutCaption            = "Timeout in millis";
         final var trustStoreCaption         = "Truststore Location";
         final var trustStorePasswordCaption = "Truststore Password";
+        final var passwordCaption           = "Password";
 
         name.setPromptText(nameCaption);
         hostname.setPromptText(hostnameCaption);
@@ -142,6 +194,18 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         timeout.setPromptText(timeoutCaption);
         trustStore.setPromptText(trustStoreCaption);
         trustStorePassword.setPromptText(trustStorePasswordCaption);
+        password.setPromptText(passwordCaption);
+
+        Optional.ofNullable(setting).ifPresent(s -> {
+            var savedTrustStorePassword = credentialManager.getTrustStorePassword(s.id);
+            if (savedTrustStorePassword != null) {
+                trustStorePassword.setPromptText("(Saved - leave empty to keep)");
+            }
+            var savedPassword = credentialManager.getPassword(s.id);
+            if (savedPassword != null) {
+                password.setPromptText("(Saved - leave empty to keep)");
+            }
+        });
 
         trustStore.setEditable(false);
         trustStore.setOnMouseClicked(_ -> {
@@ -187,17 +251,22 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
 
             verify(p != null && t != null, "Port and timeout formats are not compliant");
             if (setting != null) {
-                setting.name               = name.getText();
-                setting.host               = hostname.getText();
-                setting.port               = p;
-                setting.timeout            = t;
-                setting.trustStorePath     = trustStore.getAccessibleText();
-                setting.trustStorePassword = trustStorePassword.getText();
+                setting.name                   = name.getText();
+                setting.host                   = hostname.getText();
+                setting.port                   = p;
+                setting.timeout                = t;
+                setting.trustStorePath         = trustStore.getAccessibleText();
+                setting.trustStorePassword     = trustStorePassword.getText();
+                setting.password               = password.getText();
+                setting.requiresAuthentication = requiresAuthentication.isSelected();
+                setting.savePassword           = savePassword.isSelected();
 
                 return setting;
             }
-            return new SocketConnectionSettingDTO(name.getText(), hostname.getText(), p, t,
-                                                  trustStore.getAccessibleText(), trustStorePassword.getText());
+            return new SocketConnectionSettingDTO(name.getText(), hostname.getText(), Ints.tryParse(port.getText()),
+                                                  Ints.tryParse(timeout.getText()), trustStore.getAccessibleText(),
+                                                  trustStorePassword.getText(), password.getText(),
+                                                  requiresAuthentication.isSelected(), savePassword.isSelected());
         });
     }
 
