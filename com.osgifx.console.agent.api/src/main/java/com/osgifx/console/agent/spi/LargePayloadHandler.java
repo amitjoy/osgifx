@@ -22,10 +22,13 @@ import org.osgi.annotation.versioning.ConsumerType;
  * RPC transport limits. Implementations can upload to HTTP servers, SFTP, S3, NFS,
  * or any other storage mechanism.
  *
- * <p>This is a {@code @ConsumerType} API - the remote runtime provides implementations,
+ * <p>
+ * This is a {@code @ConsumerType} API - the remote runtime provides implementations,
  * and the framework only defines the interface.
  *
- * <p><b>Example Implementation:</b>
+ * <p>
+ * <b>Example Implementation:</b>
+ * 
  * <pre>
  * {@code @Component}
  * public class S3PayloadHandler implements LargePayloadHandler {
@@ -64,7 +67,8 @@ public interface LargePayloadHandler {
      * Handles a large payload file from the agent.
      * The implementation decides where and how to store/upload the file.
      *
-     * <p>The local file at {@code localPath} should be deleted after successful
+     * <p>
+     * The local file at {@code localPath} should be deleted after successful
      * handling to avoid filling up disk space.
      *
      * @param localPath the absolute path to the local file on the agent device

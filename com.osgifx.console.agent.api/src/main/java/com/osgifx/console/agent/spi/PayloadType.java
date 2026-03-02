@@ -21,6 +21,7 @@ package com.osgifx.console.agent.spi;
  * @since 11.0
  */
 public enum PayloadType {
+
     /**
      * Heap dump file (.hprof or .hprof.gz)
      */
@@ -30,4 +31,5 @@ public enum PayloadType {
      * Runtime snapshot file (.json)
      */
     SNAPSHOT
+
 }

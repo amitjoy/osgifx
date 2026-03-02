@@ -49,29 +49,62 @@ public final class XHeapDumpAdmin {
      * @throws Exception if the heap dump creation fails
      */
     public String createHeapdump(final String outputPath) throws Exception {
+        logger.atInfo().msg("Starting heapdump creation with outputPath: {}").arg(outputPath).log();
+        
         final File outputFile = new File(outputPath);
+        logger.atDebug().msg("Output file object created: {}").arg(outputFile.getAbsolutePath()).log();
+        logger.atDebug().msg("Output file exists: {}, isDirectory: {}, isFile: {}").arg(outputFile.exists()).arg(outputFile.isDirectory()).arg(outputFile.isFile()).log();
+        
         final File parentDir = outputFile.getParentFile();
+        logger.atDebug().msg("Parent directory: {}").arg(parentDir != null ? parentDir.getAbsolutePath() : "null").log();
 
         // Create parent directory if it doesn't exist
         if (parentDir != null && !parentDir.exists()) {
+            logger.atInfo().msg("Creating parent directory: {}").arg(parentDir.getAbsolutePath()).log();
             if (!parentDir.mkdirs()) {
                 throw new IOException("Failed to create directory: " + parentDir.getAbsolutePath());
             }
+            logger.atInfo().msg("Parent directory created successfully").log();
         }
 
         // Generate filename if outputPath is a directory
         final File heapdumpFile;
         if (outputFile.isDirectory() || outputPath.endsWith("/") || outputPath.endsWith("\\")) {
+            logger.atInfo().msg("Output path is a directory, generating filename").log();
             final String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMAT);
             final String filename = "heapdump-" + timestamp + ".hprof.gz";
             heapdumpFile = new File(outputFile, filename);
+            logger.atInfo().msg("Generated heapdump filename: {}").arg(heapdumpFile.getAbsolutePath()).log();
         } else {
+            logger.atInfo().msg("Output path is a file path, using as-is").log();
             heapdumpFile = outputFile;
         }
 
+        logger.atInfo().msg("Final heapdump file path: {}").arg(heapdumpFile.getAbsolutePath()).log();
+        logger.atDebug().msg("Heapdump file exists before deletion: {}").arg(heapdumpFile.exists()).log();
+
+        // Delete existing file if it exists to prevent "File exists" error
+        if (heapdumpFile.exists()) {
+            logger.atInfo().msg("Deleting existing heapdump file: {}").arg(heapdumpFile.getAbsolutePath()).log();
+            if (!heapdumpFile.delete()) {
+                logger.atWarn().msg("Failed to delete existing heapdump file: {}").arg(heapdumpFile.getAbsolutePath()).log();
+            } else {
+                logger.atInfo().msg("Successfully deleted existing heapdump file").log();
+            }
+        }
+
         // Create temporary uncompressed heap dump
+        logger.atInfo().msg("Creating temporary heap dump file").log();
         final File tempHprof = File.createTempFile("heapdump-", ".hprof");
-        tempHprof.deleteOnExit();
+        final String tempPath = tempHprof.getAbsolutePath();
+        logger.atInfo().msg("Temporary heap dump file created: {}").arg(tempPath).log();
+        
+        // Delete the temp file immediately - HotSpot's dumpHeap requires the file to NOT exist
+        if (!tempHprof.delete()) {
+            logger.atWarn().msg("Failed to delete temp file before heap dump").log();
+        } else {
+            logger.atInfo().msg("Deleted temp file so HotSpot can create it fresh").log();
+        }
 
         try {
             // Use HotSpot diagnostic MBean to create heap dump
@@ -83,34 +116,56 @@ public final class XHeapDumpAdmin {
             );
 
             final Method dumpHeap = hotspotMBean.getClass().getMethod("dumpHeap", String.class, boolean.class);
-            dumpHeap.invoke(hotspotMBean, tempHprof.getAbsolutePath(), true); // true = live objects only
+            logger.atInfo().msg("Invoking HotSpot dumpHeap method to: {}").arg(tempPath).log();
+            dumpHeap.invoke(hotspotMBean, tempPath, true); // true = live objects only
 
-            logger.atInfo().msg("Heap dump created at: {}").arg(tempHprof.getAbsolutePath()).log();
+            // Recreate File object since we deleted it before dumpHeap
+            final File createdHprof = new File(tempPath);
+            logger.atInfo().msg("Heap dump created at: {}").arg(createdHprof.getAbsolutePath()).log();
+            logger.atDebug().msg("Temp heap dump size: {} bytes").arg(createdHprof.length()).log();
 
             // Compress the heap dump
-            compressFile(tempHprof, heapdumpFile);
+            logger.atInfo().msg("Starting compression from {} to {}").arg(createdHprof.getAbsolutePath()).arg(heapdumpFile.getAbsolutePath()).log();
+            compressFile(createdHprof, heapdumpFile);
 
             logger.atInfo().msg("Compressed heap dump saved to: {}").arg(heapdumpFile.getAbsolutePath()).log();
+            logger.atDebug().msg("Compressed heap dump size: {} bytes").arg(heapdumpFile.length()).log();
 
             return heapdumpFile.getAbsolutePath();
         } finally {
             // Clean up temporary file
-            if (tempHprof.exists()) {
-                tempHprof.delete();
+            final File tempFile = new File(tempPath);
+            if (tempFile.exists()) {
+                logger.atDebug().msg("Cleaning up temporary heap dump file: {}").arg(tempFile.getAbsolutePath()).log();
+                tempFile.delete();
             }
         }
     }
 
     private void compressFile(final File source, final File destination) throws IOException {
+        logger.atDebug().msg("Compression: source exists={}, destination exists={}").arg(source.exists()).arg(destination.exists()).log();
+        logger.atDebug().msg("Compression: source path={}, destination path={}").arg(source.getAbsolutePath()).arg(destination.getAbsolutePath()).log();
+        
+        if (destination.exists()) {
+            logger.atWarn().msg("Destination file already exists before compression: {}").arg(destination.getAbsolutePath()).log();
+        }
+        
         try (final FileInputStream fis = new FileInputStream(source);
              final FileOutputStream fos = new FileOutputStream(destination);
              final GZIPOutputStream gzos = new GZIPOutputStream(fos)) {
 
+            logger.atDebug().msg("Compression streams opened successfully").log();
             final byte[] buffer = new byte[8192];
             int len;
+            long totalBytes = 0;
             while ((len = fis.read(buffer)) > 0) {
                 gzos.write(buffer, 0, len);
+                totalBytes += len;
             }
+            logger.atInfo().msg("Compression completed: {} bytes read from source").arg(totalBytes).log();
+        } catch (final IOException e) {
+            logger.atError().msg("Compression failed: {}").arg(e.getMessage()).throwable(e).log();
+            throw e;
         }
     }
 }
