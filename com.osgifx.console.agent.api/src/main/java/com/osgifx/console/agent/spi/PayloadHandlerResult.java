@@ -54,9 +54,9 @@ public final class PayloadHandlerResult {
      * Constructor with all fields
      */
     public PayloadHandlerResult(boolean success, String location, String errorMessage, long durationMs) {
-        this.success = success;
-        this.location = location;
+        this.success      = success;
+        this.location     = location;
         this.errorMessage = errorMessage;
-        this.durationMs = durationMs;
+        this.durationMs   = durationMs;
     }
 }

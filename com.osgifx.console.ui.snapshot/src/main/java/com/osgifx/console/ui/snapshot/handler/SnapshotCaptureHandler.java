@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.dialog.ProgressDialog;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -31,10 +33,15 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.gson.Gson;
-import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.spi.LargePayloadHandler;
+import com.osgifx.console.agent.spi.PayloadMetadata;
+import com.osgifx.console.agent.spi.PayloadType;
 import com.osgifx.console.dto.SnapshotDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.snapshot.SnapshotPathPromptDialog;
+import com.osgifx.console.ui.snapshot.SnapshotOptionsDialog;
+import com.osgifx.console.ui.snapshot.SnapshotOptionsDialog.SnapshotStatistics;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.io.IO;
@@ -61,22 +68,149 @@ public final class SnapshotCaptureHandler {
     @Inject
     @Named("is_snapshot_agent")
     private boolean           isSnapshotAgent;
+    @Inject
+    private IEclipseContext   eclipseContext;
     private ProgressDialog    progressDialog;
 
     @Execute
     public void execute() {
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            return;
+        }
+
+        final long    estimatedSize       = agent.estimateSnapshotSize();
+        final long    estimatedCompressed = estimatedSize / 5;
+        final long    rpcLimit            = 200_000_000L;
+        final boolean rpcAvailable        = estimatedCompressed <= rpcLimit;
+        final boolean isMqttTransport     = supervisor.getConnectionType().equals("MQTT");
+
+        final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
+        final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
+
+        final var bundleCount  = agent.getAllBundles().size();
+        final var serviceCount = agent.getAllServices().size();
+
+        final var stats = new SnapshotStatistics(bundleCount, serviceCount, estimatedSize, estimatedCompressed,
+                                                 isMqttTransport, rpcAvailable, handler);
+
+        final var dialog = new SnapshotOptionsDialog();
+        ContextInjectionFactory.inject(dialog, eclipseContext);
+        dialog.init(stats);
+
+        final var optionResult = dialog.showAndWait();
+        if (optionResult.isEmpty()) {
+            return;
+        }
+
+        final var option = optionResult.get();
+        switch (option) {
+            case USE_HANDLER:
+                snapshotWithHandler(handler);
+                break;
+            case USE_RPC:
+                snapshotWithRpc();
+                break;
+            case STORE_LOCALLY:
+                snapshotLocally();
+                break;
+        }
+    }
+
+    private void snapshotWithHandler(final LargePayloadHandler handler) {
+        final var agent = supervisor.getAgent();
+
+        final Task<String> snapshotTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                try {
+                    updateMessage("Stage 1/3: Generating snapshot file");
+                    final var localPath = agent.createSnapshotLocally("/tmp/snapshots");
+
+                    updateMessage("Stage 2/3: Uploading via handler");
+                    final var metadata = new PayloadMetadata(new File(localPath).getName(),
+                                                             new File(localPath).length(), "application/json",
+                                                             PayloadType.SNAPSHOT, System.currentTimeMillis());
+                    final var result   = handler.handle(localPath, metadata);
+
+                    updateMessage("Stage 3/3: Finalizing");
+                    if (!result.success) {
+                        throw new Exception("Handler failed: " + result.errorMessage);
+                    }
+                    return result.location;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot capture snapshot with handler");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+
+        snapshotTask.valueProperty().addListener((ChangeListener<String>) (_, _, location) -> {
+            if (location != null) {
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("Snapshot Successfully Uploaded", location));
+            }
+        });
+
+        final var taskFuture = executor.runAsync(snapshotTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Snapshot", snapshotTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
+    }
+
+    private void snapshotWithRpc() {
         final var directoryChooser = new DirectoryChooser();
         final var location         = directoryChooser.showDialog(null);
         if (location == null) {
             return;
         }
-        final Task<String> snapshotTask = new Task<>() {
 
+        final Task<String> snapshotTask = new Task<>() {
             @Override
             protected String call() throws Exception {
                 try {
-                    updateMessage("Capturing snapshot of the remote runtime");
-                    return snapshot();
+                    updateMessage("Capturing bundles (1/17)...");
+                    final var dto   = new SnapshotDTO();
+                    final var agent = supervisor.getAgent();
+
+                    dto.bundles = agent.getAllBundles();
+                    updateMessage("Capturing components (2/17)...");
+                    dto.components = agent.getAllComponents();
+                    updateMessage("Capturing configurations (3/17)...");
+                    dto.configurations = agent.getAllConfigurations();
+                    updateMessage("Capturing properties (4/17)...");
+                    dto.properties = agent.getAllProperties();
+                    updateMessage("Capturing services (5/17)...");
+                    dto.services = agent.getAllServices();
+                    updateMessage("Capturing threads (6/17)...");
+                    dto.threads = agent.getAllThreads();
+                    updateMessage("Capturing DMT nodes (7/17)...");
+                    dto.dmtNodes = agent.readDmtNode(".");
+                    updateMessage("Capturing memory info (8/17)...");
+                    dto.memoryInfo = agent.getMemoryInfo();
+                    updateMessage("Capturing roles (9/17)...");
+                    dto.roles = agent.getAllRoles();
+                    updateMessage("Capturing health checks (10/17)...");
+                    dto.healthChecks = agent.getAllHealthChecks();
+                    updateMessage("Capturing classloader leaks (11/17)...");
+                    dto.classloaderLeaks = agent.getClassloaderLeaks();
+                    updateMessage("Capturing HTTP components (12/17)...");
+                    dto.httpComponents = agent.getHttpComponents();
+                    updateMessage("Capturing logger contexts (13/17)...");
+                    dto.bundleLoggerContexts = agent.getBundleLoggerContexts();
+                    updateMessage("Capturing JAX-RS components (14/17)...");
+                    dto.jaxRsComponents = agent.getJaxRsComponents();
+                    updateMessage("Capturing CDI containers (15/17)...");
+                    dto.cdiContainers = agent.getCdiContainers();
+                    updateMessage("Capturing heap usage (16/17)...");
+                    dto.heapUsage = agent.getHeapUsage();
+                    updateMessage("Capturing runtime info (17/17)...");
+                    dto.runtime = agent.getRuntimeDTO();
+
+                    updateMessage("Serializing snapshot...");
+                    return new Gson().toJson(dto);
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot capture snapshot");
                     threadSync.asyncExec(() -> {
@@ -101,41 +235,61 @@ public final class SnapshotCaptureHandler {
                 });
             }
         });
+
         final var taskFuture = executor.runAsync(snapshotTask);
         progressDialog = FxDialog.showProgressDialog("Capture Snapshot", snapshotTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
     }
 
-    private String snapshot() {
-        Agent agent = null;
-        if (supervisor == null || (agent = supervisor.getAgent()) == null) {
-            return null;
-        }
-        final var dto = new SnapshotDTO();
+    private void snapshotLocally() {
+        final var pathDialog = new SnapshotPathPromptDialog();
+        ContextInjectionFactory.inject(pathDialog, eclipseContext);
+        final var timestamp  = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var defaultPath = "/tmp/snapshot-" + timestamp + ".json";
+        pathDialog.init(defaultPath, "Specify File Path",
+                "Enter the full file path on the agent where the snapshot should be saved (including filename):");
 
-        dto.bundles              = agent.getAllBundles();
-        dto.components           = agent.getAllComponents();
-        dto.configurations       = agent.getAllConfigurations();
-        dto.properties           = agent.getAllProperties();
-        dto.services             = agent.getAllServices();
-        dto.threads              = agent.getAllThreads();
-        dto.dmtNodes             = agent.readDmtNode(".");
-        dto.memoryInfo           = agent.getMemoryInfo();
-        dto.roles                = agent.getAllRoles();
-        dto.healthChecks         = agent.getAllHealthChecks();
-        dto.classloaderLeaks     = agent.getClassloaderLeaks();
-        dto.httpComponents       = agent.getHttpComponents();
-        dto.bundleLoggerContexts = agent.getBundleLoggerContexts();
-        dto.jaxRsComponents      = agent.getJaxRsComponents();
-        dto.cdiContainers        = agent.getCdiContainers();
-        dto.heapUsage            = agent.getHeapUsage();
-        dto.runtime              = agent.getRuntimeDTO();
-
-        try {
-            return new Gson().toJson(dto);
-        } catch (final Exception e) {
-            return null;
+        final var pathResult = pathDialog.showAndWait();
+        if (pathResult.isEmpty()) {
+            return;
         }
+
+        final var directoryPath = pathResult.get();
+        final var agent         = supervisor.getAgent();
+
+        final Task<String> snapshotTask = new Task<>() {
+
+            @Override
+            protected String call() throws Exception {
+                try {
+                    updateMessage("Stage 1/3: Capturing snapshot");
+                    Thread.sleep(100);
+                    updateMessage("Stage 2/3: Serializing snapshot");
+                    Thread.sleep(100);
+                    final var localPath = agent.createSnapshotLocally(directoryPath);
+                    updateMessage("Stage 3/3: Finalizing");
+                    return localPath;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot create local snapshot");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+
+        snapshotTask.valueProperty().addListener((ChangeListener<String>) (_, _, localPath) -> {
+            if (localPath != null) {
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("Snapshot Saved Locally",
+                        "File saved at: " + localPath + "\nRetrieve via SFTP/SCP"));
+            }
+        });
+
+        final var taskFuture = executor.runAsync(snapshotTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Snapshot", snapshotTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
     @CanExecute

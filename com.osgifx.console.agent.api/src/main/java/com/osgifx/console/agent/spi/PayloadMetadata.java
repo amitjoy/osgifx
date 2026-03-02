@@ -57,10 +57,10 @@ public final class PayloadMetadata {
      * Constructor with all fields
      */
     public PayloadMetadata(String filename, long sizeBytes, String contentType, PayloadType type, long timestamp) {
-        this.filename = filename;
-        this.sizeBytes = sizeBytes;
+        this.filename    = filename;
+        this.sizeBytes   = sizeBytes;
         this.contentType = contentType;
-        this.type = type;
-        this.timestamp = timestamp;
+        this.type        = type;
+        this.timestamp   = timestamp;
     }
 }
