@@ -176,6 +176,65 @@ public interface Agent {
     String AGENT_GOGO_ALLOWLIST_KEY = "osgi.fx.agent.gogo.allowlist";
 
     /**
+     * The property key to specify the maximum total decompressed size of a GZIP stream in an RPC call.
+     * <p>
+     * This is used to prevent Zip Bomb attacks.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY = "osgi.fx.agent.rpc.max.decompressed.size";
+
+    /**
+     * The property key to specify the maximum number of elements allowed in a decoded collection.
+     * <p>
+     * This is used to prevent Collection Bomb attacks.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_COLLECTION_SIZE_KEY = "osgi.fx.agent.rpc.max.collection.size";
+
+    /**
+     * The property key to specify the maximum number of entries allowed in a decoded map.
+     * <p>
+     * This is used to prevent Collection Bomb attacks.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_MAP_SIZE_KEY = "osgi.fx.agent.rpc.max.map.size";
+
+    /**
+     * The property key to specify the maximum total length allowed for a decoded byte array.
+     * <p>
+     * This is used to prevent memory exhaustion when decoding large byte arrays.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY = "osgi.fx.agent.rpc.max.byte.array.size";
+
+    /**
+     * The property key to specify the maximum allowed size of a heap dump file in bytes.
+     *
+     * @since 11.0
+     */
+    String AGENT_HEAPDUMP_MAX_SIZE_KEY = "osgi.fx.agent.heapdump.max.size";
+
+    /**
+     * The property key to specify the GZIP compression level (1-9).
+     *
+     * @since 11.0
+     */
+    String AGENT_GZIP_COMPRESSION_LEVEL_KEY = "osgi.fx.agent.gzip.compression.level";
+
+    /**
+     * The property key to specify the disk buffer percentage for heap dump creation.
+     * <p>
+     * This defines the extra space required on disk beyond the estimated heap size.
+     *
+     * @since 11.0
+     */
+    String AGENT_HEAPDUMP_DISK_BUFFER_PERCENTAGE_KEY = "osgi.fx.agent.heapdump.disk.buffer.percentage";
+
+    /**
      * The port for attaching to a remote Gogo CommandSession
      */
     int COMMAND_SESSION = -1;
