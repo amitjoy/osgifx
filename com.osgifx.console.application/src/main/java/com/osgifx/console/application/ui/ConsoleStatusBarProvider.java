@@ -24,18 +24,28 @@ import static javafx.scene.paint.Color.TRANSPARENT;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.controlsfx.control.PopOver;
 import org.controlsfx.control.StatusBar;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 
+import com.osgifx.console.api.RpcCallInfo;
+import com.osgifx.console.api.RpcProgressTracker;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.VBox;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -47,7 +57,14 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
     @Optional
     @Named("connected.agent")
     private String          connectedAgent;
+    
+    @Inject
+    @Optional
+    private RpcProgressTracker rpcProgressTracker;
+    
     private final StatusBar statusBar = new StatusBar();
+    private Button rpcProgressButton;
+    private PopOver rpcProgressPopover;
 
     @Override
     public void addTo(final BorderPane pane) {
@@ -99,6 +116,113 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
     @Override
     public void clearAllInRight() {
         statusBar.getRightItems().clear();
+    }
+
+    @Override
+    public void enableRpcProgressTracking() {
+        if (rpcProgressTracker == null || rpcProgressButton != null) {
+            return; // Already enabled or tracker not available
+        }
+
+        // Create RPC progress button
+        final var glyph = new Glyph("FontAwesome", FontAwesome.Glyph.SPINNER);
+        glyph.useGradientEffect();
+        glyph.useHoverEffect();
+
+        rpcProgressButton = new Button("", glyph);
+        rpcProgressButton.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
+        rpcProgressButton.setVisible(false); // Hidden by default
+
+        // Show/hide button based on active RPC count
+        rpcProgressTracker.activeRpcCountProperty().addListener((obs, oldVal, newVal) -> {
+            rpcProgressButton.setVisible(newVal.intValue() > 0);
+            if (newVal.intValue() == 0 && rpcProgressPopover != null) {
+                rpcProgressPopover.hide();
+            }
+        });
+
+        // Create popover content
+        final VBox popoverContent = createRpcPopoverContent();
+        rpcProgressPopover = new PopOver(popoverContent);
+        rpcProgressPopover.setTitle("Active RPC Calls");
+        rpcProgressPopover.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+        rpcProgressPopover.setDetachable(false);
+
+        // Show popover on button click
+        rpcProgressButton.setOnAction(e -> {
+            if (rpcProgressPopover.isShowing()) {
+                rpcProgressPopover.hide();
+            } else {
+                rpcProgressPopover.show(rpcProgressButton);
+            }
+        });
+
+        // Add to status bar (right side)
+        statusBar.getRightItems().add(new Separator(VERTICAL));
+        statusBar.getRightItems().add(rpcProgressButton);
+    }
+
+    @Override
+    public Node getRpcProgressButton() {
+        return rpcProgressButton;
+    }
+
+    private VBox createRpcPopoverContent() {
+        final VBox content = new VBox(10);
+        content.setPadding(new Insets(10));
+        content.setPrefWidth(500);
+        content.setPrefHeight(300);
+
+        // Create table for active RPC calls
+        final TableView<RpcCallInfo> table = new TableView<>();
+        table.setItems(rpcProgressTracker.getActiveRpcCalls());
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // Method name column
+        final TableColumn<RpcCallInfo, String> methodCol = new TableColumn<>("Method");
+        methodCol.setCellValueFactory(data -> data.getValue().descriptionProperty());
+        methodCol.setPrefWidth(200);
+
+        // Progress column
+        final TableColumn<RpcCallInfo, Double> progressCol = new TableColumn<>("Progress");
+        progressCol.setCellValueFactory(data -> data.getValue().progressProperty().asObject());
+        progressCol.setCellFactory(col -> new TableCell<>() {
+            private final ProgressBar progressBar = new ProgressBar();
+            {
+                progressBar.setPrefWidth(150);
+            }
+            @Override
+            protected void updateItem(Double progress, boolean empty) {
+                super.updateItem(progress, empty);
+                if (empty || progress == null) {
+                    setGraphic(null);
+                } else {
+                    progressBar.setProgress(progress);
+                    setGraphic(progressBar);
+                }
+            }
+        });
+        progressCol.setPrefWidth(150);
+
+        // Duration column
+        final TableColumn<RpcCallInfo, String> durationCol = new TableColumn<>("Duration");
+        durationCol.setCellValueFactory(data -> {
+            final long durationMs = data.getValue().getDurationMs();
+            final String durationStr = String.format("%.1fs", durationMs / 1000.0);
+            return new SimpleStringProperty(durationStr);
+        });
+        durationCol.setPrefWidth(80);
+
+        table.getColumns().add(methodCol);
+        table.getColumns().add(progressCol);
+        table.getColumns().add(durationCol);
+
+        // Add placeholder for empty table
+        final Label placeholder = new Label("No active RPC calls");
+        table.setPlaceholder(placeholder);
+
+        content.getChildren().add(table);
+        return content;
     }
 
 }
