@@ -37,13 +37,13 @@ import javafx.collections.ObservableList;
  * @since 11.0
  */
 @Component(service = RpcProgressTracker.class)
-public class RpcProgressTrackerImpl implements RpcProgressTracker {
+public class RpcProgressTrackerProvider implements RpcProgressTracker {
 
     private final ObservableList<RpcCallInfo> activeRpcCalls;
     private final ConcurrentHashMap<String, RpcCallInfo> rpcCallMap;
     private final IntegerProperty activeRpcCount;
 
-    public RpcProgressTrackerImpl() {
+    public RpcProgressTrackerProvider() {
         this.activeRpcCalls = FXCollections.observableArrayList();
         this.rpcCallMap = new ConcurrentHashMap<>();
         this.activeRpcCount = new SimpleIntegerProperty(0);
