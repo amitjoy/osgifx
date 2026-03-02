@@ -350,11 +350,12 @@ public final class BundlesFxController {
         table.getColumns().add(statusColumn);
 
         filteredList = new FilteredList<>(dataProvider.bundles());
-        table.setItems(filteredList);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(symbolicNameColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(filteredList);
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(symbolicNameColumn);
+            table.sort();
+        });
     }
 
     @Inject

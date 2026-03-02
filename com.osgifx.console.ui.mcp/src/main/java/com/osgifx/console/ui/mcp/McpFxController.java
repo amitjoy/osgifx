@@ -161,11 +161,13 @@ public final class McpFxController {
         descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         schemaColumn.setCellValueFactory(cellData -> cellData.getValue().schemaProperty());
 
-        toolsTable.setItems(tools);
-        Fx.addContextMenuToCopyContent(toolsTable);
-        TableFilter.forTableView(toolsTable).lazy(true).apply();
-        toolsTable.getSortOrder().add(nameColumn);
-        toolsTable.sort();
+        threadSync.asyncExec(() -> {
+            toolsTable.setItems(tools);
+            Fx.addContextMenuToCopyContent(toolsTable);
+            TableFilter.forTableView(toolsTable).lazy(true).apply();
+            toolsTable.getSortOrder().add(nameColumn);
+            toolsTable.sort();
+        });
     }
 
     private void initLogsTable() {
@@ -173,12 +175,14 @@ public final class McpFxController {
         typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
         contentColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
 
-        logsTable.setItems(logs);
-        Fx.addContextMenuToCopyContent(logsTable);
-        TableFilter.forTableView(logsTable).lazy(true).apply();
-        timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
-        logsTable.getSortOrder().add(timestampColumn);
-        logsTable.sort();
+        threadSync.asyncExec(() -> {
+            logsTable.setItems(logs);
+            Fx.addContextMenuToCopyContent(logsTable);
+            TableFilter.forTableView(logsTable).lazy(true).apply();
+            timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
+            logsTable.getSortOrder().add(timestampColumn);
+            logsTable.sort();
+        });
     }
 
     private void updateTools() {
