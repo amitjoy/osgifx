@@ -70,14 +70,17 @@ public final class EventsFxUI {
     private IEclipseContext   eclipseContext;
 
     @PostConstruct
-    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-        createControls(parent, loader);
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Events part has been initialized");
     }
 
     @Inject
     @Optional
     private void updateOnEventReceiveStarted(@UIEventTopic(EVENT_RECEIVE_STARTED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent) {
+        createControls(parent);
                                              final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);

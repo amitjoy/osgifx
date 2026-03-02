@@ -69,7 +69,8 @@ public final class HealthCheckFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
-        logger.atDebug().log("Healthcheck part has been initialized");
+        statusBar.enableRpcProgressTracking();
+        logger.atDebug().log("Health checks part has been initialized");
     }
 
     @Focus

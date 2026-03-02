@@ -59,9 +59,10 @@ public final class McpFxUI {
     private BundleContext     context;
 
     @PostConstruct
-    public void postConstruct(final BorderPane parent, final MPart part, @LocalInstance final FXMLLoader loader) {
-        createControls(parent, loader);
-        logger.atDebug().log("MCP UI part has been initialized");
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
+        logger.atDebug().log("MCP part has been initialized");
     }
 
     @Inject

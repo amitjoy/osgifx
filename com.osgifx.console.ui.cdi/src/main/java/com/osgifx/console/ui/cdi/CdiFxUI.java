@@ -70,6 +70,7 @@ public final class CdiFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("CDI part has been initialized");
     }
 
