@@ -80,6 +80,7 @@ public final class PackagesFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Packages part has been initialized");
     }
 

@@ -144,13 +144,9 @@ public final class OverviewFxUI {
     private final AtomicBoolean isRealtimeUpdateRunning = new AtomicBoolean(true);
 
     @PostConstruct
-    public void postConstruct() {
-        createTimelineButton();
-        updateStaticOverviewInfo();
-        retrieveRuntimeInfo();
-        createUIComponents(parent);
-        initTimeline();
-
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Overview part has been initialized");
     }
 

@@ -86,8 +86,9 @@ public final class GraphFxUI {
     private GraphController   loadedController;
 
     @PostConstruct
-    public void postConstruct() {
-        createControls();
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Graph part has been initialized");
     }
 

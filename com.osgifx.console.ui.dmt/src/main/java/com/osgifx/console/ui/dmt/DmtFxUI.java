@@ -68,8 +68,9 @@ public final class DmtFxUI {
     private DmtFxController   fxController;
 
     @PostConstruct
-    public void postConstruct() {
-        createControls();
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("DMT part has been initialized");
     }
 

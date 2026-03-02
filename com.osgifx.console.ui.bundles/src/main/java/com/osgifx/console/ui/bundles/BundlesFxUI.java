@@ -80,6 +80,7 @@ public final class BundlesFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Bundles part has been initialized");
     }
 

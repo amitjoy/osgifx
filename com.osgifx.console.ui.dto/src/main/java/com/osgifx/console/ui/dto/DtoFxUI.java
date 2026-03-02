@@ -67,8 +67,9 @@ public final class DtoFxUI {
     private DtoFxController   fxController;
 
     @PostConstruct
-    public void postConstruct() {
-        createControls();
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("DTO part has been initialized");
     }
 
