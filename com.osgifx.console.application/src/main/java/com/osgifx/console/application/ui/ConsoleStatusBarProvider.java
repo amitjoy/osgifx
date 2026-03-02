@@ -56,15 +56,15 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
     @Inject
     @Optional
     @Named("connected.agent")
-    private String          connectedAgent;
-    
+    private String connectedAgent;
+
     @Inject
     @Optional
     private RpcProgressTracker rpcProgressTracker;
-    
+
     private final StatusBar statusBar = new StatusBar();
-    private Button rpcProgressButton;
-    private PopOver rpcProgressPopover;
+    private Button          rpcProgressButton;
+    private PopOver         rpcProgressPopover;
 
     @Override
     public void addTo(final BorderPane pane) {
@@ -130,11 +130,12 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         glyph.useHoverEffect();
 
         rpcProgressButton = new Button("", glyph);
-        rpcProgressButton.setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
+        rpcProgressButton
+                .setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
         rpcProgressButton.setVisible(false); // Hidden by default
 
         // Show/hide button based on active RPC count
-        rpcProgressTracker.activeRpcCountProperty().addListener((obs, oldVal, newVal) -> {
+        rpcProgressTracker.activeRpcCountProperty().addListener((_, _, newVal) -> {
             rpcProgressButton.setVisible(newVal.intValue() > 0);
             if (newVal.intValue() == 0 && rpcProgressPopover != null) {
                 rpcProgressPopover.hide();
@@ -149,7 +150,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         rpcProgressPopover.setDetachable(false);
 
         // Show popover on button click
-        rpcProgressButton.setOnAction(e -> {
+        rpcProgressButton.setOnAction(_ -> {
             if (rpcProgressPopover.isShowing()) {
                 rpcProgressPopover.hide();
             } else {
@@ -176,7 +177,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         // Create table for active RPC calls
         final TableView<RpcCallInfo> table = new TableView<>();
         table.setItems(rpcProgressTracker.getActiveRpcCalls());
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
         // Method name column
         final TableColumn<RpcCallInfo, String> methodCol = new TableColumn<>("Method");
@@ -186,11 +187,12 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         // Progress column
         final TableColumn<RpcCallInfo, Double> progressCol = new TableColumn<>("Progress");
         progressCol.setCellValueFactory(data -> data.getValue().progressProperty().asObject());
-        progressCol.setCellFactory(col -> new TableCell<>() {
+        progressCol.setCellFactory(_ -> new TableCell<>() {
             private final ProgressBar progressBar = new ProgressBar();
             {
                 progressBar.setPrefWidth(150);
             }
+
             @Override
             protected void updateItem(Double progress, boolean empty) {
                 super.updateItem(progress, empty);
@@ -207,7 +209,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         // Duration column
         final TableColumn<RpcCallInfo, String> durationCol = new TableColumn<>("Duration");
         durationCol.setCellValueFactory(data -> {
-            final long durationMs = data.getValue().getDurationMs();
+            final long   durationMs  = data.getValue().getDurationMs();
             final String durationStr = String.format("%.1fs", durationMs / 1000.0);
             return new SimpleStringProperty(durationStr);
         });

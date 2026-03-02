@@ -112,17 +112,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         this.codec         = new BinaryCodec(bundleContext);
 
         // Read max decompressed size from configuration
-        final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
-        final String sizeStr = bundleContext.getProperty("osgi.fx.agent.rpc.max.decompressed.size");
-        if (sizeStr != null) {
-            try {
-                this.maxDecompressedSize = Long.parseLong(sizeStr);
-            } catch (final NumberFormatException e) {
-                this.maxDecompressedSize = defaultMaxSize;
-            }
-        } else {
-            this.maxDecompressedSize = defaultMaxSize;
-        }
+        this.maxDecompressedSize = readMaxDecompressedSize(bundleContext);
 
         // Initialize Trackers
         this.multiplexerTracker    = new ServiceTracker<>(bundleContext, MqttRequestMultiplexer.class, null);
@@ -456,5 +446,20 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     @Override
     public boolean isOpen() {
         return !stopped.get();
+    }
+
+    private static long readMaxDecompressedSize(final BundleContext context) {
+        final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
+        if (context != null) {
+            final String sizeStr = context.getProperty("osgi.fx.agent.rpc.max.decompressed.size");
+            if (sizeStr != null) {
+                try {
+                    return Long.parseLong(sizeStr);
+                } catch (final NumberFormatException e) {
+                    return defaultMaxSize;
+                }
+            }
+        }
+        return defaultMaxSize;
     }
 }

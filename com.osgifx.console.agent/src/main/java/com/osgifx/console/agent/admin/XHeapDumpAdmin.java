@@ -16,6 +16,7 @@
 package com.osgifx.console.agent.admin;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -101,9 +102,9 @@ public final class XHeapDumpAdmin {
     }
 
     private void compressFile(final File source, final File destination) throws IOException {
-        try (final var fis = new java.io.FileInputStream(source);
-             final var fos = new FileOutputStream(destination);
-             final var gzos = new GZIPOutputStream(fos)) {
+        try (final FileInputStream fis = new FileInputStream(source);
+             final FileOutputStream fos = new FileOutputStream(destination);
+             final GZIPOutputStream gzos = new GZIPOutputStream(fos)) {
 
             final byte[] buffer = new byte[8192];
             int len;
