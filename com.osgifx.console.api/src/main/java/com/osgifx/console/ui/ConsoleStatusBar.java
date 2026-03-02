@@ -69,4 +69,22 @@ public interface ConsoleStatusBar {
      */
     void clearAllInLeft();
 
+    /**
+     * Enables RPC progress tracking in this status bar.
+     * When enabled, the status bar will automatically display RPC progress
+     * indicators and allow users to view active RPC calls via a popover.
+     *
+     * @since 11.0
+     */
+    void enableRpcProgressTracking();
+
+    /**
+     * Returns the RPC progress button node for attaching popovers or tooltips.
+     * This button is only available after calling {@link #enableRpcProgressTracking()}.
+     *
+     * @return the RPC progress button node, or null if RPC tracking is not enabled
+     * @since 11.0
+     */
+    Node getRpcProgressButton();
+
 }
