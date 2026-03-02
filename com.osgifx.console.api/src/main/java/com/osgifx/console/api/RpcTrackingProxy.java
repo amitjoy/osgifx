@@ -13,12 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.rpc;
+package com.osgifx.console.api;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-
-import com.osgifx.console.api.RpcProgressTracker;
 
 /**
  * Dynamic proxy that wraps Agent interface calls to automatically track RPC progress.
