@@ -208,7 +208,7 @@ public class BinaryCodec {
         if (context != null) {
             MAX_COLLECTION_SIZE = getIntProperty(context, "osgi.fx.agent.rpc.max.collection.size",
                     DEFAULT_MAX_COLLECTION_SIZE);
-            MAX_MAP_SIZE = getIntProperty(context, "osgi.fx.agent.rpc.max.map.size", DEFAULT_MAX_MAP_SIZE);
+            MAX_MAP_SIZE        = getIntProperty(context, "osgi.fx.agent.rpc.max.map.size", DEFAULT_MAX_MAP_SIZE);
             MAX_BYTE_ARRAY_SIZE = getIntProperty(context, "osgi.fx.agent.rpc.max.byte.array.size",
                     DEFAULT_MAX_BYTE_ARRAY_SIZE);
         } else {
@@ -420,14 +420,10 @@ public class BinaryCodec {
                 int size = in.readInt();
                 // Validate collection size to prevent collection bomb attacks
                 if (size < 0 || size > MAX_COLLECTION_SIZE) {
-                    throw new IOException(
-                        String.format(
-                            "Collection size limit exceeded: requested %d elements, limit is %d. " +
-                            "This may indicate a collection bomb attack or an unexpectedly large collection.",
-                            size,
-                            MAX_COLLECTION_SIZE
-                        )
-                    );
+                    throw new IOException(String.format(
+                            "Collection size limit exceeded: requested %d elements, limit is %d. "
+                                    + "This may indicate a collection bomb attack or an unexpectedly large collection.",
+                            size, MAX_COLLECTION_SIZE));
                 }
                 List<Object> list     = new ArrayList<>(size);
                 Type         compType = Object.class;
@@ -453,14 +449,10 @@ public class BinaryCodec {
                 int size = in.readInt();
                 // Validate map size to prevent collection bomb attacks
                 if (size < 0 || size > MAX_MAP_SIZE) {
-                    throw new IOException(
-                        String.format(
-                            "Map size limit exceeded: requested %d entries, limit is %d. " +
-                            "This may indicate a collection bomb attack or an unexpectedly large map.",
-                            size,
-                            MAX_MAP_SIZE
-                        )
-                    );
+                    throw new IOException(String.format(
+                            "Map size limit exceeded: requested %d entries, limit is %d. "
+                                    + "This may indicate a collection bomb attack or an unexpectedly large map.",
+                            size, MAX_MAP_SIZE));
                 }
                 Map<Object, Object> map   = new LinkedHashMap<>(size);
                 Type                kType = Object.class;
@@ -479,14 +471,10 @@ public class BinaryCodec {
                 int len = in.readInt();
                 // Validate byte array size to prevent memory exhaustion
                 if (len < 0 || len > MAX_BYTE_ARRAY_SIZE) {
-                    throw new IOException(
-                        String.format(
-                            "Byte array size limit exceeded: requested %d bytes, limit is %d bytes. " +
-                            "This may indicate a collection bomb attack or an unexpectedly large array.",
-                            len,
-                            MAX_BYTE_ARRAY_SIZE
-                        )
-                    );
+                    throw new IOException(String.format(
+                            "Byte array size limit exceeded: requested %d bytes, limit is %d bytes. "
+                                    + "This may indicate a collection bomb attack or an unexpectedly large array.",
+                            len, MAX_BYTE_ARRAY_SIZE));
                 }
                 byte[] data = new byte[len];
                 in.readFully(data);
@@ -522,14 +510,10 @@ public class BinaryCodec {
                 int len = in.readInt();
                 // Validate large string size to prevent memory exhaustion
                 if (len < 0 || len > MAX_BYTE_ARRAY_SIZE) {
-                    throw new IOException(
-                        String.format(
-                            "Large string size limit exceeded: requested %d bytes, limit is %d bytes. " +
-                            "This may indicate an attack or an unexpectedly large string.",
-                            len,
-                            MAX_BYTE_ARRAY_SIZE
-                        )
-                    );
+                    throw new IOException(String.format(
+                            "Large string size limit exceeded: requested %d bytes, limit is %d bytes. "
+                                    + "This may indicate an attack or an unexpectedly large string.",
+                            len, MAX_BYTE_ARRAY_SIZE));
                 }
                 byte[] bytes = new byte[len];
                 in.readFully(bytes);

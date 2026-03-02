@@ -34,7 +34,7 @@ import aQute.lib.json.JSONCodec;
  */
 public final class XSnapshotAdmin {
 
-    private static final FluentLogger logger = LoggerFactory.getFluentLogger(XSnapshotAdmin.class);
+    private static final FluentLogger      logger           = LoggerFactory.getFluentLogger(XSnapshotAdmin.class);
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 
     private final XDtoAdmin dtoAdmin;
@@ -53,7 +53,7 @@ public final class XSnapshotAdmin {
      */
     public String createSnapshot(final String outputPath) throws Exception {
         final File outputFile = new File(outputPath);
-        final File parentDir = outputFile.getParentFile();
+        final File parentDir  = outputFile.getParentFile();
 
         // Create parent directory if it doesn't exist
         if (parentDir != null && !parentDir.exists()) {
@@ -66,7 +66,7 @@ public final class XSnapshotAdmin {
         final File snapshotFile;
         if (outputFile.isDirectory() || outputPath.endsWith("/") || outputPath.endsWith("\\")) {
             final String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMAT);
-            final String filename = "snapshot-" + timestamp + ".json";
+            final String filename  = "snapshot-" + timestamp + ".json";
             snapshotFile = new File(outputFile, filename);
         } else {
             snapshotFile = outputFile;
@@ -77,7 +77,7 @@ public final class XSnapshotAdmin {
 
         // Serialize to JSON using JSONCodec
         final JSONCodec codec = new JSONCodec();
-        final String json = codec.enc().indent("  ").put(snapshot).toString();
+        final String    json  = codec.enc().indent("  ").put(snapshot).toString();
 
         try (final FileWriter writer = new FileWriter(snapshotFile)) {
             writer.write(json);

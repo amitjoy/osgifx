@@ -39,20 +39,20 @@ import javafx.collections.ObservableList;
 @Component(service = RpcProgressTracker.class)
 public class RpcProgressTrackerProvider implements RpcProgressTracker {
 
-    private final ObservableList<RpcCallInfo> activeRpcCalls;
+    private final ObservableList<RpcCallInfo>            activeRpcCalls;
     private final ConcurrentHashMap<String, RpcCallInfo> rpcCallMap;
-    private final IntegerProperty activeRpcCount;
+    private final IntegerProperty                        activeRpcCount;
 
     public RpcProgressTrackerProvider() {
         this.activeRpcCalls = FXCollections.observableArrayList();
-        this.rpcCallMap = new ConcurrentHashMap<>();
+        this.rpcCallMap     = new ConcurrentHashMap<>();
         this.activeRpcCount = new SimpleIntegerProperty(0);
     }
 
     @Override
     public String startRpc(String methodName, String description) {
-        final String trackerId = UUID.randomUUID().toString();
-        final RpcCallInfo info = new RpcCallInfo(trackerId, methodName, description);
+        final String      trackerId = UUID.randomUUID().toString();
+        final RpcCallInfo info      = new RpcCallInfo(trackerId, methodName, description);
 
         rpcCallMap.put(trackerId, info);
 

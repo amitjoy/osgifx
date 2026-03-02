@@ -882,8 +882,8 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public long estimateHeapdumpSize() {
-        final Runtime runtime = Runtime.getRuntime();
-        final long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        final Runtime runtime    = Runtime.getRuntime();
+        final long    usedMemory = runtime.totalMemory() - runtime.freeMemory();
         // Estimate compressed size: GZIP typically achieves 20-30% compression for heap dumps
         // We use 25% as a conservative estimate
         return (long) (usedMemory * 0.25);
@@ -899,27 +899,27 @@ public final class AgentServer implements Agent, Closeable {
     public long estimateSnapshotSize() {
         // Estimate snapshot size based on runtime objects
         final BundleContext context = di.getInstance(BundleContext.class);
-        final Bundle[] bundles = context.getBundles();
-        
+        final Bundle[]      bundles = context.getBundles();
+
         // Rough estimation:
         // - Each bundle: ~500 bytes JSON
         // - Each component: ~300 bytes JSON
         // - Each configuration: ~400 bytes JSON
         // - Each service: ~250 bytes JSON
         // - Base overhead: 10 KB
-        
+
         long estimatedSize = 10_000; // Base overhead
         estimatedSize += bundles.length * 500L; // Bundles
-        
+
         // Estimate components (assume ~2 per bundle on average)
         estimatedSize += bundles.length * 2L * 300L;
-        
+
         // Estimate configurations (assume ~1 per 3 bundles)
         estimatedSize += (bundles.length / 3L) * 400L;
-        
+
         // Estimate services (assume ~3 per bundle on average)
         estimatedSize += bundles.length * 3L * 250L;
-        
+
         return estimatedSize;
     }
 

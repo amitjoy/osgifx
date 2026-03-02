@@ -35,7 +35,7 @@ import com.osgifx.console.agent.helper.AgentHelper;
  */
 public final class AgentCommand {
 
-    private final Activator    activator;
+    private final Activator     activator;
     private final BundleContext bundleContext;
 
     public AgentCommand(final Activator activator, final BundleContext bundleContext) {

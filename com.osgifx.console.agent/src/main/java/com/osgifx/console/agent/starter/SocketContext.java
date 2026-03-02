@@ -57,7 +57,8 @@ public final class SocketContext {
     }
 
     public ServerSocket getSocket() throws Exception {
-        final String secureCommunicationEnabled = AgentHelper.getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY, bundleContext);
+        final String secureCommunicationEnabled = AgentHelper.getProperty(AGENT_SOCKET_SECURE_COMMUNICATION_KEY,
+                bundleContext);
         if (Boolean.parseBoolean(secureCommunicationEnabled)) {
             logger.atInfo().msg("Secure communication enabled").log();
             final String sslContextFilter = AgentHelper
@@ -86,7 +87,8 @@ public final class SocketContext {
 
     private void extractSpec() {
         final String portKey    = AgentHelper.getProperty(AGENT_SOCKET_PORT_KEY, bundleContext);
-        final String portKeyOld = AgentHelper.getProperty("osgi.fx.agent.port", bundleContext); // backward compatibility
+        final String portKeyOld = AgentHelper.getProperty("osgi.fx.agent.port", bundleContext); // backward
+                                                                                                // compatibility
         if (portKey == null && portKeyOld == null) {
             throw new IllegalArgumentException("Socket port not defined");
         }

@@ -24,15 +24,15 @@ import java.io.InputStream;
  * from the underlying stream. This is used to protect against zip bomb attacks where a small
  * compressed payload can decompress to gigabytes of data, causing memory exhaustion.
  *
- * <p>When the limit is exceeded, an {@link IOException} is thrown with a descriptive message.
+ * <p>
+ * When the limit is exceeded, an {@link IOException} is thrown with a descriptive message.
  *
- * <p><b>Example usage:</b>
+ * <p>
+ * <b>Example usage:</b>
+ * 
  * <pre>
  * // Limit decompressed GZIP stream to 250 MB
- * InputStream bounded = new BoundedInputStream(
- *     new GZIPInputStream(compressedStream),
- *     250 * 1024 * 1024
- * );
+ * InputStream bounded = new BoundedInputStream(new GZIPInputStream(compressedStream), 250 * 1024 * 1024);
  * </pre>
  *
  * @since 11.0
@@ -40,7 +40,7 @@ import java.io.InputStream;
 public final class BoundedInputStream extends FilterInputStream {
 
     private final long maxBytes;
-    private long bytesRead;
+    private long       bytesRead;
 
     /**
      * Creates a bounded input stream.
@@ -54,7 +54,7 @@ public final class BoundedInputStream extends FilterInputStream {
         if (maxBytes < 0) {
             throw new IllegalArgumentException("maxBytes must be non-negative: " + maxBytes);
         }
-        this.maxBytes = maxBytes;
+        this.maxBytes  = maxBytes;
         this.bytesRead = 0;
     }
 
@@ -106,15 +106,10 @@ public final class BoundedInputStream extends FilterInputStream {
 
     private void checkLimit(final long additionalBytes) throws IOException {
         if (bytesRead > maxBytes) {
-            throw new IOException(
-                String.format(
-                    "Stream size limit exceeded: read %d bytes, limit is %d bytes (exceeded by %d bytes). " +
-                    "This may indicate a zip bomb attack or an unexpectedly large payload.",
-                    bytesRead,
-                    maxBytes,
-                    bytesRead - maxBytes
-                )
-            );
+            throw new IOException(String.format(
+                    "Stream size limit exceeded: read %d bytes, limit is %d bytes (exceeded by %d bytes). "
+                            + "This may indicate a zip bomb attack or an unexpectedly large payload.",
+                    bytesRead, maxBytes, bytesRead - maxBytes));
         }
     }
 }

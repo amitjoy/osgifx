@@ -47,8 +47,8 @@ public final class AgentHelper {
      */
     public static String getProperty(final String key, final BundleContext bundleContext) {
         final String fromSystem = System.getProperty(key);
-        return fromSystem != null && !fromSystem.trim().isEmpty() ? fromSystem 
-               : bundleContext != null ? bundleContext.getProperty(key) : null;
+        return fromSystem != null && !fromSystem.trim().isEmpty() ? fromSystem
+                : bundleContext != null ? bundleContext.getProperty(key) : null;
     }
 
     public static XResultDTO createResult(final int result, final String response) {
