@@ -70,7 +70,8 @@ public final class HttpFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
-        logger.atDebug().log("Configurations part has been initialized");
+        statusBar.enableRpcProgressTracking();
+        logger.atDebug().log("HTTP part has been initialized");
     }
 
     @Focus

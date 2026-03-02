@@ -80,6 +80,7 @@ public final class ConfigurationsFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Configurations part has been initialized");
     }
 

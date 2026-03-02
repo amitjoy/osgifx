@@ -56,14 +56,16 @@ public final class GogoFxUI {
     private ConsoleMaskerPane progressPane;
 
     @PostConstruct
-    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
-        createControls(parent, loader);
+    public void postConstruct(final BorderPane parent) {
+        createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Gogo part has been initialized");
     }
 
     @Inject
     @Optional
     private void updateOnAgentConnectedEvent(@UIEventTopic(AGENT_CONNECTED_EVENT_TOPIC) final String data,
+                                             final BorderPane parent) {
                                              final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent connected event received");

@@ -69,6 +69,7 @@ public final class ThreadsFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Threads part has been initialized");
     }
 
