@@ -762,4 +762,54 @@ public interface Agent {
      * @since 11.0
      */
     Collection<String> listBundleResources(long bundleId, String path, String pattern, int options);
+
+    /**
+     * Estimates the compressed heapdump size based on current heap usage.
+     * <p>
+     * This uses the current heap usage and applies an estimated compression ratio
+     * (typically 20-30% for GZIP compression of heap dumps).
+     *
+     * @return estimated compressed heapdump size in bytes
+     * @since 11.0
+     */
+    long estimateHeapdumpSize();
+
+    /**
+     * Creates a heapdump and saves it locally on the agent device.
+     * <p>
+     * The heapdump is compressed with GZIP and saved to the specified path.
+     * The file is NOT automatically deleted - the caller is responsible for cleanup.
+     *
+     * @param outputPath the absolute path where the heapdump should be saved
+     *                   (e.g., "/opt/agent/heapdumps/dump.hprof.gz")
+     * @return the absolute path to the created heapdump file
+     * @throws Exception if the heapdump creation fails
+     * @since 11.0
+     */
+    String createHeapdumpLocally(String outputPath) throws Exception;
+
+    /**
+     * Estimates the snapshot size based on current runtime state.
+     * <p>
+     * This estimates the size of a JSON snapshot by counting bundles, components,
+     * configurations, services, and other runtime objects.
+     *
+     * @return estimated snapshot size in bytes
+     * @since 11.0
+     */
+    long estimateSnapshotSize();
+
+    /**
+     * Creates a snapshot and saves it locally on the agent device.
+     * <p>
+     * The snapshot is saved as JSON to the specified path.
+     * The file is NOT automatically deleted - the caller is responsible for cleanup.
+     *
+     * @param outputPath the absolute path where the snapshot should be saved
+     *                   (e.g., "/opt/agent/snapshots/snapshot.json")
+     * @return the absolute path to the created snapshot file
+     * @throws Exception if the snapshot creation fails
+     * @since 11.0
+     */
+    String createSnapshotLocally(String outputPath) throws Exception;
 }
