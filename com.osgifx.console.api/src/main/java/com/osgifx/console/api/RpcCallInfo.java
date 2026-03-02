@@ -30,14 +30,14 @@ import javafx.beans.property.StringProperty;
  */
 public final class RpcCallInfo {
 
-    private final String id;
-    private final String methodName;
-    private final long startTime;
-    private final StringProperty description;
-    private final DoubleProperty progress;
-    private final StringProperty message;
+    private final String                    id;
+    private final String                    methodName;
+    private final long                      startTime;
+    private final StringProperty            description;
+    private final DoubleProperty            progress;
+    private final StringProperty            message;
     private final ObjectProperty<RpcStatus> status;
-    private final StringProperty errorMessage;
+    private final StringProperty            errorMessage;
 
     /**
      * Creates a new RPC call info object.
@@ -47,13 +47,13 @@ public final class RpcCallInfo {
      * @param description human-readable description
      */
     public RpcCallInfo(String id, String methodName, String description) {
-        this.id = id;
-        this.methodName = methodName;
-        this.startTime = System.currentTimeMillis();
-        this.description = new SimpleStringProperty(description);
-        this.progress = new SimpleDoubleProperty(-1.0); // Indeterminate by default
-        this.message = new SimpleStringProperty("");
-        this.status = new SimpleObjectProperty<>(RpcStatus.RUNNING);
+        this.id           = id;
+        this.methodName   = methodName;
+        this.startTime    = System.currentTimeMillis();
+        this.description  = new SimpleStringProperty(description);
+        this.progress     = new SimpleDoubleProperty(-1.0);               // Indeterminate by default
+        this.message      = new SimpleStringProperty("");
+        this.status       = new SimpleObjectProperty<>(RpcStatus.RUNNING);
         this.errorMessage = new SimpleStringProperty(null);
     }
 

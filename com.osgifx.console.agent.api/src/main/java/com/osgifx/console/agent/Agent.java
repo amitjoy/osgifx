@@ -62,12 +62,12 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
  * <h2>Communication Channels</h2>
  * The agent supports two RPC transports:
  * <ul>
- *   <li><b>Socket</b> – configured via {@link #AGENT_SOCKET_PORT_KEY}. A plain or
- *       TLS-secured TCP connection.</li>
- *   <li><b>MQTT 5</b> – configured via {@link #AGENT_MQTT_PROVIDER_KEY},
- *       {@link #AGENT_MQTT_PUB_TOPIC_KEY}, and {@link #AGENT_MQTT_SUB_TOPIC_KEY}.
- *       Supports OSGi Messaging or custom {@link Mqtt5Publisher}/{@link Mqtt5Subscriber}
- *       implementations.</li>
+ * <li><b>Socket</b> – configured via {@link #AGENT_SOCKET_PORT_KEY}. A plain or
+ * TLS-secured TCP connection.</li>
+ * <li><b>MQTT 5</b> – configured via {@link #AGENT_MQTT_PROVIDER_KEY},
+ * {@link #AGENT_MQTT_PUB_TOPIC_KEY}, and {@link #AGENT_MQTT_SUB_TOPIC_KEY}.
+ * Supports OSGi Messaging or custom {@link Mqtt5Publisher}/{@link Mqtt5Subscriber}
+ * implementations.</li>
  * </ul>
  *
  * <h2>Graceful Degradation</h2>
@@ -781,7 +781,7 @@ public interface Agent {
      * The file is NOT automatically deleted - the caller is responsible for cleanup.
      *
      * @param outputPath the absolute path where the heapdump should be saved
-     *                   (e.g., "/opt/agent/heapdumps/dump.hprof.gz")
+     *            (e.g., "/opt/agent/heapdumps/dump.hprof.gz")
      * @return the absolute path to the created heapdump file
      * @throws Exception if the heapdump creation fails
      * @since 11.0
@@ -806,7 +806,7 @@ public interface Agent {
      * The file is NOT automatically deleted - the caller is responsible for cleanup.
      *
      * @param outputPath the absolute path where the snapshot should be saved
-     *                   (e.g., "/opt/agent/snapshots/snapshot.json")
+     *            (e.g., "/opt/agent/snapshots/snapshot.json")
      * @return the absolute path to the created snapshot file
      * @throws Exception if the snapshot creation fails
      * @since 11.0

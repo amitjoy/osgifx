@@ -25,7 +25,9 @@ import javafx.collections.ObservableList;
  * This is a singleton service that provides visibility into all ongoing
  * RPC operations, enabling Eclipse-style progress tracking in the status bar.
  *
- * <p><b>Usage Example:</b>
+ * <p>
+ * <b>Usage Example:</b>
+ * 
  * <pre>
  * // Start tracking an RPC call
  * String trackerId = tracker.startRpc("getAllBundles", "Fetching all bundles");

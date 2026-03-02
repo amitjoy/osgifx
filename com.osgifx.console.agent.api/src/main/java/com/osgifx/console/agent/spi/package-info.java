@@ -16,7 +16,8 @@
 /**
  * Service Provider Interface (SPI) for extending OSGi.fx Agent functionality.
  *
- * <p>This package contains {@code @ConsumerType} interfaces that remote runtimes
+ * <p>
+ * This package contains {@code @ConsumerType} interfaces that remote runtimes
  * can implement to extend agent capabilities.
  *
  * @since 11.0
