@@ -65,6 +65,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
     private final StatusBar statusBar = new StatusBar();
     private Button          rpcProgressButton;
     private PopOver         rpcProgressPopover;
+    private Separator       rpcProgressSeparator;
 
     @Override
     public void addTo(final BorderPane pane) {
@@ -121,7 +122,8 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         if (rpcProgressPopover != null && rpcProgressPopover.isShowing()) {
             rpcProgressPopover.hide();
         }
-        rpcProgressPopover = null;
+        rpcProgressPopover   = null;
+        rpcProgressSeparator = null;
     }
 
     @Override
@@ -141,8 +143,6 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         glyph.useHoverEffect();
 
         rpcProgressButton = new Button("", glyph);
-        rpcProgressButton
-                .setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
         rpcProgressButton.setTooltip(new javafx.scene.control.Tooltip("RPC Progress"));
 
         // Update button style based on active RPC count
@@ -169,20 +169,17 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         });
 
         // Add to status bar (right side)
-        statusBar.getRightItems().add(new Separator(VERTICAL));
-        statusBar.getRightItems().add(rpcProgressButton);
+        rpcProgressSeparator = new Separator(VERTICAL);
+        statusBar.getRightItems().addAll(rpcProgressButton, rpcProgressSeparator);
     }
 
     @Override
     public void disableRpcProgressTracking() {
         if (rpcProgressButton != null) {
             statusBar.getRightItems().remove(rpcProgressButton);
-            // Also remove the separator before the button if it exists
-            if (!statusBar.getRightItems().isEmpty()) {
-                final Node lastItem = statusBar.getRightItems().get(statusBar.getRightItems().size() - 1);
-                if (lastItem instanceof Separator) {
-                    statusBar.getRightItems().remove(lastItem);
-                }
+            if (rpcProgressSeparator != null) {
+                statusBar.getRightItems().remove(rpcProgressSeparator);
+                rpcProgressSeparator = null;
             }
             rpcProgressButton = null;
             if (rpcProgressPopover != null && rpcProgressPopover.isShowing()) {
