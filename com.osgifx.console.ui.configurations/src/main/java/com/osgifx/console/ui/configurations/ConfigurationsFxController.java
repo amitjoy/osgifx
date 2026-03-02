@@ -235,11 +235,12 @@ public final class ConfigurationsFxController {
         table.getColumns().add(isFactoryColumn);
 
         filteredList = new FilteredList<>(dataProvider.configurations());
-        table.setItems(filteredList);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(pidColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(filteredList);
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(pidColumn);
+            table.sort();
+        });
     }
 
     @Inject

@@ -345,10 +345,11 @@ public final class EventsFxController {
         table.getColumns().add(topicColumn);
 
         final var events = dataProvider.events();
-        table.setItems(events);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        sortByReceivedAt(receivedAtColumn);
+        threadSync.asyncExec(() -> {
+            table.setItems(events);
+            TableFilter.forTableView(table).lazy(true).apply();
+            sortByReceivedAt(receivedAtColumn);
+        });
     }
 
     private void sortByReceivedAt(final TableColumn<XEventDTO, Date> column) {

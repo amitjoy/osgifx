@@ -201,10 +201,12 @@ public final class RolesFxController {
         table.getColumns().add(roleNameColumn);
         table.getColumns().add(roleTypeColumn);
 
-        table.setItems(dataProvider.roles());
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(roleNameColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(dataProvider.roles());
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(roleNameColumn);
+            table.sort();
+        });
     }
 
 }
