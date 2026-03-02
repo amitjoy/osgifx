@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.mqtt;
 
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY;
+
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -52,9 +54,9 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
-import com.osgifx.console.agent.rpc.BoundedInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
+import com.osgifx.console.agent.rpc.BoundedInputStream;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -451,7 +453,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private static long readMaxDecompressedSize(final BundleContext context) {
         final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
         if (context != null) {
-            final String sizeStr = context.getProperty("osgi.fx.agent.rpc.max.decompressed.size");
+            final String sizeStr = context.getProperty(AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY);
             if (sizeStr != null) {
                 try {
                     return Long.parseLong(sizeStr);

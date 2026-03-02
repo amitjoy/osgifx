@@ -15,6 +15,10 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_COLLECTION_SIZE_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_MAP_SIZE_KEY;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,6 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +44,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -206,10 +210,10 @@ public class BinaryCodec {
      */
     public BinaryCodec(final BundleContext context) {
         if (context != null) {
-            MAX_COLLECTION_SIZE = getIntProperty(context, "osgi.fx.agent.rpc.max.collection.size",
+            MAX_COLLECTION_SIZE = getIntProperty(context, AGENT_RPC_MAX_COLLECTION_SIZE_KEY,
                     DEFAULT_MAX_COLLECTION_SIZE);
-            MAX_MAP_SIZE        = getIntProperty(context, "osgi.fx.agent.rpc.max.map.size", DEFAULT_MAX_MAP_SIZE);
-            MAX_BYTE_ARRAY_SIZE = getIntProperty(context, "osgi.fx.agent.rpc.max.byte.array.size",
+            MAX_MAP_SIZE        = getIntProperty(context, AGENT_RPC_MAX_MAP_SIZE_KEY, DEFAULT_MAX_MAP_SIZE);
+            MAX_BYTE_ARRAY_SIZE = getIntProperty(context, AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY,
                     DEFAULT_MAX_BYTE_ARRAY_SIZE);
         } else {
             MAX_COLLECTION_SIZE = DEFAULT_MAX_COLLECTION_SIZE;
