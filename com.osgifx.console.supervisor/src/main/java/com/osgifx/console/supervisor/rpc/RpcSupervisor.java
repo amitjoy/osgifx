@@ -59,6 +59,7 @@ import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
+import com.osgifx.console.api.RpcProgressTracker;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -99,6 +100,9 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     @Reference
     private ConfigurationAdmin configurationAdmin;
 
+    @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
+    private volatile RpcProgressTracker tracker;
+
     private FluentLogger  logger;
     private OSGiResult    pubReg;
     private OSGiResult    subReg;
@@ -108,7 +112,9 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     @Activate
     void activate(final BundleContext context) {
         this.context = context;
-        logger       = FluentLogger.of(factory.createLogger(getClass().getName()));
+        this.bundleContext = context;
+        this.rpcProgressTracker = tracker;
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
     @Deactivate
