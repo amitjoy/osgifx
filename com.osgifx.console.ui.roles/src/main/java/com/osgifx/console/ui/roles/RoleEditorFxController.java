@@ -30,6 +30,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -41,15 +42,18 @@ import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.model.validators.CustomValidator;
 import com.dlsc.formsfx.view.controls.SimpleCheckBoxControl;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.roles.helper.RolesConfigTextControl;
 import com.osgifx.console.ui.roles.helper.RolesHelper;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -63,27 +67,31 @@ public final class RoleEditorFxController {
 
     @Log
     @Inject
-    private FluentLogger logger;
+    private FluentLogger      logger;
     @Inject
-    private DataProvider dataProvider;
+    private DataProvider      dataProvider;
     @FXML
-    private BorderPane   rootPanel;
+    private BorderPane        rootPanel;
     @Inject
     @Optional
-    private Supervisor   supervisor;
+    private Supervisor        supervisor;
     @Inject
-    private EventBroker  eventBroker;
+    private EventBroker       eventBroker;
+    @Inject
+    private Executor          executor;
+    @Inject
+    private ThreadSynchronize threadSync;
     @FXML
-    private Button       cancelButton;
+    private Button            cancelButton;
     @FXML
-    private Button       saveRoleButton;
+    private Button            saveRoleButton;
     @FXML
-    private Button       deleteRoleButton;
+    private Button            deleteRoleButton;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean      isSnapshotAgent;
-    private Form         form;
-    private FormRenderer formRenderer;
+    private boolean           isSnapshotAgent;
+    private Form              form;
+    private FormRenderer      formRenderer;
 
     @FXML
     public void initialize() {
@@ -115,35 +123,73 @@ public final class RoleEditorFxController {
     }
 
     private void deleteRole(final String roleName) {
-        final var result = supervisor.getAgent().removeRole(roleName);
-        if (result.result == SUCCESS) {
-            logger.atInfo().log(result.response);
-            eventBroker.post(ROLE_DELETED_EVENT_TOPIC, roleName);
-            Fx.showSuccessNotification("Role Deletion", "Role has been deleted successfully");
-        } else if (result.result == SKIPPED) {
-            logger.atWarning().log(result.response);
-            FxDialog.showWarningDialog("Role Deletion", result.response, getClass().getClassLoader());
-        } else {
-            logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Role Deletion", result.response, getClass().getClassLoader());
-        }
+        final Task<XResultDTO> task = new Task<>() {
+            @Override
+            protected XResultDTO call() throws Exception {
+                updateMessage("Deleting role...");
+                return supervisor.getAgent().removeRole(roleName);
+            }
+        };
+
+        task.setOnSucceeded(_ -> {
+            final var result = task.getValue();
+            if (result.result == SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.post(ROLE_DELETED_EVENT_TOPIC, roleName);
+                Fx.showSuccessNotification("Role Deletion", "Role has been deleted successfully");
+            } else if (result.result == SKIPPED) {
+                logger.atWarning().log(result.response);
+                FxDialog.showWarningDialog("Role Deletion", result.response, getClass().getClassLoader());
+            } else {
+                logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Role Deletion", result.response, getClass().getClassLoader());
+            }
+        });
+
+        task.setOnFailed(_ -> {
+            final var ex = task.getException();
+            logger.atError().withException(ex).log("Failed to delete role");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var taskFuture = executor.runAsync(task);
+        FxDialog.showProgressDialog("Delete Role", task, getClass().getClassLoader(), () -> taskFuture.cancel(true));
     }
 
     private void updateRole(final XRoleDTO role) {
         final var newRole = initNewRole(role);
-        final var result  = supervisor.getAgent().updateRole(newRole);
 
-        if (result.result == SUCCESS) {
-            logger.atInfo().log(result.response);
-            eventBroker.post(ROLE_UPDATED_EVENT_TOPIC, role);
-            Fx.showSuccessNotification("Role Updation", "Role has been updated successfully");
-        } else if (result.result == SKIPPED) {
-            logger.atWarning().log(result.response);
-            FxDialog.showWarningDialog("Role Updation", result.response, getClass().getClassLoader());
-        } else {
-            logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Role Updation", result.response, getClass().getClassLoader());
-        }
+        final Task<XResultDTO> task = new Task<>() {
+            @Override
+            protected XResultDTO call() throws Exception {
+                updateMessage("Updating role...");
+                return supervisor.getAgent().updateRole(newRole);
+            }
+        };
+
+        task.setOnSucceeded(_ -> {
+            final var result = task.getValue();
+            if (result.result == SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.post(ROLE_UPDATED_EVENT_TOPIC, role);
+                Fx.showSuccessNotification("Role Updation", "Role has been updated successfully");
+            } else if (result.result == SKIPPED) {
+                logger.atWarning().log(result.response);
+                FxDialog.showWarningDialog("Role Updation", result.response, getClass().getClassLoader());
+            } else {
+                logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Role Updation", result.response, getClass().getClassLoader());
+            }
+        });
+
+        task.setOnFailed(_ -> {
+            final var ex = task.getException();
+            logger.atError().withException(ex).log("Failed to update role");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var taskFuture = executor.runAsync(task);
+        FxDialog.showProgressDialog("Update Role", task, getClass().getClassLoader(), () -> taskFuture.cancel(true));
     }
 
     private FormRenderer createForm(final XRoleDTO role) {

@@ -66,15 +66,19 @@ import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XComponentReferenceFilterDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.configurations.control.MultipleCardinalityTextControl;
 import com.osgifx.console.ui.configurations.control.PeekablePasswordControl;
 import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
 
+import org.eclipse.fx.core.ThreadSynchronize;
+
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -100,6 +104,10 @@ public final class ConfigurationEditorFxController {
     private Supervisor             supervisor;
     @Inject
     private EventBroker            eventBroker;
+    @Inject
+    private Executor               executor;
+    @Inject
+    private ThreadSynchronize      threadSync;
     @FXML
     private Button                 cancelButton;
     @FXML
@@ -319,44 +327,104 @@ public final class ConfigurationEditorFxController {
     }
 
     private void deleteConfiguration(final String pid) {
-        final var result = supervisor.getAgent().deleteConfiguration(pid);
-        if (result.result == XResultDTO.SUCCESS) {
-            logger.atInfo().log(result.response);
-            eventBroker.post(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
-        } else if (result.result == XResultDTO.SKIPPED) {
-            logger.atWarning().log(result.response);
-        } else {
-            logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Configuration Delete Error", result.response, getClass().getClassLoader());
-        }
+        final Task<XResultDTO> task = new Task<>() {
+            @Override
+            protected XResultDTO call() throws Exception {
+                updateMessage("Deleting configuration...");
+                return supervisor.getAgent().deleteConfiguration(pid);
+            }
+        };
+
+        task.setOnSucceeded(_ -> {
+            final var result = task.getValue();
+            if (result.result == XResultDTO.SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.post(CONFIGURATION_DELETED_EVENT_TOPIC, pid);
+            } else if (result.result == XResultDTO.SKIPPED) {
+                logger.atWarning().log(result.response);
+            } else {
+                logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Configuration Delete Error", result.response, getClass().getClassLoader());
+            }
+        });
+
+        task.setOnFailed(_ -> {
+            final var ex = task.getException();
+            logger.atError().withException(ex).log("Failed to delete configuration");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var taskFuture = executor.runAsync(task);
+        FxDialog.showProgressDialog("Delete Configuration", task, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
     private void createFactoryConfiguration(final String factoryPID, final List<ConfigValue> properties) {
-        final var result = supervisor.getAgent().createFactoryConfiguration(factoryPID, properties);
-        if (result.result == XResultDTO.SUCCESS) {
-            logger.atInfo().log(result.response);
-            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
-        } else if (result.result == XResultDTO.SKIPPED) {
-            logger.atWarning().log(result.response);
-        } else {
-            logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Factory Configuration Creation Error", result.response,
-                    getClass().getClassLoader());
-        }
+        final Task<XResultDTO> task = new Task<>() {
+            @Override
+            protected XResultDTO call() throws Exception {
+                updateMessage("Creating factory configuration...");
+                return supervisor.getAgent().createFactoryConfiguration(factoryPID, properties);
+            }
+        };
+
+        task.setOnSucceeded(_ -> {
+            final var result = task.getValue();
+            if (result.result == XResultDTO.SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, factoryPID);
+            } else if (result.result == XResultDTO.SKIPPED) {
+                logger.atWarning().log(result.response);
+            } else {
+                logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Factory Configuration Creation Error", result.response,
+                        getClass().getClassLoader());
+            }
+        });
+
+        task.setOnFailed(_ -> {
+            final var ex = task.getException();
+            logger.atError().withException(ex).log("Failed to create factory configuration");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var taskFuture = executor.runAsync(task);
+        FxDialog.showProgressDialog("Create Factory Configuration", task, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
     private void createOrUpdateConfiguration(final String pid, final List<ConfigValue> properties) {
-        final var result = supervisor.getAgent().createOrUpdateConfiguration(pid, properties);
-        if (result.result == XResultDTO.SUCCESS) {
-            logger.atInfo().log(result.response);
-            eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
-        } else if (result.result == XResultDTO.SKIPPED) {
-            logger.atWarning().log(result.response);
-        } else {
-            logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Configuration Creation/Updation Error", result.response,
-                    getClass().getClassLoader());
-        }
+        final Task<XResultDTO> task = new Task<>() {
+            @Override
+            protected XResultDTO call() throws Exception {
+                updateMessage("Saving configuration...");
+                return supervisor.getAgent().createOrUpdateConfiguration(pid, properties);
+            }
+        };
+
+        task.setOnSucceeded(_ -> {
+            final var result = task.getValue();
+            if (result.result == XResultDTO.SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.post(CONFIGURATION_UPDATED_EVENT_TOPIC, pid);
+            } else if (result.result == XResultDTO.SKIPPED) {
+                logger.atWarning().log(result.response);
+            } else {
+                logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Configuration Creation/Updation Error", result.response,
+                        getClass().getClassLoader());
+            }
+        });
+
+        task.setOnFailed(_ -> {
+            final var ex = task.getException();
+            logger.atError().withException(ex).log("Failed to create/update configuration");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var taskFuture = executor.runAsync(task);
+        FxDialog.showProgressDialog("Save Configuration", task, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
     private FormRenderer createForm(final XConfigurationDTO config) {
