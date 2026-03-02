@@ -52,6 +52,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
+import com.osgifx.console.agent.rpc.BoundedInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
 import com.osgifx.console.agent.rpc.RemoteRPC;
@@ -80,7 +81,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final FluentLogger  logger  = LoggerFactory.getFluentLogger(getClass());
 
     // Optimization: Shared Codec & Buffers
-    private static final BinaryCodec                     codec       = new BinaryCodec();
+    private final BinaryCodec                            codec;
+    private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer      = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
     private final ThreadLocal<FastByteArrayOutputStream> argBuffer   = ThreadLocal
@@ -107,6 +109,20 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         this.pubTopic      = pubTopic;
         this.subTopic      = subTopic;
         this.executor      = executor;
+        this.codec         = new BinaryCodec(bundleContext);
+
+        // Read max decompressed size from configuration
+        final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
+        final String sizeStr = bundleContext.getProperty("osgi.fx.agent.rpc.max.decompressed.size");
+        if (sizeStr != null) {
+            try {
+                this.maxDecompressedSize = Long.parseLong(sizeStr);
+            } catch (final NumberFormatException e) {
+                this.maxDecompressedSize = defaultMaxSize;
+            }
+        } else {
+            this.maxDecompressedSize = defaultMaxSize;
+        }
 
         // Initialize Trackers
         this.multiplexerTracker    = new ServiceTracker<>(bundleContext, MqttRequestMultiplexer.class, null);
@@ -320,7 +336,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
         InputStream source = new FastByteArrayInputStream(data);
         if (isGzip(data)) {
-            source = new GZIPInputStream(source);
+            source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
         }
 
         try (DataInputStream in = new DataInputStream(source)) {
@@ -347,7 +363,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
             InputStream source = new FastByteArrayInputStream(data);
             if (isGzip(data)) {
-                source = new GZIPInputStream(source);
+                source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
             }
 
             try (DataInputStream in = new DataInputStream(source)) {
