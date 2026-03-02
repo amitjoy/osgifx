@@ -21,13 +21,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.osgi.framework.BundleContext;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.RuntimeDTO;
+
+import aQute.lib.json.JSONCodec;
 
 /**
  * Admin class for creating runtime snapshots.
@@ -39,11 +37,9 @@ public final class XSnapshotAdmin {
     private static final FluentLogger logger = LoggerFactory.getFluentLogger(XSnapshotAdmin.class);
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 
-    private final BundleContext context;
     private final XDtoAdmin dtoAdmin;
 
-    public XSnapshotAdmin(final BundleContext context, final XDtoAdmin dtoAdmin) {
-        this.context = context;
+    public XSnapshotAdmin(final XDtoAdmin dtoAdmin) {
         this.dtoAdmin = dtoAdmin;
     }
 
@@ -77,15 +73,14 @@ public final class XSnapshotAdmin {
         }
 
         // Create runtime snapshot
-        final RuntimeDTO snapshot = dtoAdmin.getRuntime();
+        final RuntimeDTO snapshot = dtoAdmin.runtime();
 
-        // Serialize to JSON
-        final Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+        // Serialize to JSON using JSONCodec
+        final JSONCodec codec = new JSONCodec();
+        final String json = codec.enc().indent("  ").put(snapshot).toString();
 
         try (final FileWriter writer = new FileWriter(snapshotFile)) {
-            gson.toJson(snapshot, writer);
+            writer.write(json);
         }
 
         logger.atInfo().msg("Snapshot saved to: {}").arg(snapshotFile.getAbsolutePath()).log();

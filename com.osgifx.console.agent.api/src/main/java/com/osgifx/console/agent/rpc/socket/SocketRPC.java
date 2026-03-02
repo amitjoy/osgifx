@@ -128,11 +128,11 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                      final InputStream in,
                      final OutputStream out,
                      final ExecutorService executor) {
-        this(context, remoteClass, local, (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in),
+        this(context, remoteClass, local,
+             (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in),
              (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out), executor);
     }
 
-    @SuppressWarnings("unchecked")
     public SocketRPC(final Class<R> remoteClass,
                      final L local,
                      final DataInputStream in,
@@ -158,21 +158,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         this.codec       = new BinaryCodec(context);
 
         // Read max decompressed size from configuration
-        final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
-        if (context != null) {
-            final String sizeStr = context.getProperty("osgi.fx.agent.rpc.max.decompressed.size");
-            if (sizeStr != null) {
-                try {
-                    this.maxDecompressedSize = Long.parseLong(sizeStr);
-                } catch (final NumberFormatException e) {
-                    this.maxDecompressedSize = defaultMaxSize;
-                }
-            } else {
-                this.maxDecompressedSize = defaultMaxSize;
-            }
-        } else {
-            this.maxDecompressedSize = defaultMaxSize;
-        }
+        this.maxDecompressedSize = readMaxDecompressedSize(context);
 
         // Cache local methods
         for (Method m : this.local.getClass().getMethods()) {
@@ -480,5 +466,20 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             // Signal completion instead of notifyAll()
             result.latch.countDown();
         }
+    }
+
+    private static long readMaxDecompressedSize(final BundleContext context) {
+        final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
+        if (context != null) {
+            final String sizeStr = context.getProperty("osgi.fx.agent.rpc.max.decompressed.size");
+            if (sizeStr != null) {
+                try {
+                    return Long.parseLong(sizeStr);
+                } catch (final NumberFormatException e) {
+                    return defaultMaxSize;
+                }
+            }
+        }
+        return defaultMaxSize;
     }
 }

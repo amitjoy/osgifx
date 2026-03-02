@@ -395,4 +395,24 @@ public final class SnapshotAgent implements Agent {
         // nothing to do
     }
 
+    @Override
+    public long estimateHeapdumpSize() {
+        return 0L;
+    }
+
+    @Override
+    public String createHeapdumpLocally(final String outputPath) throws Exception {
+        return null;
+    }
+
+    @Override
+    public long estimateSnapshotSize() {
+        return 0L;
+    }
+
+    @Override
+    public String createSnapshotLocally(final String outputPath) throws Exception {
+        return null;
+    }
+
 }
