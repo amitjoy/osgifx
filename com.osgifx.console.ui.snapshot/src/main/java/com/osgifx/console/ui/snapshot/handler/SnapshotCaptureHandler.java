@@ -79,42 +79,65 @@ public final class SnapshotCaptureHandler {
             return;
         }
 
-        final long    estimatedSize       = agent.estimateSnapshotSize();
-        final long    estimatedCompressed = estimatedSize / 5;
-        final long    rpcLimit            = 200_000_000L;
-        final boolean rpcAvailable        = estimatedCompressed <= rpcLimit;
-        final boolean isMqttTransport     = supervisor.getConnectionType().equals("MQTT");
+        // Prepare snapshot statistics in background to avoid blocking UI
+        final Task<SnapshotStatistics> prepTask = new Task<>() {
+            @Override
+            protected SnapshotStatistics call() throws Exception {
+                updateMessage("Estimating snapshot size...");
+                final long    estimatedSize       = agent.estimateSnapshotSize();
+                final long    estimatedCompressed = estimatedSize / 5;
+                final long    rpcLimit            = 200_000_000L;
+                final boolean rpcAvailable        = estimatedCompressed <= rpcLimit;
+                final boolean isMqttTransport     = supervisor.getConnectionType().equals("MQTT");
 
-        final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
-        final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
+                final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
+                final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
 
-        final var bundleCount  = agent.getAllBundles().size();
-        final var serviceCount = agent.getAllServices().size();
+                updateMessage("Counting bundles and services...");
+                final var bundleCount  = agent.getAllBundles().size();
+                final var serviceCount = agent.getAllServices().size();
 
-        final var stats = new SnapshotStatistics(bundleCount, serviceCount, estimatedSize, estimatedCompressed,
-                                                 isMqttTransport, rpcAvailable, handler);
+                return new SnapshotStatistics(bundleCount, serviceCount, estimatedSize, estimatedCompressed,
+                                              isMqttTransport, rpcAvailable, handler);
+            }
+        };
 
-        final var dialog = new SnapshotOptionsDialog();
-        ContextInjectionFactory.inject(dialog, eclipseContext);
-        dialog.init(stats);
+        prepTask.setOnSucceeded(_ -> {
+            final var stats = prepTask.getValue();
 
-        final var optionResult = dialog.showAndWait();
-        if (optionResult.isEmpty()) {
-            return;
-        }
+            final var dialog = new SnapshotOptionsDialog();
+            ContextInjectionFactory.inject(dialog, eclipseContext);
+            dialog.init(stats);
 
-        final var option = optionResult.get();
-        switch (option) {
-            case USE_HANDLER:
-                snapshotWithHandler(handler);
-                break;
-            case USE_RPC:
-                snapshotWithRpc();
-                break;
-            case STORE_LOCALLY:
-                snapshotLocally();
-                break;
-        }
+            final var optionResult = dialog.showAndWait();
+            if (optionResult.isEmpty()) {
+                return;
+            }
+
+            final var option  = optionResult.get();
+            final var handler = stats.handler;
+            switch (option) {
+                case USE_HANDLER:
+                    snapshotWithHandler(handler);
+                    break;
+                case USE_RPC:
+                    snapshotWithRpc();
+                    break;
+                case STORE_LOCALLY:
+                    snapshotLocally();
+                    break;
+            }
+        });
+
+        prepTask.setOnFailed(_ -> {
+            final var ex = prepTask.getException();
+            logger.atError().withException(ex).log("Failed to prepare snapshot statistics");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var prepFuture = executor.runAsync(prepTask);
+        FxDialog.showProgressDialog("Preparing Snapshot", prepTask, getClass().getClassLoader(),
+                () -> prepFuture.cancel(true));
     }
 
     private void snapshotWithHandler(final LargePayloadHandler handler) {
@@ -244,7 +267,8 @@ public final class SnapshotCaptureHandler {
     private void snapshotLocally() {
         final var pathDialog = new SnapshotPathPromptDialog();
         ContextInjectionFactory.inject(pathDialog, eclipseContext);
-        final var timestamp  = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var timestamp   = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         final var defaultPath = "/tmp/snapshot-" + timestamp + ".json";
         pathDialog.init(defaultPath, "Specify File Path",
                 "Enter the full file path on the agent where the snapshot should be saved (including filename):");

@@ -337,38 +337,60 @@ public final class HeapMonitorPane extends BorderPane {
             return;
         }
 
-        final long    estimatedSize   = agent.estimateHeapdumpSize();
-        final long    rpcLimit        = 200_000_000L;
-        final boolean rpcAvailable    = estimatedSize <= rpcLimit;
-        final boolean isMqttTransport = supervisor.getConnectionType().equals("MQTT");
+        // Prepare heapdump statistics in background to avoid blocking UI
+        final Task<HeapdumpOptionsDialog.HeapdumpStatistics> prepTask = new Task<>() {
+            @Override
+            protected HeapdumpOptionsDialog.HeapdumpStatistics call() throws Exception {
+                updateMessage("Estimating heapdump size...");
+                final long    estimatedSize   = agent.estimateHeapdumpSize();
+                final long    rpcLimit        = 200_000_000L;
+                final boolean rpcAvailable    = estimatedSize <= rpcLimit;
+                final boolean isMqttTransport = supervisor.getConnectionType().equals("MQTT");
 
-        final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
-        final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
+                final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
+                final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
 
-        final var stats = new HeapdumpOptionsDialog.HeapdumpStatistics(estimatedSize * 5, estimatedSize,
-                                                                       isMqttTransport, rpcAvailable, handler);
+                return new HeapdumpOptionsDialog.HeapdumpStatistics(estimatedSize * 5, estimatedSize, isMqttTransport,
+                                                                    rpcAvailable, handler);
+            }
+        };
 
-        final var dialog = new HeapdumpOptionsDialog();
-        ContextInjectionFactory.inject(dialog, eclipseContext);
-        dialog.init(stats);
+        prepTask.setOnSucceeded(_ -> {
+            final var stats = prepTask.getValue();
 
-        final var optionResult = dialog.showAndWait();
-        if (optionResult.isEmpty()) {
-            return;
-        }
+            final var dialog = new HeapdumpOptionsDialog();
+            ContextInjectionFactory.inject(dialog, eclipseContext);
+            dialog.init(stats);
 
-        final var option = optionResult.get();
-        switch (option) {
-            case USE_HANDLER:
-                heapDumpWithHandler(handler);
-                break;
-            case USE_RPC:
-                heapDumpWithRpc();
-                break;
-            case STORE_LOCALLY:
-                heapDumpLocally();
-                break;
-        }
+            final var optionResult = dialog.showAndWait();
+            if (optionResult.isEmpty()) {
+                return;
+            }
+
+            final var option  = optionResult.get();
+            final var handler = stats.handler;
+            switch (option) {
+                case USE_HANDLER:
+                    heapDumpWithHandler(handler);
+                    break;
+                case USE_RPC:
+                    heapDumpWithRpc();
+                    break;
+                case STORE_LOCALLY:
+                    heapDumpLocally();
+                    break;
+            }
+        });
+
+        prepTask.setOnFailed(_ -> {
+            final var ex = prepTask.getException();
+            logger.atError().withException(ex).log("Failed to prepare heapdump statistics");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var prepFuture = executor.runAsync(prepTask);
+        FxDialog.showProgressDialog("Preparing Heapdump", prepTask, getClass().getClassLoader(),
+                () -> prepFuture.cancel(true));
     }
 
     private void heapDumpWithHandler(final LargePayloadHandler handler) {
@@ -466,7 +488,8 @@ public final class HeapMonitorPane extends BorderPane {
     private void heapDumpLocally() {
         final var pathDialog = new HeapdumpPathPromptDialog();
         ContextInjectionFactory.inject(pathDialog, eclipseContext);
-        final var timestamp  = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var timestamp   = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         final var defaultPath = "/tmp/heapdump-" + timestamp + ".hprof.gz";
         pathDialog.init(defaultPath, "Specify File Path",
                 "Enter the full file path on the agent where the heapdump should be saved (including filename):");
