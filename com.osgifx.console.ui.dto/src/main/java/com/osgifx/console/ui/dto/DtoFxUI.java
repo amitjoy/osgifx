@@ -68,8 +68,7 @@ public final class DtoFxUI {
 
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
-        createControls(parent);
-        statusBar.enableRpcProgressTracking();
+        createControls();
         logger.atDebug().log("DTO part has been initialized");
     }
 
@@ -84,6 +83,7 @@ public final class DtoFxUI {
     @Optional
     private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls();
     }
 
@@ -125,6 +125,7 @@ public final class DtoFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
+            statusBar.enableRpcProgressTracking();
             final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);

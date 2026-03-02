@@ -70,17 +70,14 @@ public final class EventsFxUI {
     private IEclipseContext   eclipseContext;
 
     @PostConstruct
-    public void postConstruct(final BorderPane parent) {
-        createControls(parent);
-        statusBar.enableRpcProgressTracking();
+    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
+        createControls(parent, loader);
         logger.atDebug().log("Events part has been initialized");
     }
 
     @Inject
     @Optional
     private void updateOnEventReceiveStarted(@UIEventTopic(EVENT_RECEIVE_STARTED_EVENT_TOPIC) final String data,
-                                             final BorderPane parent) {
-        createControls(parent);
                                              final BorderPane parent,
                                              @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
@@ -109,6 +106,7 @@ public final class EventsFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls(parent, loader);
     }
 
@@ -142,6 +140,7 @@ public final class EventsFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
+            statusBar.enableRpcProgressTracking();
             final var node = Fx.initStatusBarButton(this::showSubscribedEventTopicsDialog, "Subscribed Event Topics",
                     "GEAR");
             if (!isSnapshotAgent) {
