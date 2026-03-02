@@ -22,21 +22,51 @@ import java.lang.reflect.Method;
  * Dynamic proxy that wraps Agent interface calls to automatically track RPC progress.
  * This enables transparent progress tracking without modifying controller code.
  *
- * <p><b>Usage Example:</b>
+ * <p>
+ * <b>Usage Example:</b>
+ * 
  * <pre>
  * Agent realAgent = supervisor.getAgent();
- * Agent trackedAgent = (Agent) Proxy.newProxyInstance(
- *     Agent.class.getClassLoader(),
- *     new Class&lt;?&gt;[] { Agent.class },
- *     new RpcTrackingProxy(realAgent, tracker)
- * );
+ * Agent trackedAgent = (Agent) Proxy.newProxyInstance(Agent.class.getClassLoader(), new Class&lt;?&gt;[] { Agent.class },
+ *         new RpcTrackingProxy(realAgent, tracker));
+ * </pre>
+ *
+ * <p>
+ * <b>Test Delay Configuration:</b>
+ * Set the framework property {@code osgifx.rpc.test.delay} to add an artificial delay
+ * (in milliseconds) to all RPC calls. This is useful for testing UI behavior with slow
+ * network connections or remote agents.
+ * 
+ * <pre>
+ * -Dosgifx.rpc.test.delay=2000  // 2 second delay for all RPC calls
  * </pre>
  *
  * @since 11.0
  */
 public class RpcTrackingProxy implements InvocationHandler {
 
-    private final Object target;
+    private static final String TEST_DELAY_PROPERTY = "osgifx.rpc.test.delay";
+    private static final long   testDelay;
+
+    static {
+        // Read test delay from framework property once at class load
+        long delay = 0;
+        try {
+            final String delayStr = System.getProperty(TEST_DELAY_PROPERTY);
+            if (delayStr != null && !delayStr.trim().isEmpty()) {
+                delay = Long.parseLong(delayStr.trim());
+                if (delay < 0) {
+                    delay = 0;
+                }
+            }
+        } catch (NumberFormatException e) {
+            // Invalid value, use 0
+            delay = 0;
+        }
+        testDelay = delay;
+    }
+
+    private final Object             target;
     private final RpcProgressTracker tracker;
 
     /**
@@ -46,7 +76,7 @@ public class RpcTrackingProxy implements InvocationHandler {
      * @param tracker the progress tracker to report to
      */
     public RpcTrackingProxy(Object target, RpcProgressTracker tracker) {
-        this.target = target;
+        this.target  = target;
         this.tracker = tracker;
     }
 
@@ -58,11 +88,16 @@ public class RpcTrackingProxy implements InvocationHandler {
         }
 
         final String methodName = method.getName();
-        final String trackerId = tracker.startRpc(methodName, "Executing " + methodName + "()");
+        final String trackerId  = tracker.startRpc(methodName, methodName);
 
         try {
             // Set indeterminate progress
             tracker.updateProgress(trackerId, -1.0);
+
+            // Apply test delay if configured
+            if (testDelay > 0) {
+                Thread.sleep(testDelay);
+            }
 
             // Execute the actual RPC call
             Object result = method.invoke(target, args);
