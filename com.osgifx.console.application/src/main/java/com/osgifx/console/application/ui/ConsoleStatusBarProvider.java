@@ -35,6 +35,7 @@ import com.osgifx.console.api.RpcProgressTracker;
 import com.osgifx.console.ui.ConsoleStatusBar;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -44,12 +45,11 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.VBox;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.VBox;
 
 public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
 
@@ -116,28 +116,38 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
     @Override
     public void clearAllInRight() {
         statusBar.getRightItems().clear();
+        // Reset RPC button reference since it was removed
+        rpcProgressButton = null;
+        if (rpcProgressPopover != null && rpcProgressPopover.isShowing()) {
+            rpcProgressPopover.hide();
+        }
+        rpcProgressPopover = null;
     }
 
     @Override
     public void enableRpcProgressTracking() {
-        if (rpcProgressTracker == null || rpcProgressButton != null) {
-            return; // Already enabled or tracker not available
+        if (rpcProgressTracker == null) {
+            return; // Tracker not available
+        }
+        
+        // Check if button is already added to this status bar instance
+        if (rpcProgressButton != null && statusBar.getRightItems().contains(rpcProgressButton)) {
+            return; // Already enabled in this status bar
         }
 
-        // Create RPC progress button
-        final var glyph = new Glyph("FontAwesome", FontAwesome.Glyph.SPINNER);
+        // Create RPC progress button (always visible)
+        final var glyph = new Glyph("FontAwesome", FontAwesome.Glyph.TASKS);
         glyph.useGradientEffect();
         glyph.useHoverEffect();
 
         rpcProgressButton = new Button("", glyph);
         rpcProgressButton
                 .setBackground(new Background(new BackgroundFill(TRANSPARENT, new CornerRadii(2), new Insets(4))));
-        rpcProgressButton.setVisible(false); // Hidden by default
+        rpcProgressButton.setTooltip(new javafx.scene.control.Tooltip("RPC Progress"));
 
-        // Show/hide button based on active RPC count
+        // Update button style based on active RPC count
         rpcProgressTracker.activeRpcCountProperty().addListener((_, _, newVal) -> {
-            rpcProgressButton.setVisible(newVal.intValue() > 0);
-            if (newVal.intValue() == 0 && rpcProgressPopover != null) {
+            if (newVal.intValue() == 0 && rpcProgressPopover != null && rpcProgressPopover.isShowing()) {
                 rpcProgressPopover.hide();
             }
         });
@@ -161,6 +171,25 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         // Add to status bar (right side)
         statusBar.getRightItems().add(new Separator(VERTICAL));
         statusBar.getRightItems().add(rpcProgressButton);
+    }
+
+    @Override
+    public void disableRpcProgressTracking() {
+        if (rpcProgressButton != null) {
+            statusBar.getRightItems().remove(rpcProgressButton);
+            // Also remove the separator before the button if it exists
+            if (!statusBar.getRightItems().isEmpty()) {
+                final Node lastItem = statusBar.getRightItems().get(statusBar.getRightItems().size() - 1);
+                if (lastItem instanceof Separator) {
+                    statusBar.getRightItems().remove(lastItem);
+                }
+            }
+            rpcProgressButton = null;
+            if (rpcProgressPopover != null && rpcProgressPopover.isShowing()) {
+                rpcProgressPopover.hide();
+            }
+            rpcProgressPopover = null;
+        }
     }
 
     @Override

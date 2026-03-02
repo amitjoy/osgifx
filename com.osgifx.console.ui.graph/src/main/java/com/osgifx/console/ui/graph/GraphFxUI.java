@@ -87,8 +87,7 @@ public final class GraphFxUI {
 
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
-        createControls(parent);
-        statusBar.enableRpcProgressTracking();
+        createControls();
         logger.atDebug().log("Graph part has been initialized");
     }
 
@@ -111,6 +110,7 @@ public final class GraphFxUI {
     @Optional
     private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls();
     }
 
@@ -159,6 +159,7 @@ public final class GraphFxUI {
 
     private void initStatusBar() {
         if (isConnected) {
+            statusBar.enableRpcProgressTracking();
             final var node = Fx.initStatusBarButton(() -> loadedController.updateModel(), "Refresh", "REFRESH");
             statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
