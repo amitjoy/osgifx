@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -51,6 +52,8 @@ public final class LeaksFxController {
     private boolean                          isConnected;
     @Inject
     private DataProvider                     dataProvider;
+    @Inject
+    private ThreadSynchronize                threadSync;
 
     @FXML
     public void initialize() {
@@ -73,10 +76,12 @@ public final class LeaksFxController {
         versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
-        table.setItems(dataProvider.leaks());
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(bsnColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(dataProvider.leaks());
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(bsnColumn);
+            table.sort();
+        });
     }
 
 }
