@@ -47,6 +47,7 @@ import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.messaging.MessageSubscription;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -59,6 +60,7 @@ import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
+import com.osgifx.console.agent.spi.LargePayloadHandler;
 import com.osgifx.console.api.RpcProgressTracker;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
@@ -111,10 +113,10 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
 
     @Activate
     void activate(final BundleContext context) {
-        this.context = context;
-        this.bundleContext = context;
+        this.context            = context;
+        this.bundleContext      = context;
         this.rpcProgressTracker = tracker;
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+        logger                  = FluentLogger.of(factory.createLogger(getClass().getName()));
     }
 
     @Deactivate
@@ -366,6 +368,24 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     private void sendEvent(final String topic) {
         final var event = new Event(topic, Map.of());
         eventAdmin.postEvent(event);
+    }
+
+    @Override
+    public String getConnectionType() {
+        return getType() == RpcType.MQTT_RPC ? "MQTT" : "Socket";
+    }
+
+    @Override
+    public ServiceTracker<LargePayloadHandler, LargePayloadHandler> getLargePayloadHandlerTracker() {
+        try {
+            final ServiceTracker<LargePayloadHandler, LargePayloadHandler> payloadHandlerTracker = //
+                    new ServiceTracker<>(context, LargePayloadHandler.class, null);
+            payloadHandlerTracker.open();
+            return payloadHandlerTracker;
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("Cannot create LargePayloadHandler tracker");
+            return null;
+        }
     }
 
 }

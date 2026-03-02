@@ -13,54 +13,58 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.application.dialog;
+package com.osgifx.console.ui.snapshot;
 
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
 import static javafx.scene.control.ButtonType.CANCEL;
 
-import org.controlsfx.control.textfield.CustomPasswordField;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.LoginDialog;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 
-public final class PasswordPromptDialog extends Dialog<String> {
+public final class SnapshotPathPromptDialog extends Dialog<String> {
 
-    public void init() {
+    public void init(final String defaultPath, final String title, final String description) {
         final var dialogPane = getDialogPane();
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.setHeaderText("Password Required");
-        dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
+        dialogPane.setHeaderText(title);
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/password.png").toString()));
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/snapshot.png").toString()));
         dialogPane.getButtonTypes().addAll(CANCEL);
 
-        final var password = (CustomPasswordField) TextFields.createClearablePasswordField();
-        password.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
-        password.setPromptText("Enter Password");
+        final var pathField = (CustomTextField) TextFields.createClearableTextField();
+        pathField.setPromptText("Enter full file path on agent (e.g., /tmp/snapshot-2024.json)");
+        pathField.setText(defaultPath);
+        pathField.setPrefWidth(500);
+
+        final var descLabel = new Label(description);
+        descLabel.setWrapText(true);
+        descLabel.setStyle("-fx-text-fill: #6b7280;");
 
         final var content = new VBox(10);
-        content.getChildren().add(password);
+        content.getChildren().addAll(descLabel, pathField);
 
         dialogPane.setContent(content);
 
-        final var connectButtonType = new ButtonType("Connect", ButtonData.OK_DONE);
-        dialogPane.getButtonTypes().addAll(connectButtonType);
+        final var okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(okButtonType);
 
-        final var connectButton = (Button) dialogPane.lookupButton(connectButtonType);
-        connectButton.disableProperty().bind(password.textProperty().isEmpty());
+        final var okButton = (Button) dialogPane.lookupButton(okButtonType);
+        okButton.disableProperty().bind(pathField.textProperty().isEmpty());
 
         setResultConverter(dialogButton -> {
             if (dialogButton == CANCEL) {
                 return null;
             }
-            return password.getText();
+            return pathField.getText();
         });
     }
 

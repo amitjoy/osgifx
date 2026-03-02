@@ -21,5 +21,6 @@
  *
  * @since 11.0
  */
+@org.osgi.annotation.bundle.Export
 @org.osgi.annotation.versioning.Version("1.0.0")
 package com.osgifx.console.agent.spi;

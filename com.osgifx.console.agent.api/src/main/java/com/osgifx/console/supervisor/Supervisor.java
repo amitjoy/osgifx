@@ -19,12 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.osgi.annotation.versioning.ProviderType;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
+import com.osgifx.console.agent.spi.LargePayloadHandler;
 
 /**
  * A Supervisor handles the initiating side of a session with a remote agent.
@@ -164,4 +166,20 @@ public interface Supervisor {
      * @return the agent
      */
     Agent getAgent();
+
+    /**
+     * Returns the connection type as a string ("MQTT" or "Socket")
+     *
+     * @return the connection type
+     * @since 11.0
+     */
+    String getConnectionType();
+
+    /**
+     * Returns the service tracker for LargePayloadHandler services
+     *
+     * @return the service tracker, or null if not available
+     * @since 11.0
+     */
+    ServiceTracker<LargePayloadHandler, LargePayloadHandler> getLargePayloadHandlerTracker();
 }

@@ -28,10 +28,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
+import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
+import com.osgifx.console.agent.spi.LargePayloadHandler;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;
 import com.osgifx.console.supervisor.MqttConnection;
@@ -128,6 +130,16 @@ public final class SnapshotSupervisor implements Supervisor {
     @Override
     public Agent getAgent() {
         return agent;
+    }
+
+    @Override
+    public String getConnectionType() {
+        return "Snapshot";
+    }
+
+    @Override
+    public ServiceTracker<LargePayloadHandler, LargePayloadHandler> getLargePayloadHandlerTracker() {
+        return null;
     }
 
 }
