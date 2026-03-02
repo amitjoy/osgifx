@@ -129,7 +129,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         if (rpcProgressTracker == null) {
             return; // Tracker not available
         }
-        
+
         // Check if button is already added to this status bar instance
         if (rpcProgressButton != null && statusBar.getRightItems().contains(rpcProgressButton)) {
             return; // Already enabled in this status bar

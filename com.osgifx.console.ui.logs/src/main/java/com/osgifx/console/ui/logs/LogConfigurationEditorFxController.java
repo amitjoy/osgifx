@@ -114,9 +114,9 @@ public final class LogConfigurationEditorFxController {
     private void saveLogConfig() {
         final var name      = loggerContext.name;
         final var logLevels = getLogLevels();
-        
+
         logger.atInfo().log("String log configuration for context '%s'", name);
-        
+
         final Task<com.osgifx.console.agent.dto.XResultDTO> task = new Task<>() {
             @Override
             protected com.osgifx.console.agent.dto.XResultDTO call() throws Exception {
