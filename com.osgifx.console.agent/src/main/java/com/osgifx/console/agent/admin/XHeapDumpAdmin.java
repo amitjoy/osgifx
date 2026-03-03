@@ -27,8 +27,11 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.management.MBeanServer;
 
+import org.osgi.framework.BundleContext;
+
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
+import com.osgifx.console.agent.helper.AgentHelper;
 
 /**
  * Admin class for creating heap dumps.
@@ -40,6 +43,12 @@ public final class XHeapDumpAdmin {
     private static final FluentLogger      logger           = LoggerFactory.getFluentLogger(XHeapDumpAdmin.class);
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 
+    private final BundleContext context;
+
+    public XHeapDumpAdmin(final BundleContext context) {
+        this.context = context;
+    }
+
     /**
      * Creates a heap dump and saves it to the specified path.
      * The heap dump is compressed with GZIP.
@@ -48,7 +57,8 @@ public final class XHeapDumpAdmin {
      * @return the absolute path to the created heap dump file
      * @throws Exception if the heap dump creation fails
      */
-    public String createHeapdump(final String outputPath) throws Exception {
+    public String createHeapdump(String outputPath) throws Exception {
+        outputPath = AgentHelper.substituteVariables(outputPath, context);
         logger.atInfo().msg("Starting heapdump creation with outputPath: {}").arg(outputPath).log();
 
         final File outputFile = new File(outputPath);
