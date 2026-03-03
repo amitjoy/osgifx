@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -60,6 +61,8 @@ public final class ThreadsFxController {
     private boolean                         isConnected;
     @Inject
     private DataProvider                    dataProvider;
+    @Inject
+    private ThreadSynchronize               threadSync;
 
     @FXML
     public void initialize() {
@@ -90,10 +93,12 @@ public final class ThreadsFxController {
         isDeadlockedColumn.setCellValueFactory(new DTOCellValueFactory<>("isDeadlocked", String.class));
         Fx.addCellFactory(isDeadlockedColumn, b -> b.isDeadlocked, Color.RED, Color.BLACK);
 
-        table.setItems(dataProvider.threads());
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(nameColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(dataProvider.threads());
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(nameColumn);
+            table.sort();
+        });
     }
 
 }

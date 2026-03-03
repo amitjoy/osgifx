@@ -192,15 +192,17 @@ public final class GraphFxBundleController implements GraphController {
     }
 
     private void initBundlesList() {
-        bundlesList.getSelectionModel().setSelectionMode(MULTIPLE);
-        bundlesList.setCellFactory(CheckBoxListCell.forListView(BundleItem::selectedProperty));
-
         final var bundles = dataProvider.bundles();
-        masterBundleList = FXCollections.observableArrayList(bundles.stream().map(BundleItem::new).toList());
+        if (masterBundleList == null) {
+            masterBundleList = FXCollections.observableArrayList(bundles.stream().map(BundleItem::new).toList());
+            bundlesList.getSelectionModel().setSelectionMode(MULTIPLE);
+            bundlesList.setCellFactory(CheckBoxListCell.forListView(BundleItem::selectedProperty));
 
-        final var filteredBundlesList = initSearchFilter(masterBundleList);
-
-        bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.getBundle().symbolicName)));
+            final var filteredBundlesList = initSearchFilter(masterBundleList);
+            bundlesList.setItems(filteredBundlesList.sorted(Comparator.comparing(b -> b.getBundle().symbolicName)));
+        } else {
+            masterBundleList.setAll(bundles.stream().map(BundleItem::new).toList());
+        }
         logger.atInfo().log("Bundles list has been initialized");
     }
 

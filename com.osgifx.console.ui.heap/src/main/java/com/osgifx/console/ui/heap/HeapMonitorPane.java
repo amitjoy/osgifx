@@ -28,6 +28,8 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.dialog.ProgressDialog;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -39,6 +41,9 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
+import com.osgifx.console.agent.spi.LargePayloadHandler;
+import com.osgifx.console.agent.spi.PayloadMetadata;
+import com.osgifx.console.agent.spi.PayloadType;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
@@ -108,6 +113,8 @@ public final class HeapMonitorPane extends BorderPane {
     @Inject
     @Named("is_snapshot_agent")
     private boolean           isSnapshotAgent;
+    @Inject
+    private IEclipseContext   eclipseContext;
     private ProgressDialog    progressDialog;
 
     @PostConstruct
@@ -325,6 +332,111 @@ public final class HeapMonitorPane extends BorderPane {
         if (!isConnected) {
             return;
         }
+        final var agent = supervisor.getAgent();
+        if (agent == null) {
+            return;
+        }
+
+        // Prepare heapdump statistics in background to avoid blocking UI
+        final Task<HeapdumpOptionsDialog.HeapdumpStatistics> prepTask = new Task<>() {
+            @Override
+            protected HeapdumpOptionsDialog.HeapdumpStatistics call() throws Exception {
+                updateMessage("Estimating heapdump size...");
+                final long    estimatedSize   = agent.estimateHeapdumpSize();
+                final long    rpcLimit        = 200_000_000L;
+                final boolean rpcAvailable    = estimatedSize <= rpcLimit;
+                final boolean isMqttTransport = supervisor.getConnectionType().equals("MQTT");
+
+                final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
+                final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
+
+                return new HeapdumpOptionsDialog.HeapdumpStatistics(estimatedSize * 5, estimatedSize, isMqttTransport,
+                                                                    rpcAvailable, handler);
+            }
+        };
+
+        prepTask.setOnSucceeded(_ -> {
+            final var stats = prepTask.getValue();
+
+            final var dialog = new HeapdumpOptionsDialog();
+            ContextInjectionFactory.inject(dialog, eclipseContext);
+            dialog.init(stats);
+
+            final var optionResult = dialog.showAndWait();
+            if (optionResult.isEmpty()) {
+                return;
+            }
+
+            final var option  = optionResult.get();
+            final var handler = stats.handler;
+            switch (option) {
+                case USE_HANDLER:
+                    heapDumpWithHandler(handler);
+                    break;
+                case USE_RPC:
+                    heapDumpWithRpc();
+                    break;
+                case STORE_LOCALLY:
+                    heapDumpLocally();
+                    break;
+            }
+        });
+
+        prepTask.setOnFailed(_ -> {
+            final var ex = prepTask.getException();
+            logger.atError().withException(ex).log("Failed to prepare heapdump statistics");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var prepFuture = executor.runAsync(prepTask);
+        FxDialog.showProgressDialog("Preparing Heapdump", prepTask, getClass().getClassLoader(),
+                () -> prepFuture.cancel(true));
+    }
+
+    private void heapDumpWithHandler(final LargePayloadHandler handler) {
+        final var agent = supervisor.getAgent();
+
+        final Task<String> heapdumpTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                try {
+                    updateMessage("Stage 1/3: Generating heap dump file");
+                    final var localPath = agent.createHeapdumpLocally("/tmp/heapdumps");
+
+                    updateMessage("Stage 2/3: Uploading via handler");
+                    final var metadata = new PayloadMetadata(new File(localPath).getName(),
+                                                             new File(localPath).length(), "application/x-hprof-gzip",
+                                                             PayloadType.HEAPDUMP, System.currentTimeMillis());
+                    final var result   = handler.handle(localPath, metadata);
+
+                    updateMessage("Stage 3/3: Finalizing");
+                    if (!result.success) {
+                        throw new Exception("Handler failed: " + result.errorMessage);
+                    }
+                    return result.location;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot capture heapdump with handler");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+
+        heapdumpTask.valueProperty().addListener((ChangeListener<String>) (_, _, location) -> {
+            if (location != null) {
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Successfully Uploaded", location));
+            }
+        });
+
+        final var taskFuture = executor.runAsync(heapdumpTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Heapdump", heapdumpTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
+    }
+
+    private void heapDumpWithRpc() {
         final var directoryChooser = new DirectoryChooser();
         final var location         = directoryChooser.showDialog(null);
         if (location == null) {
@@ -333,12 +445,16 @@ public final class HeapMonitorPane extends BorderPane {
         final var agent = supervisor.getAgent();
 
         final Task<byte[]> heapdumpTask = new Task<>() {
-
             @Override
             protected byte[] call() throws Exception {
                 try {
-                    updateMessage("Capturing heapdump");
-                    return agent.heapdump();
+                    updateMessage("Stage 1/3: Generating heap dump file");
+                    Thread.sleep(100);
+                    updateMessage("Stage 2/3: Compressing heap dump (this may take 30 seconds)");
+                    Thread.sleep(100);
+                    final var data = agent.heapdump();
+                    updateMessage("Stage 3/3: Transferring heap dump");
+                    return data;
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot capture heapdump");
                     threadSync.asyncExec(() -> {
@@ -349,22 +465,76 @@ public final class HeapMonitorPane extends BorderPane {
                 }
             }
         };
+
         heapdumpTask.valueProperty().addListener((ChangeListener<byte[]>) (_, _, newValue) -> {
             if (newValue != null) {
                 threadSync.asyncExec(() -> {
                     try {
                         final var heapdumpFile = new File(location, IO.prepareFilenameFor("hprof"));
                         FileUtils.writeByteArrayToFile(heapdumpFile, newValue);
-                        threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Successfully Captured",
-                                heapdumpFile.getAbsolutePath()));
+                        Fx.showSuccessNotification("Heapdump Successfully Captured", heapdumpFile.getAbsolutePath());
                     } catch (final IOException e) {
                         FxDialog.showExceptionDialog(e, getClass().getClassLoader());
                     }
                 });
             }
         });
+
         final var taskFuture = executor.runAsync(heapdumpTask);
-        progressDialog = FxDialog.showProgressDialog("Capture Snapshpt", heapdumpTask, getClass().getClassLoader(),
+        progressDialog = FxDialog.showProgressDialog("Capture Heapdump", heapdumpTask, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
+    }
+
+    private void heapDumpLocally() {
+        final var pathDialog = new HeapdumpPathPromptDialog();
+        ContextInjectionFactory.inject(pathDialog, eclipseContext);
+        final var timestamp   = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var defaultPath = "{java.io.tmpdir}/heapdump-" + timestamp + ".hprof.gz";
+        pathDialog.init(defaultPath, "Specify File Path",
+                "Enter the full file path on the agent where the heapdump should be saved (including filename).\n"
+                        + "System/Framework properties (e.g., {java.io.tmpdir}) and environment variables (e.g., {env:TEMP}) can be used:");
+
+        final var pathResult = pathDialog.showAndWait();
+        if (pathResult.isEmpty()) {
+            return;
+        }
+
+        final var directoryPath = pathResult.get();
+        final var agent         = supervisor.getAgent();
+
+        final Task<String> heapdumpTask = new Task<>() {
+
+            @Override
+            protected String call() throws Exception {
+                try {
+                    updateMessage("Stage 1/3: Generating heap dump file");
+                    Thread.sleep(100);
+                    updateMessage("Stage 2/3: Compressing heap dump (this may take 30 seconds)");
+                    Thread.sleep(100);
+                    final var localPath = agent.createHeapdumpLocally(directoryPath);
+                    updateMessage("Stage 3/3: Finalizing");
+                    return localPath;
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Cannot create local heapdump");
+                    threadSync.asyncExec(() -> {
+                        progressDialog.close();
+                        FxDialog.showExceptionDialog(e, getClass().getClassLoader());
+                    });
+                    throw e;
+                }
+            }
+        };
+
+        heapdumpTask.valueProperty().addListener((ChangeListener<String>) (_, _, localPath) -> {
+            if (localPath != null) {
+                threadSync.asyncExec(() -> Fx.showSuccessNotification("Heapdump Saved Locally",
+                        "File saved at: " + localPath + "\nRetrieve via SFTP/SCP"));
+            }
+        });
+
+        final var taskFuture = executor.runAsync(heapdumpTask);
+        progressDialog = FxDialog.showProgressDialog("Capture Heapdump", heapdumpTask, getClass().getClassLoader(),
                 () -> taskFuture.cancel(true));
     }
 

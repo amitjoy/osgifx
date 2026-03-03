@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -49,6 +50,8 @@ public final class PropertiesFxController {
     private boolean                           isConnected;
     @Inject
     private DataProvider                      dataProvider;
+    @Inject
+    private ThreadSynchronize                 threadSync;
 
     @FXML
     public void initialize() {
@@ -70,10 +73,12 @@ public final class PropertiesFxController {
         propertyValue.setCellValueFactory(new DTOCellValueFactory<>("value", String.class));
         propertyType.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
-        propertyTable.setItems(dataProvider.properties());
-        TableFilter.forTableView(propertyTable).lazy(true).apply();
-        propertyTable.getSortOrder().add(propertyName);
-        propertyTable.sort();
+        threadSync.asyncExec(() -> {
+            propertyTable.setItems(dataProvider.properties());
+            TableFilter.forTableView(propertyTable).lazy(true).apply();
+            propertyTable.getSortOrder().add(propertyName);
+            propertyTable.sort();
+        });
     }
 
 }

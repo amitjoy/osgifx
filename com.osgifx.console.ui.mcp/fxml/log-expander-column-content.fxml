@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright 2021-2026 Amit Kumar Mondal
+  
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane hgap="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.mcp.LogDetailsFxController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="20.0" />
+    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="80.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+    <RowConstraints minHeight="200.0" vgrow="ALWAYS" />
+  </rowConstraints>
+   <children>
+      <Label style="-fx-font-weight: bold;" text="Timestamp" GridPane.halignment="RIGHT" />
+      <Label fx:id="timestampLabel" text="Label" GridPane.columnIndex="1" />
+      
+      <Label style="-fx-font-weight: bold;" text="Type" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+      <Label fx:id="typeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      
+      <Label style="-fx-font-weight: bold;" text="Content" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+      <TextArea fx:id="contentTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</GridPane>

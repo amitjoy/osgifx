@@ -21,73 +21,54 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import org.controlsfx.control.ToggleSwitch?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.CheckBox?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<GridPane fx:id="installBundleDialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="350.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.bundles.dialog.BundleInstallDialogController">
-  <columnConstraints>
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="228.0" minWidth="10.0" prefWidth="206.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="144.0" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="38.0" vgrow="SOMETIMES" />
-      <RowConstraints maxHeight="47.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
-    <RowConstraints maxHeight="45.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
-  </rowConstraints>
+<VBox fx:id="installBundleDialogPane" prefWidth="480.0" spacing="15.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.bundles.dialog.BundleInstallDialogController">
    <children>
-      <Label text="Select a JAR" GridPane.halignment="LEFT">
-         <GridPane.margin>
-            <Insets left="78.0" right="20.0" />
-         </GridPane.margin>
-      </Label>
-      <Label text="Start Bundle" GridPane.halignment="LEFT" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="78.0" right="20.0" />
-         </GridPane.margin>
-      </Label>
-      <ToggleSwitch fx:id="startBundleToggle" GridPane.columnIndex="1" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="-10.0" />
-         </GridPane.margin>
-      </ToggleSwitch>
-      <Button fx:id="fileChooser" mnemonicParsing="false" onAction="#chooseBundle" prefHeight="28.0" prefWidth="78.0" text="Choose" GridPane.columnIndex="1">
-         <GridPane.margin>
-            <Insets left="10.0" right="20.0" />
-         </GridPane.margin>
-      </Button>
-      <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;">
-         <GridPane.margin>
-            <Insets left="41.0" />
-         </GridPane.margin>
-         <graphic>
-        	<Glyph fontFamily="FontAwesome" icon="CUBE" />
-    	</graphic>
-      </Button>
-      <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;" GridPane.rowIndex="2">
-         <GridPane.margin>
-            <Insets left="41.0" />
-         </GridPane.margin>
-         <graphic>
-        	<Glyph fontFamily="FontAwesome" icon="PLAY" />
-    	</graphic>
-      </Button>
-      <Label text="Start Level" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="78.0" right="20.0" />
-         </GridPane.margin>
-      </Label>
-      <TextField fx:id="startLevel" maxWidth="72.0" prefHeight="27.0" prefWidth="64.0" text="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <GridPane.margin>
-            <Insets left="10.0" />
-         </GridPane.margin>
-      </TextField>
-      <Button mnemonicParsing="false" style="-fx-border-color: transparent; -fx-border-width: 0; -fx-background-radius: 0; -fx-background-color: transparent;" GridPane.rowIndex="1">
-         <graphic>
-            <Glyph fontFamily="FontAwesome" icon="SORT_NUMERIC_ASC" />
-         </graphic>
-         <GridPane.margin>
-            <Insets left="41.0" />
-         </GridPane.margin>
-      </Button>
+      <Label alignment="TOP_LEFT" prefWidth="440.0" style="-fx-text-fill: #4a4b4e;" text="Select a bundle to install. If the bundle already exists in the remote runtime, it will be updated." wrapText="true" />
+      
+      <GridPane hgap="10.0" vgap="15.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="120.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Glyph fontFamily="FontAwesome" icon="CUBE" style="-fx-text-fill: #272828;" />
+                  <Label text="Select a JAR" />
+               </children>
+            </HBox>
+            <Button fx:id="fileChooser" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseBundle" prefHeight="30.0" style="-fx-background-radius: 4; -fx-cursor: hand;" text="Choose..." GridPane.columnIndex="1" />
+            
+            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.rowIndex="1">
+               <children>
+                  <Glyph fontFamily="FontAwesome" icon="SORT_NUMERIC_ASC" style="-fx-text-fill: #272828;" />
+                  <Label text="Start Level" />
+               </children>
+            </HBox>
+            <TextField fx:id="startLevel" maxWidth="100.0" prefHeight="30.0" style="-fx-background-radius: 4;" text="10" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            
+            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.rowIndex="2">
+               <children>
+                  <Glyph fontFamily="FontAwesome" icon="PLAY" style="-fx-text-fill: #272828;" />
+                  <Label text="Start Bundle" />
+               </children>
+            </HBox>
+            <CheckBox fx:id="startBundleToggle" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
    </children>
-</GridPane>
+   <padding>
+      <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+   </padding>
+</VBox>
+
