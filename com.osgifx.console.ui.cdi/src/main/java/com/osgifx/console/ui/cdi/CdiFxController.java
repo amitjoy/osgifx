@@ -91,24 +91,23 @@ public final class CdiFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var idColumn = new TableColumn<XCdiContainerDTO, String>("ID");
-        idColumn.setPrefWidth(300);
         idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
 
         final var bundleIdColumn = new TableColumn<XCdiContainerDTO, String>("Bundle ID");
-        bundleIdColumn.setPrefWidth(150);
         bundleIdColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("bundleId", String.class, s -> String.valueOf(s.bundleId)));
 
         final var componentsCountColumn = new TableColumn<XCdiContainerDTO, String>("Components");
-        componentsCountColumn.setPrefWidth(150);
         componentsCountColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("components", String.class,
                                           s -> String.valueOf(s.components == null ? 0 : s.components.size())));
 
         final var errorsColumn = new TableColumn<XCdiContainerDTO, String>("Errors");
-        errorsColumn.setPrefWidth(150);
         errorsColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("errors", String.class, s -> (s.errors == null || s.errors.isEmpty()) ? "None"
                         : String.valueOf(s.errors.size())));
@@ -118,6 +117,7 @@ public final class CdiFxController {
         table.getColumns().add(bundleIdColumn);
         table.getColumns().add(componentsCountColumn);
         table.getColumns().add(errorsColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.cdiContainers());

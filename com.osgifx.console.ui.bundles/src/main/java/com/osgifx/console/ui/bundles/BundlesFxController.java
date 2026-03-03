@@ -321,26 +321,25 @@ public final class BundlesFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var idColumn = new TableColumn<XBundleDTO, Integer>("ID");
 
-        idColumn.setPrefWidth(90);
         idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
         final var symbolicNameColumn = new TableColumn<XBundleDTO, String>("Symbolic Name");
 
-        symbolicNameColumn.setPrefWidth(450);
         symbolicNameColumn.setCellValueFactory(new DTOCellValueFactory<>("symbolicName", String.class));
         Fx.addCellFactory(symbolicNameColumn, b -> b.isFragment, Color.SLATEBLUE, Color.BLACK);
 
         final var versionColumn = new TableColumn<XBundleDTO, String>("Version");
 
-        versionColumn.setPrefWidth(450);
         versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
         final var statusColumn = new TableColumn<XBundleDTO, String>("State");
 
-        statusColumn.setPrefWidth(200);
         statusColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
         table.getColumns().add(expanderColumn);
@@ -348,6 +347,7 @@ public final class BundlesFxController {
         table.getColumns().add(symbolicNameColumn);
         table.getColumns().add(versionColumn);
         table.getColumns().add(statusColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.bundles());
         threadSync.asyncExec(() -> {

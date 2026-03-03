@@ -121,45 +121,57 @@
       <ListView fx:id="interfacesList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="15" />
       
       <Label style="-fx-font-weight: bold;" text="Properties" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="TOP" />
-      <TableView fx:id="propertiesTable" prefHeight="263.0" prefWidth="569.0" GridPane.columnIndex="1" GridPane.rowIndex="16">
+      <TableView fx:id="propertiesTable" GridPane.columnIndex="1" GridPane.rowIndex="16">
       	<placeholder>
         	<Label text="No associated properties" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="propertiesTableColumn1" prefWidth="259.0" />
-          <TableColumn fx:id="propertiesTableColumn2" minWidth="0.0" prefWidth="290.0" />
+          <TableColumn fx:id="propertiesTableColumn1" />
+          <TableColumn fx:id="propertiesTableColumn2" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="References" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="TOP" />
-      <TableView fx:id="referencesTable" prefHeight="7.0" prefWidth="569.0" style="-fx-table-cell-border-color: transparent;" GridPane.columnIndex="1" GridPane.rowIndex="17" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="referencesTable" style="-fx-table-cell-border-color: transparent;" GridPane.columnIndex="1" GridPane.rowIndex="17" GridPane.vgrow="ALWAYS">
          <placeholder>
         	<Label text="No associated references" />
     	</placeholder>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Bound Services" GridPane.halignment="RIGHT" GridPane.rowIndex="18" GridPane.valignment="TOP" />
-      <TableView fx:id="boundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="boundServicesTable" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No bound services" />
     	</placeholder>
          <columns>
-            <TableColumn fx:id="boundServicesNameColumn" prefWidth="200.0" text="Name" />
-            <TableColumn fx:id="boundServicesTargetColumn" prefWidth="101.0" text="Target" />
-            <TableColumn fx:id="boundServicesClassColumn" prefWidth="623.0" text="Object Class" />
+            <TableColumn fx:id="boundServicesNameColumn" text="Name" />
+            <TableColumn fx:id="boundServicesTargetColumn" text="Target" />
+            <TableColumn fx:id="boundServicesClassColumn" text="Object Class" />
          </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Unbound Services" GridPane.halignment="RIGHT" GridPane.rowIndex="19" GridPane.valignment="TOP" />
-      <TableView fx:id="unboundServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="19" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="unboundServicesTable" GridPane.columnIndex="1" GridPane.rowIndex="19" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No unbound services" />
     	</placeholder>
          <columns>
-            <TableColumn fx:id="unboundServicesNameColumn" prefWidth="200.0" text="Name" />
-            <TableColumn fx:id="unboundServicesTargetColumn" prefWidth="101.0" text="Target" />
-            <TableColumn fx:id="unboundServicesClassColumn" prefWidth="623.0" text="Object Class" />
+            <TableColumn fx:id="unboundServicesNameColumn" text="Name" />
+            <TableColumn fx:id="unboundServicesTargetColumn" text="Target" />
+            <TableColumn fx:id="unboundServicesClassColumn" text="Object Class" />
          </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
    <padding>

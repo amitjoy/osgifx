@@ -138,99 +138,126 @@
       <Label fx:id="startDurationLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="17" />
       
       <Label style="-fx-font-weight: bold;" text="Exported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="18" GridPane.valignment="TOP" />
-      <TableView fx:id="exportedPackagesNameTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="exportedPackagesNameTable" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No packages exported" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="exportedPackagesNameTableColumn" prefWidth="339.0" text="Name" />
-          <TableColumn fx:id="exportedPackagesVersionTableColumn" minWidth="0.0" prefWidth="220.0" text="Version" />
+          <TableColumn fx:id="exportedPackagesNameTableColumn" text="Name" />
+          <TableColumn fx:id="exportedPackagesVersionTableColumn" text="Version" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Imported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="19" GridPane.valignment="TOP" />
-      <TableView fx:id="importedPackagesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="19" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="importedPackagesTable" GridPane.columnIndex="1" GridPane.rowIndex="19" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No packages imported" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="importedPackagesNameTableColumn" prefWidth="353.0" text="Name" />
-          <TableColumn fx:id="importedPackagesVersionTableColumn" prefWidth="209.0" text="Version" />
+          <TableColumn fx:id="importedPackagesNameTableColumn" text="Name" />
+          <TableColumn fx:id="importedPackagesVersionTableColumn" text="Version" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Wired Bundles As Provider" GridPane.halignment="RIGHT" GridPane.rowIndex="20" GridPane.valignment="TOP" />
-      <TableView fx:id="wiredBundlesAsProviderTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="20" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="wiredBundlesAsProviderTable" GridPane.columnIndex="1" GridPane.rowIndex="20" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No bundles wired" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="wiredBundlesAsProviderIdTableColumn" prefWidth="118.0" text="ID" />
-          <TableColumn fx:id="wiredBundlesAsProviderBsnTableColumn" prefWidth="444.0" text="Symbolic Name" />
+          <TableColumn fx:id="wiredBundlesAsProviderIdTableColumn" text="ID" />
+          <TableColumn fx:id="wiredBundlesAsProviderBsnTableColumn" text="Symbolic Name" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Wired Bundles As Requirer" GridPane.halignment="RIGHT" GridPane.rowIndex="21" GridPane.valignment="TOP" />
-      <TableView fx:id="wiredBundlesAsRequirerTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="21" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="wiredBundlesAsRequirerTable" GridPane.columnIndex="1" GridPane.rowIndex="21" GridPane.vgrow="ALWAYS">
         <placeholder>
         	<Label text="No bundles wired" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="wiredBundlesAsRequirerIdTableColumn" prefWidth="122.0" text="ID" />
-          <TableColumn fx:id="wiredBundlesAsRequirerBsnTableColumn" prefWidth="440.0" text="Symbolic Name" />
+          <TableColumn fx:id="wiredBundlesAsRequirerIdTableColumn" text="ID" />
+          <TableColumn fx:id="wiredBundlesAsRequirerBsnTableColumn" text="Symbolic Name" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Registered Services" GridPane.halignment="RIGHT" GridPane.rowIndex="22" GridPane.valignment="TOP" />
-      <TableView fx:id="registeredServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="22" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="registeredServicesTable" GridPane.columnIndex="1" GridPane.rowIndex="22" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No services registered" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="registeredServicesIdTableColumn" prefWidth="124.0" text="ID" />
-          <TableColumn fx:id="registeredServicesClassTableColumn" prefWidth="437.0" text="Object Class" />
+          <TableColumn fx:id="registeredServicesIdTableColumn" text="ID" />
+          <TableColumn fx:id="registeredServicesClassTableColumn" text="Object Class" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Manifest Headers" GridPane.halignment="RIGHT" GridPane.rowIndex="23" GridPane.valignment="TOP" />
-      <TableView fx:id="manifestHeadersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="23" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="manifestHeadersTable" GridPane.columnIndex="1" GridPane.rowIndex="23" GridPane.vgrow="ALWAYS">
         <columns>
-          <TableColumn fx:id="manifestHeadersTableColumn1" prefWidth="259.0" />
-          <TableColumn fx:id="manifestHeadersTableColumn2" minWidth="0.0" prefWidth="299.0" />
+          <TableColumn fx:id="manifestHeadersTableColumn1" />
+          <TableColumn fx:id="manifestHeadersTableColumn2" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Used Services" GridPane.halignment="RIGHT" GridPane.rowIndex="24" GridPane.valignment="TOP" />
-      <TableView fx:id="usedServicesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="24" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="usedServicesTable" GridPane.columnIndex="1" GridPane.rowIndex="24" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No services used" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="usedServicesIdTableColumn" prefWidth="111.0" text="ID" />
-          <TableColumn fx:id="usedServicesClassTableColumn" prefWidth="442.0" text="Object Class" />
+          <TableColumn fx:id="usedServicesIdTableColumn" text="ID" />
+          <TableColumn fx:id="usedServicesClassTableColumn" text="Object Class" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Host Bundles" GridPane.halignment="RIGHT" GridPane.rowIndex="25" GridPane.valignment="TOP" />
-      <TableView fx:id="hostBundlesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="25" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="hostBundlesTable" GridPane.columnIndex="1" GridPane.rowIndex="25" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No host bundles" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="hostBundlesIdTableColumn" prefWidth="110.0" text="ID" />
-          <TableColumn fx:id="hostBundlesBsnTableColumn" prefWidth="437.0" text="Symbolic Name" />
+          <TableColumn fx:id="hostBundlesIdTableColumn" text="ID" />
+          <TableColumn fx:id="hostBundlesBsnTableColumn" text="Symbolic Name" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Attached Fragments" GridPane.halignment="RIGHT" GridPane.rowIndex="26" GridPane.valignment="TOP" />
-      <TableView fx:id="attachedFragmentsTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="26" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="attachedFragmentsTable" GridPane.columnIndex="1" GridPane.rowIndex="26" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No fragments attached" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="attachedFragmentsIdTableColumn" prefWidth="109.0" text="ID" />
-          <TableColumn fx:id="attachedFragmentsBsnTableColumn" prefWidth="438.0" text="Symbolic Name" />
+          <TableColumn fx:id="attachedFragmentsIdTableColumn" text="ID" />
+          <TableColumn fx:id="attachedFragmentsBsnTableColumn" text="Symbolic Name" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
    <padding>

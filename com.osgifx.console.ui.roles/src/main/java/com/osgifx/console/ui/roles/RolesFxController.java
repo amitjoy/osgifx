@@ -188,18 +188,20 @@ public final class RolesFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var roleNameColumn = new TableColumn<XRoleDTO, String>("Name");
-        roleNameColumn.setPrefWidth(580);
         roleNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var roleTypeColumn = new TableColumn<XRoleDTO, String>("Type");
-        roleTypeColumn.setPrefWidth(400);
         roleTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(roleNameColumn);
         table.getColumns().add(roleTypeColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.roles());

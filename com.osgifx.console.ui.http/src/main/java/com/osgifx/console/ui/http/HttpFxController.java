@@ -91,9 +91,11 @@ public final class HttpFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var componentColumn = new TableColumn<XHttpComponentDTO, String>("Component Name");
-        componentColumn.setPrefWidth(600);
         componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> {
             // resource doesn't have associated name field
             try {
@@ -105,19 +107,15 @@ public final class HttpFxController {
         }));
 
         final var contextNameColumn = new TableColumn<XHttpComponentDTO, String>("Context Name");
-        contextNameColumn.setPrefWidth(150);
         contextNameColumn.setCellValueFactory(new DTOCellValueFactory<>("contextName", String.class));
 
         final var contextPathColumn = new TableColumn<XHttpComponentDTO, String>("Context Path");
-        contextPathColumn.setPrefWidth(200);
         contextPathColumn.setCellValueFactory(new DTOCellValueFactory<>("contextPath", String.class));
 
         final var contextServiceIdColumn = new TableColumn<XHttpComponentDTO, String>("Context Service ID");
-        contextServiceIdColumn.setPrefWidth(140);
         contextServiceIdColumn.setCellValueFactory(new DTOCellValueFactory<>("contextServiceId", String.class));
 
         final var componentTypeColumn = new TableColumn<XHttpComponentDTO, String>("Type");
-        componentTypeColumn.setPrefWidth(100);
         componentTypeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
         table.getColumns().add(expanderColumn);
@@ -126,6 +124,7 @@ public final class HttpFxController {
         table.getColumns().add(contextPathColumn);
         table.getColumns().add(contextServiceIdColumn);
         table.getColumns().add(componentTypeColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.httpComponents());

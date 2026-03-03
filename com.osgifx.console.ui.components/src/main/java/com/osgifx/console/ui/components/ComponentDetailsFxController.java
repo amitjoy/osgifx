@@ -192,6 +192,7 @@ public final class ComponentDetailsFxController {
         Fx.addContextMenuToCopyContent(unboundServicesTable);
 
         Fx.disableSelectionModel(referencesTable);
+        referencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
@@ -220,15 +221,16 @@ public final class ComponentDetailsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var nameColumn = new TableColumn<XReferenceDTO, String>("Name");
 
-        nameColumn.setPrefWidth(200);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var interfaceColumn = new TableColumn<XReferenceDTO, String>("Interface");
 
-        interfaceColumn.setPrefWidth(550);
         interfaceColumn.setCellValueFactory(new DTOCellValueFactory<>("interfaceName", String.class));
 
         if (!areReferenceTableNodesLoader.get()) {

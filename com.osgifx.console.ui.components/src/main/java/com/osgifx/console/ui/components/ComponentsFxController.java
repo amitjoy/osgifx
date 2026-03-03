@@ -104,25 +104,24 @@ public final class ComponentsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var idColumn = new TableColumn<XComponentDTO, Integer>("ID");
 
-        idColumn.setPrefWidth(90);
         idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
         final var componentNameColumn = new TableColumn<XComponentDTO, String>("Name");
 
-        componentNameColumn.setPrefWidth(800);
         componentNameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var stateColumn = new TableColumn<XComponentDTO, String>("State");
 
-        stateColumn.setPrefWidth(200);
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
         final var conditionIdColumn = new TableColumn<XComponentDTO, String>("Condition ID");
 
-        conditionIdColumn.setPrefWidth(180);
         conditionIdColumn.setCellValueFactory(this::parseConditionId);
 
         table.getColumns().add(expanderColumn);
@@ -130,6 +129,7 @@ public final class ComponentsFxController {
         table.getColumns().add(componentNameColumn);
         table.getColumns().add(stateColumn);
         table.getColumns().add(conditionIdColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.components());
         threadSync.asyncExec(() -> {

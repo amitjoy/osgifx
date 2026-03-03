@@ -91,22 +91,21 @@ public final class JaxRsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var componentColumn = new TableColumn<XJaxRsComponentDTO, String>("Name");
-        componentColumn.setPrefWidth(400);
         componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var typeColumn = new TableColumn<XJaxRsComponentDTO, String>("Type");
-        typeColumn.setPrefWidth(200);
         typeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
         final var serviceIdColumn = new TableColumn<XJaxRsComponentDTO, String>("Service ID");
-        serviceIdColumn.setPrefWidth(150);
         serviceIdColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("serviceId", String.class, s -> String.valueOf(s.serviceId)));
 
         final var statusColumn = new TableColumn<XJaxRsComponentDTO, String>("Status");
-        statusColumn.setPrefWidth(150);
         statusColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("isFailed", String.class, s -> s.isFailed ? "Failed" : "Active"));
 
@@ -115,6 +114,7 @@ public final class JaxRsFxController {
         table.getColumns().add(typeColumn);
         table.getColumns().add(serviceIdColumn);
         table.getColumns().add(statusColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.jaxRsComponents());
