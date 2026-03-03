@@ -51,14 +51,13 @@ import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.batchinstall.dialog.ArtifactInstaller;
 import com.osgifx.console.ui.batchinstall.dialog.BatchInstallDialog;
-import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
 import com.osgifx.console.ui.bundles.dialog.BatchInstallIntroDialog;
+import com.osgifx.console.ui.bundles.dialog.BundleInstallDialog;
 import com.osgifx.console.ui.bundles.obr.bnd.ResourceBuilder;
 import com.osgifx.console.ui.bundles.obr.bnd.XMLResourceGenerator;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
-
 import com.osgifx.console.util.io.IO;
 
 import javafx.collections.transformation.FilteredList;

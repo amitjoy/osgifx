@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.table.TableFilter;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -46,6 +45,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -70,7 +70,7 @@ public final class BundleDetailsFxController {
     @FXML
     private Label                                      categoryLabel;
     @FXML
-    private ToggleSwitch                               fragmentLabel;
+    private CheckBox                                   fragmentLabel;
     @FXML
     private Label                                      lasModifiedLabel;
     @FXML
@@ -82,9 +82,9 @@ public final class BundleDetailsFxController {
     @FXML
     private Label                                      revisionsLabel;
     @FXML
-    private ToggleSwitch                               isPersistentlyStartedLabel;
+    private CheckBox                                   isPersistentlyStartedLabel;
     @FXML
-    private ToggleSwitch                               isActivationPolicyUsedLabel;
+    private CheckBox                                   isActivationPolicyUsedLabel;
     @FXML
     private Label                                      descLabel;
     @FXML

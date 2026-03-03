@@ -77,8 +77,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         lbMessage.setVisible(false);
         lbMessage.setManaged(false);
 
-        final var lbDescription = new Label(
-                "Configure PID and properties. Existing configurations will be updated.");
+        final var lbDescription = new Label("Configure PID and properties. Existing configurations will be updated.");
         lbDescription.setWrapText(true);
         lbDescription.setStyle("-fx-text-fill: #4a4b4e;");
 

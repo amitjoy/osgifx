@@ -26,7 +26,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import org.controlsfx.control.ToggleSwitch?>
+<?import javafx.scene.control.CheckBox?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
 <GridPane hgap="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2500.0" prefWidth="900.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.bundles.BundleDetailsFxController">
@@ -108,13 +108,13 @@
       <Label fx:id="revisionsLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" />
       
       <Label style="-fx-font-weight: bold;" text="Is Fragment?" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
-      <ToggleSwitch fx:id="fragmentLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+      <CheckBox fx:id="fragmentLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
       
       <Label style="-fx-font-weight: bold;" text="Is Persistently Started?" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-      <ToggleSwitch fx:id="isPersistentlyStartedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+      <CheckBox fx:id="isPersistentlyStartedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="9" />
       
       <Label style="-fx-font-weight: bold;" text="Is Activation Policy Used?" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
-      <ToggleSwitch fx:id="isActivationPolicyUsedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+      <CheckBox fx:id="isActivationPolicyUsedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
       
       <Label style="-fx-font-weight: bold;" text="Last Modified" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
       <Label fx:id="lasModifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" />

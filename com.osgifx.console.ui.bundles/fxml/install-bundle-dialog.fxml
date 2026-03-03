@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
-<?import org.controlsfx.control.ToggleSwitch?>
+<?import javafx.scene.control.CheckBox?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
 <VBox fx:id="installBundleDialogPane" prefWidth="480.0" spacing="15.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.bundles.dialog.BundleInstallDialogController">
@@ -63,7 +63,7 @@
                   <Label text="Start Bundle" />
                </children>
             </HBox>
-            <ToggleSwitch fx:id="startBundleToggle" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <CheckBox fx:id="startBundleToggle" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
    </children>

@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import org.controlsfx.control.ToggleSwitch?>
+<?import javafx.scene.control.CheckBox?>
 
 <GridPane hgap="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.packages.PackageDetailsFxController">
   <columnConstraints>
@@ -45,7 +45,7 @@
       <Label fx:id="versionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       
       <Label style="-fx-font-weight: bold;" text="Is Duplicate Export?" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-      <ToggleSwitch fx:id="duplicateLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <CheckBox fx:id="duplicateLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       
       <Label style="-fx-font-weight: bold;" text="Exporters" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
       <TableView style="-fx-table-cell-border-color: transparent;" fx:id="exportersTable" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">

@@ -28,6 +28,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.service.log.LogLevel;
@@ -44,8 +45,6 @@ import com.osgifx.console.ui.logs.helper.LoggerConfigTextControl;
 import com.osgifx.console.ui.logs.helper.LogsHelper;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
-
-import org.eclipse.fx.core.ThreadSynchronize;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
