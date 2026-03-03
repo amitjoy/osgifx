@@ -203,12 +203,11 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         // Create table for active RPC calls
         final TableView<RpcCallInfo> table = new TableView<>();
         table.setItems(rpcProgressTracker.getActiveRpcCalls());
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         // Method name column
         final TableColumn<RpcCallInfo, String> methodCol = new TableColumn<>("Method");
         methodCol.setCellValueFactory(data -> data.getValue().descriptionProperty());
-        methodCol.setPrefWidth(200);
 
         // Progress column
         final TableColumn<RpcCallInfo, Double> progressCol = new TableColumn<>("Progress");
@@ -230,7 +229,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
                 }
             }
         });
-        progressCol.setPrefWidth(150);
+
 
         // Duration column
         final TableColumn<RpcCallInfo, String> durationCol = new TableColumn<>("Duration");
@@ -239,8 +238,10 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
             final String durationStr = String.format("%.1fs", durationMs / 1000.0);
             return new SimpleStringProperty(durationStr);
         });
-        durationCol.setPrefWidth(80);
 
+        durationCol.setPrefWidth(80);
+        durationCol.setMaxWidth(80);
+        durationCol.setMinWidth(80);
         table.getColumns().add(methodCol);
         table.getColumns().add(progressCol);
         table.getColumns().add(durationCol);

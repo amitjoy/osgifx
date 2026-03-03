@@ -102,27 +102,28 @@ public final class ServicesFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var idColumn = new TableColumn<XServiceDTO, Integer>("ID");
 
-        idColumn.setPrefWidth(100);
         idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
         final var objectClassColumn = new TableColumn<XServiceDTO, String>("Object Class");
 
-        objectClassColumn.setPrefWidth(700);
         objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
         Fx.addCellFactory(objectClassColumn, s -> s.properties.containsKey(COMPONENT_ID), Color.SLATEBLUE, Color.BLACK);
 
         final var registeringBundleColumn = new TableColumn<XServiceDTO, String>("Registering Bundle");
 
-        registeringBundleColumn.setPrefWidth(400);
         registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(idColumn);
         table.getColumns().add(objectClassColumn);
         table.getColumns().add(registeringBundleColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.services());
         threadSync.asyncExec(() -> {

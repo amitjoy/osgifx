@@ -21,16 +21,19 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.properties.PropertiesFxController">
    <children>
-      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="propertyTable" layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="propertyTable" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <placeholder>
         	<Label text="No system or framework properties" />
     	</placeholder>
         <columns>
-          <TableColumn prefWidth="30.0" text="" />
-          <TableColumn fx:id="propertyName" prefWidth="515.0" text="Name" />
-          <TableColumn fx:id="propertyValue" prefWidth="450.0" text="Value" />
-          <TableColumn fx:id="propertyType" prefWidth="200.0" text="Type" />
+          <TableColumn prefWidth="48.0" maxWidth="48.0" minWidth="48.0" text="" />
+          <TableColumn fx:id="propertyName" text="Name" />
+          <TableColumn fx:id="propertyValue" text="Value" />
+          <TableColumn fx:id="propertyType" text="Type" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
 </AnchorPane>

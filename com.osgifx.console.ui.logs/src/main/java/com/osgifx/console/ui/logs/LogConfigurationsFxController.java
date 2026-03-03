@@ -92,20 +92,22 @@ public final class LogConfigurationsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var nameColumn = new TableColumn<XBundleLoggerContextDTO, String>("Logger Context Name");
 
-        nameColumn.setPrefWidth(650);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>("Has Custom Log Levels?");
 
-        hasCustomLogLevelsColumn.setPrefWidth(250);
         hasCustomLogLevelsColumn.setCellValueFactory(c -> new SimpleBooleanProperty(!c.getValue().logLevels.isEmpty()));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(nameColumn);
         table.getColumns().add(hasCustomLogLevelsColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         final var loggerContexts = dataProvider.loggerContexts();
         threadSync.asyncExec(() -> {

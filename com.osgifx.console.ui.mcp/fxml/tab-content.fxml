@@ -45,28 +45,26 @@
         <tabs>
           <Tab text="Tools">
                <content>
-                  <TableView fx:id="toolsTable" prefHeight="200.0" prefWidth="200.0">
+                  <TableView style="-fx-table-cell-border-color: transparent;" fx:id="toolsTable">
                     <columns>
-                      <TableColumn fx:id="nameColumn" prefWidth="200.0" text="Tool Name" />
-                      <TableColumn fx:id="descriptionColumn" prefWidth="400.0" text="Description" />
-                        <TableColumn fx:id="schemaColumn" prefWidth="300.0" text="Input Schema" />
+                      <TableColumn fx:id="nameColumn" text="Tool Name" />
+                      <TableColumn fx:id="descriptionColumn" text="Description" />
                     </columns>
                      <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
                      </columnResizePolicy>
                   </TableView>
                </content>
           </Tab>
           <Tab text="Logs">
                <content>
-                  <TableView fx:id="logsTable" prefHeight="200.0" prefWidth="200.0">
+                  <TableView style="-fx-table-cell-border-color: transparent;" fx:id="logsTable">
                     <columns>
-                      <TableColumn fx:id="timestampColumn" prefWidth="150.0" text="Timestamp" />
-                      <TableColumn fx:id="typeColumn" prefWidth="100.0" text="Type" />
-                        <TableColumn fx:id="contentColumn" prefWidth="600.0" text="Content" />
+                      <TableColumn style="-fx-alignment: CENTER;" fx:id="timestampColumn" text="Timestamp" />
+                      <TableColumn style="-fx-alignment: CENTER;" fx:id="typeColumn" text="Tool" />
                     </columns>
                      <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
                      </columnResizePolicy>
                   </TableView>
                </content>
