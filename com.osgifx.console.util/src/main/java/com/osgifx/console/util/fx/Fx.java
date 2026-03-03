@@ -29,6 +29,7 @@ import org.osgi.framework.BundleContext;
 
 import com.google.common.collect.Sets;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
@@ -106,7 +107,7 @@ public final class Fx {
                              .hideAfter(Duration.seconds(3))
                              .position(Pos.CENTER);
         // @formatter:on
-        notification.show();
+        Platform.runLater(notification::show);
     }
 
     public static void showErrorNotification(final String title, final String text) {
@@ -120,7 +121,7 @@ public final class Fx {
                              .hideAfter(Duration.seconds(3))
                              .position(Pos.CENTER);
         // @formatter:on
-        notification.show();
+        Platform.runLater(notification::show);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

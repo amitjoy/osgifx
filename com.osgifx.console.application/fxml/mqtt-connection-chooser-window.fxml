@@ -21,17 +21,20 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="370.0" style="-fx-font-size: 10pt;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.application.fxml.controller.MqttConnectionSettingsDialogController">
    <children>
-      <TableView fx:id="connectionTable" layoutY="69.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="connectionTable" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columns>
-          <TableColumn fx:id="nameColumn" editable="false" prefWidth="125.0" text="Name" />
-          <TableColumn fx:id="clientIdColumn" editable="false" prefWidth="130.0" text="Client ID" />
-          <TableColumn fx:id="serverColumn" editable="false" prefWidth="180.0" text="Server" />
-          <TableColumn fx:id="portColumn" editable="false" prefWidth="100.0" text="Port" />
-          <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" prefWidth="110.0" text="Timeout" />
+          <TableColumn fx:id="nameColumn" editable="false" text="Name" />
+          <TableColumn fx:id="clientIdColumn" editable="false" text="Client ID" />
+          <TableColumn fx:id="serverColumn" editable="false" text="Server" />
+          <TableColumn fx:id="portColumn" editable="false" text="Port" />
+          <TableColumn fx:id="timeoutColumn" editable="false" minWidth="0.0" text="Timeout" />
         </columns>
         <placeholder>
         	<Label text="No MQTT connections configured" />
     	</placeholder>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
 </AnchorPane>

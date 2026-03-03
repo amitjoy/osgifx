@@ -29,14 +29,17 @@
     </Tab>
     <Tab text="Resource Methods">
       <content>
-        <TableView fx:id="methodsTable" prefHeight="200.0" prefWidth="200.0">
+        <TableView style="-fx-table-cell-border-color: transparent;" fx:id="methodsTable">
           <columns>
-            <TableColumn fx:id="methodColumn" prefWidth="100.0" text="Method" />
-            <TableColumn fx:id="pathColumn" prefWidth="250.0" text="Path" />
-            <TableColumn fx:id="consumesColumn" prefWidth="150.0" text="Consumes" />
-            <TableColumn fx:id="producesColumn" prefWidth="150.0" text="Produces" />
-            <TableColumn fx:id="nameBindingsColumn" prefWidth="200.0" text="Name Bindings" />
+            <TableColumn fx:id="methodColumn" text="Method" />
+            <TableColumn fx:id="pathColumn" text="Path" />
+            <TableColumn fx:id="consumesColumn" text="Consumes" />
+            <TableColumn fx:id="producesColumn" text="Produces" />
+            <TableColumn fx:id="nameBindingsColumn" text="Name Bindings" />
           </columns>
+          <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+          </columnResizePolicy>
         </TableView>
       </content>
     </Tab>

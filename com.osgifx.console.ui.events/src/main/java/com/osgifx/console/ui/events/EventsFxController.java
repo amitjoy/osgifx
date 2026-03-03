@@ -329,20 +329,22 @@ public final class EventsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var receivedAtColumn = new TableColumn<XEventDTO, Date>("Received At");
 
-        receivedAtColumn.setPrefWidth(290);
         receivedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("received", Date.class));
 
         final var topicColumn = new TableColumn<XEventDTO, String>("Topic");
 
-        topicColumn.setPrefWidth(650);
         topicColumn.setCellValueFactory(new DTOCellValueFactory<>("topic", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(receivedAtColumn);
         table.getColumns().add(topicColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         final var events = dataProvider.events();
         threadSync.asyncExec(() -> {

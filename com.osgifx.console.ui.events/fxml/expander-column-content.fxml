@@ -42,14 +42,17 @@
       <Label fx:id="topicLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       
       <Label style="-fx-font-weight: bold;" text="Properties" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-      <TableView fx:id="propertiesTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="propertiesTable" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No associated properties" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="propertiesKeyTableColumn" prefWidth="259.0" text="Key" />
-          <TableColumn fx:id="propertiesValueTableColumn" minWidth="0.0" prefWidth="290.0" text="Value" />
+          <TableColumn fx:id="propertiesKeyTableColumn" text="Key" />
+          <TableColumn fx:id="propertiesValueTableColumn" text="Value" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
    <padding>

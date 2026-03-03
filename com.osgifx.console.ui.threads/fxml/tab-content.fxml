@@ -21,21 +21,24 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.threads.ThreadsFxController">
    <children>
-      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="table" layoutX="8.0" layoutY="-20.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="table" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       	<placeholder>
         	<Label text="No threads" />
     	</placeholder>
       	<columns>
-          <TableColumn prefWidth="30.0" text="" />
-          <TableColumn fx:id="nameColumn" prefWidth="540.0" text="Name" />
-          <TableColumn fx:id="idColumn" prefWidth="90.0" text="ID" />
-          <TableColumn fx:id="priorityColumn" prefWidth="90.0" text="Priority" />
-          <TableColumn fx:id="stateColumn" prefWidth="140.0" text="State" />
-          <TableColumn fx:id="isInterruptedColumn" prefWidth="100.0" text="Is Interrupted?" />
-          <TableColumn fx:id="isAliveColumn" prefWidth="100.0" text="Is Alive?" />
-          <TableColumn fx:id="isDaemonColumn" prefWidth="100.0" text="Is Daemon?" />
-          <TableColumn fx:id="isDeadlockedColumn" prefWidth="110.0" text="Is Deadlocked?" />
+          <TableColumn prefWidth="48.0" maxWidth="48.0" minWidth="48.0" text="" />
+          <TableColumn fx:id="nameColumn" text="Name" />
+          <TableColumn fx:id="idColumn" text="ID" />
+          <TableColumn fx:id="priorityColumn" text="Priority" />
+          <TableColumn fx:id="stateColumn" text="State" />
+          <TableColumn fx:id="isInterruptedColumn" text="Is Interrupted?" />
+          <TableColumn fx:id="isAliveColumn" text="Is Alive?" />
+          <TableColumn fx:id="isDaemonColumn" text="Is Daemon?" />
+          <TableColumn fx:id="isDeadlockedColumn" text="Is Deadlocked?" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
 </AnchorPane>

@@ -100,26 +100,27 @@ public final class PackagesFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var nameColumn = new TableColumn<PackageDTO, String>("Name");
 
-        nameColumn.setPrefWidth(550);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var versionColumn = new TableColumn<PackageDTO, String>("Version");
 
-        versionColumn.setPrefWidth(450);
         versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
         final var hasDuplicatesColumn = new TableColumn<PackageDTO, String>("Is Duplicate Export?");
 
-        hasDuplicatesColumn.setPrefWidth(200);
         hasDuplicatesColumn.setCellValueFactory(new DTOCellValueFactory<>("isDuplicateExport", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(nameColumn);
         table.getColumns().add(versionColumn);
         table.getColumns().add(hasDuplicatesColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.packages());
         threadSync.asyncExec(() -> {
