@@ -21,9 +21,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.osgi.framework.BundleContext;
+
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.RuntimeDTO;
+import com.osgifx.console.agent.helper.AgentHelper;
 
 import aQute.lib.json.JSONCodec;
 
@@ -37,9 +40,11 @@ public final class XSnapshotAdmin {
     private static final FluentLogger      logger           = LoggerFactory.getFluentLogger(XSnapshotAdmin.class);
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 
-    private final XDtoAdmin dtoAdmin;
+    private final XDtoAdmin     dtoAdmin;
+    private final BundleContext context;
 
-    public XSnapshotAdmin(final XDtoAdmin dtoAdmin) {
+    public XSnapshotAdmin(final BundleContext context, final XDtoAdmin dtoAdmin) {
+        this.context  = context;
         this.dtoAdmin = dtoAdmin;
     }
 
@@ -51,7 +56,8 @@ public final class XSnapshotAdmin {
      * @return the absolute path to the created snapshot file
      * @throws Exception if the snapshot creation fails
      */
-    public String createSnapshot(final String outputPath) throws Exception {
+    public String createSnapshot(String outputPath) throws Exception {
+        outputPath = AgentHelper.substituteVariables(outputPath, context);
         final File outputFile = new File(outputPath);
         final File parentDir  = outputFile.getParentFile();
 

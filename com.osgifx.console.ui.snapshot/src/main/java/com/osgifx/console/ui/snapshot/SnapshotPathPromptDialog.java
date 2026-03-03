@@ -41,7 +41,7 @@ public final class SnapshotPathPromptDialog extends Dialog<String> {
         dialogPane.getButtonTypes().addAll(CANCEL);
 
         final var pathField = (CustomTextField) TextFields.createClearableTextField();
-        pathField.setPromptText("Enter full file path on agent (e.g., /tmp/snapshot-2024.json)");
+        pathField.setPromptText("Enter full file path on agent (e.g., {env:TEMP}/snapshot-2024.json)");
         pathField.setText(defaultPath);
         pathField.setPrefWidth(500);
 

@@ -136,7 +136,7 @@ public final class OptionsDialogHelper {
         radio.setUserData(userData);
         radio.setStyle("-fx-font-weight: bold;");
 
-        final var descLabel = new Label("You will be prompted to specify the directory path on the agent");
+        final var descLabel = new Label("You will be prompted to specify the file path on the agent");
         descLabel.setStyle("-fx-text-fill: #6b7280;");
         VBox.setMargin(descLabel, new Insets(0, 0, 0, 25));
 
