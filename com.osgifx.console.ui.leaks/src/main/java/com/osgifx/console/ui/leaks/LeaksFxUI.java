@@ -94,6 +94,7 @@ public final class LeaksFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls(parent, loader);
     }
 
@@ -127,6 +128,7 @@ public final class LeaksFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
+            statusBar.enableRpcProgressTracking();
             final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);

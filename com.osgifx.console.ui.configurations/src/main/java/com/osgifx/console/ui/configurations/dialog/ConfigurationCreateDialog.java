@@ -59,7 +59,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         final var dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.setHeaderText("Create New Configuration for OSGi Configuration Admin");
+        dialogPane.setHeaderText("New OSGi Configuration");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
         dialogPane
@@ -77,11 +77,14 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         lbMessage.setVisible(false);
         lbMessage.setManaged(false);
 
-        final var content = new VBox(10);
+        final var lbDescription = new Label("Configure PID and properties. Existing configurations will be updated.");
+        lbDescription.setWrapText(true);
+        lbDescription.setStyle("-fx-text-fill: #4a4b4e;");
 
-        content.getChildren().add(lbMessage);
-        content.getChildren().add(txtPid);
-        content.getChildren().add(txtFactoryPid);
+        final var content = new VBox(10);
+        content.setPadding(new javafx.geometry.Insets(10));
+
+        content.getChildren().addAll(lbMessage, lbDescription, txtPid, txtFactoryPid);
 
         final var form = new PropertiesForm(dialogPane);
         form.addFieldPair(content);

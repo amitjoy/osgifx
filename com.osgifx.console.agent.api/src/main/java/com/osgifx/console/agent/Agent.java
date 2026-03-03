@@ -62,12 +62,12 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
  * <h2>Communication Channels</h2>
  * The agent supports two RPC transports:
  * <ul>
- *   <li><b>Socket</b> – configured via {@link #AGENT_SOCKET_PORT_KEY}. A plain or
- *       TLS-secured TCP connection.</li>
- *   <li><b>MQTT 5</b> – configured via {@link #AGENT_MQTT_PROVIDER_KEY},
- *       {@link #AGENT_MQTT_PUB_TOPIC_KEY}, and {@link #AGENT_MQTT_SUB_TOPIC_KEY}.
- *       Supports OSGi Messaging or custom {@link Mqtt5Publisher}/{@link Mqtt5Subscriber}
- *       implementations.</li>
+ * <li><b>Socket</b> – configured via {@link #AGENT_SOCKET_PORT_KEY}. A plain or
+ * TLS-secured TCP connection.</li>
+ * <li><b>MQTT 5</b> – configured via {@link #AGENT_MQTT_PROVIDER_KEY},
+ * {@link #AGENT_MQTT_PUB_TOPIC_KEY}, and {@link #AGENT_MQTT_SUB_TOPIC_KEY}.
+ * Supports OSGi Messaging or custom {@link Mqtt5Publisher}/{@link Mqtt5Subscriber}
+ * implementations.</li>
  * </ul>
  *
  * <h2>Graceful Degradation</h2>
@@ -174,6 +174,65 @@ public interface Agent {
      * The property key to specify the allowlist for Gogo command execution. Defaults to {@code *}.
      */
     String AGENT_GOGO_ALLOWLIST_KEY = "osgi.fx.agent.gogo.allowlist";
+
+    /**
+     * The property key to specify the maximum total decompressed size of a GZIP stream in an RPC call.
+     * <p>
+     * This is used to prevent Zip Bomb attacks.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY = "osgi.fx.agent.rpc.max.decompressed.size";
+
+    /**
+     * The property key to specify the maximum number of elements allowed in a decoded collection.
+     * <p>
+     * This is used to prevent Collection Bomb attacks.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_COLLECTION_SIZE_KEY = "osgi.fx.agent.rpc.max.collection.size";
+
+    /**
+     * The property key to specify the maximum number of entries allowed in a decoded map.
+     * <p>
+     * This is used to prevent Collection Bomb attacks.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_MAP_SIZE_KEY = "osgi.fx.agent.rpc.max.map.size";
+
+    /**
+     * The property key to specify the maximum total length allowed for a decoded byte array.
+     * <p>
+     * This is used to prevent memory exhaustion when decoding large byte arrays.
+     *
+     * @since 11.0
+     */
+    String AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY = "osgi.fx.agent.rpc.max.byte.array.size";
+
+    /**
+     * The property key to specify the maximum allowed size of a heap dump file in bytes.
+     *
+     * @since 11.0
+     */
+    String AGENT_HEAPDUMP_MAX_SIZE_KEY = "osgi.fx.agent.heapdump.max.size";
+
+    /**
+     * The property key to specify the GZIP compression level (1-9).
+     *
+     * @since 11.0
+     */
+    String AGENT_GZIP_COMPRESSION_LEVEL_KEY = "osgi.fx.agent.gzip.compression.level";
+
+    /**
+     * The property key to specify the disk buffer percentage for heap dump creation.
+     * <p>
+     * This defines the extra space required on disk beyond the estimated heap size.
+     *
+     * @since 11.0
+     */
+    String AGENT_HEAPDUMP_DISK_BUFFER_PERCENTAGE_KEY = "osgi.fx.agent.heapdump.disk.buffer.percentage";
 
     /**
      * The port for attaching to a remote Gogo CommandSession
@@ -762,4 +821,54 @@ public interface Agent {
      * @since 11.0
      */
     Collection<String> listBundleResources(long bundleId, String path, String pattern, int options);
+
+    /**
+     * Estimates the compressed heapdump size based on current heap usage.
+     * <p>
+     * This uses the current heap usage and applies an estimated compression ratio
+     * (typically 20-30% for GZIP compression of heap dumps).
+     *
+     * @return estimated compressed heapdump size in bytes
+     * @since 11.0
+     */
+    long estimateHeapdumpSize();
+
+    /**
+     * Creates a heapdump and saves it locally on the agent device.
+     * <p>
+     * The heapdump is compressed with GZIP and saved to the specified path.
+     * The file is NOT automatically deleted - the caller is responsible for cleanup.
+     *
+     * @param outputPath the absolute path where the heapdump should be saved
+     *            (e.g., "/opt/agent/heapdumps/dump.hprof.gz")
+     * @return the absolute path to the created heapdump file
+     * @throws Exception if the heapdump creation fails
+     * @since 11.0
+     */
+    String createHeapdumpLocally(String outputPath) throws Exception;
+
+    /**
+     * Estimates the snapshot size based on current runtime state.
+     * <p>
+     * This estimates the size of a JSON snapshot by counting bundles, components,
+     * configurations, services, and other runtime objects.
+     *
+     * @return estimated snapshot size in bytes
+     * @since 11.0
+     */
+    long estimateSnapshotSize();
+
+    /**
+     * Creates a snapshot and saves it locally on the agent device.
+     * <p>
+     * The snapshot is saved as JSON to the specified path.
+     * The file is NOT automatically deleted - the caller is responsible for cleanup.
+     *
+     * @param outputPath the absolute path where the snapshot should be saved
+     *            (e.g., "/opt/agent/snapshots/snapshot.json")
+     * @return the absolute path to the created snapshot file
+     * @throws Exception if the snapshot creation fails
+     * @since 11.0
+     */
+    String createSnapshotLocally(String outputPath) throws Exception;
 }

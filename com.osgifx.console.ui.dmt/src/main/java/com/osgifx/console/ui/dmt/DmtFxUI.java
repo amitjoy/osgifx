@@ -68,7 +68,7 @@ public final class DmtFxUI {
     private DmtFxController   fxController;
 
     @PostConstruct
-    public void postConstruct() {
+    public void postConstruct(final BorderPane parent) {
         createControls();
         logger.atDebug().log("DMT part has been initialized");
     }
@@ -84,6 +84,7 @@ public final class DmtFxUI {
     @Optional
     private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls();
     }
 
@@ -132,6 +133,7 @@ public final class DmtFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
+            statusBar.enableRpcProgressTracking();
             final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);

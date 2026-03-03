@@ -15,6 +15,10 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_COLLECTION_SIZE_KEY;
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_MAP_SIZE_KEY;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,6 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,9 +44,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+
+import org.osgi.framework.BundleContext;
 
 /**
  * A High-Performance, Hybrid (Unsafe + MethodHandle) binary codec for OSGi DTOs.
@@ -68,6 +74,16 @@ public class BinaryCodec {
     private static final Map<Class<?>, FieldAccessor[]> accessorCache = new ConcurrentHashMap<>();
     private static final Map<Class<?>, Supplier<?>>     factoryCache  = new ConcurrentHashMap<>();
     private static final MethodHandles.Lookup           lookup        = MethodHandles.lookup();
+
+    // Configuration limits (read once at construction)
+    private final int MAX_COLLECTION_SIZE;
+    private final int MAX_MAP_SIZE;
+    private final int MAX_BYTE_ARRAY_SIZE;
+
+    // Default limits
+    private static final int DEFAULT_MAX_COLLECTION_SIZE = 1_000_000;
+    private static final int DEFAULT_MAX_MAP_SIZE        = 500_000;
+    private static final int DEFAULT_MAX_BYTE_ARRAY_SIZE = 100 * 1024 * 1024; // 100 MB
 
     // -- Unsafe Capabilities --
     private static final Object unsafe;
@@ -177,6 +193,45 @@ public class BinaryCodec {
         CallSite site = LambdaMetafactory.metafactory(lookup, interfaceMethodName,
                 MethodType.methodType(interfaceType, unsafeClass), interfaceTypeMethod, handle, interfaceTypeMethod);
         return (T) site.getTarget().invoke(unsafeInstance);
+    }
+
+    /**
+     * Creates a BinaryCodec with default limits.
+     * This constructor is used when no BundleContext is available.
+     */
+    public BinaryCodec() {
+        this(null);
+    }
+
+    /**
+     * Creates a BinaryCodec with configurable limits from BundleContext properties.
+     *
+     * @param context the bundle context for reading configuration properties (can be null)
+     */
+    public BinaryCodec(final BundleContext context) {
+        if (context != null) {
+            MAX_COLLECTION_SIZE = getIntProperty(context, AGENT_RPC_MAX_COLLECTION_SIZE_KEY,
+                    DEFAULT_MAX_COLLECTION_SIZE);
+            MAX_MAP_SIZE        = getIntProperty(context, AGENT_RPC_MAX_MAP_SIZE_KEY, DEFAULT_MAX_MAP_SIZE);
+            MAX_BYTE_ARRAY_SIZE = getIntProperty(context, AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY,
+                    DEFAULT_MAX_BYTE_ARRAY_SIZE);
+        } else {
+            MAX_COLLECTION_SIZE = DEFAULT_MAX_COLLECTION_SIZE;
+            MAX_MAP_SIZE        = DEFAULT_MAX_MAP_SIZE;
+            MAX_BYTE_ARRAY_SIZE = DEFAULT_MAX_BYTE_ARRAY_SIZE;
+        }
+    }
+
+    private static int getIntProperty(final BundleContext context, final String key, final int defaultValue) {
+        final String value = context.getProperty(key);
+        if (value != null) {
+            try {
+                return Integer.parseInt(value);
+            } catch (final NumberFormatException e) {
+                // Fall back to default if property value is invalid
+            }
+        }
+        return defaultValue;
     }
 
     // Type Tags
@@ -366,7 +421,14 @@ public class BinaryCodec {
 
         switch (tag) {
             case LIST: {
-                int          size     = in.readInt();
+                int size = in.readInt();
+                // Validate collection size to prevent collection bomb attacks
+                if (size < 0 || size > MAX_COLLECTION_SIZE) {
+                    throw new IOException(String.format(
+                            "Collection size limit exceeded: requested %d elements, limit is %d. "
+                                    + "This may indicate a collection bomb attack or an unexpectedly large collection.",
+                            size, MAX_COLLECTION_SIZE));
+                }
                 List<Object> list     = new ArrayList<>(size);
                 Type         compType = Object.class;
                 if (type instanceof ParameterizedType)
@@ -388,7 +450,14 @@ public class BinaryCodec {
                 return list;
             }
             case MAP: {
-                int                 size  = in.readInt();
+                int size = in.readInt();
+                // Validate map size to prevent collection bomb attacks
+                if (size < 0 || size > MAX_MAP_SIZE) {
+                    throw new IOException(String.format(
+                            "Map size limit exceeded: requested %d entries, limit is %d. "
+                                    + "This may indicate a collection bomb attack or an unexpectedly large map.",
+                            size, MAX_MAP_SIZE));
+                }
                 Map<Object, Object> map   = new LinkedHashMap<>(size);
                 Type                kType = Object.class;
                 Type                vType = Object.class;
@@ -403,7 +472,14 @@ public class BinaryCodec {
             }
             case ARRAY: {
                 in.readUTF(); // Skip type signature
-                int    len  = in.readInt();
+                int len = in.readInt();
+                // Validate byte array size to prevent memory exhaustion
+                if (len < 0 || len > MAX_BYTE_ARRAY_SIZE) {
+                    throw new IOException(String.format(
+                            "Byte array size limit exceeded: requested %d bytes, limit is %d bytes. "
+                                    + "This may indicate a collection bomb attack or an unexpectedly large array.",
+                            len, MAX_BYTE_ARRAY_SIZE));
+                }
                 byte[] data = new byte[len];
                 in.readFully(data);
                 return data;
@@ -435,7 +511,14 @@ public class BinaryCodec {
             case STRING:
                 return in.readUTF();
             case STRING_LARGE: {
-                int    len   = in.readInt();
+                int len = in.readInt();
+                // Validate large string size to prevent memory exhaustion
+                if (len < 0 || len > MAX_BYTE_ARRAY_SIZE) {
+                    throw new IOException(String.format(
+                            "Large string size limit exceeded: requested %d bytes, limit is %d bytes. "
+                                    + "This may indicate an attack or an unexpectedly large string.",
+                            len, MAX_BYTE_ARRAY_SIZE));
+                }
                 byte[] bytes = new byte[len];
                 in.readFully(bytes);
                 return new String(bytes, StandardCharsets.UTF_8);

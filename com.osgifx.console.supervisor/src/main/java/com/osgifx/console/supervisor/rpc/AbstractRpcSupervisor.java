@@ -27,6 +27,7 @@ import static org.osgi.service.condition.Condition.INSTANCE;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.lang.reflect.Proxy;
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -50,6 +51,8 @@ import com.google.mu.util.concurrent.Retryer.Delay;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
 import com.osgifx.console.agent.rpc.socket.SocketRPC;
+import com.osgifx.console.api.RpcProgressTracker;
+import com.osgifx.console.api.RpcTrackingProxy;
 import com.osgifx.console.supervisor.MqttConnection;
 import com.osgifx.console.supervisor.SocketConnection;
 import com.osgifx.console.supervisor.rpc.TokenProvider.TokenConfigDTO;
@@ -101,12 +104,15 @@ public abstract class AbstractRpcSupervisor<S, A> {
     private static final int    SOCKET_RPC_BACKOFF_LIMIT      = 4;
     private static final double SOCKET_RPC_BACKOFF_MULTIPLIER = 1.5d;
 
-    private A                 agent;
-    protected int             port;
-    protected int             timeout;
-    protected String          host;
-    protected RemoteRPC<S, A> remoteRPC;
-    protected volatile int    exitCode;
+    private A                    agent;
+    private A                    rawAgent;          // Unwrapped agent for internal use
+    protected int                port;
+    protected int                timeout;
+    protected String             host;
+    protected RemoteRPC<S, A>    remoteRPC;
+    protected volatile int       exitCode;
+    protected BundleContext      bundleContext;
+    protected RpcProgressTracker rpcProgressTracker;
 
     protected void connectToSocket(final Class<A> agent,
                                    final S supervisor,
@@ -165,8 +171,8 @@ public abstract class AbstractRpcSupervisor<S, A> {
                         }
 
                         final var executor = newFixedThreadPool("fx-supervisor-socket-");
-                        remoteRPC = new SocketRPC<>(agent, supervisor, socket, executor);
-                        this.setRemoteRPC(remoteRPC);
+                        remoteRPC = new SocketRPC<>(bundleContext, agent, supervisor, socket, executor);
+                        this.setRemoteRPC(remoteRPC, agent);
                         remoteRPC.open();
                         return null;
                     } catch (final ConnectException e) {
@@ -228,19 +234,36 @@ public abstract class AbstractRpcSupervisor<S, A> {
         final var executor = newFixedThreadPool("fx-supervisor-mqtt-");
         remoteRPC = new MqttRPC<>(bundleContext, agent, supervisor, connection.subTopic(), connection.pubTopic(),
                                   executor);
-        this.setRemoteRPC(remoteRPC);
+        this.setRemoteRPC(remoteRPC, agent);
         remoteRPC.open();
 
         return result;
     }
 
-    private void setRemoteRPC(final RemoteRPC<S, A> rpc) {
-        agent     = rpc.getRemote();
+    @SuppressWarnings("unchecked")
+    private void setRemoteRPC(final RemoteRPC<S, A> rpc, final Class<A> agentClass) {
+        rawAgent  = rpc.getRemote();
         remoteRPC = rpc;
+
+        // Wrap agent with RpcTrackingProxy if tracker is available
+        if (rpcProgressTracker != null) {
+            agent = (A) Proxy.newProxyInstance(agentClass.getClassLoader(), new Class<?>[] { agentClass },
+                    new RpcTrackingProxy(rawAgent, rpcProgressTracker));
+        } else {
+            agent = rawAgent;
+        }
     }
 
     public A getAgent() {
         return agent;
+    }
+
+    /**
+     * Returns the raw unwrapped agent for internal use.
+     * Use this when you need to bypass RPC tracking.
+     */
+    protected A getRawAgent() {
+        return rawAgent;
     }
 
     public boolean isOpen() {

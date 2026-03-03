@@ -105,6 +105,7 @@ public final class ServicesFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         searchFilter = null;
         createControls(parent, loader);
     }
@@ -156,6 +157,7 @@ public final class ServicesFxUI {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
         if (isConnected) {
+            statusBar.enableRpcProgressTracking();
             final var infoNode = Fx.initStatusBarButton(this::showInfo, "Info", "INFO");
             statusBar.addToRight(infoNode);
             statusBar.addToRight(new Separator(VERTICAL));

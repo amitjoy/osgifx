@@ -39,7 +39,7 @@ public final class WebGraphView extends BorderPane {
     private final CompletableFuture<Void> readyFuture = new CompletableFuture<>();
 
     public WebGraphView() {
-        webView   = new WebView();
+        webView = new WebView();
         webView.setContextMenuEnabled(false);
         webEngine = webView.getEngine();
         setCenter(webView);
@@ -124,9 +124,10 @@ public final class WebGraphView extends BorderPane {
             return;
         }
         final var jsonArray = new StringBuilder("[");
-        var first = true;
+        var       first     = true;
         for (final var id : nodeIds) {
-            if (!first) jsonArray.append(",");
+            if (!first)
+                jsonArray.append(",");
             jsonArray.append("\"").append(escapeForJS(id)).append("\"");
             first = false;
         }

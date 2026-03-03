@@ -19,6 +19,7 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -27,6 +28,9 @@ import javax.inject.Named;
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
 import org.controlsfx.control.table.TableFilter;
+import org.controlsfx.control.table.TableRowExpanderColumn;
+import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
@@ -58,6 +62,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
 public final class McpFxController {
 
@@ -86,15 +91,11 @@ public final class McpFxController {
     @FXML
     private TableColumn<McpToolDTO, String> descriptionColumn;
     @FXML
-    private TableColumn<McpToolDTO, String> schemaColumn;
-    @FXML
     private TableView<McpLogDTO>            logsTable;
     @FXML
     private TableColumn<McpLogDTO, String>  timestampColumn;
     @FXML
     private TableColumn<McpLogDTO, String>  typeColumn;
-    @FXML
-    private TableColumn<McpLogDTO, String>  contentColumn;
 
     @Inject
     @Optional
@@ -116,6 +117,8 @@ public final class McpFxController {
     private final ObservableList<McpToolDTO> tools = FXCollections.observableArrayList();
     private final ObservableList<McpLogDTO>  logs  = FXCollections.observableArrayList();
     private final Gson                       gson  = new GsonBuilder().setPrettyPrinting().create();
+    private TableRowDataFeatures<McpToolDTO> previouslyExpandedTool;
+    private TableRowDataFeatures<McpLogDTO>  previouslyExpandedLog;
 
     @FXML
     public void initialize() {
@@ -157,28 +160,85 @@ public final class McpFxController {
     }
 
     private void initToolsTable() {
-        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
-        schemaColumn.setCellValueFactory(cellData -> cellData.getValue().schemaProperty());
+        final var nestedLoader = new FXMLLoader();
+        nestedLoader.setLocation(bundleContext.getBundle().getResource("/fxml/expander-column-content.fxml"));
+        nestedLoader.setControllerFactory(c -> ContextInjectionFactory.make(c, eclipseContext));
+        try {
+            final var expandedNode = (GridPane) nestedLoader.load();
+            final var controller   = (ToolDetailsFxController) nestedLoader.getController();
 
-        toolsTable.setItems(tools);
-        Fx.addContextMenuToCopyContent(toolsTable);
-        TableFilter.forTableView(toolsTable).lazy(true).apply();
-        toolsTable.getSortOrder().add(nameColumn);
-        toolsTable.sort();
+            final var expanderColumn = new TableRowExpanderColumn<McpToolDTO>(current -> {
+                if (previouslyExpandedTool != null && current.getValue() == previouslyExpandedTool.getValue()) {
+                    return expandedNode;
+                }
+                if (previouslyExpandedTool != null && previouslyExpandedTool.isExpanded()) {
+                    previouslyExpandedTool.toggleExpanded();
+                }
+                controller.initControls(current.getValue());
+                previouslyExpandedTool = current;
+                return expandedNode;
+            });
+
+            expanderColumn.setPrefWidth(48);
+            expanderColumn.setMaxWidth(48);
+            expanderColumn.setMinWidth(48);
+
+            nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+            descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
+
+            threadSync.asyncExec(() -> {
+                toolsTable.getColumns().add(0, expanderColumn);
+                toolsTable.setItems(tools);
+                Fx.addContextMenuToCopyContent(toolsTable);
+                TableFilter.forTableView(toolsTable).lazy(true).apply();
+                toolsTable.getSortOrder().add(nameColumn);
+                toolsTable.sort();
+            });
+        } catch (final IOException e) {
+            logger.atError().withException(e).log("Cannot load tools expander FXML");
+        }
     }
 
     private void initLogsTable() {
-        timestampColumn.setCellValueFactory(cellData -> Fx.formatTime(cellData.getValue().timestampProperty().get()));
-        typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
-        contentColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
+        final var nestedLoader = new FXMLLoader();
+        nestedLoader.setLocation(bundleContext.getBundle().getResource("/fxml/log-expander-column-content.fxml"));
+        nestedLoader.setControllerFactory(c -> ContextInjectionFactory.make(c, eclipseContext));
+        try {
+            final var expandedNode = (GridPane) nestedLoader.load();
+            final var controller   = (LogDetailsFxController) nestedLoader.getController();
 
-        logsTable.setItems(logs);
-        Fx.addContextMenuToCopyContent(logsTable);
-        TableFilter.forTableView(logsTable).lazy(true).apply();
-        timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
-        logsTable.getSortOrder().add(timestampColumn);
-        logsTable.sort();
+            final var expanderColumn = new TableRowExpanderColumn<McpLogDTO>(current -> {
+                if (previouslyExpandedLog != null && current.getValue() == previouslyExpandedLog.getValue()) {
+                    return expandedNode;
+                }
+                if (previouslyExpandedLog != null && previouslyExpandedLog.isExpanded()) {
+                    previouslyExpandedLog.toggleExpanded();
+                }
+                controller.initControls(current.getValue());
+                previouslyExpandedLog = current;
+                return expandedNode;
+            });
+
+            expanderColumn.setPrefWidth(48);
+            expanderColumn.setMaxWidth(48);
+            expanderColumn.setMinWidth(48);
+
+            timestampColumn
+                    .setCellValueFactory(cellData -> Fx.formatTime(cellData.getValue().timestampProperty().get()));
+            typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
+
+            threadSync.asyncExec(() -> {
+                logsTable.getColumns().add(0, expanderColumn);
+                logsTable.setItems(logs);
+                Fx.addContextMenuToCopyContent(logsTable);
+                TableFilter.forTableView(logsTable).lazy(true).apply();
+                timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
+                logsTable.getSortOrder().add(timestampColumn);
+                logsTable.sort();
+            });
+        } catch (final IOException e) {
+            logger.atError().withException(e).log("Cannot load logs expander FXML");
+        }
     }
 
     private void updateTools() {

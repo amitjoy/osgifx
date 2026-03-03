@@ -22,6 +22,7 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -56,6 +57,8 @@ public final class LogConfigurationsFxController {
     private boolean                                       isConnected;
     @Inject
     private DataProvider                                  dataProvider;
+    @Inject
+    private ThreadSynchronize                             threadSync;
     private TableRowDataFeatures<XBundleLoggerContextDTO> previouslyExpanded;
 
     @FXML
@@ -89,27 +92,30 @@ public final class LogConfigurationsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var nameColumn = new TableColumn<XBundleLoggerContextDTO, String>("Logger Context Name");
 
-        nameColumn.setPrefWidth(650);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var hasCustomLogLevelsColumn = new TableColumn<XBundleLoggerContextDTO, Boolean>("Has Custom Log Levels?");
 
-        hasCustomLogLevelsColumn.setPrefWidth(250);
         hasCustomLogLevelsColumn.setCellValueFactory(c -> new SimpleBooleanProperty(!c.getValue().logLevels.isEmpty()));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(nameColumn);
         table.getColumns().add(hasCustomLogLevelsColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         final var loggerContexts = dataProvider.loggerContexts();
-        table.setItems(loggerContexts);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(nameColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(loggerContexts);
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(nameColumn);
+            table.sort();
+        });
     }
 
 }

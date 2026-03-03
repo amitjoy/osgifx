@@ -21,6 +21,7 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
@@ -51,6 +52,9 @@ public final class TerminalFxUI {
     @Inject
     private Executor          executor;
     @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
     private ConsoleMaskerPane progressPane;
@@ -76,6 +80,7 @@ public final class TerminalFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls(parent, loader);
     }
 
@@ -96,6 +101,9 @@ public final class TerminalFxUI {
                 parent.getChildren().clear();
                 parent.setCenter(tabContent);
                 statusBar.addTo(parent);
+                if (isConnected) {
+                    statusBar.enableRpcProgressTracking();
+                }
                 progressPane.setVisible(false);
             }
         };

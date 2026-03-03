@@ -189,15 +189,18 @@ public final class GraphFxComponentController implements GraphController {
     }
 
     private void initComponentsList() {
-        componentsList.getSelectionModel().setSelectionMode(MULTIPLE);
-        componentsList.setCellFactory(CheckBoxListCell.forListView(ComponentItem::selectedProperty));
-
         final var components = dataProvider.components();
-        masterComponentList = FXCollections.observableArrayList(components.stream().map(ComponentItem::new).toList());
+        if (masterComponentList == null) {
+            masterComponentList = FXCollections
+                    .observableArrayList(components.stream().map(ComponentItem::new).toList());
+            componentsList.getSelectionModel().setSelectionMode(MULTIPLE);
+            componentsList.setCellFactory(CheckBoxListCell.forListView(ComponentItem::selectedProperty));
 
-        final var filteredComponentsList = initSearchFilter(masterComponentList);
-
-        componentsList.setItems(filteredComponentsList.sorted(Comparator.comparing(b -> b.getComponent().name)));
+            final var filteredComponentsList = initSearchFilter(masterComponentList);
+            componentsList.setItems(filteredComponentsList.sorted(Comparator.comparing(b -> b.getComponent().name)));
+        } else {
+            masterComponentList.setAll(components.stream().map(ComponentItem::new).toList());
+        }
         logger.atInfo().log("Components list has been initialized");
     }
 

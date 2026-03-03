@@ -117,3 +117,105 @@ We provide a robust Java script to launch the client with all necessary modulari
 ### Headless Launch
 
 For automated connections without the wizard, refer to the [Headless Launch Guide](HEADLESS_LAUNCH.md).
+
+---
+
+## 3. Agent Configuration Reference
+
+The OSGi.fx agent can be customized using system properties. These properties allow you to harden the agent against resource exhaustion attacks and configure how large payloads (like heap dumps) are handled.
+
+### Security Hardening
+
+To prevent attacks such as Zip Bombs or Collection Bombs during RPC communication, the following properties can be configured:
+
+| Property | Default | Description |
+| :--- | :--- | :--- |
+| `osgi.fx.agent.rpc.max.decompressed.size` | 250 MB | Maximum allowed decompressed size for GZIP streams. Prevents Zip Bomb attacks. |
+| `osgi.fx.agent.rpc.max.collection.size` | 1,000,000 | Maximum number of elements in a decoded collection. Prevents Collection Bomb attacks. |
+| `osgi.fx.agent.rpc.max.map.size` | 1,000,000 | Maximum number of entries in a decoded map. Prevents Collection Bomb attacks. |
+| `osgi.fx.agent.rpc.max.byte.array.size` | 100 MB | Maximum allowed length for a decoded byte array. Prevents memory exhaustion. |
+
+### Heapdump & Snapshot
+
+The following properties control the generation and storage of heap dumps and snapshots:
+
+| Property | Default | Description |
+| :--- | :--- | :--- |
+| `osgi.fx.agent.heapdump.max.size` | -1 (Unlimited) | Maximum allowed size of a heap dump file in bytes. |
+| `osgi.fx.agent.gzip.compression.level` | 6 | GZIP compression level (1-9) for compressed payloads. |
+| `osgi.fx.agent.heapdump.disk.buffer.percentage` | 10 | Extra disk space (percentage) required beyond the estimated heap size for heap dump creation. |
+
+---
+
+## 4. Large Payload Handling (SPI)
+
+For remote runtimes where transferring large files (e.g., several hundred MBs of heap dumps) over RPC is inefficient or restricted, OSGi.fx provides the `LargePayloadHandler` Service Provider Interface (SPI).
+
+This SPI allows you to implement custom logic to handle large payloads, such as uploading them to an external storage service (e.g., Amazon S3, Azure Blob Storage, or an internal Artifactory).
+
+### The SPI Interface
+
+To use this feature, implement the `LargePayloadHandler` interface and register it as an OSGi service in your remote runtime.
+
+```java
+public interface LargePayloadHandler {
+    /**
+     * Handles the large payload (e.g., uploads to S3).
+     *
+     * @param metadata the payload metadata
+     * @param content  the payload content as a stream
+     * @return the result of the handling operation
+     */
+    PayloadHandlerResult handle(PayloadMetadata metadata, InputStream content);
+
+    /**
+     * Returns the maximum payload size supported by this handler in bytes.
+     * Large payloads exceeding this limit will fallback to other methods.
+     */
+    long getMaximumSize();
+
+    /**
+     * Returns a human-readable name for this handler (e.g., "S3 Upload").
+     */
+    String getName();
+}
+```
+
+### Pre-flight and User Decision
+
+When a large payload operation (like "Heap Dump") is triggered:
+
+1.  **Pre-flight Check**: The agent estimates the payload size and checks for registered `LargePayloadHandler` services.
+2.  **User Choice**: A dialog is presented to the user with the following options:
+    *   **Transfer via RPC**: Default method; directly transfers the file through the active connection.
+    *   **Use [Handler Name]**: Available if an SPI implementation is registered.
+    *   **Store Locally**: Saves the file on the remote machine's disk at a specified location.
+
+### Implementation Example (Conceptual S3 Upload)
+
+```java
+@Component(service = LargePayloadHandler.class)
+public class S3PayloadHandler implements LargePayloadHandler {
+
+    @Override
+    public PayloadHandlerResult handle(PayloadMetadata metadata, InputStream content) {
+        try {
+            // Logic to upload 'content' to an S3 bucket...
+            String s3Url = "https://s3.amazonaws.com/my-bucket/" + metadata.getFilename();
+            return PayloadHandlerResult.success(s3Url);
+        } catch (Exception e) {
+            return PayloadHandlerResult.failure("Upload failed: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public long getMaximumSize() {
+        return 5 * 1024 * 1024 * 1024L; // 5 GB
+    }
+
+    @Override
+    public String getName() {
+        return "Amazon S3";
+    }
+}
+```

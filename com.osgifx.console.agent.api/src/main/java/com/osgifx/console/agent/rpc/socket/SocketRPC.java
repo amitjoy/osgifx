@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.socket;
 
+import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,11 +46,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.osgi.framework.BundleContext;
+
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
+import com.osgifx.console.agent.rpc.BoundedInputStream;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -68,7 +73,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
 
     // Optimization: Shared Codec & Reuse Buffers
-    private static final BinaryCodec                     codec       = new BinaryCodec();
+    private final BinaryCodec                            codec;
+    private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer      = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
     private final Map<String, Method>                    methodCache = new HashMap<>();
@@ -96,7 +102,16 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                      final L local,
                      final Socket socket,
                      final ExecutorService executor) throws IOException {
-        this(remoteClass, local, new BufferedInputStream(configureSocket(socket).getInputStream()),
+        this(null, remoteClass, local, new BufferedInputStream(configureSocket(socket).getInputStream()),
+             new BufferedOutputStream(socket.getOutputStream()), executor);
+    }
+
+    public SocketRPC(final BundleContext context,
+                     final Class<R> remoteClass,
+                     final L local,
+                     final Socket socket,
+                     final ExecutorService executor) throws IOException {
+        this(context, remoteClass, local, new BufferedInputStream(configureSocket(socket).getInputStream()),
              new BufferedOutputStream(socket.getOutputStream()), executor);
     }
 
@@ -105,12 +120,32 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                      final InputStream in,
                      final OutputStream out,
                      final ExecutorService executor) {
-        this(remoteClass, local, (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in),
+        this(null, remoteClass, local, (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in),
              (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out), executor);
     }
 
-    @SuppressWarnings("unchecked")
+    public SocketRPC(final BundleContext context,
+                     final Class<R> remoteClass,
+                     final L local,
+                     final InputStream in,
+                     final OutputStream out,
+                     final ExecutorService executor) {
+        this(context, remoteClass, local,
+             (in instanceof DataInputStream) ? (DataInputStream) in : new DataInputStream(in),
+             (out instanceof DataOutputStream) ? (DataOutputStream) out : new DataOutputStream(out), executor);
+    }
+
     public SocketRPC(final Class<R> remoteClass,
+                     final L local,
+                     final DataInputStream in,
+                     final DataOutputStream out,
+                     final ExecutorService executor) {
+        this(null, remoteClass, local, in, out, executor);
+    }
+
+    @SuppressWarnings("unchecked")
+    public SocketRPC(final BundleContext context,
+                     final Class<R> remoteClass,
                      final L local,
                      final DataInputStream in,
                      final DataOutputStream out,
@@ -122,6 +157,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         this.in          = in;
         this.out         = out;
         this.executor    = executor;
+        this.codec       = new BinaryCodec(context);
+
+        // Read max decompressed size from configuration
+        this.maxDecompressedSize = readMaxDecompressedSize(context);
 
         // Cache local methods
         for (Method m : this.local.getClass().getMethods()) {
@@ -357,7 +396,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
 
             InputStream source = new FastByteArrayInputStream(result.value);
             if (isGzip(result.value)) {
-                source = new GZIPInputStream(source);
+                source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
             }
 
             try (DataInputStream dataIn = new DataInputStream(source)) {
@@ -388,7 +427,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     final byte[] argData = args.get(i);
                     InputStream  source  = new FastByteArrayInputStream(argData);
                     if (isGzip(argData)) {
-                        source = new GZIPInputStream(source);
+                        source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
                     }
 
                     try (DataInputStream dataIn = new DataInputStream(source)) {
@@ -429,5 +468,20 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             // Signal completion instead of notifyAll()
             result.latch.countDown();
         }
+    }
+
+    private static long readMaxDecompressedSize(final BundleContext context) {
+        final long defaultMaxSize = 250L * 1024 * 1024; // 250 MB
+        if (context != null) {
+            final String sizeStr = context.getProperty(AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY);
+            if (sizeStr != null) {
+                try {
+                    return Long.parseLong(sizeStr);
+                } catch (final NumberFormatException e) {
+                    return defaultMaxSize;
+                }
+            }
+        }
+        return defaultMaxSize;
     }
 }

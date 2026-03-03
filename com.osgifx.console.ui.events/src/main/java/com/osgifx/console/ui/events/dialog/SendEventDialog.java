@@ -27,7 +27,6 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.dialog.LoginDialog;
@@ -47,6 +46,7 @@ import com.osgifx.console.util.fx.PropertiesForm.FormContent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -76,7 +76,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
         validationSupport.registerValidator(txtTopic,
                 createPredicateValidator(value -> validateTopic(value.toString()), "Invalid Event Topic"));
 
-        final var isSyncToggle = new ToggleSwitch("Is Synchronous?");
+        final var isSyncToggle = new CheckBox("Is Synchronous?");
 
         final var lbMessage = new Label("");
         lbMessage.getStyleClass().addAll("message-banner");
@@ -131,7 +131,7 @@ public final class SendEventDialog extends Dialog<EventDTO> {
     }
 
     private EventDTO getInput(final CustomTextField txtTopic,
-                              final ToggleSwitch isSyncToggle,
+                              final CheckBox isSyncToggle,
                               final Map<FormContent, Triple<Supplier<String>, Supplier<String>, Supplier<XAttributeDefType>>> entries) {
         final List<ConfigValue> properties = Lists.newArrayList();
         entries.forEach((_, v) -> {

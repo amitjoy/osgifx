@@ -38,8 +38,7 @@ public final class PasswordPromptDialog extends Dialog<String> {
         dialogPane.setHeaderText("Password Required");
         dialogPane.getStylesheets().add(LoginDialog.class.getResource("dialogs.css").toExternalForm());
         dialogPane.getStylesheets().add(getClass().getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(
-                new ImageView(this.getClass().getResource("/graphic/images/password.png").toString()));
+        dialogPane.setGraphic(new ImageView(this.getClass().getResource("/graphic/images/password.png").toString()));
         dialogPane.getButtonTypes().addAll(CANCEL);
 
         final var password = (CustomPasswordField) TextFields.createClearablePasswordField();

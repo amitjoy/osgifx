@@ -28,6 +28,7 @@ import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -64,6 +65,8 @@ public final class PackagesFxController {
     private boolean                          isConnected;
     @Inject
     private DataProvider                     dataProvider;
+    @Inject
+    private ThreadSynchronize                threadSync;
     private FilteredList<PackageDTO>         filteredList;
     private TableRowDataFeatures<PackageDTO> previouslyExpanded;
 
@@ -97,33 +100,35 @@ public final class PackagesFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var nameColumn = new TableColumn<PackageDTO, String>("Name");
 
-        nameColumn.setPrefWidth(550);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var versionColumn = new TableColumn<PackageDTO, String>("Version");
 
-        versionColumn.setPrefWidth(450);
         versionColumn.setCellValueFactory(new DTOCellValueFactory<>("version", String.class));
 
         final var hasDuplicatesColumn = new TableColumn<PackageDTO, String>("Is Duplicate Export?");
 
-        hasDuplicatesColumn.setPrefWidth(200);
         hasDuplicatesColumn.setCellValueFactory(new DTOCellValueFactory<>("isDuplicateExport", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(nameColumn);
         table.getColumns().add(versionColumn);
         table.getColumns().add(hasDuplicatesColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.packages());
-        table.setItems(filteredList);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(nameColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(filteredList);
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(nameColumn);
+            table.sort();
+        });
     }
 
     @Inject

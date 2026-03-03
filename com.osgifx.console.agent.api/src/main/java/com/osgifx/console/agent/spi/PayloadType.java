@@ -13,34 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.ui.events.dialog;
+package com.osgifx.console.agent.spi;
 
-import java.util.Set;
+/**
+ * Type of large payload.
+ *
+ * @since 11.0
+ */
+public enum PayloadType {
 
-import javax.inject.Inject;
-import javax.inject.Named;
+    /**
+     * Heap dump file (.hprof or .hprof.gz)
+     */
+    HEAPDUMP,
 
-import org.eclipse.fx.core.log.FluentLogger;
-import org.eclipse.fx.core.log.Log;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-
-public final class SubscribedEventsDialogController {
-
-    @Log
-    @Inject
-    private FluentLogger     logger;
-    @FXML
-    private ListView<String> subscribedEvents;
-    @Inject
-    @Named("subscribed_topics")
-    private Set<String>      subscribedTopics;
-
-    @FXML
-    public void initialize() {
-        logger.atDebug().log("FXML controller has been initialized");
-        subscribedEvents.getItems().addAll(subscribedTopics);
-    }
+    /**
+     * Runtime snapshot file (.json)
+     */
+    SNAPSHOT
 
 }

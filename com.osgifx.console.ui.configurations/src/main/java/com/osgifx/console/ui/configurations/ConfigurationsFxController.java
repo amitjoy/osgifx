@@ -206,26 +206,25 @@ public final class ConfigurationsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var pidColumn = new TableColumn<XConfigurationDTO, String>("PID/Factory PID");
-        pidColumn.setPrefWidth(580);
         pidColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("pid", String.class,
                                           _ -> "Not created yet but property descriptor available"));
         Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);
 
         final var nameColumn = new TableColumn<XConfigurationDTO, String>("Name");
-        nameColumn.setPrefWidth(400);
         nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> java.util.Optional
                 .ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
 
         final var locationColumn = new TableColumn<XConfigurationDTO, String>("Location");
-        locationColumn.setPrefWidth(150);
         locationColumn
                 .setCellValueFactory(new DTOCellValueFactory<>("location", String.class, _ -> "No bound location"));
 
         final var isFactoryColumn = new TableColumn<XConfigurationDTO, String>("Is Factory?");
-        isFactoryColumn.setPrefWidth(100);
         isFactoryColumn.setCellValueFactory(new DTOCellValueFactory<>("isFactory", String.class));
 
         table.getColumns().add(expanderColumn);
@@ -233,13 +232,15 @@ public final class ConfigurationsFxController {
         table.getColumns().add(nameColumn);
         table.getColumns().add(locationColumn);
         table.getColumns().add(isFactoryColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.configurations());
-        table.setItems(filteredList);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(pidColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(filteredList);
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(pidColumn);
+            table.sort();
+        });
     }
 
     @Inject

@@ -28,6 +28,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.service.log.LogLevel;
@@ -38,12 +39,14 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.logs.helper.LoggerConfigTextControl;
 import com.osgifx.console.ui.logs.helper.LogsHelper;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -71,6 +74,10 @@ public final class LogConfigurationEditorFxController {
     private Supervisor              supervisor;
     @Inject
     private EventBroker             eventBroker;
+    @Inject
+    private Executor                executor;
+    @Inject
+    private ThreadSynchronize       threadSync;
     @FXML
     private BorderPane              rootPanel;
     @FXML
@@ -104,20 +111,43 @@ public final class LogConfigurationEditorFxController {
     }
 
     private void saveLogConfig() {
-        final var name = loggerContext.name;
+        final var name      = loggerContext.name;
+        final var logLevels = getLogLevels();
+
         logger.atInfo().log("String log configuration for context '%s'", name);
-        final var result = supervisor.getAgent().updateBundleLoggerContext(name, getLogLevels());
-        if (result.result == SUCCESS) {
-            logger.atInfo().log(result.response);
-            eventBroker.post(LOGGER_CONTEXT_UPDATED_EVENT_TOPIC, name);
-            Fx.showSuccessNotification("Logger Context", "Logger context has been updated successfully");
-        } else if (result.result == SKIPPED) {
-            logger.atWarning().log(result.response);
-            FxDialog.showWarningDialog("Logger Context", result.response, getClass().getClassLoader());
-        } else {
-            logger.atError().log(result.response);
-            FxDialog.showErrorDialog("Logger Context", result.response, getClass().getClassLoader());
-        }
+
+        final Task<com.osgifx.console.agent.dto.XResultDTO> task = new Task<>() {
+            @Override
+            protected com.osgifx.console.agent.dto.XResultDTO call() throws Exception {
+                updateMessage("Updating logger context...");
+                return supervisor.getAgent().updateBundleLoggerContext(name, logLevels);
+            }
+        };
+
+        task.setOnSucceeded(_ -> {
+            final var result = task.getValue();
+            if (result.result == SUCCESS) {
+                logger.atInfo().log(result.response);
+                eventBroker.post(LOGGER_CONTEXT_UPDATED_EVENT_TOPIC, name);
+                Fx.showSuccessNotification("Logger Context", "Logger context has been updated successfully");
+            } else if (result.result == SKIPPED) {
+                logger.atWarning().log(result.response);
+                FxDialog.showWarningDialog("Logger Context", result.response, getClass().getClassLoader());
+            } else {
+                logger.atError().log(result.response);
+                FxDialog.showErrorDialog("Logger Context", result.response, getClass().getClassLoader());
+            }
+        });
+
+        task.setOnFailed(_ -> {
+            final var ex = task.getException();
+            logger.atError().withException(ex).log("Failed to update logger context");
+            threadSync.asyncExec(() -> FxDialog.showExceptionDialog(ex, getClass().getClassLoader()));
+        });
+
+        final var taskFuture = executor.runAsync(task);
+        FxDialog.showProgressDialog("Update Logger Context", task, getClass().getClassLoader(),
+                () -> taskFuture.cancel(true));
     }
 
     private Map<String, String> getLogLevels() {

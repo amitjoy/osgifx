@@ -60,9 +60,6 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.chart.ChartData;
 import eu.hansolo.tilesfx.colors.Bright;
 import eu.hansolo.tilesfx.colors.Dark;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.RowConstraints;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -79,10 +76,13 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -90,7 +90,6 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 public final class OverviewFxUI {
-
 
     private static final double REFRESH_DELAY = 5;
     private static final int    CYCLE_COUNT   = 5;
@@ -721,6 +720,7 @@ public final class OverviewFxUI {
     private void updateOnAgentDisconnectedEvent(@UIEventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data,
                                                 final BorderPane parent) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         dataRetrieverTimeline.stop();
 
         updateStaticOverviewInfo();
@@ -742,15 +742,18 @@ public final class OverviewFxUI {
     private void initStatusBar(final BorderPane parent) {
         statusBar.clearAllInRight();
         statusBar.addTo(parent);
-        if (isConnected && !isSnapshotAgent) {
-            final var refreshDelayDialog = Fx.initStatusBarButton(this::showViewRefreshDelayDialog,
-                    "View Refresh Delay", "GEAR");
-            statusBar.addToRight(timelineButton);
-            statusBar.addToRight(new Separator(VERTICAL));
-            statusBar.addToRight(refreshDelayDialog);
-            statusBar.addToRight(new Separator(VERTICAL));
-            final var refreshButton = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            statusBar.addToRight(refreshButton);
+        if (isConnected) {
+            statusBar.enableRpcProgressTracking();
+            if (!isSnapshotAgent) {
+                final var refreshDelayDialog = Fx.initStatusBarButton(this::showViewRefreshDelayDialog,
+                        "View Refresh Delay", "GEAR");
+                statusBar.addToRight(timelineButton);
+                statusBar.addToRight(new Separator(VERTICAL));
+                statusBar.addToRight(refreshDelayDialog);
+                statusBar.addToRight(new Separator(VERTICAL));
+                final var refreshButton = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+                statusBar.addToRight(refreshButton);
+            }
         }
     }
 

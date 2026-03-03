@@ -15,13 +15,13 @@
  ******************************************************************************/
 package com.osgifx.console.propertytypes;
 
-import org.osgi.service.component.annotations.ComponentPropertyType;
-
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import org.osgi.service.component.annotations.ComponentPropertyType;
 
 /**
  * Component Property Type for defining an MCP Tool.

@@ -43,6 +43,7 @@ public final class HeapMonitorFxUI {
     @PostConstruct
     public void postConstruct(final BorderPane parent) {
         createControls(parent);
+        statusBar.enableRpcProgressTracking();
         logger.atDebug().log("Heap monitor part has been initialized");
     }
 

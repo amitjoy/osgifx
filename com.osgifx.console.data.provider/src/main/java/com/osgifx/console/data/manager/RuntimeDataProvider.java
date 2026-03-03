@@ -17,13 +17,13 @@ package com.osgifx.console.data.manager;
 
 import static com.osgifx.console.data.manager.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
+import static com.osgifx.console.data.supplier.CdiContainersInfoSupplier.CDI_ID;
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.data.supplier.HealthChecksInfoSupplier.HEALTHCHECKS_ID;
 import static com.osgifx.console.data.supplier.HttpComponentsInfoSupplier.HTTP_ID;
 import static com.osgifx.console.data.supplier.JaxRsComponentsInfoSupplier.JAXRS_ID;
-import static com.osgifx.console.data.supplier.CdiContainersInfoSupplier.CDI_ID;
 import static com.osgifx.console.data.supplier.LeaksInfoSupplier.LEAKS_ID;
 import static com.osgifx.console.data.supplier.LoggerContextsInfoSupplier.LOGGER_CONTEXTS_ID;
 import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;

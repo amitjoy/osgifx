@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -41,6 +40,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
@@ -153,7 +153,7 @@ public final class PropertiesForm {
                     txtField.setTextFormatter(integerFormatter);
                     break;
                 case BOOLEAN:
-                    return new ToggleSwitch();
+                    return new CheckBox();
                 case DOUBLE:
                     final var captionAsDouble = "Decimal Number";
                     txtField.setPromptText(captionAsDouble);
@@ -212,7 +212,7 @@ public final class PropertiesForm {
         if (node instanceof final TextField tf) {
             return tf.getText();
         }
-        if (node instanceof final ToggleSwitch ts) {
+        if (node instanceof final CheckBox ts) {
             return String.valueOf(ts.isSelected());
         }
         return null;

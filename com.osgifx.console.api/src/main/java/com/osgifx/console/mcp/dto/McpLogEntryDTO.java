@@ -19,8 +19,8 @@ import org.osgi.dto.DTO;
 
 public class McpLogEntryDTO extends DTO {
 
-    public long           timestamp;
+    public long            timestamp;
     public McpLogEntryType type;
-    public String         content;
+    public String          content;
 
 }

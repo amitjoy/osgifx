@@ -21,15 +21,18 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.extension.dialog.ExtensionsViewDialogController">
    <center>
-      <TableView fx:id="extensionsList" prefHeight="200.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
-      	<placeholder>
-        	<Label text="No installed extensions" />
-    	</placeholder>
-        <columns>
-          <TableColumn fx:id="nameColumn" prefWidth="300.0" text="Name" />
-          <TableColumn fx:id="displayNameColumn" prefWidth="500.0" text="Display Name" />
-          <TableColumn fx:id="versionColumn" prefWidth="200.0" text="Version" />
-        </columns>
-      </TableView>
+       <TableView style="-fx-table-cell-border-color: transparent;" fx:id="extensionsList" BorderPane.alignment="CENTER">
+          <columnResizePolicy>
+             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+          </columnResizePolicy>
+          <placeholder>
+             <Label text="No installed extensions" />
+          </placeholder>
+          <columns>
+            <TableColumn fx:id="nameColumn" text="Name" />
+            <TableColumn fx:id="displayNameColumn" text="Display Name" />
+            <TableColumn fx:id="versionColumn" text="Version" />
+          </columns>
+       </TableView>
    </center>
 </BorderPane>

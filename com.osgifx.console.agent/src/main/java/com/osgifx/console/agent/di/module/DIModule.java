@@ -31,6 +31,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.admin.XBundleAdmin;
+import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
@@ -38,7 +39,6 @@ import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
-import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XJaxRsAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;

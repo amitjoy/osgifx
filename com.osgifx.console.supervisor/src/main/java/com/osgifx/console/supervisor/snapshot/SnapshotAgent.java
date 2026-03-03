@@ -39,13 +39,13 @@ import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
-import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
@@ -393,6 +393,26 @@ public final class SnapshotAgent implements Agent {
     @Override
     public void disableReceivingEvent() {
         // nothing to do
+    }
+
+    @Override
+    public long estimateHeapdumpSize() {
+        return 0L;
+    }
+
+    @Override
+    public String createHeapdumpLocally(final String outputPath) throws Exception {
+        return null;
+    }
+
+    @Override
+    public long estimateSnapshotSize() {
+        return 0L;
+    }
+
+    @Override
+    public String createSnapshotLocally(final String outputPath) throws Exception {
+        return null;
     }
 
 }

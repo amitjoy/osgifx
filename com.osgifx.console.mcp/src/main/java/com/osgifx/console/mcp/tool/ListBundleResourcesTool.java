@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -31,7 +32,6 @@ import com.osgifx.console.mcp.McpTool;
 import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
-import org.osgi.framework.wiring.BundleWiring;
 
 @Component(service = McpTool.class)
 @McpToolDef(name = "list_bundle_resources", description = "Finds resources in the bundle's classpath (includes imports)")

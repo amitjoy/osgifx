@@ -24,6 +24,7 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -59,6 +60,8 @@ public final class LogsViewFxController {
     private boolean                            isConnected;
     @Inject
     private DataProvider                       dataProvider;
+    @Inject
+    private ThreadSynchronize                  threadSync;
     private TableRowDataFeatures<XLogEntryDTO> previouslyExpanded;
 
     @FXML
@@ -92,20 +95,20 @@ public final class LogsViewFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var loggedAtColumn = new TableColumn<XLogEntryDTO, Date>("Logged At");
 
-        loggedAtColumn.setPrefWidth(270);
         loggedAtColumn.setCellValueFactory(new DTOCellValueFactory<>("loggedAt", Date.class));
 
         final var logLevelColumn = new TableColumn<XLogEntryDTO, String>("Level");
 
-        logLevelColumn.setPrefWidth(110);
         logLevelColumn.setCellValueFactory(new DTOCellValueFactory<>("level", String.class));
 
         final var messageColumn = new TableColumn<XLogEntryDTO, String>("Message");
 
-        messageColumn.setPrefWidth(750);
         messageColumn.setCellValueFactory(new DTOCellValueFactory<>("message", String.class));
         Fx.addCellFactory(messageColumn, c -> "ERROR".equalsIgnoreCase(c.level), Color.MEDIUMVIOLETRED, Color.BLACK);
 
@@ -113,12 +116,14 @@ public final class LogsViewFxController {
         table.getColumns().add(loggedAtColumn);
         table.getColumns().add(logLevelColumn);
         table.getColumns().add(messageColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         final var logs = dataProvider.logs();
-        table.setItems(logs);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        sortByLoggedAt(loggedAtColumn);
+        threadSync.asyncExec(() -> {
+            table.setItems(logs);
+            TableFilter.forTableView(table).lazy(true).apply();
+            sortByLoggedAt(loggedAtColumn);
+        });
     }
 
     private void sortByLoggedAt(final TableColumn<XLogEntryDTO, Date> column) {

@@ -22,6 +22,7 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -34,9 +35,9 @@ import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TabPane;
 
 public final class CdiFxController {
 
@@ -56,6 +57,8 @@ public final class CdiFxController {
     private boolean                                isConnected;
     @Inject
     private DataProvider                           dataProvider;
+    @Inject
+    private ThreadSynchronize                      threadSync;
     private TableRowDataFeatures<XCdiContainerDTO> previouslyExpanded;
 
     @FXML
@@ -88,24 +91,23 @@ public final class CdiFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var idColumn = new TableColumn<XCdiContainerDTO, String>("ID");
-        idColumn.setPrefWidth(300);
         idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", String.class));
 
         final var bundleIdColumn = new TableColumn<XCdiContainerDTO, String>("Bundle ID");
-        bundleIdColumn.setPrefWidth(150);
         bundleIdColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("bundleId", String.class, s -> String.valueOf(s.bundleId)));
 
         final var componentsCountColumn = new TableColumn<XCdiContainerDTO, String>("Components");
-        componentsCountColumn.setPrefWidth(150);
         componentsCountColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("components", String.class,
                                           s -> String.valueOf(s.components == null ? 0 : s.components.size())));
 
         final var errorsColumn = new TableColumn<XCdiContainerDTO, String>("Errors");
-        errorsColumn.setPrefWidth(150);
         errorsColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("errors", String.class, s -> (s.errors == null || s.errors.isEmpty()) ? "None"
                         : String.valueOf(s.errors.size())));
@@ -115,11 +117,14 @@ public final class CdiFxController {
         table.getColumns().add(bundleIdColumn);
         table.getColumns().add(componentsCountColumn);
         table.getColumns().add(errorsColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        table.setItems(dataProvider.cdiContainers());
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(idColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(dataProvider.cdiContainers());
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(idColumn);
+            table.sort();
+        });
     }
 
 }

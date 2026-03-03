@@ -26,7 +26,6 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.ToggleSwitch;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.glyphfont.FontAwesome;
@@ -42,6 +41,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
@@ -126,7 +126,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         if (node instanceof final CustomTextField c) {
             return c.getText();
         }
-        if (node instanceof final ToggleSwitch s) {
+        if (node instanceof final CheckBox s) {
             return String.valueOf(s.isSelected());
         }
         return null;
@@ -194,7 +194,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
                         });
                         break;
                     case BOOLEAN_ARRAY, BOOLEAN_LIST:
-                        final var toggleSwitch = new ToggleSwitch();
+                        final var toggleSwitch = new CheckBox();
                         toggleSwitch.setSelected(Boolean.parseBoolean(initValue));
                         return toggleSwitch;
                     case DOUBLE_ARRAY, DOUBLE_LIST, FLOAT_ARRAY, FLOAT_LIST:
