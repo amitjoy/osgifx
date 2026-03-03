@@ -490,9 +490,10 @@ public final class HeapMonitorPane extends BorderPane {
         ContextInjectionFactory.inject(pathDialog, eclipseContext);
         final var timestamp   = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
-        final var defaultPath = "/tmp/heapdump-" + timestamp + ".hprof.gz";
+        final var defaultPath = "{java.io.tmpdir}/heapdump-" + timestamp + ".hprof.gz";
         pathDialog.init(defaultPath, "Specify File Path",
-                "Enter the full file path on the agent where the heapdump should be saved (including filename):");
+                "Enter the full file path on the agent where the heapdump should be saved (including filename).\n"
+                        + "System/Framework properties (e.g., {java.io.tmpdir}) and environment variables (e.g., {env:TEMP}) can be used:");
 
         final var pathResult = pathDialog.showAndWait();
         if (pathResult.isEmpty()) {

@@ -41,7 +41,7 @@ public final class HeapdumpPathPromptDialog extends Dialog<String> {
         dialogPane.getButtonTypes().addAll(CANCEL);
 
         final var pathField = (CustomTextField) TextFields.createClearableTextField();
-        pathField.setPromptText("Enter full file path on agent (e.g., /tmp/heapdump-2024.hprof.gz)");
+        pathField.setPromptText("Enter full file path on agent (e.g., {env:TEMP}/heapdump-2024.hprof.gz)");
         pathField.setText(defaultPath);
         pathField.setPrefWidth(500);
 
