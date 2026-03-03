@@ -37,6 +37,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -66,7 +67,7 @@ import aQute.lib.io.IO;
  * environment in any way.
  */
 @Header(name = BUNDLE_ACTIVATOR, value = "${@class}")
-public final class Activator extends Thread implements BundleActivator {
+public final class Activator implements BundleActivator {
 
     private static final int    RPC_POOL_CORE_THREADS_SIZE          = 10;
     private static final int    RPC_POOL_MAX_THREADS_SIZE           = 20;
@@ -89,6 +90,8 @@ public final class Activator extends Thread implements BundleActivator {
 
     private volatile boolean isSocketAgentRunning = false;
     private volatile boolean isMqttAgentRunning   = false;
+
+    private ExecutorService socketAcceptExecutor;
 
     private ExecutorService              mqttExecutor;
     private RemoteRPC<Agent, Supervisor> mqttRpc;
@@ -144,9 +147,17 @@ public final class Activator extends Thread implements BundleActivator {
 
         final SocketContext socketContext = new SocketContext(module.di().getInstance(BundleContext.class));
         serverSocket = socketContext.getSocket();
-        start(); // starts the thread for accepting socket connections
 
+        // @formatter:off
+        socketAcceptExecutor = Executors.newSingleThreadExecutor(
+                                                  new ThreadFactoryBuilder()
+                                                                  .setThreadFactoryName("osgifx-socket-accept")
+                                                                  .setDaemon(true)
+                                                                  .build());
+        // @formatter:on
+        socketAcceptExecutor.execute(this::acceptConnections);
         isSocketAgentRunning = true;
+
         logger.atInfo().msg("[OSGi.fx] Socket agent configured").log();
         logger.atInfo().msg("[OSGi.fx] Host: {}").arg(socketContext.host()).log();
         logger.atInfo().msg("[OSGi.fx] Port: {}").arg(socketContext.port()).log();
@@ -156,7 +167,9 @@ public final class Activator extends Thread implements BundleActivator {
         if (!isSocketAgentRunning) {
             return;
         }
-        interrupt(); // interrupt the socket accept thread
+        if (socketAcceptExecutor != null) {
+            socketAcceptExecutor.shutdownNow();
+        }
         IO.close(serverSocket);
 
         // Close all active socket agents so it actually disconnects
@@ -170,6 +183,7 @@ public final class Activator extends Thread implements BundleActivator {
         agents.removeIf(a -> a.getRpcType() == SOCKET_RPC);
 
         isSocketAgentRunning = false;
+        socketAcceptExecutor = null;
         logger.atInfo().msg("[OSGi.fx] Socket agent stopped").log();
     }
 
@@ -266,10 +280,9 @@ public final class Activator extends Thread implements BundleActivator {
         return isMqttAgentRunning;
     }
 
-    @Override
-    public void run() {
+    private void acceptConnections() {
         try {
-            while (!isInterrupted()) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     final Socket socket = serverSocket.accept();
                     // timeout to get interrupts
@@ -324,9 +337,15 @@ public final class Activator extends Thread implements BundleActivator {
                     module.bindInstance(Supervisor.class, socketRPC.getRemote());
 
                     agentServer.setEndpoint(socketRPC);
-                    socketRPC.run();
+                    try {
+                        socketRPC.run();
+                    } finally {
+                        if (agents.remove(agentServer)) {
+                            IO.close(agentServer);
+                        }
+                    }
                 } catch (final SocketException e) {
-                    if (!isInterrupted()) {
+                    if (!Thread.currentThread().isInterrupted()) {
                         logger.atWarn().msg("[OSGi.fx] Accepting agent requests").throwable(e).log();
                     }
                 } catch (final Exception e) {
