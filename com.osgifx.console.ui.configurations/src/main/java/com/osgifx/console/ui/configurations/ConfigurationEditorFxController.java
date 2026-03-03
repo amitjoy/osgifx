@@ -45,6 +45,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.util.converter.TypeReference;
@@ -72,8 +73,6 @@ import com.osgifx.console.ui.configurations.control.MultipleCardinalityTextContr
 import com.osgifx.console.ui.configurations.control.PeekablePasswordControl;
 import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.FxDialog;
-
-import org.eclipse.fx.core.ThreadSynchronize;
 
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
