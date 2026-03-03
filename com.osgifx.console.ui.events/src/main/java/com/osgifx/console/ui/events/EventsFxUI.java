@@ -21,11 +21,13 @@ import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECE
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.controlsfx.control.PopOver;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
@@ -38,13 +40,17 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
-import com.osgifx.console.ui.events.dialog.SubscribedEventsDialog;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 public final class EventsFxUI {
 
@@ -68,6 +74,8 @@ public final class EventsFxUI {
     private boolean           isSnapshotAgent;
     @Inject
     private IEclipseContext   eclipseContext;
+
+    private PopOver popover;
 
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -141,19 +149,40 @@ public final class EventsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::showSubscribedEventTopicsDialog, "Subscribed Event Topics",
-                    "GEAR");
             if (!isSnapshotAgent) {
-                statusBar.addToRight(node);
+                final var button = (Button) Fx.initStatusBarButton(null, "Subscribed Event Topics", "GEAR");
+                button.setOnAction(_ -> showSubscribedEventTopicsPopover(button));
+                statusBar.addToRight(button);
             }
         }
     }
 
-    private void showSubscribedEventTopicsDialog() {
-        final var dialog = new SubscribedEventsDialog();
-        ContextInjectionFactory.inject(dialog, eclipseContext);
-        dialog.init();
-        dialog.showAndWait();
+    @SuppressWarnings("unchecked")
+    private void showSubscribedEventTopicsPopover(final Node source) {
+        if (popover != null && popover.isShowing()) {
+            popover.hide();
+            return;
+        }
+        final var content = new VBox();
+        content.setPadding(new Insets(10));
+        content.setPrefWidth(500);
+        content.setPrefHeight(300);
+
+        final var listView = new ListView<String>();
+        final var topics   = (Set<String>) eclipseContext.get("subscribed_topics");
+        if (topics != null) {
+            listView.getItems().addAll(topics);
+        }
+        final var placeholder = new Label("No subscribed topic");
+        listView.setPlaceholder(placeholder);
+
+        content.getChildren().add(listView);
+
+        popover = new PopOver(content);
+        popover.setTitle("Subscribed Event Topics");
+        popover.setArrowLocation(PopOver.ArrowLocation.BOTTOM_RIGHT);
+        popover.setDetachable(false);
+        popover.show(source);
     }
 
 }
