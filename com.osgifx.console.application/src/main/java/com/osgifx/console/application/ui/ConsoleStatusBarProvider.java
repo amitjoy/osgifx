@@ -156,7 +156,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         final VBox popoverContent = createRpcPopoverContent();
         rpcProgressPopover = new PopOver(popoverContent);
         rpcProgressPopover.setTitle("Active RPC Calls");
-        rpcProgressPopover.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+        rpcProgressPopover.setArrowLocation(PopOver.ArrowLocation.BOTTOM_RIGHT);
         rpcProgressPopover.setDetachable(false);
 
         // Show popover on button click
