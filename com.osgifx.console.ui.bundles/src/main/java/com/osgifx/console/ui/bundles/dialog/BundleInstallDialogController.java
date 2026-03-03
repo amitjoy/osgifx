@@ -36,7 +36,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -52,7 +52,7 @@ public final class BundleInstallDialogController {
     @FXML
     private ToggleSwitch               startBundleToggle;
     @FXML
-    private GridPane                   installBundleDialogPane;
+    private VBox                       installBundleDialogPane;
     @FXML
     private TextField                  startLevel;
     private File                       bundle;
@@ -99,12 +99,14 @@ public final class BundleInstallDialogController {
             final var db         = event.getDragboard();
             final var isAccepted = db.getFiles().get(0).getName().toLowerCase().endsWith(".jar");
             if (db.hasFiles() && isAccepted) {
-                installBundleDialogPane.setStyle("-fx-background-color: #C6C6C6");
+                installBundleDialogPane.setStyle(
+                        "-fx-border-color: #26a69a; -fx-border-width: 2; -fx-border-style: dashed; -fx-background-color: rgba(38, 166, 154, 0.1);");
                 event.acceptTransferModes(TransferMode.COPY);
             } else {
                 event.consume();
             }
         });
+        installBundleDialogPane.setOnDragExited(_ -> installBundleDialogPane.setStyle(null));
         installBundleDialogPane.setOnDragDropped(event -> {
             final var db      = event.getDragboard();
             var       success = false;
@@ -116,7 +118,7 @@ public final class BundleInstallDialogController {
                     fileChooser.setText(file.getName());
                     bundle = file;
                     bundleProperty.set(bundle);
-                    fileChooser.setTooltip(new Tooltip(bundle.getName()));
+                    fileChooser.setTooltip(new Tooltip(file.getName()));
                 });
             }
             event.setDropCompleted(success);
