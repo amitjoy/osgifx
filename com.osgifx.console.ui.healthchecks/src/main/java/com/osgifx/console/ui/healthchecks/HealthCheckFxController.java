@@ -49,6 +49,7 @@ import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -170,10 +171,25 @@ public final class HealthCheckFxController {
     private FilteredList<String> initSearchFilter(final ObservableList<String> metadata) {
         final var filteredMetadataList = new FilteredList<>(metadata);
         updateFilteredList(filteredMetadataList);
-        java.util.Optional.of(searchText).ifPresent(_ -> searchText.textProperty().addListener(_ -> {
+
+        // Bind the text property to update ONLY the predicate of the currently active filtered metadata list.
+        // We ensure we do not add redundant listeners.
+        // The previous bug was caused by recreating listeners repeatedly for every table update event.
+        // We map to it lazily.
+        final ChangeListener<String> textListener = (_, _, _) -> {
             updateFilteredList(filteredMetadataList);
             searchText.requestFocus();
-        }));
+        };
+
+        if (searchText.getUserData() != null) {
+            @SuppressWarnings("unchecked")
+            final var oldListener = (ChangeListener<String>) searchText.getUserData();
+            searchText.textProperty().removeListener(oldListener);
+        }
+
+        searchText.textProperty().addListener(textListener);
+        searchText.setUserData(textListener);
+
         return filteredMetadataList;
     }
 
