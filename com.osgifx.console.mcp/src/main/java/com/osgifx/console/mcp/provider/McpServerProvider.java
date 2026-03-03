@@ -18,10 +18,10 @@ package com.osgifx.console.mcp.provider;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -39,11 +39,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.osgifx.console.mcp.McpTool;
 import com.osgifx.console.mcp.data.McpDataProvider;
 import com.osgifx.console.mcp.dto.McpLogEntryDTO;
 import com.osgifx.console.mcp.dto.McpLogEntryType;
 import com.osgifx.console.mcp.dto.McpToolDTO;
-import com.osgifx.console.mcp.McpTool;
 import com.osgifx.console.mcp.server.McpJsonRpcServer;
 
 /**

@@ -22,11 +22,11 @@ import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -51,6 +51,9 @@ public final class McpFxUI {
     @Inject
     private Executor          executor;
     @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
     private ConsoleMaskerPane progressPane;
@@ -59,9 +62,9 @@ public final class McpFxUI {
     private BundleContext     context;
 
     @PostConstruct
-    public void postConstruct(final BorderPane parent, final MPart part, @LocalInstance final FXMLLoader loader) {
+    public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
         createControls(parent, loader);
-        logger.atDebug().log("MCP UI part has been initialized");
+        logger.atDebug().log("MCP part has been initialized");
     }
 
     @Inject
@@ -79,6 +82,7 @@ public final class McpFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        statusBar.disableRpcProgressTracking();
         createControls(parent, loader);
     }
 
@@ -101,6 +105,9 @@ public final class McpFxUI {
                 parent.getChildren().clear();
                 parent.setCenter(tabContent);
                 statusBar.addTo(parent);
+                if (isConnected) {
+                    statusBar.enableRpcProgressTracking();
+                }
                 progressPane.setVisible(false);
             }
 
@@ -111,6 +118,9 @@ public final class McpFxUI {
                 parent.getChildren().clear();
                 parent.setCenter(new Label("Failed to render MCP UI. Please check logs for details."));
                 statusBar.addTo(parent);
+                if (isConnected) {
+                    statusBar.enableRpcProgressTracking();
+                }
                 progressPane.setVisible(false);
                 Fx.showErrorNotification("Model Context Protocol", "MCP UI could not be rendered");
             }

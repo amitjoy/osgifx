@@ -23,7 +23,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import org.controlsfx.control.ToggleSwitch?>
+<?import javafx.scene.control.CheckBox?>
 
 <GridPane hgap="20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.packages.PackageDetailsFxController">
   <columnConstraints>
@@ -45,28 +45,34 @@
       <Label fx:id="versionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       
       <Label style="-fx-font-weight: bold;" text="Is Duplicate Export?" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-      <ToggleSwitch fx:id="duplicateLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <CheckBox fx:id="duplicateLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       
       <Label style="-fx-font-weight: bold;" text="Exporters" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-      <TableView fx:id="exportersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
+      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="exportersTable" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No exporter bundle" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="exportersTableIdColumn" prefWidth="110.0" text="ID" />
-          <TableColumn fx:id="exportersTableBsnColumn" prefWidth="435.0" text="Symbolic Name" />
+          <TableColumn fx:id="exportersTableIdColumn" text="ID" />
+          <TableColumn fx:id="exportersTableBsnColumn" text="Symbolic Name" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
       
       <Label style="-fx-font-weight: bold;" text="Importers" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="TOP" />
-      <TableView fx:id="importersTable" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
+      <TableView style="-fx-table-cell-border-color: transparent;" fx:id="importersTable" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
       	<placeholder>
         	<Label text="No importer bundle" />
     	</placeholder>
         <columns>
-          <TableColumn fx:id="importersTableIdColumn" prefWidth="110.0" text="ID" />
-          <TableColumn fx:id="importersTableBsnColumn" prefWidth="435.0" text="Symbolic Name" />
+          <TableColumn fx:id="importersTableIdColumn" text="ID" />
+          <TableColumn fx:id="importersTableBsnColumn" text="Symbolic Name" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+        </columnResizePolicy>
       </TableView>
    </children>
    <padding>

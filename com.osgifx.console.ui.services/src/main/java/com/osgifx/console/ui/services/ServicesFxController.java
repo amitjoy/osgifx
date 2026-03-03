@@ -29,6 +29,7 @@ import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -66,6 +67,8 @@ public final class ServicesFxController {
     private boolean                           isConnected;
     @Inject
     private DataProvider                      dataProvider;
+    @Inject
+    private ThreadSynchronize                 threadSync;
     private FilteredList<XServiceDTO>         filteredList;
     private TableRowDataFeatures<XServiceDTO> previouslyExpanded;
 
@@ -99,34 +102,36 @@ public final class ServicesFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var idColumn = new TableColumn<XServiceDTO, Integer>("ID");
 
-        idColumn.setPrefWidth(100);
         idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
 
         final var objectClassColumn = new TableColumn<XServiceDTO, String>("Object Class");
 
-        objectClassColumn.setPrefWidth(700);
         objectClassColumn.setCellValueFactory(new DTOCellValueFactory<>("types", String.class));
         Fx.addCellFactory(objectClassColumn, s -> s.properties.containsKey(COMPONENT_ID), Color.SLATEBLUE, Color.BLACK);
 
         final var registeringBundleColumn = new TableColumn<XServiceDTO, String>("Registering Bundle");
 
-        registeringBundleColumn.setPrefWidth(400);
         registeringBundleColumn.setCellValueFactory(new DTOCellValueFactory<>("registeringBundle", String.class));
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(idColumn);
         table.getColumns().add(objectClassColumn);
         table.getColumns().add(registeringBundleColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         filteredList = new FilteredList<>(dataProvider.services());
-        table.setItems(filteredList);
-
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(objectClassColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(filteredList);
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(objectClassColumn);
+            table.sort();
+        });
     }
 
     @Inject

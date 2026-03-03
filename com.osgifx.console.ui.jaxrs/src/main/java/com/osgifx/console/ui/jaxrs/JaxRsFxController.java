@@ -22,6 +22,7 @@ import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -34,9 +35,9 @@ import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TabPane;
 
 public final class JaxRsFxController {
 
@@ -56,6 +57,8 @@ public final class JaxRsFxController {
     private boolean                                  isConnected;
     @Inject
     private DataProvider                             dataProvider;
+    @Inject
+    private ThreadSynchronize                        threadSync;
     private TableRowDataFeatures<XJaxRsComponentDTO> previouslyExpanded;
 
     @FXML
@@ -88,22 +91,21 @@ public final class JaxRsFxController {
                                      previouslyExpanded = current;
                                      return expandedNode;
                                  });
+        expanderColumn.setPrefWidth(48);
+        expanderColumn.setMaxWidth(48);
+        expanderColumn.setMinWidth(48);
 
         final var componentColumn = new TableColumn<XJaxRsComponentDTO, String>("Name");
-        componentColumn.setPrefWidth(400);
         componentColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class));
 
         final var typeColumn = new TableColumn<XJaxRsComponentDTO, String>("Type");
-        typeColumn.setPrefWidth(200);
         typeColumn.setCellValueFactory(new DTOCellValueFactory<>("type", String.class));
 
         final var serviceIdColumn = new TableColumn<XJaxRsComponentDTO, String>("Service ID");
-        serviceIdColumn.setPrefWidth(150);
         serviceIdColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("serviceId", String.class, s -> String.valueOf(s.serviceId)));
 
         final var statusColumn = new TableColumn<XJaxRsComponentDTO, String>("Status");
-        statusColumn.setPrefWidth(150);
         statusColumn.setCellValueFactory(
                 new DTOCellValueFactory<>("isFailed", String.class, s -> s.isFailed ? "Failed" : "Active"));
 
@@ -112,11 +114,14 @@ public final class JaxRsFxController {
         table.getColumns().add(typeColumn);
         table.getColumns().add(serviceIdColumn);
         table.getColumns().add(statusColumn);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        table.setItems(dataProvider.jaxRsComponents());
-        TableFilter.forTableView(table).lazy(true).apply();
-        table.getSortOrder().add(componentColumn);
-        table.sort();
+        threadSync.asyncExec(() -> {
+            table.setItems(dataProvider.jaxRsComponents());
+            TableFilter.forTableView(table).lazy(true).apply();
+            table.getSortOrder().add(componentColumn);
+            table.sort();
+        });
     }
 
 }

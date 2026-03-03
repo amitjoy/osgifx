@@ -30,22 +30,28 @@
     </Tab>
     <Tab text="Components">
       <content>
-        <TableView fx:id="componentsTable" prefHeight="200.0" prefWidth="200.0">
+        <TableView style="-fx-table-cell-border-color: transparent;" fx:id="componentsTable">
           <columns>
-            <TableColumn fx:id="componentNameColumn" prefWidth="250.0" text="Name" />
-            <TableColumn fx:id="componentTypeColumn" prefWidth="150.0" text="Type" />
-            <TableColumn fx:id="componentEnabledColumn" prefWidth="100.0" text="Enabled" />
+            <TableColumn fx:id="componentNameColumn" text="Name" />
+            <TableColumn fx:id="componentTypeColumn" text="Type" />
+            <TableColumn fx:id="componentEnabledColumn" text="Enabled" />
           </columns>
+          <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+          </columnResizePolicy>
         </TableView>
       </content>
     </Tab>
     <Tab text="Extensions">
       <content>
-        <TableView fx:id="extensionsTable" prefHeight="200.0" prefWidth="200.0">
+        <TableView style="-fx-table-cell-border-color: transparent;" fx:id="extensionsTable">
           <columns>
-            <TableColumn fx:id="extensionServiceIdColumn" prefWidth="150.0" text="Service ID" />
-            <TableColumn fx:id="extensionFilterColumn" prefWidth="400.0" text="Service Filter" />
+            <TableColumn fx:id="extensionServiceIdColumn" text="Service ID" />
+            <TableColumn fx:id="extensionFilterColumn" text="Service Filter" />
           </columns>
+          <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS" />
+          </columnResizePolicy>
         </TableView>
       </content>
     </Tab>

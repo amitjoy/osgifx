@@ -17,7 +17,9 @@ package com.osgifx.console.data.provider;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.osgi.dto.DTO;
+
 import com.osgifx.console.agent.dto.XBundleDTO;
 
 /**

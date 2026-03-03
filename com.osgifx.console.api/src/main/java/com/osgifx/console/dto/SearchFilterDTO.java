@@ -16,6 +16,7 @@
 package com.osgifx.console.dto;
 
 import java.util.function.Predicate;
+
 import org.osgi.dto.DTO;
 
 /**

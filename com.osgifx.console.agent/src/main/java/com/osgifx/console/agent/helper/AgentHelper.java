@@ -20,13 +20,15 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
-
-import org.osgi.framework.BundleContext;
 
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
@@ -47,8 +49,33 @@ public final class AgentHelper {
      */
     public static String getProperty(final String key, final BundleContext bundleContext) {
         final String fromSystem = System.getProperty(key);
-        return fromSystem != null && !fromSystem.trim().isEmpty() ? fromSystem 
-               : bundleContext != null ? bundleContext.getProperty(key) : null;
+        return fromSystem != null && !fromSystem.trim().isEmpty() ? fromSystem
+                : bundleContext != null ? bundleContext.getProperty(key) : null;
+    }
+
+    public static String substituteVariables(final String text, final BundleContext bundleContext) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        final Pattern      pattern = Pattern.compile("\\{([^}]+)\\}");
+        final Matcher      matcher = pattern.matcher(text);
+        final StringBuffer sb      = new StringBuffer();
+        while (matcher.find()) {
+            final String key   = matcher.group(1);
+            String       value = null;
+            if (key.startsWith("env:")) {
+                value = System.getenv(key.substring(4));
+            } else {
+                value = getProperty(key, bundleContext);
+            }
+            if (value != null) {
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(value));
+            } else {
+                matcher.appendReplacement(sb, "{" + key + "}");
+            }
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     public static XResultDTO createResult(final int result, final String response) {
