@@ -19,12 +19,11 @@ import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_
 import static org.osgi.service.condition.Condition.CONDITION_ID;
 import static org.osgi.service.condition.Condition.INSTANCE;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import java.io.IOException;
 
 import org.apache.aries.component.dsl.OSGi;
 import org.apache.aries.component.dsl.OSGiResult;
@@ -224,7 +223,8 @@ public final class McpFxController {
             expanderColumn.setMaxWidth(48);
             expanderColumn.setMinWidth(48);
 
-            timestampColumn.setCellValueFactory(cellData -> Fx.formatTime(cellData.getValue().timestampProperty().get()));
+            timestampColumn
+                    .setCellValueFactory(cellData -> Fx.formatTime(cellData.getValue().timestampProperty().get()));
             typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
 
             threadSync.asyncExec(() -> {

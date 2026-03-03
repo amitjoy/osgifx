@@ -230,7 +230,6 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
             }
         });
 
-
         // Duration column
         final TableColumn<RpcCallInfo, String> durationCol = new TableColumn<>("Duration");
         durationCol.setCellValueFactory(data -> {

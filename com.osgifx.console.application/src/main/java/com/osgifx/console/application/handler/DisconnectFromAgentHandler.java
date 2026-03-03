@@ -21,10 +21,6 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-import org.osgi.framework.FrameworkUtil;
-
-import in.bytehue.messaging.mqtt5.api.MqttClient;
-
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -33,11 +29,14 @@ import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
+import org.osgi.framework.FrameworkUtil;
 
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.supervisor.factory.SupervisorFactory;
 import com.osgifx.console.supervisor.factory.SupervisorFactory.SupervisorType;
+
+import in.bytehue.messaging.mqtt5.api.MqttClient;
 
 public final class DisconnectFromAgentHandler {
 

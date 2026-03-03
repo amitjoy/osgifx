@@ -20,7 +20,6 @@ import java.util.function.UnaryOperator;
 
 import javax.inject.Inject;
 
-import org.controlsfx.control.ToggleSwitch;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -32,6 +31,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
@@ -50,7 +50,7 @@ public final class BundleInstallDialogController {
     @FXML
     private Button                     fileChooser;
     @FXML
-    private ToggleSwitch               startBundleToggle;
+    private CheckBox                   startBundleToggle;
     @FXML
     private VBox                       installBundleDialogPane;
     @FXML
