@@ -45,7 +45,7 @@ public final class AgentCommand {
 
     /**
      * Starts the socket agent using the provided configuration properties.
-     * Properties will be coerced from Gogo Map syntax: agent:startSocket [port=1099 host=localhost]
+     * Properties will be coerced from Gogo Map syntax: osgifx:startSocket [port=1099 host=localhost]
      *
      * @param config the configuration properties
      */
@@ -96,7 +96,7 @@ public final class AgentCommand {
 
     /**
      * Starts the MQTT agent using the provided configuration properties.
-     * Properties will be coerced from Gogo Map syntax: agent:startMqtt [provider=osgi-messaging pubTopic=/out
+     * Properties will be coerced from Gogo Map syntax: osgifx:startMqtt [provider=osgi-messaging pubTopic=/out
      * subTopic=/in]
      *
      * @param config the configuration properties

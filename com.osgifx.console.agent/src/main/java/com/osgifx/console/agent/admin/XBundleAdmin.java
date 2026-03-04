@@ -31,6 +31,7 @@ import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_ID;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
+import static org.osgi.framework.FrameworkEvent.STARTLEVEL_CHANGED;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -88,6 +90,13 @@ public final class XBundleAdmin {
     private ServiceTracker<Object, Future<?>> serviceTracker;
     private ExecutorService                   executor;
 
+    // Framework start level cached once; updated via FrameworkListener on STARTLEVEL_CHANGED
+    private volatile int      cachedFrameworkStartLevel = -1;
+    private FrameworkListener frameworkStartLevelListener;
+
+    // Inverted index: serviceId -> set of bundleIds that registered or use that service
+    private final Map<Long, Set<Long>> serviceToBundleIds = new ConcurrentHashMap<>();
+
     private static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
 
     @Inject
@@ -97,9 +106,19 @@ public final class XBundleAdmin {
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
         this.executor                  = executor;
+        // Prime the cache immediately so the first DTO creation never falls back to -1
+        this.cachedFrameworkStartLevel = readFrameworkStartLevel();
     }
 
     public void init() {
+        // Keep framework start level cache fresh
+        frameworkStartLevelListener = event -> {
+            if (event.getType() == STARTLEVEL_CHANGED) {
+                cachedFrameworkStartLevel = readFrameworkStartLevel();
+            }
+        };
+        context.addFrameworkListener(frameworkStartLevelListener);
+
         bundleTracker = new BundleTracker<Future<?>>(context,
                                                      Bundle.INSTALLED | Bundle.RESOLVED | Bundle.STARTING
                                                              | Bundle.ACTIVE | Bundle.STOPPING | Bundle.UNINSTALLED,
@@ -149,6 +168,9 @@ public final class XBundleAdmin {
     }
 
     public void stop() {
+        if (frameworkStartLevelListener != null) {
+            context.removeFrameworkListener(frameworkStartLevelListener);
+        }
         if (bundleTracker != null) {
             bundleTracker.close();
         }
@@ -159,7 +181,7 @@ public final class XBundleAdmin {
 
     private void processBundleSafely(final Bundle bundle) {
         try {
-            final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator);
+            final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator, cachedFrameworkStartLevel);
             bundles.put(bundle.getBundleId(), dto);
         } catch (final Exception e) {
             logger.atError().msg("Error processing bundle '{}'").arg(bundle.getSymbolicName()).throwable(e).log();
@@ -167,37 +189,38 @@ public final class XBundleAdmin {
     }
 
     private void handleServiceChange(final ServiceReference<Object> reference) {
-        // Update provider
-        final Bundle provider = reference.getBundle();
+        final Long     serviceId = (Long) reference.getProperty(SERVICE_ID);
+        final Bundle   provider  = reference.getBundle();
+        final Bundle[] consumers = reference.getUsingBundles();
+
+        // Maintain inverted index while updating
+        final Set<Long> affected = new HashSet<>();
         if (provider != null) {
+            affected.add(provider.getBundleId());
             updateServices(provider);
         }
-        // Update consumers
-        final Bundle[] usingBundles = reference.getUsingBundles();
-        if (usingBundles != null) {
-            for (final Bundle bundle : usingBundles) {
+        if (consumers != null) {
+            for (final Bundle bundle : consumers) {
+                affected.add(bundle.getBundleId());
                 updateServices(bundle);
             }
         }
+        serviceToBundleIds.put(serviceId, affected);
     }
 
     private void handleServiceRemoval(final ServiceReference<Object> reference) {
         final Long serviceId = (Long) reference.getProperty(SERVICE_ID);
-        // We cannot rely on reference.getBundle() or reference.getUsingBundles() as the service is already unregistered
-        // So we assume that any bundle that has this service in its registered or used list needs an update
-        bundles.values().stream().filter(dto -> hasService(dto, serviceId)).forEach(dto -> {
-            final Bundle bundle = context.getBundle(dto.id);
+        // O(1) lookup via inverted index instead of O(N×M) full scan
+        final Set<Long> affectedBundleIds = serviceToBundleIds.remove(serviceId);
+        if (affectedBundleIds == null) {
+            return;
+        }
+        for (final long bundleId : affectedBundleIds) {
+            final Bundle bundle = context.getBundle(bundleId);
             if (bundle != null) {
                 updateServices(bundle);
             }
-        });
-    }
-
-    private boolean hasService(final XBundleDTO dto, final long serviceId) {
-        if (dto.registeredServices != null && dto.registeredServices.stream().anyMatch(s -> s.id == serviceId)) {
-            return true;
         }
-        return dto.usedServices != null && dto.usedServices.stream().anyMatch(s -> s.id == serviceId);
     }
 
     private void updateServices(final Bundle bundle) {
@@ -283,23 +306,33 @@ public final class XBundleAdmin {
         return IO.collect(dataFile);
     }
 
+    /** Convenience overload for non-hot callers (e.g. classloader leak detection). */
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+        return toDTO(bundle, bundleStartTimeCalculator, readFrameworkStartLevel());
+    }
+
+    public static XBundleDTO toDTO(final Bundle bundle,
+                                   final BundleStartTimeCalculator bundleStartTimeCalculator,
+                                   final int frameworkStartLevel) {
         final XBundleDTO dto = new XBundleDTO();
+
+        // Fetch headers once and reuse across all header reads
+        final Dictionary<String, String> headers = bundle.getHeaders();
 
         dto.id                  = bundle.getBundleId();
         dto.state               = findState(bundle.getState());
         dto.symbolicName        = bundle.getSymbolicName();
         dto.version             = bundle.getVersion().toString();
         dto.location            = bundle.getLocation();
-        dto.category            = getHeader(bundle, BUNDLE_CATEGORY);
-        dto.isFragment          = getHeader(bundle, FRAGMENT_HOST) != null;
+        dto.category            = headers.get(BUNDLE_CATEGORY);
+        dto.isFragment          = headers.get(FRAGMENT_HOST) != null;
         dto.lastModified        = bundle.getLastModified();
         dto.dataFolderSize      = getStorageSize(bundle);
-        dto.documentation       = getHeader(bundle, BUNDLE_DOCURL);
-        dto.vendor              = getHeader(bundle, BUNDLE_VENDOR);
-        dto.description         = getHeader(bundle, BUNDLE_DESCRIPTION);
+        dto.documentation       = headers.get(BUNDLE_DOCURL);
+        dto.vendor              = headers.get(BUNDLE_VENDOR);
+        dto.description         = headers.get(BUNDLE_DESCRIPTION);
         dto.startLevel          = getStartLevel(bundle);
-        dto.frameworkStartLevel = getFrameworkStartLevel();
+        dto.frameworkStartLevel = frameworkStartLevel;
         // @formatter:off
         dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDuration(bundle.getBundleId())
                                                               .map(BundleStartDuration::getStartedAfter)
@@ -312,7 +345,7 @@ public final class XBundleAdmin {
         dto.wiredBundlesAsProvider = getWiredBundlesAsProvider(bundle);
         dto.wiredBundlesAsRequirer = getWiredBundlesAsRequirer(bundle);
         dto.registeredServices     = getRegisteredServices(bundle);
-        dto.manifestHeaders        = toMap(bundle.getHeaders());
+        dto.manifestHeaders        = toMap(headers);
         dto.usedServices           = getUsedServices(bundle);
         dto.hostBundles            = getHostBundles(bundle);
         dto.fragmentsAttached      = getAttachedFragements(bundle);
@@ -363,7 +396,7 @@ public final class XBundleAdmin {
         }
     }
 
-    private static int getFrameworkStartLevel() {
+    private static int readFrameworkStartLevel() {
         try {
             final BundleContext current = FrameworkUtil.getBundle(XBundleAdmin.class).getBundleContext();
             return current.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkStartLevelDTO.class).startLevel;
@@ -518,10 +551,12 @@ public final class XBundleAdmin {
     private static List<XServiceInfoDTO> prepareServiceInfo(final ServiceReference<?> service,
                                                             final List<String> objectClazz) {
         final List<XServiceInfoDTO> serviceInfos = new ArrayList<>();
+        final long                  serviceId    = (Long) service.getProperty(SERVICE_ID);
+
         for (final String clz : objectClazz) {
             final XServiceInfoDTO dto = new XServiceInfoDTO();
 
-            dto.id          = Long.parseLong(service.getProperty(SERVICE_ID).toString());
+            dto.id          = serviceId;
             dto.objectClass = clz;
 
             serviceInfos.add(dto);
@@ -671,10 +706,6 @@ public final class XBundleAdmin {
                 break;
         }
         return null;
-    }
-
-    private static String getHeader(final Bundle bundle, final String header) {
-        return bundle.getHeaders().get(header);
     }
 
     private static Map<String, String> toMap(final Dictionary<String, String> dictionary) {

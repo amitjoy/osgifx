@@ -31,7 +31,7 @@ public class XLogEntryDTO extends DTO {
 
     // Bundle Information
     /** The bundle that generated the log entry. */
-    public XBundleDTO bundle;
+    public XBundleInfoDTO bundle;
 
     // Log Details
     /** The log level of the entry (e.g., "DEBUG", "INFO", "WARN", "ERROR"). */

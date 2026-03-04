@@ -194,8 +194,11 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     @Override
     public void onOSGiEvent(final XEventDTO event) {
         checkNotNull(event, "'event' cannot be null");
-        eventListeners.stream().filter(l -> matchTopic(event.topic, l.topics()))
-                .forEach(listener -> listener.onEvent(event));
+        for (final EventListener listener : eventListeners) {
+            if (matchTopic(event.topic, listener.topics())) {
+                listener.onEvent(event);
+            }
+        }
     }
 
     @Override
