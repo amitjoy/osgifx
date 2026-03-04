@@ -135,16 +135,6 @@ To prevent attacks such as Zip Bombs or Collection Bombs during RPC communicatio
 | `osgi.fx.agent.rpc.max.map.size` | 1,000,000 | Maximum number of entries in a decoded map. Prevents Collection Bomb attacks. |
 | `osgi.fx.agent.rpc.max.byte.array.size` | 100 MB | Maximum allowed length for a decoded byte array. Prevents memory exhaustion. |
 
-### Heapdump & Snapshot
-
-The following properties control the generation and storage of heap dumps and snapshots:
-
-| Property | Default | Description |
-| :--- | :--- | :--- |
-| `osgi.fx.agent.heapdump.max.size` | -1 (Unlimited) | Maximum allowed size of a heap dump file in bytes. |
-| `osgi.fx.agent.gzip.compression.level` | 6 | GZIP compression level (1-9) for compressed payloads. |
-| `osgi.fx.agent.heapdump.disk.buffer.percentage` | 10 | Extra disk space (percentage) required beyond the estimated heap size for heap dump creation. |
-
 ---
 
 ## 4. Gogo Commands
