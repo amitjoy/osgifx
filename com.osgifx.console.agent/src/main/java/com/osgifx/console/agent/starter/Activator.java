@@ -109,21 +109,21 @@ public final class Activator implements BundleActivator {
             startSocketAgent();
         } else {
             logger.atInfo()
-                    .msg("[OSGi.fx] Socket agent dormant. Awaiting 'osgifx:agent startSocket' or system properties.")
+                    .msg("[OSGi.fx] Socket agent dormant. Awaiting 'osgifx:startSocket' or system properties.")
                     .log();
         }
 
         if (isMqttConfigured(bundleContext)) {
             startMqttAgent();
         } else {
-            logger.atInfo().msg("[OSGi.fx] MQTT agent dormant. Awaiting 'osgifx:agent startMqtt' or system properties.")
+            logger.atInfo().msg("[OSGi.fx] MQTT agent dormant. Awaiting 'osgifx:startMqtt' or system properties.")
                     .log();
         }
     }
 
     private void registerAgentCommand(final BundleContext bundleContext) {
         final Dictionary<String, Object> props = new Hashtable<>();
-        props.put("osgi.command.scope", "agent");
+        props.put("osgi.command.scope", "osgifx");
         props.put("osgi.command.function",
                 new String[] { "startSocket", "stopSocket", "startMqtt", "stopMqtt", "status" });
         bundleContext.registerService(Object.class.getName(), new AgentCommand(this, bundleContext), props);
