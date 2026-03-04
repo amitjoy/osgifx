@@ -189,37 +189,38 @@ public final class XBundleAdmin {
     }
 
     private void handleServiceChange(final ServiceReference<Object> reference) {
-        // Update provider
-        final Bundle provider = reference.getBundle();
+        final Long     serviceId = (Long) reference.getProperty(SERVICE_ID);
+        final Bundle   provider  = reference.getBundle();
+        final Bundle[] consumers = reference.getUsingBundles();
+
+        // Maintain inverted index while updating
+        final Set<Long> affected = new HashSet<>();
         if (provider != null) {
+            affected.add(provider.getBundleId());
             updateServices(provider);
         }
-        // Update consumers
-        final Bundle[] usingBundles = reference.getUsingBundles();
-        if (usingBundles != null) {
-            for (final Bundle bundle : usingBundles) {
+        if (consumers != null) {
+            for (final Bundle bundle : consumers) {
+                affected.add(bundle.getBundleId());
                 updateServices(bundle);
             }
         }
+        serviceToBundleIds.put(serviceId, affected);
     }
 
     private void handleServiceRemoval(final ServiceReference<Object> reference) {
         final Long serviceId = (Long) reference.getProperty(SERVICE_ID);
-        // We cannot rely on reference.getBundle() or reference.getUsingBundles() as the service is already unregistered
-        // So we assume that any bundle that has this service in its registered or used list needs an update
-        bundles.values().stream().filter(dto -> hasService(dto, serviceId)).forEach(dto -> {
-            final Bundle bundle = context.getBundle(dto.id);
+        // O(1) lookup via inverted index instead of O(N×M) full scan
+        final Set<Long> affectedBundleIds = serviceToBundleIds.remove(serviceId);
+        if (affectedBundleIds == null) {
+            return;
+        }
+        for (final long bundleId : affectedBundleIds) {
+            final Bundle bundle = context.getBundle(bundleId);
             if (bundle != null) {
                 updateServices(bundle);
             }
-        });
-    }
-
-    private boolean hasService(final XBundleDTO dto, final long serviceId) {
-        if (dto.registeredServices != null && dto.registeredServices.stream().anyMatch(s -> s.id == serviceId)) {
-            return true;
         }
-        return dto.usedServices != null && dto.usedServices.stream().anyMatch(s -> s.id == serviceId);
     }
 
     private void updateServices(final Bundle bundle) {
@@ -305,7 +306,14 @@ public final class XBundleAdmin {
         return IO.collect(dataFile);
     }
 
+    /** Convenience overload for non-hot callers (e.g. classloader leak detection). */
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
+        return toDTO(bundle, bundleStartTimeCalculator, readFrameworkStartLevel());
+    }
+
+    public static XBundleDTO toDTO(final Bundle bundle,
+                                   final BundleStartTimeCalculator bundleStartTimeCalculator,
+                                   final int frameworkStartLevel) {
         final XBundleDTO dto = new XBundleDTO();
 
         // Fetch headers once and reuse across all header reads
