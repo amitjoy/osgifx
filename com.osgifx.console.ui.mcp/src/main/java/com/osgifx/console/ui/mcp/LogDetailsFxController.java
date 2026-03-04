@@ -15,11 +15,16 @@
  ******************************************************************************/
 package com.osgifx.console.ui.mcp;
 
+import java.util.function.Supplier;
+
 import javax.inject.Inject;
 
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import com.osgifx.console.ui.mcp.dto.McpLogDTO;
 import com.osgifx.console.util.fx.Fx;
 
@@ -47,7 +52,18 @@ public final class LogDetailsFxController {
     public void initControls(final McpLogDTO log) {
         timestampLabel.setText(Fx.formatTime(log.timestampProperty().get()).get());
         typeLabel.setText(log.typeProperty().get());
-        contentTextArea.setText(log.contentProperty().get());
+
+        final var content = log.contentProperty().get();
+        try {
+            final var jsonElement = JsonParser.parseString(content);
+            contentTextArea.setText(createGSON().get().toJson(jsonElement));
+        } catch (final Exception _) {
+            contentTextArea.setText(content);
+        }
+    }
+
+    private Supplier<Gson> createGSON() {
+        return () -> new GsonBuilder().setPrettyPrinting().create();
     }
 
 }

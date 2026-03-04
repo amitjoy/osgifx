@@ -135,19 +135,35 @@ To prevent attacks such as Zip Bombs or Collection Bombs during RPC communicatio
 | `osgi.fx.agent.rpc.max.map.size` | 1,000,000 | Maximum number of entries in a decoded map. Prevents Collection Bomb attacks. |
 | `osgi.fx.agent.rpc.max.byte.array.size` | 100 MB | Maximum allowed length for a decoded byte array. Prevents memory exhaustion. |
 
-### Heapdump & Snapshot
+---
 
-The following properties control the generation and storage of heap dumps and snapshots:
+## 4. Gogo Commands
 
-| Property | Default | Description |
+The OSGi.fx agent registers several Gogo commands under the `osgifx` scope. These commands allow you to dynamically start/stop the agent and check its status from the console.
+
+| Command | Description | Example |
 | :--- | :--- | :--- |
-| `osgi.fx.agent.heapdump.max.size` | -1 (Unlimited) | Maximum allowed size of a heap dump file in bytes. |
-| `osgi.fx.agent.gzip.compression.level` | 6 | GZIP compression level (1-9) for compressed payloads. |
-| `osgi.fx.agent.heapdump.disk.buffer.percentage` | 10 | Extra disk space (percentage) required beyond the estimated heap size for heap dump creation. |
+| `osgifx:startSocket` | Starts the socket agent | `osgifx:startSocket [port=1234 host=0.0.0.0]` |
+| `osgifx:stopSocket` | Stops the socket agent | `osgifx:stopSocket` |
+| `osgifx:startMqtt` | Starts the MQTT agent | `osgifx:startMqtt [pubTopic=/out subTopic=/in]` |
+| `osgifx:stopMqtt` | Stops the MQTT agent | `osgifx:stopMqtt` |
+| `osgifx:status` | Prints the agent status | `osgifx:status` |
+
+### Starting Socket Agent
+You can start the socket agent with optional arguments for port, host, security, and SSL context filter:
+```bash
+g! osgifx:startSocket [port=4567 host=localhost secure=true]
+```
+
+### Starting MQTT Agent
+You can start the MQTT agent with optional arguments for provider, pubTopic, and subTopic:
+```bash
+g! osgifx:startMqtt [provider=osgi-messaging pubTopic=osgifx/out subTopic=osgifx/in]
+```
 
 ---
 
-## 4. Large Payload Handling (SPI)
+## 5. Large Payload Handling (SPI)
 
 For remote runtimes where transferring large files (e.g., several hundred MBs of heap dumps) over RPC is inefficient or restricted, OSGi.fx provides the `LargePayloadHandler` Service Provider Interface (SPI).
 
