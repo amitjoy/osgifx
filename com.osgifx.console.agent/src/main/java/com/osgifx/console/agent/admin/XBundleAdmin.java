@@ -543,10 +543,12 @@ public final class XBundleAdmin {
     private static List<XServiceInfoDTO> prepareServiceInfo(final ServiceReference<?> service,
                                                             final List<String> objectClazz) {
         final List<XServiceInfoDTO> serviceInfos = new ArrayList<>();
+        final long                  serviceId    = (Long) service.getProperty(SERVICE_ID);
+
         for (final String clz : objectClazz) {
             final XServiceInfoDTO dto = new XServiceInfoDTO();
 
-            dto.id          = Long.parseLong(service.getProperty(SERVICE_ID).toString());
+            dto.id          = serviceId;
             dto.objectClass = clz;
 
             serviceInfos.add(dto);
