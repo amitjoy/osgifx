@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.application.handler;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
@@ -26,15 +25,11 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.preferences.Preference;
-import org.eclipse.fx.core.preferences.Value;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.SocketConnectionSettingDTO;
+import com.osgifx.console.application.preference.ConnectionManager;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.application.preference.CredentialManager;
 
@@ -44,16 +39,15 @@ public final class SocketConnectionPreferenceHandler {
     @Inject
     private FluentLogger        logger;
     @Inject
-    @Preference(nodePath = "osgi.fx.connections", key = "socket.settings", defaultValue = "")
-    private Value<String>       settings;
-    @Inject
     private ConnectionsProvider connectionsProvider;
     @Inject
     private CredentialManager   credentialManager;
+    @Inject
+    private ConnectionManager   connectionManager;
 
     @PostConstruct
     public void init() {
-        connectionsProvider.addSocketConnections(getStoredValues());
+        connectionsProvider.addSocketConnections(connectionManager.loadSocketConnections());
     }
 
     @Execute
@@ -69,8 +63,7 @@ public final class SocketConnectionPreferenceHandler {
                         @Named("requiresAuthentication") @Optional final String requiresAuthentication,
                         @Named("savePassword") @Optional final String savePassword) {
 
-        final var gson                     = new Gson();
-        final var connections              = getStoredValues();
+        final var connections              = connectionManager.loadSocketConnections();
         final var dtRequiresAuthentication = Boolean.parseBoolean(requiresAuthentication);
         final var dtSavePassword           = Boolean.parseBoolean(savePassword);
         final var dto                      = new SocketConnectionSettingDTO(id, name, host, Ints.tryParse(port),
@@ -123,18 +116,7 @@ public final class SocketConnectionPreferenceHandler {
         } else {
             logger.atWarning().log("Cannot execute command with type '%s'", type);
         }
-        settings.publish(gson.toJson(connections));
-    }
-
-    private List<SocketConnectionSettingDTO> getStoredValues() {
-        final var                        gson        = new Gson();
-        List<SocketConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
-                new TypeToken<List<SocketConnectionSettingDTO>>() {
-                                                             }.getType());
-        if (connections == null) {
-            connections = Lists.newArrayList();
-        }
-        return connections;
+        connectionManager.saveSocketConnections(connections);
     }
 
 }
