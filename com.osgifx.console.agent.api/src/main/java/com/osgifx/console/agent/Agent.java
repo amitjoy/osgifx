@@ -146,11 +146,6 @@ public interface Agent {
     String AGENT_MQTT_SUB_TOPIC_KEY = "osgi.fx.agent.mqtt.subtopic";
 
     /**
-     * The property key to enable agent RPC logs
-     */
-    String AGENT_RPC_TRACE_LOG_KEY = "osgi.fx.agent.rpc.logs.enabled";
-
-    /**
      * The property key to enable auto-start of the log capture mechanism
      */
     String AGENT_AUTO_START_LOG_CAPTURE_KEY = "osgi.fx.agent.auto.start.log.capture";
