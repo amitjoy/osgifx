@@ -25,10 +25,9 @@ import java.util.Optional;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 
-import com.osgifx.console.agent.admin.XBundleAdmin;
+import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.provider.BinaryLogBuffer;
-import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -54,13 +53,11 @@ public final class OSGiLogListener implements LogListener {
         GET_LOGGER_NAME = getLoggerName;
     }
 
-    private final BundleStartTimeCalculator bundleStartTimeCalculator;
-    private BinaryLogBuffer                 logBuffer;
-    private Supervisor                      supervisor;
+    private BinaryLogBuffer logBuffer;
+    private Supervisor      supervisor;
 
     @Inject
-    public OSGiLogListener(final BundleStartTimeCalculator bundleStartTimeCalculator) {
-        this.bundleStartTimeCalculator = bundleStartTimeCalculator;
+    public OSGiLogListener() {
     }
 
     public void setSupervisor(final Supervisor supervisor) {
@@ -91,7 +88,12 @@ public final class OSGiLogListener implements LogListener {
     private XLogEntryDTO toDTO(final LogEntry entry) {
         final XLogEntryDTO dto = new XLogEntryDTO();
 
-        dto.bundle  = XBundleAdmin.toDTO(entry.getBundle(), bundleStartTimeCalculator);
+        // Lightweight bundle info — the logs UI only displays symbolicName
+        final XBundleInfoDTO bundleInfo = new XBundleInfoDTO();
+        bundleInfo.id           = entry.getBundle().getBundleId();
+        bundleInfo.symbolicName = entry.getBundle().getSymbolicName();
+        dto.bundle              = bundleInfo;
+
         dto.message = entry.getMessage();
 
         // must not use OSGi R7 reference to getLogLevel()

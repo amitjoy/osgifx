@@ -146,11 +146,6 @@ public interface Agent {
     String AGENT_MQTT_SUB_TOPIC_KEY = "osgi.fx.agent.mqtt.subtopic";
 
     /**
-     * The property key to enable agent RPC logs
-     */
-    String AGENT_RPC_TRACE_LOG_KEY = "osgi.fx.agent.rpc.logs.enabled";
-
-    /**
      * The property key to enable auto-start of the log capture mechanism
      */
     String AGENT_AUTO_START_LOG_CAPTURE_KEY = "osgi.fx.agent.auto.start.log.capture";
@@ -211,28 +206,7 @@ public interface Agent {
      */
     String AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY = "osgi.fx.agent.rpc.max.byte.array.size";
 
-    /**
-     * The property key to specify the maximum allowed size of a heap dump file in bytes.
-     *
-     * @since 11.0
-     */
-    String AGENT_HEAPDUMP_MAX_SIZE_KEY = "osgi.fx.agent.heapdump.max.size";
 
-    /**
-     * The property key to specify the GZIP compression level (1-9).
-     *
-     * @since 11.0
-     */
-    String AGENT_GZIP_COMPRESSION_LEVEL_KEY = "osgi.fx.agent.gzip.compression.level";
-
-    /**
-     * The property key to specify the disk buffer percentage for heap dump creation.
-     * <p>
-     * This defines the extra space required on disk beyond the estimated heap size.
-     *
-     * @since 11.0
-     */
-    String AGENT_HEAPDUMP_DISK_BUFFER_PERCENTAGE_KEY = "osgi.fx.agent.heapdump.disk.buffer.percentage";
 
     /**
      * The port for attaching to a remote Gogo CommandSession
