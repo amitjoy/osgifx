@@ -1031,12 +1031,13 @@ public final class AgentServer implements Agent, Closeable {
 
     @Override
     public XMemoryInfoDTO getMemoryInfo() {
-        final XMemoryInfoDTO dto = new XMemoryInfoDTO();
+        final XMemoryInfoDTO dto     = new XMemoryInfoDTO();
+        final Runtime        runtime = Runtime.getRuntime();
 
         dto.uptime      = getSystemUptime();
-        dto.maxMemory   = Runtime.getRuntime().maxMemory();
-        dto.freeMemory  = Runtime.getRuntime().freeMemory();
-        dto.totalMemory = Runtime.getRuntime().totalMemory();
+        dto.maxMemory   = runtime.maxMemory();
+        dto.freeMemory  = runtime.freeMemory();
+        dto.totalMemory = runtime.totalMemory();
 
         return dto;
     }
