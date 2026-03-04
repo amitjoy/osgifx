@@ -88,7 +88,6 @@ public final class RuntimeComponentGraph {
         return vertices;
     }
 
-    @SuppressWarnings("unused")
     public Graph<ComponentVertex, DefaultEdge> getAllCycles() {
         final var                                 tarjan = new TarjanSimpleCycles<>(graph);
         final var                                 cycles = tarjan.findSimpleCycles();
@@ -97,7 +96,7 @@ public final class RuntimeComponentGraph {
         for (final List<ComponentVertex> group : cycles) {
             Node<ComponentVertex> node = CircularLinkedList.create(group);
             if (node != null) {
-                for (final ComponentVertex element : group) {
+                for (final var _ : group) {
                     node = node.getNext();
                     final var source = node.getData();
                     graph.addVertex(source);
