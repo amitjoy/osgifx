@@ -186,6 +186,10 @@ public final class AgentServer implements Agent, Closeable {
     private OSGiLogListener        logListener;
     private ServiceRegistration<?> osgiEventListenerServiceReg;
 
+    // Cached allowlist split — allowlist is a static OSGi property that rarely changes
+    private volatile String   cachedAllowlistRaw    = null;
+    private volatile String[] cachedAllowedCommands = null;
+
     private final DI           di;
     private final FluentLogger logger = LoggerFactory.getFluentLogger(getClass());
 
@@ -504,7 +508,12 @@ public final class AgentServer implements Agent, Closeable {
                     .arg(allowlistKey).log();
             return null;
         }
-        final String[] allowedCommands = allowlist.split(",");
+        // Re-split only when the raw property value has changed
+        if (!allowlist.equals(cachedAllowlistRaw)) {
+            cachedAllowlistRaw    = allowlist;
+            cachedAllowedCommands = allowlist.split(",");
+        }
+        final String[] allowedCommands = cachedAllowedCommands;
         final String   baseCommand     = command.trim().split("\\s+")[0];
 
         for (String allowedCommand : allowedCommands) {
