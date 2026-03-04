@@ -1,6 +1,6 @@
 -runrepos                       =         Workspace, Runtime, e(fx)clipse, Local
 -runfw                          =         org.eclipse.osgi;version=latest
--runkeep                        =         ${is;${driver};gradle}
+-runkeep                        =         false
 -runtrace                       =         true
 -runee                          =         JavaSE-25
 -runsystemcapabilities          =         ${native_capability},\
@@ -14,7 +14,8 @@
                                           bnd.identity;id='com.osgifx.console.api',\
                                           bnd.identity;id='org.osgi.service.messaging'
 current.directory               =         .
-storage.directory               =         ${current.directory}/.osgifx-ws
+osgifx.directory                =         ${current.directory}/.osgifx-ws
+storage.directory               =         ${osgifx.directory}/storage
 
 -runproperties.storage          =         launch.storage.dir=${storage.directory},\
                                           org.osgi.framework.storage=${storage.directory}
