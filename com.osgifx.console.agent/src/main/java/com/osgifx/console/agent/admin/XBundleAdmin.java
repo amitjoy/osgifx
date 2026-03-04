@@ -31,6 +31,7 @@ import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_ID;
 import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 import static org.osgi.framework.Constants.VERSION_ATTRIBUTE;
+import static org.osgi.framework.FrameworkEvent.STARTLEVEL_CHANGED;
 import static org.osgi.framework.namespace.HostNamespace.HOST_NAMESPACE;
 import static org.osgi.framework.wiring.BundleRevision.PACKAGE_NAMESPACE;
 
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -88,6 +90,13 @@ public final class XBundleAdmin {
     private ServiceTracker<Object, Future<?>> serviceTracker;
     private ExecutorService                   executor;
 
+    // Framework start level cached once; updated via FrameworkListener on STARTLEVEL_CHANGED
+    private volatile int      cachedFrameworkStartLevel = -1;
+    private FrameworkListener frameworkStartLevelListener;
+
+    // Inverted index: serviceId -> set of bundleIds that registered or use that service
+    private final Map<Long, Set<Long>> serviceToBundleIds = new ConcurrentHashMap<>();
+
     private static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
 
     @Inject
@@ -97,9 +106,19 @@ public final class XBundleAdmin {
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
         this.executor                  = executor;
+        // Prime the cache immediately so the first DTO creation never falls back to -1
+        this.cachedFrameworkStartLevel = readFrameworkStartLevel();
     }
 
     public void init() {
+        // Keep framework start level cache fresh
+        frameworkStartLevelListener = event -> {
+            if (event.getType() == STARTLEVEL_CHANGED) {
+                cachedFrameworkStartLevel = readFrameworkStartLevel();
+            }
+        };
+        context.addFrameworkListener(frameworkStartLevelListener);
+
         bundleTracker = new BundleTracker<Future<?>>(context,
                                                      Bundle.INSTALLED | Bundle.RESOLVED | Bundle.STARTING
                                                              | Bundle.ACTIVE | Bundle.STOPPING | Bundle.UNINSTALLED,
@@ -149,6 +168,9 @@ public final class XBundleAdmin {
     }
 
     public void stop() {
+        if (frameworkStartLevelListener != null) {
+            context.removeFrameworkListener(frameworkStartLevelListener);
+        }
         if (bundleTracker != null) {
             bundleTracker.close();
         }
@@ -159,7 +181,7 @@ public final class XBundleAdmin {
 
     private void processBundleSafely(final Bundle bundle) {
         try {
-            final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator);
+            final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator, cachedFrameworkStartLevel);
             bundles.put(bundle.getBundleId(), dto);
         } catch (final Exception e) {
             logger.atError().msg("Error processing bundle '{}'").arg(bundle.getSymbolicName()).throwable(e).log();
@@ -299,7 +321,7 @@ public final class XBundleAdmin {
         dto.vendor              = getHeader(bundle, BUNDLE_VENDOR);
         dto.description         = getHeader(bundle, BUNDLE_DESCRIPTION);
         dto.startLevel          = getStartLevel(bundle);
-        dto.frameworkStartLevel = getFrameworkStartLevel();
+        dto.frameworkStartLevel = frameworkStartLevel;
         // @formatter:off
         dto.startDurationInMillis  = bundleStartTimeCalculator.getBundleStartDuration(bundle.getBundleId())
                                                               .map(BundleStartDuration::getStartedAfter)
@@ -363,7 +385,7 @@ public final class XBundleAdmin {
         }
     }
 
-    private static int getFrameworkStartLevel() {
+    private static int readFrameworkStartLevel() {
         try {
             final BundleContext current = FrameworkUtil.getBundle(XBundleAdmin.class).getBundleContext();
             return current.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkStartLevelDTO.class).startLevel;
