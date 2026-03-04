@@ -28,6 +28,9 @@ public final class FxConstants {
         throw new IllegalAccessError("Cannot be instantiated");
     }
 
+    /** System property key containing the workspace location */
+    public static final String WORKSPACE_PROPERTY = "osgifx.ws";
+
     /** Path to the root FXML file used in the application. */
     public static final String ROOT_FXML = "/fxml/tab-content.fxml";
 

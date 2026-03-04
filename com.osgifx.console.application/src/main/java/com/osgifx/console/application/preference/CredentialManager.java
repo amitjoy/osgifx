@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.application.preference;
 
+import static com.osgifx.console.constants.FxConstants.WORKSPACE_PROPERTY;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -38,14 +40,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 @Component(service = CredentialManager.class)
 public final class CredentialManager {
 
     private static final String ALGORITHM       = "AES";
-    private static final Path   CREDENTIAL_FILE = Paths.get(System.getProperty("user.dir"), ".osgifx-ws",
-            "credentials.json");
+    private static final Path   CREDENTIAL_FILE = Paths.get(System.getProperty(WORKSPACE_PROPERTY), "credentials.json");
 
     @Reference
     private LoggerFactory factory;
@@ -143,7 +145,7 @@ public final class CredentialManager {
         try (var reader = Files.newBufferedReader(CREDENTIAL_FILE, StandardCharsets.UTF_8)) {
             final var                 type = new TypeToken<ConcurrentHashMap<String, String>>() {
                                            }.getType();
-            final Map<String, String> map  = new Gson().fromJson(reader, type);
+            final Map<String, String> map  = createGSON().get().fromJson(reader, type);
             return map == null ? new ConcurrentHashMap<>() : map;
         } catch (final Exception e) {
             logger.atWarning().withException(e).log("Failed to read credentials file");
@@ -154,8 +156,11 @@ public final class CredentialManager {
     private void saveCredentialsMap(final Map<String, String> map) throws Exception {
         Files.createDirectories(CREDENTIAL_FILE.getParent());
         try (var writer = Files.newBufferedWriter(CREDENTIAL_FILE, StandardCharsets.UTF_8)) {
-            new Gson().toJson(map, writer);
+            createGSON().get().toJson(map, writer);
         }
     }
 
+    private Supplier<Gson> createGSON() {
+        return () -> new GsonBuilder().setPrettyPrinting().create();
+    }
 }

@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.application.handler;
 
-import java.util.List;
 import java.util.stream.IntStream;
 
 import javax.annotation.PostConstruct;
@@ -26,15 +25,11 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
-import org.eclipse.fx.core.preferences.Preference;
-import org.eclipse.fx.core.preferences.Value;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.osgifx.console.application.dialog.MqttConnectionSettingDTO;
+import com.osgifx.console.application.preference.ConnectionManager;
 import com.osgifx.console.application.preference.ConnectionsProvider;
 import com.osgifx.console.application.preference.CredentialManager;
 
@@ -44,16 +39,15 @@ public final class MqttConnectionPreferenceHandler {
     @Inject
     private FluentLogger        logger;
     @Inject
-    @Preference(nodePath = "osgi.fx.connections", key = "mqtt.settings", defaultValue = "")
-    private Value<String>       settings;
-    @Inject
     private ConnectionsProvider connectionsProvider;
     @Inject
     private CredentialManager   credentialManager;
+    @Inject
+    private ConnectionManager   connectionManager;
 
     @PostConstruct
     public void init() {
-        connectionsProvider.addMqttConnections(getStoredValues());
+        connectionsProvider.addMqttConnections(connectionManager.loadMqttConnections());
     }
 
     @Execute
@@ -73,8 +67,7 @@ public final class MqttConnectionPreferenceHandler {
                         @Named("subTopic") @Optional final String subTopic,
                         @Named("lwtTopic") @Optional final String lwtTopic) {
 
-        final var gson                     = new Gson();
-        final var connections              = getStoredValues();
+        final var connections              = connectionManager.loadMqttConnections();
         final var dtRequiresAuthentication = Boolean.parseBoolean(requiresAuthentication);
         final var dtSavePassword           = Boolean.parseBoolean(savePassword);
         final var dto                      = new MqttConnectionSettingDTO(id, name, clientId, server,
@@ -117,18 +110,7 @@ public final class MqttConnectionPreferenceHandler {
         } else {
             logger.atWarning().log("Cannot execute command with type '%s'", type);
         }
-        settings.publish(gson.toJson(connections));
-    }
-
-    private List<MqttConnectionSettingDTO> getStoredValues() {
-        final var                      gson        = new Gson();
-        List<MqttConnectionSettingDTO> connections = gson.fromJson(settings.getValue(),
-                new TypeToken<List<MqttConnectionSettingDTO>>() {
-                                                           }.getType());
-        if (connections == null) {
-            connections = Lists.newArrayList();
-        }
-        return connections;
+        connectionManager.saveMqttConnections(connections);
     }
 
 }
