@@ -308,18 +308,21 @@ public final class XBundleAdmin {
     public static XBundleDTO toDTO(final Bundle bundle, final BundleStartTimeCalculator bundleStartTimeCalculator) {
         final XBundleDTO dto = new XBundleDTO();
 
+        // Fetch headers once and reuse across all header reads
+        final Dictionary<String, String> headers = bundle.getHeaders();
+
         dto.id                  = bundle.getBundleId();
         dto.state               = findState(bundle.getState());
         dto.symbolicName        = bundle.getSymbolicName();
         dto.version             = bundle.getVersion().toString();
         dto.location            = bundle.getLocation();
-        dto.category            = getHeader(bundle, BUNDLE_CATEGORY);
-        dto.isFragment          = getHeader(bundle, FRAGMENT_HOST) != null;
+        dto.category            = headers.get(BUNDLE_CATEGORY);
+        dto.isFragment          = headers.get(FRAGMENT_HOST) != null;
         dto.lastModified        = bundle.getLastModified();
         dto.dataFolderSize      = getStorageSize(bundle);
-        dto.documentation       = getHeader(bundle, BUNDLE_DOCURL);
-        dto.vendor              = getHeader(bundle, BUNDLE_VENDOR);
-        dto.description         = getHeader(bundle, BUNDLE_DESCRIPTION);
+        dto.documentation       = headers.get(BUNDLE_DOCURL);
+        dto.vendor              = headers.get(BUNDLE_VENDOR);
+        dto.description         = headers.get(BUNDLE_DESCRIPTION);
         dto.startLevel          = getStartLevel(bundle);
         dto.frameworkStartLevel = frameworkStartLevel;
         // @formatter:off
@@ -334,7 +337,7 @@ public final class XBundleAdmin {
         dto.wiredBundlesAsProvider = getWiredBundlesAsProvider(bundle);
         dto.wiredBundlesAsRequirer = getWiredBundlesAsRequirer(bundle);
         dto.registeredServices     = getRegisteredServices(bundle);
-        dto.manifestHeaders        = toMap(bundle.getHeaders());
+        dto.manifestHeaders        = toMap(headers);
         dto.usedServices           = getUsedServices(bundle);
         dto.hostBundles            = getHostBundles(bundle);
         dto.fragmentsAttached      = getAttachedFragements(bundle);
@@ -693,10 +696,6 @@ public final class XBundleAdmin {
                 break;
         }
         return null;
-    }
-
-    private static String getHeader(final Bundle bundle, final String header) {
-        return bundle.getHeaders().get(header);
     }
 
     private static Map<String, String> toMap(final Dictionary<String, String> dictionary) {
