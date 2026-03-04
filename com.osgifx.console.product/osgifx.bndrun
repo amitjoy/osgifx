@@ -36,7 +36,8 @@ startlevels                       :   com.osgifx.console.agent;startlevel=1,\
 
 -runproperties.product            :   eclipse.product=com.osgifx.console.application.product
 -runproperties.name               :   launch.name=OSGi.fx
--runproperties.logging            :   org.apache.sling.commons.log.file=${storage.directory}/logs/fx.log,\
+-runproperties.workspace          :   osgifx.ws=${osgifx.directory}
+-runproperties.logging            :   org.apache.sling.commons.log.file=${osgifx.directory}/logs/fx.log,\
                                       org.apache.sling.commons.log.pattern="{0,date,yyyy-MM-dd  HH:mm:ss.SSSXXX}     {4}     [{2}]  [{3}]  {5}"
 
 # the following configuration is used to ensure that MQTT client will not be automatically enabled
