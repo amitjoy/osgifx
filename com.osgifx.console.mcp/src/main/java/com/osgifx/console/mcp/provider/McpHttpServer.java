@@ -15,12 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.mcp.provider;
 
-import static com.osgifx.console.mcp.provider.McpHttpServer.CONDITION_ID_VALUE;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MANDATORY;
 import static org.osgi.service.component.annotations.ReferencePolicy.STATIC;
-import static org.osgi.service.condition.Condition.CONDITION_ID;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
@@ -35,12 +34,12 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.propertytypes.SatisfyingConditionTarget;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.osgifx.console.mcp.provider.McpHttpServer.Configuration;
+import com.osgifx.console.mcp.server.FxMcpServer;
 
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;
@@ -50,11 +49,8 @@ import io.fusionauth.http.server.HTTPResponse;
 import io.fusionauth.http.server.HTTPServer;
 
 @Designate(ocd = Configuration.class)
-@Component(service = McpHttpServer.class, immediate = true)
-@SatisfyingConditionTarget("(" + CONDITION_ID + "=" + CONDITION_ID_VALUE + ")")
-public class McpHttpServer {
-
-    public static final String CONDITION_ID_VALUE = "osgi.fx.mcp";
+@Component(service = FxMcpServer.class)
+public class McpHttpServer implements FxMcpServer {
 
     @ObjectClassDefinition(name = "MCP HTTP Server Configuration", description = "Configuration for the MCP HTTP Server")
     public @interface Configuration {
@@ -68,6 +64,7 @@ public class McpHttpServer {
     @Reference
     private LoggerFactory factory;
     private FluentLogger  logger;
+    private int           port;
 
     private HTTPServer httpServer;
 
@@ -83,21 +80,29 @@ public class McpHttpServer {
 
     @Activate
     void activate(final Configuration config) {
+        port   = config.port();
         logger = FluentLogger.of(factory.createLogger(getClass().getName()));
-        startServer(config);
         // Register notification sender to broadcast to all SSE clients
         mcpProvider.getServer().setNotificationSender(this::broadcast);
     }
 
     @Deactivate
-    void deactivate() {
-        stopServer();
+    void deactivate() throws Exception {
+        stop();
     }
 
     @SuppressWarnings("resource")
-    private void startServer(final Configuration config) {
+    @Override
+    public void start() throws Exception {
         if (httpServer != null) {
             return;
+        }
+
+        // Port availability check because FusionAuth's HTTPServer swallows bind exceptions natively.
+        try (var _ = new ServerSocket(port)) {
+            // Port is available, closed immediately.
+        } catch (final Exception e) {
+            throw new RuntimeException("Port " + port + " is already in use or unavailable", e);
         }
 
         final HTTPHandler handler = (req, res) -> {
@@ -126,15 +131,16 @@ public class McpHttpServer {
             res.setStatus(404);
         };
 
-        final HTTPListenerConfiguration listenerConfig = new HTTPListenerConfiguration(config.port());
+        final HTTPListenerConfiguration listenerConfig = new HTTPListenerConfiguration(port);
 
         httpServer = new HTTPServer().withListener(listenerConfig).withHandler(handler);
         httpServer.start();
 
-        logger.atInfo().log("MCP HTTP Server started at http://localhost:%d/mcp", config.port());
+        logger.atInfo().log("MCP HTTP Server started at http://localhost:%d/mcp", port);
     }
 
-    private void stopServer() {
+    @Override
+    public void stop() throws Exception {
         if (httpServer != null) {
             httpServer.close();
             httpServer = null;
