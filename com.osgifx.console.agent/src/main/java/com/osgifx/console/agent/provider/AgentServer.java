@@ -135,6 +135,7 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
@@ -1359,6 +1360,20 @@ public final class AgentServer implements Agent, Closeable {
         };
         logReaderTracker.open();
         return () -> logReaderTracker.close();
+    }
+
+    @Override
+    public List<XRuntimeCapabilityDTO> getRuntimeCapabilities() {
+        final PackageWirings              wirings = di.getInstance(PackageWirings.class);
+        final List<XRuntimeCapabilityDTO> result  = new ArrayList<>();
+        for (final PackageWirings.Type type : PackageWirings.Type.values()) {
+            final XRuntimeCapabilityDTO dto = new XRuntimeCapabilityDTO();
+            dto.id          = type.name();
+            dto.name        = type.comprehensibleName;
+            dto.isAvailable = wirings.isWiredFresh(type);
+            result.add(dto);
+        }
+        return Collections.unmodifiableList(result);
     }
 
 }

@@ -67,6 +67,10 @@ public final class LogConfigurationsFxController {
             Fx.addTablePlaceholderWhenDisconnected(table);
             return;
         }
+        if (!isCapabilityAvailable("R7_LOGGER")) {
+            Fx.addTablePlaceholderWhenFeatureUnavailable(table, "R7 Logger");
+            return;
+        }
         try {
             createControls();
             Fx.disableSelectionModel(table);
@@ -74,6 +78,10 @@ public final class LogConfigurationsFxController {
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     private void createControls() {

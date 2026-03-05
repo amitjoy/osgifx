@@ -97,6 +97,16 @@ public final class GraphFxComponentController implements GraphController {
     @FXML
     public void initialize() {
         try {
+            if (!isCapabilityAvailable("SCR")) {
+                graphPane.setCenter(Fx.createFeatureUnavailablePlaceholder("Declarative Services"));
+                searchText.setDisable(true);
+                componentsList.setDisable(true);
+                wiringSelection.setDisable(true);
+                layoutSelection.setDisable(true);
+                transitiveView.setDisable(true);
+                showSelectedOnlyView.setDisable(true);
+                return;
+            }
             addExportToDotContextMenu();
             initComponentsList();
             progressPane = new MaskerPane();
@@ -106,6 +116,10 @@ public final class GraphFxComponentController implements GraphController {
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     @Override

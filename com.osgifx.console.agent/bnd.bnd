@@ -42,6 +42,7 @@ Import-Package: \
 	javax.management.remote;'resolution:'=optional,\
 	org.apache.commons.logging.*;'resolution:'=optional,\
 	org.apache.felix.hc.*;'resolution:'=optional,\
+	org.apache.felix.gogo.runtime;'resolution:'=optional,\
 	org.apache.felix.service.command;'resolution:'=optional,\
 	org.apache.log4j;'resolution:'=optional,\
 	org.apache.logging.*;'resolution:'=optional,\
