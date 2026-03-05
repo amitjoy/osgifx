@@ -35,6 +35,7 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
@@ -195,4 +196,19 @@ public interface DataProvider {
      * @return a CompletableFuture containing the heap usage information
      */
     CompletableFuture<XHeapUsageDTO> heapUsage();
+
+    /**
+     * Returns the availability snapshot of all optional OSGi compendium features
+     * tracked by the agent (SCR, ConfigAdmin, JAX-RS, HTTP, CDI, HealthCheck, etc.).
+     *
+     * <p>
+     * The list is updated automatically when a bundle-action event fires (i.e., a
+     * bundle is installed or uninstalled via OSGi.fx) and is cleared on disconnect.
+     * Tab switches read this in-memory list — no RPC is triggered.
+     * </p>
+     *
+     * @return an observable, never-{@code null} list of capability descriptors
+     * @since 12.0
+     */
+    ObservableList<XRuntimeCapabilityDTO> runtimeCapabilities();
 }
