@@ -16,17 +16,12 @@
 package com.osgifx.console.ui.mcp;
 
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static org.osgi.service.condition.Condition.CONDITION_ID;
-import static org.osgi.service.condition.Condition.INSTANCE;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.aries.component.dsl.OSGi;
-import org.apache.aries.component.dsl.OSGiResult;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
@@ -40,12 +35,12 @@ import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
-import org.osgi.service.condition.Condition;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.mcp.data.McpDataProvider;
+import com.osgifx.console.mcp.server.FxMcpServer;
 import com.osgifx.console.ui.mcp.dialog.McpConfigDialog;
 import com.osgifx.console.ui.mcp.dto.McpLogDTO;
 import com.osgifx.console.ui.mcp.dto.McpToolDTO;
@@ -112,8 +107,10 @@ public final class McpFxController {
     private boolean           isConnected;
     @Inject
     private Executor          executor;
+    @Inject
+    @Optional
+    private FxMcpServer       fxMcpServer;
 
-    private static OSGiResult                mcpResult;
     private final ObservableList<McpToolDTO> tools = FXCollections.observableArrayList();
     private final ObservableList<McpLogDTO>  logs  = FXCollections.observableArrayList();
     private final Gson                       gson  = new GsonBuilder().setPrettyPrinting().create();
@@ -139,6 +136,14 @@ public final class McpFxController {
                 clearLogsButton.setDisable(true);
                 statusLabel.setText("Status: UNAVAILABLE");
                 Fx.showErrorNotification("Model Context Protocol", "MCP data provider service is unavailable");
+                return;
+            }
+            if (fxMcpServer == null) {
+                actionButton.setDisable(true);
+                refreshLogsButton.setDisable(true);
+                clearLogsButton.setDisable(true);
+                statusLabel.setText("Status: UNAVAILABLE");
+                Fx.showErrorNotification("Model Context Protocol", "MCP server is unavailable");
                 return;
             }
             initToolsTable();
@@ -287,21 +292,30 @@ public final class McpFxController {
 
     private void startServer() {
         executor.runAsync(() -> {
-            mcpResult = OSGi.register(Condition.class, INSTANCE, Map.of(CONDITION_ID, "osgi.fx.mcp"))
-                    .run(bundleContext);
-            System.setProperty("is_started_mcp", "true");
-            threadSync.asyncExec(() -> {
-                updateStatus();
-                Fx.showSuccessNotification("Model Context Protocol", "MCP server has been started");
-            });
+            try {
+                fxMcpServer.start();
+                System.setProperty("is_started_mcp", "true");
+                threadSync.asyncExec(() -> {
+                    updateStatus();
+                    Fx.showSuccessNotification("Model Context Protocol", "MCP server has been started");
+                });
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Failed to start MCP server");
+                System.setProperty("is_started_mcp", "false"); // Ensure status is correct
+                threadSync.asyncExec(() -> {
+                    updateStatus();
+                    Fx.showErrorNotification("Model Context Protocol", "Failed to start MCP server: " + e.getMessage());
+                });
+            }
         });
     }
 
     private void stopServer() {
         executor.runAsync(() -> {
-            if (mcpResult != null) {
-                mcpResult.close();
-                mcpResult = null;
+            try {
+                fxMcpServer.stop();
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Failed to stop MCP server");
             }
             System.setProperty("is_started_mcp", "false");
             threadSync.asyncExec(() -> {
