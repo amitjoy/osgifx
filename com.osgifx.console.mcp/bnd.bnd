@@ -8,3 +8,4 @@
                       com.osgifx.console.mcp.provider
 -privatepackage     : com.osgifx.console.mcp.*
 -conditionalpackage : io.fusionauth*
+-fixupmessages      : 'split'
