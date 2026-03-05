@@ -26,14 +26,17 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Throwables;
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 
 public final class GogoFxController {
 
@@ -56,6 +59,8 @@ public final class GogoFxController {
     @Inject
     @Named("is_snapshot_agent")
     private boolean            isSnapshotAgent;
+    @Inject
+    private DataProvider       dataProvider;
     private int                historyPointer;
 
     @FXML
@@ -66,6 +71,12 @@ public final class GogoFxController {
             logger.atWarning().log("Agent not connected");
             return;
         }
+        if (!isCapabilityAvailable("GOGO")) {
+            final var parent = (BorderPane) output.getParent();
+            parent.setCenter(Fx.createFeatureUnavailablePlaceholder("Apache Felix Gogo"));
+            input.setDisable(true);
+            return;
+        }
         executor.runAsync(() -> {
             final var gogoCommands = agent.getGogoCommands();
             if (gogoCommands != null) {
@@ -73,6 +84,10 @@ public final class GogoFxController {
             }
         });
         logger.atDebug().log("FXML controller has been initialized");
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     @FXML

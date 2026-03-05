@@ -80,6 +80,10 @@ public final class ComponentsFxController {
             Fx.addTablePlaceholderWhenDisconnected(table);
             return;
         }
+        if (!isCapabilityAvailable("SCR")) {
+            Fx.addTablePlaceholderWhenFeatureUnavailable(table, "Declarative Services");
+            return;
+        }
         try {
             createControls();
             Fx.disableSelectionModel(table);
@@ -87,6 +91,10 @@ public final class ComponentsFxController {
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     private void createControls() {

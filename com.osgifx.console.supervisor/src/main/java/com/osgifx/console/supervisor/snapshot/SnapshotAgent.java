@@ -53,6 +53,7 @@ import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.dto.SnapshotDTO;
@@ -413,6 +414,11 @@ public final class SnapshotAgent implements Agent {
     @Override
     public String createSnapshotLocally(final String outputPath) throws Exception {
         return null;
+    }
+
+    @Override
+    public List<XRuntimeCapabilityDTO> getRuntimeCapabilities() {
+        return List.of();
     }
 
 }

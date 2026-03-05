@@ -67,6 +67,10 @@ public final class JaxRsFxController {
             Fx.addTablePlaceholderWhenDisconnected(table);
             return;
         }
+        if (!isCapabilityAvailable("JAX_RS")) {
+            Fx.addTablePlaceholderWhenFeatureUnavailable(table, "JAX-RS");
+            return;
+        }
         try {
             createControls();
             Fx.disableSelectionModel(table);
@@ -74,6 +78,10 @@ public final class JaxRsFxController {
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     private void createControls() {
