@@ -48,6 +48,7 @@ import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -106,6 +107,15 @@ public final class HealthCheckFxController {
     @FXML
     public void initialize() {
         try {
+            if (!isCapabilityAvailable("HC")) {
+                hcResultArea.setCenter(Fx.createFeatureUnavailablePlaceholder("Felix HealthCheck"));
+                hcTypeButton.setDisable(true);
+                searchText.setDisable(true);
+                executeHcButton.setDisable(true);
+                deselectAllButton.setDisable(true);
+                hcMetadataList.setDisable(true);
+                return;
+            }
             initHcList();
             progressPane = new MaskerPane();
             logger.atDebug().log("FXML controller has been initialized");
@@ -114,6 +124,10 @@ public final class HealthCheckFxController {
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     private void initHcTypeButton() {

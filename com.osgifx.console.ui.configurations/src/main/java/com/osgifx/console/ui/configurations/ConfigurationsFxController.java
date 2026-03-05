@@ -106,6 +106,11 @@ public final class ConfigurationsFxController {
             updateButtonStates();
             return;
         }
+        if (!isCapabilityAvailable("CM")) {
+            Fx.addTablePlaceholderWhenFeatureUnavailable(table, "Config Admin");
+            updateButtonStates();
+            return;
+        }
         try {
             createControls();
             Fx.disableSelectionModel(table);
@@ -114,6 +119,10 @@ public final class ConfigurationsFxController {
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     @FXML

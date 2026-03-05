@@ -217,6 +217,47 @@ public final class Fx {
         table.setPlaceholder(placeholder);
     }
 
+    /**
+     * Sets a "Feature not available" placeholder on a {@link TableView}.
+     * <p>
+     * Call this after the agent-connected check, when the corresponding OSGi
+     * compendium feature is absent from the connected runtime.
+     *
+     * @param table the table to update
+     * @param featureName the human-readable name of the missing feature (e.g. {@code "JAX-RS"})
+     */
+    public static void addTablePlaceholderWhenFeatureUnavailable(final TableView<?> table, final String featureName) {
+        final var placeholder = new Label();
+
+        placeholder.setText(featureName + " is not available in the connected runtime");
+        placeholder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.WARNING));
+
+        table.setPlaceholder(placeholder);
+    }
+
+    /**
+     * Creates a standalone placeholder {@link Node} suitable for replacing an
+     * entire content pane (e.g. HealthCheck tab, Graph component tab) when the
+     * corresponding OSGi compendium feature is absent from the connected runtime.
+     *
+     * @param featureName the human-readable name of the missing feature (e.g. {@code "Felix HealthCheck"})
+     * @return a centred {@code VBox} containing a warning glyph and a descriptive label
+     */
+    public static Node createFeatureUnavailablePlaceholder(final String featureName) {
+        final var glyph = new Glyph("FontAwesome", FontAwesome.Glyph.WARNING);
+        glyph.setFontSize(48);
+
+        final var label = new Label(featureName + " is not available in the connected runtime");
+        label.setWrapText(true);
+
+        final var box = new javafx.scene.layout.VBox(12, glyph, label);
+        box.setAlignment(Pos.CENTER);
+        box.setMaxWidth(Double.MAX_VALUE);
+        box.setMaxHeight(Double.MAX_VALUE);
+
+        return box;
+    }
+
     public static StringProperty formatTime(final long timestamp) {
         return new SimpleStringProperty(TIME_FORMATTER.format(Instant.ofEpochMilli(timestamp)));
     }

@@ -91,12 +91,24 @@ public final class DmtFxController {
         if (!isConnected) {
             return;
         }
+        if (!isCapabilityAvailable("DMT")) {
+            final var parent = (javafx.scene.layout.VBox) dmtTree.getParent();
+            parent.getChildren().clear();
+            parent.getChildren().add(Fx.createFeatureUnavailablePlaceholder("DMT"));
+            searchBox.setDisable(true);
+            searchBtn.setDisable(true);
+            return;
+        }
         try {
             initTree();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
         }
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     public void updateModel() {

@@ -48,7 +48,8 @@ public final class PackageWirings {
         JAX_RS("JAX-RS"),
         CDI("CDI"),
         JMX("JMX"),
-        HC("Felix Healthcheck");
+        HC("Felix Healthcheck"),
+        GOGO("Gogo");
 
         public String comprehensibleName;
 
@@ -141,6 +142,97 @@ public final class PackageWirings {
 
     public boolean isFelixHcWired() {
         return isWired("org.apache.felix.hc.api");
+    }
+
+    public boolean isGogoWired() {
+        return isWired("org.apache.felix.gogo.runtime");
+    }
+
+    /**
+     * Dispatches to the cache-backed individual {@code isXxxWired()} methods.
+     * Keeps the existing lazy-caching behaviour for all internal callers.
+     */
+    public boolean isWiredByType(final Type type) {
+        switch (type) {
+            case SCR:
+                return isScrWired();
+            case CM:
+                return isConfigAdminWired();
+            case DMT:
+                return isDmtAdminWired();
+            case USER_ADMIN:
+                return isUserAdminWired();
+            case METATYPE:
+                return isMetatypeWired();
+            case EVENT_ADMIN:
+                return isEventAdminWired();
+            case LOG:
+                return isLogWired();
+            case R7_LOGGER:
+                return isR7LoggerAdminWired();
+            case HTTP:
+                return isHttpServiceRuntimeWired();
+            case JAX_RS:
+                return isJaxRsWired();
+            case CDI:
+                return isCDIWired();
+            case JMX:
+                return isJmxWired();
+            case HC:
+                return isFelixHcWired();
+            case GOGO:
+                return isGogoWired();
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Bypasses the lazy cache and walks the live framework wires directly.
+     * <p>
+     * Used exclusively by {@code AgentServer.getRuntimeCapabilities()} so that a
+     * fresh snapshot is returned after a bundle install/uninstall <em>without</em>
+     * invalidating the shared cache for all other callers.
+     * </p>
+     */
+    public boolean isWiredFresh(final Type type) {
+        final String pkg = packageNameFor(type);
+        return pkg != null && checkWiring(pkg);
+    }
+
+    private String packageNameFor(final Type type) {
+        switch (type) {
+            case SCR:
+                return "org.osgi.service.component.runtime";
+            case CM:
+                return "org.osgi.service.cm";
+            case DMT:
+                return "org.osgi.service.dmt";
+            case USER_ADMIN:
+                return "org.osgi.service.useradmin";
+            case METATYPE:
+                return "org.osgi.service.metatype";
+            case EVENT_ADMIN:
+                return "org.osgi.service.event";
+            case LOG:
+                return "org.osgi.service.log";
+            case R7_LOGGER:
+                return "org.osgi.service.log.admin";
+            case HTTP:
+                return "org.osgi.service.http.runtime";
+            case JAX_RS:
+                return "org.osgi.service.jaxrs.runtime";
+            case CDI:
+                return "org.osgi.service.cdi.runtime";
+            case JMX:
+                return "javax.management";
+            case HC:
+                return "org.apache.felix.hc.api";
+            case GOGO:
+                return "org.apache.felix.gogo.runtime";
+            default:
+                return null;
+        }
     }
 
 }
