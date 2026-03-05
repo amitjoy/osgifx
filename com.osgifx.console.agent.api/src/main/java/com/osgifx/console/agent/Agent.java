@@ -45,6 +45,7 @@ import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.extension.AgentExtension;
@@ -205,8 +206,6 @@ public interface Agent {
      * @since 11.0
      */
     String AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY = "osgi.fx.agent.rpc.max.byte.array.size";
-
-
 
     /**
      * The port for attaching to a remote Gogo CommandSession
@@ -845,4 +844,22 @@ public interface Agent {
      * @since 11.0
      */
     String createSnapshotLocally(String outputPath) throws Exception;
+
+    /**
+     * Returns the availability of all optional OSGi compendium features tracked by
+     * the agent (SCR, ConfigAdmin, JAX-RS, HTTP, CDI, HealthCheck, etc.).
+     *
+     * <p>
+     * Each entry in the returned list corresponds to one {@code PackageWirings.Type}
+     * value. The check bypasses the internal wiring cache so that the result always
+     * reflects the <em>current</em> live state of the connected runtime. Callers
+     * should invoke this method only when a bundle-action event has fired, not on
+     * every user interaction.
+     * </p>
+     *
+     * @return a non-{@code null}, unmodifiable list of capability descriptors
+     * @since 12.0
+     */
+    List<XRuntimeCapabilityDTO> getRuntimeCapabilities();
+
 }

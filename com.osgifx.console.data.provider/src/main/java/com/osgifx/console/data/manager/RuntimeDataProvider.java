@@ -30,6 +30,7 @@ import static com.osgifx.console.data.supplier.LogsInfoSupplier.LOGS_ID;
 import static com.osgifx.console.data.supplier.PackagesInfoSupplier.PACKAGES_ID;
 import static com.osgifx.console.data.supplier.PropertiesInfoSupplier.PROPERTIES_ID;
 import static com.osgifx.console.data.supplier.RolesInfoSupplier.ROLES_ID;
+import static com.osgifx.console.data.supplier.RuntimeCapabilitiesInfoSupplier.CAPABILITIES_ID;
 import static com.osgifx.console.data.supplier.ServicesInfoSupplier.SERVICES_ID;
 import static com.osgifx.console.data.supplier.ThreadsInfoSupplier.THREADS_ID;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ALL_TOPIC;
@@ -69,6 +70,7 @@ import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.data.provider.DataProvider;
@@ -256,6 +258,11 @@ public final class RuntimeDataProvider implements DataProvider {
             return null;
         }
         return executor.supplyAsync(agent::getHeapUsage);
+    }
+
+    @Override
+    public ObservableList<XRuntimeCapabilityDTO> runtimeCapabilities() {
+        return (ObservableList<XRuntimeCapabilityDTO>) supply(CAPABILITIES_ID);
     }
 
     private ObservableList<?> supply(final String id) {
