@@ -97,29 +97,37 @@ public final class Fx {
     }
 
     public static void showSuccessNotification(final String title, final String text) {
-        final var success = new Image(Fx.class.getClassLoader().getResource("/success.png").toExternalForm());
+        final var image     = new Image(Fx.class.getClassLoader().getResource("/success.png").toExternalForm());
+        final var imageView = new ImageView(image);
+        imageView.setFitWidth(32);
+        imageView.setFitHeight(32);
         // @formatter:off
         final var notification = //
                 Notifications.create()
                              .title(title)
-                             .graphic(new ImageView(success))
+                             .graphic(imageView)
                              .text(text)
-                             .hideAfter(Duration.seconds(3))
-                             .position(Pos.CENTER);
+                             .hideAfter(Duration.seconds(4))
+                             .position(Pos.BOTTOM_RIGHT)
+                             .darkStyle();
         // @formatter:on
         Platform.runLater(notification::show);
     }
 
     public static void showErrorNotification(final String title, final String text) {
-        final var success = new Image(Fx.class.getClassLoader().getResource("/error.png").toExternalForm());
+        final var image     = new Image(Fx.class.getClassLoader().getResource("/error.png").toExternalForm());
+        final var imageView = new ImageView(image);
+        imageView.setFitWidth(32);
+        imageView.setFitHeight(32);
         // @formatter:off
         final var notification = //
                 Notifications.create()
                              .title(title)
-                             .graphic(new ImageView(success))
+                             .graphic(imageView)
                              .text(text)
-                             .hideAfter(Duration.seconds(3))
-                             .position(Pos.CENTER);
+                             .hideAfter(Duration.seconds(7))
+                             .position(Pos.BOTTOM_RIGHT)
+                             .darkStyle();
         // @formatter:on
         Platform.runLater(notification::show);
     }
