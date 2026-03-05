@@ -108,8 +108,7 @@ public final class Activator implements BundleActivator {
         if (isSocketConfigured(bundleContext)) {
             startSocketAgent();
         } else {
-            logger.atInfo()
-                    .msg("[OSGi.fx] Socket agent dormant. Awaiting 'osgifx:startSocket' or system properties.")
+            logger.atInfo().msg("[OSGi.fx] Socket agent dormant. Awaiting 'osgifx:startSocket' or system properties.")
                     .log();
         }
 
