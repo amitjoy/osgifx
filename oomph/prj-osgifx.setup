@@ -218,7 +218,7 @@
       <setupTask
           xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.jdt.ui/formatter_profile"
-          value="_OSGi.fx"/>
+          value="OSGi.fx"/>
       <setupTask
           xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.jdt.ui/formatter_settings_version"
