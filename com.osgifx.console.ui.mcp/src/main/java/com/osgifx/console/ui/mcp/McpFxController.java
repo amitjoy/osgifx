@@ -148,6 +148,7 @@ public final class McpFxController {
             }
             initToolsTable();
             initLogsTable();
+            Fx.disableSelectionModel(toolsTable, logsTable);
             updateTools();
             updateLogs();
             updateStatus();
@@ -194,7 +195,6 @@ public final class McpFxController {
             threadSync.asyncExec(() -> {
                 toolsTable.getColumns().add(0, expanderColumn);
                 toolsTable.setItems(tools);
-                Fx.addContextMenuToCopyContent(toolsTable);
                 TableFilter.forTableView(toolsTable).lazy(true).apply();
                 threadSync.asyncExec(() -> {
                     toolsTable.getSortOrder().add(nameColumn);
@@ -237,7 +237,6 @@ public final class McpFxController {
             threadSync.asyncExec(() -> {
                 logsTable.getColumns().add(0, expanderColumn);
                 logsTable.setItems(logs);
-                Fx.addContextMenuToCopyContent(logsTable);
                 TableFilter.forTableView(logsTable).lazy(true).apply();
                 threadSync.asyncExec(() -> {
                     timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
