@@ -27,8 +27,8 @@ import org.osgi.util.converter.Converters;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 public final class LogDetailsFxController {
 
@@ -36,15 +36,15 @@ public final class LogDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private Label        receivedAtLabel;
+    private TextField        receivedAtLabel;
     @FXML
-    private Label        levelLabel;
+    private TextField        levelLabel;
     @FXML
-    private Label        bundleLabel;
+    private TextField        bundleLabel;
     @FXML
-    private Label        loggerLabel;
+    private TextField        loggerLabel;
     @FXML
-    private Label        threadLabel;
+    private TextField        threadLabel;
     @FXML
     private TextArea     messageText;
     @FXML

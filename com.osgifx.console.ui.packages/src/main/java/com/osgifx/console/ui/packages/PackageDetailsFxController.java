@@ -29,16 +29,16 @@ import com.osgifx.console.util.fx.Fx;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 public final class PackageDetailsFxController {
 
     @FXML
-    private Label                           nameLabel;
+    private TextField                           nameLabel;
     @FXML
-    private Label                           versionLabel;
+    private TextField                           versionLabel;
     @FXML
     private CheckBox                        duplicateLabel;
     @FXML

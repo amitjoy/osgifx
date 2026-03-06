@@ -46,9 +46,9 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 public final class BundleDetailsFxController {
 
@@ -58,39 +58,39 @@ public final class BundleDetailsFxController {
     private static final String BUNDLE_UNINSTALL_COMMAND_ID = "com.osgifx.console.application.command.bundle.uninstall";
 
     @FXML
-    private Label                                      idLabel;
+    private TextField                                  idLabel;
     @FXML
-    private Label                                      bsnLabel;
+    private TextField                                  bsnLabel;
     @FXML
-    private Label                                      stateLabel;
+    private TextField                                  stateLabel;
     @FXML
-    private Label                                      versionLabel;
+    private TextField                                  versionLabel;
     @FXML
-    private Label                                      locationLabel;
+    private TextField                                  locationLabel;
     @FXML
-    private Label                                      categoryLabel;
+    private TextField                                  categoryLabel;
     @FXML
     private CheckBox                                   fragmentLabel;
     @FXML
-    private Label                                      lasModifiedLabel;
+    private TextField                                  lasModifiedLabel;
     @FXML
-    private Label                                      dataFolderSizeLabel;
+    private TextField                                  dataFolderSizeLabel;
     @FXML
-    private Label                                      docLabel;
+    private TextField                                  docLabel;
     @FXML
-    private Label                                      vendorLabel;
+    private TextField                                  vendorLabel;
     @FXML
-    private Label                                      revisionsLabel;
+    private TextField                                  revisionsLabel;
     @FXML
     private CheckBox                                   isPersistentlyStartedLabel;
     @FXML
     private CheckBox                                   isActivationPolicyUsedLabel;
     @FXML
-    private Label                                      descLabel;
+    private TextField                                  descLabel;
     @FXML
-    private Label                                      startLevelLabel;
+    private TextField                                  startLevelLabel;
     @FXML
-    private Label                                      startDurationLabel;
+    private TextField                                  startDurationLabel;
     @FXML
     private Button                                     startBundleButton;
     @FXML
