@@ -13,6 +13,28 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("1.0.0")
-package com.osgifx.console.mcp.server;
+package com.osgifx.console.mcp;
+
+import org.osgi.annotation.versioning.ProviderType;
+
+/**
+ * Service interface to control the FX MCP Server.
+ */
+@ProviderType
+public interface FxMcpServer {
+
+    /**
+     * Starts the MCP server.
+     *
+     * @throws Exception if the server fails to start
+     */
+    void start() throws Exception;
+
+    /**
+     * Stops the MCP server.
+     *
+     * @throws Exception if the server fails to stop
+     */
+    void stop() throws Exception;
+
+}
