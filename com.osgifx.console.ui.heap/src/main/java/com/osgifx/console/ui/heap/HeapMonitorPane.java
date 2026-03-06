@@ -61,11 +61,13 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -563,13 +565,15 @@ public final class HeapMonitorPane extends BorderPane {
         return gridPane;
     }
 
-    private Label createRightSideLabel(final StringProperty totalUsedHeap) {
-        final var label = new Label();
+    private TextField createRightSideLabel(final StringProperty totalUsedHeap) {
+        final var label = new TextField();
+        label.setEditable(false);
+        label.getStyleClass().add("copyable-label");
         label.textProperty().bind(totalUsedHeap);
 
         GridPane.setHalignment(label, HPos.LEFT);
 
-        label.setTextAlignment(TextAlignment.LEFT);
+        label.setAlignment(Pos.CENTER_LEFT);
         label.setPrefWidth(800);
 
         return label;

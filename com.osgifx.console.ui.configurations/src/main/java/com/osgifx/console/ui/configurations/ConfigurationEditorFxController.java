@@ -72,6 +72,7 @@ import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.configurations.control.MultipleCardinalityTextControl;
 import com.osgifx.console.ui.configurations.control.PeekablePasswordControl;
 import com.osgifx.console.util.converter.ValueConverter;
+import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.beans.binding.When;
@@ -166,6 +167,7 @@ public final class ConfigurationEditorFxController {
 
         if (!grids.isEmpty()) {
             applyGridConstraints(grids);
+            Fx.makeReadOnlyLabelsCopyable(node);
         } else {
             // Retry after 200ms
             final var timer = new javafx.animation.PauseTransition(javafx.util.Duration.millis(200));

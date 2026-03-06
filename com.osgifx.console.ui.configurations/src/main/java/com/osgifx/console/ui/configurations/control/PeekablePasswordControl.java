@@ -24,6 +24,7 @@ import javafx.beans.binding.StringBinding;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
@@ -41,7 +42,7 @@ public final class PeekablePasswordControl extends SimpleControl<PasswordField> 
      * readOnlyLabel displays the field's value if it is not editable.
      */
     protected PeekablePasswordField editableField;
-    protected Label                 readOnlyLabel;
+    protected TextField readOnlyLabel;
     protected Label                 fieldLabel;
 
     /*
@@ -60,7 +61,9 @@ public final class PeekablePasswordControl extends SimpleControl<PasswordField> 
         editableField = new PeekablePasswordField();
         editableField.setText(field.getValue());
 
-        readOnlyLabel = new Label(obfuscate(field.getValue()));
+        readOnlyLabel = new TextField(obfuscate(field.getValue()));
+        readOnlyLabel.setEditable(false);
+        readOnlyLabel.getStyleClass().add("copyable-label");
         fieldLabel    = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
     }

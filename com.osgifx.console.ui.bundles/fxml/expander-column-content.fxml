@@ -19,6 +19,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.Tooltip?>
@@ -87,25 +88,25 @@
          </children>
       </HBox>
       <Label style="-fx-font-weight: bold;" text="ID" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-      <Label fx:id="idLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="idLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Symbolic Name" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-      <Label fx:id="bsnLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <TextField fx:id="bsnLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="State" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-      <Label fx:id="stateLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <TextField fx:id="stateLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Version" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-      <Label fx:id="versionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      <TextField fx:id="versionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Location" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-      <Label fx:id="locationLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      <TextField fx:id="locationLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Category" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
-      <Label fx:id="categoryLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <TextField fx:id="categoryLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Revisions" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
-      <Label fx:id="revisionsLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+      <TextField fx:id="revisionsLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Is Fragment?" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
       <CheckBox fx:id="fragmentLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
@@ -117,25 +118,25 @@
       <CheckBox fx:id="isActivationPolicyUsedLabel" disable="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
       
       <Label style="-fx-font-weight: bold;" text="Last Modified" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
-      <Label fx:id="lasModifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+      <TextField fx:id="lasModifiedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Data Folder Size" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-      <Label fx:id="dataFolderSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+      <TextField fx:id="dataFolderSizeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Documentation" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
-      <Label fx:id="docLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+      <TextField fx:id="docLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Vendor" GridPane.halignment="RIGHT" GridPane.rowIndex="14" />
-      <Label fx:id="vendorLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+      <TextField fx:id="vendorLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="14" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="15" />
-      <Label fx:id="descLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+      <TextField fx:id="descLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="15" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Start Level" GridPane.halignment="RIGHT" GridPane.rowIndex="16" />
-      <Label fx:id="startLevelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+      <TextField fx:id="startLevelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="16" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Start Duration" GridPane.halignment="RIGHT" GridPane.rowIndex="17" />
-      <Label fx:id="startDurationLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+      <TextField fx:id="startDurationLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="17" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Exported Packages" GridPane.halignment="RIGHT" GridPane.rowIndex="18" GridPane.valignment="TOP" />
       <TableView fx:id="exportedPackagesNameTable" GridPane.columnIndex="1" GridPane.rowIndex="18" GridPane.vgrow="ALWAYS">

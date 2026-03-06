@@ -277,6 +277,7 @@ public final class HealthCheckFxController {
                 // @formatter:on
 
                 final var renderer = new FormRenderer(form);
+                Fx.addCopySupportToReadOnlyLabels(renderer);
 
                 GridPane.setColumnSpan(renderer, 2);
                 GridPane.setRowIndex(renderer, 3);

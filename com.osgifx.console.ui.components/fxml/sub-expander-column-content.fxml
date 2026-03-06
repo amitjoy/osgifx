@@ -18,6 +18,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -45,46 +46,46 @@
   </rowConstraints>
    <children>
       <Label style="-fx-font-weight: bold;" text="Name" GridPane.halignment="RIGHT" />
-      <Label fx:id="nameLabel" text="Label" GridPane.columnIndex="1" />
+      <TextField fx:id="nameLabel" text="Label" GridPane.columnIndex="1" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Interface Name" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-      <Label fx:id="interfaceLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="interfaceLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Cardinality" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-      <Label fx:id="cardinalityLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <TextField fx:id="cardinalityLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Policy" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-      <Label fx:id="policyLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <TextField fx:id="policyLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Policy Option" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-      <Label fx:id="policyOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      <TextField fx:id="policyOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Target" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
-      <Label fx:id="targetLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      <TextField fx:id="targetLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Bind" GridPane.halignment="RIGHT" GridPane.rowIndex="6" />
-      <Label fx:id="bindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <TextField fx:id="bindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="6" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Unbind" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
-      <Label fx:id="unbindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+      <TextField fx:id="unbindLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="7" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Updated" GridPane.halignment="RIGHT" GridPane.rowIndex="8" />
-      <Label fx:id="updatedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+      <TextField fx:id="updatedLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="8" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Field" GridPane.halignment="RIGHT" GridPane.rowIndex="9" />
-      <Label fx:id="fieldLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+      <TextField fx:id="fieldLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="9" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Field Option" GridPane.halignment="RIGHT" GridPane.rowIndex="10" />
-      <Label fx:id="fieldOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+      <TextField fx:id="fieldOptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="10" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Scope" GridPane.halignment="RIGHT" GridPane.rowIndex="11" />
-      <Label fx:id="scopeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+      <TextField fx:id="scopeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="11" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Parameter" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
-      <Label fx:id="parameterLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+      <TextField fx:id="parameterLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="12" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Collection Type" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
-      <Label fx:id="collectionTypeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+      <TextField fx:id="collectionTypeLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="13" editable="false" styleClass="copyable-label" />
    </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
