@@ -127,8 +127,10 @@ public final class JaxRsFxController {
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.jaxRsComponents());
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(componentColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(componentColumn);
+                table.sort();
+            });
         });
     }
 

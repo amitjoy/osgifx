@@ -129,8 +129,10 @@ public final class ServicesFxController {
         threadSync.asyncExec(() -> {
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(objectClassColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(objectClassColumn);
+                table.sort();
+            });
         });
     }
 
