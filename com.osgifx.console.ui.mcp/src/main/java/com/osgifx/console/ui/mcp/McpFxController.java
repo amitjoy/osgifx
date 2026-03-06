@@ -254,23 +254,23 @@ public final class McpFxController {
         if (mcpDataProvider == null) {
             return;
         }
-        tools.clear();
         final var registeredTools = mcpDataProvider.tools();
-        for (final var tool : registeredTools) {
-            final var schema = gson.toJson(tool.inputSchema);
-            tools.add(new McpToolDTO(tool.name, tool.description, schema));
-        }
+        final var newTools        = registeredTools.stream()
+                .map(tool -> new McpToolDTO(tool.name, tool.description, gson.toJson(tool.inputSchema))).toList();
+
+        toolsTable.getSelectionModel().clearSelection();
+        tools.setAll(newTools);
     }
 
     private void updateLogs() {
         if (mcpDataProvider == null) {
             return;
         }
-        logs.clear();
         final var serverLogs = mcpDataProvider.logs();
-        for (final var log : serverLogs) {
-            logs.add(new McpLogDTO(log));
-        }
+        final var newLogs    = serverLogs.stream().map(McpLogDTO::new).toList();
+
+        logsTable.getSelectionModel().clearSelection();
+        logs.setAll(newLogs);
     }
 
     private void updateStatus() {
@@ -343,6 +343,7 @@ public final class McpFxController {
 
     @FXML
     private void clearLogs() {
+        logsTable.getSelectionModel().clearSelection();
         logs.clear();
         // Ideally clear server logs too if we had an API for that
         Fx.showSuccessNotification("MCP Logs", "Log list has been cleared");
