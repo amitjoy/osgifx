@@ -29,10 +29,10 @@ import com.osgifx.console.util.fx.Fx;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 public final class ServiceDetailsFxController {
 
@@ -40,11 +40,11 @@ public final class ServiceDetailsFxController {
     @Inject
     private FluentLogger                               logger;
     @FXML
-    private Label                                      idLabel;
+    private TextField                                  idLabel;
     @FXML
-    private Label                                      bundleIdLabel;
+    private TextField                                  bundleIdLabel;
     @FXML
-    private Label                                      bundleBsnLabel;
+    private TextField                                  bundleBsnLabel;
     @FXML
     private ListView<String>                           objectClassesList;
     @FXML

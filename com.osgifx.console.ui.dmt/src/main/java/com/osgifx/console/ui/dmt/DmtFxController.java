@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dmt;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
 
 import java.util.Map;
@@ -24,10 +25,12 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -50,6 +53,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 
 public final class DmtFxController {
 
@@ -88,11 +92,15 @@ public final class DmtFxController {
 
     @FXML
     public void initialize() {
+        final var parent = (VBox) dmtTree.getParent();
         if (!isConnected) {
+            parent.getChildren().clear();
+            parent.getChildren().add(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            searchBox.setDisable(true);
+            searchBtn.setDisable(true);
             return;
         }
         if (!isCapabilityAvailable("DMT")) {
-            final var parent = (javafx.scene.layout.VBox) dmtTree.getParent();
             parent.getChildren().clear();
             parent.getChildren().add(Fx.createFeatureUnavailablePlaceholder("DMT"));
             searchBox.setDisable(true);
@@ -100,6 +108,12 @@ public final class DmtFxController {
             return;
         }
         try {
+            if (!parent.getChildren().contains(dmtTree)) {
+                parent.getChildren().clear();
+                parent.getChildren().add(dmtTree);
+            }
+            searchBox.setDisable(false);
+            searchBtn.setDisable(false);
             initTree();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
@@ -255,6 +269,12 @@ public final class DmtFxController {
             result.append("]");
         }
         return result.toString();
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }

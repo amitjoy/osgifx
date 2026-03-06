@@ -18,6 +18,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -35,10 +36,10 @@
   </rowConstraints>
    <children>
       <Label style="-fx-font-weight: bold;" text="Name" GridPane.halignment="RIGHT" />
-      <Label fx:id="nameLabel" text="Label" GridPane.columnIndex="1" />
+      <TextField fx:id="nameLabel" text="Label" GridPane.columnIndex="1" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-      <Label fx:id="descriptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="descriptionLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" editable="false" styleClass="copyable-label" />
       
       <Label style="-fx-font-weight: bold;" text="Input Schema" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="TOP" />
       <TextArea fx:id="schemaTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />

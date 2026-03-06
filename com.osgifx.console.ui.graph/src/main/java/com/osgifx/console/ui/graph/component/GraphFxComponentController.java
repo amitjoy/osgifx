@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph.component;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
@@ -27,6 +29,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.Strings;
 import org.controlsfx.control.MaskerPane;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -54,6 +59,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -85,6 +91,9 @@ public final class GraphFxComponentController implements GraphController {
     @Inject
     private DataProvider                        dataProvider;
     @Inject
+    @javax.inject.Named("is_connected")
+    private boolean                             isConnected;
+    @Inject
     private ThreadSynchronize                   threadSync;
     @Inject
     private RuntimeComponentGraph               runtimeGraph;
@@ -97,6 +106,17 @@ public final class GraphFxComponentController implements GraphController {
     @FXML
     public void initialize() {
         try {
+            if (!isConnected) {
+                graphPane.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+                searchText.setDisable(true);
+                componentsList.setPlaceholder(new Label("Agent not connected"));
+                componentsList.setDisable(true);
+                wiringSelection.setDisable(true);
+                layoutSelection.setDisable(true);
+                transitiveView.setDisable(true);
+                showSelectedOnlyView.setDisable(true);
+                return;
+            }
             if (!isCapabilityAvailable("SCR")) {
                 graphPane.setCenter(Fx.createFeatureUnavailablePlaceholder("Declarative Services"));
                 searchText.setDisable(true);
@@ -107,6 +127,15 @@ public final class GraphFxComponentController implements GraphController {
                 showSelectedOnlyView.setDisable(true);
                 return;
             }
+            searchText.setDisable(false);
+            componentsList.setDisable(false);
+            componentsList.setPlaceholder(null);
+            graphPane.setCenter(null);
+            wiringSelection.setDisable(false);
+            layoutSelection.setDisable(false);
+            transitiveView.setDisable(false);
+            showSelectedOnlyView.setDisable(false);
+
             addExportToDotContextMenu();
             initComponentsList();
             progressPane = new MaskerPane();
@@ -345,6 +374,18 @@ public final class GraphFxComponentController implements GraphController {
         if (masterComponentList != null) {
             masterComponentList.forEach(c -> c.setSelected(true));
         }
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_COMPONENTS_TOPIC) final String data) {
+        threadSync.asyncExec(this::initComponentsList);
     }
 
 }

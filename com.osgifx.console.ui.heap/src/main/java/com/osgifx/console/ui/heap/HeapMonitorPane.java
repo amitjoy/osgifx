@@ -15,8 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.ui.heap;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -28,10 +31,12 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.dialog.ProgressDialog;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -61,11 +66,13 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -121,18 +128,33 @@ public final class HeapMonitorPane extends BorderPane {
     public void init() {
         memoryUsageCharts.clear();
         setTop(createControlPanel());
-
-        final var box        = createMainContent();
-        final var scrollPane = new ScrollPane(box);
-
-        scrollPane.setFitToWidth(true);
-        setCenter(scrollPane);
+        refreshUI();
 
         final var frame = new KeyFrame(Duration.seconds(REFRESH_DELAY), _ -> updateHeapInformation());
 
         animation = new Timeline();
         animation.getKeyFrames().add(frame);
         animation.setCycleCount(Animation.INDEFINITE);
+    }
+
+    private void refreshUI() {
+        if (!isConnected) {
+            setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            return;
+        }
+        if (!isCapabilityAvailable("JMX")) {
+            setCenter(Fx.createFeatureUnavailablePlaceholder("JMX"));
+            return;
+        }
+        final var box        = createMainContent();
+        final var scrollPane = new ScrollPane(box);
+
+        scrollPane.setFitToWidth(true);
+        setCenter(scrollPane);
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     private Pane createMainContent() {
@@ -488,8 +510,7 @@ public final class HeapMonitorPane extends BorderPane {
     private void heapDumpLocally() {
         final var pathDialog = new HeapdumpPathPromptDialog();
         ContextInjectionFactory.inject(pathDialog, eclipseContext);
-        final var timestamp   = java.time.LocalDateTime.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var timestamp   = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         final var defaultPath = "{java.io.tmpdir}/heapdump-" + timestamp + ".hprof.gz";
         pathDialog.init(defaultPath, "Specify File Path",
                 "Enter the full file path on the agent where the heapdump should be saved (including filename).\n"
@@ -563,13 +584,15 @@ public final class HeapMonitorPane extends BorderPane {
         return gridPane;
     }
 
-    private Label createRightSideLabel(final StringProperty totalUsedHeap) {
-        final var label = new Label();
+    private TextField createRightSideLabel(final StringProperty totalUsedHeap) {
+        final var label = new TextField();
+        label.setEditable(false);
+        label.getStyleClass().add("copyable-label");
         label.textProperty().bind(totalUsedHeap);
 
         GridPane.setHalignment(label, HPos.LEFT);
 
-        label.setTextAlignment(TextAlignment.LEFT);
+        label.setAlignment(Pos.CENTER_LEFT);
         label.setPrefWidth(800);
 
         return label;
@@ -588,6 +611,12 @@ public final class HeapMonitorPane extends BorderPane {
 
     public void stopUpdates() {
         animation.pause();
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::refreshUI);
     }
 
     public Supplier<CompletableFuture<XMemoryUsage>> getMemoryUsageByMemoryPoolBean(final XMemoryPoolMXBean bean) {
