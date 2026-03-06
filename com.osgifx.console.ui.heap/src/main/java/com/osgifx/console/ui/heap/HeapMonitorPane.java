@@ -17,6 +17,8 @@ package com.osgifx.console.ui.heap;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -28,6 +30,7 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.dialog.ProgressDialog;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Creatable;
@@ -123,18 +126,25 @@ public final class HeapMonitorPane extends BorderPane {
     public void init() {
         memoryUsageCharts.clear();
         setTop(createControlPanel());
-
-        final var box        = createMainContent();
-        final var scrollPane = new ScrollPane(box);
-
-        scrollPane.setFitToWidth(true);
-        setCenter(scrollPane);
+        refreshUI();
 
         final var frame = new KeyFrame(Duration.seconds(REFRESH_DELAY), _ -> updateHeapInformation());
 
         animation = new Timeline();
         animation.getKeyFrames().add(frame);
         animation.setCycleCount(Animation.INDEFINITE);
+    }
+
+    private void refreshUI() {
+        if (!isConnected) {
+            setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            return;
+        }
+        final var box        = createMainContent();
+        final var scrollPane = new ScrollPane(box);
+
+        scrollPane.setFitToWidth(true);
+        setCenter(scrollPane);
     }
 
     private Pane createMainContent() {
@@ -490,8 +500,7 @@ public final class HeapMonitorPane extends BorderPane {
     private void heapDumpLocally() {
         final var pathDialog = new HeapdumpPathPromptDialog();
         ContextInjectionFactory.inject(pathDialog, eclipseContext);
-        final var timestamp   = java.time.LocalDateTime.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var timestamp   = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         final var defaultPath = "{java.io.tmpdir}/heapdump-" + timestamp + ".hprof.gz";
         pathDialog.init(defaultPath, "Specify File Path",
                 "Enter the full file path on the agent where the heapdump should be saved (including filename).\n"

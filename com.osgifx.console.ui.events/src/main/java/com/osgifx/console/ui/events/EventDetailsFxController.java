@@ -41,9 +41,9 @@ public final class EventDetailsFxController {
     @Inject
     private FluentLogger                               logger;
     @FXML
-    private TextField                                      receivedAtLabel;
+    private TextField                                  receivedAtLabel;
     @FXML
-    private TextField                                      topicLabel;
+    private TextField                                  topicLabel;
     @FXML
     private TableView<Entry<String, String>>           propertiesTable;
     @FXML

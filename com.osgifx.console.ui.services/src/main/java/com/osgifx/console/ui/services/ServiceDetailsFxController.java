@@ -40,11 +40,11 @@ public final class ServiceDetailsFxController {
     @Inject
     private FluentLogger                               logger;
     @FXML
-    private TextField                                      idLabel;
+    private TextField                                  idLabel;
     @FXML
-    private TextField                                      bundleIdLabel;
+    private TextField                                  bundleIdLabel;
     @FXML
-    private TextField                                      bundleBsnLabel;
+    private TextField                                  bundleBsnLabel;
     @FXML
     private ListView<String>                           objectClassesList;
     @FXML

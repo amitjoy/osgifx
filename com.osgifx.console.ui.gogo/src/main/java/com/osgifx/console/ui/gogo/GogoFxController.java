@@ -15,13 +15,18 @@
  ******************************************************************************/
 package com.osgifx.console.ui.gogo;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.textfield.TextFields;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
@@ -61,26 +66,38 @@ public final class GogoFxController {
     private boolean            isSnapshotAgent;
     @Inject
     private DataProvider       dataProvider;
+    @Inject
+    @Named("is_connected")
+    private boolean            isConnected;
+    @Inject
+    private ThreadSynchronize  threadSync;
     private int                historyPointer;
 
     @FXML
     public void initialize() {
         historyPointer = 0;
+        final var parent = (BorderPane) output.getParent();
+        if (!isConnected) {
+            parent.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            input.setDisable(true);
+            return;
+        }
+        if (!isCapabilityAvailable("GOGO")) {
+            parent.setCenter(Fx.createFeatureUnavailablePlaceholder("Apache Felix Gogo"));
+            input.setDisable(true);
+            return;
+        }
         final var agent = supervisor != null ? supervisor.getAgent() : null;
         if (agent == null) {
             logger.atWarning().log("Agent not connected");
             return;
         }
-        if (!isCapabilityAvailable("GOGO")) {
-            final var parent = (BorderPane) output.getParent();
-            parent.setCenter(Fx.createFeatureUnavailablePlaceholder("Apache Felix Gogo"));
-            input.setDisable(true);
-            return;
-        }
+        parent.setCenter(output);
+        input.setDisable(false);
         executor.runAsync(() -> {
             final var gogoCommands = agent.getGogoCommands();
             if (gogoCommands != null) {
-                TextFields.bindAutoCompletion(input, gogoCommands);
+                threadSync.asyncExec(() -> TextFields.bindAutoCompletion(input, gogoCommands));
             }
         });
         logger.atDebug().log("FXML controller has been initialized");
@@ -167,6 +184,12 @@ public final class GogoFxController {
             logger.atInfo().log("Task for command '%s' has been succeeded", command);
         });
         executor.runAsync(task);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }

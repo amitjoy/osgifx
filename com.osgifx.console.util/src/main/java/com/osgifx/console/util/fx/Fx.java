@@ -221,12 +221,7 @@ public final class Fx {
     }
 
     public static void addTablePlaceholderWhenDisconnected(final TableView<?> table) {
-        final var placeholder = new Label();
-
-        placeholder.setText("Agent not connected");
-        placeholder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.POWER_OFF));
-
-        table.setPlaceholder(placeholder);
+        table.setPlaceholder(createPlaceholderNode("Agent not connected", FontAwesome.Glyph.POWER_OFF));
     }
 
     /**
@@ -239,12 +234,8 @@ public final class Fx {
      * @param featureName the human-readable name of the missing feature (e.g. {@code "JAX-RS"})
      */
     public static void addTablePlaceholderWhenFeatureUnavailable(final TableView<?> table, final String featureName) {
-        final var placeholder = new Label();
-
-        placeholder.setText(featureName + " is not available in the connected runtime");
-        placeholder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.WARNING));
-
-        table.setPlaceholder(placeholder);
+        table.setPlaceholder(createPlaceholderNode(featureName + " is not available in the connected runtime",
+                FontAwesome.Glyph.WARNING));
     }
 
     /**
@@ -256,16 +247,24 @@ public final class Fx {
      * @return a centred {@code VBox} containing a warning glyph and a descriptive label
      */
     public static Node createFeatureUnavailablePlaceholder(final String featureName) {
-        final var glyph = new Glyph("FontAwesome", FontAwesome.Glyph.WARNING);
-        glyph.setFontSize(48);
+        return createPlaceholderNode(featureName + " is not available in the connected runtime",
+                FontAwesome.Glyph.WARNING);
+    }
 
-        final var label = new Label(featureName + " is not available in the connected runtime");
+    public static Node createPlaceholderNode(final String text, final FontAwesome.Glyph icon) {
+        final var glyph = new Glyph("FontAwesome", icon);
+        glyph.setFontSize(48);
+        glyph.getStyleClass().add("feature-unavailable-glyph");
+
+        final var label = new Label(text);
         label.setWrapText(true);
 
         final var box = new javafx.scene.layout.VBox(12, glyph, label);
         box.setAlignment(Pos.CENTER);
         box.setMaxWidth(Double.MAX_VALUE);
         box.setMaxHeight(Double.MAX_VALUE);
+        box.setStyle("-fx-background-color: -fx-control-inner-background;");
+        javafx.scene.layout.VBox.setVgrow(box, javafx.scene.layout.Priority.ALWAYS);
 
         return box;
     }

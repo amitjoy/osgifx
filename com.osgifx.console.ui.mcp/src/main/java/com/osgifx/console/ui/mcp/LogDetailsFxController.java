@@ -38,9 +38,9 @@ public final class LogDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private TextField        timestampLabel;
+    private TextField    timestampLabel;
     @FXML
-    private TextField        typeLabel;
+    private TextField    typeLabel;
     @FXML
     private TextArea     contentTextArea;
 

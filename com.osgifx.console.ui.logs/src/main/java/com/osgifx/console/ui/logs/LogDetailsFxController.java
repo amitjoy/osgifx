@@ -36,15 +36,15 @@ public final class LogDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private TextField        receivedAtLabel;
+    private TextField    receivedAtLabel;
     @FXML
-    private TextField        levelLabel;
+    private TextField    levelLabel;
     @FXML
-    private TextField        bundleLabel;
+    private TextField    bundleLabel;
     @FXML
-    private TextField        loggerLabel;
+    private TextField    loggerLabel;
     @FXML
-    private TextField        threadLabel;
+    private TextField    threadLabel;
     @FXML
     private TextArea     messageText;
     @FXML

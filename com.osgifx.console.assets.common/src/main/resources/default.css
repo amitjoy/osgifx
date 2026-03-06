@@ -106,3 +106,8 @@
 .copyable-label .scroll-bar {
     -fx-opacity: 0;
 }
+
+.feature-unavailable-glyph,
+.feature-unavailable-glyph .text {
+    -fx-font-size: 48.0pt !important;
+}

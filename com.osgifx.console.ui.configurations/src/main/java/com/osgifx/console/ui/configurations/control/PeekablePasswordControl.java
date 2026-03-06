@@ -42,7 +42,7 @@ public final class PeekablePasswordControl extends SimpleControl<PasswordField> 
      * readOnlyLabel displays the field's value if it is not editable.
      */
     protected PeekablePasswordField editableField;
-    protected TextField readOnlyLabel;
+    protected TextField             readOnlyLabel;
     protected Label                 fieldLabel;
 
     /*
@@ -64,7 +64,7 @@ public final class PeekablePasswordControl extends SimpleControl<PasswordField> 
         readOnlyLabel = new TextField(obfuscate(field.getValue()));
         readOnlyLabel.setEditable(false);
         readOnlyLabel.getStyleClass().add("copyable-label");
-        fieldLabel    = new Label(field.labelProperty().getValue());
+        fieldLabel = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
     }
 

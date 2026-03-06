@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.healthchecks;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_HEALTHCHECKS_TOPIC;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
@@ -29,6 +30,7 @@ import javax.inject.Named;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -101,12 +103,24 @@ public final class HealthCheckFxController {
     @Inject
     @Named("is_snapshot_agent")
     private boolean               isSnapshotAgent;
+    @Inject
+    @Named("is_connected")
+    private boolean               isConnected;
     private MaskerPane            progressPane;
     private Future<?>             hcExecFuture;
 
     @FXML
     public void initialize() {
         try {
+            if (!isConnected) {
+                hcResultArea.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+                hcTypeButton.setDisable(true);
+                searchText.setDisable(true);
+                executeHcButton.setDisable(true);
+                deselectAllButton.setDisable(true);
+                hcMetadataList.setDisable(true);
+                return;
+            }
             if (!isCapabilityAvailable("HC")) {
                 hcResultArea.setCenter(Fx.createFeatureUnavailablePlaceholder("Felix HealthCheck"));
                 hcTypeButton.setDisable(true);
@@ -116,6 +130,12 @@ public final class HealthCheckFxController {
                 hcMetadataList.setDisable(true);
                 return;
             }
+            hcTypeButton.setDisable(false);
+            searchText.setDisable(false);
+            executeHcButton.setDisable(isSnapshotAgent);
+            deselectAllButton.setDisable(false);
+            hcMetadataList.setDisable(false);
+
             initHcList();
             progressPane = new MaskerPane();
             logger.atDebug().log("FXML controller has been initialized");
@@ -356,6 +376,12 @@ public final class HealthCheckFxController {
             tagHcButton.setSelected(true);
             initTags();
         }
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }

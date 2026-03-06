@@ -36,9 +36,9 @@ import javafx.scene.control.TextField;
 public final class PackageDetailsFxController {
 
     @FXML
-    private TextField                           nameLabel;
+    private TextField                       nameLabel;
     @FXML
-    private TextField                           versionLabel;
+    private TextField                       versionLabel;
     @FXML
     private CheckBox                        duplicateLabel;
     @FXML

@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.configurations;
 
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC;
 
 import java.util.function.Predicate;
@@ -260,6 +261,12 @@ public final class ConfigurationsFxController {
     public void onFilterUpdateEvent(@UIEventTopic(UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super XConfigurationDTO>) filter.predicate);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }

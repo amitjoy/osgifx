@@ -31,33 +31,33 @@ public final class ReferenceDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private TextField        nameLabel;
+    private TextField    nameLabel;
     @FXML
-    private TextField        interfaceLabel;
+    private TextField    interfaceLabel;
     @FXML
-    private TextField        cardinalityLabel;
+    private TextField    cardinalityLabel;
     @FXML
-    private TextField        policyLabel;
+    private TextField    policyLabel;
     @FXML
-    private TextField        policyOptionLabel;
+    private TextField    policyOptionLabel;
     @FXML
-    private TextField        targetLabel;
+    private TextField    targetLabel;
     @FXML
-    private TextField        unbindLabel;
+    private TextField    unbindLabel;
     @FXML
-    private TextField        updatedLabel;
+    private TextField    updatedLabel;
     @FXML
-    private TextField        fieldLabel;
+    private TextField    fieldLabel;
     @FXML
-    private TextField        fieldOptionLabel;
+    private TextField    fieldOptionLabel;
     @FXML
-    private TextField        scopeLabel;
+    private TextField    scopeLabel;
     @FXML
-    private TextField        bindLabel;
+    private TextField    bindLabel;
     @FXML
-    private TextField        parameterLabel;
+    private TextField    parameterLabel;
     @FXML
-    private TextField        collectionTypeLabel;
+    private TextField    collectionTypeLabel;
 
     @FXML
     public void initialize() {
