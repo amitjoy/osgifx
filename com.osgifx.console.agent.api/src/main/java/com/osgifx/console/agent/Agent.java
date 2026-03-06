@@ -796,6 +796,33 @@ public interface Agent {
     Collection<String> listBundleResources(long bundleId, String path, String pattern, int options);
 
     /**
+     * Retrieves the raw byte content of a physical resource from the specified bundle's JAR.
+     * <p>
+     * This method bypasses the classloader and strictly reads the physical file.
+     *
+     * @param bundleId the bundle ID
+     * @param path the path to the resource (e.g., "com/example/MyClass.class")
+     * @return the byte array of the resource, or {@code null} if not found
+     * @throws Exception if an error occurs while reading the resource stream
+     * @since 12.0
+     */
+    byte[] getBundleEntryBytes(long bundleId, String path) throws Exception;
+
+    /**
+     * Retrieves the raw byte content of a resource from the specified bundle's class space.
+     * <p>
+     * This method uses the bundle's classloader, meaning it can resolve classes from
+     * attached fragments or imported packages.
+     *
+     * @param bundleId the bundle ID
+     * @param path the path to the resource (e.g., "com/example/MyClass.class")
+     * @return the byte array of the resource, or {@code null} if not found
+     * @throws Exception if an error occurs while reading the resource stream
+     * @since 12.0
+     */
+    byte[] getBundleResourceBytes(long bundleId, String path) throws Exception;
+
+    /**
      * Estimates the compressed heapdump size based on current heap usage.
      * <p>
      * This uses the current heap usage and applies an estimated compression ratio
