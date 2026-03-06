@@ -1,0 +1,9 @@
+-buildpath          : \
+                      ${bundles.required},\
+                      com.osgifx.console.api;version=snapshot,\
+                      org.vineflower:vineflower;packages=*
+-privatepackage     : \
+                      com.osgifx.console.decompiler.*
+-conditionalpackage : \
+                      net.fabricmc.fernflower.api,\
+                      org.jetbrains.java.decompiler.*

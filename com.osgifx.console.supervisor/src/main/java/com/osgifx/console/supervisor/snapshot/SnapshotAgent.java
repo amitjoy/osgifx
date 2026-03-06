@@ -172,6 +172,16 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public byte[] getBundleEntryBytes(final long bundleId, final String path) throws Exception {
+        return null;
+    }
+
+    @Override
+    public byte[] getBundleResourceBytes(final long bundleId, final String path) throws Exception {
+        return null;
+    }
+
+    @Override
     public List<XBundleDTO> getAllBundles() {
         return snapshotDTO.bundles;
     }
