@@ -32,6 +32,7 @@ import com.osgifx.console.agent.dto.XCdiComponentDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XCdiExtensionDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -115,6 +116,7 @@ public final class CdiDetailsFxController {
         GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
+        Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
     }
 

@@ -29,8 +29,8 @@ import com.osgifx.console.ui.mcp.dto.McpLogDTO;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 public final class LogDetailsFxController {
 
@@ -38,9 +38,9 @@ public final class LogDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private Label        timestampLabel;
+    private TextField    timestampLabel;
     @FXML
-    private Label        typeLabel;
+    private TextField    typeLabel;
     @FXML
     private TextArea     contentTextArea;
 

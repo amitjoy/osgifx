@@ -23,7 +23,7 @@ import org.eclipse.fx.core.log.Log;
 import com.osgifx.console.agent.dto.XReferenceDTO;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 
 public final class ReferenceDetailsFxController {
 
@@ -31,33 +31,33 @@ public final class ReferenceDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private Label        nameLabel;
+    private TextField    nameLabel;
     @FXML
-    private Label        interfaceLabel;
+    private TextField    interfaceLabel;
     @FXML
-    private Label        cardinalityLabel;
+    private TextField    cardinalityLabel;
     @FXML
-    private Label        policyLabel;
+    private TextField    policyLabel;
     @FXML
-    private Label        policyOptionLabel;
+    private TextField    policyOptionLabel;
     @FXML
-    private Label        targetLabel;
+    private TextField    targetLabel;
     @FXML
-    private Label        unbindLabel;
+    private TextField    unbindLabel;
     @FXML
-    private Label        updatedLabel;
+    private TextField    updatedLabel;
     @FXML
-    private Label        fieldLabel;
+    private TextField    fieldLabel;
     @FXML
-    private Label        fieldOptionLabel;
+    private TextField    fieldOptionLabel;
     @FXML
-    private Label        scopeLabel;
+    private TextField    scopeLabel;
     @FXML
-    private Label        bindLabel;
+    private TextField    bindLabel;
     @FXML
-    private Label        parameterLabel;
+    private TextField    parameterLabel;
     @FXML
-    private Label        collectionTypeLabel;
+    private TextField    collectionTypeLabel;
 
     @FXML
     public void initialize() {
