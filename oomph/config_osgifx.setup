@@ -35,11 +35,14 @@
         id="bndtools-release"
         type="URI"
         name="bndtools-release"
-        value="https://bndtools.org/bndtools.p2.repo/7.1.0/"
+        value="https://bndtools.org/bndtools.p2.repo/7.2.1/"
         label="bndtools-release">
       <choice
+          value="https://bndtools.org/bndtools.p2.repo/7.2.1/"
+          label="7.2.1 (Latest)"/>
+      <choice
           value="https://bndtools.org/bndtools.p2.repo/7.1.0/"
-          label="7.1.0 (Latest)"/>
+          label="7.1.0"/>
       <choice
           value="https://bndtools.org/bndtools.p2.repo/7.0.0/"
           label="7.0.0"/>
