@@ -143,8 +143,10 @@ public final class ComponentsFxController {
         threadSync.asyncExec(() -> {
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(componentNameColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(componentNameColumn);
+                table.sort();
+            });
         });
     }
 

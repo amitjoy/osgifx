@@ -196,8 +196,10 @@ public final class McpFxController {
                 toolsTable.setItems(tools);
                 Fx.addContextMenuToCopyContent(toolsTable);
                 TableFilter.forTableView(toolsTable).lazy(true).apply();
-                toolsTable.getSortOrder().add(nameColumn);
-                toolsTable.sort();
+                threadSync.asyncExec(() -> {
+                    toolsTable.getSortOrder().add(nameColumn);
+                    toolsTable.sort();
+                });
             });
         } catch (final IOException e) {
             logger.atError().withException(e).log("Cannot load tools expander FXML");
@@ -237,9 +239,11 @@ public final class McpFxController {
                 logsTable.setItems(logs);
                 Fx.addContextMenuToCopyContent(logsTable);
                 TableFilter.forTableView(logsTable).lazy(true).apply();
-                timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
-                logsTable.getSortOrder().add(timestampColumn);
-                logsTable.sort();
+                threadSync.asyncExec(() -> {
+                    timestampColumn.setSortType(TableColumn.SortType.DESCENDING);
+                    logsTable.getSortOrder().add(timestampColumn);
+                    logsTable.sort();
+                });
             });
         } catch (final IOException e) {
             logger.atError().withException(e).log("Cannot load logs expander FXML");
