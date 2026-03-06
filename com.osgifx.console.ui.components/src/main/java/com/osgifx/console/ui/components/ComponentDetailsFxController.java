@@ -48,11 +48,11 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 public final class ComponentDetailsFxController {
@@ -61,31 +61,31 @@ public final class ComponentDetailsFxController {
     private static final String COMPONENT_DISABLE_COMMAND_ID = "com.osgifx.console.application.command.component.disable";
 
     @FXML
-    private Label                                         idLabel;
+    private TextField                                     idLabel;
     @FXML
-    private Label                                         componentNameLabel;
+    private TextField                                     componentNameLabel;
     @FXML
-    private Label                                         stateLabel;
+    private TextField                                     stateLabel;
     @FXML
-    private Label                                         bundleLabel;
+    private TextField                                     bundleLabel;
     @FXML
-    private Label                                         bundleIdLabel;
+    private TextField                                     bundleIdLabel;
     @FXML
-    private Label                                         factoryLabel;
+    private TextField                                     factoryLabel;
     @FXML
-    private Label                                         scopeLabel;
+    private TextField                                     scopeLabel;
     @FXML
-    private Label                                         classLabel;
+    private TextField                                     classLabel;
     @FXML
-    private Label                                         policyLabel;
+    private TextField                                     policyLabel;
     @FXML
     private TextArea                                      failureText;
     @FXML
-    private Label                                         activateLabel;
+    private TextField                                     activateLabel;
     @FXML
-    private Label                                         deactivateLabel;
+    private TextField                                     deactivateLabel;
     @FXML
-    private Label                                         modifiedLabel;
+    private TextField                                     modifiedLabel;
     @FXML
     private Button                                        enableComponentButton;
     @FXML

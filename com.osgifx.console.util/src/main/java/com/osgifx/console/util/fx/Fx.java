@@ -29,12 +29,14 @@ import org.osgi.framework.BundleContext;
 
 import com.google.common.collect.Sets;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -45,11 +47,13 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -296,4 +300,56 @@ public final class Fx {
         return button;
     }
 
+    public static void makeReadOnlyLabelsCopyable(final Node node) {
+        if (node instanceof Label label) {
+            if (label.getStyleClass().contains("read-only-label")
+                    && !label.getProperties().containsKey("copyable-injected")) {
+                label.getProperties().put("copyable-injected", true);
+                final TextField copyable = new TextField();
+                copyable.setEditable(false);
+                copyable.textProperty().bind(label.textProperty());
+                copyable.getStyleClass().addAll("copyable-label");
+                copyable.visibleProperty().bind(label.visibleProperty());
+                copyable.managedProperty().bind(label.managedProperty());
+
+                label.setStyle("-fx-opacity: 0;");
+
+                final Parent parent = label.getParent();
+                if (parent instanceof Pane pane) {
+                    pane.getChildren().add(copyable);
+                }
+            }
+        }
+        if (node instanceof Parent parent) {
+            for (final Node child : parent.getChildrenUnmodifiable()) {
+                makeReadOnlyLabelsCopyable(child);
+            }
+        }
+    }
+
+    public static void addCopySupportToReadOnlyLabels(final Node formRenderer) {
+        if (formRenderer.getScene() != null) {
+            scheduleReadOnlyLabelsFix(formRenderer, 0);
+        } else {
+            formRenderer.sceneProperty().addListener((_, _, newScene) -> {
+                if (newScene != null) {
+                    scheduleReadOnlyLabelsFix(formRenderer, 0);
+                }
+            });
+        }
+    }
+
+    private static void scheduleReadOnlyLabelsFix(final Node node, final int attempt) {
+        if (attempt > 50) {
+            return;
+        }
+        final var labels = node.lookupAll(".read-only-label");
+        if (!labels.isEmpty()) {
+            makeReadOnlyLabelsCopyable(node);
+        } else {
+            final var timer = new PauseTransition(javafx.util.Duration.millis(200));
+            timer.setOnFinished(_ -> scheduleReadOnlyLabelsFix(node, attempt + 1));
+            timer.play();
+        }
+    }
 }

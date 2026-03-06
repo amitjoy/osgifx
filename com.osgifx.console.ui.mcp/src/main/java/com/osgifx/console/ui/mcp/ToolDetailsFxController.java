@@ -23,8 +23,8 @@ import org.eclipse.fx.core.log.Log;
 import com.osgifx.console.ui.mcp.dto.McpToolDTO;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 public final class ToolDetailsFxController {
 
@@ -32,9 +32,9 @@ public final class ToolDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private Label        nameLabel;
+    private TextField        nameLabel;
     @FXML
-    private Label        descriptionLabel;
+    private TextField        descriptionLabel;
     @FXML
     private TextArea     schemaTextArea;
 

@@ -28,6 +28,7 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -75,6 +76,7 @@ public final class HttpDetailsFxController {
         GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
+        Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
     }
 

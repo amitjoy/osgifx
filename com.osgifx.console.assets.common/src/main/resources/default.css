@@ -87,3 +87,22 @@
     -fx-font-family: 'FontAwesome';
     -fx-font-size: 11.0pt;
 }
+
+.copyable-label, .copyable-label:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-text-box-border: transparent;
+    -fx-opacity: 1;
+}
+.copyable-label .content {
+    -fx-background-color: transparent;
+}
+.copyable-label .scroll-bar {
+    -fx-opacity: 0;
+}
