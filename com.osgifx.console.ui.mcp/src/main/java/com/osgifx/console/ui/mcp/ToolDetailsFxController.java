@@ -32,9 +32,9 @@ public final class ToolDetailsFxController {
     @Inject
     private FluentLogger logger;
     @FXML
-    private TextField        nameLabel;
+    private TextField    nameLabel;
     @FXML
-    private TextField        descriptionLabel;
+    private TextField    descriptionLabel;
     @FXML
     private TextArea     schemaTextArea;
 

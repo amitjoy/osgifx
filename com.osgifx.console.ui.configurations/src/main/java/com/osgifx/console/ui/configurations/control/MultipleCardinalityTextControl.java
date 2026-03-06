@@ -82,7 +82,7 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
         readOnlyLabel = new TextField(field.getValue());
         readOnlyLabel.setEditable(false);
         readOnlyLabel.getStyleClass().add("copyable-label");
-        fieldLabel    = new Label(field.labelProperty().getValue());
+        fieldLabel = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
 
         editableArea.setOnMouseClicked(_ -> {

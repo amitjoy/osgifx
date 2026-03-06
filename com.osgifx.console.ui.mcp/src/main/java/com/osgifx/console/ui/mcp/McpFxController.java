@@ -15,8 +15,6 @@
   ******************************************************************************/
 package com.osgifx.console.ui.mcp;
 
-import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -28,7 +26,6 @@ import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
@@ -365,16 +362,6 @@ public final class McpFxController {
         imageView.setFitWidth(16.0);
         imageView.setPreserveRatio(true);
         return imageView;
-    }
-
-    @Inject
-    @Optional
-    private void agentDisconnected(@EventTopic(AGENT_DISCONNECTED_EVENT_TOPIC) final String data) {
-        logger.atInfo().log("Agent disconnected event has been received");
-        final var isStarted = Boolean.getBoolean("is_started_mcp");
-        if (isStarted) {
-            stopServer();
-        }
     }
 
 }
