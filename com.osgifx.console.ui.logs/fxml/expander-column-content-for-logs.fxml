@@ -16,6 +16,7 @@
 -->
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -46,26 +47,26 @@
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="levelLabel" text="Level" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+      <TextField fx:id="levelLabel" text="Level" GridPane.halignment="RIGHT" GridPane.rowIndex="1" editable="false" styleClass="copyable-label">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
-      </Label>
+      </TextField>
       <Label text="Exception" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="receivedAtLabel" text="Label" GridPane.columnIndex="1">
+      <TextField fx:id="receivedAtLabel" text="Label" GridPane.columnIndex="1" editable="false" styleClass="copyable-label">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
-      </Label>
-      <Label fx:id="levelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      </TextField>
+      <TextField fx:id="levelLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" editable="false" styleClass="copyable-label">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
-      </Label>
+      </TextField>
       <Label text="Message" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
          <GridPane.margin>
             <Insets left="20.0" right="50.0" />
@@ -86,11 +87,11 @@
             <Insets right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="bundleLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2">
+      <TextField fx:id="bundleLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" editable="false" styleClass="copyable-label">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
-      </Label>
+      </TextField>
       <Label text="Logger" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets right="50.0" />
@@ -101,16 +102,16 @@
             <Insets right="50.0" />
          </GridPane.margin>
       </Label>
-      <Label fx:id="loggerLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3">
+      <TextField fx:id="loggerLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" editable="false" styleClass="copyable-label">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
-      </Label>
-      <Label fx:id="threadLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4">
+      </TextField>
+      <TextField fx:id="threadLabel" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" editable="false" styleClass="copyable-label">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin>
-      </Label>
+      </TextField>
    </children>
    <padding>
       <Insets bottom="20.0" top="20.0" />

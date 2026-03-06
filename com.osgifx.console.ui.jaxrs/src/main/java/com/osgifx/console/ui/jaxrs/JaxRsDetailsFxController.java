@@ -30,6 +30,7 @@ import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XResourceMethodInfoDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -112,6 +113,7 @@ public final class JaxRsDetailsFxController {
         GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
+        Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
     }
 

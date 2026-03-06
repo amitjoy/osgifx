@@ -82,8 +82,29 @@ public final class McpFxUI {
                                                 final BorderPane parent,
                                                 @LocalInstance final FXMLLoader loader) {
         logger.atInfo().log("Agent disconnected event received");
+        final var isStarted = Boolean.getBoolean("is_started_mcp");
+        if (isStarted) {
+            stopMcpServer();
+        }
         statusBar.disableRpcProgressTracking();
         createControls(parent, loader);
+    }
+
+    private void stopMcpServer() {
+        executor.runAsync(() -> {
+            try {
+                final var bundle = context.getBundle();
+                final var ref    = bundle.getBundleContext().getServiceReference("com.osgifx.console.mcp.FxMcpServer");
+                if (ref != null) {
+                    final var service = (com.osgifx.console.mcp.FxMcpServer) bundle.getBundleContext().getService(ref);
+                    service.stop();
+                    System.setProperty("is_started_mcp", "false");
+                    logger.atInfo().log("MCP server has been stopped");
+                }
+            } catch (final Exception e) {
+                logger.atError().withException(e).log("Failed to stop MCP server upon disconnection");
+            }
+        });
     }
 
     private void createControls(final BorderPane parent, final FXMLLoader loader) {

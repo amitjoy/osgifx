@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2021-2026 Amit Kumar Mondal
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
 <setup:Configuration
     xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI"
@@ -20,11 +35,14 @@
         id="bndtools-release"
         type="URI"
         name="bndtools-release"
-        value="https://bndtools.org/bndtools.p2.repo/7.1.0/"
+        value="https://bndtools.org/bndtools.p2.repo/7.2.1/"
         label="bndtools-release">
       <choice
+          value="https://bndtools.org/bndtools.p2.repo/7.2.1/"
+          label="7.2.1 (Latest)"/>
+      <choice
           value="https://bndtools.org/bndtools.p2.repo/7.1.0/"
-          label="7.1.0 (Latest)"/>
+          label="7.1.0"/>
       <choice
           value="https://bndtools.org/bndtools.p2.repo/7.0.0/"
           label="7.0.0"/>

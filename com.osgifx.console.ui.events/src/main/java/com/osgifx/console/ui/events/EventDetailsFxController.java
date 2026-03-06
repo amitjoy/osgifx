@@ -31,9 +31,9 @@ import com.osgifx.console.util.fx.Fx;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 public final class EventDetailsFxController {
 
@@ -41,9 +41,9 @@ public final class EventDetailsFxController {
     @Inject
     private FluentLogger                               logger;
     @FXML
-    private Label                                      receivedAtLabel;
+    private TextField                                  receivedAtLabel;
     @FXML
-    private Label                                      topicLabel;
+    private TextField                                  topicLabel;
     @FXML
     private TableView<Entry<String, String>>           propertiesTable;
     @FXML

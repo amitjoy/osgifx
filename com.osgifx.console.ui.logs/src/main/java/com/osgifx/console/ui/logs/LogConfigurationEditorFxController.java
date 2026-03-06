@@ -170,6 +170,7 @@ public final class LogConfigurationEditorFxController {
         GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
+        Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
     }
 

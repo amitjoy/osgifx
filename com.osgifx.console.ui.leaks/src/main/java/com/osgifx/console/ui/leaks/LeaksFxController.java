@@ -15,10 +15,14 @@
  ******************************************************************************/
 package com.osgifx.console.ui.leaks;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.table.TableFilter;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -84,6 +88,12 @@ public final class LeaksFxController {
                 table.sort();
             });
         });
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }

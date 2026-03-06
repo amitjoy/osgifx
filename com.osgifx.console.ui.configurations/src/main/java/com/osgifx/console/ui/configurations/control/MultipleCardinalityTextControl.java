@@ -48,7 +48,7 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
      */
     protected TextField editableField;
     protected TextArea  editableArea;
-    protected Label     readOnlyLabel;
+    protected TextField readOnlyLabel;
     protected Label     fieldLabel;
 
     private final String            key;
@@ -79,8 +79,10 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
         editableArea.setEditable(false);
         editableArea.setFocusTraversable(false);
 
-        readOnlyLabel = new Label(field.getValue());
-        fieldLabel    = new Label(field.labelProperty().getValue());
+        readOnlyLabel = new TextField(field.getValue());
+        readOnlyLabel.setEditable(false);
+        readOnlyLabel.getStyleClass().add("copyable-label");
+        fieldLabel = new Label(field.labelProperty().getValue());
         editableField.setPromptText(field.placeholderProperty().getValue());
 
         editableArea.setOnMouseClicked(_ -> {

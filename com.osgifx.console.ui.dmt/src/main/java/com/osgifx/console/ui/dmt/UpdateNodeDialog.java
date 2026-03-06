@@ -42,6 +42,7 @@ import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.DmtDataType;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.ui.dmt.UpdateNodeDialog.UpdateDialogDTO;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -123,6 +124,7 @@ public final class UpdateNodeDialog extends Dialog<UpdateDialogDTO> {
         GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
         GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
+        Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
     }
 

@@ -41,6 +41,7 @@ import com.osgifx.console.ui.search.filter.SearchComponent;
 import com.osgifx.console.ui.search.filter.SearchFilter;
 import com.osgifx.console.ui.search.filter.SearchFilterManager;
 import com.osgifx.console.ui.search.filter.SearchOperation;
+import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.geometry.Insets;
@@ -132,6 +133,7 @@ public final class SearchDialog extends Dialog<FilterDTO> {
             userInputField.placeholder(newValue.placeholder());
             userInputField.validate(newValue.validator());
         });
+        Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
     }
 

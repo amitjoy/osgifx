@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.graph.bundle;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_BUNDLES_TOPIC;
 import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
@@ -29,6 +30,9 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.Strings;
 import org.controlsfx.control.MaskerPane;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -58,6 +62,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -89,6 +94,9 @@ public final class GraphFxBundleController implements GraphController {
     @Inject
     private DataProvider                               dataProvider;
     @Inject
+    @javax.inject.Named("is_connected")
+    private boolean                                    isConnected;
+    @Inject
     private ThreadSynchronize                          threadSync;
     @Inject
     private RuntimeBundleGraph                         runtimeGraph;
@@ -101,6 +109,26 @@ public final class GraphFxBundleController implements GraphController {
     @FXML
     public void initialize() {
         try {
+            if (!isConnected) {
+                graphPane.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+                bundlesList.setPlaceholder(new Label("Agent not connected"));
+                searchText.setDisable(true);
+                bundlesList.setDisable(true);
+                wiringSelection.setDisable(true);
+                layoutSelection.setDisable(true);
+                transitiveView.setDisable(true);
+                showSelectedOnlyView.setDisable(true);
+                return;
+            }
+            searchText.setDisable(false);
+            bundlesList.setDisable(false);
+            bundlesList.setPlaceholder(null);
+            graphPane.setCenter(null);
+            wiringSelection.setDisable(false);
+            layoutSelection.setDisable(false);
+            transitiveView.setDisable(false);
+            showSelectedOnlyView.setDisable(false);
+
             addExportToDotContextMenu();
             initBundlesList();
             progressPane = new MaskerPane();
@@ -349,6 +377,12 @@ public final class GraphFxBundleController implements GraphController {
         if (masterBundleList != null) {
             masterBundleList.forEach(b -> b.setSelected(true));
         }
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_BUNDLES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initBundlesList);
     }
 
 }
