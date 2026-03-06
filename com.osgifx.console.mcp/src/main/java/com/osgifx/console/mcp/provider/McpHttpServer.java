@@ -38,8 +38,8 @@ import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
+import com.osgifx.console.mcp.FxMcpServer;
 import com.osgifx.console.mcp.provider.McpHttpServer.Configuration;
-import com.osgifx.console.mcp.server.FxMcpServer;
 
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;

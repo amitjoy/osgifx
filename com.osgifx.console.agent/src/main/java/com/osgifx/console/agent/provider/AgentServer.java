@@ -891,6 +891,51 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     @Override
+    public byte[] getBundleEntryBytes(long bundleId, String path) throws Exception {
+        Bundle bundle = di.getInstance(BundleContext.class).getBundle(bundleId);
+        return bundle != null ? readUrlToByteArray(bundle.getEntry(path)) : null;
+    }
+
+    @Override
+    public byte[] getBundleResourceBytes(long bundleId, String path) throws Exception {
+        Bundle bundle = di.getInstance(BundleContext.class).getBundle(bundleId);
+        return bundle != null ? readUrlToByteArray(bundle.getResource(path)) : null;
+    }
+
+    private byte[] readUrlToByteArray(URL url) throws Exception {
+        if (url == null)
+            return null;
+
+        long   maxSize    = 10 * 1024 * 1024;                                                                  // Default
+                                                                                                               // 10MB
+                                                                                                               // to be
+                                                                                                               // safe
+        String configSize = di.getInstance(BundleContext.class).getProperty(AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY);
+        if (configSize != null) {
+            try {
+                maxSize = Long.parseLong(configSize);
+            } catch (NumberFormatException e) {
+                // Ignore and use default
+            }
+        }
+
+        try (InputStream is = url.openStream(); ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            int    nRead;
+            long   totalRead = 0;
+            byte[] data      = new byte[4096];
+            while ((nRead = is.read(data, 0, data.length)) != -1) {
+                totalRead += nRead;
+                if (totalRead > maxSize) {
+                    throw new IllegalArgumentException("Resource size exceeds maximum allowed byte array size: "
+                            + maxSize);
+                }
+                buffer.write(data, 0, nRead);
+            }
+            return buffer.toByteArray();
+        }
+    }
+
+    @Override
     public long estimateHeapdumpSize() {
         final Runtime runtime    = Runtime.getRuntime();
         final long    usedMemory = runtime.totalMemory() - runtime.freeMemory();

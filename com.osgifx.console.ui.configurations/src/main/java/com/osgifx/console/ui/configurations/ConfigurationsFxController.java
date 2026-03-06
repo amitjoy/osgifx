@@ -247,8 +247,10 @@ public final class ConfigurationsFxController {
         threadSync.asyncExec(() -> {
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(pidColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(pidColumn);
+                table.sort();
+            });
         });
     }
 

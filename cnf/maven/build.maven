@@ -71,3 +71,6 @@ org.osgi:osgi.enroute.junit.wrapper:4.12.0
 
 # HTTP Server
 io.fusionauth:java-http:1.4.0
+
+# Decompiler
+org.vineflower:vineflower:1.11.2
