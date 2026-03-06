@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.heap;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -140,11 +142,19 @@ public final class HeapMonitorPane extends BorderPane {
             setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
             return;
         }
+        if (!isCapabilityAvailable("JMX")) {
+            setCenter(Fx.createFeatureUnavailablePlaceholder("JMX"));
+            return;
+        }
         final var box        = createMainContent();
         final var scrollPane = new ScrollPane(box);
 
         scrollPane.setFitToWidth(true);
         setCenter(scrollPane);
+    }
+
+    private boolean isCapabilityAvailable(final String capabilityId) {
+        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     private Pane createMainContent() {
@@ -601,6 +611,12 @@ public final class HeapMonitorPane extends BorderPane {
 
     public void stopUpdates() {
         animation.pause();
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::refreshUI);
     }
 
     public Supplier<CompletableFuture<XMemoryUsage>> getMemoryUsageByMemoryPoolBean(final XMemoryPoolMXBean bean) {
