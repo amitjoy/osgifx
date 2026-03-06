@@ -175,7 +175,7 @@ public final class GraphFxUI {
         final FXMLBuilder<Node> builder = fxmlLoader.loadBundleRelative(resourceName);
         try {
             return builder.loadWithController();
-        } catch (final Exception e) {
+        } catch (final Exception _) {
             return null;
         }
     }

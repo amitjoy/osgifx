@@ -72,7 +72,7 @@ public final class Fx {
         loader.setLocation(fxml);
         try {
             return loader.load();
-        } catch (final Exception e) {
+        } catch (final Exception _) {
             return null;
         }
     }
