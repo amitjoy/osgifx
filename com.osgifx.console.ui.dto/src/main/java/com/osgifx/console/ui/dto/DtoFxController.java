@@ -15,11 +15,16 @@
  ******************************************************************************/
 package com.osgifx.console.ui.dto;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.controlsfx.glyphfont.FontAwesome.Glyph;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
@@ -32,6 +37,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -39,6 +45,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 
 public final class DtoFxController {
 
@@ -66,10 +73,21 @@ public final class DtoFxController {
 
     @FXML
     public void initialize() {
+        final var parent = (VBox) dtoTree.getParent();
         if (!isConnected) {
+            parent.getChildren().clear();
+            parent.getChildren().add(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            searchBox.setDisable(true);
+            searchBtn.setDisable(true);
             return;
         }
         try {
+            if (!parent.getChildren().contains(dtoTree)) {
+                parent.getChildren().clear();
+                parent.getChildren().add(dtoTree);
+            }
+            searchBox.setDisable(false);
+            searchBtn.setDisable(false);
             initTree();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
@@ -149,6 +167,12 @@ public final class DtoFxController {
             item.setValue(name + " : " + json);
         }
         return item;
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }

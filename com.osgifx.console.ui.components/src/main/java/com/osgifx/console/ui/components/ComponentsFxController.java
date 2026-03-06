@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.components;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_COMPONENT_FILTER_EVENT_TOPIC;
 
 import java.util.function.Predicate;
@@ -171,6 +172,12 @@ public final class ComponentsFxController {
             // @formatter:on
         }
         return value;
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        threadSync.asyncExec(this::initialize);
     }
 
 }
