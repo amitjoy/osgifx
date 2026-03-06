@@ -130,8 +130,10 @@ public final class CdiFxController {
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.cdiContainers());
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(idColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(idColumn);
+                table.sort();
+            });
         });
     }
 

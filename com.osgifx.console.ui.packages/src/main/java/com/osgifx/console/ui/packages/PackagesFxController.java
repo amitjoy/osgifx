@@ -126,8 +126,10 @@ public final class PackagesFxController {
         threadSync.asyncExec(() -> {
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(nameColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(nameColumn);
+                table.sort();
+            });
         });
     }
 

@@ -121,8 +121,10 @@ public final class LogConfigurationsFxController {
         threadSync.asyncExec(() -> {
             table.setItems(loggerContexts);
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(nameColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(nameColumn);
+                table.sort();
+            });
         });
     }
 

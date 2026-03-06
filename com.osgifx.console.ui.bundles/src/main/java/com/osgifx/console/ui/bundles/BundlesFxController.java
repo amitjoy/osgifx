@@ -352,8 +352,10 @@ public final class BundlesFxController {
         threadSync.asyncExec(() -> {
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(symbolicNameColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(symbolicNameColumn);
+                table.sort();
+            });
         });
     }
 

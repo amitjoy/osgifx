@@ -137,8 +137,10 @@ public final class HttpFxController {
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.httpComponents());
             TableFilter.forTableView(table).lazy(true).apply();
-            table.getSortOrder().add(componentColumn);
-            table.sort();
+            threadSync.asyncExec(() -> {
+                table.getSortOrder().add(componentColumn);
+                table.sort();
+            });
         });
     }
 
