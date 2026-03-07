@@ -33,18 +33,19 @@ import java.lang.reflect.Type;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.osgi.framework.BundleContext;
 
@@ -53,14 +54,16 @@ import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
-import com.osgifx.console.agent.rpc.BoundedInputStream;
+import com.osgifx.console.agent.rpc.Lz4Codec;
+import com.osgifx.console.agent.rpc.Lz4InputStream;
+import com.osgifx.console.agent.rpc.MethodKey;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
 
 /**
  * Socket Implementation of RemoteRPC.
- * Optimized for constrained networks using TCP_NODELAY, Buffering, and GZIP compression.
+ * Optimized for constrained networks using TCP_NODELAY, Buffering, and LZ4 compression.
  */
 public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R> {
 
@@ -75,9 +78,30 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     // Optimization: Shared Codec & Reuse Buffers
     private final BinaryCodec                            codec;
     private final long                                   maxDecompressedSize;
-    private final ThreadLocal<FastByteArrayOutputStream> buffer      = ThreadLocal
+    private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
-    private final Map<String, Method>                    methodCache = new HashMap<>();
+    private final Map<String, Method>                    methodCache     = new HashMap<>();
+    private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
+    private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
+    private final ThreadLocal<Object[]>                  parameterBuffer = ThreadLocal.withInitial(() -> new Object[8]);
+
+    // Method Signature Caching
+    private final Map<Method, Type[]>     genericParameterTypeCache = new HashMap<>();
+    private final Map<Method, byte[]>     methodNameBytesCache      = new HashMap<>();
+    private final Map<Method, Class<?>>   returnTypeCache           = new HashMap<>();
+    private final Map<Method, Class<?>[]> parameterTypeCache        = new HashMap<>();
+
+    // Empty array constant for zero-arg methods
+    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+
+    // Promise Pool (max 16 results)
+    private final Queue<RpcResult> resultPool           = new ConcurrentLinkedQueue<>();
+    private static final int       MAX_RESULT_POOL_SIZE = 16;
+
+    // Adaptive Compression Threshold
+    private final AtomicInteger compressionThreshold  = new AtomicInteger(1024);
+    private final AtomicInteger compressionSamples    = new AtomicInteger(0);
+    private final AtomicInteger totalCompressionRatio = new AtomicInteger(0);
 
     private L                   local;
     private R                   remote;
@@ -86,9 +110,19 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final ReentrantLock outLock = new ReentrantLock();
 
     private static class RpcResult {
-        final CountDownLatch latch = new CountDownLatch(1);
-        byte[]               value;
-        boolean              exception;
+        CountDownLatch latch;
+        byte[]         value;
+        boolean        exception;
+
+        RpcResult() {
+            reset();
+        }
+
+        void reset() {
+            this.latch     = new CountDownLatch(1);
+            this.value     = null;
+            this.exception = false;
+        }
     }
 
     private static Socket configureSocket(Socket socket) throws IOException {
@@ -162,10 +196,27 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         // Read max decompressed size from configuration
         this.maxDecompressedSize = readMaxDecompressedSize(context);
 
-        // Cache local methods
+        // Cache local methods and their signatures
         for (Method m : this.local.getClass().getMethods()) {
             if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
-                methodCache.put(m.getName() + "#" + m.getParameterTypes().length, m);
+                // Intern method name to reduce memory footprint
+                String internedName = m.getName().intern();
+                methodCache.put(internedName + "#" + m.getParameterTypes().length, m);
+                methodKeyCache.put(new MethodKey(internedName, m.getParameterTypes().length), m);
+                // Cache method signatures
+                parameterTypeCache.put(m, m.getParameterTypes());
+                genericParameterTypeCache.put(m, m.getGenericParameterTypes());
+                returnTypeCache.put(m, m.getReturnType());
+                // Cache method name bytes for faster serialization
+                try {
+                    ByteArrayOutputStream nameOut = new ByteArrayOutputStream();
+                    DataOutputStream      dos     = new DataOutputStream(nameOut);
+                    dos.writeUTF(internedName);
+                    dos.flush();
+                    methodNameBytesCache.put(m, nameOut.toByteArray());
+                } catch (IOException e) {
+                    // Fallback to runtime encoding
+                }
             }
         }
     }
@@ -300,24 +351,60 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     }
 
     private Method getMethod(final String cmd, final int count) {
+        // Use ThreadLocal MethodKey for zero-allocation lookup
+        MethodKey key = methodKeyHolder.get();
+        key.set(cmd, count);
+        Method m = methodKeyCache.get(key);
+        if (m != null) {
+            return m;
+        }
+        // Fallback to old cache
         return methodCache.get(cmd + "#" + count);
     }
 
-    private boolean isGzip(byte[] bytes) {
-        if (bytes == null || bytes.length < 2) {
+    private boolean isLz4(byte[] bytes) {
+        if (bytes == null || bytes.length < 8) {
             return false;
         }
-        return (bytes[0] == (byte) 0x1f) && (bytes[1] == (byte) 0x8b);
+        // LZ4 format: 4 bytes compressed length + 4 bytes uncompressed length + compressed data
+        // Read header
+        int compLen   = ((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8)
+                | (bytes[3] & 0xFF);
+        int uncompLen = ((bytes[4] & 0xFF) << 24) | ((bytes[5] & 0xFF) << 16) | ((bytes[6] & 0xFF) << 8)
+                | (bytes[7] & 0xFF);
+
+        // Validate: totalLength must equal 8 (header) + compressedLength
+        // This prevents false positives where random data looks like a valid header
+        return compLen > 0 && compLen < 100_000_000 && uncompLen > 0 && uncompLen < 100_000_000
+                && bytes.length == (8 + compLen);
     }
 
     private int send(final int msgId, final Method m, Object[] values) throws Exception {
         if (stopped.get())
             throw new IOException("RPC channel is closed");
-        if (m != null)
-            promises.put(msgId, new RpcResult());
+        if (m != null) {
+            // Get RpcResult from pool or create new
+            RpcResult result = resultPool.poll();
+            if (result == null) {
+                result = new RpcResult();
+            } else {
+                result.reset();
+            }
+            promises.put(msgId, result);
+        }
         outLock.lock();
         try {
-            out.writeUTF(m != null ? m.getName() : "");
+            // Use cached method name bytes if available
+            if (m != null) {
+                byte[] nameBytes = methodNameBytesCache.get(m);
+                if (nameBytes != null) {
+                    out.write(nameBytes);
+                } else {
+                    out.writeUTF(m.getName());
+                }
+            } else {
+                out.writeUTF("");
+            }
             out.writeInt(msgId);
             if (values == null)
                 values = new String[] {};
@@ -338,29 +425,28 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     final int    length    = bout.size();
                     final byte[] rawBuffer = bout.getBuffer();
 
-                    if (length >= 1024) {
-                        // Compress if >= 1KB
-                        // Reuse the buffer for output? No, we need input.
-                        // We can't reuse 'bout' for output because we are reading from it (conceptually).
-                        // Actually 'bout' holds the raw data.
-                        // We need a NEW buffer for compressed data?
-                        // Or we can write to 'out' directly (chunked)?
-                        // The protocol sends length + data.
-                        // GZIP output length is unknown until finished.
-                        // So we MUST buffer GZIP output.
+                    // Use adaptive compression threshold
+                    final int threshold = compressionThreshold.get();
+                    if (length >= threshold) {
+                        // LZ4 compression - use Lz4Codec directly
+                        byte[] compressed = Lz4Codec.compress(rawBuffer, 0, length);
 
-                        // We need a separate buffer for compression to avoid overwriting raw data while reading it?
-                        // 'gzip.write' consumes input.
-                        // If we use a separate ByteArrayOutputStream for compression.
-                        try (ByteArrayOutputStream compOut = new ByteArrayOutputStream(length / 2); // Estimate
-                                GZIPOutputStream gzip = new GZIPOutputStream(compOut);
-                                DataOutputStream dataOut = new DataOutputStream(gzip)) {
-                            gzip.write(rawBuffer, 0, length);
-                            gzip.finish();
+                        // Lz4Codec returns uncompressed data if compression doesn't help
+                        // Check if actually compressed by comparing sizes
+                        if (compressed.length < length) {
+                            // Write LZ4 header: compressed length + uncompressed length
+                            int totalLength = 8 + compressed.length;
+                            out.writeInt(totalLength); // Total length including header
+                            out.writeInt(compressed.length); // Compressed length
+                            out.writeInt(length); // Uncompressed length
+                            out.write(compressed);
 
-                            final byte[] compressedData = compOut.toByteArray();
-                            out.writeInt(compressedData.length);
-                            out.write(compressedData);
+                            // Update adaptive threshold based on compression ratio
+                            updateCompressionThreshold(length, compressed.length);
+                        } else {
+                            // Compression didn't help, send raw
+                            out.writeInt(length);
+                            out.write(rawBuffer, 0, length);
                         }
                     } else {
                         // Send raw - Zero Copy from buffer
@@ -395,8 +481,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                 return (T) result.value;
 
             InputStream source = new FastByteArrayInputStream(result.value);
-            if (isGzip(result.value)) {
-                source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
+            if (isLz4(result.value)) {
+                source = new Lz4InputStream(source, maxDecompressedSize);
             }
 
             try (DataInputStream dataIn = new DataInputStream(source)) {
@@ -408,6 +494,11 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             }
         } finally {
             promises.remove(id);
+            // Return RpcResult to pool
+            if (result != null && resultPool.size() < MAX_RESULT_POOL_SIZE) {
+                result.reset();
+                resultPool.offer(result);
+            }
         }
     }
 
@@ -418,26 +509,67 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             final Method m = getMethod(cmd, args.size());
             if (m == null)
                 return;
-            final Object[] parameters = new Object[args.size()];
+
+            // Fast-path for zero-argument methods
+            if (args.size() == 0) {
+                try {
+                    final Object result = m.invoke(local, EMPTY_OBJECT_ARRAY);
+                    if (returnTypeCache.get(m) == void.class)
+                        return;
+                    try {
+                        send(id, null, new Object[] { result });
+                    } catch (final Exception e) {
+                        terminate();
+                    }
+                } catch (Throwable t) {
+                    t = Exceptions.unrollCause(t, InvocationTargetException.class);
+                    try {
+                        send(-id, null, new Object[] { t + "" });
+                    } catch (final Exception e) {
+                        terminate();
+                    }
+                }
+                return;
+            }
+
+            // Use cached parameter types
+            final Class<?>[] paramTypes   = parameterTypeCache.get(m);
+            final Type[]     genericTypes = genericParameterTypeCache.get(m);
+
+            // Reuse parameter array for decoding, but create exact-sized array for invoke
+            Object[] tempParams = parameterBuffer.get();
+            if (tempParams.length < args.size()) {
+                tempParams = new Object[Math.max(8, args.size())];
+                parameterBuffer.set(tempParams);
+            }
+
             for (int i = 0; i < args.size(); i++) {
-                final Class<?> type = m.getParameterTypes()[i];
+                final Class<?> type = paramTypes[i];
                 if (type == byte[].class) {
-                    parameters[i] = args.get(i);
+                    tempParams[i] = args.get(i);
                 } else {
                     final byte[] argData = args.get(i);
                     InputStream  source  = new FastByteArrayInputStream(argData);
-                    if (isGzip(argData)) {
-                        source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
+                    if (isLz4(argData)) {
+                        source = new Lz4InputStream(source, maxDecompressedSize);
                     }
 
                     try (DataInputStream dataIn = new DataInputStream(source)) {
-                        parameters[i] = codec.decode(dataIn, m.getGenericParameterTypes()[i]);
+                        tempParams[i] = codec.decode(dataIn, genericTypes[i]);
                     }
                 }
             }
+
+            // Create exact-sized array for method invocation
+            final Object[] parameters = Arrays.copyOf(tempParams, args.size());
+
             try {
+                // Clear used slots in temp array to avoid memory leaks
+                for (int i = 0; i < args.size(); i++) {
+                    tempParams[i] = null;
+                }
                 final Object result = m.invoke(local, parameters);
-                if (m.getReturnType() == void.class)
+                if (returnTypeCache.get(m) == void.class)
                     return;
                 try {
                     send(id, null, new Object[] { result });
@@ -467,6 +599,35 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             result.exception = exception;
             // Signal completion instead of notifyAll()
             result.latch.countDown();
+        }
+    }
+
+    // Update adaptive compression threshold based on compression ratio
+    private void updateCompressionThreshold(int uncompressedSize, int compressedSize) {
+        // Calculate compression ratio as percentage (e.g., 50 = 50% compression)
+        int ratio = 100 - (compressedSize * 100 / uncompressedSize);
+
+        // Update running average
+        int samples = compressionSamples.incrementAndGet();
+        totalCompressionRatio.addAndGet(ratio);
+
+        // Every 100 samples, adjust threshold
+        if (samples >= 100) {
+            int avgRatio         = totalCompressionRatio.get() / samples;
+            int currentThreshold = compressionThreshold.get();
+
+            // If compression is very effective (>30% reduction), lower threshold
+            if (avgRatio > 30 && currentThreshold > 512) {
+                compressionThreshold.set(currentThreshold - 256);
+            }
+            // If compression is poor (<15% reduction), raise threshold
+            else if (avgRatio < 15 && currentThreshold < 2048) {
+                compressionThreshold.set(currentThreshold + 256);
+            }
+
+            // Reset counters
+            compressionSamples.set(0);
+            totalCompressionRatio.set(0);
         }
     }
 
