@@ -17,6 +17,7 @@ package com.osgifx.console.agent.rpc.mqtt;
 
 import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_DECOMPRESSED_SIZE_KEY;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -28,6 +29,7 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +37,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceObjects;
@@ -56,7 +57,9 @@ import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.rpc.BinaryCodec;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
 import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
-import com.osgifx.console.agent.rpc.BoundedInputStream;
+import com.osgifx.console.agent.rpc.Lz4Codec;
+import com.osgifx.console.agent.rpc.Lz4InputStream;
+import com.osgifx.console.agent.rpc.MethodKey;
 import com.osgifx.console.agent.rpc.RemoteRPC;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -85,11 +88,28 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     // Optimization: Shared Codec & Buffers
     private final BinaryCodec                            codec;
     private final long                                   maxDecompressedSize;
-    private final ThreadLocal<FastByteArrayOutputStream> buffer      = ThreadLocal
+    private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
-    private final ThreadLocal<FastByteArrayOutputStream> argBuffer   = ThreadLocal
+    private final ThreadLocal<FastByteArrayOutputStream> argBuffer       = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(1024));
-    private final Map<String, Method>                    methodCache = new HashMap<>();
+    private final Map<String, Method>                    methodCache     = new HashMap<>();
+    private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
+    private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
+    private final ThreadLocal<Object[]>                  parameterBuffer = ThreadLocal.withInitial(() -> new Object[8]);
+
+    // Method Signature Caching
+    private final Map<Method, Type[]>     genericParameterTypeCache = new HashMap<>();
+    private final Map<Method, byte[]>     methodNameBytesCache      = new HashMap<>();
+    private final Map<Method, Class<?>[]> parameterTypeCache        = new HashMap<>();
+    private final Map<Method, Class<?>>   returnTypeCache           = new HashMap<>();
+
+    // Empty array constant for zero-arg methods
+    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+
+    // Adaptive Compression Threshold
+    private final AtomicInteger compressionThreshold  = new AtomicInteger(1024);
+    private final AtomicInteger compressionSamples    = new AtomicInteger(0);
+    private final AtomicInteger totalCompressionRatio = new AtomicInteger(0);
 
     private final L               local;
     private R                     remote;
@@ -122,10 +142,27 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         this.publisherTracker      = new ServiceTracker<>(bundleContext, MessagePublisher.class, null);
         this.subscriptionTracker   = new ServiceTracker<>(bundleContext, MessageSubscription.class, null);
 
-        // Cache local methods
+        // Cache local methods and their signatures
         for (Method m : this.local.getClass().getMethods()) {
             if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
-                methodCache.put(m.getName() + "#" + m.getParameterTypes().length, m);
+                // Intern method name to reduce memory footprint
+                String internedName = m.getName().intern();
+                methodCache.put(internedName + "#" + m.getParameterTypes().length, m);
+                methodKeyCache.put(new MethodKey(internedName, m.getParameterTypes().length), m);
+                // Cache method signatures
+                parameterTypeCache.put(m, m.getParameterTypes());
+                genericParameterTypeCache.put(m, m.getGenericParameterTypes());
+                returnTypeCache.put(m, m.getReturnType());
+                // Cache method name bytes for faster serialization
+                try {
+                    ByteArrayOutputStream nameOut = new ByteArrayOutputStream();
+                    DataOutputStream      dos     = new DataOutputStream(nameOut);
+                    dos.writeUTF(internedName);
+                    dos.flush();
+                    methodNameBytesCache.put(m, nameOut.toByteArray());
+                } catch (IOException e) {
+                    // Fallback to runtime encoding
+                }
             }
         }
     }
@@ -288,20 +325,37 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         }
         int rawLength = bout.size();
 
-        // 2. Decide whether to compress
-        if (rawLength >= 1024) {
+        // 2. Decide whether to compress using adaptive threshold
+        final int threshold = compressionThreshold.get();
+        if (rawLength >= threshold) {
             byte[] rawData = new byte[rawLength];
             System.arraycopy(bout.getBuffer(), 0, rawData, 0, rawLength);
-            bout.reset();
-            try (GZIPOutputStream gzip = new GZIPOutputStream(bout);
-                    DataOutputStream out = new DataOutputStream(gzip)) {
-                out.write(rawData);
-                gzip.finish();
+
+            // LZ4 compression - use Lz4Codec directly
+            byte[] compressed = Lz4Codec.compress(rawData, 0, rawLength);
+
+            // Lz4Codec returns uncompressed data if compression doesn't help
+            // Check if actually compressed by comparing sizes
+            if (compressed.length < rawLength) {
+                // Build LZ4 payload: header (8 bytes) + compressed data
+                byte[] result = new byte[8 + compressed.length];
+                // Write compressed length
+                result[0] = (byte) (compressed.length >>> 24);
+                result[1] = (byte) (compressed.length >>> 16);
+                result[2] = (byte) (compressed.length >>> 8);
+                result[3] = (byte) compressed.length;
+                // Write uncompressed length
+                result[4] = (byte) (rawLength >>> 24);
+                result[5] = (byte) (rawLength >>> 16);
+                result[6] = (byte) (rawLength >>> 8);
+                result[7] = (byte) rawLength;
+                // Copy compressed data
+                System.arraycopy(compressed, 0, result, 8, compressed.length);
+
+                // Update adaptive threshold based on compression ratio
+                updateCompressionThreshold(rawLength, compressed.length);
+                return result;
             }
-            // Return compressed data
-            byte[] compressed = new byte[bout.size()];
-            System.arraycopy(bout.getBuffer(), 0, compressed, 0, bout.size());
-            return compressed;
         }
         // Return a copy of raw data (since buffer will be reused)
         byte[] result = new byte[rawLength];
@@ -314,11 +368,21 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         void accept(T t) throws IOException;
     }
 
-    private boolean isGzip(byte[] bytes) {
-        if (bytes == null || bytes.length < 2) {
+    private boolean isLz4(byte[] bytes) {
+        if (bytes == null || bytes.length < 8) {
             return false;
         }
-        return (bytes[0] == (byte) 0x1f) && (bytes[1] == (byte) 0x8b);
+        // LZ4 format: 4 bytes compressed length + 4 bytes uncompressed length + compressed data
+        // Read header
+        int compLen   = ((bytes[0] & 0xFF) << 24) | ((bytes[1] & 0xFF) << 16) | ((bytes[2] & 0xFF) << 8)
+                | (bytes[3] & 0xFF);
+        int uncompLen = ((bytes[4] & 0xFF) << 24) | ((bytes[5] & 0xFF) << 16) | ((bytes[6] & 0xFF) << 8)
+                | (bytes[7] & 0xFF);
+
+        // Validate: totalLength must equal 8 (header) + compressedLength
+        // This prevents false positives where random data looks like a valid header
+        return compLen > 0 && compLen < 100_000_000 && uncompLen > 0 && uncompLen < 100_000_000
+                && bytes.length == (8 + compLen);
     }
 
     private Object decodeResponse(Message msg, Type returnType) throws Exception {
@@ -327,8 +391,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         payload.get(data);
 
         InputStream source = new FastByteArrayInputStream(data);
-        if (isGzip(data)) {
-            source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
+        if (isLz4(data)) {
+            source = new Lz4InputStream(source, maxDecompressedSize);
         }
 
         try (DataInputStream in = new DataInputStream(source)) {
@@ -354,8 +418,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             List<byte[]> rawArgs = new ArrayList<>();
 
             InputStream source = new FastByteArrayInputStream(data);
-            if (isGzip(data)) {
-                source = new BoundedInputStream(new GZIPInputStream(source), maxDecompressedSize);
+            if (isLz4(data)) {
+                source = new Lz4InputStream(source, maxDecompressedSize);
             }
 
             try (DataInputStream in = new DataInputStream(source)) {
@@ -374,19 +438,54 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             boolean isError  = false;
             String  errorMsg = null;
 
-            Method m = methodCache.get(methodName + "#" + rawArgs.size());
+            // Use ThreadLocal MethodKey for zero-allocation lookup
+            MethodKey key = methodKeyHolder.get();
+            key.set(methodName, rawArgs.size());
+            Method m = methodKeyCache.get(key);
+            if (m == null) {
+                // Fallback to old cache
+                m = methodCache.get(methodName + "#" + rawArgs.size());
+            }
             if (m != null) {
-                Object[] args = new Object[rawArgs.size()];
-                for (int i = 0; i < args.length; i++) {
-                    try (DataInputStream argIn = new DataInputStream(new FastByteArrayInputStream(rawArgs.get(i)))) {
-                        args[i] = codec.decode(argIn, m.getGenericParameterTypes()[i]);
+                // Fast-path for zero-argument methods
+                if (rawArgs.size() == 0) {
+                    try {
+                        result = m.invoke(local, EMPTY_OBJECT_ARRAY);
+                    } catch (Throwable t) {
+                        isError  = true;
+                        errorMsg = Exceptions.unrollCause(t, InvocationTargetException.class).getMessage();
                     }
-                }
-                try {
-                    result = m.invoke(local, args);
-                } catch (Throwable t) {
-                    isError  = true;
-                    errorMsg = Exceptions.unrollCause(t, InvocationTargetException.class).getMessage();
+                } else {
+                    // Use cached generic parameter types
+                    final Type[] genericTypes = genericParameterTypeCache.get(m);
+
+                    // Reuse parameter array for decoding, but create exact-sized array for invoke
+                    Object[] tempParams = parameterBuffer.get();
+                    if (tempParams.length < rawArgs.size()) {
+                        tempParams = new Object[Math.max(8, rawArgs.size())];
+                        parameterBuffer.set(tempParams);
+                    }
+
+                    for (int i = 0; i < rawArgs.size(); i++) {
+                        try (DataInputStream argIn = new DataInputStream(new FastByteArrayInputStream(rawArgs
+                                .get(i)))) {
+                            tempParams[i] = codec.decode(argIn, genericTypes[i]);
+                        }
+                    }
+
+                    // Create exact-sized array for method invocation
+                    final Object[] args = Arrays.copyOf(tempParams, rawArgs.size());
+
+                    try {
+                        // Clear used slots in temp array to avoid memory leaks
+                        for (int i = 0; i < rawArgs.size(); i++) {
+                            tempParams[i] = null;
+                        }
+                        result = m.invoke(local, args);
+                    } catch (Throwable t) {
+                        isError  = true;
+                        errorMsg = Exceptions.unrollCause(t, InvocationTargetException.class).getMessage();
+                    }
                 }
             } else {
                 isError  = true;
@@ -448,6 +547,35 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     @Override
     public boolean isOpen() {
         return !stopped.get();
+    }
+
+    // Update adaptive compression threshold based on compression ratio
+    private void updateCompressionThreshold(int uncompressedSize, int compressedSize) {
+        // Calculate compression ratio as percentage (e.g., 50 = 50% compression)
+        int ratio = 100 - (compressedSize * 100 / uncompressedSize);
+
+        // Update running average
+        int samples = compressionSamples.incrementAndGet();
+        totalCompressionRatio.addAndGet(ratio);
+
+        // Every 100 samples, adjust threshold
+        if (samples >= 100) {
+            int avgRatio         = totalCompressionRatio.get() / samples;
+            int currentThreshold = compressionThreshold.get();
+
+            // If compression is very effective (>30% reduction), lower threshold
+            if (avgRatio > 30 && currentThreshold > 512) {
+                compressionThreshold.set(currentThreshold - 256);
+            }
+            // If compression is poor (<15% reduction), raise threshold
+            else if (avgRatio < 15 && currentThreshold < 2048) {
+                compressionThreshold.set(currentThreshold + 256);
+            }
+
+            // Reset counters
+            compressionSamples.set(0);
+            totalCompressionRatio.set(0);
+        }
     }
 
     private static long readMaxDecompressedSize(final BundleContext context) {
