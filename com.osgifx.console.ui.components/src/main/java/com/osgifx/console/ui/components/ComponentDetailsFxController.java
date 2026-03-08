@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.osgifx.console.ui.components;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -25,7 +27,10 @@ import javax.inject.Named;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.command.CommandService;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -41,7 +46,6 @@ import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.beans.binding.When;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -132,6 +136,9 @@ public final class ComponentDetailsFxController {
     @Inject
     @Named("is_snapshot_agent")
     private boolean                                       isSnapshotAgent;
+    @Inject
+    private ThreadSynchronize                             threadSync;
+    private XComponentDTO                                 selectedComponent;
     private TableRowDataFeatures<XReferenceDTO>           previouslyExpanded;
     private AtomicBoolean                                 areReferenceTableNodesLoader;
 
@@ -142,6 +149,7 @@ public final class ComponentDetailsFxController {
     }
 
     void initControls(final XComponentDTO component) {
+        selectedComponent = component;
         registerButtonHandlers(component);
 
         idLabel.setText(String.valueOf(component.id));
@@ -196,14 +204,32 @@ public final class ComponentDetailsFxController {
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
-        final BooleanProperty isSnapshot        = new SimpleBooleanProperty(isSnapshotAgent);
-        final var             isSnapshotBinding = new When(isSnapshot).then(true).otherwise(false);
+        final var isSnapshot        = new SimpleBooleanProperty(isSnapshotAgent);
+        final var isSnapshotBinding = new When(isSnapshot).then(true).otherwise(false);
 
-        final BooleanProperty isEnabled        = new SimpleBooleanProperty(!"DISABLED".equals(component.state));
-        final var             isEnabledBinding = new When(isEnabled).then(true).otherwise(false);
+        final var state            = component.state;
+        final var isEnabled        = new SimpleBooleanProperty(!"DISABLED".equals(state));
+        final var isEnabledBinding = new When(isEnabled).then(true).otherwise(false);
 
-        enableComponentButton.disableProperty().bind(isSnapshotBinding.or(isEnabledBinding));
-        disableComponentButton.disableProperty().bind(isSnapshotBinding.or(isEnabledBinding.not()));
+        final var isUnsatisfiedReference     = new SimpleBooleanProperty("UNSATISFIED_REFERENCE".equals(state));
+        final var isUnsatisfiedConfiguration = new SimpleBooleanProperty("UNSATISFIED_CONFIGURATION".equals(state));
+        final var isFailedActivation         = new SimpleBooleanProperty("FAILED_ACTIVATION".equals(state));
+
+        final var isLifecycleDisabled = isUnsatisfiedReference.or(isUnsatisfiedConfiguration).or(isFailedActivation);
+
+        enableComponentButton.disableProperty().bind(isSnapshotBinding.or(isEnabledBinding).or(isLifecycleDisabled));
+        disableComponentButton.disableProperty()
+                .bind(isSnapshotBinding.or(isEnabledBinding.not()).or(isLifecycleDisabled));
+    }
+
+    @Inject
+    @Optional
+    private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_COMPONENTS_TOPIC) final String data) {
+        if (selectedComponent == null) {
+            return;
+        }
+        final var updatedComponent = selectedComponent;
+        threadSync.asyncExec(() -> initControls(updatedComponent));
     }
 
     private void createReferenceExpandedTable(final XComponentDTO component) {
