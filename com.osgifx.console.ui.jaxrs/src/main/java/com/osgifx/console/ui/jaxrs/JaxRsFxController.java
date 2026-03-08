@@ -64,6 +64,7 @@ public final class JaxRsFxController {
     @Inject
     private ThreadSynchronize                        threadSync;
     private TableRowDataFeatures<XJaxRsComponentDTO> previouslyExpanded;
+    private boolean                                  isInitialized;
 
     @FXML
     public void initialize() {
@@ -76,8 +77,11 @@ public final class JaxRsFxController {
             return;
         }
         try {
-            createControls();
-            Fx.disableSelectionModel(table);
+            if (!isInitialized) {
+                createControls();
+                Fx.disableSelectionModel(table);
+                isInitialized = true;
+            }
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
