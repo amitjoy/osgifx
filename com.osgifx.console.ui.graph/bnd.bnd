@@ -12,15 +12,10 @@ Model-Fragment      : fragment.e4xmi
                       org.jgrapht.core,\
                       org.jgrapht.io
 -privatepackage     : \
-                      org.jgrapht.*,\
                       com.osgifx.console.ui.graph.*
 Import-Package      : \
                       javafx.scene.web,\
                       javafx.concurrent,\
                       org.controlsfx.control,\
                       org.controlsfx.glyphfont,\
-                      !org.antlr.*,\
-                      !org.apache.commons.text.*,\
-                      !org.apfloat.*,\
-                      !org.jheaps.*,\
                       *
