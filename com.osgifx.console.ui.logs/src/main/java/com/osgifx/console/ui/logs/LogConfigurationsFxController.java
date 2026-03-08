@@ -65,6 +65,7 @@ public final class LogConfigurationsFxController {
     @Inject
     private ThreadSynchronize                             threadSync;
     private TableRowDataFeatures<XBundleLoggerContextDTO> previouslyExpanded;
+    private boolean                                       isInitialized;
 
     @FXML
     public void initialize() {
@@ -77,8 +78,11 @@ public final class LogConfigurationsFxController {
             return;
         }
         try {
-            createControls();
-            Fx.disableSelectionModel(table);
+            if (!isInitialized) {
+                createControls();
+                Fx.disableSelectionModel(table);
+                isInitialized = true;
+            }
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");

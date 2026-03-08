@@ -119,6 +119,7 @@ public final class BundlesFxController {
 
     private FilteredList<XBundleDTO>         filteredList;
     private TableRowDataFeatures<XBundleDTO> previouslyExpanded;
+    private boolean                          isInitialized;
 
     @FXML
     public void initialize() {
@@ -129,8 +130,11 @@ public final class BundlesFxController {
             return;
         }
         try {
-            createControls();
-            Fx.disableSelectionModel(table);
+            if (!isInitialized) {
+                createControls();
+                Fx.disableSelectionModel(table);
+                isInitialized = true;
+            }
             updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {

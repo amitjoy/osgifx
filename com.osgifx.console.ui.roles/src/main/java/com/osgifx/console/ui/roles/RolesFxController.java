@@ -90,6 +90,7 @@ public final class RolesFxController {
     private Button              addRoleButton;
 
     private TableRowDataFeatures<XRoleDTO> previouslyExpanded;
+    private boolean                        isInitialized;
 
     @FXML
     public void initialize() {
@@ -105,8 +106,11 @@ public final class RolesFxController {
             return;
         }
         try {
-            createControls();
-            Fx.disableSelectionModel(table);
+            if (!isInitialized) {
+                createControls();
+                Fx.disableSelectionModel(table);
+                isInitialized = true;
+            }
             updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
