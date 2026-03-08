@@ -38,46 +38,62 @@ public final class BundleUninstallHandler {
 
     @Log
     @Inject
-    private FluentLogger      logger;
+    private FluentLogger                                                                     logger;
     @Inject
-    private Executor          executor;
+    private Executor                                                                         executor;
     @Inject
-    private IEventBroker      eventBroker;
+    private IEventBroker                                                                     eventBroker;
     @Inject
     @Optional
-    private Supervisor        supervisor;
+    private Supervisor                                                                       supervisor;
     @Inject
-    private ThreadSynchronize threadSync;
+    private ThreadSynchronize                                                                threadSync;
     @Inject
     @Optional
     @Named("is_connected")
-    private boolean           isConnected;
+    private boolean                                                                          isConnected;
+    @Inject
+    private com.osgifx.console.data.provider.DataProvider                                    dataProvider;
+    @Inject
+    private javax.inject.Provider<com.osgifx.console.ui.bundles.dialog.ImpactAnalysisDialog> impactAnalysisDialogProvider;
+    @Inject
+    @org.eclipse.fx.core.di.ContextValue("shell")
+    private javafx.stage.Window                                                              window;
 
     @Execute
     public void execute(@Named("id") final String id) {
-        final Task<Void> uninstallTask = new Task<>() {
+        final var selection     = dataProvider.bundles().stream().filter(b -> String.valueOf(b.id).equals(id)).toList();
+        final var allBundles    = dataProvider.bundles();
+        final var allComponents = dataProvider.components();
 
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    final var agent = supervisor.getAgent();
-                    final var error = agent.uninstall(Long.parseLong(id));
-                    if (error == null) {
-                        logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
-                        eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
-                    } else {
-                        logger.atError().log(error);
-                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Uninstall Error", error,
-                                getClass().getClassLoader()));
+        final var dialog = impactAnalysisDialogProvider.get();
+        dialog.init("UNINSTALL", selection, allBundles, allComponents, window);
+
+        final var result = dialog.showAndWait();
+        if (result.isPresent() && result.get().getButtonData().isDefaultButton()) {
+            final Task<Void> uninstallTask = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var agent = supervisor.getAgent();
+                        final var error = agent.uninstall(Long.parseLong(id));
+                        if (error == null) {
+                            logger.atInfo().log("Bundle with ID '%s' has been uninstalled", id);
+                            eventBroker.post(BUNDLE_UNINSTALLED_EVENT_TOPIC, id);
+                        } else {
+                            logger.atError().log(error);
+                            threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Uninstall Error", error,
+                                    getClass().getClassLoader()));
+                        }
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", id);
+                        threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
                     }
-                } catch (final Exception e) {
-                    logger.atError().withException(e).log("Bundle with ID '%s' cannot be uninstalled", e);
-                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                    return null;
                 }
-                return null;
-            }
-        };
-        executor.runAsync(uninstallTask);
+            };
+            executor.runAsync(uninstallTask);
+        }
     }
 
     @CanExecute

@@ -6,7 +6,12 @@ Model-Fragment      : fragment.e4xmi
 					  fxml = fxml,\
 					  graphic = graphic,\
 					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
--buildpath          : ${bundles.required}
-Import-Package      : org.controlsfx.glyphfont,\
+-buildpath          : \
+                      ${bundles.required},\
+                      org.jgrapht.core
+Import-Package      : \
+                      org.controlsfx.glyphfont,\
+                      org.controlsfx.control,\
                       *
--privatepackage     : com.osgifx.console.ui.components.*
+-privatepackage     : \
+                      com.osgifx.console.ui.components.*

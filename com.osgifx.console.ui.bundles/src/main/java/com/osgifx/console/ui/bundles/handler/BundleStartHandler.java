@@ -19,65 +19,86 @@ import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_STA
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.bundles.dialog.ImpactAnalysisDialog;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
+import javafx.stage.Window;
 
 public final class BundleStartHandler {
 
     @Log
     @Inject
-    private FluentLogger      logger;
+    private FluentLogger                   logger;
     @Inject
-    private Executor          executor;
+    private Executor                       executor;
     @Inject
-    private IEventBroker      eventBroker;
+    private IEventBroker                   eventBroker;
     @Inject
     @Optional
-    private Supervisor        supervisor;
+    private Supervisor                     supervisor;
     @Inject
     @Optional
     @Named("is_connected")
-    private boolean           isConnected;
+    private boolean                        isConnected;
     @Inject
-    private ThreadSynchronize threadSync;
+    private DataProvider                   dataProvider;
+    @Inject
+    private Provider<ImpactAnalysisDialog> impactAnalysisDialogProvider;
+    @Inject
+    @ContextValue("shell")
+    private Window                         window;
+    @Inject
+    private ThreadSynchronize              threadSync;
 
     @Execute
     public void execute(@Named("id") final String id) {
-        final Task<Void> startTask = new Task<>() {
+        final var selection     = dataProvider.bundles().stream().filter(b -> String.valueOf(b.id).equals(id)).toList();
+        final var allBundles    = dataProvider.bundles();
+        final var allComponents = dataProvider.components();
 
-            @Override
-            protected Void call() throws Exception {
-                try {
-                    final var agent = supervisor.getAgent();
-                    final var error = agent.start(Long.parseLong(id));
-                    if (error == null) {
-                        logger.atInfo().log("Bundle with ID '%s' has been started", id);
-                        eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
-                    } else {
-                        logger.atError().log(error);
-                        threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error,
-                                getClass().getClassLoader()));
+        final var dialog = impactAnalysisDialogProvider.get();
+        dialog.init("START", selection, allBundles, allComponents, window);
+
+        final var result = dialog.showAndWait();
+        if (result.isPresent() && result.get().getButtonData().isDefaultButton()) {
+            final Task<Void> startTask = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    try {
+                        final var agent = supervisor.getAgent();
+                        final var error = agent.start(Long.parseLong(id));
+                        if (error == null) {
+                            logger.atInfo().log("Bundle with ID '%s' has been started", id);
+                            eventBroker.post(BUNDLE_STARTED_EVENT_TOPIC, id);
+                        } else {
+                            logger.atError().log(error);
+                            threadSync.asyncExec(() -> FxDialog.showErrorDialog("Bundle Start Error", error,
+                                    getClass().getClassLoader()));
+                        }
+                    } catch (final Exception e) {
+                        logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
+                        threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
                     }
-                } catch (final Exception e) {
-                    logger.atError().withException(e).log("Bundle with ID '%s' cannot be started", id);
-                    threadSync.asyncExec(() -> FxDialog.showExceptionDialog(e, getClass().getClassLoader()));
+                    return null;
                 }
-                return null;
-            }
-        };
-        executor.runAsync(startTask);
+            };
+            executor.runAsync(startTask);
+        }
     }
 
     @CanExecute
