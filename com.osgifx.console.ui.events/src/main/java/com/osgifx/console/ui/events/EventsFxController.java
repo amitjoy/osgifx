@@ -129,6 +129,7 @@ public final class EventsFxController {
     private final BooleanSupplier           isReceivingEvent        = () -> Boolean.getBoolean("is_receiving_event");
     private final Consumer<Boolean>         isReceivingEventUpdater = flag -> System.setProperty("is_receiving_event",
             String.valueOf(flag));
+    private boolean                         isInitialized;
 
     @FXML
     public void initialize() {
@@ -139,8 +140,11 @@ public final class EventsFxController {
             return;
         }
         try {
-            createControls();
-            Fx.disableSelectionModel(table);
+            if (!isInitialized) {
+                createControls();
+                Fx.disableSelectionModel(table);
+                isInitialized = true;
+            }
             initButtonIcons();
             updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");

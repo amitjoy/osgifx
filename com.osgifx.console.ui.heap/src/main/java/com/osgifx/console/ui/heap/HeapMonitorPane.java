@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.heap;
 
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
