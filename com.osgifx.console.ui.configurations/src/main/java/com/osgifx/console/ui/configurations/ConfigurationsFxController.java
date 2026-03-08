@@ -98,6 +98,7 @@ public final class ConfigurationsFxController {
 
     private FilteredList<XConfigurationDTO>         filteredList;
     private TableRowDataFeatures<XConfigurationDTO> previouslyExpanded;
+    private boolean                                 isInitialized;
 
     @FXML
     public void initialize() {
@@ -113,8 +114,11 @@ public final class ConfigurationsFxController {
             return;
         }
         try {
-            createControls();
-            Fx.disableSelectionModel(table);
+            if (!isInitialized) {
+                createControls();
+                Fx.disableSelectionModel(table);
+                isInitialized = true;
+            }
             updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {

@@ -141,6 +141,7 @@ public final class ComponentDetailsFxController {
     private XComponentDTO                                 selectedComponent;
     private TableRowDataFeatures<XReferenceDTO>           previouslyExpanded;
     private AtomicBoolean                                 areReferenceTableNodesLoader;
+    private boolean                                       isInitialized;
 
     @FXML
     public void initialize() {
@@ -191,16 +192,19 @@ public final class ComponentDetailsFxController {
         unboundServicesTable.setItems(FXCollections.observableArrayList(component.unsatisfiedReferences));
 
         createReferenceExpandedTable(component);
-        applyTableFilters();
+        if (!isInitialized) {
+            applyTableFilters();
 
-        Fx.addContextMenuToCopyContent(pidsList);
-        Fx.addContextMenuToCopyContent(interfacesList);
-        Fx.addContextMenuToCopyContent(propertiesTable);
-        Fx.addContextMenuToCopyContent(boundServicesTable);
-        Fx.addContextMenuToCopyContent(unboundServicesTable);
+            Fx.addContextMenuToCopyContent(pidsList);
+            Fx.addContextMenuToCopyContent(interfacesList);
+            Fx.addContextMenuToCopyContent(propertiesTable);
+            Fx.addContextMenuToCopyContent(boundServicesTable);
+            Fx.addContextMenuToCopyContent(unboundServicesTable);
 
-        Fx.disableSelectionModel(referencesTable);
-        referencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+            Fx.disableSelectionModel(referencesTable);
+            referencesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+            isInitialized = true;
+        }
     }
 
     private void initConditionalComponents(final XComponentDTO component) {
