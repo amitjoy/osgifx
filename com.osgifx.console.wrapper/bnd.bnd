@@ -6,4 +6,6 @@
              eu.lestard:advanced-bindings,\
              jar/grid-0.3.0.jar;version=file,\
              com.dlsc.formsfx:formsfx-core,\
-             com.google.mug:mug
+             com.google.mug:mug,\
+             org.jgrapht.core,\
+             org.jgrapht.io

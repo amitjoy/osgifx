@@ -10,8 +10,10 @@ Model-Fragment      : fragment.e4xmi
                       ${bundles.required},\
                       biz.aQute.bndlib;packages=*,\
                       biz.aQute.bnd.util;packages=*,\
-                      com.osgifx.console.ui.batchinstall
--privatepackage     : com.osgifx.console.ui.bundles.*
+                      com.osgifx.console.ui.batchinstall,\
+                      org.jgrapht.core
+-privatepackage     : \
+                      com.osgifx.console.ui.bundles.*
 -conditionalpackage : aQute.* 
 Import-Package      : \
                       org.controlsfx.glyphfont,\
