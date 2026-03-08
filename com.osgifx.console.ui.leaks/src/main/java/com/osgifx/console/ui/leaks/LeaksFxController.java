@@ -58,6 +58,7 @@ public final class LeaksFxController {
     private DataProvider                     dataProvider;
     @Inject
     private ThreadSynchronize                threadSync;
+    private boolean                          isInitialized;
 
     @FXML
     public void initialize() {
@@ -66,8 +67,11 @@ public final class LeaksFxController {
             return;
         }
         try {
-            initCells();
-            Fx.addContextMenuToCopyContent(table);
+            if (!isInitialized) {
+                initCells();
+                Fx.addContextMenuToCopyContent(table);
+                isInitialized = true;
+            }
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");

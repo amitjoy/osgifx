@@ -113,6 +113,7 @@ public final class McpFxController {
     private final Gson                       gson  = new GsonBuilder().setPrettyPrinting().create();
     private TableRowDataFeatures<McpToolDTO> previouslyExpandedTool;
     private TableRowDataFeatures<McpLogDTO>  previouslyExpandedLog;
+    private boolean                          isInitialized;
 
     @FXML
     public void initialize() {
@@ -127,25 +128,28 @@ public final class McpFxController {
             return;
         }
         try {
-            if (mcpDataProvider == null) {
-                actionButton.setDisable(true);
-                refreshLogsButton.setDisable(true);
-                clearLogsButton.setDisable(true);
-                statusLabel.setText("Status: UNAVAILABLE");
-                Fx.showErrorNotification("Model Context Protocol", "MCP data provider service is unavailable");
-                return;
+            if (!isInitialized) {
+                if (mcpDataProvider == null) {
+                    actionButton.setDisable(true);
+                    refreshLogsButton.setDisable(true);
+                    clearLogsButton.setDisable(true);
+                    statusLabel.setText("Status: UNAVAILABLE");
+                    Fx.showErrorNotification("Model Context Protocol", "MCP data provider service is unavailable");
+                    return;
+                }
+                if (fxMcpServer == null) {
+                    actionButton.setDisable(true);
+                    refreshLogsButton.setDisable(true);
+                    clearLogsButton.setDisable(true);
+                    statusLabel.setText("Status: UNAVAILABLE");
+                    Fx.showErrorNotification("Model Context Protocol", "MCP server is unavailable");
+                    return;
+                }
+                initToolsTable();
+                initLogsTable();
+                Fx.disableSelectionModel(toolsTable, logsTable);
+                isInitialized = true;
             }
-            if (fxMcpServer == null) {
-                actionButton.setDisable(true);
-                refreshLogsButton.setDisable(true);
-                clearLogsButton.setDisable(true);
-                statusLabel.setText("Status: UNAVAILABLE");
-                Fx.showErrorNotification("Model Context Protocol", "MCP server is unavailable");
-                return;
-            }
-            initToolsTable();
-            initLogsTable();
-            Fx.disableSelectionModel(toolsTable, logsTable);
             updateTools();
             updateLogs();
             updateStatus();
