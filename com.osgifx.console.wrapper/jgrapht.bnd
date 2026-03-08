@@ -1,0 +1,7 @@
+Export-Package: org.jgrapht.*
+Import-Package: \
+                !org.antlr.*,\
+                !org.apache.commons.text.*,\
+                !org.apfloat.*,\
+                !org.jheaps.*,\
+                *
