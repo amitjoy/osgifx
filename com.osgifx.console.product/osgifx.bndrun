@@ -84,6 +84,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.jaxrs',\
                                       bnd.identity;id='com.osgifx.console.ui.cdi',\
                                       bnd.identity;id='com.osgifx.console.ui.leaks',\
+                                      bnd.identity;id='com.osgifx.console.ui.chaos',\
                                       bnd.identity;id='com.osgifx.console.ui.overview',\
                                       bnd.identity;id='com.osgifx.console.ui.packages',\
                                       bnd.identity;id='com.osgifx.console.ui.properties',\
@@ -122,7 +123,8 @@ install.order                     :   \
                                       com.osgifx.console.ui.dto,\
                                       com.osgifx.console.ui.dmt,\
                                       com.osgifx.console.ui.mcp,\
-                                      com.osgifx.console.ui.healthchecks
+                                      com.osgifx.console.ui.healthchecks,\
+                                      com.osgifx.console.ui.chaos
 
 -runbundles.X    	              :   ${install.order}
 
