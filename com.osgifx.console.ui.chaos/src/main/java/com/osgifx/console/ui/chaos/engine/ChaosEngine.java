@@ -16,8 +16,6 @@
 package com.osgifx.console.ui.chaos.engine;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -27,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.chaos.model.ActionLog;
 
@@ -42,7 +40,7 @@ public final class ChaosEngine {
 
     private final Map<String, ChaosEvent>            victimLedger   = new ConcurrentHashMap<>();
     private final AtomicBoolean                      isRunning      = new AtomicBoolean(false);
-    private ScheduledExecutorService                 scheduler;
+    private ScheduledFuture<?>                       scheduledTask;
     private ChaosConfig                              config;
     private Supervisor                               supervisor;
     private DataProvider                             dataProvider;
@@ -54,6 +52,7 @@ public final class ChaosEngine {
     public void start(final ChaosConfig config,
                       final Supervisor supervisor,
                       final DataProvider dataProvider,
+                      final Executor executor,
                       final Consumer<ActionLog> logConsumer) {
         this.config       = requireNonNull(config);
         this.supervisor   = requireNonNull(supervisor);
@@ -61,10 +60,10 @@ public final class ChaosEngine {
         this.logConsumer  = requireNonNull(logConsumer);
         this.startTime    = Instant.now();
 
-        scheduler = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "chaos-engine"));
         isRunning.set(true);
 
-        scheduler.scheduleAtFixedRate(this::cycle, 0, config.actionInterval, SECONDS);
+        scheduledTask = executor.scheduleAtFixedRate(this::cycle, Duration.ZERO,
+                Duration.ofSeconds(config.actionInterval));
         log("🚀", "Chaos engine unleashed", "Engine");
     }
 
@@ -75,8 +74,8 @@ public final class ChaosEngine {
         isRunning.set(false);
         log("⛔", "Chaos engine halted", "Engine");
         revertAllVictims();
-        if (scheduler != null) {
-            scheduler.shutdownNow();
+        if (scheduledTask != null) {
+            scheduledTask.cancel(true);
         }
     }
 
