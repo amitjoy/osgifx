@@ -134,7 +134,7 @@ public final class DmtFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
+            final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Sync", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
