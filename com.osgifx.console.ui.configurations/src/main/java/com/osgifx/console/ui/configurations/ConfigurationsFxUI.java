@@ -161,8 +161,10 @@ public final class ConfigurationsFxUI {
             final var infoNode = Fx.initStatusBarButton(this::showInfo, "Info", "INFO");
             statusBar.addToRight(infoNode);
             statusBar.addToRight(new Separator(VERTICAL));
-            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isCmAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "CM".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isCmAvailable && !isSnapshotAgent) {
+                final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
                 statusBar.addToRight(refreshNode);
             }
         }
@@ -185,8 +187,13 @@ public final class ConfigurationsFxUI {
                     }), "Reset Search Filter", "CLOSE", Color.RED);
             statusBar.addToRight(searchFilterResetNode);
             statusBar.addToRight(new Separator(VERTICAL));
-            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            statusBar.addToRight(refreshNode);
+
+            final var isCmAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "CM".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isCmAvailable) {
+                final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
+                statusBar.addToRight(refreshNode);
+            }
         }
     }
 
