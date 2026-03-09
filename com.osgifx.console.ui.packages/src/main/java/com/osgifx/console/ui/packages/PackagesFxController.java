@@ -37,14 +37,20 @@ import org.osgi.framework.BundleContext;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.dto.SearchFilterDTO;
+import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 public final class PackagesFxController {
@@ -64,17 +70,29 @@ public final class PackagesFxController {
     @Named("is_connected")
     private boolean                          isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean                          isSnapshotAgent;
+    @Inject
     private DataProvider                     dataProvider;
     @Inject
     private ThreadSynchronize                threadSync;
+    @Inject
+    private Executor                         executor;
+    @Inject
+    @Optional
+    private Supervisor                       supervisor;
+    @FXML
+    private Button                           packageRefreshButton;
     private FilteredList<PackageDTO>         filteredList;
     private TableRowDataFeatures<PackageDTO> previouslyExpanded;
     private boolean                          isInitialized;
 
     @FXML
     public void initialize() {
+        initButtonIcons();
         if (!isConnected) {
             Fx.addTablePlaceholderWhenDisconnected(table);
+            updateButtonStates();
             return;
         }
         try {
@@ -83,6 +101,7 @@ public final class PackagesFxController {
                 Fx.disableSelectionModel(table);
                 isInitialized = true;
             }
+            updateButtonStates();
             logger.atDebug().log("FXML controller has been initialized");
         } catch (final Exception e) {
             logger.atError().withException(e).log("FXML controller could not be initialized");
@@ -143,6 +162,39 @@ public final class PackagesFxController {
     public void onFilterUpdateEvent(@UIEventTopic(UPDATE_PACKAGE_FILTER_EVENT_TOPIC) final SearchFilterDTO filter) {
         logger.atInfo().log("Update filter event received");
         filteredList.setPredicate((Predicate<? super PackageDTO>) filter.predicate);
+    }
+
+    @FXML
+    public void packageRefresh() {
+        logger.atInfo().log("Package refresh has been triggered");
+        final Task<Void> refreshTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                supervisor.getAgent().refresh();
+                return null;
+            }
+        };
+        refreshTask.setOnSucceeded(_ -> threadSync.asyncExec(
+                () -> Fx.showSuccessNotification("Package Refresh", "Framework bundles have been refreshed")));
+        refreshTask.setOnFailed(_ -> {
+            final var throwable = refreshTask.getException();
+            logger.atError().withException(throwable).log("Package refresh failed");
+            threadSync.asyncExec(() -> Fx.showErrorNotification("Package Refresh", "Package refresh failed"));
+        });
+        executor.runAsync(refreshTask);
+    }
+
+    private void initButtonIcons() {
+        final var image     = new Image(getClass().getResourceAsStream("/graphic/icons/refresh.png"));
+        final var imageView = new ImageView(image);
+        imageView.setFitHeight(16.0);
+        imageView.setFitWidth(16.0);
+        imageView.setPreserveRatio(true);
+        packageRefreshButton.setGraphic(imageView);
+    }
+
+    private void updateButtonStates() {
+        packageRefreshButton.setDisable(!isConnected || isSnapshotAgent);
     }
 
 }
