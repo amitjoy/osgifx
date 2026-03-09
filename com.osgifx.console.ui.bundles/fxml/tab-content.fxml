@@ -29,6 +29,7 @@
          </padding>
          <Button fx:id="installBundleButton" mnemonicParsing="false" onAction="#installOrUpdateBundle" text="Install/Update Bundle" />
          <Button fx:id="batchInstallButton" mnemonicParsing="false" onAction="#batchInstall" text="Batch Install" />
+         <Button fx:id="packageRefreshButton" mnemonicParsing="false" onAction="#packageRefresh" text="Package Refresh" />
          <Button fx:id="generateObrButton" mnemonicParsing="false" onAction="#generateObr" text="Generate Repository XML" />
       </HBox>
    </top>

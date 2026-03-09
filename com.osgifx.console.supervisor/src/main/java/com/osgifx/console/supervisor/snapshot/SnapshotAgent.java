@@ -156,6 +156,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public void refresh() throws InterruptedException {
+        // nothing to do
+    }
+
+    @Override
     public List<String> findBundleEntries(final long bundleId,
                                           final String path,
                                           final String pattern,

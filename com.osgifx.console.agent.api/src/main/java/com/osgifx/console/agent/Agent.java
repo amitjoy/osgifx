@@ -402,6 +402,17 @@ public interface Agent {
     boolean ping();
 
     /**
+     * Refreshes the framework wiring.
+     * <p>
+     * This method triggers a calculation of the framework wiring after bundle installs,
+     * updates, or uninstalls.
+     * 
+     * @throws InterruptedException if the refresh operation is interrupted
+     * @since 12.0
+     */
+    void refresh() throws InterruptedException;
+
+    /**
      * Returns the detailed information of all the installed bundles
      *
      * @return the detailed information of all the installed bundles
