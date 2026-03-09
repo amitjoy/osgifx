@@ -283,13 +283,21 @@ public final class BundleDetailsFxController {
         final BooleanProperty isInstalled        = new SimpleBooleanProperty("INSTALLED".equals(bundle.state));
         final var             isInstalledBinding = new When(isInstalled).then(true).otherwise(false);
 
+        final BooleanProperty isStarting        = new SimpleBooleanProperty("STARTING".equals(bundle.state));
+        final var             isStartingBinding = new When(isStarting).then(true).otherwise(false);
+
+        final BooleanProperty isStopping        = new SimpleBooleanProperty("STOPPING".equals(bundle.state));
+        final var             isStoppingBinding = new When(isStopping).then(true).otherwise(false);
+
         final BooleanProperty isAgent        = new SimpleBooleanProperty(AGENT_BUNDLE_BSN.equals(bundle.symbolicName));
         final var             isAgentBinding = new When(isAgent).then(true).otherwise(false);
 
-        startBundleButton.disableProperty().bind(isSnapshotBinding.or(isFragmentBinding).or(isActiveBinding));
-        stopBundleButton.disableProperty()
-                .bind(isSnapshotBinding.or(isResolvedBinding).or(isInstalledBinding).or(isAgentBinding));
-        uninstallBundleButton.disableProperty().bind(isSnapshotBinding.or(isAgentBinding));
+        startBundleButton.disableProperty().bind(isSnapshotBinding.or(isFragmentBinding).or(isActiveBinding)
+                .or(isStartingBinding).or(isStoppingBinding));
+        stopBundleButton.disableProperty().bind(isSnapshotBinding.or(isResolvedBinding).or(isInstalledBinding)
+                .or(isAgentBinding).or(isStartingBinding).or(isStoppingBinding));
+        uninstallBundleButton.disableProperty()
+                .bind(isSnapshotBinding.or(isAgentBinding).or(isStartingBinding).or(isStoppingBinding));
 
         fragmentLabel.setSelected(bundle.isFragment);
     }
