@@ -325,6 +325,9 @@ public final class XComponentAdmin {
             final Collection<ComponentConfigurationDTO> configurationDTOs = scr.getComponentConfigurationDTOs(dto);
             for (final ComponentConfigurationDTO configDTO : configurationDTOs) {
                 if (configDTO.id == id) {
+                    if (!enable && isCriticalComponent(dto)) {
+                        return createResult(ERROR, "Component '" + dto.name + "' is critical and cannot be disabled");
+                    }
                     try {
                         final Promise<Void> promise = enable ? scr.enableComponent(dto) : scr.disableComponent(dto);
                         promise.getValue(); // Blocks intentionally (User Action)
@@ -341,6 +344,10 @@ public final class XComponentAdmin {
             }
         }
         return createResult(SUCCESS, "Component with id '" + id + "' has not been found");
+    }
+
+    private boolean isCriticalComponent(final ComponentDescriptionDTO dto) {
+        return dto.name.startsWith("com.osgifx.") || dto.name.startsWith("org.eclipse.");
     }
 
     private XComponentDTO findCachedDTO(final long componentId) {
@@ -373,6 +380,9 @@ public final class XComponentAdmin {
 
         for (final ComponentDescriptionDTO dto : descriptionDTOs) {
             if (dto.name.equals(name)) {
+                if (!enable && isCriticalComponent(dto)) {
+                    return createResult(ERROR, "Component '" + dto.name + "' is critical and cannot be disabled");
+                }
                 try {
                     final Promise<Void> promise = enable ? scr.enableComponent(dto) : scr.disableComponent(dto);
                     promise.getValue();
