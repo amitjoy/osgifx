@@ -161,7 +161,7 @@ public final class BundlesFxUI {
             final var infoNode = Fx.initStatusBarButton(this::showInfo, "Info", "INFO");
             statusBar.addToRight(infoNode);
             statusBar.addToRight(new Separator(VERTICAL));
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+            final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
@@ -184,7 +184,7 @@ public final class BundlesFxUI {
                     }), "Reset Search Filter", "CLOSE", Color.RED);
             statusBar.addToRight(searchFilterResetNode);
             statusBar.addToRight(new Separator(VERTICAL));
-            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
             statusBar.addToRight(refreshNode);
         }
     }

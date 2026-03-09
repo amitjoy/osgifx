@@ -147,7 +147,7 @@ public final class LogsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh Log Configurations", "REFRESH");
+            final var node = Fx.initStatusBarButton(this::refreshData, "Sync Log Configurations", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
