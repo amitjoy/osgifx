@@ -160,7 +160,7 @@ public final class GraphFxUI {
     private void initStatusBar() {
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(() -> loadedController.updateModel(), "Refresh", "REFRESH");
+            final var node = Fx.initStatusBarButton(() -> loadedController.updateModel(), "Sync", "REFRESH");
             statusBar.clearAllInRight();
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);

@@ -33,6 +33,7 @@ import org.eclipse.fx.ui.di.FXMLBuilder.Data;
 import org.eclipse.fx.ui.di.FXMLLoader;
 import org.eclipse.fx.ui.di.FXMLLoaderFactory;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -65,6 +66,8 @@ public final class DmtFxUI {
     private boolean           isSnapshotAgent;
     @Inject
     private ConsoleMaskerPane progressPane;
+    @Inject
+    private DataProvider      dataProvider;
     private DmtFxController   fxController;
 
     @PostConstruct
@@ -134,8 +137,10 @@ public final class DmtFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Refresh", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isDmtAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "DMT".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isDmtAvailable && !isSnapshotAgent) {
+                final var node = Fx.initStatusBarButton(() -> fxController.updateModel(), "Sync", "REFRESH");
                 statusBar.addToRight(node);
             }
         }

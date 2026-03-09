@@ -139,8 +139,10 @@ public final class JaxRsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isJaxRsAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "JAX_RS".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isJaxRsAvailable && !isSnapshotAgent) {
+                final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
                 statusBar.addToRight(node);
             }
         }

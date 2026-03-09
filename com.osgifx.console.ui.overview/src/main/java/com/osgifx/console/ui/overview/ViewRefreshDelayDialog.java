@@ -53,7 +53,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
         final var dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.setHeaderText("Refresh Delay in Seconds");
+        dialogPane.setHeaderText("Sync Delay in Seconds");
         dialogPane.getStylesheets().add(getClass().getClassLoader().getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(
                 new ImageView(getClass().getClassLoader().getResource("/graphic/images/delay.png").toString()));
@@ -67,7 +67,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
         final var content    = new VBox(10);
         final var delayField = (CustomTextField) TextFields.createClearableTextField();
 
-        final var nameCaption          = "Refresh Delay";
+        final var nameCaption          = "Sync Delay";
         final var requiredFormat       = "'%s' is required";
         final var requiredNumberFormat = "'%s' should be a valid integer number";
 
@@ -111,7 +111,7 @@ public final class ViewRefreshDelayDialog extends Dialog<Double> {
                 }
                 return null;
             } catch (final Exception e) {
-                logger.atError().withException(e).log("Invalid refresh delay");
+                logger.atError().withException(e).log("Invalid sync delay");
                 throw e;
             }
         });

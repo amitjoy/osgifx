@@ -28,6 +28,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.chaos.engine.ChaosConfig;
 import com.osgifx.console.ui.chaos.engine.ChaosEngine;
@@ -60,6 +61,8 @@ public final class ChaosFxController implements Initializable {
     @Log
     @Inject
     private FluentLogger                   logger;
+    @Inject
+    private Executor                       executor;
     @Inject
     @Named("is_connected")
     private boolean                        isConnected;
@@ -202,7 +205,7 @@ public final class ChaosFxController implements Initializable {
         haltButton.setDisable(false);
         setControlsDisable(true);
 
-        engine.start(config, supervisor, dataProvider, this::handleLog);
+        engine.start(config, supervisor, dataProvider, executor, this::handleLog);
     }
 
     @FXML

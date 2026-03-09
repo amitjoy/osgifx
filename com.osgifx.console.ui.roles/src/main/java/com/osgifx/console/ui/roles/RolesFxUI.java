@@ -129,8 +129,10 @@ public final class RolesFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isUserAdminAvailable = dataProvider.runtimeCapabilities().stream()
+                    .filter(c -> "USER_ADMIN".equals(c.id)).anyMatch(c -> c.isAvailable);
+            if (isUserAdminAvailable && !isSnapshotAgent) {
+                final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
                 statusBar.addToRight(node);
             }
         }

@@ -746,13 +746,13 @@ public final class OverviewFxUI {
             statusBar.enableRpcProgressTracking();
             if (!isSnapshotAgent) {
                 final var refreshDelayDialog = Fx.initStatusBarButton(this::showViewRefreshDelayDialog,
-                        "View Refresh Delay", "GEAR");
+                        "View Sync Delay", "GEAR");
                 statusBar.addToRight(timelineButton);
                 statusBar.addToRight(new Separator(VERTICAL));
                 statusBar.addToRight(refreshDelayDialog);
                 statusBar.addToRight(new Separator(VERTICAL));
-                final var refreshButton = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-                statusBar.addToRight(refreshButton);
+                final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
+                statusBar.addToRight(refreshNode);
             }
         }
     }

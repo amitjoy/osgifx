@@ -158,8 +158,10 @@ public final class ComponentsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isScrAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "SCR".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isScrAvailable && !isSnapshotAgent) {
+                final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
                 statusBar.addToRight(node);
             }
         }
@@ -176,8 +178,13 @@ public final class ComponentsFxUI {
                     }), "Reset Search Filter", "CLOSE", Color.RED);
             statusBar.addToRight(searchFilterResetNode);
             statusBar.addToRight(new Separator(VERTICAL));
-            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
-            statusBar.addToRight(refreshNode);
+
+            final var isScrAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "SCR".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isScrAvailable) {
+                final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
+                statusBar.addToRight(refreshNode);
+            }
         }
     }
 
