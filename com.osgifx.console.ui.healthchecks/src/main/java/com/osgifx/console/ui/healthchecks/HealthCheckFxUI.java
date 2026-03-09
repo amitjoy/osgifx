@@ -129,8 +129,10 @@ public final class HealthCheckFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isHcAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "HC".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isHcAvailable && !isSnapshotAgent) {
+                final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
                 statusBar.addToRight(node);
             }
         }

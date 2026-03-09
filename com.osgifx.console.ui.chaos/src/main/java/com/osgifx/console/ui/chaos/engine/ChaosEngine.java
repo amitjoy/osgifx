@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.chaos.engine;
 
 import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;

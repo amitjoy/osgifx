@@ -37,6 +37,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
@@ -72,6 +73,8 @@ public final class EventsFxUI {
     @Inject
     @Named("is_snapshot_agent")
     private boolean           isSnapshotAgent;
+    @Inject
+    private DataProvider      dataProvider;
     @Inject
     private IEclipseContext   eclipseContext;
 
@@ -149,7 +152,9 @@ public final class EventsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            if (!isSnapshotAgent) {
+            final var isEventAdminAvailable = dataProvider.runtimeCapabilities().stream()
+                    .anyMatch(cap -> "EVENT_ADMIN".equals(cap.id) && cap.isAvailable);
+            if (!isSnapshotAgent && isEventAdminAvailable) {
                 final var button = (Button) Fx.initStatusBarButton(null, "Subscribed Event Topics", "GEAR");
                 button.setOnAction(_ -> showSubscribedEventTopicsPopover(button));
                 statusBar.addToRight(button);

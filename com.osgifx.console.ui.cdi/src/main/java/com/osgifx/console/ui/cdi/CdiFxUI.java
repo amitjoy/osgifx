@@ -139,8 +139,10 @@ public final class CdiFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
-            if (!isSnapshotAgent) {
+            final var isCdiAvailable = dataProvider.runtimeCapabilities().stream().filter(c -> "CDI".equals(c.id))
+                    .anyMatch(c -> c.isAvailable);
+            if (isCdiAvailable && !isSnapshotAgent) {
+                final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
                 statusBar.addToRight(node);
             }
         }
