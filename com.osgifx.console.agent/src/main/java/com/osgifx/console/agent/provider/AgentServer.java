@@ -270,6 +270,7 @@ public final class AgentServer implements Agent, Closeable {
         final InputStream is = new URL(url).openStream();
         final Bundle      b  = di.getInstance(BundleContext.class).installBundle(location, is);
         installed.put(b.getLocation(), url);
+        refresh(true);
         return toDTO(b);
     }
 
@@ -341,7 +342,15 @@ public final class AgentServer implements Agent, Closeable {
                 sb.append(e.getMessage()).append('\n');
             }
         }
-        return sb.length() == 0 ? null : sb.toString();
+        if (sb.length() == 0) {
+            try {
+                refresh(true);
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return null;
+        }
+        return sb.toString();
     }
 
     @Override
@@ -687,6 +696,11 @@ public final class AgentServer implements Agent, Closeable {
     @Override
     public boolean ping() {
         return true;
+    }
+
+    @Override
+    public void refresh() throws InterruptedException {
+        refresh(true);
     }
 
     public void refresh(final boolean async) throws InterruptedException {
@@ -1335,6 +1349,9 @@ public final class AgentServer implements Agent, Closeable {
             if (installedBundle == null) {
                 installedBundle = di.getInstance(BundleContext.class).installBundle(location, stream);
                 installedBundle.adapt(BundleStartLevel.class).setStartLevel(startLevel);
+                if (shouldRefresh) {
+                    refresh(true);
+                }
             } else {
                 installedBundle.update(stream);
                 if (shouldRefresh) {
