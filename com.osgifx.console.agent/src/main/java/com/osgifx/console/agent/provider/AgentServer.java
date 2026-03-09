@@ -304,6 +304,11 @@ public final class AgentServer implements Agent, Closeable {
                 sb.append("Bundle ").append(id).append(" does not exist").append('\n');
                 continue;
             }
+            if (isCriticalBundle(bundle)) {
+                sb.append("Bundle ").append(id).append(" (").append(bundle.getSymbolicName())
+                        .append(") is critical and cannot be stopped").append('\n');
+                continue;
+            }
             try {
                 bundle.stop();
             } catch (final BundleException e) {
@@ -322,6 +327,11 @@ public final class AgentServer implements Agent, Closeable {
             final Bundle bundle = di.getInstance(BundleContext.class).getBundle(id);
             if (bundle == null) {
                 sb.append("Bundle ").append(id).append(" does not exist").append('\n');
+                continue;
+            }
+            if (isCriticalBundle(bundle)) {
+                sb.append("Bundle ").append(id).append(" (").append(bundle.getSymbolicName())
+                        .append(") is critical and cannot be uninstalled").append('\n');
                 continue;
             }
             try {
@@ -738,6 +748,12 @@ public final class AgentServer implements Agent, Closeable {
                 throw new IllegalArgumentException("No location specified but there are multiple bundles with the same bsn "
                         + entry.getKey() + ": " + bundles);
         }
+    }
+
+    private boolean isCriticalBundle(final Bundle bundle) {
+        final String bsn      = bundle.getSymbolicName();
+        final String agentBsn = getContext().getBundle().getSymbolicName();
+        return bundle.getBundleId() == 0 || bsn.equals(agentBsn);
     }
 
     @Override
