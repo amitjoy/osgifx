@@ -79,44 +79,45 @@ public final class BundlesFxController {
 
     @Log
     @Inject
-    private FluentLogger          logger;
+    private FluentLogger                     logger;
     @Inject
     @LocalInstance
-    private FXMLLoader            loader;
+    private FXMLLoader                       loader;
     @FXML
-    private TableView<XBundleDTO> table;
+    private TableView<XBundleDTO>            table;
     @Inject
     @OSGiBundle
-    private BundleContext         context;
+    private BundleContext                    context;
     @Inject
     @Named("is_connected")
-    private boolean               isConnected;
+    private boolean                          isConnected;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean               isSnapshotAgent;
+    private boolean                          isSnapshotAgent;
     @Inject
-    private DataProvider          dataProvider;
+    private DataProvider                     dataProvider;
     @Inject
-    private IEclipseContext       eclipseContext;
+    private IEclipseContext                  eclipseContext;
     @Inject
-    private Executor              executor;
-    @Inject
-    @Optional
-    private Supervisor            supervisor;
-    @Inject
-    private ThreadSynchronize     threadSync;
-    @Inject
-    private IEventBroker          eventBroker;
+    private Executor                         executor;
     @Inject
     @Optional
-    private ArtifactInstaller     installer;
+    private Supervisor                       supervisor;
+    @Inject
+    private ThreadSynchronize                threadSync;
+    @Inject
+    private IEventBroker                     eventBroker;
+    @Inject
+    @Optional
+    private ArtifactInstaller                installer;
     @FXML
-    private Button                installBundleButton;
+    private Button                           installBundleButton;
     @FXML
-    private Button                batchInstallButton;
+    private Button                           batchInstallButton;
     @FXML
-    private Button                generateObrButton;
-
+    private Button                           packageRefreshButton;
+    @FXML
+    private Button                           generateObrButton;
     private FilteredList<XBundleDTO>         filteredList;
     private TableRowDataFeatures<XBundleDTO> previouslyExpanded;
     private boolean                          isInitialized;
@@ -256,6 +257,26 @@ public final class BundlesFxController {
         exportOBR(location);
     }
 
+    @FXML
+    public void packageRefresh() {
+        logger.atInfo().log("Package refresh has been triggered");
+        final Task<Void> refreshTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                supervisor.getAgent().refresh();
+                return null;
+            }
+        };
+        refreshTask.setOnSucceeded(_ -> threadSync.asyncExec(
+                () -> Fx.showSuccessNotification("Package Refresh", "Framework bundles have been refreshed")));
+        refreshTask.setOnFailed(_ -> {
+            final var throwable = refreshTask.getException();
+            logger.atError().withException(throwable).log("Package refresh failed");
+            threadSync.asyncExec(() -> Fx.showErrorNotification("Package Refresh", "Package refresh failed"));
+        });
+        executor.runAsync(refreshTask);
+    }
+
     private void exportOBR(final File location) {
         final var resources = dataProvider.bundles().stream().map(this::toResource).toList();
         if (resources.isEmpty()) {
@@ -290,6 +311,7 @@ public final class BundlesFxController {
     private void initButtonIcons() {
         installBundleButton.setGraphic(createIcon("/graphic/icons/install.png"));
         batchInstallButton.setGraphic(createIcon("/graphic/icons/directory.png"));
+        packageRefreshButton.setGraphic(createIcon("/graphic/icons/refresh.png"));
         generateObrButton.setGraphic(createIcon("/graphic/icons/obr.png"));
     }
 
@@ -297,6 +319,7 @@ public final class BundlesFxController {
         final var disableActions = !isConnected || isSnapshotAgent;
         installBundleButton.setDisable(disableActions);
         batchInstallButton.setDisable(disableActions);
+        packageRefreshButton.setDisable(disableActions);
         generateObrButton.setDisable(disableActions);
     }
 

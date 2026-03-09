@@ -129,7 +129,7 @@ public final class ThreadsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Refresh", "REFRESH");
+            final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
             if (!isSnapshotAgent) {
                 statusBar.addToRight(node);
             }
