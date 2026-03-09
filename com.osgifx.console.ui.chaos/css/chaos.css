@@ -1,0 +1,47 @@
+.list-view .list-cell {
+    -fx-font-family: "Monospaced";
+    -fx-font-size: 13px;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+}
+
+.table-view .table-cell {
+    -fx-alignment: center-left;
+}
+
+#offlineList {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 4px;
+}
+
+#offlineList .list-cell:empty {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+}
+
+#offlineList .list-cell:filled {
+    -fx-background-color: #fdeaea;
+    -fx-text-fill: #c0392b;
+    -fx-font-weight: bold;
+}
+
+.unleash-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+}
+
+.unleash-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+.halt-button {
+    -fx-background-color: #34495e;
+    -fx-text-fill: white;
+}
+
+.halt-button:hover {
+    -fx-background-color: #2c3e50;
+}
