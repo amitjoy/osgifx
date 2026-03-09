@@ -235,3 +235,25 @@ public class S3PayloadHandler implements LargePayloadHandler {
     }
 }
 ```
+
+---
+
+## 6. Chaos Monkey - Resilience Testing
+
+The **Chaos Monkey** is a powerful fault-injection tool designed to test the resilience, self-healing, and dynamic rebinding capabilities of your OSGi applications. It randomly disrupts bundles and SCR components based on your configuration.
+
+### 4-Layer Safety Architecture
+
+To prevent accidental "suicide" of the remote environment, Chaos Monkey implements a multi-layered safety guard:
+
+1.  **System Bundle Guard**: The System Bundle (ID 0) is strictly immune to all chaos operations.
+2.  **Agent Guard**: The OSGi.fx Agent bundle is automatically detected and protected.
+3.  **Infrastructure Guard**: Bundles from the framework itself (e.g., Felix or Equinox core) are excluded.
+4.  **Scope Guard**: You define the exact pool of bundles and components to be targeted.
+    *   **Filtering**: Both inclusion and exclusion filters support **comma-separated regular expressions** (e.g., `com.my.*, com.other.*`).
+
+### Example Scenarios
+
+*   **Test Bundle Refresh**: Use Chaos Monkey to stop bundles that provide common services. This verifies if dependent bundles correctly handle service disappearance and refresh.
+*   **Component Rebinding**: Randomly disable single DS components to ensure that consumers correctly rebind to alternatives or transition into a safe "unsatisfied" state without crashing.
+*   **Safety Timers**: Always use the **Auto-Stop Timer** to ensure that a chaos session doesn't run indefinitely in shared development environments.
