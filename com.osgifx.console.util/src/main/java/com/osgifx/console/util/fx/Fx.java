@@ -224,6 +224,10 @@ public final class Fx {
         table.setPlaceholder(createPlaceholderNode("Agent not connected", FontAwesome.Glyph.POWER_OFF));
     }
 
+    public static void addListViewPlaceholderWhenDisconnected(final ListView<?> list) {
+        list.setPlaceholder(createPlaceholderNode("Agent not connected", FontAwesome.Glyph.POWER_OFF));
+    }
+
     /**
      * Sets a "Feature not available" placeholder on a {@link TableView}.
      * <p>
