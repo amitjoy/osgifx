@@ -227,9 +227,10 @@ public final class XMetaTypeAdmin implements ConfigurationListener {
         if (configAdmin == null) {
             return;
         }
-        final String pid = event.getPid();
+        final String pid        = event.getPid();
+        final String factoryPid = event.getFactoryPid();
         if (event.getType() == ConfigurationEvent.CM_UPDATED) {
-            if (ocdCache.containsKey(pid) || isFactoryConfig(pid)) {
+            if (ocdCache.containsKey(pid) || (factoryPid != null && ocdCache.containsKey(factoryPid))) {
                 updateConfigCache(pid);
             }
         } else if (event.getType() == ConfigurationEvent.CM_DELETED) {
@@ -366,19 +367,6 @@ public final class XMetaTypeAdmin implements ConfigurationListener {
             }
         } catch (final Exception e) {
             logger.atError().msg("Error updating factory config cache").throwable(e).log();
-        }
-    }
-
-    private boolean isFactoryConfig(final String pid) {
-        final ConfigurationAdmin configAdmin = configAdminTracker.getService();
-        if (configAdmin == null) {
-            return false;
-        }
-        try {
-            final Configuration config = configAdmin.getConfiguration(pid, "?");
-            return config.getFactoryPid() != null && ocdCache.containsKey(config.getFactoryPid());
-        } catch (Exception e) {
-            return false;
         }
     }
 
