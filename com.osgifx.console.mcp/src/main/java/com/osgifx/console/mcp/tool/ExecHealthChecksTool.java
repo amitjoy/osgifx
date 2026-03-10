@@ -33,7 +33,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "run_health_checks", description = "Runs system health checks. Accepts optional 'tags' or 'names' to filter execution; otherwise runs all checks.")
 public class ExecHealthChecksTool implements McpTool {
 

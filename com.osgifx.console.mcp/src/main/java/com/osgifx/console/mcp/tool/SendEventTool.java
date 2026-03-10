@@ -36,7 +36,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "send_event", description = "Sends an OSGi event to the specified topic with optional properties.")
 public class SendEventTool implements McpTool {
 

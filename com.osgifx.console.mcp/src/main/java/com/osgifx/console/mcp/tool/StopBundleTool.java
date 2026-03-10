@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "stop_bundle", description = "Stops the bundle with the specified ID.")
 public class StopBundleTool implements McpTool {
 

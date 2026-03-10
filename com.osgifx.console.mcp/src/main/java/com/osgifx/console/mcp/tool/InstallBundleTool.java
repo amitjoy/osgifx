@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "install_bundle", description = "Installs a bundle from a URL. Optional 'location' and 'startLevel'. Returns the Bundle ID.")
 public class InstallBundleTool implements McpTool {
 

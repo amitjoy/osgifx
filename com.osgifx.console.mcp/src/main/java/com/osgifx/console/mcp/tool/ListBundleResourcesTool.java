@@ -33,7 +33,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_bundle_resources", description = "Finds resources in the bundle's classpath (includes imports)")
 public class ListBundleResourcesTool implements McpTool {
 

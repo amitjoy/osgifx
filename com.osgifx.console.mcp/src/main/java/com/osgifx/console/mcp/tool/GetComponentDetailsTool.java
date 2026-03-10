@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_component_details", description = "Retrieves detailed information (configuration policy, references) for a specific component by name.")
 public class GetComponentDetailsTool implements McpTool {
 

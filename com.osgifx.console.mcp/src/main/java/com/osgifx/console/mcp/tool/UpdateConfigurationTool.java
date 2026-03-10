@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "update_configuration", description = "Updates or creates an OSGi configuration. Requires 'pid' and 'properties' map.")
 public class UpdateConfigurationTool implements McpTool {
 

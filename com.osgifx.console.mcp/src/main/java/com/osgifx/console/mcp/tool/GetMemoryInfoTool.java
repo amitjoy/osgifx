@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "check_memory_usage", description = "Retrieves a detailed breakdown of JVM memory usage (Heap, Non-Heap, Pools).")
 public class GetMemoryInfoTool implements McpTool {
 
