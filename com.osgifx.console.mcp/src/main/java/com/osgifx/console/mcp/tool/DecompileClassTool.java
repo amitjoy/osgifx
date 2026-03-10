@@ -20,6 +20,9 @@ import static org.osgi.service.component.annotations.ReferencePolicyOption.GREED
 
 import java.util.Map;
 
+import org.eclipse.fx.core.log.FluentLogger;
+import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -29,15 +32,22 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "decompile_class", description = "Decompiles a Java class from a remote OSGi bundle")
 public final class DecompileClassTool implements McpTool {
 
-    @Reference
-    private FxDecompiler decompiler;
-
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
+    @Reference
+    private FxDecompiler        decompiler;
+    @Reference
+    private LoggerFactory       factory;
+    private FluentLogger        logger;
+
+    @Activate
+    void activate() {
+        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    }
 
     @Override
     public Map<String, Object> inputSchema() {
@@ -50,20 +60,22 @@ public final class DecompileClassTool implements McpTool {
 
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
+        logger.atInfo().log("Executing DecompileClassTool");
         final var agent = supervisor == null ? null : supervisor.getAgent();
         if (agent == null) {
-            return "Error: Agent is not connected";
+            logger.atWarning().log("Agent is not connected");
+            return "Agent is not connected";
         }
 
         final Number bundleIdNum = (Number) args.get("bundleId");
         if (bundleIdNum == null) {
-            return "Error: bundleId is required";
+            return "'bundleId' is required";
         }
         final long bundleId = bundleIdNum.longValue();
 
         final String className = (String) args.get("className");
         if (className == null || className.trim().isEmpty()) {
-            return "Error: className is required";
+            return "'className' is required";
         }
 
         final Boolean useClassloaderBool = (Boolean) args.get("useClassloader");
@@ -74,21 +86,28 @@ public final class DecompileClassTool implements McpTool {
 
         try {
             if (useClassloader) {
+                logger.atInfo().log("Retrieving class bytes for '%s' using classloader from bundle %d", className,
+                        bundleId);
                 classBytes = agent.getBundleResourceBytes(bundleId, classPath);
             } else {
+                logger.atInfo().log("Retrieving class bytes for '%s' from bundle %d entry", className, bundleId);
                 classBytes = agent.getBundleEntryBytes(bundleId, classPath);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("Error retrieving class bytes from remote agent: %s", e.getMessage());
             return "Error retrieving class bytes from remote agent: " + e.getMessage();
         }
 
         if (classBytes == null) {
-            return "Error: Class not found in bundle " + bundleId + " at path " + classPath;
+            logger.atWarning().log("Class '%s' not found in bundle %d at path '%s'", className, bundleId, classPath);
+            return "Class '" + className + "' not found in bundle " + bundleId + " at path '" + classPath + "'";
         }
 
         try {
+            logger.atInfo().log("Decompiling class '%s' (%d bytes)", className, classBytes.length);
             return decompiler.decompile(classBytes, className);
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("Error decompiling class '%s': %s", className, e.getMessage());
             return "Error decompiling class: " + e.getMessage();
         }
     }

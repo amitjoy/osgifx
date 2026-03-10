@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_gogo_commands", description = "Lists all available Gogo shell commands across all scopes. Use this to discover what commands can be run via 'run_gogo_command'.")
 public class GetGogoCommandsTool implements McpTool {
 

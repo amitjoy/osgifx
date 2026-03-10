@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_threads", description = "Lists all active JVM threads with their current state, priority, and stack trace. Use this to diagnose deadlocks or high CPU usage.")
 public class GetThreadsTool implements McpTool {
 

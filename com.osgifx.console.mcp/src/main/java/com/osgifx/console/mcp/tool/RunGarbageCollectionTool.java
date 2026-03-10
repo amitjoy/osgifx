@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "run_garbage_collection", description = "Triggers a System.gc() on the remote JVM. Use this before checking heap usage to get accurate metrics.")
 public class RunGarbageCollectionTool implements McpTool {
 
