@@ -80,6 +80,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
+    private final ThreadLocal<DataOutputStream>          encodingOut     = ThreadLocal
+            .withInitial(() -> new DataOutputStream(buffer.get()));
     private final Map<String, Method>                    methodCache     = new HashMap<>();
     private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
     private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
@@ -418,10 +420,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     final FastByteArrayOutputStream bout = buffer.get();
                     bout.reset();
                     // Adaptive Compression: Serialize first, then decide
-                    // We use a temporary DataOutputStream wrapper around the buffer
-                    try (DataOutputStream dataOut = new DataOutputStream(bout)) {
-                        codec.encode(value, dataOut);
-                    }
+                    // We use a cached DataOutputStream wrapper around the buffer
+                    final DataOutputStream dataOut = encodingOut.get();
+                    codec.encode(value, dataOut);
+
                     final int    length    = bout.size();
                     final byte[] rawBuffer = bout.getBuffer();
 
@@ -454,8 +456,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                         out.write(rawBuffer, 0, length);
                     }
 
-                    if (length > 1024 * 1024)
+                    if (length > 1024 * 1024) {
                         buffer.set(new FastByteArrayOutputStream(4096));
+                        encodingOut.set(new DataOutputStream(buffer.get()));
+                    }
                 }
             }
             out.flush();

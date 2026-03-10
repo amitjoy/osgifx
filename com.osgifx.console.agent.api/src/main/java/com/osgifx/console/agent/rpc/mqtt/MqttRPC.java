@@ -90,8 +90,12 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
+    private final ThreadLocal<DataOutputStream>          bufferOut       = ThreadLocal
+            .withInitial(() -> new DataOutputStream(buffer.get()));
     private final ThreadLocal<FastByteArrayOutputStream> argBuffer       = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(1024));
+    private final ThreadLocal<DataOutputStream>          argBufferOut    = ThreadLocal
+            .withInitial(() -> new DataOutputStream(argBuffer.get()));
     private final Map<String, Method>                    methodCache     = new HashMap<>();
     private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
     private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
@@ -299,16 +303,20 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                 for (Object arg : args) {
                     final FastByteArrayOutputStream argBout = argBuffer.get();
                     argBout.reset();
-                    try (DataOutputStream argOut = new DataOutputStream(argBout)) {
-                        try {
-                            codec.encode(arg, argOut);
-                        } catch (Exception e) {
-                            throw new IOException(e);
-                        }
+                    final DataOutputStream argOut = argBufferOut.get();
+                    try {
+                        codec.encode(arg, argOut);
+                    } catch (Exception e) {
+                        throw new IOException(e);
                     }
                     int argLen = argBout.size();
                     out.writeInt(argLen);
                     out.write(argBout.getBuffer(), 0, argLen);
+
+                    if (argLen > 1024 * 1024) {
+                        argBuffer.set(new FastByteArrayOutputStream(1024));
+                        argBufferOut.set(new DataOutputStream(argBuffer.get()));
+                    }
                 }
             } else {
                 out.writeShort(0);
@@ -320,9 +328,9 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                                       IOConsumer<DataOutputStream> writer) throws IOException {
         // 1. Write to buffer uncompressed first
         bout.reset();
-        try (DataOutputStream out = new DataOutputStream(bout)) {
-            writer.accept(out);
-        }
+        final DataOutputStream out = bufferOut.get();
+        writer.accept(out);
+
         int rawLength = bout.size();
 
         // 2. Decide whether to compress using adaptive threshold
@@ -357,6 +365,11 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         // Return a copy of raw data (since buffer will be reused)
         byte[] result = new byte[rawLength];
         System.arraycopy(bout.getBuffer(), 0, result, 0, rawLength);
+
+        if (rawLength > 1024 * 1024) {
+            buffer.set(new FastByteArrayOutputStream(4096));
+            bufferOut.set(new DataOutputStream(buffer.get()));
+        }
         return result;
     }
 
