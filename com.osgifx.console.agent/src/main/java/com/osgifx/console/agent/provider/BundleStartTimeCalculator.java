@@ -23,11 +23,10 @@ import static org.osgi.framework.Constants.SYSTEM_BUNDLE_ID;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -65,8 +64,7 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
         }
     }
 
-    private final ReentrantLock        lock              = new ReentrantLock();
-    private final Map<Long, StartTime> bundleToStartTime = new HashMap<>();
+    private final Map<Long, StartTime> bundleToStartTime = new ConcurrentHashMap<>();
     private final Clock                clock             = Clock.systemUTC();
     private final long                 ourBundleId;
 
@@ -86,35 +84,24 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
             return;
         }
 
-        lock.lock();
-        try {
-            switch (event.getType()) {
-                case STARTING:
-                    bundleToStartTime.put(bundle.getBundleId(),
-                            new StartTime(bundle.getSymbolicName(), clock.millis()));
-                    break;
-                case STARTED:
-                    final StartTime startTime = bundleToStartTime.get(bundle.getBundleId());
-                    if (startTime == null) {
-                        return;
-                    }
-                    startTime.started(clock.millis());
-                    break;
-                default:
-                    break;
-            }
-        } finally {
-            lock.unlock();
+        switch (event.getType()) {
+            case STARTING:
+                bundleToStartTime.put(bundle.getBundleId(), new StartTime(bundle.getSymbolicName(), clock.millis()));
+                break;
+            case STARTED:
+                final StartTime startTime = bundleToStartTime.get(bundle.getBundleId());
+                if (startTime == null) {
+                    return;
+                }
+                startTime.started(clock.millis());
+                break;
+            default:
+                break;
         }
     }
 
     public List<BundleStartDuration> getBundleStartDurations() {
-        lock.lock();
-        try {
-            return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
-        } finally {
-            lock.unlock();
-        }
+        return bundleToStartTime.values().stream().map(StartTime::toBundleStartDuration).collect(toList());
     }
 
     public Optional<BundleStartDuration> getBundleStartDuration(long bundleId) {
@@ -122,9 +109,9 @@ public final class BundleStartTimeCalculator implements SynchronousBundleListene
     }
 
     static class StartTime {
-        private final String bundleSymbolicName;
-        private final long   startingTimestamp;
-        private long         startedTimestamp;
+        private final String  bundleSymbolicName;
+        private final long    startingTimestamp;
+        private volatile long startedTimestamp;
 
         public StartTime(final String bundleSymbolicName, final long startingTimestamp) {
             this.bundleSymbolicName = bundleSymbolicName;
