@@ -33,7 +33,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "update_logger_context", description = "Updates the Logger Context for a bundle (BSN) with a map of logger names to log levels.")
 public class UpdateLoggerContextTool implements McpTool {
 

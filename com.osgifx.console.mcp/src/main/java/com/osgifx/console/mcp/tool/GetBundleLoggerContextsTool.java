@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_logger_contexts", description = "Lists the Logger Context configuration for bundles, showing effective log levels.")
 public class GetBundleLoggerContextsTool implements McpTool {
 

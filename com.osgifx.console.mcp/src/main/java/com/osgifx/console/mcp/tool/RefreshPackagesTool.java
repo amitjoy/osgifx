@@ -12,13 +12,12 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************/
+ *******************************************************************************/
 package com.osgifx.console.mcp.tool;
 
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.eclipse.fx.core.log.FluentLogger;
@@ -33,8 +32,8 @@ import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
 @Component
-@McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
-public class GetRolesTool implements McpTool {
+@McpToolDef(name = "refresh_packages", description = "Refreshes the framework wiring (package refresh).")
+public class RefreshPackagesTool implements McpTool {
 
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
@@ -54,14 +53,13 @@ public class GetRolesTool implements McpTool {
 
     @Override
     public Object execute(final Map<String, Object> args) throws Exception {
-        logger.atInfo().log("Executing GetRolesTool");
+        logger.atInfo().log("Executing RefreshPackagesTool");
         final var agent = supervisor.getAgent();
         if (agent == null) {
             logger.atWarning().log("Agent is not connected");
-            return Collections.emptyList();
+            return "Agent is not connected";
         }
-        final var roles = agent.getAllRoles();
-        logger.atInfo().log("Retrieved roles: %s", roles.size());
-        return roles;
+        agent.refresh();
+        return "Packages refreshed successfully";
     }
 }
