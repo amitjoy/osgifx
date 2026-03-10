@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_bundles", description = "Lists all installed OSGi bundles with their state, version, and ID. Use this to verify which bundles are active or resolved.")
 public class GetBundlesTool implements McpTool {
 
