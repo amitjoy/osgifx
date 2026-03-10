@@ -46,21 +46,23 @@ public final class XThreadAdmin {
         try {
             final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
             final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
-            return threadList.stream().map(this::toDTO).collect(toList());
+            final long[]                           deadlocks  = getDeadlockedThreads();
+
+            return threadList.stream().map(t -> toDTO(t, deadlocks)).collect(toList());
         } catch (final Exception e) {
             logger.atError().msg("Error occurred while retrieving threads").throwable(e).log();
             return Collections.emptyList();
         }
     }
 
-    private XThreadDTO toDTO(final Thread thread) {
+    private XThreadDTO toDTO(final Thread thread, final long[] deadlocks) {
         final XThreadDTO dto = new XThreadDTO();
 
         dto.name          = thread.getName();
         dto.id            = thread.getId();
         dto.priority      = thread.getPriority();
         dto.state         = thread.getState().name();
-        dto.isDeadlocked  = isDeadlocked(thread.getId());
+        dto.isDeadlocked  = isDeadlocked(thread.getId(), deadlocks);
         dto.isInterrupted = thread.isInterrupted();
         dto.isAlive       = thread.isAlive();
         dto.isDaemon      = thread.isDaemon();
@@ -68,18 +70,21 @@ public final class XThreadAdmin {
         return dto;
     }
 
-    private boolean isDeadlocked(final long id) {
+    private boolean isDeadlocked(final long id, final long[] deadlocks) {
+        if (deadlocks == null) {
+            return false;
+        }
+        return Arrays.stream(deadlocks).anyMatch(e -> e == id);
+    }
+
+    private long[] getDeadlockedThreads() {
         final boolean isJmxWired = wirings.isJmxWired();
         if (isJmxWired) {
-            final ThreadMXBean bean      = ManagementFactory.getThreadMXBean();
-            final long[]       deadlocks = bean.findDeadlockedThreads();
-            if (deadlocks == null) {
-                return false;
-            }
-            return Arrays.stream(deadlocks).anyMatch(e -> e == id);
+            final ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+            return bean.findDeadlockedThreads();
         }
-        logger.atDebug().msg("JMX unavailable to check if thread [id: '%s'] is deadlocked").arg(id).log();
-        return false;
+        logger.atDebug().msg("JMX unavailable to check for deadlocked threads").log();
+        return null;
     }
 
 }
