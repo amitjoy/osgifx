@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_heap_usage", description = "Returns the current JVM heap memory usage statistics (used, committed, max).")
 public class GetHeapUsageTool implements McpTool {
 

@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_bundle_revisions", description = "Retrieves detailed revision info (Import/Export Packages, capabilities) for a bundle. Critical for debugging wiring issues.")
 public class GetBundleRevisionsTool implements McpTool {
 

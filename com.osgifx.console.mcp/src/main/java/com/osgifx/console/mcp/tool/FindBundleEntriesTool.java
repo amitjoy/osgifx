@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "find_bundle_entries", description = "Finds files strictly inside the bundle (and its attached fragments)")
 public class FindBundleEntriesTool implements McpTool {
 

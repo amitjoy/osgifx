@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "execute_agent_extension", description = "Executes a named Agent Extension with a context map. Allows triggering arbitrary custom logic.")
 public class ExecuteAgentExtensionTool implements McpTool {
 

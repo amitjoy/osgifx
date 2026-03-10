@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "read_dmt_node", description = "Reads the value and metadata of a specific node in the Device Management Tree (DMT).")
 public class ReadDmtNodeTool implements McpTool {
 
