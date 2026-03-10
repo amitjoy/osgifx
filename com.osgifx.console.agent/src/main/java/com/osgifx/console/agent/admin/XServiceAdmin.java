@@ -65,16 +65,26 @@ public final class XServiceAdmin {
                 @Override
                 public Future<?> addingService(final ServiceReference<Object> reference) {
                     return executor.submit(() -> {
+                        if (Thread.currentThread().isInterrupted() || reference.getBundle() == null) {
+                            return;
+                        }
                         final XServiceDTO dto = toDTO(reference);
-                        services.put(dto.id, dto);
+                        if (reference.getBundle() != null) {
+                            services.put(dto.id, dto);
+                        }
                     });
                 }
 
                 @Override
                 public void modifiedService(final ServiceReference<Object> reference, final Future<?> future) {
                     executor.submit(() -> {
+                        if (Thread.currentThread().isInterrupted() || reference.getBundle() == null) {
+                            return;
+                        }
                         final XServiceDTO dto = toDTO(reference);
-                        services.put(dto.id, dto);
+                        if (reference.getBundle() != null) {
+                            services.put(dto.id, dto);
+                        }
                     });
                 }
 
