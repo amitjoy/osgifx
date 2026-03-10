@@ -92,6 +92,7 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 | **`list_gogo_commands`** | Lists all available Gogo shell commands across all scopes. |
 | **`get_framework_info`** | Retrieves the full OSGi Core Framework DTO, providing a hierarchical view of the system state. |
 | **`decompile_class`** | Decompiles a Java class from a remote OSGi bundle, returning its source code. |
+| **`refresh_packages`** | Refreshes the framework wiring (package refresh). |
 
 ## System Prompt / Guiding Principles
 
