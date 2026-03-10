@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_bundle_data_file", description = "Retrieves the content of a file from a bundle's persistent storage area")
 public class GetBundleDataFileTool implements McpTool {
 

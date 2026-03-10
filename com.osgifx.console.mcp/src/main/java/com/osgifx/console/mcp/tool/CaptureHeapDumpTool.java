@@ -31,7 +31,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "capture_heap_dump", description = "Captures a HPROF heap dump from the remote JVM. Returns the binary dump as a Base64 encoded string. WARNING: This can be very large.")
 public class CaptureHeapDumpTool implements McpTool {
 

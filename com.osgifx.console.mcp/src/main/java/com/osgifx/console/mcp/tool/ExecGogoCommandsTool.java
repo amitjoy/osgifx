@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "run_gogo_command", description = "Executes a raw Gogo shell command. STRICTLY RESERVED for advanced diagnostics or when no specific tool exists. State-changing commands are blocked.")
 public class ExecGogoCommandsTool implements McpTool {
 

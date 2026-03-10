@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_user_admin_roles", description = "Lists all configured user roles and permissions from the UserAdmin service.")
 public class GetRolesTool implements McpTool {
 

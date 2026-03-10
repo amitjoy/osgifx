@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_system_properties", description = "Retrieves the full set of Java System Properties (System.getProperties()) and OSGi framework properties. Use this to check environment flags (e.g. java.version, osgi.org).")
 public class GetPropertiesTool implements McpTool {
 

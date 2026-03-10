@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_http_components", description = "Lists all registered HTTP servlets, resources, filters, and error pages. Use this to debug 404s or endpoint availability.")
 public class GetHttpComponentsTool implements McpTool {
 

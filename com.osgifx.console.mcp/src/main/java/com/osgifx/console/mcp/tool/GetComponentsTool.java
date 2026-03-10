@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "list_components", description = "Lists all Declarative Services (DS) components with their satisfaction state. Use this to debug why a component is not active or unsatisfied.")
 public class GetComponentsTool implements McpTool {
 

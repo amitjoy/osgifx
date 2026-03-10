@@ -32,7 +32,7 @@ import com.osgifx.console.mcp.McpToolSchema;
 import com.osgifx.console.propertytypes.McpToolDef;
 import com.osgifx.console.supervisor.Supervisor;
 
-@Component(service = McpTool.class)
+@Component
 @McpToolDef(name = "get_bundle_headers", description = "Retrieves the manifest headers for a specific bundle ID.")
 public class GetBundleHeadersTool implements McpTool {
 
