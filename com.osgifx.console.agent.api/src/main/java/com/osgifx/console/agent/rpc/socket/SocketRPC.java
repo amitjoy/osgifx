@@ -82,7 +82,6 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             .withInitial(() -> new FastByteArrayOutputStream(4096));
     private final ThreadLocal<DataOutputStream>          encodingOut     = ThreadLocal
             .withInitial(() -> new DataOutputStream(buffer.get()));
-    private final Map<String, Method>                    methodCache     = new HashMap<>();
     private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
     private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
     private final ThreadLocal<Object[]>                  parameterBuffer = ThreadLocal.withInitial(() -> new Object[8]);
@@ -203,7 +202,6 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
                 // Intern method name to reduce memory footprint
                 String internedName = m.getName().intern();
-                methodCache.put(internedName + "#" + m.getParameterTypes().length, m);
                 methodKeyCache.put(new MethodKey(internedName, m.getParameterTypes().length), m);
                 // Cache method signatures
                 parameterTypeCache.put(m, m.getParameterTypes());
@@ -356,12 +354,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         // Use ThreadLocal MethodKey for zero-allocation lookup
         MethodKey key = methodKeyHolder.get();
         key.set(cmd, count);
-        Method m = methodKeyCache.get(key);
-        if (m != null) {
-            return m;
-        }
-        // Fallback to old cache
-        return methodCache.get(cmd + "#" + count);
+        return methodKeyCache.get(key);
     }
 
     private boolean isLz4(byte[] bytes) {
