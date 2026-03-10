@@ -328,11 +328,8 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
         // 2. Decide whether to compress using adaptive threshold
         final int threshold = compressionThreshold.get();
         if (rawLength >= threshold) {
-            byte[] rawData = new byte[rawLength];
-            System.arraycopy(bout.getBuffer(), 0, rawData, 0, rawLength);
-
             // LZ4 compression - use Lz4Codec directly
-            byte[] compressed = Lz4Codec.compress(rawData, 0, rawLength);
+            byte[] compressed = Lz4Codec.compress(bout.getBuffer(), 0, rawLength);
 
             // Lz4Codec returns uncompressed data if compression doesn't help
             // Check if actually compressed by comparing sizes
