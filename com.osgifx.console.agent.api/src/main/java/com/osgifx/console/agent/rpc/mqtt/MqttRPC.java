@@ -96,7 +96,6 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             .withInitial(() -> new FastByteArrayOutputStream(1024));
     private final ThreadLocal<DataOutputStream>          argBufferOut    = ThreadLocal
             .withInitial(() -> new DataOutputStream(argBuffer.get()));
-    private final Map<String, Method>                    methodCache     = new HashMap<>();
     private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
     private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
     private final ThreadLocal<Object[]>                  parameterBuffer = ThreadLocal.withInitial(() -> new Object[8]);
@@ -151,7 +150,6 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
                 // Intern method name to reduce memory footprint
                 String internedName = m.getName().intern();
-                methodCache.put(internedName + "#" + m.getParameterTypes().length, m);
                 methodKeyCache.put(new MethodKey(internedName, m.getParameterTypes().length), m);
                 // Cache method signatures
                 parameterTypeCache.put(m, m.getParameterTypes());
@@ -452,10 +450,6 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             MethodKey key = methodKeyHolder.get();
             key.set(methodName, rawArgs.size());
             Method m = methodKeyCache.get(key);
-            if (m == null) {
-                // Fallback to old cache
-                m = methodCache.get(methodName + "#" + rawArgs.size());
-            }
             if (m != null) {
                 // Fast-path for zero-argument methods
                 if (rawArgs.size() == 0) {
