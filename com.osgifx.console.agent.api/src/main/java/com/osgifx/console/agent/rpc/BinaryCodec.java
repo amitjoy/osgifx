@@ -429,22 +429,23 @@ public class BinaryCodec {
                                     + "This may indicate a collection bomb attack or an unexpectedly large collection.",
                             size, MAX_COLLECTION_SIZE));
                 }
-                List<Object> list     = new ArrayList<>(size);
-                Type         compType = Object.class;
+                Type compType = Object.class;
                 if (type instanceof ParameterizedType)
                     compType = ((ParameterizedType) type).getActualTypeArguments()[0];
                 else if (rawClass.isArray())
                     compType = rawClass.getComponentType();
 
-                for (int i = 0; i < size; i++)
-                    list.add(decode(in, compType));
-
                 if (rawClass.isArray()) {
                     Object arr = Array.newInstance((Class<?>) compType, size);
                     for (int i = 0; i < size; i++)
-                        Array.set(arr, i, list.get(i));
+                        Array.set(arr, i, decode(in, compType));
                     return arr;
                 }
+
+                List<Object> list = new ArrayList<>(size);
+                for (int i = 0; i < size; i++)
+                    list.add(decode(in, compType));
+
                 if (Set.class.isAssignableFrom(rawClass))
                     return new LinkedHashSet<>(list);
                 return list;
