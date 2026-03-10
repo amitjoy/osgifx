@@ -32,6 +32,7 @@ public final class Lz4Codec {
     // ThreadLocal instances for thread-safe reuse
     private static final ThreadLocal<Lz4Compressor>   COMPRESSOR   = ThreadLocal.withInitial(Lz4Compressor::new);
     private static final ThreadLocal<Lz4Decompressor> DECOMPRESSOR = ThreadLocal.withInitial(Lz4Decompressor::new);
+    private static final ThreadLocal<byte[]>          COMPRESS_BUF = ThreadLocal.withInitial(() -> new byte[65536]);
 
     private Lz4Codec() {
     }
@@ -59,7 +60,12 @@ public final class Lz4Codec {
         try {
             Lz4Compressor compressor          = COMPRESSOR.get();
             int           maxCompressedLength = compressor.maxCompressedLength(length);
-            byte[]        compressed          = new byte[maxCompressedLength];
+            byte[]        compressed          = COMPRESS_BUF.get();
+
+            if (compressed.length < maxCompressedLength) {
+                compressed = new byte[maxCompressedLength];
+                COMPRESS_BUF.set(compressed);
+            }
 
             int compressedSize = compressor.compress(data, offset, length, compressed, 0, maxCompressedLength);
 
@@ -67,6 +73,10 @@ public final class Lz4Codec {
             if (compressedSize < length) {
                 byte[] result = new byte[compressedSize];
                 System.arraycopy(compressed, 0, result, 0, compressedSize);
+
+                if (maxCompressedLength > 1024 * 1024) {
+                    COMPRESS_BUF.remove();
+                }
                 return result;
             }
 
