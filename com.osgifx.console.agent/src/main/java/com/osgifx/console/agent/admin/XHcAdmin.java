@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
 import org.apache.felix.hc.api.HealthCheck;
@@ -42,39 +43,87 @@ import org.apache.felix.hc.api.execution.HealthCheckSelector;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO;
 import com.osgifx.console.agent.dto.XHealthCheckResultDTO.ResultDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import aQute.bnd.exceptions.Exceptions;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XHcAdmin {
+@Singleton
+public final class XHcAdmin extends AbstractSnapshotAdmin<XHealthCheckDTO> {
 
-    private final BundleContext    context;
-    private final Supplier<Object> felixHcExecutorSupplier;
-    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                      context;
+    private final Supplier<Object>                   felixHcExecutorSupplier;
+    private ServiceTracker<HealthCheck, HealthCheck> hcTracker;
 
     @Inject
-    public XHcAdmin(final BundleContext context, final Supplier<Object> felixHcExecutorSupplier) {
+    public XHcAdmin(final BundleContext context,
+                    final BinaryCodec codec,
+                    final SnapshotDecoder decoder,
+                    final Supplier<Object> felixHcExecutorSupplier,
+                    final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.context                 = context;
         this.felixHcExecutorSupplier = felixHcExecutorSupplier;
     }
 
-    public List<XHealthCheckDTO> getHealthchecks() {
+    public void init() {
+        hcTracker = new ServiceTracker<HealthCheck, HealthCheck>(context, HealthCheck.class, null) {
+            @Override
+            public HealthCheck addingService(final ServiceReference<HealthCheck> reference) {
+                final HealthCheck service = super.addingService(reference);
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+                return service;
+            }
+
+            @Override
+            public void modifiedService(ServiceReference<HealthCheck> reference, HealthCheck service) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+            }
+
+            @Override
+            public void removedService(final ServiceReference<HealthCheck> reference, final HealthCheck service) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+                super.removedService(reference, service);
+            }
+        };
+        hcTracker.open();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (hcTracker != null) {
+            hcTracker.close();
+        }
+    }
+
+    @Override
+    protected List<XHealthCheckDTO> map() throws Exception {
         if (context == null) {
-            logger.atWarn().msg("Bundle context is null").log();
+            return null;
+        }
+        return findAllHealthChecks();
+    }
+
+    @Override
+    public List<XHealthCheckDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
             return Collections.emptyList();
         }
         try {
-            return findAllHealthChecks();
+            return decoder.decodeList(current, XHealthCheckDTO.class);
         } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving health checks").throwable(e).log();
+            logger.atError().msg("Failed to decode health check snapshot").throwable(e).log();
             return Collections.emptyList();
         }
     }

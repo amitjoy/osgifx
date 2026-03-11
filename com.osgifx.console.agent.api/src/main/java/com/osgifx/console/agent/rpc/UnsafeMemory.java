@@ -95,8 +95,13 @@ public final class UnsafeMemory {
 
     static {
         try {
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field    f           = unsafeClass.getDeclaredField("theUnsafe");
+            Class<?> unsafeClass = null;
+            try {
+                unsafeClass = Class.forName("sun.misc.Unsafe");
+            } catch (ClassNotFoundException e) {
+                unsafeClass = Class.forName("sun.misc.Unsafe", true, null);
+            }
+            Field f = unsafeClass.getDeclaredField("theUnsafe");
             f.setAccessible(true);
             Object unsafe = f.get(null);
 

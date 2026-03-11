@@ -32,51 +32,94 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.useradmin.Group;
 import org.osgi.service.useradmin.Role;
 import org.osgi.service.useradmin.User;
 import org.osgi.service.useradmin.UserAdmin;
+import org.osgi.service.useradmin.UserAdminEvent;
+import org.osgi.service.useradmin.UserAdminListener;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.helper.AgentHelper;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XUserAdmin {
+@Singleton
+public final class XUserAdmin extends AbstractSnapshotAdmin<XRoleDTO> implements UserAdminListener {
 
-    private final Supplier<Object> userAdminSupplier;
-    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                    context;
+    private final Supplier<Object>                 userAdminSupplier;
+    private ServiceRegistration<UserAdminListener> registration;
 
     @Inject
-    public XUserAdmin(final Supplier<Object> userAdminSupplier) {
+    public XUserAdmin(final BundleContext context,
+                      final Supplier<Object> userAdminSupplier,
+                      final BinaryCodec codec,
+                      final SnapshotDecoder decoder,
+                      final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context           = context;
         this.userAdminSupplier = userAdminSupplier;
     }
 
-    public List<XRoleDTO> getRoles() {
+    public void init() {
+        if (registration == null) {
+            registration = context.registerService(UserAdminListener.class, this, null);
+        }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (registration != null) {
+            registration.unregister();
+            registration = null;
+        }
+    }
+
+    @Override
+    public void roleChanged(final UserAdminEvent event) {
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
+    }
+
+    @Override
+    public List<XRoleDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return new ArrayList<>();
+        }
+        try {
+            return decoder.decodeList(current, XRoleDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode user snapshot").throwable(e).log();
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    protected List<XRoleDTO> map() throws Exception {
         final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
             logger.atWarn().msg("UserAdmin is unavailable").log();
             return Collections.emptyList();
         }
-        final List<XRoleDTO> dtos = new ArrayList<>();
-        try {
-            final Role[] roles = userAdmin.getRoles(null);
-            if (roles != null) {
-                for (final Role role : roles) {
-                    dtos.add(toRole(role, new HashSet<>()));
-                }
+        final List<XRoleDTO> dtos  = new ArrayList<>();
+        final Role[]         roles = userAdmin.getRoles(null);
+        if (roles != null) {
+            for (final Role role : roles) {
+                dtos.add(toRole(role, new HashSet<>()));
             }
-        } catch (final Exception e) {
-            // for any exception occurs in remote runtime
-            logger.atError().msg("Error occurred while retrieving users").throwable(e).log();
-            return Collections.emptyList();
         }
         return dtos;
     }
@@ -89,6 +132,7 @@ public final class XUserAdmin {
         }
         final Role role = userAdmin.createRole(name, getType(type));
         if (role != null) {
+            invalidate();
             return createResult(SUCCESS, "The role '" + name + "' has been created successfully");
         }
         return createResult(ERROR, "The role '" + name + "' could not be created");
@@ -167,6 +211,7 @@ public final class XUserAdmin {
                     });
                 }
             }
+            invalidate();
             return createResult(SUCCESS, "The role '" + roleDTO.name + "' has been updated successfully");
         } catch (final Exception e) {
             return createResult(ERROR, "The role '" + roleDTO.name + "' could not be updated");
@@ -200,6 +245,9 @@ public final class XUserAdmin {
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final boolean isRemoved = userAdmin.removeRole(name);
+        if (isRemoved) {
+            invalidate();
+        }
         return isRemoved ? createResult(SUCCESS, "The role '" + name + "' has been removed successfully")
                 : createResult(ERROR, "The role '" + name + "' could not be removed");
     }

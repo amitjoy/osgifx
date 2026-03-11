@@ -15,7 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
-import com.osgifx.console.agent.spi.LargePayloadHandler;
+import com.osgifx.console.agent.spi.payload.LargePayloadHandler;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;

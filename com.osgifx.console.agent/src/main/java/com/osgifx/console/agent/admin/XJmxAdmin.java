@@ -38,6 +38,9 @@ import com.osgifx.console.agent.dto.XHeapUsageDTO.XGarbageCollectorMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryPoolMXBean;
 import com.osgifx.console.agent.dto.XHeapUsageDTO.XMemoryUsage;
 
+import jakarta.inject.Singleton;
+
+@Singleton
 public final class XJmxAdmin {
 
     private static final String        HOTSPOT_BEAN_NAME = "com.sun.management:type=HotSpotDiagnostic";

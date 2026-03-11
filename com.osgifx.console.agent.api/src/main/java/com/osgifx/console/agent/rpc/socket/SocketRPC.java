@@ -51,13 +51,13 @@ import org.osgi.framework.BundleContext;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
-import com.osgifx.console.agent.rpc.BinaryCodec;
-import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
-import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
-import com.osgifx.console.agent.rpc.Lz4Codec;
 import com.osgifx.console.agent.rpc.Lz4InputStream;
 import com.osgifx.console.agent.rpc.MethodKey;
 import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec.FastByteArrayInputStream;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec.FastByteArrayOutputStream;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
 
 import aQute.bnd.exceptions.Exceptions;
 

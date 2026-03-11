@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.extension;
+package com.osgifx.console.agent.spi.extension;
 
 import org.osgi.dto.DTO;
 

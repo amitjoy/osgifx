@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static java.util.function.Function.identity;
 import static org.osgi.framework.Bundle.ACTIVE;
 import static org.osgi.framework.Bundle.INSTALLED;
 import static org.osgi.framework.Bundle.RESOLVED;
@@ -43,14 +42,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -77,35 +75,37 @@ import com.osgifx.console.agent.dto.XPackageType;
 import com.osgifx.console.agent.dto.XServiceInfoDTO;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator.BundleStartDuration;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import aQute.lib.io.IO;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XBundleAdmin {
+@Singleton
+public final class XBundleAdmin extends AbstractSnapshotAdmin<XBundleDTO> {
 
-    private final Map<Long, XBundleDTO>       bundles = new ConcurrentHashMap<>();
-    private final BundleContext               context;
-    private final BundleStartTimeCalculator   bundleStartTimeCalculator;
-    private BundleTracker<Future<?>>          bundleTracker;
-    private ServiceTracker<Object, Future<?>> serviceTracker;
-    private ExecutorService                   executor;
+    private final BundleContext             context;
+    private final BundleStartTimeCalculator bundleStartTimeCalculator;
+    private BundleTracker<Object>           bundleTracker;
+    private ServiceTracker<Object, Object>  serviceTracker;
 
     // Framework start level cached once; updated via FrameworkListener on STARTLEVEL_CHANGED
     private volatile int      cachedFrameworkStartLevel = -1;
     private FrameworkListener frameworkStartLevelListener;
 
-    // Inverted index: serviceId -> set of bundleIds that registered or use that service
-    private final Map<Long, Set<Long>> serviceToBundleIds = new ConcurrentHashMap<>();
-
-    private static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
+    protected static final FluentLogger logger = LoggerFactory.getFluentLogger(XBundleAdmin.class);
 
     @Inject
     public XBundleAdmin(final BundleContext context,
                         final BundleStartTimeCalculator bundleStartTimeCalculator,
-                        final ExecutorService executor) {
+                        final BinaryCodec codec,
+                        final SnapshotDecoder decoder,
+                        final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
-        this.executor                  = executor;
         // Prime the cache immediately so the first DTO creation never falls back to -1
         this.cachedFrameworkStartLevel = readFrameworkStartLevel();
     }
@@ -115,59 +115,61 @@ public final class XBundleAdmin {
         frameworkStartLevelListener = event -> {
             if (event.getType() == STARTLEVEL_CHANGED) {
                 cachedFrameworkStartLevel = readFrameworkStartLevel();
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
             }
         };
         context.addFrameworkListener(frameworkStartLevelListener);
 
-        bundleTracker = new BundleTracker<Future<?>>(context,
-                                                     Bundle.INSTALLED | Bundle.RESOLVED | Bundle.STARTING
-                                                             | Bundle.ACTIVE | Bundle.STOPPING | Bundle.UNINSTALLED,
-                                                     null) {
+        bundleTracker = new BundleTracker<Object>(context, Bundle.INSTALLED | Bundle.RESOLVED | Bundle.STARTING
+                | Bundle.ACTIVE | Bundle.STOPPING | Bundle.UNINSTALLED, null) {
             @Override
-            public Future<?> addingBundle(final Bundle bundle, final BundleEvent event) {
-                return executor.submit(() -> processBundleSafely(bundle));
+            public Object addingBundle(final Bundle bundle, final BundleEvent event) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+                return new Object();
             }
 
             @Override
-            public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Future<?> object) {
-                executor.submit(() -> processBundleSafely(bundle));
+            public void modifiedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
             }
 
             @Override
-            public void removedBundle(final Bundle bundle, final BundleEvent event, final Future<?> object) {
-                if (object != null && !object.isDone()) {
-                    object.cancel(true);
-                }
-                bundles.remove(bundle.getBundleId());
+            public void removedBundle(final Bundle bundle, final BundleEvent event, final Object object) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
             }
         };
         bundleTracker.open();
 
         try {
-            serviceTracker = new ServiceTracker<Object, Future<?>>(context, context.createFilter("(objectClass=*)"),
-                                                                   null) {
+            serviceTracker = new ServiceTracker<Object, Object>(context, context.createFilter("(objectClass=*)"),
+                                                                null) {
                 @Override
-                public Future<?> addingService(final ServiceReference<Object> reference) {
-                    return executor.submit(() -> handleServiceChange(reference));
+                public Object addingService(final ServiceReference<Object> reference) {
+                    scheduleUpdate(pendingChangeCount.incrementAndGet());
+                    return new Object();
                 }
 
                 @Override
-                public void modifiedService(final ServiceReference<Object> reference, final Future<?> object) {
-                    executor.submit(() -> handleServiceChange(reference));
+                public void modifiedService(final ServiceReference<Object> reference, final Object object) {
+                    scheduleUpdate(pendingChangeCount.incrementAndGet());
                 }
 
                 @Override
-                public void removedService(final ServiceReference<Object> reference, final Future<?> object) {
-                    executor.submit(() -> handleServiceRemoval(reference));
+                public void removedService(final ServiceReference<Object> reference, final Object object) {
+                    scheduleUpdate(pendingChangeCount.incrementAndGet());
                 }
             };
             serviceTracker.open();
         } catch (final Exception e) {
             logger.atError().msg("Error occurred while initializing service tracker").throwable(e).log();
         }
+        // Trigger initial snapshot
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
     }
 
+    @Override
     public void stop() {
+        super.stop();
         if (frameworkStartLevelListener != null) {
             context.removeFrameworkListener(frameworkStartLevelListener);
         }
@@ -179,64 +181,59 @@ public final class XBundleAdmin {
         }
     }
 
-    private void processBundleSafely(final Bundle bundle) {
-        try {
-            final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator, cachedFrameworkStartLevel);
-            bundles.put(bundle.getBundleId(), dto);
-        } catch (final Exception e) {
-            logger.atError().msg("Error processing bundle '{}'").arg(bundle.getSymbolicName()).throwable(e).log();
+    // --- Adaptive Scheduler (Lock-Free) ---
+    @Override
+    protected List<XBundleDTO> map() throws Exception {
+        final Bundle[] allBundles = context.getBundles();
+        if (allBundles == null) {
+            return Collections.emptyList();
         }
-    }
-
-    private void handleServiceChange(final ServiceReference<Object> reference) {
-        final Long     serviceId = (Long) reference.getProperty(SERVICE_ID);
-        final Bundle   provider  = reference.getBundle();
-        final Bundle[] consumers = reference.getUsingBundles();
-
-        // Maintain inverted index while updating
-        final Set<Long> affected = new HashSet<>();
-        if (provider != null) {
-            affected.add(provider.getBundleId());
-            updateServices(provider);
-        }
-        if (consumers != null) {
-            for (final Bundle bundle : consumers) {
-                affected.add(bundle.getBundleId());
-                updateServices(bundle);
+        final List<XBundleDTO> dtos = new ArrayList<>(allBundles.length);
+        for (final Bundle bundle : allBundles) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
             }
+            dtos.add(toDTO(bundle, bundleStartTimeCalculator, cachedFrameworkStartLevel));
         }
-        serviceToBundleIds.put(serviceId, affected);
+        return dtos;
     }
 
-    private void handleServiceRemoval(final ServiceReference<Object> reference) {
-        final Long serviceId = (Long) reference.getProperty(SERVICE_ID);
-        // O(1) lookup via inverted index instead of O(N×M) full scan
-        final Set<Long> affectedBundleIds = serviceToBundleIds.remove(serviceId);
-        if (affectedBundleIds == null) {
-            return;
-        }
-        for (final long bundleId : affectedBundleIds) {
-            final Bundle bundle = context.getBundle(bundleId);
-            if (bundle != null) {
-                updateServices(bundle);
-            }
-        }
-    }
-
-    private void updateServices(final Bundle bundle) {
-        final XBundleDTO dto = bundles.get(bundle.getBundleId());
-        if (dto != null) {
-            dto.registeredServices = getRegisteredServices(bundle);
-            dto.usedServices       = getUsedServices(bundle);
-        }
-    }
-
+    @Override
     public List<XBundleDTO> get() {
         if (context == null) {
             logger.atWarn().msg("Bundle context is null").log();
             return Collections.emptyList();
         }
-        return new ArrayList<>(bundles.values());
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return decoder.decodeList(current, XBundleDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode bundle snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    public byte[] snapshot(final long bundleId) {
+        if (context == null) {
+            logger.atWarn().msg("Bundle context is null").log();
+            return new byte[0];
+        }
+        final Bundle bundle = context.getBundle(bundleId);
+        if (bundle == null) {
+            logger.atWarn().msg("Bundle with ID '{}' not found").arg(bundleId).log();
+            return new byte[0];
+        }
+        final XBundleDTO dto = toDTO(bundle, bundleStartTimeCalculator, cachedFrameworkStartLevel);
+        try {
+            final byte[] encoded = codec.encode(dto);
+            return Lz4Codec.compressWithLength(encoded);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to compress single bundle snapshot").throwable(e).log();
+            return new byte[0];
+        }
     }
 
     public List<String> findEntries(final long bundleId,
@@ -501,8 +498,7 @@ public final class XBundleAdmin {
     }
 
     private static List<XServiceInfoDTO> getUsedServices(final Bundle bundle) {
-        final List<XServiceInfoDTO> services = new ArrayList<>();
-        ServiceReference<?>[]       usedServices;
+        ServiceReference<?>[] usedServices;
         try {
             // In equinox, the following checks if a bundle is valid and if not, equinox
             // throws unchecked exception (for example, if the bundle is uninstalled)
@@ -510,11 +506,12 @@ public final class XBundleAdmin {
         } catch (final Exception e) {
             logger.atWarn().msg("Invalid state '{}' for bundle '{}'").arg(bundle.getState())
                     .arg(bundle.getSymbolicName()).log();
-            usedServices = new ServiceReference<?>[0];
-        }
-        if (usedServices == null) {
             return Collections.emptyList();
         }
+        if (usedServices == null || usedServices.length == 0) {
+            return Collections.emptyList();
+        }
+        final List<XServiceInfoDTO> services = new ArrayList<>();
         for (final ServiceReference<?> service : usedServices) {
             final String[]     objectClass = (String[]) service.getProperty(OBJECTCLASS);
             final List<String> objectClazz = Arrays.asList(objectClass);
@@ -525,8 +522,7 @@ public final class XBundleAdmin {
     }
 
     private static List<XServiceInfoDTO> getRegisteredServices(final Bundle bundle) {
-        final List<XServiceInfoDTO> services = new ArrayList<>();
-        ServiceReference<?>[]       registeredServices;
+        ServiceReference<?>[] registeredServices;
         try {
             // In equinox, the following checks if a bundle is valid and if not, equinox
             // throws unchecked exception (for example, if the bundle is uninstalled)
@@ -534,11 +530,12 @@ public final class XBundleAdmin {
         } catch (final Exception e) {
             logger.atWarn().msg("Invalid state '{}' for bundle '{}'").arg(bundle.getState())
                     .arg(bundle.getSymbolicName()).log();
-            registeredServices = new ServiceReference<?>[0];
-        }
-        if (registeredServices == null) {
             return Collections.emptyList();
         }
+        if (registeredServices == null || registeredServices.length == 0) {
+            return Collections.emptyList();
+        }
+        final List<XServiceInfoDTO> services = new ArrayList<>();
         for (final ServiceReference<?> service : registeredServices) {
             final String[]     objectClasses = (String[]) service.getProperty(OBJECTCLASS);
             final List<String> objectClazz   = Arrays.asList(objectClasses);
@@ -630,14 +627,14 @@ public final class XBundleAdmin {
             }
             final List<BundleWire>  bundleWires      = bundleWiring.getRequiredWires(PACKAGE_NAMESPACE);
             final List<XPackageDTO> importedPackages = new ArrayList<>();
-            final Set<String>       seenPackages     = new HashSet<>();
+            final Set<Integer>      seenPackages     = new HashSet<>();
 
             for (final BundleWire bundleWire : bundleWires) {
                 final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
                 final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
                 final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
 
-                if (seenPackages.add(pkg + ":" + version)) {
+                if (seenPackages.add(Objects.hash(pkg, version))) {
                     final XPackageDTO dto = new XPackageDTO();
 
                     dto.name    = pkg;
@@ -663,14 +660,14 @@ public final class XBundleAdmin {
             }
             final List<BundleWire>  bundleWires      = bundleWiring.getProvidedWires(PACKAGE_NAMESPACE);
             final List<XPackageDTO> exportedPackages = new ArrayList<>();
-            final Set<String>       seenPackages     = new HashSet<>();
+            final Set<Integer>      seenPackages     = new HashSet<>();
 
             for (final BundleWire bundleWire : bundleWires) {
                 final Map<String, Object> attributes = bundleWire.getCapability().getAttributes();
                 final String              pkg        = (String) attributes.get(PACKAGE_NAMESPACE);
                 final String              version    = attributes.get(VERSION_ATTRIBUTE).toString();
 
-                if (seenPackages.add(pkg + ":" + version)) {
+                if (seenPackages.add(Objects.hash(pkg, version))) {
                     final XPackageDTO dto = new XPackageDTO();
 
                     dto.name    = pkg;
@@ -709,8 +706,13 @@ public final class XBundleAdmin {
     }
 
     private static Map<String, String> toMap(final Dictionary<String, String> dictionary) {
-        final List<String> keys = Collections.list(dictionary.keys());
-        return keys.stream().collect(Collectors.toMap(identity(), dictionary::get));
+        final Map<String, String> map  = new HashMap<>(dictionary.size());
+        final Enumeration<String> keys = dictionary.keys();
+        while (keys.hasMoreElements()) {
+            final String key = keys.nextElement();
+            map.put(key, dictionary.get(key));
+        }
+        return map;
     }
 
 }
