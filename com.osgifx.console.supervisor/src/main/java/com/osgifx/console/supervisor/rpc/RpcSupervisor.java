@@ -60,7 +60,7 @@ import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.rpc.mqtt.MqttRPC;
-import com.osgifx.console.agent.spi.LargePayloadHandler;
+import com.osgifx.console.agent.spi.payload.LargePayloadHandler;
 import com.osgifx.console.api.RpcProgressTracker;
 import com.osgifx.console.supervisor.EventListener;
 import com.osgifx.console.supervisor.LogEntryListener;

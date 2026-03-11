@@ -26,7 +26,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -34,44 +33,47 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationEvent;
 import org.osgi.service.cm.ConfigurationListener;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XComponentReferenceFilterDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XReferenceDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
-import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
-import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
+import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XConfigurationAdmin implements ConfigurationListener {
+@Singleton
+public final class XConfigurationAdmin extends AbstractSnapshotAdmin<XConfigurationDTO>
+        implements ConfigurationListener, BundleListener {
 
-    private final BundleContext                                    context;
-    private final XComponentAdmin                                  componentAdmin;
-    private final XMetaTypeAdmin                                   xMetaTypeAdmin;
-    private final FluentLogger                                     logger         = LoggerFactory
-            .getFluentLogger(getClass());
-    private final Map<String, XConfigurationDTO>                   configurations = new ConcurrentHashMap<>();
-    private ServiceRegistration<ConfigurationListener>             registration;
-    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
-    private volatile ConfigurationAdmin                            configAdmin;
-    private ExecutorService                                        executor;
+    private final BundleContext                                              context;
+    private final XComponentAdmin                                            componentAdmin;
+    private final XMetaTypeAdmin                                             xMetaTypeAdmin;
+    private final PackageWirings                                             packageWirings;
+    private ServiceRegistration<ConfigurationListener>                       registration;
+    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin>           configAdminTracker;
+    private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
 
     // --- Optimized Reflection Handles (Init Once, Use Forever) ---
     private static final MethodHandle UPDATE_IF_DIFFERENT;
@@ -92,11 +94,15 @@ public final class XConfigurationAdmin implements ConfigurationListener {
     public XConfigurationAdmin(final BundleContext context,
                                final XComponentAdmin componentAdmin,
                                final XMetaTypeAdmin xMetaTypeAdmin,
-                               final ExecutorService executor) {
+                               final PackageWirings packageWirings,
+                               final BinaryCodec codec,
+                               final SnapshotDecoder decoder,
+                               final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.context        = context;
         this.componentAdmin = componentAdmin;
         this.xMetaTypeAdmin = xMetaTypeAdmin;
-        this.executor       = executor;
+        this.packageWirings = packageWirings;
     }
 
     public void init() {
@@ -105,10 +111,9 @@ public final class XConfigurationAdmin implements ConfigurationListener {
                                                                                         null) {
             @Override
             public ConfigurationAdmin addingService(final ServiceReference<ConfigurationAdmin> reference) {
-                final ConfigurationAdmin service = super.addingService(reference);
-                configAdmin = service;
+                final ConfigurationAdmin service = context.getService(reference);
                 registerConfigListener();
-                processExistingConfigs(service);
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
                 return service;
             }
 
@@ -116,18 +121,92 @@ public final class XConfigurationAdmin implements ConfigurationListener {
             public void removedService(final ServiceReference<ConfigurationAdmin> reference,
                                        final ConfigurationAdmin service) {
                 unregisterConfigListener();
-                configurations.clear();
-                configAdmin = null;
+                snapshot.set(null);
                 super.removedService(reference, service);
             }
         };
         configAdminTracker.open();
+
+        if (packageWirings.isScrWired()) {
+            scrTracker = new ServiceTracker<>(context, ServiceComponentRuntime.class,
+                                              new ServiceTrackerCustomizer<ServiceComponentRuntime, ServiceComponentRuntime>() {
+                                                  @Override
+                                                  public ServiceComponentRuntime addingService(final ServiceReference<ServiceComponentRuntime> reference) {
+                                                      final ServiceComponentRuntime service = context
+                                                              .getService(reference);
+                                                      scheduleUpdate(getChangeCount(reference));
+                                                      return service;
+                                                  }
+
+                                                  @Override
+                                                  public void modifiedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                                                              final ServiceComponentRuntime service) {
+                                                      scheduleUpdate(getChangeCount(reference));
+                                                  }
+
+                                                  @Override
+                                                  public void removedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                                                             final ServiceComponentRuntime service) {
+                                                      context.ungetService(reference);
+                                                  }
+                                              });
+            scrTracker.open();
+        }
+
+        context.addBundleListener(this);
     }
 
+    @Override
     public void stop() {
+        super.stop();
         if (configAdminTracker != null) {
             configAdminTracker.close();
         }
+        if (scrTracker != null) {
+            scrTracker.close();
+        }
+        context.removeBundleListener(this);
+    }
+
+    @Override
+    protected List<XConfigurationDTO> map() throws Exception {
+        final ConfigurationAdmin configAdmin = getConfigAdmin();
+        if (configAdmin == null) {
+            return null;
+        }
+        final List<XConfigurationDTO> dtos = new ArrayList<>();
+
+        // 1. Add metatyped configurations (including metatypes without configurations)
+        if (xMetaTypeAdmin != null) {
+            dtos.addAll(xMetaTypeAdmin.getConfigurations());
+        }
+
+        // 2. Add configurations that don't have metatyping
+        final Configuration[] configs = configAdmin.listConfigurations(null);
+        if (configs != null) {
+            for (final Configuration config : configs) {
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
+                final boolean hasMetatype = xMetaTypeAdmin == null ? false : xMetaTypeAdmin.isMetatype(config);
+                if (!hasMetatype) {
+                    dtos.add(toConfigDTO(config));
+                }
+            }
+        }
+
+        // 3. Add Component Reference Filters
+        if (packageWirings.isScrWired() && componentAdmin != null) {
+            try {
+                final List<XComponentDTO> components = componentAdmin.map();
+                if (components != null && !components.isEmpty()) {
+                    dtos.forEach(c -> setComponentReferenceFilters(c, components));
+                }
+            } catch (final Exception e) {
+                logger.atWarn().msg("Failed to retrieve components for reference filters").throwable(e).log();
+            }
+        }
+        return dtos;
     }
 
     private void registerConfigListener() {
@@ -144,67 +223,36 @@ public final class XConfigurationAdmin implements ConfigurationListener {
     }
 
     private ConfigurationAdmin getConfigAdmin() {
-        final ConfigurationAdmin service = configAdminTracker.getService();
-        if (service != null) {
-            return service;
-        }
-        return configAdmin;
-    }
-
-    private void processExistingConfigs(final ConfigurationAdmin configAdmin) {
-        try {
-            final Configuration[] configs = configAdmin.listConfigurations(null);
-            if (configs != null) {
-                for (final Configuration config : configs) {
-                    executor.submit(() -> processConfiguration(config));
-                }
-            }
-        } catch (final Exception e) {
-            logger.atError().msg("Error processing existing configurations").throwable(e).log();
-        }
-    }
-
-    private void processConfiguration(final Configuration config) {
-        final String pid = config.getPid();
-        try {
-            final boolean hasMetatype = xMetaTypeAdmin == null ? false : xMetaTypeAdmin.isMetatype(config);
-            if (!hasMetatype) {
-                configurations.put(pid, toConfigDTO(config));
-            } else {
-                configurations.remove(pid);
-            }
-        } catch (final Exception e) {
-            logger.atError().msg("Error processing configuration for PID: " + pid).throwable(e).log();
-        }
+        return configAdminTracker == null ? null : configAdminTracker.getService();
     }
 
     @Override
     public void configurationEvent(final ConfigurationEvent event) {
-        final ConfigurationAdmin configAdmin = getConfigAdmin();
-        if (configAdmin == null) {
-            return;
-        }
-        final String pid = event.getPid();
-        if (event.getType() == ConfigurationEvent.CM_DELETED) {
-            configurations.remove(pid);
-        } else if (event.getType() == ConfigurationEvent.CM_UPDATED) {
-            executor.submit(() -> {
-                try {
-                    final Configuration config = configAdmin.getConfiguration(pid, "?");
-                    processConfiguration(config);
-                } catch (final Exception e) {
-                    logger.atError().msg("Error processing configuration event for PID: " + pid).throwable(e).log();
-                }
-            });
-        }
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
     }
 
-    public List<XConfigurationDTO> getConfigurations() {
-        if (getConfigAdmin() == null) {
-            logger.atWarn().msg(serviceUnavailable(CM)).log();
-            return Collections.emptyList();
+    @Override
+    public void bundleChanged(final BundleEvent event) {
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
+    }
+
+    private long getChangeCount(final ServiceReference<?> ref) {
+        final Object prop = ref.getProperty("service.changecount");
+        return prop instanceof Long ? (Long) prop : 0L;
+    }
+
+    @Override
+    public List<XConfigurationDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return new ArrayList<>();
         }
-        return new ArrayList<>(configurations.values());
+        try {
+            return decoder.decodeList(current, XConfigurationDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode configuration snapshot").throwable(e).log();
+            return new ArrayList<>();
+        }
     }
 
     public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
@@ -270,7 +318,7 @@ public final class XConfigurationAdmin implements ConfigurationListener {
 
     public static Map<String, ConfigValue> prepareConfiguration(final Configuration config) {
         if (config == null) {
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
         final Map<String, ConfigValue> props = new HashMap<>();
         for (final Entry<String, Object> entry : AgentHelper.valueOf(config.getProperties()).entrySet()) {
@@ -282,48 +330,57 @@ public final class XConfigurationAdmin implements ConfigurationListener {
         return props;
     }
 
-    public void setComponentReferenceFilters(final XConfigurationDTO configuration) {
+    public void setComponentReferenceFilters(final XConfigurationDTO configuration,
+                                             final List<XComponentDTO> components) {
         final List<XComponentReferenceFilterDTO> componentReferenceFilters = new ArrayList<>();
-        final List<XComponentDTO>                components                = componentAdmin.getComponents();
         for (final XComponentDTO component : components) {
             if (!matchPID(component, configuration)) {
                 continue;
             }
-            final List<XComponentReferenceFilterDTO> satisfiedReferenceFilters   = findSatisfiedReferenceFilters(
-                    component, configuration);
-            final List<XComponentReferenceFilterDTO> unsatisfiedReferenceFilters = findUnsatisfiedReferenceFilters(
-                    component, configuration);
-            componentReferenceFilters.addAll(satisfiedReferenceFilters);
-            componentReferenceFilters.addAll(unsatisfiedReferenceFilters);
+            final List<XComponentReferenceFilterDTO> referenceFilters = findAllReferenceFilters(component,
+                    configuration);
+            componentReferenceFilters.addAll(referenceFilters);
         }
         configuration.componentReferenceFilters = componentReferenceFilters;
     }
 
     private boolean matchPID(final XComponentDTO component, final XConfigurationDTO configuration) {
+        // Strategy 1: Component explicitly declares this PID in its configurationPid array
         final boolean hasFactoryPID = component.configurationPid.contains(configuration.factoryPid);
         final boolean hasConfigPID  = component.configurationPid.contains(configuration.pid);
 
-        return hasConfigPID || hasFactoryPID;
+        // Strategy 2: DS default - component name is used as PID when configurationPid is not set
+        final boolean nameMatchesPID        = component.name.equals(configuration.pid);
+        final boolean nameMatchesFactoryPID = component.name.equals(configuration.factoryPid);
+
+        // Strategy 3: Configuration PID matches component's implementation class
+        // This handles cases where the configuration is named after the implementation class
+        final boolean implClassMatchesPID        = component.implementationClass != null
+                && component.implementationClass.equals(configuration.pid);
+        final boolean implClassMatchesFactoryPID = component.implementationClass != null
+                && component.implementationClass.equals(configuration.factoryPid);
+
+        final boolean matches = hasConfigPID || hasFactoryPID || nameMatchesPID || nameMatchesFactoryPID
+                || implClassMatchesPID || implClassMatchesFactoryPID;
+
+        return matches;
     }
 
-    private List<XComponentReferenceFilterDTO> findSatisfiedReferenceFilters(final XComponentDTO component,
-                                                                             final XConfigurationDTO configuration) {
+    private List<XComponentReferenceFilterDTO> findAllReferenceFilters(final XComponentDTO component,
+                                                                       final XConfigurationDTO configuration) {
         final List<XComponentReferenceFilterDTO> referenceFilters = new ArrayList<>();
-        for (final XSatisfiedReferenceDTO satisfiedReference : component.satisfiedReferences) {
-            referenceFilters.add(toComponentRefFilter(component.name, satisfiedReference.name, configuration));
+        for (final XReferenceDTO reference : component.references) {
+            referenceFilters.add(toComponentRefFilter(component.name, reference.name, configuration));
         }
         return referenceFilters;
     }
 
-    private List<XComponentReferenceFilterDTO> findUnsatisfiedReferenceFilters(final XComponentDTO component,
-                                                                               final XConfigurationDTO configuration) {
-        final List<XComponentReferenceFilterDTO> referenceFilters = new ArrayList<>();
-        for (final XUnsatisfiedReferenceDTO unsatisfiedReference : component.unsatisfiedReferences) {
-            referenceFilters.add(toComponentRefFilter(component.name, unsatisfiedReference.name, configuration));
-        }
-        return referenceFilters;
-    }
-
+    /**
+     * Converts a component reference to a DTO and extracts the target filter.
+     * <p>
+     * <b>Note:</b> This method mutates the {@code configuration.properties} map by removing
+     * the target filter key to avoid duplication in the UI.
+     */
     private XComponentReferenceFilterDTO toComponentRefFilter(final String componentName,
                                                               final String refName,
                                                               final XConfigurationDTO configuration) {

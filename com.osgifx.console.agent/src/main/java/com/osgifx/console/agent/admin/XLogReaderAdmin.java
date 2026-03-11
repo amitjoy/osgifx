@@ -21,6 +21,9 @@ import org.osgi.service.log.LogReaderService;
 
 import com.osgifx.console.agent.handler.OSGiLogListener;
 
+import jakarta.inject.Singleton;
+
+@Singleton
 public final class XLogReaderAdmin {
 
     public void register(final Object service, final OSGiLogListener logListener) {

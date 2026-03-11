@@ -172,6 +172,9 @@ public final class DtoFxController {
     @Inject
     @Optional
     private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        if (dtoTree == null) {
+            return;
+        }
         threadSync.asyncExec(this::initialize);
     }
 

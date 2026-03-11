@@ -1,2 +1,4 @@
--buildpath          : ${bundles.required}
+-buildpath          : \
+                      ${bundles.required},\
+                      com.osgifx.console.agent.api;version=snapshot
 -privatepackage     : com.osgifx.console.data.*

@@ -39,11 +39,14 @@ public final class ConsoleFxHelper {
      * This is required as the agent can be disconnected and all invoked method
      * executions will return null thereafter
      */
-    public static <T> Collection<T> makeNullSafe(final Collection<T> source) {
+    public static <T> List<T> makeNullSafe(final Collection<T> source) {
         if (source == null) {
             return List.of();
         }
-        return source;
+        if (source instanceof List) {
+            return (List<T>) source;
+        }
+        return List.copyOf(source);
     }
 
     public static boolean validateTopic(final String topic) {

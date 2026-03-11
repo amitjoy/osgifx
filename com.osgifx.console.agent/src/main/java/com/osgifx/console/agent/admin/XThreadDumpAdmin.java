@@ -32,11 +32,10 @@ import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.helper.AgentHelper;
 
-/**
- * Admin class for creating thread dumps.
- *
- * @since 12.0
- */
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
 public final class XThreadDumpAdmin {
 
     private static final FluentLogger      logger           = LoggerFactory.getFluentLogger(XThreadDumpAdmin.class);
@@ -44,6 +43,7 @@ public final class XThreadDumpAdmin {
 
     private final BundleContext context;
 
+    @Inject
     public XThreadDumpAdmin(final BundleContext context) {
         this.context = context;
     }

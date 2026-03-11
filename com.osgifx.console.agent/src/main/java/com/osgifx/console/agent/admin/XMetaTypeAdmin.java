@@ -59,7 +59,9 @@ import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XObjectClassDefDTO;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
+@Singleton
 public final class XMetaTypeAdmin implements ConfigurationListener {
 
     private final BundleContext context;

@@ -38,16 +38,26 @@ import com.osgifx.console.agent.admin.XDmtAdmin;
 import com.osgifx.console.agent.admin.XDtoAdmin;
 import com.osgifx.console.agent.admin.XEventAdmin;
 import com.osgifx.console.agent.admin.XHcAdmin;
+import com.osgifx.console.agent.admin.XHeapDumpAdmin;
 import com.osgifx.console.agent.admin.XHttpAdmin;
 import com.osgifx.console.agent.admin.XJaxRsAdmin;
+import com.osgifx.console.agent.admin.XJmxAdmin;
+import com.osgifx.console.agent.admin.XLogReaderAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
 import com.osgifx.console.agent.admin.XMetaTypeAdmin;
+import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
+import com.osgifx.console.agent.admin.XSnapshotAdmin;
+import com.osgifx.console.agent.admin.XThreadAdmin;
+import com.osgifx.console.agent.admin.XThreadDumpAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.di.DI;
-import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.provider.BundleStartTimeCalculator;
 import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
+import com.osgifx.console.agent.spi.extension.AgentExtension;
 
 @SuppressWarnings("rawtypes")
 public final class DIModule {
@@ -77,9 +87,19 @@ public final class DIModule {
     private BundleStartTimeCalculator bundleStartTimeCalculator;
     private XBundleAdmin              xBundleAdmin;
     private XServiceAdmin             xServiceAdmin;
-    private Object                    xConfigurationAdmin;
-    private Object                    xComponentAdmin;
-    private Object                    xMetaTypeAdmin;
+    private XConfigurationAdmin       xConfigurationAdmin;
+    private XComponentAdmin           xComponentAdmin;
+    private XMetaTypeAdmin            xMetaTypeAdmin;
+    private XPropertyAdmin            xPropertyAdmin;
+    private XHcAdmin                  xHcAdmin;
+    private XHttpAdmin                xHttpAdmin;
+    private XCdiAdmin                 xCdiAdmin;
+    private XJaxRsAdmin               xJaxRsAdmin;
+    private XUserAdmin                xUserAdmin;
+    private XLoggerAdmin              xLoggerAdmin;
+    private XLogReaderAdmin           xLogReaderAdmin;
+    private XJmxAdmin                 xJmxAdmin;
+    private XThreadAdmin              xThreadAdmin;
 
     public DIModule(final BundleContext context) {
         di           = new DI();
@@ -87,6 +107,9 @@ public final class DIModule {
 
         di.bindInstance(DI.class, di);
         di.bindInstance(BundleContext.class, context);
+        final BinaryCodec codec = new BinaryCodec(context);
+        di.bindInstance(BinaryCodec.class, codec);
+        di.bindInstance(SnapshotDecoder.class, new SnapshotDecoder(codec));
     }
 
     public void start() throws Exception {
@@ -99,40 +122,124 @@ public final class DIModule {
 
         // --- Eagerly instantiated admins (guarded by PackageWirings) ---
 
+        final BinaryCodec     codec   = di.getInstance(BinaryCodec.class);
+        final SnapshotDecoder decoder = di.getInstance(SnapshotDecoder.class);
+
         if (wirings.isScrWired()) {
-            xComponentAdmin = new XComponentAdmin(context, executor);
-            di.bindInstance(XComponentAdmin.class, (XComponentAdmin) xComponentAdmin);
+            xComponentAdmin = new XComponentAdmin(context, codec, decoder, executor);
+            di.bindInstance(XComponentAdmin.class, xComponentAdmin);
         }
 
-        xBundleAdmin = new XBundleAdmin(context, bundleStartTimeCalculator, executor);
+        xBundleAdmin = new XBundleAdmin(context, bundleStartTimeCalculator, codec, decoder, executor);
         di.bindInstance(XBundleAdmin.class, xBundleAdmin);
 
-        xServiceAdmin = new XServiceAdmin(context, executor);
+        xServiceAdmin = new XServiceAdmin(context, codec, decoder, executor);
         di.bindInstance(XServiceAdmin.class, xServiceAdmin);
 
         if (wirings.isMetatypeWired() && wirings.isConfigAdminWired()) {
             xMetaTypeAdmin = new XMetaTypeAdmin(context, executor);
-            di.bindInstance(XMetaTypeAdmin.class, (XMetaTypeAdmin) xMetaTypeAdmin);
+            di.bindInstance(XMetaTypeAdmin.class, xMetaTypeAdmin);
         }
 
         if (wirings.isConfigAdminWired()) {
-            xConfigurationAdmin = new XConfigurationAdmin(context, (XComponentAdmin) xComponentAdmin,
-                                                          (XMetaTypeAdmin) xMetaTypeAdmin, executor);
-            di.bindInstance(XConfigurationAdmin.class, (XConfigurationAdmin) xConfigurationAdmin);
+            xConfigurationAdmin = new XConfigurationAdmin(context, xComponentAdmin, xMetaTypeAdmin, wirings, codec,
+                                                          decoder, executor);
+            di.bindInstance(XConfigurationAdmin.class, xConfigurationAdmin);
         }
+
+        xPropertyAdmin = new XPropertyAdmin(context, codec, decoder, executor);
+        di.bindInstance(XPropertyAdmin.class, xPropertyAdmin);
+
+        if (wirings.isFelixHcWired()) {
+            xHcAdmin = new XHcAdmin(context, codec, decoder, () -> felixHcExecutorTracker.getService(), executor);
+            di.bindInstance(XHcAdmin.class, xHcAdmin);
+        }
+
+        if (wirings.isJaxRsWired()) {
+            xJaxRsAdmin = new XJaxRsAdmin(context, () -> jaxrsServiceRuntimeTracker.getService(), codec, decoder,
+                                          executor);
+            di.bindInstance(XJaxRsAdmin.class, xJaxRsAdmin);
+        }
+
+        if (wirings.isHttpServiceRuntimeWired()) {
+            xHttpAdmin = new XHttpAdmin(context, () -> httpServiceRuntimeTracker.getService(), codec, decoder,
+                                        executor);
+            di.bindInstance(XHttpAdmin.class, xHttpAdmin);
+        }
+
+        if (wirings.isCDIWired()) {
+            xCdiAdmin = new XCdiAdmin(context, () -> cdiServiceRuntimeTracker.getService(), codec, decoder, executor);
+            di.bindInstance(XCdiAdmin.class, xCdiAdmin);
+        }
+
+        if (wirings.isUserAdminWired()) {
+            xUserAdmin = new XUserAdmin(context, () -> userAdminTracker.getService(), codec, decoder, executor);
+            di.bindInstance(XUserAdmin.class, xUserAdmin);
+        }
+
+        if (wirings.isR7LoggerAdminWired()) {
+            xLoggerAdmin = new XLoggerAdmin(() -> loggerAdminTracker.getService(), wirings, context, codec, decoder,
+                                            executor);
+            di.bindInstance(XLoggerAdmin.class, xLoggerAdmin);
+        }
+
+        if (wirings.isLogWired()) {
+            xLogReaderAdmin = new XLogReaderAdmin();
+            di.bindInstance(XLogReaderAdmin.class, xLogReaderAdmin);
+        }
+
+        if (wirings.isJmxWired()) {
+            xJmxAdmin = new XJmxAdmin();
+            di.bindInstance(XJmxAdmin.class, xJmxAdmin);
+
+            di.bindInstance(XHeapDumpAdmin.class, new XHeapDumpAdmin(context));
+        }
+
+        xThreadAdmin = new XThreadAdmin(wirings, codec, decoder, executor);
+        di.bindInstance(XThreadAdmin.class, xThreadAdmin);
+
+        di.bindInstance(XThreadDumpAdmin.class, new XThreadDumpAdmin(context));
+
+        di.bindProvider(XSnapshotAdmin.class, () -> new XSnapshotAdmin(context, di.getInstance(XDtoAdmin.class)));
 
         // initialize the trackers
         xBundleAdmin.init();
         xServiceAdmin.init();
         if (xComponentAdmin != null) {
-            ((XComponentAdmin) xComponentAdmin).init();
+            xComponentAdmin.init();
         }
         if (xConfigurationAdmin != null) {
-            ((XConfigurationAdmin) xConfigurationAdmin).init();
+            xConfigurationAdmin.init();
         }
         if (xMetaTypeAdmin != null) {
-            ((XMetaTypeAdmin) xMetaTypeAdmin).init();
+            xMetaTypeAdmin.init();
         }
+        if (xHcAdmin != null) {
+            xHcAdmin.init();
+        }
+        if (xJaxRsAdmin != null) {
+            xJaxRsAdmin.init();
+        }
+        if (xHttpAdmin != null) {
+            xHttpAdmin.init();
+        }
+        if (xCdiAdmin != null) {
+            xCdiAdmin.init();
+        }
+        if (xUserAdmin != null) {
+            xUserAdmin.init();
+        }
+        if (xLoggerAdmin != null) {
+            xLoggerAdmin.init();
+        }
+        if (xLogReaderAdmin != null) {
+            // XLogReaderAdmin currently has no init()
+        }
+        if (xJmxAdmin != null) {
+            xJmxAdmin.init();
+        }
+        xThreadAdmin.init();
+        xPropertyAdmin.init();
 
         // --- Lazily bound admins (guarded by PackageWirings) ---
 
@@ -141,7 +248,7 @@ public final class DIModule {
         }
         if (wirings.isScrWired()) {
             di.bindProvider(XDtoAdmin.class,
-                    () -> new XDtoAdmin(context, () -> ((XComponentAdmin) xComponentAdmin).getServiceComponentRuntime(),
+                    () -> new XDtoAdmin(context, () -> xComponentAdmin.getServiceComponentRuntime(),
                                         () -> jaxrsServiceRuntimeTracker.getService(),
                                         () -> httpServiceRuntimeTracker.getService(),
                                         () -> cdiServiceRuntimeTracker.getService(), wirings));
@@ -149,32 +256,13 @@ public final class DIModule {
         if (wirings.isEventAdminWired()) {
             di.bindProvider(XEventAdmin.class, () -> new XEventAdmin(() -> eventAdminTracker.getService()));
         }
-        if (wirings.isFelixHcWired()) {
-            di.bindProvider(XHcAdmin.class, () -> new XHcAdmin(context, () -> felixHcExecutorTracker.getService()));
-        }
-        if (wirings.isHttpServiceRuntimeWired()) {
-            di.bindProvider(XHttpAdmin.class, () -> new XHttpAdmin(() -> httpServiceRuntimeTracker.getService()));
-        }
-        if (wirings.isJaxRsWired()) {
-            di.bindProvider(XJaxRsAdmin.class, () -> new XJaxRsAdmin(() -> jaxrsServiceRuntimeTracker.getService()));
-        }
-        if (wirings.isCDIWired()) {
-            di.bindProvider(XCdiAdmin.class, () -> new XCdiAdmin(() -> cdiServiceRuntimeTracker.getService()));
-        }
-        if (wirings.isUserAdminWired()) {
-            di.bindProvider(XUserAdmin.class, () -> new XUserAdmin(() -> userAdminTracker.getService()));
-        }
-        if (wirings.isR7LoggerAdminWired()) {
-            di.bindProvider(XLoggerAdmin.class,
-                    () -> new XLoggerAdmin(() -> loggerAdminTracker.getService(), wirings, context));
-        }
         di.bindInstance(Set.class, gogoCommands);
         di.bindInstance(Map.class, agentExtensions);
     }
 
     public void stop() {
         if (xComponentAdmin != null) {
-            ((XComponentAdmin) xComponentAdmin).stop();
+            xComponentAdmin.stop();
         }
         if (xBundleAdmin != null) {
             xBundleAdmin.stop();
@@ -183,10 +271,34 @@ public final class DIModule {
             xServiceAdmin.stop();
         }
         if (xConfigurationAdmin != null) {
-            ((XConfigurationAdmin) xConfigurationAdmin).stop();
+            xConfigurationAdmin.stop();
         }
         if (xMetaTypeAdmin != null) {
-            ((XMetaTypeAdmin) xMetaTypeAdmin).stop();
+            xMetaTypeAdmin.stop();
+        }
+        if (xHcAdmin != null) {
+            xHcAdmin.stop();
+        }
+        if (xJaxRsAdmin != null) {
+            xJaxRsAdmin.stop();
+        }
+        if (xHttpAdmin != null) {
+            xHttpAdmin.stop();
+        }
+        if (xCdiAdmin != null) {
+            xCdiAdmin.stop();
+        }
+        if (xUserAdmin != null) {
+            xUserAdmin.stop();
+        }
+        if (xLoggerAdmin != null) {
+            xLoggerAdmin.stop();
+        }
+        if (xPropertyAdmin != null) {
+            xPropertyAdmin.stop();
+        }
+        if (xThreadAdmin != null) {
+            xThreadAdmin.stop();
         }
         dmtAdminTracker.close();
         userAdminTracker.close();
@@ -201,6 +313,8 @@ public final class DIModule {
         if (executor != null) {
             executor.shutdownNow();
         }
+        BinaryCodec.clearCache();
+        Lz4Codec.clear();
     }
 
     public DI di() {

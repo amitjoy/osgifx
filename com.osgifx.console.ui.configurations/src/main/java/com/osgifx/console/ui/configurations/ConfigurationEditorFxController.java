@@ -135,19 +135,11 @@ public final class ConfigurationEditorFxController {
             rootPanel.getChildren().remove(formRenderer);
         }
         formRenderer = createForm(config);
+        formRenderer.setOpacity(0.0);
         initButtons(config);
         rootPanel.setCenter(formRenderer);
 
-        // Start trying to fix the layout once the scene is attached
-        if (formRenderer.getScene() != null) {
-            scheduleLayoutFix(formRenderer, 0);
-        } else {
-            formRenderer.sceneProperty().addListener((_, _, newScene) -> {
-                if (newScene != null) {
-                    scheduleLayoutFix(formRenderer, 0);
-                }
-            });
-        }
+        scheduleLayoutFix(formRenderer, 0);
     }
 
     private void scheduleLayoutFix(final Node node, final int attempt) {
@@ -168,7 +160,12 @@ public final class ConfigurationEditorFxController {
         if (!grids.isEmpty()) {
             applyGridConstraints(grids);
             Fx.makeReadOnlyLabelsCopyable(node);
+            node.setOpacity(1.0);
         } else {
+            // Force a layout pass if no grids found yet
+            if (node instanceof Parent p) {
+                p.layout();
+            }
             // Retry after 200ms
             final var timer = new javafx.animation.PauseTransition(javafx.util.Duration.millis(200));
             timer.setOnFinished(_ -> scheduleLayoutFix(node, attempt + 1));
@@ -190,8 +187,6 @@ public final class ConfigurationEditorFxController {
     }
 
     private void applyGridConstraints(final List<Node> grids) {
-        logger.atInfo().log("Found %d GridPanes to apply column constraints", grids.size());
-
         for (final var item : grids) {
             if (item instanceof GridPane grid) {
                 grid.setHgap(5); // Reduced gap to 5 based on user feedback
@@ -448,7 +443,7 @@ public final class ConfigurationEditorFxController {
         formGroups.add(genericPropertiesGroup);
         formGroups.add(specificPropertiesGroup);
 
-        if (config.componentReferenceFilters == null) {
+        if (config.componentReferenceFilters == null || config.componentReferenceFilters.isEmpty()) {
             return formGroups;
         }
 

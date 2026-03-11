@@ -33,9 +33,26 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.gson.Gson;
-import com.osgifx.console.agent.spi.LargePayloadHandler;
-import com.osgifx.console.agent.spi.PayloadMetadata;
-import com.osgifx.console.agent.spi.PayloadType;
+import com.osgifx.console.agent.dto.RuntimeDTO;
+import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XCdiContainerDTO;
+import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.dto.XHealthCheckDTO;
+import com.osgifx.console.agent.dto.XHeapUsageDTO;
+import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
+import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
+import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
+import com.osgifx.console.agent.spi.payload.LargePayloadHandler;
+import com.osgifx.console.agent.spi.payload.PayloadMetadata;
+import com.osgifx.console.agent.spi.payload.PayloadType;
 import com.osgifx.console.dto.SnapshotDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
@@ -92,10 +109,11 @@ public final class SnapshotCaptureHandler {
 
                 final var handlerTracker = supervisor.getLargePayloadHandlerTracker();
                 final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
+                final var decoder        = new SnapshotDecoder(new BinaryCodec());
 
                 updateMessage("Counting bundles and services...");
-                final var bundleCount  = agent.getAllBundles().size();
-                final var serviceCount = agent.getAllServices().size();
+                final var bundleCount  = decoder.decodeList(agent.bundles(), XBundleDTO.class).size();
+                final var serviceCount = decoder.decodeList(agent.services(), XServiceDTO.class).size();
 
                 return new SnapshotStatistics(bundleCount, serviceCount, estimatedSize, estimatedCompressed,
                                               isMqttTransport, rpcAvailable, handler);
@@ -194,43 +212,48 @@ public final class SnapshotCaptureHandler {
             @Override
             protected String call() throws Exception {
                 try {
-                    updateMessage("Capturing bundles (1/17)...");
-                    final var dto   = new SnapshotDTO();
-                    final var agent = supervisor.getAgent();
+                    final var dto     = new SnapshotDTO();
+                    final var agent   = supervisor.getAgent();
+                    final var decoder = new SnapshotDecoder(new BinaryCodec());
 
-                    dto.bundles = agent.getAllBundles();
-                    updateMessage("Capturing components (2/17)...");
-                    dto.components = agent.getAllComponents();
-                    updateMessage("Capturing configurations (3/17)...");
-                    dto.configurations = agent.getAllConfigurations();
-                    updateMessage("Capturing properties (4/17)...");
-                    dto.properties = agent.getAllProperties();
-                    updateMessage("Capturing services (5/17)...");
-                    dto.services = agent.getAllServices();
-                    updateMessage("Capturing threads (6/17)...");
-                    dto.threads = agent.getAllThreads();
-                    updateMessage("Capturing DMT nodes (7/17)...");
+                    updateMessage("Capturing bundles (1/18)...");
+                    dto.bundles = decoder.decodeList(agent.bundles(), XBundleDTO.class);
+                    updateMessage("Capturing components (2/18)...");
+                    dto.components = decoder.decodeList(agent.components(), XComponentDTO.class);
+                    updateMessage("Capturing configurations (3/18)...");
+                    dto.configurations = decoder.decodeList(agent.configurations(), XConfigurationDTO.class);
+                    updateMessage("Capturing properties (4/18)...");
+                    dto.properties = decoder.decodeList(agent.properties(), XPropertyDTO.class);
+                    updateMessage("Capturing services (5/18)...");
+                    dto.services = decoder.decodeList(agent.services(), XServiceDTO.class);
+                    updateMessage("Capturing threads (6/18)...");
+                    dto.threads = decoder.decodeList(agent.threads(), XThreadDTO.class);
+                    updateMessage("Capturing DMT nodes (7/18)...");
                     dto.dmtNodes = agent.readDmtNode(".");
-                    updateMessage("Capturing memory info (8/17)...");
+                    updateMessage("Capturing memory info (8/18)...");
                     dto.memoryInfo = agent.getMemoryInfo();
-                    updateMessage("Capturing roles (9/17)...");
-                    dto.roles = agent.getAllRoles();
-                    updateMessage("Capturing health checks (10/17)...");
-                    dto.healthChecks = agent.getAllHealthChecks();
-                    updateMessage("Capturing classloader leaks (11/17)...");
-                    dto.classloaderLeaks = agent.getClassloaderLeaks();
-                    updateMessage("Capturing HTTP components (12/17)...");
-                    dto.httpComponents = agent.getHttpComponents();
-                    updateMessage("Capturing logger contexts (13/17)...");
-                    dto.bundleLoggerContexts = agent.getBundleLoggerContexts();
-                    updateMessage("Capturing JAX-RS components (14/17)...");
-                    dto.jaxRsComponents = agent.getJaxRsComponents();
-                    updateMessage("Capturing CDI containers (15/17)...");
-                    dto.cdiContainers = agent.getCdiContainers();
-                    updateMessage("Capturing heap usage (16/17)...");
-                    dto.heapUsage = agent.getHeapUsage();
-                    updateMessage("Capturing runtime info (17/17)...");
-                    dto.runtime = agent.getRuntimeDTO();
+                    updateMessage("Capturing roles (9/18)...");
+                    dto.roles = decoder.decodeList(agent.roles(), XRoleDTO.class);
+                    updateMessage("Capturing health checks (10/18)...");
+                    dto.healthChecks = decoder.decodeList(agent.healthChecks(), XHealthCheckDTO.class);
+                    updateMessage("Capturing classloader leaks (11/18)...");
+                    dto.classloaderLeaks = decoder.decodeSet(agent.leaks(), XBundleDTO.class);
+                    updateMessage("Capturing HTTP components (12/18)...");
+                    dto.httpComponents = decoder.decodeList(agent.httpComponents(), XHttpComponentDTO.class);
+                    updateMessage("Capturing logger contexts (13/18)...");
+                    dto.bundleLoggerContexts = decoder.decodeList(agent.bundleLoggerContexts(),
+                            XBundleLoggerContextDTO.class);
+                    updateMessage("Capturing JAX-RS components (14/18)...");
+                    dto.jaxRsComponents = decoder.decodeList(agent.jaxRsComponents(), XJaxRsComponentDTO.class);
+                    updateMessage("Capturing CDI containers (15/18)...");
+                    dto.cdiContainers = decoder.decodeList(agent.cdiContainers(), XCdiContainerDTO.class);
+                    updateMessage("Capturing runtime capabilities (16/18)...");
+                    dto.runtimeCapabilities = decoder.decodeList(agent.runtimeCapabilities(),
+                            XRuntimeCapabilityDTO.class);
+                    updateMessage("Capturing heap usage (17/18)...");
+                    dto.heapUsage = decoder.decode(agent.heapUsage(), XHeapUsageDTO.class);
+                    updateMessage("Capturing runtime info (18/18)...");
+                    dto.runtime = decoder.decode(agent.runtime(), RuntimeDTO.class);
 
                     updateMessage("Serializing snapshot...");
                     return new Gson().toJson(dto);

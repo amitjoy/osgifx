@@ -24,7 +24,7 @@ import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.osgi.framework.BundleContext;
 
-import com.osgifx.console.agent.spi.LargePayloadHandler;
+import com.osgifx.console.agent.spi.payload.LargePayloadHandler;
 import com.osgifx.console.util.fx.Fx;
 
 import javafx.fxml.FXMLLoader;

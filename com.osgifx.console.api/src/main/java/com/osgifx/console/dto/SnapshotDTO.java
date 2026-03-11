@@ -34,6 +34,7 @@ import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
 
@@ -88,6 +89,9 @@ public class SnapshotDTO extends DTO {
 
     /** A list of CDI container data transfer objects. */
     public List<XCdiContainerDTO> cdiContainers;
+
+    /** A list of runtime capability data transfer objects. */
+    public List<XRuntimeCapabilityDTO> runtimeCapabilities;
 
     /** A data transfer object representing the heap usage. */
     public XHeapUsageDTO heapUsage;

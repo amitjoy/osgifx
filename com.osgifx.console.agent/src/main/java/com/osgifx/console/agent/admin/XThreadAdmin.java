@@ -24,35 +24,60 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XThreadAdmin {
+@Singleton
+public final class XThreadAdmin extends AbstractSnapshotAdmin<XThreadDTO> {
 
     private final PackageWirings wirings;
-    private final FluentLogger   logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XThreadAdmin(final PackageWirings wirings) {
+    public XThreadAdmin(final PackageWirings wirings,
+                        final BinaryCodec codec,
+                        final SnapshotDecoder decoder,
+                        final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.wirings = wirings;
     }
 
-    public List<XThreadDTO> get() {
-        try {
-            final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
-            final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
-            final long[]                           deadlocks  = getDeadlockedThreads();
+    public void init() {
+        // No background polling needed for threads; cheap to get live.
+    }
 
-            return threadList.stream().map(t -> toDTO(t, deadlocks)).collect(toList());
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving threads").throwable(e).log();
+    @Override
+    public byte[] snapshot() {
+        return liveSnapshot();
+    }
+
+    @Override
+    public List<XThreadDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
             return Collections.emptyList();
         }
+        try {
+            return decoder.decodeList(current, XThreadDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode thread snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    protected List<XThreadDTO> map() throws Exception {
+        final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
+        final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
+        final long[]                           deadlocks  = getDeadlockedThreads();
+
+        return threadList.stream().map(t -> toDTO(t, deadlocks)).collect(toList());
     }
 
     private XThreadDTO toDTO(final Thread thread, final long[] deadlocks) {

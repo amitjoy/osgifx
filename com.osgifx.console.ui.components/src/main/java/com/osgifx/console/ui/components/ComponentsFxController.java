@@ -181,6 +181,9 @@ public final class ComponentsFxController {
     @Inject
     @Optional
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        if (table == null) {
+            return;
+        }
         threadSync.asyncExec(this::initialize);
     }
 

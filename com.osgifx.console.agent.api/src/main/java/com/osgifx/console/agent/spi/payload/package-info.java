@@ -13,29 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.extension;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.CLASS;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ComponentPropertyType;
-
 /**
- * Component Property Type for the {@code agent.extension.name} service
- * property.
- * <p>
- * This annotation can be used on a {@link Component} to declare the value of
- * the {@code agent.extension.name} service property.
+ * Service Provider Interface (SPI) for extending OSGi.fx Agent functionality.
  *
- * @see "Component Property Types"
+ * <p>
+ * This package contains {@code @ConsumerType} interfaces that remote runtimes
+ * can implement to extend agent capabilities.
+ *
+ * @since 11.0
  */
-@Target(TYPE)
-@Retention(CLASS)
-@ComponentPropertyType
-public @interface AgentExtensionName {
-    String value();
-}
+@org.osgi.annotation.bundle.Export
+@org.osgi.annotation.versioning.Version("1.0.0")
+package com.osgifx.console.agent.spi.payload;
