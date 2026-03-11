@@ -43,7 +43,9 @@ import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
+@Singleton
 public final class XDmtAdmin {
 
     private final Supplier<Object> dmtAdminSupplier;

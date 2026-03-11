@@ -25,35 +25,60 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.dto.FrameworkDTO;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XPropertyDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO.XPropertyType;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XPropertyAdmin {
+@Singleton
+public final class XPropertyAdmin extends AbstractSnapshotAdmin<XPropertyDTO> {
 
     private final BundleContext context;
-    private final FluentLogger  logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XPropertyAdmin(final BundleContext context) {
+    public XPropertyAdmin(final BundleContext context,
+                          final BinaryCodec codec,
+                          final SnapshotDecoder decoder,
+                          final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.context = context;
     }
 
+    public void init() {
+        // No background polling needed for properties; cheap to get live.
+    }
+
+    @Override
+    public byte[] snapshot() {
+        return liveSnapshot();
+    }
+
+    @Override
     public List<XPropertyDTO> get() {
-        try {
-            final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
-            return prepareProperties(dto.properties);
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving properties").throwable(e).log();
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
             return Collections.emptyList();
         }
+        try {
+            return decoder.decodeList(current, XPropertyDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode property snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    protected List<XPropertyDTO> map() throws Exception {
+        final FrameworkDTO dto = context.getBundle(SYSTEM_BUNDLE_ID).adapt(FrameworkDTO.class);
+        return prepareProperties(dto.properties);
     }
 
     private List<XPropertyDTO> prepareProperties(final Map<String, Object> properties) {

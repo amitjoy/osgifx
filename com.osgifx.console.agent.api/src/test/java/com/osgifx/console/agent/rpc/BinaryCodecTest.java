@@ -22,6 +22,8 @@ import java.io.DataOutputStream;
 
 import org.junit.Test;
 
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+
 public class BinaryCodecTest {
 
     @Test

@@ -22,7 +22,9 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
+@Singleton
 public final class XEventAdmin {
 
     private final Supplier<Object> eventAdminSupplier;

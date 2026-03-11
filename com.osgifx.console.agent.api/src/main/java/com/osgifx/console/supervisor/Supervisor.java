@@ -26,7 +26,7 @@ import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
-import com.osgifx.console.agent.spi.LargePayloadHandler;
+import com.osgifx.console.agent.spi.payload.LargePayloadHandler;
 
 /**
  * A Supervisor handles the initiating side of a session with a remote agent.

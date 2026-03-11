@@ -109,7 +109,6 @@ import com.osgifx.console.agent.admin.XJaxRsAdmin;
 import com.osgifx.console.agent.admin.XJmxAdmin;
 import com.osgifx.console.agent.admin.XLogReaderAdmin;
 import com.osgifx.console.agent.admin.XLoggerAdmin;
-import com.osgifx.console.agent.admin.XMetaTypeAdmin;
 import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
 import com.osgifx.console.agent.admin.XSnapshotAdmin;
@@ -139,7 +138,6 @@ import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
-import com.osgifx.console.agent.extension.AgentExtension;
 import com.osgifx.console.agent.handler.OSGiEventHandler;
 import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.helper.AgentHelper;
@@ -150,6 +148,9 @@ import com.osgifx.console.agent.redirector.RedirectOutput;
 import com.osgifx.console.agent.redirector.Redirector;
 import com.osgifx.console.agent.redirector.SocketRedirector;
 import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
+import com.osgifx.console.agent.spi.extension.AgentExtension;
 import com.osgifx.console.supervisor.Supervisor;
 
 import aQute.bnd.exceptions.Exceptions;
@@ -780,7 +781,7 @@ public final class AgentServer implements Agent, Closeable {
     public List<XComponentDTO> getAllComponents() {
         final boolean isScrAvailable = di.getInstance(PackageWirings.class).isScrWired();
         if (isScrAvailable) {
-            return di.getInstance(XComponentAdmin.class).getComponents();
+            return di.getInstance(XComponentAdmin.class).get();
         }
         return Collections.emptyList();
     }
@@ -788,22 +789,10 @@ public final class AgentServer implements Agent, Closeable {
     @Override
     public List<XConfigurationDTO> getAllConfigurations() {
         final boolean isConfigAdminAvailable = di.getInstance(PackageWirings.class).isConfigAdminWired();
-        final boolean isMetatypeAvailable    = di.getInstance(PackageWirings.class).isMetatypeWired();
-        final boolean isScrAvailable         = di.getInstance(PackageWirings.class).isScrWired();
-
-        final Map<String, XConfigurationDTO> configMap = new java.util.HashMap<>();
         if (isConfigAdminAvailable) {
-            di.getInstance(XConfigurationAdmin.class).getConfigurations().forEach(c -> configMap.put(c.pid, c));
+            return di.getInstance(XConfigurationAdmin.class).get();
         }
-        if (isMetatypeAvailable) {
-            di.getInstance(XMetaTypeAdmin.class).getConfigurations().forEach(c -> configMap.put(c.pid, c));
-        }
-        final List<XConfigurationDTO> configs = new ArrayList<>(configMap.values());
-
-        if (isScrAvailable) {
-            configs.forEach(c -> di.getInstance(XConfigurationAdmin.class).setComponentReferenceFilters(c));
-        }
-        return configs;
+        return Collections.emptyList();
     }
 
     @Override
@@ -1195,9 +1184,8 @@ public final class AgentServer implements Agent, Closeable {
     public List<XRoleDTO> getAllRoles() {
         final boolean isUserAdminAvailable = di.getInstance(PackageWirings.class).isUserAdminWired();
         if (isUserAdminAvailable) {
-            return di.getInstance(XUserAdmin.class).getRoles();
+            return di.getInstance(XUserAdmin.class).get();
         }
-        logger.atWarn().msg(packageNotWired(USER_ADMIN)).log();
         return Collections.emptyList();
     }
 
@@ -1205,9 +1193,8 @@ public final class AgentServer implements Agent, Closeable {
     public List<XBundleLoggerContextDTO> getBundleLoggerContexts() {
         final boolean isR7LogAvailable = di.getInstance(PackageWirings.class).isR7LoggerAdminWired();
         if (isR7LogAvailable) {
-            return di.getInstance(XLoggerAdmin.class).getLoggerContexts();
+            return di.getInstance(XLoggerAdmin.class).get();
         }
-        logger.atWarn().msg(packageNotWired(R7_LOGGER)).log();
         return Collections.emptyList();
     }
 
@@ -1215,9 +1202,8 @@ public final class AgentServer implements Agent, Closeable {
     public List<XHealthCheckDTO> getAllHealthChecks() {
         final boolean isFelixHcAvailable = di.getInstance(PackageWirings.class).isFelixHcWired();
         if (isFelixHcAvailable) {
-            return di.getInstance(XHcAdmin.class).getHealthchecks();
+            return di.getInstance(XHcAdmin.class).get();
         }
-        logger.atWarn().msg(packageNotWired(HC)).log();
         return Collections.emptyList();
     }
 
@@ -1265,7 +1251,7 @@ public final class AgentServer implements Agent, Closeable {
     public List<XHttpComponentDTO> getHttpComponents() {
         final boolean isHttpServiceRuntimeWired = di.getInstance(PackageWirings.class).isHttpServiceRuntimeWired();
         if (isHttpServiceRuntimeWired) {
-            return di.getInstance(XHttpAdmin.class).runtime();
+            return di.getInstance(XHttpAdmin.class).get();
         }
         logger.atWarn().msg(packageNotWired(HTTP)).log();
         return Collections.emptyList();
@@ -1275,7 +1261,7 @@ public final class AgentServer implements Agent, Closeable {
     public List<XJaxRsComponentDTO> getJaxRsComponents() {
         final boolean isJaxRsServiceRuntimeWired = di.getInstance(PackageWirings.class).isJaxRsWired();
         if (isJaxRsServiceRuntimeWired) {
-            return di.getInstance(XJaxRsAdmin.class).getJaxRsComponents();
+            return di.getInstance(XJaxRsAdmin.class).get();
         }
         logger.atWarn().msg(packageNotWired(JAX_RS)).log();
         return Collections.emptyList();
@@ -1285,7 +1271,7 @@ public final class AgentServer implements Agent, Closeable {
     public List<XCdiContainerDTO> getCdiContainers() {
         final boolean isCdiServiceRuntimeWired = di.getInstance(PackageWirings.class).isCDIWired();
         if (isCdiServiceRuntimeWired) {
-            return di.getInstance(XCdiAdmin.class).getCdiContainers();
+            return di.getInstance(XCdiAdmin.class).get();
         }
         logger.atWarn().msg(packageNotWired(CDI)).log();
         return Collections.emptyList();
@@ -1469,6 +1455,136 @@ public final class AgentServer implements Agent, Closeable {
             result.add(dto);
         }
         return Collections.unmodifiableList(result);
+    }
+
+    @Override
+    public byte[] bundles() {
+        return di.getInstance(XBundleAdmin.class).snapshot();
+    }
+
+    @Override
+    public byte[] components() {
+        final boolean isScrWired = di.getInstance(PackageWirings.class).isScrWired();
+        if (isScrWired) {
+            return di.getInstance(XComponentAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] services() {
+        return di.getInstance(XServiceAdmin.class).snapshot();
+    }
+
+    @Override
+    public byte[] configurations() {
+        final boolean isConfigAdminWired = di.getInstance(PackageWirings.class).isConfigAdminWired();
+        if (isConfigAdminWired) {
+            return di.getInstance(XConfigurationAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] properties() {
+        return di.getInstance(XPropertyAdmin.class).snapshot();
+    }
+
+    @Override
+    public byte[] threads() {
+        return di.getInstance(XThreadAdmin.class).snapshot();
+    }
+
+    @Override
+    public byte[] roles() {
+        final boolean isUserAdminWired = di.getInstance(PackageWirings.class).isUserAdminWired();
+        if (isUserAdminWired) {
+            return di.getInstance(XUserAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] healthChecks() {
+        final boolean isFelixHcWired = di.getInstance(PackageWirings.class).isFelixHcWired();
+        if (isFelixHcWired) {
+            return di.getInstance(XHcAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] httpComponents() {
+        final boolean isHttpServiceRuntimeWired = di.getInstance(PackageWirings.class).isHttpServiceRuntimeWired();
+        if (isHttpServiceRuntimeWired) {
+            return di.getInstance(XHttpAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] jaxRsComponents() {
+        final boolean isJaxRsWired = di.getInstance(PackageWirings.class).isJaxRsWired();
+        if (isJaxRsWired) {
+            return di.getInstance(XJaxRsAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] cdiContainers() {
+        final boolean isCDIWired = di.getInstance(PackageWirings.class).isCDIWired();
+        if (isCDIWired) {
+            return di.getInstance(XCdiAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] bundleLoggerContexts() {
+        final boolean isR7LoggerAdminWired = di.getInstance(PackageWirings.class).isR7LoggerAdminWired();
+        if (isR7LoggerAdminWired) {
+            return di.getInstance(XLoggerAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] runtime() {
+        return encode(getRuntimeDTO());
+    }
+
+    @Override
+    public byte[] heapUsage() {
+        return encode(getHeapUsage());
+    }
+
+    @Override
+    public byte[] bundle(final long id) {
+        return di.getInstance(XBundleAdmin.class).snapshot(id);
+    }
+
+    @Override
+    public byte[] leaks() {
+        return di.getInstance(ClassloaderLeakDetector.class).snapshot();
+    }
+
+    @Override
+    public byte[] runtimeCapabilities() {
+        return encode(getRuntimeCapabilities());
+    }
+
+    private byte[] encode(final Object data) {
+        if (data == null) {
+            return new byte[0];
+        }
+        try {
+            final BinaryCodec codec   = di.getInstance(BinaryCodec.class);
+            final byte[]      encoded = codec.encode(data);
+            return Lz4Codec.compressWithLength(encoded);
+        } catch (final Exception e) {
+            return new byte[0];
+        }
     }
 
 }

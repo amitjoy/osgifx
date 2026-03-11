@@ -48,10 +48,10 @@ import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
-import com.osgifx.console.agent.extension.AgentExtension;
-import com.osgifx.console.agent.extension.AgentExtensionName;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Publisher;
 import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
+import com.osgifx.console.agent.spi.extension.AgentExtension;
+import com.osgifx.console.agent.spi.extension.AgentExtensionName;
 
 /**
  * The {@code Agent} interface defines the remote-management contract for an OSGi
@@ -84,7 +84,7 @@ import com.osgifx.console.agent.rpc.mqtt.api.Mqtt5Subscriber;
  * @since 1.0
  */
 @ProviderType
-public interface Agent {
+public interface Agent extends AgentSnapshot {
 
     /**
      * Bundle location prefix for installing new bundles
@@ -172,7 +172,7 @@ public interface Agent {
     String AGENT_GOGO_ALLOWLIST_KEY = "osgi.fx.agent.gogo.allowlist";
 
     /**
-     * The property key to specify the maximum total decompressed size of a GZIP stream in an RPC call.
+     * The property key to specify the maximum total decompressed size of an LZ4 stream in an RPC call.
      * <p>
      * This is used to prevent Zip Bomb attacks.
      *
@@ -413,17 +413,32 @@ public interface Agent {
     void refresh() throws InterruptedException;
 
     /**
-     * Returns the detailed information of all the installed bundles
+     * Returns the detailed information of all the installed bundles.
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #bundles()} for efficient remote interactions.
      *
      * @return the detailed information of all the installed bundles
      */
     List<XBundleDTO> getAllBundles();
 
     /**
+     * Returns the detailed information of the specified bundle.
+     *
+     * @param id the bundle ID
+     * @return the compressed byte array containing the full bundle information
+     * @since 12.0
+     */
+    byte[] bundle(long id);
+
+    /**
      * Get the detailed information of all the registered DS service components
      * <p>
      * Note that, this is only possible if the remote runtime has SCR bundle
      * installed.
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #components()} for efficient remote interactions.
      *
      * @return the detailed information of all the registered DS service components,
      *         otherwise {@code empty} list if the remote runtime does not have SCR
@@ -439,6 +454,9 @@ public interface Agent {
      * <p>
      * Also note that, if metatype bundle is installed, the property descriptors
      * will also be included.
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #configurations()} for efficient remote interactions.
      *
      * @return the detailed information of all the configurations, otherwise
      *         {@code empty} list if the remote runtime does not have CM bundle
@@ -448,6 +466,9 @@ public interface Agent {
 
     /**
      * Get the detailed information of all the properties
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #properties()} for efficient remote interactions.
      *
      * @return the detailed information of all the properties
      */
@@ -455,6 +476,9 @@ public interface Agent {
 
     /**
      * Get the detailed information of all services
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #services()} for efficient remote interactions.
      *
      * @return the detailed information of all services
      */
@@ -462,6 +486,9 @@ public interface Agent {
 
     /**
      * Get the detailed information of all the threads
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #threads()} for efficient remote interactions.
      *
      * @return the detailed information of all the threads
      */
@@ -659,6 +686,9 @@ public interface Agent {
 
     /**
      * Returns the existing roles stored in {@code UserAdmin}
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #roles()} for efficient remote interactions.
      *
      * @return the list of roles (can be empty)
      */
@@ -666,6 +696,9 @@ public interface Agent {
 
     /**
      * Returns the existing Felix healthchecks
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #healthChecks()} for efficient remote interactions.
      *
      * @return the list of healthchecks (can be empty)
      */
@@ -699,6 +732,9 @@ public interface Agent {
 
     /**
      * Returns the list of suspicious bundles causing probable classloader leaks
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #leaks()} for efficient remote interactions.
      *
      * @return the set of bundles (can be empty)
      */
@@ -707,6 +743,9 @@ public interface Agent {
     /**
      * Returns the HTTP runtime information that includes list of all servlets,
      * resources, listeners, filters and error pages
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #httpComponents()} for efficient remote interactions.
      *
      * @return the list of all HTTP components
      */
@@ -714,6 +753,9 @@ public interface Agent {
 
     /**
      * Returns the JAX-RS runtime information
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #jaxRsComponents()} for efficient remote interactions.
      *
      * @return the list of all JAX-RS components
      */
@@ -721,6 +763,9 @@ public interface Agent {
 
     /**
      * Returns the CDI runtime information
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #cdiContainers()} for efficient remote interactions.
      *
      * @return the list of all CDI containers
      */
@@ -728,6 +773,9 @@ public interface Agent {
 
     /**
      * Returns the bundle logger contexts (only valid for OSGi R7)
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #bundleLoggerContexts()} for efficient remote interactions.
      *
      * @return the list of all bundle logger contexts
      */
@@ -735,6 +783,9 @@ public interface Agent {
 
     /**
      * Returns the heap usage information
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #heapUsage()} for efficient remote interactions.
      *
      * @return the heap usage information
      */
@@ -742,6 +793,9 @@ public interface Agent {
 
     /**
      * Returns the runtime DTOs
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #runtime()} for efficient remote interactions.
      *
      * @return the runtime DTOs
      */
@@ -932,9 +986,12 @@ public interface Agent {
      * should invoke this method only when a bundle-action event has fired, not on
      * every user interaction.
      * </p>
+     * <p>
+     * <b>Note:</b> This method does not utilize high-performance binary-encoded caching
+     * strategies. Use {@link #runtimeCapabilities()} for efficient remote interactions.
+     * </p>
      *
      * @return a non-{@code null}, unmodifiable list of capability descriptors
-     * @since 12.0
      */
     List<XRuntimeCapabilityDTO> getRuntimeCapabilities();
 

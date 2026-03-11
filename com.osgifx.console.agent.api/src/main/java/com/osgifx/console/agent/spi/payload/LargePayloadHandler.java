@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.spi;
+package com.osgifx.console.agent.spi.payload;
 
 import org.osgi.annotation.versioning.ConsumerType;
 

@@ -259,7 +259,8 @@ public final class McpFxController {
                 .map(tool -> new McpToolDTO(tool.name, tool.description, gson.toJson(tool.inputSchema))).toList();
 
         toolsTable.getSelectionModel().clearSelection();
-        tools.setAll(newTools);
+        tools.clear();
+        tools.addAll(newTools);
     }
 
     private void updateLogs() {
@@ -270,7 +271,8 @@ public final class McpFxController {
         final var newLogs    = serverLogs.stream().map(McpLogDTO::new).toList();
 
         logsTable.getSelectionModel().clearSelection();
-        logs.setAll(newLogs);
+        logs.clear();
+        logs.addAll(newLogs);
     }
 
     private void updateStatus() {
