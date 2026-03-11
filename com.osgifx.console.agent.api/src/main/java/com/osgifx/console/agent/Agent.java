@@ -884,6 +884,44 @@ public interface Agent {
     String createSnapshotLocally(String outputPath) throws Exception;
 
     /**
+     * Performs a thread dump of all active threads in the remote JVM.
+     * <p>
+     * The thread dump is formatted in {@code jstack}-style plain text and
+     * GZIP-compressed before being returned.
+     *
+     * @return the GZIP-compressed thread dump as a byte array
+     * @throws Exception if the thread dump creation fails
+     * @since 12.0
+     */
+    byte[] threadDump() throws Exception;
+
+    /**
+     * Estimates the uncompressed thread dump size based on current thread count.
+     * <p>
+     * This uses an approximate per-thread byte budget (name, state, stack frames)
+     * to arrive at a conservative upper bound.
+     *
+     * @return estimated uncompressed thread dump size in bytes
+     * @since 12.0
+     */
+    long estimateThreadDumpSize();
+
+    /**
+     * Creates a thread dump and saves it locally on the agent device.
+     * <p>
+     * The thread dump is formatted in {@code jstack}-style plain text and
+     * GZIP-compressed to {@code .tdump.gz}. The file is NOT automatically
+     * deleted &ndash; the caller is responsible for cleanup.
+     *
+     * @param outputPath the absolute path where the thread dump should be saved
+     *            (e.g., {@code "/opt/agent/threaddumps/dump.tdump.gz"})
+     * @return the absolute path to the created thread dump file
+     * @throws Exception if the thread dump creation fails
+     * @since 12.0
+     */
+    String createThreadDumpLocally(String outputPath) throws Exception;
+
+    /**
      * Returns the availability of all optional OSGi compendium features tracked by
      * the agent (SCR, ConfigAdmin, JAX-RS, HTTP, CDI, HealthCheck, etc.).
      *

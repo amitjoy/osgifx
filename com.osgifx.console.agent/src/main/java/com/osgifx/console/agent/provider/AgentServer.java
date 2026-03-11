@@ -114,6 +114,7 @@ import com.osgifx.console.agent.admin.XPropertyAdmin;
 import com.osgifx.console.agent.admin.XServiceAdmin;
 import com.osgifx.console.agent.admin.XSnapshotAdmin;
 import com.osgifx.console.agent.admin.XThreadAdmin;
+import com.osgifx.console.agent.admin.XThreadDumpAdmin;
 import com.osgifx.console.agent.admin.XUserAdmin;
 import com.osgifx.console.agent.di.DI;
 import com.osgifx.console.agent.dto.ConfigValue;
@@ -1012,6 +1013,22 @@ public final class AgentServer implements Agent, Closeable {
     public String createSnapshotLocally(final String outputPath) throws Exception {
         requireNonNull(outputPath, "Output path cannot be null");
         return di.getInstance(XSnapshotAdmin.class).createSnapshot(outputPath);
+    }
+
+    @Override
+    public byte[] threadDump() throws Exception {
+        return di.getInstance(XThreadDumpAdmin.class).threadDump();
+    }
+
+    @Override
+    public long estimateThreadDumpSize() {
+        return di.getInstance(XThreadDumpAdmin.class).estimateThreadDumpSize();
+    }
+
+    @Override
+    public String createThreadDumpLocally(final String outputPath) throws Exception {
+        requireNonNull(outputPath, "Output path cannot be null");
+        return di.getInstance(XThreadDumpAdmin.class).createThreadDump(outputPath);
     }
 
     @Override

@@ -38,7 +38,7 @@ public final class PayloadMetadata {
     public String contentType;
 
     /**
-     * The type of payload (HEAPDUMP or SNAPSHOT)
+     * The type of payload (HEAPDUMP / SNAPSHOT / THREADDUMP)
      */
     public PayloadType type;
 

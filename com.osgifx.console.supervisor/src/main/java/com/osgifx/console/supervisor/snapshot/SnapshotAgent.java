@@ -367,6 +367,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public byte[] threadDump() throws Exception {
+        return null;
+    }
+
+    @Override
     public void gc() {
         // nothing to do
     }
@@ -417,6 +422,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public long estimateThreadDumpSize() {
+        return 0L;
+    }
+
+    @Override
     public String createHeapdumpLocally(final String outputPath) throws Exception {
         return null;
     }
@@ -428,6 +438,11 @@ public final class SnapshotAgent implements Agent {
 
     @Override
     public String createSnapshotLocally(final String outputPath) throws Exception {
+        return null;
+    }
+
+    @Override
+    public String createThreadDumpLocally(String outputPath) throws Exception {
         return null;
     }
 

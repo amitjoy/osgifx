@@ -34,6 +34,7 @@ import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -65,6 +66,9 @@ public final class ThreadsFxUI {
     private ConsoleMaskerPane progressPane;
     @Inject
     private DataProvider      dataProvider;
+    @Inject
+    @Optional
+    private Supervisor        supervisor;
 
     @PostConstruct
     public void postConstruct(final BorderPane parent, @LocalInstance final FXMLLoader loader) {
@@ -129,9 +133,9 @@ public final class ThreadsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
+            final var syncNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
             if (!isSnapshotAgent) {
-                statusBar.addToRight(node);
+                statusBar.addToRight(syncNode);
             }
         }
     }
