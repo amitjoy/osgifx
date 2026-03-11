@@ -30,6 +30,11 @@ public enum PayloadType {
     /**
      * Runtime snapshot file (.json)
      */
-    SNAPSHOT
+    SNAPSHOT,
+
+    /**
+     * Thread dump file (.tdump.gz)
+     */
+    THREADDUMP
 
 }
