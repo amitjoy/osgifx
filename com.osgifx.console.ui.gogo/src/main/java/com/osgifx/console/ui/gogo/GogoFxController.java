@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -78,7 +77,12 @@ public final class GogoFxController {
         historyPointer = 0;
         final var parent = (BorderPane) output.getParent();
         if (!isConnected) {
-            parent.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            parent.setCenter(Fx.createDisconnectedPlaceholder());
+            input.setDisable(true);
+            return;
+        }
+        if (isSnapshotAgent) {
+            parent.setCenter(Fx.createSnapshotPlaceholder());
             input.setDisable(true);
             return;
         }

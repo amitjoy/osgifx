@@ -22,7 +22,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -76,7 +75,7 @@ public final class DtoFxController {
         final var parent = (VBox) dtoTree.getParent();
         if (!isConnected) {
             parent.getChildren().clear();
-            parent.getChildren().add(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            parent.getChildren().add(Fx.createDisconnectedPlaceholder());
             searchBox.setDisable(true);
             searchBtn.setDisable(true);
             return;

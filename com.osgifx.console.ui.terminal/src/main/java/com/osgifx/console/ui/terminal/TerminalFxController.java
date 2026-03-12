@@ -15,24 +15,30 @@
  ******************************************************************************/
 package com.osgifx.console.ui.terminal;
 
+import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.base.Throwables;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.util.fx.Fx;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 
 public final class TerminalFxController {
 
@@ -40,30 +46,48 @@ public final class TerminalFxController {
 
     @Log
     @Inject
-    private FluentLogger    logger;
+    private FluentLogger      logger;
     @FXML
-    private TextField       input;
+    private TextField         input;
     @FXML
-    private TextArea        output;
+    private TextArea          output;
     @Inject
-    private Executor        executor;
+    private Executor          executor;
     @Inject
     @Optional
-    private Supervisor      supervisor;
+    private Supervisor        supervisor;
     @Inject
-    private TerminalHistory history;
+    private TerminalHistory   history;
     @Inject
     @Named("is_snapshot_agent")
-    private boolean         isSnapshotAgent;
-    private int             historyPointer;
+    private boolean           isSnapshotAgent;
+    @Inject
+    @Named("is_connected")
+    private boolean           isConnected;
+    @Inject
+    private ThreadSynchronize threadSync;
+    private int               historyPointer;
 
     @FXML
     public void initialize() {
         historyPointer = 0;
+        final var parent = (BorderPane) output.getParent();
+        if (!isConnected) {
+            parent.setCenter(Fx.createDisconnectedPlaceholder());
+            input.setDisable(true);
+            return;
+        }
+        if (isSnapshotAgent) {
+            parent.setCenter(Fx.createSnapshotPlaceholder());
+            input.setDisable(true);
+            return;
+        }
         if (supervisor == null || supervisor.getAgent() == null) {
             logger.atWarning().log("Agent not connected");
             return;
         }
+        parent.setCenter(output);
+        input.setDisable(false);
         logger.atDebug().log("FXML controller has been initialized");
     }
 
@@ -145,6 +169,15 @@ public final class TerminalFxController {
             logger.atDebug().log("Task for command '%s' has been succeeded", command);
         });
         executor.runAsync(task);
+    }
+
+    @Inject
+    @Optional
+    private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        if (input == null) {
+            return;
+        }
+        threadSync.asyncExec(this::initialize);
     }
 
 }

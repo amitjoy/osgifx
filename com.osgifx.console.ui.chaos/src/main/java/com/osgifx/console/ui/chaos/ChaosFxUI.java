@@ -56,6 +56,9 @@ public final class ChaosFxUI {
     @Named("is_connected")
     private boolean           isConnected;
     @Inject
+    @Named("is_snapshot_agent")
+    private boolean           isSnapshotAgent;
+    @Inject
     private ConsoleStatusBar  statusBar;
     @Inject
     private ConsoleMaskerPane progressPane;
@@ -116,6 +119,20 @@ public final class ChaosFxUI {
     }
 
     private void createControls(final BorderPane parent, final FXMLLoader loader) {
+        if (!isConnected) {
+            progressPane.setVisible(false);
+            parent.getChildren().clear();
+            parent.setCenter(Fx.createDisconnectedPlaceholder());
+            statusBar.addTo(parent);
+            return;
+        }
+        if (isSnapshotAgent) {
+            progressPane.setVisible(false);
+            parent.getChildren().clear();
+            parent.setCenter(Fx.createSnapshotPlaceholder());
+            statusBar.addTo(parent);
+            return;
+        }
         progressPane.setVisible(true);
         final Task<Void> task = new Task<>() {
 
