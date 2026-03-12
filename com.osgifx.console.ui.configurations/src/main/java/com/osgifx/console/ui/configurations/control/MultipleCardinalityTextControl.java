@@ -61,7 +61,7 @@ public final class MultipleCardinalityTextControl extends SimpleControl<StringFi
                                           final int unsignedCardinality) {
         this.key                 = key;
         this.type                = type;
-        classLoader              = getClass().getClassLoader();
+        classLoader              = MultipleCardinalityPropertiesDialog.class.getClassLoader();
         this.unsignedCardinality = unsignedCardinality;
     }
 
