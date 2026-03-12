@@ -32,7 +32,6 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.dialog.ProgressDialog;
-import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Creatable;
@@ -128,6 +127,11 @@ public final class HeapMonitorPane extends BorderPane {
     @PostConstruct
     public void init() {
         memoryUsageCharts.clear();
+        if (!isConnected || isSnapshotAgent) {
+            setTop(null);
+            refreshUI();
+            return;
+        }
         setTop(createControlPanel());
         refreshUI();
 
@@ -140,7 +144,11 @@ public final class HeapMonitorPane extends BorderPane {
 
     private void refreshUI() {
         if (!isConnected) {
-            setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+            setCenter(Fx.createDisconnectedPlaceholder());
+            return;
+        }
+        if (isSnapshotAgent) {
+            setCenter(Fx.createSnapshotPlaceholder());
             return;
         }
         if (!isCapabilityAvailable("JMX")) {
