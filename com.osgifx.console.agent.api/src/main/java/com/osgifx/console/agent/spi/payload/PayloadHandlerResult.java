@@ -13,54 +13,50 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.spi;
+package com.osgifx.console.agent.spi.payload;
 
 /**
- * Metadata about a large payload file.
+ * Result of a large payload handling operation.
  *
  * @since 11.0
  */
-public final class PayloadMetadata {
+public final class PayloadHandlerResult {
 
     /**
-     * The filename (e.g., "heapdump-2026-03-02-12-30-45.hprof.gz")
+     * Whether the handling operation was successful
      */
-    public String filename;
+    public boolean success;
 
     /**
-     * The size of the file in bytes
+     * The location where the payload was stored.
+     * This can be a download URL, file path, or storage identifier.
+     * (e.g., "https://s3.amazonaws.com/bucket/heapdump.hprof.gz" or "/var/heapdumps/dump.hprof.gz")
      */
-    public long sizeBytes;
+    public String location;
 
     /**
-     * The content type (e.g., "application/x-hprof-gzip" or "application/json")
+     * Error message if the operation failed (null if successful)
      */
-    public String contentType;
+    public String errorMessage;
 
     /**
-     * The type of payload (HEAPDUMP or SNAPSHOT)
+     * Duration of the handling operation in milliseconds
      */
-    public PayloadType type;
-
-    /**
-     * The timestamp when the payload was created (epoch milliseconds)
-     */
-    public long timestamp;
+    public long durationMs;
 
     /**
      * Default constructor for DTO deserialization
      */
-    public PayloadMetadata() {
+    public PayloadHandlerResult() {
     }
 
     /**
      * Constructor with all fields
      */
-    public PayloadMetadata(String filename, long sizeBytes, String contentType, PayloadType type, long timestamp) {
-        this.filename    = filename;
-        this.sizeBytes   = sizeBytes;
-        this.contentType = contentType;
-        this.type        = type;
-        this.timestamp   = timestamp;
+    public PayloadHandlerResult(boolean success, String location, String errorMessage, long durationMs) {
+        this.success      = success;
+        this.location     = location;
+        this.errorMessage = errorMessage;
+        this.durationMs   = durationMs;
     }
 }

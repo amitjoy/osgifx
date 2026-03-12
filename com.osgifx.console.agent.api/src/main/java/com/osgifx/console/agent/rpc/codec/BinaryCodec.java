@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.rpc;
+package com.osgifx.console.agent.rpc.codec;
 
 import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_BYTE_ARRAY_SIZE_KEY;
 import static com.osgifx.console.agent.Agent.AGENT_RPC_MAX_COLLECTION_SIZE_KEY;
@@ -71,9 +71,10 @@ import org.osgi.framework.BundleContext;
  */
 public class BinaryCodec {
 
-    private static final Map<Class<?>, FieldAccessor[]> accessorCache = new ConcurrentHashMap<>();
-    private static final Map<Class<?>, Supplier<?>>     factoryCache  = new ConcurrentHashMap<>();
-    private static final MethodHandles.Lookup           lookup        = MethodHandles.lookup();
+    private static final Map<Class<?>, FieldAccessor[]> accessorCache         = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Supplier<?>>     factoryCache          = new ConcurrentHashMap<>();
+    private static final MethodHandles.Lookup           lookup                = MethodHandles.lookup();
+    private static final Comparator<Field>              FIELD_NAME_COMPARATOR = Comparator.comparing(Field::getName);
 
     // Configuration limits (read once at construction)
     private final int MAX_COLLECTION_SIZE;
@@ -112,8 +113,13 @@ public class BinaryCodec {
     static {
         Object u = null;
         try {
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field    f           = unsafeClass.getDeclaredField("theUnsafe");
+            Class<?> unsafeClass = null;
+            try {
+                unsafeClass = Class.forName("sun.misc.Unsafe");
+            } catch (ClassNotFoundException e) {
+                unsafeClass = Class.forName("sun.misc.Unsafe", true, null);
+            }
+            Field f = unsafeClass.getDeclaredField("theUnsafe");
             f.setAccessible(true);
             u = f.get(null);
 
@@ -234,6 +240,15 @@ public class BinaryCodec {
         return defaultValue;
     }
 
+    /**
+     * Clears the static caches to prevent classloader leaks.
+     * Should be called when the agent bundle is stopped.
+     */
+    public static void clearCache() {
+        accessorCache.clear();
+        factoryCache.clear();
+    }
+
     // Type Tags
     private static final byte NULL         = 0;
     private static final byte BOOL         = 1;
@@ -253,6 +268,31 @@ public class BinaryCodec {
     private static final byte STRING_LARGE = 15;
 
     // --- ENCODER ---
+    /**
+     * Encodes an object into a binary byte array.
+     *
+     * @param obj the object to encode
+     * @return the binary representation
+     * @throws Exception if encoding fails
+     */
+    public byte[] encode(final Object obj) throws Exception {
+        if (obj == null) {
+            return new byte[] { NULL };
+        }
+        final FastByteArrayOutputStream baos = new FastByteArrayOutputStream(1024);
+        try (DataOutputStream dos = new DataOutputStream(baos)) {
+            encode(obj, dos);
+            dos.flush();
+            final byte[] buffer = baos.getBuffer();
+            final int    size   = baos.size();
+            if (buffer.length == size) {
+                return buffer;
+            }
+            final byte[] result = new byte[size];
+            System.arraycopy(buffer, 0, result, 0, size);
+            return result;
+        }
+    }
 
     public void encode(Object obj, DataOutputStream out) throws Exception {
         if (obj == null) {
@@ -336,14 +376,17 @@ public class BinaryCodec {
     }
 
     public <T> T decode(final byte[] data, final Class<T> type) {
-        if (data == null || data.length == 0)
+        return decode(data, (Type) type);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T decode(final byte[] data, final Type type) {
+        if (data == null || data.length == 0) {
             return null;
-        // Optimization: Use FastByteArrayInputStream to avoid synchronized overhead of ByteArrayInputStream
-        // and reduce strict object creation if we expand this to a pool later.
-        // For now, it simply replaces ByteArrayInputStream with a lighter version.
+        }
         try (DataInputStream in = new DataInputStream(new FastByteArrayInputStream(data))) {
-            return decode(in, type);
-        } catch (Exception e) {
+            return (T) decode(in, type);
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -429,22 +472,23 @@ public class BinaryCodec {
                                     + "This may indicate a collection bomb attack or an unexpectedly large collection.",
                             size, MAX_COLLECTION_SIZE));
                 }
-                List<Object> list     = new ArrayList<>(size);
-                Type         compType = Object.class;
+                Type compType = Object.class;
                 if (type instanceof ParameterizedType)
                     compType = ((ParameterizedType) type).getActualTypeArguments()[0];
                 else if (rawClass.isArray())
                     compType = rawClass.getComponentType();
 
-                for (int i = 0; i < size; i++)
-                    list.add(decode(in, compType));
-
                 if (rawClass.isArray()) {
                     Object arr = Array.newInstance((Class<?>) compType, size);
                     for (int i = 0; i < size; i++)
-                        Array.set(arr, i, list.get(i));
+                        Array.set(arr, i, decode(in, compType));
                     return arr;
                 }
+
+                List<Object> list = new ArrayList<>(size);
+                for (int i = 0; i < size; i++)
+                    list.add(decode(in, compType));
+
                 if (Set.class.isAssignableFrom(rawClass))
                     return new LinkedHashSet<>(list);
                 return list;
@@ -547,7 +591,7 @@ public class BinaryCodec {
                     // present?
                     // No, existing code used getFields() + accessible check logic implicitly or getFields().
                     // Standard OSGi DTOs use public fields. Let's use getFields() to be safe and spec compliant.
-                    .filter(f -> !Modifier.isStatic(f.getModifiers())).sorted(Comparator.comparing(Field::getName))
+                    .filter(f -> !Modifier.isStatic(f.getModifiers())).sorted(FIELD_NAME_COMPARATOR)
                     .map(f -> unsafe != null ? createUnsafeAccessor(f) : createStandardAccessor(f))
                     .toArray(FieldAccessor[]::new);
         });

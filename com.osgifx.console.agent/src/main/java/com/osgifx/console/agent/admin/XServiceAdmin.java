@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.osgifx.console.agent.admin;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 
@@ -24,9 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
@@ -36,72 +33,95 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleInfoDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XServiceAdmin {
+@Singleton
+public final class XServiceAdmin extends AbstractSnapshotAdmin<XServiceDTO> {
 
-    private final Map<Long, XServiceDTO>      services = new ConcurrentHashMap<>();
-    private final BundleContext               context;
-    private final FluentLogger                logger   = LoggerFactory.getFluentLogger(getClass());
-    private ServiceTracker<Object, Future<?>> serviceTracker;
-    private ExecutorService                   executor;
+    private final BundleContext            context;
+    private ServiceTracker<Object, Object> serviceTracker;
 
     @Inject
-    public XServiceAdmin(final BundleContext context, final ExecutorService executor) {
-        this.context  = context;
-        this.executor = executor;
+    public XServiceAdmin(final BundleContext context,
+                         final BinaryCodec codec,
+                         final SnapshotDecoder decoder,
+                         final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context = context;
     }
 
     public void init() {
         try {
-
-            serviceTracker = new ServiceTracker<Object, Future<?>>(context, context.createFilter("(objectClass=*)"),
-                                                                   null) {
+            serviceTracker = new ServiceTracker<Object, Object>(context, context.createFilter("(objectClass=*)"),
+                                                                null) {
                 @Override
-                public Future<?> addingService(final ServiceReference<Object> reference) {
-                    return executor.submit(() -> {
-                        final XServiceDTO dto = toDTO(reference);
-                        services.put(dto.id, dto);
-                    });
+                public Object addingService(final ServiceReference<Object> reference) {
+                    scheduleUpdate(pendingChangeCount.incrementAndGet());
+                    return new Object();
                 }
 
                 @Override
-                public void modifiedService(final ServiceReference<Object> reference, final Future<?> future) {
-                    executor.submit(() -> {
-                        final XServiceDTO dto = toDTO(reference);
-                        services.put(dto.id, dto);
-                    });
+                public void modifiedService(final ServiceReference<Object> reference, final Object object) {
+                    scheduleUpdate(pendingChangeCount.incrementAndGet());
                 }
 
                 @Override
-                public void removedService(final ServiceReference<Object> reference, final Future<?> future) {
-                    if (future != null && !future.isDone()) {
-                        future.cancel(true);
-                    }
-                    final long id = (Long) reference.getProperty(org.osgi.framework.Constants.SERVICE_ID);
-                    services.remove(id);
+                public void removedService(final ServiceReference<Object> reference, final Object object) {
+                    scheduleUpdate(pendingChangeCount.incrementAndGet());
                 }
             };
             serviceTracker.open();
         } catch (final InvalidSyntaxException e) {
             logger.atError().msg("Error occurred while initializing service tracker").throwable(e).log();
         }
+        // Trigger initial snapshot
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
     }
 
+    @Override
     public void stop() {
+        super.stop();
         if (serviceTracker != null) {
             serviceTracker.close();
         }
     }
 
+    @Override
+    protected List<XServiceDTO> map() throws Exception {
+        final ServiceReference<?>[] allRefs = context.getAllServiceReferences(null, null);
+        final List<XServiceDTO>     dtos    = new ArrayList<>(allRefs == null ? 0 : allRefs.length);
+
+        if (allRefs != null) {
+            for (final ServiceReference<?> ref : allRefs) {
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
+                if (ref.getBundle() != null) {
+                    dtos.add(toDTO(ref));
+                }
+            }
+        }
+        return dtos;
+    }
+
+    @Override
     public List<XServiceDTO> get() {
-        requireNonNull(context);
-        return new ArrayList<>(services.values());
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return new ArrayList<>();
+        }
+        try {
+            return decoder.decodeList(current, XServiceDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode service snapshot").throwable(e).log();
+            return new ArrayList<>();
+        }
     }
 
     private XServiceDTO toDTO(final ServiceReference<?> ref) {

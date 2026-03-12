@@ -18,6 +18,8 @@ package com.osgifx.console.agent.rpc;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
+
 /**
  * LZ4 compression stream that mimics GZIPOutputStream interface.
  * Buffers data, compresses on finish(), and writes: compressed length + uncompressed length + compressed data.

@@ -18,6 +18,8 @@ package com.osgifx.console.agent.rpc;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
+
 /**
  * LZ4 decompression stream that mimics GZIPInputStream interface.
  * Reads compressed length + uncompressed length header, then decompresses the payload.

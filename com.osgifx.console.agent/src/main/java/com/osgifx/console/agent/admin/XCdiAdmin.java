@@ -21,8 +21,11 @@ import static java.util.stream.Collectors.toMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cdi.runtime.CDIComponentRuntime;
 import org.osgi.service.cdi.runtime.dto.ActivationDTO;
 import org.osgi.service.cdi.runtime.dto.ComponentDTO;
@@ -31,9 +34,9 @@ import org.osgi.service.cdi.runtime.dto.ConfigurationDTO;
 import org.osgi.service.cdi.runtime.dto.ContainerDTO;
 import org.osgi.service.cdi.runtime.dto.ExtensionDTO;
 import org.osgi.service.cdi.runtime.dto.ReferenceDTO;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XCdiActivationDTO;
 import com.osgifx.console.agent.dto.XCdiComponentDTO;
 import com.osgifx.console.agent.dto.XCdiComponentInstanceDTO;
@@ -41,34 +44,92 @@ import com.osgifx.console.agent.dto.XCdiConfigurationDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XCdiExtensionDTO;
 import com.osgifx.console.agent.dto.XCdiReferenceDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class XCdiAdmin {
+public final class XCdiAdmin extends AbstractSnapshotAdmin<XCdiContainerDTO> {
 
-    private final Supplier<Object> cdiRuntimeSupplier;
-    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                                      context;
+    private final Supplier<Object>                                   cdiRuntimeSupplier;
+    private ServiceTracker<CDIComponentRuntime, CDIComponentRuntime> cdiTracker;
 
     @Inject
-    public XCdiAdmin(final Supplier<Object> cdiRuntimeSupplier) {
+    public XCdiAdmin(final BundleContext context,
+                     final Supplier<Object> cdiRuntimeSupplier,
+                     final BinaryCodec codec,
+                     final SnapshotDecoder decoder,
+                     final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context            = context;
         this.cdiRuntimeSupplier = cdiRuntimeSupplier;
     }
 
-    public List<XCdiContainerDTO> getCdiContainers() {
+    public void init() {
+        cdiTracker = new ServiceTracker<>(context, CDIComponentRuntime.class,
+                                          new ServiceTrackerCustomizer<CDIComponentRuntime, CDIComponentRuntime>() {
+
+                                              @Override
+                                              public CDIComponentRuntime addingService(final ServiceReference<CDIComponentRuntime> reference) {
+                                                  final CDIComponentRuntime service = context.getService(reference);
+                                                  scheduleUpdate(getChangeCount(reference));
+                                                  return service;
+                                              }
+
+                                              @Override
+                                              public void modifiedService(final ServiceReference<CDIComponentRuntime> reference,
+                                                                          final CDIComponentRuntime service) {
+                                                  scheduleUpdate(getChangeCount(reference));
+                                              }
+
+                                              @Override
+                                              public void removedService(final ServiceReference<CDIComponentRuntime> reference,
+                                                                         final CDIComponentRuntime service) {
+                                                  invalidate();
+                                                  context.ungetService(reference);
+                                              }
+                                          });
+        cdiTracker.open();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (cdiTracker != null) {
+            cdiTracker.close();
+        }
+    }
+
+    private long getChangeCount(final ServiceReference<?> ref) {
+        final Object prop = ref.getProperty("service.changecount");
+        return prop instanceof Long ? (Long) prop : 0L;
+    }
+
+    @Override
+    public List<XCdiContainerDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return decoder.decodeList(current, XCdiContainerDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode CDI snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    protected List<XCdiContainerDTO> map() throws Exception {
         final CDIComponentRuntime runtime = (CDIComponentRuntime) cdiRuntimeSupplier.get();
         if (runtime == null) {
             logger.atWarn().msg("OSGi CDI Runtime service is unavailable").log();
             return Collections.emptyList();
         }
-
-        try {
-            return runtime.getContainerDTOs().stream().map(this::toXCdiContainerDTO).collect(toList());
-        } catch (final Exception e) {
-            logger.atError().msg("Error retrieving CDI containers").throwable(e).log();
-            return Collections.emptyList();
-        }
+        return runtime.getContainerDTOs().stream().map(this::toXCdiContainerDTO).collect(toList());
     }
 
     private XCdiContainerDTO toXCdiContainerDTO(final ContainerDTO dto) {

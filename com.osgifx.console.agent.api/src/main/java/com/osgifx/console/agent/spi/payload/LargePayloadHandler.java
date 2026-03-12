@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.spi;
+package com.osgifx.console.agent.spi.payload;
 
 import org.osgi.annotation.versioning.ConsumerType;
 
 /**
- * Service interface for handling large payloads (heapdumps, snapshots) that exceed
- * RPC transport limits. Implementations can upload to HTTP servers, SFTP, S3, NFS,
- * or any other storage mechanism.
+ * Service interface for handling large payloads (heapdumps, snapshots, threaddumps)
+ * that exceed RPC transport limits. Implementations can upload to HTTP servers,
+ * SFTP, S3, NFS, or any other storage mechanism.
  *
  * <p>
  * This is a {@code @ConsumerType} API - the remote runtime provides implementations,

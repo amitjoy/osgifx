@@ -22,8 +22,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
@@ -35,55 +38,113 @@ import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XResourceMethodInfoDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class XJaxRsAdmin {
+public final class XJaxRsAdmin extends AbstractSnapshotAdmin<XJaxRsComponentDTO> {
 
-    private final Supplier<Object> jaxRsRuntimeSupplier;
-    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                                      context;
+    private final Supplier<Object>                                   jaxRsRuntimeSupplier;
+    private ServiceTracker<JaxrsServiceRuntime, JaxrsServiceRuntime> jaxRsTracker;
 
     @Inject
-    public XJaxRsAdmin(final Supplier<Object> jaxRsRuntimeSupplier) {
+    public XJaxRsAdmin(final BundleContext context,
+                       final Supplier<Object> jaxRsRuntimeSupplier,
+                       final BinaryCodec codec,
+                       final SnapshotDecoder decoder,
+                       final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context              = context;
         this.jaxRsRuntimeSupplier = jaxRsRuntimeSupplier;
     }
 
-    public List<XJaxRsComponentDTO> getJaxRsComponents() {
+    public void init() {
+        jaxRsTracker = new ServiceTracker<>(context, JaxrsServiceRuntime.class,
+                                            new ServiceTrackerCustomizer<JaxrsServiceRuntime, JaxrsServiceRuntime>() {
+
+                                                @Override
+                                                public JaxrsServiceRuntime addingService(final ServiceReference<JaxrsServiceRuntime> reference) {
+                                                    final JaxrsServiceRuntime service = context.getService(reference);
+                                                    scheduleUpdate(getChangeCount(reference));
+                                                    return service;
+                                                }
+
+                                                @Override
+                                                public void modifiedService(final ServiceReference<JaxrsServiceRuntime> reference,
+                                                                            final JaxrsServiceRuntime service) {
+                                                    scheduleUpdate(getChangeCount(reference));
+                                                }
+
+                                                @Override
+                                                public void removedService(final ServiceReference<JaxrsServiceRuntime> reference,
+                                                                           final JaxrsServiceRuntime service) {
+                                                    invalidate();
+                                                    context.ungetService(reference);
+                                                }
+                                            });
+        jaxRsTracker.open();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (jaxRsTracker != null) {
+            jaxRsTracker.close();
+        }
+    }
+
+    private long getChangeCount(final ServiceReference<?> ref) {
+        final Object prop = ref.getProperty("service.changecount");
+        return prop instanceof Long ? (Long) prop : 0L;
+    }
+
+    @Override
+    public List<XJaxRsComponentDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return decoder.decodeList(current, XJaxRsComponentDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode JAX-RS snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    protected List<XJaxRsComponentDTO> map() throws Exception {
         final JaxrsServiceRuntime runtime = (JaxrsServiceRuntime) jaxRsRuntimeSupplier.get();
         if (runtime == null) {
             logger.atWarn().msg(serviceUnavailable(JAX_RS_RUNTIME)).log();
             return Collections.emptyList();
         }
-        try {
-            final RuntimeDTO               runtimeDTO = runtime.getRuntimeDTO();
-            final List<XJaxRsComponentDTO> dtos       = new ArrayList<>();
+        final RuntimeDTO               runtimeDTO = runtime.getRuntimeDTO();
+        final List<XJaxRsComponentDTO> dtos       = new ArrayList<>();
 
-            // Applications
-            if (runtimeDTO.defaultApplication != null) {
-                addApplications(dtos, new ApplicationDTO[] { runtimeDTO.defaultApplication }, false,
-                        "Default Application");
-            }
-            addApplications(dtos, runtimeDTO.applicationDTOs, false, "Application");
-            addFailedApplications(dtos, runtimeDTO.failedApplicationDTOs, "Application");
-
-            // Failed Extensions
-            addFailedExtensions(dtos, runtimeDTO.failedExtensionDTOs, "Extension");
-
-            // Failed Resources
-            addFailedResources(dtos, runtimeDTO.failedResourceDTOs, "Resource");
-
-            return dtos;
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving JAX-RS components").throwable(e).log();
-            return Collections.emptyList();
+        // Applications
+        if (runtimeDTO.defaultApplication != null) {
+            addApplications(dtos, new ApplicationDTO[] { runtimeDTO.defaultApplication }, false, "Default Application");
         }
+        addApplications(dtos, runtimeDTO.applicationDTOs, false, "Application");
+        addFailedApplications(dtos, runtimeDTO.failedApplicationDTOs, "Application");
+
+        // Failed Extensions
+        addFailedExtensions(dtos, runtimeDTO.failedExtensionDTOs, "Extension");
+
+        // Failed Resources
+        addFailedResources(dtos, runtimeDTO.failedResourceDTOs, "Resource");
+
+        return dtos;
     }
 
     private void addApplications(final List<XJaxRsComponentDTO> dtos,

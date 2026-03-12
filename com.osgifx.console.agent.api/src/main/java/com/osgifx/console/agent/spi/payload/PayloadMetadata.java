@@ -13,50 +13,54 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.spi;
+package com.osgifx.console.agent.spi.payload;
 
 /**
- * Result of a large payload handling operation.
+ * Metadata about a large payload file.
  *
  * @since 11.0
  */
-public final class PayloadHandlerResult {
+public final class PayloadMetadata {
 
     /**
-     * Whether the handling operation was successful
+     * The filename (e.g., "heapdump-2026-03-02-12-30-45.hprof.gz")
      */
-    public boolean success;
+    public String filename;
 
     /**
-     * The location where the payload was stored.
-     * This can be a download URL, file path, or storage identifier.
-     * (e.g., "https://s3.amazonaws.com/bucket/heapdump.hprof.gz" or "/var/heapdumps/dump.hprof.gz")
+     * The size of the file in bytes
      */
-    public String location;
+    public long sizeBytes;
 
     /**
-     * Error message if the operation failed (null if successful)
+     * The content type (e.g., "application/x-hprof-gzip" or "application/json")
      */
-    public String errorMessage;
+    public String contentType;
 
     /**
-     * Duration of the handling operation in milliseconds
+     * The type of payload (HEAPDUMP / SNAPSHOT / THREADDUMP)
      */
-    public long durationMs;
+    public PayloadType type;
+
+    /**
+     * The timestamp when the payload was created (epoch milliseconds)
+     */
+    public long timestamp;
 
     /**
      * Default constructor for DTO deserialization
      */
-    public PayloadHandlerResult() {
+    public PayloadMetadata() {
     }
 
     /**
      * Constructor with all fields
      */
-    public PayloadHandlerResult(boolean success, String location, String errorMessage, long durationMs) {
-        this.success      = success;
-        this.location     = location;
-        this.errorMessage = errorMessage;
-        this.durationMs   = durationMs;
+    public PayloadMetadata(String filename, long sizeBytes, String contentType, PayloadType type, long timestamp) {
+        this.filename    = filename;
+        this.sizeBytes   = sizeBytes;
+        this.contentType = contentType;
+        this.type        = type;
+        this.timestamp   = timestamp;
     }
 }

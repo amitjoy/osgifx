@@ -237,7 +237,8 @@ public final class ChaosFxController implements Initializable {
 
     private void handleLog(final ActionLog log) {
         logs.add(0, log);
-        offlineTargets.setAll(engine.getOfflineTargets().keySet());
+        offlineTargets.clear();
+        offlineTargets.addAll(engine.getOfflineTargets().keySet());
     }
 
     private void setControlsDisable(final boolean disable) {

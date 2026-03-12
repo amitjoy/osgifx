@@ -51,13 +51,13 @@ import org.osgi.framework.BundleContext;
 
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
-import com.osgifx.console.agent.rpc.BinaryCodec;
-import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayInputStream;
-import com.osgifx.console.agent.rpc.BinaryCodec.FastByteArrayOutputStream;
-import com.osgifx.console.agent.rpc.Lz4Codec;
 import com.osgifx.console.agent.rpc.Lz4InputStream;
 import com.osgifx.console.agent.rpc.MethodKey;
 import com.osgifx.console.agent.rpc.RemoteRPC;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec.FastByteArrayInputStream;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec.FastByteArrayOutputStream;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
 
 import aQute.bnd.exceptions.Exceptions;
 
@@ -80,7 +80,8 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal
             .withInitial(() -> new FastByteArrayOutputStream(4096));
-    private final Map<String, Method>                    methodCache     = new HashMap<>();
+    private final ThreadLocal<DataOutputStream>          encodingOut     = ThreadLocal
+            .withInitial(() -> new DataOutputStream(buffer.get()));
     private final Map<MethodKey, Method>                 methodKeyCache  = new HashMap<>();
     private final ThreadLocal<MethodKey>                 methodKeyHolder = ThreadLocal.withInitial(MethodKey::new);
     private final ThreadLocal<Object[]>                  parameterBuffer = ThreadLocal.withInitial(() -> new Object[8]);
@@ -201,7 +202,6 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             if (m.getDeclaringClass() != RemoteRPC.class && m.getDeclaringClass() != Object.class) {
                 // Intern method name to reduce memory footprint
                 String internedName = m.getName().intern();
-                methodCache.put(internedName + "#" + m.getParameterTypes().length, m);
                 methodKeyCache.put(new MethodKey(internedName, m.getParameterTypes().length), m);
                 // Cache method signatures
                 parameterTypeCache.put(m, m.getParameterTypes());
@@ -354,12 +354,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
         // Use ThreadLocal MethodKey for zero-allocation lookup
         MethodKey key = methodKeyHolder.get();
         key.set(cmd, count);
-        Method m = methodKeyCache.get(key);
-        if (m != null) {
-            return m;
-        }
-        // Fallback to old cache
-        return methodCache.get(cmd + "#" + count);
+        return methodKeyCache.get(key);
     }
 
     private boolean isLz4(byte[] bytes) {
@@ -418,10 +413,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     final FastByteArrayOutputStream bout = buffer.get();
                     bout.reset();
                     // Adaptive Compression: Serialize first, then decide
-                    // We use a temporary DataOutputStream wrapper around the buffer
-                    try (DataOutputStream dataOut = new DataOutputStream(bout)) {
-                        codec.encode(value, dataOut);
-                    }
+                    // We use a cached DataOutputStream wrapper around the buffer
+                    final DataOutputStream dataOut = encodingOut.get();
+                    codec.encode(value, dataOut);
+
                     final int    length    = bout.size();
                     final byte[] rawBuffer = bout.getBuffer();
 
@@ -454,8 +449,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                         out.write(rawBuffer, 0, length);
                     }
 
-                    if (length > 1024 * 1024)
+                    if (length > 1024 * 1024) {
                         buffer.set(new FastByteArrayOutputStream(4096));
+                        encodingOut.set(new DataOutputStream(buffer.get()));
+                    }
                 }
             }
             out.flush();

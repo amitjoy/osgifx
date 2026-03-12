@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.osgifx.console.agent.rpc;
+package com.osgifx.console.agent.rpc.codec;
 
 import java.io.IOException;
 
@@ -24,6 +24,20 @@ import com.osgifx.console.agent.rpc.lz4.Lz4Decompressor;
  * LZ4 compression/decompression codec for RPC payloads.
  * Uses vendored LZ4 from io.airlift:aircompressor for zero-allocation compression.
  * Thread-safe via ThreadLocal instances.
+ * <p>
+ * <b>Compression Format:</b>
+ * <ul>
+ * <li>{@link #compressWithLength(byte[])} produces a self-describing payload with:
+ * <ul>
+ * <li>1-byte compression flag (0x00 = uncompressed, 0x01 = compressed)</li>
+ * <li>4-byte big-endian uncompressed length (supports up to 2GB payloads)</li>
+ * <li>Compressed or raw data bytes</li>
+ * </ul>
+ * </li>
+ * <li>Payloads smaller than {@value #COMPRESSION_THRESHOLD} bytes are not compressed to avoid overhead</li>
+ * </ul>
+ *
+ * @since 12.0
  */
 public final class Lz4Codec {
 
@@ -32,6 +46,7 @@ public final class Lz4Codec {
     // ThreadLocal instances for thread-safe reuse
     private static final ThreadLocal<Lz4Compressor>   COMPRESSOR   = ThreadLocal.withInitial(Lz4Compressor::new);
     private static final ThreadLocal<Lz4Decompressor> DECOMPRESSOR = ThreadLocal.withInitial(Lz4Decompressor::new);
+    private static final ThreadLocal<byte[]>          COMPRESS_BUF = ThreadLocal.withInitial(() -> new byte[65536]);
 
     private Lz4Codec() {
     }
@@ -59,7 +74,12 @@ public final class Lz4Codec {
         try {
             Lz4Compressor compressor          = COMPRESSOR.get();
             int           maxCompressedLength = compressor.maxCompressedLength(length);
-            byte[]        compressed          = new byte[maxCompressedLength];
+            byte[]        compressed          = COMPRESS_BUF.get();
+
+            if (compressed.length < maxCompressedLength) {
+                compressed = new byte[maxCompressedLength];
+                COMPRESS_BUF.set(compressed);
+            }
 
             int compressedSize = compressor.compress(data, offset, length, compressed, 0, maxCompressedLength);
 
@@ -67,6 +87,10 @@ public final class Lz4Codec {
             if (compressedSize < length) {
                 byte[] result = new byte[compressedSize];
                 System.arraycopy(compressed, 0, result, 0, compressedSize);
+
+                if (maxCompressedLength > 1024 * 1024) {
+                    COMPRESS_BUF.remove();
+                }
                 return result;
             }
 
@@ -119,6 +143,62 @@ public final class Lz4Codec {
     }
 
     /**
+     * Compresses data with a length prefix and compression flag.
+     * <p>
+     * <b>Format:</b> [1-byte flag][4-byte big-endian length][compressed/raw data]
+     * <ul>
+     * <li>Flag: 0x00 = uncompressed, 0x01 = LZ4 compressed</li>
+     * <li>Length: Original uncompressed size (4 bytes, big-endian)</li>
+     * <li>Data: LZ4-compressed bytes or raw bytes if compression didn't reduce size</li>
+     * </ul>
+     *
+     * @param data the data to compress
+     * @return payload with 1-byte flag and 4-byte length prefix
+     * @throws IOException if compression fails
+     */
+    public static byte[] compressWithLength(byte[] data) throws IOException {
+        int     length       = data.length;
+        byte[]  compressed   = compress(data, 0, length);
+        boolean isCompressed = (compressed != data);
+
+        byte[] result = new byte[compressed.length + 5];
+        result[0] = isCompressed ? (byte) 1 : (byte) 0;
+        result[1] = (byte) (length >> 24);
+        result[2] = (byte) (length >> 16);
+        result[3] = (byte) (length >> 8);
+        result[4] = (byte) length;
+        System.arraycopy(compressed, 0, result, 5, compressed.length);
+        return result;
+    }
+
+    /**
+     * Decompresses data that was compressed with {@link #compressWithLength(byte[])}.
+     *
+     * @param data the length-prefixed payload
+     * @param maxDecompressedSize maximum allowed decompressed size
+     * @return decompressed data
+     * @throws IOException if decompression fails or size limit exceeded
+     */
+    public static byte[] decompressWithLength(byte[] data, long maxDecompressedSize) throws IOException {
+        if (data == null || data.length < 5) {
+            return new byte[0];
+        }
+        boolean isCompressed       = data[0] == 1;
+        int     uncompressedLength = ((data[1] & 0xFF) << 24) | ((data[2] & 0xFF) << 16) | ((data[3] & 0xFF) << 8)
+                | (data[4] & 0xFF);
+
+        if (!isCompressed) {
+            byte[] result = new byte[data.length - 5];
+            System.arraycopy(data, 5, result, 0, result.length);
+            return result;
+        }
+
+        byte[] compressed = new byte[data.length - 5];
+        System.arraycopy(data, 5, compressed, 0, compressed.length);
+        return decompress(compressed, uncompressedLength, maxDecompressedSize);
+    }
+
+    /**
      * Returns the compression threshold in bytes.
      * Payloads smaller than this are not compressed.
      *
@@ -126,5 +206,15 @@ public final class Lz4Codec {
      */
     public static int getCompressionThreshold() {
         return COMPRESSION_THRESHOLD;
+    }
+
+    /**
+     * Clears the ThreadLocal instances to prevent classloader leaks.
+     * Should be called when the agent bundle is stopped.
+     */
+    public static void clear() {
+        COMPRESSOR.remove();
+        DECOMPRESSOR.remove();
+        COMPRESS_BUF.remove();
     }
 }

@@ -41,7 +41,9 @@ import com.osgifx.console.agent.dto.ServiceComponentRuntimeDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
+@Singleton
 public final class XDtoAdmin {
 
     private final BundleContext    context;

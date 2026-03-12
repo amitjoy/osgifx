@@ -43,6 +43,8 @@ import org.osgi.util.tracker.BundleTracker;
 
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.dto.XBundleDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -93,15 +95,29 @@ public final class ClassloaderLeakDetector implements Runnable {
     private final Map<Long, BundleInfo>       bundleInfos = new ConcurrentHashMap<>();
 
     private final BundleContext             context;
+    private final BinaryCodec               codec;
     private Thread                          referencePoller;
     private BundleTracker<Bundle>           bundleTracker;
     private final BundleStartTimeCalculator bundleStartTimeCalculator;
 
     @Inject
     public ClassloaderLeakDetector(final BundleContext context,
-                                   final BundleStartTimeCalculator bundleStartTimeCalculator) {
+                                   final BundleStartTimeCalculator bundleStartTimeCalculator,
+                                   final BinaryCodec codec) {
         this.context                   = context;
         this.bundleStartTimeCalculator = bundleStartTimeCalculator;
+        this.codec                     = codec;
+    }
+
+    public synchronized byte[] snapshot() {
+        try {
+            final Set<XBundleDTO> suspiciousBundles = getSuspiciousBundles();
+            final byte[]          encoded           = codec.encode(suspiciousBundles);
+            final byte[]          compressed        = Lz4Codec.compressWithLength(encoded);
+            return compressed;
+        } catch (final Exception e) {
+            return new byte[0];
+        }
     }
 
     public void start() {

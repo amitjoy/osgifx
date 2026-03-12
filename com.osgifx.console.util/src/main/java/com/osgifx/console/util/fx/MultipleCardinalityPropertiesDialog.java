@@ -68,7 +68,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         initStyle(StageStyle.UNDECORATED);
         dialogPane.setHeaderText("Multiple Cardinality [Key: " + key + "]");
         dialogPane.getStylesheets().add(classLoader.getResource(STANDARD_CSS).toExternalForm());
-        dialogPane.setGraphic(new ImageView(classLoader.getResource("/graphic/images/configuration.png").toString()));
+        dialogPane.setGraphic(new ImageView(classLoader.getResource("configuration.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
 
         final var lbMessage = new Label("");
@@ -171,7 +171,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             final CustomTextField txtField;
             if (type != BOOLEAN || type != BOOLEAN_ARRAY || type != BOOLEAN_LIST) {
                 txtField = (CustomTextField) TextFields.createClearableTextField();
-                txtField.setLeft(new ImageView(classLoader.getResource("/graphic/icons/kv.png").toExternalForm()));
+                txtField.setLeft(new ImageView(classLoader.getResource("kv.png").toExternalForm()));
                 if (initValue != null) {
                     txtField.setText(initValue);
                 }
