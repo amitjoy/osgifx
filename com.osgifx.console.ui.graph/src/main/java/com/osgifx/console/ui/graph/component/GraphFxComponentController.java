@@ -26,10 +26,10 @@ import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.lang3.Strings;
 import org.controlsfx.control.MaskerPane;
-import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -91,10 +91,13 @@ public final class GraphFxComponentController implements GraphController {
     @Inject
     private DataProvider                        dataProvider;
     @Inject
-    @javax.inject.Named("is_connected")
+    @Named("is_connected")
     private boolean                             isConnected;
     @Inject
     private ThreadSynchronize                   threadSync;
+    @Inject
+    @Named("is_snapshot_agent")
+    private boolean                             isSnapshotAgent;
     @Inject
     private RuntimeComponentGraph               runtimeGraph;
     private MaskerPane                          progressPane;
@@ -107,7 +110,7 @@ public final class GraphFxComponentController implements GraphController {
     public void initialize() {
         try {
             if (!isConnected) {
-                graphPane.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+                graphPane.setCenter(Fx.createDisconnectedPlaceholder());
                 searchText.setDisable(true);
                 componentsList.setPlaceholder(new Label("Agent not connected"));
                 componentsList.setDisable(true);

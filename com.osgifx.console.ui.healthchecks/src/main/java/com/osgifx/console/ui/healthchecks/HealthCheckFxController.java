@@ -30,7 +30,6 @@ import javax.inject.Named;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.MaskerPane;
 import org.controlsfx.control.SegmentedButton;
-import org.controlsfx.glyphfont.FontAwesome.Glyph;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -113,7 +112,7 @@ public final class HealthCheckFxController {
     public void initialize() {
         try {
             if (!isConnected) {
-                hcResultArea.setCenter(Fx.createPlaceholderNode("Agent not connected", Glyph.POWER_OFF));
+                hcResultArea.setCenter(Fx.createDisconnectedPlaceholder());
                 hcTypeButton.setDisable(true);
                 searchText.setDisable(true);
                 executeHcButton.setDisable(true);

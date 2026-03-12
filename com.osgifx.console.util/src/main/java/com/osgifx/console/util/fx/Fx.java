@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.util.fx;
 
+import static javafx.scene.layout.Priority.ALWAYS;
+import static org.controlsfx.glyphfont.FontAwesome.Glyph.CAMERA;
+import static org.controlsfx.glyphfont.FontAwesome.Glyph.POWER_OFF;
+import static org.controlsfx.glyphfont.FontAwesome.Glyph.WARNING;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -145,7 +150,6 @@ public final class Fx {
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         final var item = new MenuItem("Copy");
         item.setOnAction(_ -> {
-
             final Set<Integer> rows = Sets.newTreeSet();
             for (final TablePosition<?, ?> tablePosition : table.getSelectionModel().getSelectedCells()) {
                 rows.add(tablePosition.getRow());
@@ -221,11 +225,21 @@ public final class Fx {
     }
 
     public static void addTablePlaceholderWhenDisconnected(final TableView<?> table) {
-        table.setPlaceholder(createPlaceholderNode("Agent not connected", FontAwesome.Glyph.POWER_OFF));
+        table.setPlaceholder(createDisconnectedPlaceholder());
     }
 
     public static void addListViewPlaceholderWhenDisconnected(final ListView<?> list) {
-        list.setPlaceholder(createPlaceholderNode("Agent not connected", FontAwesome.Glyph.POWER_OFF));
+        list.setPlaceholder(createDisconnectedPlaceholder());
+    }
+
+    /**
+     * Creates a standalone placeholder {@link Node} suitable for replacing an
+     * entire content pane when the agent is disconnected.
+     *
+     * @return a centred {@code VBox} containing a power-off glyph and a descriptive label
+     */
+    public static Node createDisconnectedPlaceholder() {
+        return createPlaceholderNode("Agent not connected", POWER_OFF);
     }
 
     /**
@@ -238,8 +252,7 @@ public final class Fx {
      * @param featureName the human-readable name of the missing feature (e.g. {@code "JAX-RS"})
      */
     public static void addTablePlaceholderWhenFeatureUnavailable(final TableView<?> table, final String featureName) {
-        table.setPlaceholder(createPlaceholderNode(featureName + " is not available in the connected runtime",
-                FontAwesome.Glyph.WARNING));
+        table.setPlaceholder(createFeatureUnavailablePlaceholder(featureName));
     }
 
     /**
@@ -251,8 +264,17 @@ public final class Fx {
      * @return a centred {@code VBox} containing a warning glyph and a descriptive label
      */
     public static Node createFeatureUnavailablePlaceholder(final String featureName) {
-        return createPlaceholderNode(featureName + " is not available in the connected runtime",
-                FontAwesome.Glyph.WARNING);
+        return createPlaceholderNode(featureName + " is not available in the connected runtime", WARNING);
+    }
+
+    /**
+     * Creates a standalone placeholder {@link Node} suitable for replacing an
+     * entire content pane when the agent is in snapshot mode.
+     *
+     * @return a centred {@code VBox} containing a camera glyph and a descriptive label
+     */
+    public static Node createSnapshotPlaceholder() {
+        return createPlaceholderNode("This feature is not available in snapshot mode", CAMERA);
     }
 
     public static Node createPlaceholderNode(final String text, final FontAwesome.Glyph icon) {
@@ -268,7 +290,7 @@ public final class Fx {
         box.setMaxWidth(Double.MAX_VALUE);
         box.setMaxHeight(Double.MAX_VALUE);
         box.setStyle("-fx-background-color: -fx-control-inner-background;");
-        javafx.scene.layout.VBox.setVgrow(box, javafx.scene.layout.Priority.ALWAYS);
+        javafx.scene.layout.VBox.setVgrow(box, ALWAYS);
 
         return box;
     }
