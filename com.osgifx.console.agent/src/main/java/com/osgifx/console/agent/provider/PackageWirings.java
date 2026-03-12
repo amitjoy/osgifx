@@ -81,7 +81,7 @@ public final class PackageWirings {
         for (final BundleWire wire : wiring.getRequiredWires(PACKAGE_NAMESPACE)) {
             final String       pkgName        = (String) wire.getCapability().getAttributes().get(PACKAGE_NAMESPACE);
             final BundleWiring providerWiring = wire.getProviderWiring();
-            if (pkgName.startsWith(packageName) && providerWiring != null) {
+            if (pkgName.equals(packageName) && providerWiring != null) {
                 return true;
             }
         }
@@ -137,7 +137,7 @@ public final class PackageWirings {
     }
 
     public boolean isJmxWired() {
-        return isWired("javax.management");
+        return isWired("javax.management") || isWired("com.sun.management");
     }
 
     public boolean isFelixHcWired() {

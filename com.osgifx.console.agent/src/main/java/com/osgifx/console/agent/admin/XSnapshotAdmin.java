@@ -29,12 +29,10 @@ import com.osgifx.console.agent.dto.RuntimeDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
 
 import aQute.lib.json.JSONCodec;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-/**
- * Admin class for creating runtime snapshots.
- *
- * @since 11.0
- */
+@Singleton
 public final class XSnapshotAdmin {
 
     private static final FluentLogger      logger           = LoggerFactory.getFluentLogger(XSnapshotAdmin.class);
@@ -43,6 +41,7 @@ public final class XSnapshotAdmin {
     private final XDtoAdmin     dtoAdmin;
     private final BundleContext context;
 
+    @Inject
     public XSnapshotAdmin(final BundleContext context, final XDtoAdmin dtoAdmin) {
         this.context  = context;
         this.dtoAdmin = dtoAdmin;

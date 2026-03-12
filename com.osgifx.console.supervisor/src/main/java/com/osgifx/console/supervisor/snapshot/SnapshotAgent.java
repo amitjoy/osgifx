@@ -56,6 +56,8 @@ import com.osgifx.console.agent.dto.XRoleDTO.Type;
 import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
 import com.osgifx.console.agent.dto.XThreadDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.Lz4Codec;
 import com.osgifx.console.dto.SnapshotDTO;
 
 @Component(service = { SnapshotAgent.class, Agent.class }, configurationPid = PID)
@@ -68,6 +70,7 @@ public final class SnapshotAgent implements Agent {
     }
 
     private volatile SnapshotDTO snapshotDTO;
+    private final BinaryCodec    codec = new BinaryCodec();
 
     @Activate
     @Modified
@@ -367,6 +370,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public byte[] threadDump() throws Exception {
+        return null;
+    }
+
+    @Override
     public void gc() {
         // nothing to do
     }
@@ -417,6 +425,11 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public long estimateThreadDumpSize() {
+        return 0L;
+    }
+
+    @Override
     public String createHeapdumpLocally(final String outputPath) throws Exception {
         return null;
     }
@@ -432,8 +445,113 @@ public final class SnapshotAgent implements Agent {
     }
 
     @Override
+    public String createThreadDumpLocally(String outputPath) throws Exception {
+        return null;
+    }
+
+    @Override
     public List<XRuntimeCapabilityDTO> getRuntimeCapabilities() {
         return List.of();
+    }
+
+    @Override
+    public byte[] bundles() {
+        return encode(snapshotDTO.bundles);
+    }
+
+    @Override
+    public byte[] components() {
+        return encode(snapshotDTO.components);
+    }
+
+    @Override
+    public byte[] services() {
+        return encode(snapshotDTO.services);
+    }
+
+    @Override
+    public byte[] configurations() {
+        return encode(snapshotDTO.configurations);
+    }
+
+    @Override
+    public byte[] properties() {
+        return encode(snapshotDTO.properties);
+    }
+
+    @Override
+    public byte[] threads() {
+        return encode(snapshotDTO.threads);
+    }
+
+    @Override
+    public byte[] roles() {
+        return encode(snapshotDTO.roles);
+    }
+
+    @Override
+    public byte[] healthChecks() {
+        return encode(snapshotDTO.healthChecks);
+    }
+
+    @Override
+    public byte[] httpComponents() {
+        return encode(snapshotDTO.httpComponents);
+    }
+
+    @Override
+    public byte[] jaxRsComponents() {
+        return encode(snapshotDTO.jaxRsComponents);
+    }
+
+    @Override
+    public byte[] cdiContainers() {
+        return encode(snapshotDTO.cdiContainers);
+    }
+
+    @Override
+    public byte[] bundleLoggerContexts() {
+        return encode(snapshotDTO.bundleLoggerContexts);
+    }
+
+    @Override
+    public byte[] runtime() {
+        return encode(snapshotDTO.runtime);
+    }
+
+    @Override
+    public byte[] heapUsage() {
+        return encode(snapshotDTO.heapUsage);
+    }
+
+    @Override
+    public byte[] bundle(long id) {
+        if (snapshotDTO.bundles != null) {
+            return snapshotDTO.bundles.stream().filter(b -> b.id == id).findFirst().map(this::encode).orElse(null);
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] leaks() {
+        return encode(snapshotDTO.classloaderLeaks);
+    }
+
+    @Override
+    public byte[] runtimeCapabilities() {
+        return encode(snapshotDTO.runtimeCapabilities);
+    }
+
+    private byte[] encode(Object data) {
+        if (data == null) {
+            return new byte[0];
+        }
+        try {
+            final byte[] raw = codec.encode(data);
+            return Lz4Codec.compressWithLength(raw);
+        } catch (final Exception e) {
+            return new byte[0];
+        }
     }
 
 }

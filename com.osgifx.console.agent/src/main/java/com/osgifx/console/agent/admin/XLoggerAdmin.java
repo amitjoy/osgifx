@@ -31,10 +31,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -42,31 +45,66 @@ import org.osgi.service.log.LogLevel;
 import org.osgi.service.log.admin.LoggerAdmin;
 import org.osgi.service.log.admin.LoggerContext;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XLoggerAdmin {
+@Singleton
+public final class XLoggerAdmin extends AbstractSnapshotAdmin<XBundleLoggerContextDTO> implements BundleListener {
 
     private final BundleContext    context;
     private final Supplier<Object> loggerAdminSupplier;
     private final boolean          isConfigAdminWired;
-    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
     public XLoggerAdmin(final Supplier<Object> loggerAdminSupplier,
                         final PackageWirings packageWirings,
-                        final BundleContext context) {
+                        final BundleContext context,
+                        final BinaryCodec codec,
+                        final SnapshotDecoder decoder,
+                        final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.context             = context;
         this.loggerAdminSupplier = loggerAdminSupplier;
         isConfigAdminWired       = packageWirings.isConfigAdminWired();
     }
 
-    public List<XBundleLoggerContextDTO> getLoggerContexts() {
+    public void init() {
+        context.addBundleListener(this);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        context.removeBundleListener(this);
+    }
+
+    @Override
+    public void bundleChanged(final BundleEvent event) {
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
+    }
+
+    @Override
+    public List<XBundleLoggerContextDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return decoder.decodeList(current, XBundleLoggerContextDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode Logger Context snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    protected List<XBundleLoggerContextDTO> map() throws Exception {
         final LoggerAdmin loggerAdmin = (LoggerAdmin) loggerAdminSupplier.get();
         if (loggerAdmin == null) {
             logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();

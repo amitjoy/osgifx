@@ -23,9 +23,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.runtime.HttpServiceRuntime;
 import org.osgi.service.http.runtime.dto.ErrorPageDTO;
 import org.osgi.service.http.runtime.dto.FilterDTO;
@@ -34,36 +37,97 @@ import org.osgi.service.http.runtime.dto.ResourceDTO;
 import org.osgi.service.http.runtime.dto.RuntimeDTO;
 import org.osgi.service.http.runtime.dto.ServletContextDTO;
 import org.osgi.service.http.runtime.dto.ServletDTO;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XHttpComponentDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XHttpAdmin {
+@Singleton
+public final class XHttpAdmin extends AbstractSnapshotAdmin<XHttpComponentDTO> {
 
-    private final Supplier<Object> httpServiceRuntimeSupplier;
-    private final FluentLogger     logger = LoggerFactory.getFluentLogger(getClass());
+    private final BundleContext                                    context;
+    private final Supplier<Object>                                 httpServiceRuntimeSupplier;
+    private ServiceTracker<HttpServiceRuntime, HttpServiceRuntime> httpTracker;
 
     @Inject
-    public XHttpAdmin(final Supplier<Object> httpServiceRuntimeSupplier) {
+    public XHttpAdmin(final BundleContext context,
+                      final Supplier<Object> httpServiceRuntimeSupplier,
+                      final BinaryCodec codec,
+                      final SnapshotDecoder decoder,
+                      final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context                    = context;
         this.httpServiceRuntimeSupplier = httpServiceRuntimeSupplier;
     }
 
-    public List<XHttpComponentDTO> runtime() {
+    public void init() {
+        httpTracker = new ServiceTracker<>(context, HttpServiceRuntime.class,
+                                           new ServiceTrackerCustomizer<HttpServiceRuntime, HttpServiceRuntime>() {
+
+                                               @Override
+                                               public HttpServiceRuntime addingService(final ServiceReference<HttpServiceRuntime> reference) {
+                                                   final HttpServiceRuntime service = context.getService(reference);
+                                                   scheduleUpdate(getChangeCount(reference));
+                                                   return service;
+                                               }
+
+                                               @Override
+                                               public void modifiedService(final ServiceReference<HttpServiceRuntime> reference,
+                                                                           final HttpServiceRuntime service) {
+                                                   scheduleUpdate(getChangeCount(reference));
+                                               }
+
+                                               @Override
+                                               public void removedService(final ServiceReference<HttpServiceRuntime> reference,
+                                                                          final HttpServiceRuntime service) {
+                                                   invalidate();
+                                                   context.ungetService(reference);
+                                               }
+                                           });
+        httpTracker.open();
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (httpTracker != null) {
+            httpTracker.close();
+        }
+    }
+
+    private long getChangeCount(final ServiceReference<?> ref) {
+        final Object prop = ref.getProperty("service.changecount");
+        return prop instanceof Long ? (Long) prop : 0L;
+    }
+
+    @Override
+    public List<XHttpComponentDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return Collections.emptyList();
+        }
+        try {
+            return decoder.decodeList(current, XHttpComponentDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode HTTP snapshot").throwable(e).log();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    protected List<XHttpComponentDTO> map() throws Exception {
         final HttpServiceRuntime httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntimeSupplier.get();
         if (httpServiceRuntime == null) {
             logger.atWarn().msg(serviceUnavailable(HTTP_RUNTIME)).log();
             return Collections.emptyList();
         }
-        try {
-            final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
-            return initHttpComponents(runtime);
-        } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving HTTP components").throwable(e).log();
-            return Collections.emptyList();
-        }
+        final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();
+        return initHttpComponents(runtime);
     }
 
     private List<XHttpComponentDTO> initHttpComponents(final RuntimeDTO runtime) {

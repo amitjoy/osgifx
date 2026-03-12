@@ -13,15 +13,28 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
+package com.osgifx.console.agent.spi.payload;
+
 /**
- * Service Provider Interface (SPI) for extending OSGi.fx Agent functionality.
- *
- * <p>
- * This package contains {@code @ConsumerType} interfaces that remote runtimes
- * can implement to extend agent capabilities.
+ * Type of large payload.
  *
  * @since 11.0
  */
-@org.osgi.annotation.bundle.Export
-@org.osgi.annotation.versioning.Version("1.0.0")
-package com.osgifx.console.agent.spi;
+public enum PayloadType {
+
+    /**
+     * Heap dump file (.hprof or .hprof.gz)
+     */
+    HEAPDUMP,
+
+    /**
+     * Runtime snapshot file (.json)
+     */
+    SNAPSHOT,
+
+    /**
+     * Thread dump file (.tdump.gz)
+     */
+    THREADDUMP
+
+}

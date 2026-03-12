@@ -17,8 +17,8 @@ package com.osgifx.console.ext.agent.custom;
 
 import org.osgi.service.component.annotations.Component;
 
-import com.osgifx.console.agent.extension.AgentExtension;
-import com.osgifx.console.agent.extension.AgentExtensionName;
+import com.osgifx.console.agent.spi.extension.AgentExtension;
+import com.osgifx.console.agent.spi.extension.AgentExtensionName;
 
 @Component
 @AgentExtensionName("my-agent-extension")

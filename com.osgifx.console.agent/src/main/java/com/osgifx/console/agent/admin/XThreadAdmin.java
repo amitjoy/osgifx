@@ -24,43 +24,70 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.provider.PackageWirings;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XThreadAdmin {
+@Singleton
+public final class XThreadAdmin extends AbstractSnapshotAdmin<XThreadDTO> {
 
     private final PackageWirings wirings;
-    private final FluentLogger   logger = LoggerFactory.getFluentLogger(getClass());
 
     @Inject
-    public XThreadAdmin(final PackageWirings wirings) {
+    public XThreadAdmin(final PackageWirings wirings,
+                        final BinaryCodec codec,
+                        final SnapshotDecoder decoder,
+                        final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
         this.wirings = wirings;
     }
 
+    public void init() {
+        // No background polling needed for threads; cheap to get live.
+    }
+
+    @Override
+    public byte[] snapshot() {
+        return liveSnapshot();
+    }
+
+    @Override
     public List<XThreadDTO> get() {
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return Collections.emptyList();
+        }
         try {
-            final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
-            final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
-            return threadList.stream().map(this::toDTO).collect(toList());
+            return decoder.decodeList(current, XThreadDTO.class);
         } catch (final Exception e) {
-            logger.atError().msg("Error occurred while retrieving threads").throwable(e).log();
+            logger.atError().msg("Failed to decode thread snapshot").throwable(e).log();
             return Collections.emptyList();
         }
     }
 
-    private XThreadDTO toDTO(final Thread thread) {
+    @Override
+    protected List<XThreadDTO> map() throws Exception {
+        final Map<Thread, StackTraceElement[]> threads    = Thread.getAllStackTraces();
+        final List<Thread>                     threadList = new ArrayList<>(threads.keySet());
+        final long[]                           deadlocks  = getDeadlockedThreads();
+
+        return threadList.stream().map(t -> toDTO(t, deadlocks)).collect(toList());
+    }
+
+    private XThreadDTO toDTO(final Thread thread, final long[] deadlocks) {
         final XThreadDTO dto = new XThreadDTO();
 
         dto.name          = thread.getName();
         dto.id            = thread.getId();
         dto.priority      = thread.getPriority();
         dto.state         = thread.getState().name();
-        dto.isDeadlocked  = isDeadlocked(thread.getId());
+        dto.isDeadlocked  = isDeadlocked(thread.getId(), deadlocks);
         dto.isInterrupted = thread.isInterrupted();
         dto.isAlive       = thread.isAlive();
         dto.isDaemon      = thread.isDaemon();
@@ -68,18 +95,21 @@ public final class XThreadAdmin {
         return dto;
     }
 
-    private boolean isDeadlocked(final long id) {
+    private boolean isDeadlocked(final long id, final long[] deadlocks) {
+        if (deadlocks == null) {
+            return false;
+        }
+        return Arrays.stream(deadlocks).anyMatch(e -> e == id);
+    }
+
+    private long[] getDeadlockedThreads() {
         final boolean isJmxWired = wirings.isJmxWired();
         if (isJmxWired) {
-            final ThreadMXBean bean      = ManagementFactory.getThreadMXBean();
-            final long[]       deadlocks = bean.findDeadlockedThreads();
-            if (deadlocks == null) {
-                return false;
-            }
-            return Arrays.stream(deadlocks).anyMatch(e -> e == id);
+            final ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+            return bean.findDeadlockedThreads();
         }
-        logger.atDebug().msg("JMX unavailable to check if thread [id: '%s'] is deadlocked").arg(id).log();
-        return false;
+        logger.atDebug().msg("JMX unavailable to check for deadlocked threads").log();
+        return null;
     }
 
 }

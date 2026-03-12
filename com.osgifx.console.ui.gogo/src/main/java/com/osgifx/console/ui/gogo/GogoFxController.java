@@ -189,6 +189,9 @@ public final class GogoFxController {
     @Inject
     @Optional
     private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        if (input == null) {
+            return;
+        }
         threadSync.asyncExec(this::initialize);
     }
 

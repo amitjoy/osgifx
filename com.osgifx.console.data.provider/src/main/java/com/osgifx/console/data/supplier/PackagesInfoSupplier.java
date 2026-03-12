@@ -30,6 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,6 +44,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XPackageDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.data.provider.PackageDTO;
 import com.osgifx.console.executor.Executor;
@@ -70,13 +73,15 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
+    private SnapshotDecoder     decoder;
 
     private final ObservableList<PackageDTO> packages     = observableArrayList();
     private final ReentrantLock              retrieveLock = new ReentrantLock();
 
     @Activate
-    void activate() {
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    void activate(final BundleContext context) {
+        logger  = FluentLogger.of(factory.createLogger(getClass().getName()));
+        decoder = new SnapshotDecoder(new BinaryCodec(context));
     }
 
     @Override
@@ -89,7 +94,9 @@ public final class PackagesInfoSupplier implements RuntimeInfoSupplier, EventHan
                 return;
             }
             logger.atInfo().log("Retrieving packages info from remote runtime");
-            final var data = preparePackages(agent.getAllBundles());
+            final var snapshot = agent.bundles();
+            final var bundles  = decoder.decodeList(snapshot, XBundleDTO.class);
+            final var data     = preparePackages(bundles);
             threadSync.asyncExec(() -> {
                 packages.setAll(data);
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_PACKAGES_TOPIC);

@@ -56,16 +56,17 @@ public final class OSGiEventHandler implements EventHandler {
 
     @Override
     public void handleEvent(final Event event) {
+        final boolean isLoggingEnabled = Boolean.getBoolean(PROPERTY_ENABLE_EVENTING);
+        if (!isLoggingEnabled) {
+            return;
+        }
         final XEventDTO dto = new XEventDTO();
 
         dto.received   = System.currentTimeMillis();
         dto.properties = initProperties(event);
         dto.topic      = event.getTopic();
 
-        final boolean isLoggingEnabled = Boolean.getBoolean(PROPERTY_ENABLE_EVENTING);
-        if (isLoggingEnabled) {
-            supervisor.onOSGiEvent(dto);
-        }
+        supervisor.onOSGiEvent(dto);
     }
 
     private Map<String, String> initProperties(final Event event) {

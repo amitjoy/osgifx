@@ -33,11 +33,10 @@ import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.helper.AgentHelper;
 
-/**
- * Admin class for creating heap dumps.
- *
- * @since 11.0
- */
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
 public final class XHeapDumpAdmin {
 
     private static final FluentLogger      logger           = LoggerFactory.getFluentLogger(XHeapDumpAdmin.class);
@@ -45,6 +44,7 @@ public final class XHeapDumpAdmin {
 
     private final BundleContext context;
 
+    @Inject
     public XHeapDumpAdmin(final BundleContext context) {
         this.context = context;
     }
