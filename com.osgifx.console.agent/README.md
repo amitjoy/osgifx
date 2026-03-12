@@ -378,7 +378,6 @@ To maintain a small footprint (< 200KB) and zero external dependencies, the agen
 - **Provider Pattern**: Supports lazy-loaded services that are only instantiated when an RPC call actually requires them.
 byte[] logSnapshot = logBuffer.snapshot(fiveMinsAgo, Long.MAX_VALUE);
 // Result is a packed binary blob, ready for LZ4 compression and transmission
-```
 
 ### Remote Eventing
 When enabled (`osgi.fx.enable.eventing=true`), the agent subscribes to all OSGi `EventAdmin` topics and streams them in real-time to the Supervisor. Events are debounced and batched to prevent flooding over slow MQTT or Socket links.
@@ -613,6 +612,7 @@ The agent can be dynamically reconfigured at runtime without restarting the bund
 | `osgifx:status` | `osgifx:status` | Displays running endpoints and active configs. |
 
 **Pro Tip:** You can change the RPC behavior on-the-fly:
+
 ```bash
 g! osgifx:startSocket [port=2222 host=0.0.0.0 secure=true]
 ```
