@@ -22,7 +22,6 @@ import static com.osgifx.console.agent.helper.AgentHelper.createResult;
 import static com.osgifx.console.agent.helper.AgentHelper.serviceUnavailable;
 import static com.osgifx.console.agent.helper.OSGiCompendiumService.SCR;
 import static java.util.Collections.emptyMap;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.ACTIVE;
 import static org.osgi.service.component.runtime.dto.ComponentConfigurationDTO.SATISFIED;
@@ -34,15 +33,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -58,21 +52,19 @@ import org.osgi.util.promise.Promise;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-import com.j256.simplelogging.FluentLogger;
-import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XReferenceDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
 import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
-public final class XComponentAdmin {
-
-    // --- Tuning ---
-    private static final long DEBOUNCE_DELAY_MS = 200;
-    private static final long MAX_WAIT_MS       = 5000;
+@Singleton
+public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> {
 
     // --- Optimized Reflection Handles (Init Once, Use Forever) ---
     private static final MethodHandle FAILURE_GETTER;
@@ -80,10 +72,10 @@ public final class XComponentAdmin {
     private static final MethodHandle COLLECTION_TYPE_GETTER;
 
     static {
-        MethodHandles.Lookup lookup         = MethodHandles.publicLookup();
-        MethodHandle         failure        = null;
-        MethodHandle         parameter      = null;
-        MethodHandle         collectionType = null;
+        final MethodHandles.Lookup lookup         = MethodHandles.publicLookup();
+        MethodHandle               failure        = null;
+        MethodHandle               parameter      = null;
+        MethodHandle               collectionType = null;
         try {
             // Attempt to resolve R7+ fields safely
             failure        = lookup.findGetter(ComponentConfigurationDTO.class, "failure", String.class);
@@ -97,28 +89,16 @@ public final class XComponentAdmin {
         COLLECTION_TYPE_GETTER = collectionType;
     }
 
-    // --- State Management ---
-    // Volatile allows lock-free reads. Readers always see a consistent map.
-    private volatile Map<Long, List<XComponentDTO>> components = Collections.emptyMap();
-
-    // Concurrency controls
-    private final AtomicLong                          lastChangeCount    = new AtomicLong(-1);     // Last *Processed*
-    private final AtomicLong                          pendingChangeCount = new AtomicLong(-1);     // Latest *Requested*
-    private final AtomicLong                          lastEventTime      = new AtomicLong(0);
-    private final AtomicLong                          deadline           = new AtomicLong(0);
-    private final AtomicReference<ScheduledFuture<?>> scheduledTask      = new AtomicReference<>();
-
-    // --- Infrastructure ---
     private final BundleContext                                              context;
-    private final ScheduledExecutorService                                   executor;
     private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
-    private final FluentLogger                                               logger = LoggerFactory
-            .getFluentLogger(getClass());
 
     @Inject
-    public XComponentAdmin(final BundleContext context, final ScheduledExecutorService executor) {
-        this.context  = context;
-        this.executor = executor;
+    public XComponentAdmin(final BundleContext context,
+                           final BinaryCodec codec,
+                           final SnapshotDecoder decoder,
+                           final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context = context;
     }
 
     public void init() {
@@ -146,124 +126,60 @@ public final class XComponentAdmin {
                                                                          final ServiceComponentRuntime service) {
                                                   // Critical: Clear cache immediately if SCR stops.
                                                   // Prevents UI from showing "ghost" components that no longer exist.
-                                                  components = Collections.emptyMap();
+                                                  snapshot.set(null);
                                                   context.ungetService(reference);
                                               }
                                           });
         scrTracker.open();
     }
 
+    @Override
     public void stop() {
+        super.stop();
         if (scrTracker != null) {
             scrTracker.close();
         }
-        final ScheduledFuture<?> task = scheduledTask.get();
-        if (task != null) {
-            task.cancel(true);
-        }
     }
 
-    // --- Adaptive Scheduler (Lock-Free) ---
-    private void scheduleUpdate(final long changeCount) {
-        final long now = System.currentTimeMillis();
-        lastEventTime.set(now);
-        pendingChangeCount.set(changeCount);
-
-        // 1. Initialize Deadline if not set (CAS ensures we only set it on the FIRST event of a burst)
-        deadline.compareAndSet(0, now + MAX_WAIT_MS);
-
-        // 2. Ensure a Checker Task is running
-        scheduledTask.updateAndGet(current -> {
-            if (current != null && !current.isDone()) {
-                // Task is already running/scheduled. It will see the updated 'lastEventTime'
-                // and reschedule itself if necessary.
-                return current;
-            }
-            // No task running. Schedule one.
-            return executor.schedule(this::checkAndRun, DEBOUNCE_DELAY_MS, MILLISECONDS);
-        });
-    }
-
-    // --- The Checker Logic ---
-    private void checkAndRun() {
-        final long now             = System.currentTimeMillis();
-        final long lastEvent       = lastEventTime.get();
-        final long currentDeadline = deadline.get();
-
-        final long silence   = now - lastEvent;
-        final long remaining = currentDeadline - now;
-        final long delay     = DEBOUNCE_DELAY_MS - silence;
-
-        // Condition to RUN: Silence achieved OR Deadline exceeded
-        if (delay <= 0 || remaining <= 0) {
-            performSnapshot(pendingChangeCount.get());
-
-            // Cleanup
-            deadline.set(0);
-
-            // Race Condition Check:
-            // If a new event came in *while* we were running (or just before we cleared deadline),
-            // 'lastEventTime' would be > 'now' (approx).
-            // We must insure we don't drop that event.
-            if (lastEventTime.get() > now) {
-                // Reschedule to handle the pending event
-                scheduledTask.set(executor.schedule(this::checkAndRun, DEBOUNCE_DELAY_MS, MILLISECONDS));
-            }
-        } else {
-            // Not ready yet. Reschedule for the remaining wait time.
-            // We take the smaller of (Debounce Delay) or (Deadline).
-            final long wait = Math.max(1, Math.min(delay, remaining));
-            scheduledTask.set(executor.schedule(this::checkAndRun, wait, MILLISECONDS));
-        }
-    }
-
-    // --- Optimized Snapshot Execution ---
-    private synchronized void performSnapshot(final long changeCount) {
-        if (changeCount != -1 && changeCount <= lastChangeCount.get()) {
-            return;
-        }
+    @Override
+    protected List<XComponentDTO> map() throws Exception {
         final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
-            return;
+            return null;
         }
+        final List<XComponentDTO> allDTOs = new ArrayList<>();
 
-        try {
-            final Map<Long, List<XComponentDTO>> newSnapshot = new HashMap<>();
-
-            // Optimization: Iterate descriptions directly
-            for (final ComponentDescriptionDTO desc : scr.getComponentDescriptionDTOs()) {
-                if (Thread.currentThread().isInterrupted()) {
-                    return;
-                }
-
-                // Optimization: Pre-size list to avoid resizing (heuristic: typical bundle has 1-5 components)
-                final List<XComponentDTO> dtos = new ArrayList<>(5);
-
-                final Collection<ComponentConfigurationDTO> configs = scr.getComponentConfigurationDTOs(desc);
-                if (configs.isEmpty()) {
-                    dtos.add(toDTO(null, desc));
-                } else {
-                    for (final ComponentConfigurationDTO config : configs) {
-                        dtos.add(toDTO(config, desc));
-                    }
-                }
-                newSnapshot.computeIfAbsent(desc.bundle.id, k -> new ArrayList<>()).addAll(dtos);
+        // Optimization: Iterate descriptions directly
+        for (final ComponentDescriptionDTO desc : scr.getComponentDescriptionDTOs()) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
             }
 
-            this.components = Collections.unmodifiableMap(newSnapshot);
-            lastChangeCount.set(changeCount);
-
-        } catch (final Exception e) {
-            logger.atError().msg("SCR Snapshot failed").throwable(e).log();
-        } finally {
-            deadline.set(0);
+            final Collection<ComponentConfigurationDTO> configs = scr.getComponentConfigurationDTOs(desc);
+            if (configs.isEmpty()) {
+                allDTOs.add(toDTO(null, desc));
+            } else {
+                for (final ComponentConfigurationDTO config : configs) {
+                    allDTOs.add(toDTO(config, desc));
+                }
+            }
         }
+        return allDTOs;
     }
 
-    // --- Lock-Free ---
-    public List<XComponentDTO> getComponents() {
+    @Override
+    public List<XComponentDTO> get() {
         // Fast. Non-blocking. Thread-safe.
-        return components.values().stream().flatMap(List::stream).collect(Collectors.toList());
+        final byte[] current = snapshot();
+        if (current == null || current.length == 0) {
+            return new ArrayList<>();
+        }
+        try {
+            return decoder.decodeList(current, XComponentDTO.class);
+        } catch (final Exception e) {
+            logger.atError().msg("Failed to decode component snapshot").throwable(e).log();
+            return new ArrayList<>();
+        }
     }
 
     public ServiceComponentRuntime getServiceComponentRuntime() {
@@ -351,11 +267,10 @@ public final class XComponentAdmin {
     }
 
     private XComponentDTO findCachedDTO(final long componentId) {
-        for (final List<XComponentDTO> list : components.values()) {
-            for (final XComponentDTO dto : list) {
-                if (dto.id == componentId) {
-                    return dto;
-                }
+        final List<XComponentDTO> all = get();
+        for (final XComponentDTO dto : all) {
+            if (dto.id == componentId) {
+                return dto;
             }
         }
         return null;

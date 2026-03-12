@@ -20,16 +20,17 @@ import static com.osgifx.console.event.topics.ComponentActionEventTopics.COMPONE
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_ACTION_EVENT_TOPICS;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CONFIGURATIONS_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
-import static com.osgifx.console.util.fx.ConsoleFxHelper.makeNullSafe;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.osgi.service.component.annotations.ReferenceCardinality.OPTIONAL;
 import static org.osgi.service.component.annotations.ReferencePolicyOption.GREEDY;
 
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,6 +41,8 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.event.propertytypes.EventTopics;
 
 import com.osgifx.console.agent.dto.XConfigurationDTO;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
 import com.osgifx.console.data.manager.RuntimeInfoSupplier;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
@@ -65,13 +68,15 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
     @Reference(cardinality = OPTIONAL, policyOption = GREEDY)
     private volatile Supervisor supervisor;
     private FluentLogger        logger;
+    private SnapshotDecoder     decoder;
 
     private final ObservableList<XConfigurationDTO> configurations = observableArrayList();
     private final ReentrantLock                     retrieveLock   = new ReentrantLock();
 
     @Activate
-    void activate() {
-        logger = FluentLogger.of(factory.createLogger(getClass().getName()));
+    void activate(final BundleContext context) {
+        logger  = FluentLogger.of(factory.createLogger(getClass().getName()));
+        decoder = new SnapshotDecoder(new BinaryCodec(context));
     }
 
     @Override
@@ -84,7 +89,8 @@ public final class ConfigurationsInfoSupplier implements RuntimeInfoSupplier, Ev
                 return;
             }
             logger.atInfo().log("Retrieving configurations info from remote runtime");
-            final var data = makeNullSafe(agent.getAllConfigurations());
+            final byte[]                  snapshot = agent.configurations();
+            final List<XConfigurationDTO> data     = decoder.decodeList(snapshot, XConfigurationDTO.class);
             threadSync.asyncExec(() -> {
                 configurations.setAll(data);
                 RuntimeInfoSupplier.sendEvent(eventAdmin, DATA_RETRIEVED_CONFIGURATIONS_TOPIC);

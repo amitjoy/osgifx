@@ -4,6 +4,9 @@ Model-Fragment      : fragment.e4xmi
 					  fragment.e4xmi = fragment.e4xmi,\
 					  css = css,\
 					  fxml = fxml,\
-					  graphic = graphic
--buildpath          : ${bundles.required}
+					  graphic = graphic,\
+					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
+-buildpath          : \
+                      ${bundles.required},\
+                      org.apache.commons.commons-io
 -privatepackage     : com.osgifx.console.ui.threads

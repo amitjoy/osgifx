@@ -370,6 +370,9 @@ public final class HealthCheckFxController {
     @Inject
     @Optional
     private void updateOnDataRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_HEALTHCHECKS_TOPIC) final String data) {
+        if (searchText == null) {
+            return;
+        }
         if (nameHcButton != null && nameHcButton.isSelected()) {
             initNames();
         } else if (tagHcButton != null) {
@@ -381,6 +384,9 @@ public final class HealthCheckFxController {
     @Inject
     @Optional
     private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
+        if (searchText == null) {
+            return;
+        }
         threadSync.asyncExec(this::initialize);
     }
 
