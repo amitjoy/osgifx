@@ -10,6 +10,7 @@
   <a href="#license"><img width="110" alt="logo" src="https://img.shields.io/badge/License-Apache-blue" /></a>
   <img width="130" alt="logo" src="https://github.com/amitjoy/osgifx/actions/workflows/build.yml/badge.svg" />
   <a href="https://github.com/amitjoy/osgifx/releases/"><img width="100" alt="logo" src="https://img.shields.io/github/release/amitjoy/osgifx?include_prereleases&sort=semver" /></a>
+  <a href="https://github.com/amitjoy/osgifx-eclipse-plugin"><img width="120" alt="logo" src="https://img.shields.io/badge/Eclipse-Plugin-orange?logo=eclipseide" /></a>
   </p>
 
 ### ❓ Why OSGi.fx?
@@ -57,6 +58,17 @@ The latest released version is **2.4.5**.
 Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
 
 For detailed instructions, please refer to the **User Guide** on the website or check our local [User Guide](GUIDE.md).
+
+------------------------------------------------------------------------------------------------------------
+
+### 🔌 IDE Integration
+
+Experience **OSGi.fx** directly within your development environment with the **[OSGi.fx Eclipse Plugin](https://github.com/amitjoy/osgifx-eclipse-plugin)**.
+
+-   **⚡ Seamless Launch:** Start the OSGi.fx console directly from Eclipse.
+-   **🛠️ Connection Profiles:** Manage your **Socket** and **MQTT** connections within the IDE.
+-   **⚙️ Auto-Managed Runtime:** Automatic setup of the required **JavaFX 25** environment.
+-   **🎨 Visual Status:** Real-time tracking of connection status with intuitive icons.
 
 ------------------------------------------------------------------------------------------------------------
 
