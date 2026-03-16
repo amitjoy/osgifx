@@ -18,6 +18,7 @@ package com.osgifx.console.ui.graph.component;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_COMPONENTS_TOPIC;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -29,6 +30,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.cycle.TarjanSimpleCycles;
 import org.jgrapht.graph.AsSubgraph;
@@ -49,11 +51,15 @@ public final class RuntimeComponentGraph {
 
     @Inject
     private DataProvider                        dataProvider;
+    @Inject
+    private ThreadSynchronize                   threadSync;
     private Graph<ComponentVertex, DefaultEdge> graph;
 
     @PostConstruct
     public void init() {
-        graph = buildGraph(dataProvider.components());
+        final List<XComponentDTO> components = threadSync.syncExec(() -> Lists.newArrayList(dataProvider.components()),
+                new ArrayList<XComponentDTO>());
+        graph = buildGraph(components);
     }
 
     @Inject

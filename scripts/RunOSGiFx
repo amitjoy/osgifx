@@ -29,6 +29,8 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RunOSGiFx {
 
@@ -154,6 +156,10 @@ public class RunOSGiFx {
         String artifact = parts[1];
         String version  = parts[2];
 
+        if ("LATEST".equalsIgnoreCase(version)) {
+            version = resolveLatestVersion(group, artifact);
+        }
+
         String repo = version.endsWith("-SNAPSHOT") ? SONATYPE_SNAPSHOTS : MAVEN_CENTRAL;
         String path = group.replace('.', '/') + "/" + artifact + "/" + version + "/" + artifact + "-" + version
                 + ".jar";
@@ -182,6 +188,32 @@ public class RunOSGiFx {
 
         System.out.println("Downloaded to " + tempFile.toAbsolutePath());
         return tempFile;
+    }
+
+    private static String resolveLatestVersion(String group, String artifact) throws IOException, InterruptedException {
+        String metadataUrl = MAVEN_CENTRAL + group.replace('.', '/') + "/" + artifact + "/maven-metadata.xml";
+        System.out.println("Resolving LATEST version from " + metadataUrl + "...");
+
+        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(10)).build();
+        HttpRequest          request  = HttpRequest.newBuilder(URI.create(metadataUrl)).GET().build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            failFast("Failed to resolve LATEST version. HTTP " + response.statusCode());
+        }
+
+        String xml     = response.body();
+        Matcher matcher = Pattern.compile("<release>(.*?)</release>").matcher(xml);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        matcher = Pattern.compile("<latest>(.*?)</latest>").matcher(xml);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        failFast("Could not find latest version in maven-metadata.xml");
+        return null;
     }
 
     private static void launch(Path jar, List<String> jvmArgs, List<String> programArgs) throws IOException, InterruptedException {

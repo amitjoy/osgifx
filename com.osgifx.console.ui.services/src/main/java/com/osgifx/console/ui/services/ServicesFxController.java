@@ -129,14 +129,12 @@ public final class ServicesFxController {
         table.getColumns().add(registeringBundleColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        filteredList = new FilteredList<>(dataProvider.services());
         threadSync.asyncExec(() -> {
+            filteredList = new FilteredList<>(dataProvider.services());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(objectClassColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(objectClassColumn);
+            table.sort();
         });
     }
 
