@@ -21,8 +21,10 @@ import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
@@ -47,6 +49,7 @@ import org.jgrapht.nio.dot.DOTExporter;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.graph.GraphController;
@@ -225,7 +228,8 @@ public final class GraphFxBundleController implements GraphController {
     }
 
     private void initBundlesList() {
-        final var bundles = dataProvider.bundles();
+        final List<XBundleDTO> bundles = threadSync.syncExec(() -> Lists.newArrayList(dataProvider.bundles()),
+                new ArrayList<XBundleDTO>());
         if (masterBundleList == null) {
             masterBundleList = FXCollections.observableArrayList(bundles.stream().map(BundleItem::new).toList());
             bundlesList.getSelectionModel().setSelectionMode(MULTIPLE);

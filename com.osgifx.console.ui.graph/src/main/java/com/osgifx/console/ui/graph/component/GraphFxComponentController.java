@@ -21,7 +21,9 @@ import static com.osgifx.console.ui.graph.GraphHelper.generateDotFileName;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -43,6 +45,8 @@ import org.jgrapht.nio.dot.DOTExporter;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.ui.graph.GraphController;
@@ -152,7 +156,9 @@ public final class GraphFxComponentController implements GraphController {
     }
 
     private boolean isCapabilityAvailable(final String capabilityId) {
-        return dataProvider.runtimeCapabilities().stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
+        final List<XRuntimeCapabilityDTO> capabilities = threadSync.syncExec(
+                () -> Lists.newArrayList(dataProvider.runtimeCapabilities()), new ArrayList<XRuntimeCapabilityDTO>());
+        return capabilities.stream().anyMatch(c -> capabilityId.equals(c.id) && c.isAvailable);
     }
 
     @Override
@@ -236,7 +242,8 @@ public final class GraphFxComponentController implements GraphController {
     }
 
     private void initComponentsList() {
-        final var components = dataProvider.components();
+        final List<XComponentDTO> components = threadSync.syncExec(() -> Lists.newArrayList(dataProvider.components()),
+                new ArrayList<XComponentDTO>());
         if (masterComponentList == null) {
             masterComponentList = FXCollections
                     .observableArrayList(components.stream().map(ComponentItem::new).toList());

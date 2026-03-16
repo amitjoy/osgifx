@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Creatable;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.EventTopic;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.AsSubgraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -47,14 +48,17 @@ import com.osgifx.console.ui.graph.GraphEdge;
 public final class RuntimeBundleGraph {
 
     @Inject
-    private DataProvider dataProvider;
+    private DataProvider      dataProvider;
+    @Inject
+    private ThreadSynchronize threadSync;
 
     private Graph<BundleVertex, DefaultEdge> graph;
     private Graph<BundleVertex, GraphEdge>   serviceGraph;
 
     @PostConstruct
     public void init() {
-        final var bundles = dataProvider.bundles();
+        final List<XBundleDTO> bundles = threadSync.syncExec(() -> new ArrayList<>(dataProvider.bundles()),
+                new ArrayList<XBundleDTO>());
         graph        = buildGraph(bundles);
         serviceGraph = buildServiceGraph(bundles);
     }
