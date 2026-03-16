@@ -32,7 +32,7 @@ You can also use the `RunOSGiFx` script which simplifies the process by handling
 ./RunOSGiFx --jar path/to/osgifx.jar -Dosgifx.config=/path/to/config.json
 
 # Run with auto-download from Maven
-./RunOSGiFx --gav com.osgifx:osgifx-console:LATEST -Dosgifx.config=/path/to/config.json
+./RunOSGiFx --gav com.osgifx:osgifx:LATEST -Dosgifx.config=/path/to/config.json
 ```
 
 ## Configuration Format
