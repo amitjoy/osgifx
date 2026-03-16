@@ -144,14 +144,12 @@ public final class ComponentsFxController {
         table.getColumns().add(conditionIdColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        filteredList = new FilteredList<>(dataProvider.components());
         threadSync.asyncExec(() -> {
+            filteredList = new FilteredList<>(dataProvider.components());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(componentNameColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(componentNameColumn);
+            table.sort();
         });
     }
 
