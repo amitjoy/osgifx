@@ -42,6 +42,7 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -102,10 +103,10 @@ public final class SocketConnectionDialog extends Dialog<SocketConnectionSetting
         final var password = (CustomPasswordField) TextFields.createClearablePasswordField();
         password.setLeft(new ImageView(getClass().getResource("/graphic/icons/truststore.png").toExternalForm()));
 
-        final var requiresAuthentication = new javafx.scene.control.CheckBox("Requires Authentication");
+        final var requiresAuthentication = new CheckBox("Requires Authentication");
         Optional.ofNullable(setting).ifPresent(s -> requiresAuthentication.setSelected(s.requiresAuthentication));
 
-        final var savePassword = new javafx.scene.control.CheckBox("Save Password");
+        final var savePassword = new CheckBox("Save Password");
         Optional.ofNullable(setting).ifPresent(s -> savePassword.setSelected(s.savePassword));
 
         // Binding 1: If password field is not empty, auto-select requiresAuthentication and savePassword

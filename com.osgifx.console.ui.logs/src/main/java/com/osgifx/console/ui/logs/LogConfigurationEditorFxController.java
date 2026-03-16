@@ -22,11 +22,11 @@ import static com.osgifx.console.event.topics.LoggerContextActionEventTopics.LOG
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -39,6 +39,7 @@ import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
+import com.osgifx.console.agent.dto.XResultDTO;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
 import com.osgifx.console.ui.logs.helper.LoggerConfigTextControl;
@@ -70,7 +71,7 @@ public final class LogConfigurationEditorFxController {
     @Named("is_snapshot_agent")
     private boolean                 isSnapshotAgent;
     @Inject
-    @Optional
+    @org.eclipse.e4.core.di.annotations.Optional
     private Supervisor              supervisor;
     @Inject
     private EventBroker             eventBroker;
@@ -116,9 +117,9 @@ public final class LogConfigurationEditorFxController {
 
         logger.atInfo().log("String log configuration for context '%s'", name);
 
-        final Task<com.osgifx.console.agent.dto.XResultDTO> task = new Task<>() {
+        final Task<XResultDTO> task = new Task<>() {
             @Override
-            protected com.osgifx.console.agent.dto.XResultDTO call() throws Exception {
+            protected XResultDTO call() throws Exception {
                 updateMessage("Updating logger context...");
                 return supervisor.getAgent().updateBundleLoggerContext(name, logLevels);
             }
@@ -176,7 +177,7 @@ public final class LogConfigurationEditorFxController {
 
     private List<Field<?>> initGenericFields(final XBundleLoggerContextDTO loggerContext) {
         // @formatter:off
-        final var      rootLogLevel      = java.util.Optional.ofNullable(loggerContext.rootLogLevel)
+        final var      rootLogLevel      = Optional.ofNullable(loggerContext.rootLogLevel)
                                                              .map(LogLevel::name)
                                                              .orElse("<NOT SET>");
 

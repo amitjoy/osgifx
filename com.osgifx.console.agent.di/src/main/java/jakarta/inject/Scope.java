@@ -67,9 +67,9 @@ import java.lang.annotation.Target;
  * For example:
  *
  * <pre>
- * &#064;java.lang.annotation.Documented
- * &#064;java.lang.annotation.Retention(RUNTIME)
- * &#064;jakarta.inject.Scope
+ * &#064;Documented
+ * &#064;Retention(RUNTIME)
+ * &#064;Scope
  * public @interface RequestScoped {
  * }
  * </pre>
@@ -80,7 +80,7 @@ import java.lang.annotation.Target;
  * forgot to configure the scope in the injector. A conservative injector
  * would generate an error rather than not apply a scope.
  *
- * @see jakarta.inject.Singleton @Singleton
+ * @see Singleton @Singleton
  */
 @Target(ANNOTATION_TYPE)
 @Retention(RUNTIME)

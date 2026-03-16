@@ -36,6 +36,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.fx.core.ExceptionUtils;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -304,7 +305,7 @@ public final class BundlesFxController {
             builder.addRequirements(bundle.bundleRevision.requirements);
             return builder.build();
         } catch (final Exception e) {
-            throw org.eclipse.fx.core.ExceptionUtils.wrap(e);
+            throw ExceptionUtils.wrap(e);
         }
     }
 
@@ -375,14 +376,12 @@ public final class BundlesFxController {
         table.getColumns().add(statusColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        filteredList = new FilteredList<>(dataProvider.bundles());
         threadSync.asyncExec(() -> {
+            filteredList = new FilteredList<>(dataProvider.bundles());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(symbolicNameColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(symbolicNameColumn);
+            table.sort();
         });
     }
 

@@ -107,7 +107,7 @@ We provide a robust Java script to launch the client with all necessary modulari
 ./RunOSGiFx --jar path/to/osgifx.jar
 
 # Download and run (requires internet)
-./RunOSGiFx --gav com.osgifx:osgifx-console:LATEST
+./RunOSGiFx --gav com.osgifx:osgifx:LATEST
 ```
 
 **Features:**

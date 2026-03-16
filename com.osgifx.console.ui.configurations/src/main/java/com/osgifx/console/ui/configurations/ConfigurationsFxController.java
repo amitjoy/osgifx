@@ -18,6 +18,7 @@ package com.osgifx.console.ui.configurations;
 import static com.osgifx.console.event.topics.ConfigurationActionEventTopics.CONFIGURATION_UPDATED_EVENT_TOPIC;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC;
+import static java.util.Optional.ofNullable;
 
 import java.util.function.Predicate;
 
@@ -231,8 +232,8 @@ public final class ConfigurationsFxController {
         Fx.addCellFactory(pidColumn, c -> !c.isPersisted, Color.MEDIUMVIOLETRED, Color.BLACK);
 
         final var nameColumn = new TableColumn<XConfigurationDTO, String>("Name");
-        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> java.util.Optional
-                .ofNullable(s.ocd).map(v -> v.name).orElse("No property descriptor available")));
+        nameColumn.setCellValueFactory(new DTOCellValueFactory<>("name", String.class, s -> ofNullable(s.ocd)
+                .map(v -> v.name).orElse("No property descriptor available")));
 
         final var locationColumn = new TableColumn<XConfigurationDTO, String>("Location");
         locationColumn
@@ -248,14 +249,12 @@ public final class ConfigurationsFxController {
         table.getColumns().add(isFactoryColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        filteredList = new FilteredList<>(dataProvider.configurations());
         threadSync.asyncExec(() -> {
+            filteredList = new FilteredList<>(dataProvider.configurations());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(pidColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(pidColumn);
+            table.sort();
         });
     }
 

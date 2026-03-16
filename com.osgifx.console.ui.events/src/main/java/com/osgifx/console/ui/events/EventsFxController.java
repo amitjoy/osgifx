@@ -43,6 +43,7 @@ import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.ContextBoundValue;
 import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.di.LocalInstance;
+import org.eclipse.fx.core.di.Service;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
@@ -108,11 +109,11 @@ public final class EventsFxController {
     @Inject
     private ConfigurationAdmin             configAdmin;
     @Inject
-    @org.eclipse.e4.core.di.annotations.Optional
+    @Optional
     @ContextValue("subscribed_topics")
     private ContextBoundValue<Set<String>> subscribedTopics;
     @Inject
-    @org.eclipse.fx.core.di.Service(filterExpression = "(supplier.id=events)")
+    @Service(filterExpression = "(supplier.id=events)")
     private EventListener                  eventListener;
     @Inject
     private IEclipseContext                eclipseContext;
@@ -350,9 +351,8 @@ public final class EventsFxController {
         table.getColumns().add(topicColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        final var events = dataProvider.events();
         threadSync.asyncExec(() -> {
-            table.setItems(events);
+            table.setItems(dataProvider.events());
             TableFilter.forTableView(table).lazy(true).apply();
             sortByReceivedAt(receivedAtColumn);
         });

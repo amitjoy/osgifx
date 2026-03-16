@@ -19,46 +19,51 @@ import static com.osgifx.console.event.topics.BundleActionEventTopics.BUNDLE_UNI
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
+import org.eclipse.fx.core.di.ContextValue;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
+import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
 import com.osgifx.console.supervisor.Supervisor;
+import com.osgifx.console.ui.bundles.dialog.ImpactAnalysisDialog;
 import com.osgifx.console.util.fx.FxDialog;
 
 import javafx.concurrent.Task;
+import javafx.stage.Window;
 
 public final class BundleUninstallHandler {
 
     @Log
     @Inject
-    private FluentLogger                                                                     logger;
+    private FluentLogger                   logger;
     @Inject
-    private Executor                                                                         executor;
+    private Executor                       executor;
     @Inject
-    private IEventBroker                                                                     eventBroker;
+    private IEventBroker                   eventBroker;
     @Inject
     @Optional
-    private Supervisor                                                                       supervisor;
+    private Supervisor                     supervisor;
     @Inject
-    private ThreadSynchronize                                                                threadSync;
+    private ThreadSynchronize              threadSync;
     @Inject
     @Optional
     @Named("is_connected")
-    private boolean                                                                          isConnected;
+    private boolean                        isConnected;
     @Inject
-    private com.osgifx.console.data.provider.DataProvider                                    dataProvider;
+    private DataProvider                   dataProvider;
     @Inject
-    private javax.inject.Provider<com.osgifx.console.ui.bundles.dialog.ImpactAnalysisDialog> impactAnalysisDialogProvider;
+    private Provider<ImpactAnalysisDialog> impactAnalysisDialogProvider;
     @Inject
-    @org.eclipse.fx.core.di.ContextValue("shell")
-    private javafx.stage.Window                                                              window;
+    @ContextValue("shell")
+    private Window                         window;
 
     @Execute
     public void execute(@Named("id") final String id) {

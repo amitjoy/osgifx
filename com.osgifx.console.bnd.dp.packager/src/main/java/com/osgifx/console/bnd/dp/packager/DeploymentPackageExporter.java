@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.bnd.dp.packager;
 
+import static com.google.common.io.Files.asByteSource;
 import static com.osgifx.console.bnd.dp.packager.DeploymentPackageHeaders.DEPLOYMENT_PACKAGE_CONTACT_ADDRESS;
 import static com.osgifx.console.bnd.dp.packager.DeploymentPackageHeaders.DEPLOYMENT_PACKAGE_COPYRIGHT;
 import static com.osgifx.console.bnd.dp.packager.DeploymentPackageHeaders.DEPLOYMENT_PACKAGE_CUSTOMIZER;
@@ -70,6 +71,7 @@ import aQute.bnd.build.Container;
 import aQute.bnd.build.Project;
 import aQute.bnd.osgi.FileResource;
 import aQute.bnd.osgi.Jar;
+import aQute.bnd.osgi.Resource;
 import aQute.bnd.service.export.Exporter;
 import aQute.lib.io.IO;
 
@@ -87,9 +89,9 @@ public class DeploymentPackageExporter implements Exporter {
     }
 
     @Override
-    public Entry<String, aQute.bnd.osgi.Resource> export(final String type,
-                                                         final Project project,
-                                                         final Map<String, String> options) throws Exception {
+    public Entry<String, Resource> export(final String type,
+                                          final Project project,
+                                          final Map<String, String> options) throws Exception {
         this.project = project;
         try {
             final var symbolicName       = options.get("symbolicName");
@@ -242,7 +244,7 @@ public class DeploymentPackageExporter implements Exporter {
 
     @SuppressWarnings("deprecation")
     private String sha1(final File file) throws IOException {
-        return com.google.common.io.Files.asByteSource(file).hash(Hashing.sha1()).toString();
+        return asByteSource(file).hash(Hashing.sha1()).toString();
     }
 
     private File findFile(final String name) {

@@ -126,14 +126,11 @@ public final class LogConfigurationsFxController {
         table.getColumns().add(hasCustomLogLevelsColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        final var loggerContexts = dataProvider.loggerContexts();
         threadSync.asyncExec(() -> {
-            table.setItems(loggerContexts);
+            table.setItems(dataProvider.loggerContexts());
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(nameColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(nameColumn);
+            table.sort();
         });
     }
 

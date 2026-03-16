@@ -59,6 +59,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -285,12 +286,12 @@ public final class Fx {
         final var label = new Label(text);
         label.setWrapText(true);
 
-        final var box = new javafx.scene.layout.VBox(12, glyph, label);
+        final var box = new VBox(12, glyph, label);
         box.setAlignment(Pos.CENTER);
         box.setMaxWidth(Double.MAX_VALUE);
         box.setMaxHeight(Double.MAX_VALUE);
         box.setStyle("-fx-background-color: -fx-control-inner-background;");
-        javafx.scene.layout.VBox.setVgrow(box, ALWAYS);
+        VBox.setVgrow(box, ALWAYS);
 
         return box;
     }
@@ -372,7 +373,7 @@ public final class Fx {
         if (!labels.isEmpty()) {
             makeReadOnlyLabelsCopyable(node);
         } else {
-            final var timer = new PauseTransition(javafx.util.Duration.millis(200));
+            final var timer = new PauseTransition(Duration.millis(200));
             timer.setOnFinished(_ -> scheduleReadOnlyLabelsFix(node, attempt + 1));
             timer.play();
         }

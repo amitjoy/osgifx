@@ -354,7 +354,7 @@ public final class McpFxController {
     @FXML
     private void showConfigInfo() {
         final var dialog = new McpConfigDialog();
-        org.eclipse.e4.core.contexts.ContextInjectionFactory.inject(dialog, eclipseContext);
+        ContextInjectionFactory.inject(dialog, eclipseContext);
         logger.atDebug().log("Injected MCP config dialog to eclipse context");
 
         dialog.init();

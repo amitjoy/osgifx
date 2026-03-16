@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.jaxrs;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -89,9 +90,8 @@ public final class JaxRsDetailsFxController {
                 new DTOCellValueFactory<>("nameBindings", String.class,
                                           s -> s.nameBindings == null ? "" : String.join(", ", s.nameBindings)));
 
-        methodsTable.setItems(FXCollections
-                .observableArrayList(jaxrsComponent.resourceMethods == null ? java.util.Collections.emptyList()
-                        : jaxrsComponent.resourceMethods));
+        methodsTable.setItems(FXCollections.observableArrayList(
+                jaxrsComponent.resourceMethods == null ? Collections.emptyList() : jaxrsComponent.resourceMethods));
     }
 
     private FormRenderer createForm(final XJaxRsComponentDTO jaxrsComponent) {

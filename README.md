@@ -69,6 +69,9 @@ Experience **OSGi.fx** directly within your development environment with the **[
 -   **🛠️ Connection Profiles:** Manage your **Socket** and **MQTT** connections within the IDE.
 -   **⚙️ Auto-Managed Runtime:** Automatic setup of the required **JavaFX 25** environment.
 -   **🎨 Visual Status:** Real-time tracking of connection status with intuitive icons.
+-   **📦 Update Sites:** Install via `Help > Install New Software...` using:
+    -   **🚀 Latest Release:** `https://osgifx.com/eclipse`
+    -   **🧪 Staging / Beta:** `https://osgifx.com/eclipse-staging`
 
 ------------------------------------------------------------------------------------------------------------
 

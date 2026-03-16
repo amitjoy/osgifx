@@ -39,6 +39,7 @@ import com.osgifx.console.util.fx.FxDialog;
 import com.osgifx.console.util.fx.PropertiesForm;
 import com.osgifx.console.util.fx.PropertiesForm.FormContent;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -82,7 +83,7 @@ public final class ConfigurationCreateDialog extends Dialog<ConfigurationDTO> {
         lbDescription.setStyle("-fx-text-fill: #4a4b4e;");
 
         final var content = new VBox(10);
-        content.setPadding(new javafx.geometry.Insets(10));
+        content.setPadding(new Insets(10));
 
         content.getChildren().addAll(lbMessage, lbDescription, txtPid, txtFactoryPid);
 

@@ -76,10 +76,8 @@ public final class PropertiesFxController {
         threadSync.asyncExec(() -> {
             propertyTable.setItems(dataProvider.properties());
             TableFilter.forTableView(propertyTable).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                propertyTable.getSortOrder().add(propertyName);
-                propertyTable.sort();
-            });
+            propertyTable.getSortOrder().add(propertyName);
+            propertyTable.sort();
         });
     }
 

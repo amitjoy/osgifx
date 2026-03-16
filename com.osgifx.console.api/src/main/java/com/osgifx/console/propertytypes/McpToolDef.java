@@ -21,12 +21,13 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ComponentPropertyType;
 
 /**
  * Component Property Type for defining an MCP Tool.
  * <p>
- * Apply this annotation to a {@link org.osgi.service.component.annotations.Component}
+ * Apply this annotation to a {@link Component}
  * to automatically register the {@code mcp.tool.name} and {@code mcp.tool.description}
  * service properties.
  * <p>

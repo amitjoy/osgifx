@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.ui.chaos.engine;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +41,7 @@ public final class TargetSelector {
                                              final DataProvider dataProvider,
                                              final Set<String> activeVictimIds,
                                              final boolean applyConcurrencyLimit) {
-        final List<Victim> eligibleTargets = new java.util.ArrayList<>();
+        final List<Victim> eligibleTargets = new ArrayList<>();
 
         if (config.targetType == ChaosConfig.TargetType.BUNDLES || config.targetType == ChaosConfig.TargetType.BOTH) {
             final List<XBundleDTO> bundles = dataProvider.bundles();
