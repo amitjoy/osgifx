@@ -219,10 +219,8 @@ public final class RolesFxController {
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.roles());
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(roleNameColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(roleNameColumn);
+            table.sort();
         });
     }
 
