@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -252,7 +253,7 @@ public final class GraphFxBundleController implements GraphController {
     private void updateFilteredList(final FilteredList<BundleItem> filteredBundlesList) {
         final var filter           = searchText.getText();
         final var showSelectedOnly = showSelectedOnlyView.isSelected();
-        final var predicate        = new java.util.function.Predicate<BundleItem>() {
+        final var predicate        = new Predicate<BundleItem>() {
                                        @Override
                                        public boolean test(final BundleItem item) {
                                            final var isSelected = item.isSelected();

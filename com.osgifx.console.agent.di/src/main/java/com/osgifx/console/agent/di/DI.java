@@ -84,7 +84,7 @@ public final class DI {
      * @param requestedType the class type of which an instance is retrieved.
      * @param <T> the generic type of the class.
      * @return an instance of the given type.
-     * @throws java.lang.IllegalArgumentException if there is a misconfiguration or a requested class can't be
+     * @throws IllegalArgumentException if there is a misconfiguration or a requested class can't be
      *             instantiated.
      */
     public <T> T getInstance(final Class<T> requestedType) {
@@ -218,7 +218,7 @@ public final class DI {
      * @param interfaceType the class type of the interface.
      * @param implementationType the class type of the implementing class.
      * @param <T> the generic type of the interface.
-     * @throws java.lang.IllegalArgumentException if the first parameter is <b>not</b> an interface or the second
+     * @throws IllegalArgumentException if the first parameter is <b>not</b> an interface or the second
      *             parameter <b>is</b> an interface or an abstract class.
      */
     public <T> void bindInterface(final Class<T> interfaceType, final Class<? extends T> implementationType) {
@@ -318,9 +318,8 @@ public final class DI {
             return () -> DI.this.getInstance((Class<?>) providerType);
         }
         throw new DiException(createErrorMessageStart(requestedType)
-                + "There is a javax.inject.Provider without a type parameter declared as dependency. "
-                + "When using javax.inject.Provider as dependency "
-                + "you need to define a type parameter for this provider!");
+                + "There is a Provider without a type parameter declared as dependency. "
+                + "When using Provider as dependency you need to define a type parameter for this provider!");
     }
 
     /**
@@ -363,12 +362,12 @@ public final class DI {
      * annotation is used.
      * <p>
      *
-     * In all other cases an {@link java.lang.IllegalStateException} is thrown.
+     * In all other cases an {@link IllegalStateException} is thrown.
      *
      * @param type the class of which the constructor is searched for.
      * @param <T> the generic type of the class.
      * @return the constructor to use
-     * @throws java.lang.IllegalStateException when no constructor can be found.
+     * @throws IllegalStateException when no constructor can be found.
      */
     @SuppressWarnings("unchecked")
     private <T> Constructor<T> findConstructor(final Class<T> type) {
@@ -386,14 +385,14 @@ public final class DI {
             throw new DiException(createErrorMessageStart(type)
                     + "There is more than one public constructor defined so I don't know which one to use. "
                     + "Fix this by either make only one constructor public "
-                    + "or annotate exactly one constructor with the javax.inject.Inject annotation.");
+                    + "or annotate exactly one constructor with the @Inject annotation.");
         }
 
         if (constructorsWithInject.size() != 1) {
             throw new DiException(createErrorMessageStart(type)
                     + "There is more than one public constructor marked with @Inject so I don't know which one to use. "
                     + "Fix this by either make only one constructor public "
-                    + "or annotate exactly one constructor with the javax.inject.Inject annotation.");
+                    + "or annotate exactly one constructor with the @Inject annotation.");
         }
         // we are not modifying the constructor array so we can safely cast here.
         return (Constructor<T>) constructorsWithInject.get(0);

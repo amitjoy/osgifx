@@ -38,12 +38,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.internal.events.EventBroker;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
@@ -75,6 +75,7 @@ import com.osgifx.console.util.converter.ValueConverter;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.animation.PauseTransition;
 import javafx.beans.binding.When;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -87,10 +88,15 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 
 public final class ConfigurationEditorFxController {
 
@@ -100,7 +106,7 @@ public final class ConfigurationEditorFxController {
     @FXML
     private BorderPane             rootPanel;
     @Inject
-    @Optional
+    @org.eclipse.e4.core.di.annotations.Optional
     private Supervisor             supervisor;
     @Inject
     private EventBroker            eventBroker;
@@ -167,7 +173,7 @@ public final class ConfigurationEditorFxController {
                 p.layout();
             }
             // Retry after 200ms
-            final var timer = new javafx.animation.PauseTransition(javafx.util.Duration.millis(200));
+            final var timer = new PauseTransition(Duration.millis(200));
             timer.setOnFinished(_ -> scheduleLayoutFix(node, attempt + 1));
             timer.play();
         }
@@ -200,8 +206,7 @@ public final class ConfigurationEditorFxController {
                 // Identify rows with inputs and map them
                 final Map<Integer, Node> rowInputs = Maps.newHashMap();
                 for (final Node child : grid.getChildren()) {
-                    if (!child.getStyleClass().contains("formsfx-label")
-                            && !(child instanceof javafx.scene.text.Text)) {
+                    if (!child.getStyleClass().contains("formsfx-label") && !(child instanceof Text)) {
                         Integer rowIndex = GridPane.getRowIndex(child);
                         if (rowIndex == null) {
                             rowIndex = 0;
@@ -217,11 +222,10 @@ public final class ConfigurationEditorFxController {
                         rowIndex = 0;
                     }
 
-                    if (child instanceof javafx.scene.control.Label label
-                            && label.getStyleClass().contains("formsfx-label")) {
+                    if (child instanceof Label label && label.getStyleClass().contains("formsfx-label")) {
                         label.setWrapText(true);
-                        label.setMinHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
-                        label.setPrefHeight(javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+                        label.setMinHeight(Region.USE_COMPUTED_SIZE);
+                        label.setPrefHeight(Region.USE_COMPUTED_SIZE);
                         label.setMaxHeight(Double.MAX_VALUE);
 
                         // Determine alignment based on row content
@@ -230,7 +234,7 @@ public final class ConfigurationEditorFxController {
                         // Check if input is a CheckBox
                         boolean isCheckBox = false;
                         if (inputInRow != null) {
-                            isCheckBox = inputInRow instanceof javafx.scene.control.CheckBox;
+                            isCheckBox = inputInRow instanceof CheckBox;
                             if (!isCheckBox && inputInRow instanceof Parent p) {
                                 isCheckBox = p.lookup(".check-box") != null;
                             }
@@ -512,9 +516,9 @@ public final class ConfigurationEditorFxController {
     }
 
     private List<Field<?>> initGenericFields(final XConfigurationDTO config) {
-        final var pid        = java.util.Optional.ofNullable(config.pid).orElse("No PID associated");
-        final var factoryPID = java.util.Optional.ofNullable(config.factoryPid).orElse("No Factory PID associated");
-        final var location   = java.util.Optional.ofNullable(config.location).orElse("No location bound");
+        final var pid        = Optional.ofNullable(config.pid).orElse("No PID associated");
+        final var factoryPID = Optional.ofNullable(config.factoryPid).orElse("No Factory PID associated");
+        final var location   = Optional.ofNullable(config.location).orElse("No location bound");
 
         final Field<?> pidField        = Field.ofStringType(pid).label("PID").editable(false);
         final Field<?> factoryPidField = Field.ofStringType(factoryPID).label("Factory PID").editable(false);

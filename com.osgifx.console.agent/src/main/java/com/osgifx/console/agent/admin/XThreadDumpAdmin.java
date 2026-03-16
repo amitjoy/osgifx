@@ -22,8 +22,11 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import org.osgi.framework.BundleContext;
@@ -141,7 +144,7 @@ public final class XThreadDumpAdmin {
         final StringBuilder sb           = new StringBuilder(4096);
 
         // Build a map of id -> Thread for daemon/priority lookup
-        final java.util.Map<Long, Thread> threadMap = new java.util.HashMap<>();
+        final Map<Long, Thread> threadMap = new HashMap<>();
         for (final Thread t : Thread.getAllStackTraces().keySet()) {
             threadMap.put(t.getId(), t);
         }
@@ -157,7 +160,7 @@ public final class XThreadDumpAdmin {
             appendThreadInfo(sb, info, deadlocks, threadMap.get(info.getThreadId()));
         }
 
-        return sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private void appendThreadInfo(final StringBuilder sb,

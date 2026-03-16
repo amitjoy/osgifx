@@ -33,6 +33,7 @@ import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.mcp.FxMcpServer;
 import com.osgifx.console.ui.ConsoleMaskerPane;
 import com.osgifx.console.ui.ConsoleStatusBar;
 import com.osgifx.console.util.fx.Fx;
@@ -94,9 +95,9 @@ public final class McpFxUI {
         executor.runAsync(() -> {
             try {
                 final var bundle = context.getBundle();
-                final var ref    = bundle.getBundleContext().getServiceReference("com.osgifx.console.mcp.FxMcpServer");
+                final var ref    = bundle.getBundleContext().getServiceReference(FxMcpServer.class);
                 if (ref != null) {
-                    final var service = (com.osgifx.console.mcp.FxMcpServer) bundle.getBundleContext().getService(ref);
+                    final var service = bundle.getBundleContext().getService(ref);
                     service.stop();
                     System.setProperty("is_started_mcp", "false");
                     logger.atInfo().log("MCP server has been stopped");

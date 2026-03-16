@@ -45,6 +45,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -143,7 +144,7 @@ public final class ConsoleStatusBarProvider implements ConsoleStatusBar {
         glyph.useHoverEffect();
 
         rpcProgressButton = new Button("", glyph);
-        rpcProgressButton.setTooltip(new javafx.scene.control.Tooltip("RPC Progress"));
+        rpcProgressButton.setTooltip(new Tooltip("RPC Progress"));
 
         // Update button style based on active RPC count
         rpcProgressTracker.activeRpcCountProperty().addListener((_, _, newVal) -> {
