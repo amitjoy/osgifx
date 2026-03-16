@@ -263,22 +263,20 @@ public final class GraphFxComponentController implements GraphController {
     }
 
     private void updateFilteredList(final FilteredList<ComponentItem> filteredComponentsList) {
-        final var filter           = searchText.getText();
-        final var showSelectedOnly = showSelectedOnlyView.isSelected();
-        final var predicate        = new Predicate<ComponentItem>() {
-                                       @Override
-                                       public boolean test(final ComponentItem item) {
-                                           final var isSelected = item.isSelected();
-                                           if (showSelectedOnly && !isSelected) {
-                                               return false;
-                                           }
-                                           if (filter == null || filter.isBlank()) {
-                                               return true;
-                                           }
-                                           return Stream.of(filter.split("\\|"))
-                                                   .anyMatch(e -> Strings.CI.contains(item.getComponent().name, e));
-                                       }
-                                   };
+        final var                      filter           = searchText.getText();
+        final var                      showSelectedOnly = showSelectedOnlyView.isSelected();
+        final Predicate<ComponentItem> predicate        = item -> {
+                                                            final var isSelected = item.isSelected();
+                                                            if (showSelectedOnly && !isSelected) {
+                                                                return false;
+                                                            }
+                                                            if (filter == null || filter.isBlank()) {
+                                                                return true;
+                                                            }
+                                                            return Stream.of(filter.split("\\|"))
+                                                                    .anyMatch(e -> Strings.CI
+                                                                            .contains(item.getComponent().name, e));
+                                                        };
         filteredComponentsList.setPredicate(predicate);
     }
 
