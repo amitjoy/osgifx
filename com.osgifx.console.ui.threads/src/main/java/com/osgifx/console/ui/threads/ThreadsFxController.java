@@ -373,10 +373,8 @@ public final class ThreadsFxController {
         threadSync.asyncExec(() -> {
             table.setItems(dataProvider.threads());
             TableFilter.forTableView(table).lazy(true).apply();
-            threadSync.asyncExec(() -> {
-                table.getSortOrder().add(nameColumn);
-                table.sort();
-            });
+            table.getSortOrder().add(nameColumn);
+            table.sort();
         });
     }
 

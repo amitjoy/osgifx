@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.graph;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.osgi.framework.FrameworkUtil;
@@ -118,7 +119,7 @@ public final class WebGraphView extends BorderPane {
      *
      * @param nodeIds the Cytoscape node IDs to mark
      */
-    public void markSelectedNodes(final java.util.Collection<String> nodeIds) {
+    public void markSelectedNodes(final Collection<String> nodeIds) {
         if (nodeIds == null || nodeIds.isEmpty()) {
             executeWhenReady("markSelectedNodes('[]')");
             return;

@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.osgifx.console.mcp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -31,8 +33,8 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public class McpToolSchema {
 
-    private final Map<String, Object>    properties = new HashMap<>();
-    private final java.util.List<String> required   = new java.util.ArrayList<>();
+    private final Map<String, Object> properties = new HashMap<>();
+    private final List<String>        required   = new ArrayList<>();
 
     /**
      * Creates a new instance of the schema builder.
