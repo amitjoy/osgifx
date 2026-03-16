@@ -251,22 +251,19 @@ public final class GraphFxBundleController implements GraphController {
     }
 
     private void updateFilteredList(final FilteredList<BundleItem> filteredBundlesList) {
-        final var filter           = searchText.getText();
-        final var showSelectedOnly = showSelectedOnlyView.isSelected();
-        final var predicate        = new Predicate<BundleItem>() {
-                                       @Override
-                                       public boolean test(final BundleItem item) {
-                                           final var isSelected = item.isSelected();
-                                           if (showSelectedOnly && !isSelected) {
-                                               return false;
-                                           }
-                                           if (filter == null || filter.isBlank()) {
-                                               return true;
-                                           }
-                                           return Stream.of(filter.split("\\|")).anyMatch(
-                                                   e -> Strings.CI.contains(item.getBundle().symbolicName, e));
-                                       }
-                                   };
+        final var                   filter           = searchText.getText();
+        final var                   showSelectedOnly = showSelectedOnlyView.isSelected();
+        final Predicate<BundleItem> predicate        = item -> {
+                                                         final var isSelected = item.isSelected();
+                                                         if (showSelectedOnly && !isSelected) {
+                                                             return false;
+                                                         }
+                                                         if (filter == null || filter.isBlank()) {
+                                                             return true;
+                                                         }
+                                                         return Stream.of(filter.split("\\|")).anyMatch(e -> Strings.CI
+                                                                 .contains(item.getBundle().symbolicName, e));
+                                                     };
         filteredBundlesList.setPredicate(predicate);
     }
 

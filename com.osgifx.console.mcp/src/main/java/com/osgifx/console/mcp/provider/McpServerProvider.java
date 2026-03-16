@@ -19,7 +19,6 @@ import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIP
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +34,7 @@ import org.osgi.util.converter.Converters;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.osgifx.console.mcp.McpTool;
 import com.osgifx.console.mcp.data.McpDataProvider;
@@ -67,20 +64,17 @@ public class McpServerProvider implements McpDataProvider {
     private final McpJsonRpcServer internalServer = new McpJsonRpcServer(createGson());
 
     private static Gson createGson() {
-        return new GsonBuilder().registerTypeHierarchyAdapter(DTO.class, new JsonSerializer<DTO>() {
-            @Override
-            public JsonElement serialize(final DTO src, final Type typeOfSrc, final JsonSerializationContext context) {
-                final JsonObject json = new JsonObject();
-                // DTOs have public fields. valid JSON-RPC requires we strictly read them.
-                for (final Field field : src.getClass().getFields()) {
-                    try {
-                        json.add(field.getName(), context.serialize(field.get(src)));
-                    } catch (final Exception e) {
-                        // ignore inaccessible
-                    }
+        return new GsonBuilder().registerTypeHierarchyAdapter(DTO.class, (JsonSerializer<DTO>) (src, _, context) -> {
+            final JsonObject json = new JsonObject();
+            // DTOs have public fields. valid JSON-RPC requires we strictly read them.
+            for (final Field field : src.getClass().getFields()) {
+                try {
+                    json.add(field.getName(), context.serialize(field.get(src)));
+                } catch (final Exception _) {
+                    // ignore inaccessible
                 }
-                return json;
             }
+            return json;
         }).create();
     }
 
