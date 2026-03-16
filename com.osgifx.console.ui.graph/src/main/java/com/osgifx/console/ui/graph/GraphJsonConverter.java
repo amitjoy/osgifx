@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.graph;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -54,7 +55,7 @@ public final class GraphJsonConverter {
     public static <V, E extends DefaultEdge> String toJson(final Graph<V, E> graph,
                                                            final Function<V, String> idMapper,
                                                            final Function<V, String> labelMapper,
-                                                           final java.util.function.Predicate<V> isSelected) {
+                                                           final Predicate<V> isSelected) {
         final var elements  = Lists.<String> newArrayList();
         var       edgeIndex = 0;
 
