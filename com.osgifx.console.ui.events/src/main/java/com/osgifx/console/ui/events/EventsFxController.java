@@ -351,9 +351,8 @@ public final class EventsFxController {
         table.getColumns().add(topicColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        final var events = dataProvider.events();
         threadSync.asyncExec(() -> {
-            table.setItems(events);
+            table.setItems(dataProvider.events());
             TableFilter.forTableView(table).lazy(true).apply();
             sortByReceivedAt(receivedAtColumn);
         });
