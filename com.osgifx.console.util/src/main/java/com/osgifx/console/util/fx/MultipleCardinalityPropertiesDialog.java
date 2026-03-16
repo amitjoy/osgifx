@@ -36,6 +36,7 @@ import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XAttributeDefType;
 
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -45,6 +46,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -66,7 +68,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         final var dialogPane = getDialogPane();
 
         initStyle(StageStyle.UNDECORATED);
-        dialogPane.setHeaderText("Multiple Cardinality [Key: " + key + "]");
+        dialogPane.setHeaderText("Edit Multiple Cardinality Values");
         dialogPane.getStylesheets().add(classLoader.getResource(STANDARD_CSS).toExternalForm());
         dialogPane.setGraphic(new ImageView(classLoader.getResource("configuration.png").toString()));
         dialogPane.getButtonTypes().addAll(ButtonType.CANCEL);
@@ -76,13 +78,19 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         lbMessage.setVisible(false);
         lbMessage.setManaged(false);
 
-        final var content = new VBox(10);
+        final var content = new VBox(15);
+        content.setPadding(new Insets(20));
 
-        content.getChildren().add(lbMessage);
+        final var lbKey = new Label("Key: " + key);
+        lbKey.setStyle("-fx-font-weight: bold; -fx-padding: 0 0 5 0;");
+
+        final var entriesContainer = new VBox(10);
+
+        content.getChildren().addAll(lbMessage, lbKey, entriesContainer);
         if (StringUtils.isNotBlank(textInput)) {
-            Splitter.on(",").split(textInput.strip()).forEach(e -> addFieldPair(content, targetType, e));
+            Splitter.on(",").split(textInput.strip()).forEach(e -> addFieldPair(entriesContainer, targetType, e));
         } else {
-            addFieldPair(content, targetType);
+            addFieldPair(entriesContainer, targetType);
         }
 
         dialogPane.setContent(content);
@@ -149,7 +157,9 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
             btnRemoveField = new Button();
 
             btnAddField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.PLUS));
+            btnAddField.setTooltip(new Tooltip("Add new value"));
             btnRemoveField.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MINUS));
+            btnRemoveField.setTooltip(new Tooltip("Remove this value"));
 
             btnAddField.setOnAction(_ -> addFieldPair(parent, type));
             btnRemoveField.setOnAction(_ -> removeFieldPair(parent, this));
@@ -160,7 +170,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
         }
 
         private void removeFieldPair(final VBox content, final PropertiesForm form) {
-            if (content.getChildren().size() > 2) {
+            if (content.getChildren().size() > 1) {
                 content.getChildren().remove(form);
                 getDialogPane().getScene().getWindow().sizeToScene();
                 entries.remove(form);
@@ -228,7 +238,7 @@ public final class MultipleCardinalityPropertiesDialog extends Dialog<String> {
     }
 
     private void addFieldPair(final VBox content, final XAttributeDefType type, final String initValue) {
-        if (content.getChildren().size() <= unsignedCardinality) {
+        if (content.getChildren().size() < unsignedCardinality) {
             content.getChildren().add(new PropertiesForm(content, type, initValue));
             getDialogPane().getScene().getWindow().sizeToScene();
         }
