@@ -17,6 +17,7 @@ package com.osgifx.console.agent.admin;
 
 import static java.util.stream.Collectors.toMap;
 import static org.osgi.framework.Constants.OBJECTCLASS;
+import static org.osgi.framework.Constants.SERVICE_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,7 +132,7 @@ public final class XServiceAdmin extends AbstractSnapshotAdmin<XServiceDTO> {
 
     private ServiceReferenceDTO toServiceReferenceDTO(final ServiceReference<?> ref) {
         final ServiceReferenceDTO dto = new ServiceReferenceDTO();
-        dto.id     = (Long) ref.getProperty(org.osgi.framework.Constants.SERVICE_ID);
+        dto.id     = (Long) ref.getProperty(SERVICE_ID);
         dto.bundle = ref.getBundle().getBundleId();
 
         dto.properties = new HashMap<>();

@@ -23,6 +23,7 @@ import static javafx.scene.control.SelectionMode.MULTIPLE;
 import java.io.File;
 import java.util.Comparator;
 import java.util.concurrent.Future;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -264,7 +265,7 @@ public final class GraphFxComponentController implements GraphController {
     private void updateFilteredList(final FilteredList<ComponentItem> filteredComponentsList) {
         final var filter           = searchText.getText();
         final var showSelectedOnly = showSelectedOnlyView.isSelected();
-        final var predicate        = new java.util.function.Predicate<ComponentItem>() {
+        final var predicate        = new Predicate<ComponentItem>() {
                                        @Override
                                        public boolean test(final ComponentItem item) {
                                            final var isSelected = item.isSelected();

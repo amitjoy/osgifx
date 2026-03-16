@@ -19,6 +19,7 @@ import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETR
 import static com.osgifx.console.event.topics.DmtActionEventTopics.DMT_UPDATED_EVENT_TOPIC;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,7 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.fx.core.ThreadSynchronize;
@@ -81,7 +81,7 @@ public final class DmtFxController {
     @Inject
     private DataProvider      dataProvider;
     @Inject
-    @Optional
+    @org.eclipse.e4.core.di.annotations.Optional
     private Supervisor        supervisor;
     @Inject
     @Named("is_snapshot_agent")
@@ -256,8 +256,7 @@ public final class DmtFxController {
         final Map<String, String> properties = Maps.newHashMap();
 
         properties.computeIfAbsent("value", _ -> node.value);
-        properties.computeIfAbsent("format",
-                _ -> java.util.Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
+        properties.computeIfAbsent("format", _ -> Optional.ofNullable(node.format).map(DmtDataType::name).orElse(null));
 
         final var propertiesToString = Joiner.on(", ").withKeyValueSeparator(": ").join(properties);
         final var result             = new StringBuilder(node.uri);
@@ -271,7 +270,7 @@ public final class DmtFxController {
     }
 
     @Inject
-    @Optional
+    @org.eclipse.e4.core.di.annotations.Optional
     private void updateOnCapabilitiesRetrievedEvent(@UIEventTopic(DATA_RETRIEVED_CAPABILITIES_TOPIC) final String data) {
         threadSync.asyncExec(this::initialize);
     }

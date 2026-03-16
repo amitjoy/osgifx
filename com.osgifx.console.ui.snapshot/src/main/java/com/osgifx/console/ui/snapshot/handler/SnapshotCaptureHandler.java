@@ -18,6 +18,8 @@ package com.osgifx.console.ui.snapshot.handler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -290,8 +292,7 @@ public final class SnapshotCaptureHandler {
     private void snapshotLocally() {
         final var pathDialog = new SnapshotPathPromptDialog();
         ContextInjectionFactory.inject(pathDialog, eclipseContext);
-        final var timestamp   = java.time.LocalDateTime.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        final var timestamp   = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         final var defaultPath = "{java.io.tmpdir}/snapshot-" + timestamp + ".json";
         pathDialog.init(defaultPath, "Specify File Path",
                 "Enter the full file path on the agent where the snapshot should be saved (including filename).\n"

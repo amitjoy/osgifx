@@ -18,6 +18,7 @@ package com.osgifx.console.ui.healthchecks;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_HEALTHCHECKS_TOPIC;
 import static javafx.scene.control.SelectionMode.MULTIPLE;
+import static org.apache.commons.lang3.Strings.CI;
 import static org.controlsfx.control.SegmentedButton.STYLE_CLASS_DARK;
 
 import java.util.List;
@@ -231,8 +232,7 @@ public final class HealthCheckFxController {
         if (filter == null || filter.isBlank()) {
             filteredMetadataList.setPredicate(Predicates.alwaysTrue());
         } else {
-            filteredMetadataList.setPredicate(s -> Stream.of(filter.split("\\|"))
-                    .anyMatch(e -> org.apache.commons.lang3.Strings.CI.contains(s, e)));
+            filteredMetadataList.setPredicate(s -> Stream.of(filter.split("\\|")).anyMatch(e -> CI.contains(s, e)));
         }
     }
 

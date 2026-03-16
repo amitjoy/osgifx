@@ -17,6 +17,7 @@ package com.osgifx.console.agent.redirector;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -109,7 +110,7 @@ public class RedirectInput extends InputStream {
         try {
             while (in == out) {
                 try {
-                    dataAvailable.await(400, java.util.concurrent.TimeUnit.MILLISECONDS);
+                    dataAvailable.await(400, TimeUnit.MILLISECONDS);
                 } catch (final InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return -1;
