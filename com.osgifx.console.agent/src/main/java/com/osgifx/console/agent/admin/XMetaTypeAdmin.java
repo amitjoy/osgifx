@@ -243,12 +243,12 @@ public final class XMetaTypeAdmin implements ConfigurationListener {
     public List<XConfigurationDTO> getConfigurations() {
         final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(CM)).log();
+            logger.atDebug().msg(serviceUnavailable(CM)).log();
             return Collections.emptyList();
         }
         final MetaTypeService metatype = getMetaTypeService();
         if (metatype == null) {
-            logger.atWarn().msg(serviceUnavailable(METATYPE)).log();
+            logger.atDebug().msg(serviceUnavailable(METATYPE)).log();
             return Collections.emptyList();
         }
         final List<XConfigurationDTO> result = new ArrayList<>(configCache.values());

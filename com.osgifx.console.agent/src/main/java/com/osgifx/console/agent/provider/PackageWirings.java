@@ -49,6 +49,7 @@ public final class PackageWirings {
         CDI("CDI"),
         JMX("JMX"),
         HC("Felix Healthcheck"),
+        CONDITION("Condition"),
         GOGO("Gogo");
 
         public String comprehensibleName;
@@ -144,6 +145,10 @@ public final class PackageWirings {
         return isWired("org.apache.felix.hc.api");
     }
 
+    public boolean isConditionWired() {
+        return isWired("org.osgi.service.condition");
+    }
+
     public boolean isGogoWired() {
         return isWired("org.apache.felix.gogo.runtime");
     }
@@ -180,6 +185,8 @@ public final class PackageWirings {
                 return isJmxWired();
             case HC:
                 return isFelixHcWired();
+            case CONDITION:
+                return isConditionWired();
             case GOGO:
                 return isGogoWired();
             default:
@@ -228,6 +235,8 @@ public final class PackageWirings {
                 return "javax.management";
             case HC:
                 return "org.apache.felix.hc.api";
+            case CONDITION:
+                return "org.osgi.service.condition";
             case GOGO:
                 return "org.apache.felix.gogo.runtime";
             default:

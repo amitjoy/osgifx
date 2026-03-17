@@ -249,8 +249,8 @@ public final class ConfigurationsFxController {
         table.getColumns().add(isFactoryColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
+        filteredList = new FilteredList<>(dataProvider.configurations());
         threadSync.asyncExec(() -> {
-            filteredList = new FilteredList<>(dataProvider.configurations());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
             table.getSortOrder().add(pidColumn);

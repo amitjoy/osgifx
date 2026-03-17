@@ -98,6 +98,7 @@ import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
+import com.osgifx.console.agent.admin.XConditionAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
 import com.osgifx.console.agent.admin.XDtoAdmin;
@@ -123,6 +124,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -141,6 +143,7 @@ import com.osgifx.console.agent.dto.XThreadDTO;
 import com.osgifx.console.agent.handler.OSGiEventHandler;
 import com.osgifx.console.agent.handler.OSGiLogListener;
 import com.osgifx.console.agent.helper.AgentHelper;
+import com.osgifx.console.agent.helper.OSGiCompendiumService;
 import com.osgifx.console.agent.redirector.ConsoleRedirector;
 import com.osgifx.console.agent.redirector.GogoRedirector;
 import com.osgifx.console.agent.redirector.NullRedirector;
@@ -706,6 +709,21 @@ public final class AgentServer implements Agent, Closeable {
     }
 
     public void refresh(final boolean async) throws InterruptedException {
+        // Clear all snapshots to force a re-fetch on next access
+        di.getInstance(XBundleAdmin.class).invalidate();
+        di.getInstance(XComponentAdmin.class).invalidate();
+        di.getInstance(XServiceAdmin.class).invalidate();
+        di.getInstance(XConfigurationAdmin.class).invalidate();
+        di.getInstance(XPropertyAdmin.class).invalidate();
+        di.getInstance(XThreadAdmin.class).invalidate();
+        di.getInstance(XUserAdmin.class).invalidate();
+        di.getInstance(XHcAdmin.class).invalidate();
+        di.getInstance(XConditionAdmin.class).invalidate();
+        di.getInstance(XHttpAdmin.class).invalidate();
+        di.getInstance(XJaxRsAdmin.class).invalidate();
+        di.getInstance(XCdiAdmin.class).invalidate();
+        di.getInstance(XLoggerAdmin.class).invalidate();
+
         final FrameworkWiring wiring = di.getInstance(BundleContext.class).getBundle(SYSTEM_BUNDLE_ID)
                 .adapt(FrameworkWiring.class);
         if (wiring != null) {
@@ -803,6 +821,35 @@ public final class AgentServer implements Agent, Closeable {
     @Override
     public List<XServiceDTO> getAllServices() {
         return di.getInstance(XServiceAdmin.class).get();
+    }
+
+    @Override
+    public List<XConditionDTO> getAllConditions() {
+        final boolean isConditionWired = di.getInstance(PackageWirings.class).isConditionWired();
+        if (isConditionWired) {
+            return di.getInstance(XConditionAdmin.class).get();
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public XResultDTO injectMockCondition(final String identifier, final Map<String, Object> properties) {
+        final boolean isConditionWired = di.getInstance(PackageWirings.class).isConditionWired();
+        if (isConditionWired) {
+            return di.getInstance(XConditionAdmin.class).injectMockCondition(identifier, properties);
+        }
+        return AgentHelper.createResult(XResultDTO.SKIPPED,
+                AgentHelper.serviceUnavailable(OSGiCompendiumService.CONDITION));
+    }
+
+    @Override
+    public XResultDTO revokeMockCondition(final String identifier) {
+        final boolean isConditionWired = di.getInstance(PackageWirings.class).isConditionWired();
+        if (isConditionWired) {
+            return di.getInstance(XConditionAdmin.class).revokeMockCondition(identifier);
+        }
+        return AgentHelper.createResult(XResultDTO.SKIPPED,
+                AgentHelper.serviceUnavailable(OSGiCompendiumService.CONDITION));
     }
 
     @Override
@@ -1253,7 +1300,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isHttpServiceRuntimeWired) {
             return di.getInstance(XHttpAdmin.class).get();
         }
-        logger.atWarn().msg(packageNotWired(HTTP)).log();
+        logger.atDebug().msg(packageNotWired(HTTP)).log();
         return Collections.emptyList();
     }
 
@@ -1263,7 +1310,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isJaxRsServiceRuntimeWired) {
             return di.getInstance(XJaxRsAdmin.class).get();
         }
-        logger.atWarn().msg(packageNotWired(JAX_RS)).log();
+        logger.atDebug().msg(packageNotWired(JAX_RS)).log();
         return Collections.emptyList();
     }
 
@@ -1273,7 +1320,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isCdiServiceRuntimeWired) {
             return di.getInstance(XCdiAdmin.class).get();
         }
-        logger.atWarn().msg(packageNotWired(CDI)).log();
+        logger.atDebug().msg(packageNotWired(CDI)).log();
         return Collections.emptyList();
     }
 
@@ -1283,7 +1330,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isJMXWired) {
             return di.getInstance(XJmxAdmin.class).init();
         }
-        logger.atWarn().msg(packageNotWired(JMX)).log();
+        logger.atDebug().msg(packageNotWired(JMX)).log();
         return null;
     }
 
@@ -1293,7 +1340,7 @@ public final class AgentServer implements Agent, Closeable {
         if (isScrWired) {
             return di.getInstance(XDtoAdmin.class).runtime();
         }
-        logger.atWarn().msg(packageNotWired(SCR)).log();
+        logger.atDebug().msg(packageNotWired(SCR)).log();
         return null;
     }
 
@@ -1387,7 +1434,7 @@ public final class AgentServer implements Agent, Closeable {
                         "One or more configuration properties cannot be converted to the requested type");
             }
         }
-        logger.atWarn().msg(packageNotWired(CM)).log();
+        logger.atDebug().msg(packageNotWired(CM)).log();
         return createResult(SKIPPED, packageNotWired(CM));
     }
 
@@ -1509,6 +1556,15 @@ public final class AgentServer implements Agent, Closeable {
         final boolean isFelixHcWired = di.getInstance(PackageWirings.class).isFelixHcWired();
         if (isFelixHcWired) {
             return di.getInstance(XHcAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] conditions() {
+        final boolean isConditionWired = di.getInstance(PackageWirings.class).isConditionWired();
+        if (isConditionWired) {
+            return di.getInstance(XConditionAdmin.class).snapshot();
         }
         return encode(Collections.emptyList());
     }

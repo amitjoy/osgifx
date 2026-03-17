@@ -106,24 +106,10 @@ public final class XHttpAdmin extends AbstractSnapshotAdmin<XHttpComponentDTO> {
     }
 
     @Override
-    public List<XHttpComponentDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
-        try {
-            return decoder.decodeList(current, XHttpComponentDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode HTTP snapshot").throwable(e).log();
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     protected List<XHttpComponentDTO> map() throws Exception {
         final HttpServiceRuntime httpServiceRuntime = (HttpServiceRuntime) httpServiceRuntimeSupplier.get();
         if (httpServiceRuntime == null) {
-            logger.atWarn().msg(serviceUnavailable(HTTP_RUNTIME)).log();
+            logger.atDebug().msg(serviceUnavailable(HTTP_RUNTIME)).log();
             return Collections.emptyList();
         }
         final RuntimeDTO runtime = httpServiceRuntime.getRuntimeDTO();

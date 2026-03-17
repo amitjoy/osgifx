@@ -19,6 +19,7 @@ import static com.osgifx.console.data.manager.RuntimeInfoSupplier.PROPERTY_ID;
 import static com.osgifx.console.data.supplier.BundlesInfoSupplier.BUNDLES_ID;
 import static com.osgifx.console.data.supplier.CdiContainersInfoSupplier.CDI_ID;
 import static com.osgifx.console.data.supplier.ComponentsInfoSupplier.COMPONENTS_ID;
+import static com.osgifx.console.data.supplier.ConditionsInfoSupplier.CONDITIONS_ID;
 import static com.osgifx.console.data.supplier.ConfigurationsInfoSupplier.CONFIGURATIONS_ID;
 import static com.osgifx.console.data.supplier.EventsInfoSupplier.EVENTS_ID;
 import static com.osgifx.console.data.supplier.HealthChecksInfoSupplier.HEALTHCHECKS_ID;
@@ -59,6 +60,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
@@ -158,6 +160,11 @@ public final class RuntimeDataProvider implements DataProvider {
     @Override
     public ObservableList<XComponentDTO> components() {
         return (ObservableList<XComponentDTO>) supply(COMPONENTS_ID);
+    }
+
+    @Override
+    public ObservableList<XConditionDTO> conditions() {
+        return (ObservableList<XConditionDTO>) supply(CONDITIONS_ID);
     }
 
     @Override

@@ -25,6 +25,7 @@ import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.osgifx.console.data.provider.DataProvider;
+import com.osgifx.console.supervisor.Supervisor;
 
 public final class RefreshHandler {
 
@@ -39,12 +40,25 @@ public final class RefreshHandler {
     private boolean      isConnected;
     @Inject
     @Optional
+    private Supervisor   supervisor;
+    @Inject
+    @Optional
     @Named("is_snapshot_agent")
     private boolean      isSnapshotAgent;
 
     @Execute
     public void execute() {
         logger.atInfo().log("Refreshing data views");
+        if (supervisor != null) {
+            final var agent = supervisor.getAgent();
+            if (agent != null) {
+                try {
+                    agent.refresh();
+                } catch (final Exception e) {
+                    logger.atError().withException(e).log("Remote agent refresh failed");
+                }
+            }
+        }
         dataProvider.retrieveInfo(null, true);
         logger.atInfo().log("Refreshed data views successfully");
     }
