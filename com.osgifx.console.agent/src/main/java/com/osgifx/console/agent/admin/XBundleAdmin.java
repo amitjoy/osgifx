@@ -198,24 +198,6 @@ public final class XBundleAdmin extends AbstractSnapshotAdmin<XBundleDTO> {
         return dtos;
     }
 
-    @Override
-    public List<XBundleDTO> get() {
-        if (context == null) {
-            logger.atWarn().msg("Bundle context is null").log();
-            return Collections.emptyList();
-        }
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
-        try {
-            return decoder.decodeList(current, XBundleDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode bundle snapshot").throwable(e).log();
-            return Collections.emptyList();
-        }
-    }
-
     public byte[] snapshot(final long bundleId) {
         if (context == null) {
             logger.atWarn().msg("Bundle context is null").log();

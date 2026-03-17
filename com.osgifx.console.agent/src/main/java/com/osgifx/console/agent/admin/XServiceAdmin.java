@@ -111,20 +111,6 @@ public final class XServiceAdmin extends AbstractSnapshotAdmin<XServiceDTO> {
         return dtos;
     }
 
-    @Override
-    public List<XServiceDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return new ArrayList<>();
-        }
-        try {
-            return decoder.decodeList(current, XServiceDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode service snapshot").throwable(e).log();
-            return new ArrayList<>();
-        }
-    }
-
     private XServiceDTO toDTO(final ServiceReference<?> ref) {
         final ServiceReferenceDTO refDTO = toServiceReferenceDTO(ref);
         return toDTO(refDTO, context);

@@ -25,6 +25,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -93,9 +94,13 @@ public class SnapshotDTO extends DTO {
     /** A list of runtime capability data transfer objects. */
     public List<XRuntimeCapabilityDTO> runtimeCapabilities;
 
+    /** A list of condition data transfer objects. */
+    public List<XConditionDTO> conditions;
+
     /** A data transfer object representing the heap usage. */
     public XHeapUsageDTO heapUsage;
 
     /** A data transfer object representing the runtime information. */
     public RuntimeDTO runtime;
+
 }

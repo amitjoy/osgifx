@@ -55,7 +55,10 @@ public enum OSGiCompendiumService {
     JAX_RS_RUNTIME("JAX-RS Runtime"),
 
     /** CDI Runtime service. */
-    CDI_RUNTIME("CDI Runtime");
+    CDI_RUNTIME("CDI Runtime"),
+
+    /** OSGi Condition service. */
+    CONDITION("Condition");
 
     /** The comprehensible name of the OSGi compendium service. */
     public final String comprehensibleName;

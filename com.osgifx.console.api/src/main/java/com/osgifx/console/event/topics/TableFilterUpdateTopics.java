@@ -29,5 +29,6 @@ public final class TableFilterUpdateTopics {
     public static final String UPDATE_COMPONENT_FILTER_EVENT_TOPIC     = UPDATE_FILTER_EVENT_TOPIC_PREFIX + "component";
     public static final String UPDATE_CONFIGURATION_FILTER_EVENT_TOPIC = UPDATE_FILTER_EVENT_TOPIC_PREFIX
             + "configuration";
+    public static final String UPDATE_CONDITION_FILTER_EVENT_TOPIC     = UPDATE_FILTER_EVENT_TOPIC_PREFIX + "condition";
 
 }
