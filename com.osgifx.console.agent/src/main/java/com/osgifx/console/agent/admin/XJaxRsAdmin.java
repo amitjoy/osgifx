@@ -108,24 +108,10 @@ public final class XJaxRsAdmin extends AbstractSnapshotAdmin<XJaxRsComponentDTO>
     }
 
     @Override
-    public List<XJaxRsComponentDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
-        try {
-            return decoder.decodeList(current, XJaxRsComponentDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode JAX-RS snapshot").throwable(e).log();
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     protected List<XJaxRsComponentDTO> map() throws Exception {
         final JaxrsServiceRuntime runtime = (JaxrsServiceRuntime) jaxRsRuntimeSupplier.get();
         if (runtime == null) {
-            logger.atWarn().msg(serviceUnavailable(JAX_RS_RUNTIME)).log();
+            logger.atDebug().msg(serviceUnavailable(JAX_RS_RUNTIME)).log();
             return Collections.emptyList();
         }
         final RuntimeDTO               runtimeDTO = runtime.getRuntimeDTO();

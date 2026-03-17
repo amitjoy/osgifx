@@ -34,8 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.osgi.framework.Bundle;
@@ -92,6 +94,10 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
     private final BundleContext                                              context;
     private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
 
+    private static final String SATISFYING_CONDITION_TARGET   = "osgi.ds.satisfying.condition.target";
+    private static final String SATISFYING_CONDITION_REF_NAME = "osgi.ds.satisfying.condition";
+    private static final String CONDITION_INTERFACE           = "org.osgi.service.condition.Condition";
+
     @Inject
     public XComponentAdmin(final BundleContext context,
                            final BinaryCodec codec,
@@ -126,7 +132,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
                                                                          final ServiceComponentRuntime service) {
                                                   // Critical: Clear cache immediately if SCR stops.
                                                   // Prevents UI from showing "ghost" components that no longer exist.
-                                                  snapshot.set(null);
+                                                  invalidate();
                                                   context.ungetService(reference);
                                               }
                                           });
@@ -167,21 +173,6 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         return allDTOs;
     }
 
-    @Override
-    public List<XComponentDTO> get() {
-        // Fast. Non-blocking. Thread-safe.
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return new ArrayList<>();
-        }
-        try {
-            return decoder.decodeList(current, XComponentDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode component snapshot").throwable(e).log();
-            return new ArrayList<>();
-        }
-    }
-
     public ServiceComponentRuntime getServiceComponentRuntime() {
         return scrTracker == null ? null : scrTracker.getService();
     }
@@ -205,7 +196,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
     private XResultDTO toggleComponent(final long id, final boolean enable) {
         final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
-            logger.atWarn().msg(serviceUnavailable(SCR)).log();
+            logger.atDebug().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
 
@@ -287,7 +278,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
     private XResultDTO toggleComponent(final String name, final boolean enable) {
         final ServiceComponentRuntime scr = getServiceComponentRuntime();
         if (scr == null) {
-            logger.atWarn().msg(serviceUnavailable(SCR)).log();
+            logger.atDebug().msg(serviceUnavailable(SCR)).log();
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
         final StringBuilder                       builder         = new StringBuilder();
@@ -345,6 +336,13 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
                 props.put(entry.getKey(), arrayToString(entry.getValue()));
             }
             dto.properties = props;
+        } else if (compDescDTO.properties != null) {
+            final int                 size  = compDescDTO.properties.size();
+            final Map<String, String> props = new HashMap<>((int) (size / 0.75f) + 1);
+            for (final Map.Entry<String, Object> entry : compDescDTO.properties.entrySet()) {
+                props.put(entry.getKey(), arrayToString(entry.getValue()));
+            }
+            dto.properties = props;
         } else {
             dto.properties = emptyMap();
         }
@@ -388,7 +386,71 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
             dto.unsatisfiedReferences = new ArrayList<>();
         }
 
+        dto.satisfyingConditionTargets = getConditionTargets(dto);
+
         return dto;
+    }
+
+    private List<String> getConditionTargets(final XComponentDTO component) {
+        final Set<String> targets = new LinkedHashSet<>();
+
+        // 1. Check for Satisfying Condition property safely
+        if (component.properties != null) {
+            final String target = component.properties.get(SATISFYING_CONDITION_TARGET);
+            if (target != null && !target.trim().isEmpty()) {
+                targets.add(cleanTarget(target));
+            }
+        }
+
+        // 2. Check for references in description
+        if (component.references != null) {
+            for (final XReferenceDTO ref : component.references) {
+                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || CONDITION_INTERFACE.equals(ref.interfaceName)) {
+                    final String target = cleanTarget(ref.target);
+                    if (target.isEmpty() && SATISFYING_CONDITION_REF_NAME.equals(ref.name)) {
+                        targets.add("(osgi.condition.id=true)");
+                    } else if (!target.isEmpty()) {
+                        targets.add(target);
+                    }
+                }
+            }
+        }
+
+        // 3. Check for satisfied references (overridden targets)
+        if (component.satisfiedReferences != null) {
+            for (final XSatisfiedReferenceDTO ref : component.satisfiedReferences) {
+                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || ref.objectClass.contains(CONDITION_INTERFACE)) {
+                    final String target = cleanTarget(ref.target);
+                    if (!target.isEmpty()) {
+                        targets.add(target);
+                    }
+                }
+            }
+        }
+
+        // 4. Check for unsatisfied references (overridden targets)
+        if (component.unsatisfiedReferences != null) {
+            for (final XUnsatisfiedReferenceDTO ref : component.unsatisfiedReferences) {
+                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || ref.objectClass.contains(CONDITION_INTERFACE)) {
+                    final String target = cleanTarget(ref.target);
+                    if (!target.isEmpty()) {
+                        targets.add(target);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(targets);
+    }
+
+    private String cleanTarget(final String target) {
+        if (target == null) {
+            return "";
+        }
+        String clean = target.trim();
+        if (clean.startsWith("[") && clean.endsWith("]")) {
+            clean = clean.substring(1, clean.length() - 1).trim();
+        }
+        return clean;
     }
 
     private static String mapToState(final int state) {

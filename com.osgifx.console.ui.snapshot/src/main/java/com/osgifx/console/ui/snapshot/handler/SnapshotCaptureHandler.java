@@ -40,6 +40,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
 import com.osgifx.console.agent.dto.XHeapUsageDTO;
@@ -102,7 +103,7 @@ public final class SnapshotCaptureHandler {
         final Task<SnapshotStatistics> prepTask = new Task<>() {
             @Override
             protected SnapshotStatistics call() throws Exception {
-                updateMessage("Estimating snapshot size...");
+                updateMessage("Estimating snapshot size (1/2)...");
                 final long    estimatedSize       = agent.estimateSnapshotSize();
                 final long    estimatedCompressed = estimatedSize / 5;
                 final long    rpcLimit            = 200_000_000L;
@@ -113,7 +114,7 @@ public final class SnapshotCaptureHandler {
                 final var handler        = handlerTracker != null ? handlerTracker.getService() : null;
                 final var decoder        = new SnapshotDecoder(new BinaryCodec());
 
-                updateMessage("Counting bundles and services...");
+                updateMessage("Counting bundles and services (2/2)...");
                 final var bundleCount  = decoder.decodeList(agent.bundles(), XBundleDTO.class).size();
                 final var serviceCount = decoder.decodeList(agent.services(), XServiceDTO.class).size();
 
@@ -218,46 +219,48 @@ public final class SnapshotCaptureHandler {
                     final var agent   = supervisor.getAgent();
                     final var decoder = new SnapshotDecoder(new BinaryCodec());
 
-                    updateMessage("Capturing bundles (1/18)...");
+                    updateMessage("Capturing bundles (1/20)...");
                     dto.bundles = decoder.decodeList(agent.bundles(), XBundleDTO.class);
-                    updateMessage("Capturing components (2/18)...");
+                    updateMessage("Capturing components (2/20)...");
                     dto.components = decoder.decodeList(agent.components(), XComponentDTO.class);
-                    updateMessage("Capturing configurations (3/18)...");
+                    updateMessage("Capturing configurations (3/20)...");
                     dto.configurations = decoder.decodeList(agent.configurations(), XConfigurationDTO.class);
-                    updateMessage("Capturing properties (4/18)...");
+                    updateMessage("Capturing properties (4/20)...");
                     dto.properties = decoder.decodeList(agent.properties(), XPropertyDTO.class);
-                    updateMessage("Capturing services (5/18)...");
+                    updateMessage("Capturing services (5/20)...");
                     dto.services = decoder.decodeList(agent.services(), XServiceDTO.class);
-                    updateMessage("Capturing threads (6/18)...");
+                    updateMessage("Capturing threads (6/20)...");
                     dto.threads = decoder.decodeList(agent.threads(), XThreadDTO.class);
-                    updateMessage("Capturing DMT nodes (7/18)...");
+                    updateMessage("Capturing DMT nodes (7/20)...");
                     dto.dmtNodes = agent.readDmtNode(".");
-                    updateMessage("Capturing memory info (8/18)...");
+                    updateMessage("Capturing memory info (8/20)...");
                     dto.memoryInfo = agent.getMemoryInfo();
-                    updateMessage("Capturing roles (9/18)...");
+                    updateMessage("Capturing roles (9/20)...");
                     dto.roles = decoder.decodeList(agent.roles(), XRoleDTO.class);
-                    updateMessage("Capturing health checks (10/18)...");
+                    updateMessage("Capturing health checks (10/20)...");
                     dto.healthChecks = decoder.decodeList(agent.healthChecks(), XHealthCheckDTO.class);
-                    updateMessage("Capturing classloader leaks (11/18)...");
+                    updateMessage("Capturing classloader leaks (11/20)...");
                     dto.classloaderLeaks = decoder.decodeSet(agent.leaks(), XBundleDTO.class);
-                    updateMessage("Capturing HTTP components (12/18)...");
+                    updateMessage("Capturing HTTP components (12/20)...");
                     dto.httpComponents = decoder.decodeList(agent.httpComponents(), XHttpComponentDTO.class);
-                    updateMessage("Capturing logger contexts (13/18)...");
+                    updateMessage("Capturing logger contexts (13/20)...");
                     dto.bundleLoggerContexts = decoder.decodeList(agent.bundleLoggerContexts(),
                             XBundleLoggerContextDTO.class);
-                    updateMessage("Capturing JAX-RS components (14/18)...");
+                    updateMessage("Capturing JAX-RS components (14/20)...");
                     dto.jaxRsComponents = decoder.decodeList(agent.jaxRsComponents(), XJaxRsComponentDTO.class);
-                    updateMessage("Capturing CDI containers (15/18)...");
+                    updateMessage("Capturing CDI containers (15/20)...");
                     dto.cdiContainers = decoder.decodeList(agent.cdiContainers(), XCdiContainerDTO.class);
-                    updateMessage("Capturing runtime capabilities (16/18)...");
+                    updateMessage("Capturing runtime capabilities (16/20)...");
                     dto.runtimeCapabilities = decoder.decodeList(agent.runtimeCapabilities(),
                             XRuntimeCapabilityDTO.class);
-                    updateMessage("Capturing heap usage (17/18)...");
+                    updateMessage("Capturing heap usage (17/20)...");
                     dto.heapUsage = decoder.decode(agent.heapUsage(), XHeapUsageDTO.class);
-                    updateMessage("Capturing runtime info (18/18)...");
+                    updateMessage("Capturing conditions (18/20)...");
+                    dto.conditions = decoder.decodeList(agent.conditions(), XConditionDTO.class);
+                    updateMessage("Capturing runtime info (19/20)...");
                     dto.runtime = decoder.decode(agent.runtime(), RuntimeDTO.class);
 
-                    updateMessage("Serializing snapshot...");
+                    updateMessage("Serializing snapshot (20/20)...");
                     return new Gson().toJson(dto);
                 } catch (final Exception e) {
                     logger.atError().withException(e).log("Cannot capture snapshot");

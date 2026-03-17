@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.osgifx.console.agent.helper;
 
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XAttributeDefType;
@@ -150,6 +152,43 @@ public final class AgentHelper {
             default:
                 return Converter.cnv(XAttributeDefType.clazz(type), source);
         }
+    }
+
+    public static Map<String, String> createProperties(final ServiceReference<?> ref) {
+        final Map<String, String> properties = new HashMap<>();
+        for (final String key : ref.getPropertyKeys()) {
+            final Object value = ref.getProperty(key);
+            properties.put(key, arrayToString(value));
+        }
+        return properties;
+    }
+
+    private static String arrayToString(final Object value) {
+        if (value == null) {
+            return "null";
+        }
+        if (value.getClass().isArray()) {
+            if (value instanceof Object[]) {
+                return Arrays.deepToString((Object[]) value);
+            } else if (value instanceof int[]) {
+                return Arrays.toString((int[]) value);
+            } else if (value instanceof long[]) {
+                return Arrays.toString((long[]) value);
+            } else if (value instanceof boolean[]) {
+                return Arrays.toString((boolean[]) value);
+            } else if (value instanceof double[]) {
+                return Arrays.toString((double[]) value);
+            } else if (value instanceof float[]) {
+                return Arrays.toString((float[]) value);
+            } else if (value instanceof short[]) {
+                return Arrays.toString((short[]) value);
+            } else if (value instanceof byte[]) {
+                return Arrays.toString((byte[]) value);
+            } else if (value instanceof char[]) {
+                return Arrays.toString((char[]) value);
+            }
+        }
+        return String.valueOf(value);
     }
 
 }

@@ -59,14 +59,9 @@ public final class XThreadAdmin extends AbstractSnapshotAdmin<XThreadDTO> {
 
     @Override
     public List<XThreadDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
         try {
-            return decoder.decodeList(current, XThreadDTO.class);
+            return map();
         } catch (final Exception e) {
-            logger.atError().msg("Failed to decode thread snapshot").throwable(e).log();
             return Collections.emptyList();
         }
     }

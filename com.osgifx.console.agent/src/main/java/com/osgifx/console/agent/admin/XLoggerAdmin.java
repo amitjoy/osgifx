@@ -90,24 +90,10 @@ public final class XLoggerAdmin extends AbstractSnapshotAdmin<XBundleLoggerConte
     }
 
     @Override
-    public List<XBundleLoggerContextDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
-        try {
-            return decoder.decodeList(current, XBundleLoggerContextDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode Logger Context snapshot").throwable(e).log();
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     protected List<XBundleLoggerContextDTO> map() throws Exception {
         final LoggerAdmin loggerAdmin = (LoggerAdmin) loggerAdminSupplier.get();
         if (loggerAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();
+            logger.atDebug().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return Collections.emptyList();
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();
@@ -130,7 +116,7 @@ public final class XLoggerAdmin extends AbstractSnapshotAdmin<XBundleLoggerConte
     public XResultDTO updateLoggerContext(final String bsn, final Map<String, String> logLevels) {
         final LoggerAdmin loggerAdmin = (LoggerAdmin) loggerAdminSupplier.get();
         if (loggerAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(LOGGER_ADMIN)).log();
+            logger.atDebug().msg(serviceUnavailable(LOGGER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(LOGGER_ADMIN));
         }
         try {
