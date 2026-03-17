@@ -24,6 +24,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
@@ -82,6 +83,13 @@ public interface DataProvider {
      * @return the observable list of components
      */
     ObservableList<XComponentDTO> components();
+
+    /**
+     * Returns an observable list of conditions.
+     *
+     * @return the observable list of conditions
+     */
+    ObservableList<XConditionDTO> conditions();
 
     /**
      * Returns an observable list of configurations.

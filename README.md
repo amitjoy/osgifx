@@ -16,7 +16,7 @@
 ### ❓ Why OSGi.fx?
 
 **OSGi.fx** is the ultimate remote management tool for your OSGi frameworks. Unlike legacy consoles, it offers a **modern, responsive JavaFX interface** that gives you:
-*   **🚀 Deep Insights:** Visualize bundles, services, users, and components instantly.
+*   **🚀 Deep Insights:** Visualize bundles, services, users, components, and conditions instantly.
 *   **⚡ Real-time Monitoring:** Track threads, heap usage, and logs live.
 *   **�️ Visual Dependencies:** Explore complex relationships with interactive graphs.
 *   **✨ Ease of Use:** Drag-and-drop installs, smart auto-complete, and valid configuration editing.
@@ -141,6 +141,7 @@ For detailed setup instructions, see the [User Guide](GUIDE.md).
 | **💥 Blast Radius Analysis** <br> _Pre-flight simulation of impact when stopping bundles or disabling components_ | 3.0.0 | ✅ | 🚧 |
 | **🌊 Activation Cascade Analysis** <br> _Predictive analysis of service activations and hijacking when starting bundles or enabling components_ | 3.0.0 | ✅ | 🚧 |
 | **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components_ | 3.0.0 | ✅ | 🚧 |
+| **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks_ | 3.0.0 | ✅ | 🚧 |
 
 --------------------------------------------------------------------------------------------------------------
 

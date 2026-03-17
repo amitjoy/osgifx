@@ -94,24 +94,10 @@ public final class XUserAdmin extends AbstractSnapshotAdmin<XRoleDTO> implements
     }
 
     @Override
-    public List<XRoleDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return new ArrayList<>();
-        }
-        try {
-            return decoder.decodeList(current, XRoleDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode user snapshot").throwable(e).log();
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
     protected List<XRoleDTO> map() throws Exception {
         final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
-            logger.atWarn().msg("UserAdmin is unavailable").log();
+            logger.atDebug().msg("UserAdmin is unavailable").log();
             return Collections.emptyList();
         }
         final List<XRoleDTO> dtos  = new ArrayList<>();
@@ -127,7 +113,7 @@ public final class XUserAdmin extends AbstractSnapshotAdmin<XRoleDTO> implements
     public XResultDTO createRole(final String name, final Type type) {
         final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
+            logger.atDebug().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final Role role = userAdmin.createRole(name, getType(type));
@@ -142,7 +128,7 @@ public final class XUserAdmin extends AbstractSnapshotAdmin<XRoleDTO> implements
     public XResultDTO updateRole(final XRoleDTO roleDTO) {
         final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
+            logger.atDebug().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         try {
@@ -241,7 +227,7 @@ public final class XUserAdmin extends AbstractSnapshotAdmin<XRoleDTO> implements
     public XResultDTO removeRole(final String name) {
         final UserAdmin userAdmin = (UserAdmin) userAdminSupplier.get();
         if (userAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(USER_ADMIN)).log();
+            logger.atDebug().msg(serviceUnavailable(USER_ADMIN)).log();
             return createResult(SKIPPED, serviceUnavailable(USER_ADMIN));
         }
         final boolean isRemoved = userAdmin.removeRole(name);

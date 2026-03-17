@@ -41,6 +41,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -452,6 +453,26 @@ public final class SnapshotAgent implements Agent {
     @Override
     public List<XRuntimeCapabilityDTO> getRuntimeCapabilities() {
         return List.of();
+    }
+
+    @Override
+    public List<XConditionDTO> getAllConditions() {
+        return snapshotDTO.conditions;
+    }
+
+    @Override
+    public XResultDTO injectMockCondition(final String identifier, final Map<String, Object> properties) {
+        return null;
+    }
+
+    @Override
+    public XResultDTO revokeMockCondition(final String identifier) {
+        return null;
+    }
+
+    @Override
+    public byte[] conditions() {
+        return encode(snapshotDTO.conditions);
     }
 
     @Override

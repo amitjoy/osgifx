@@ -17,8 +17,11 @@ package com.osgifx.console.ui.components;
 
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_CAPABILITIES_TOPIC;
 import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_COMPONENT_FILTER_EVENT_TOPIC;
+import static com.osgifx.console.event.topics.TableFilterUpdateTopics.UPDATE_CONDITION_FILTER_EVENT_TOPIC;
+import static org.eclipse.e4.ui.workbench.modeling.EPartService.PartState.ACTIVATE;
 
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,15 +31,17 @@ import org.controlsfx.control.table.TableRowExpanderColumn;
 import org.controlsfx.control.table.TableRowExpanderColumn.TableRowDataFeatures;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.di.extensions.OSGiBundle;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.di.LocalInstance;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 import org.osgi.framework.BundleContext;
 
-import com.google.mu.util.Substring;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.dto.SearchFilterDTO;
 import com.osgifx.console.util.fx.DTOCellValueFactory;
@@ -47,10 +52,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 public final class ComponentsFxController {
 
@@ -70,6 +80,11 @@ public final class ComponentsFxController {
     private boolean                             isConnected;
     @Inject
     private DataProvider                        dataProvider;
+    @Inject
+    @Optional
+    private EPartService                        partService;
+    @Inject
+    private IEventBroker                        eventBroker;
     @Inject
     private ThreadSynchronize                   threadSync;
     private FilteredList<XComponentDTO>         filteredList;
@@ -133,19 +148,52 @@ public final class ComponentsFxController {
 
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", String.class));
 
-        final var conditionIdColumn = new TableColumn<XComponentDTO, String>("Condition ID");
+        final var satisfyingConditionColumn = new TableColumn<XComponentDTO, String>("Satisfying Condition");
 
-        conditionIdColumn.setCellValueFactory(this::parseConditionId);
+        satisfyingConditionColumn.setCellValueFactory(this::getSatisfyingConditionTarget);
+        satisfyingConditionColumn.setCellFactory(_ -> new TableCell<>() {
+            @Override
+            protected void updateItem(final String item, final boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isEmpty() || "(osgi.condition.id=true)".equals(item)) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    final var filters = item.split(", ");
+                    final var box     = new HBox();
+                    for (int i = 0; i < filters.length; i++) {
+                        final var conditionFilter = filters[i];
+                        final var link            = new Hyperlink(conditionFilter);
+                        link.setPadding(Insets.EMPTY);
+                        link.setBorder(Border.EMPTY);
+                        link.setOnAction(_ -> {
+                            final var filter = new SearchFilterDTO();
+                            filter.description = "Condition Filter: " + conditionFilter;
+                            filter.predicate   = (Predicate<XConditionDTO>) c -> conditionFilter.equals(c.identifier);
+
+                            partService.showPart("com.osgifx.console.application.tab.conditions", ACTIVATE);
+                            eventBroker.post(UPDATE_CONDITION_FILTER_EVENT_TOPIC, filter);
+                        });
+                        box.getChildren().add(link);
+                        if (i < filters.length - 1) {
+                            box.getChildren().add(new javafx.scene.control.Label(", "));
+                        }
+                    }
+                    setGraphic(box);
+                    setText(null);
+                }
+            }
+        });
 
         table.getColumns().add(expanderColumn);
         table.getColumns().add(idColumn);
         table.getColumns().add(componentNameColumn);
         table.getColumns().add(stateColumn);
-        table.getColumns().add(conditionIdColumn);
+        table.getColumns().add(satisfyingConditionColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
+        filteredList = new FilteredList<>(dataProvider.components());
         threadSync.asyncExec(() -> {
-            filteredList = new FilteredList<>(dataProvider.components());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
             table.getSortOrder().add(componentNameColumn);
@@ -161,19 +209,14 @@ public final class ComponentsFxController {
         filteredList.setPredicate((Predicate<? super XComponentDTO>) filter.predicate);
     }
 
-    private ReadOnlyStringProperty parseConditionId(final CellDataFeatures<XComponentDTO, String> p) {
-        final var property = p.getValue().properties.get("osgi.ds.satisfying.condition.target");
-        final var value    = new SimpleStringProperty();
-        if (property != null) {
-            // @formatter:off
-            Substring.between("(", ")")
-                     .from(property)
-                     .ifPresent(e -> Substring.first("=")
-                                              .splitThenTrim(e)
-                                              .ifPresent((_, k) -> value.set(k)));
-            // @formatter:on
+    private ReadOnlyStringProperty getSatisfyingConditionTarget(final CellDataFeatures<XComponentDTO, String> p) {
+        final var component = p.getValue();
+        if (component.satisfyingConditionTargets == null || component.satisfyingConditionTargets.isEmpty()) {
+            return new SimpleStringProperty("");
         }
-        return value;
+        final String joined = component.satisfyingConditionTargets.stream()
+                .filter(t -> !t.isEmpty() && !"(osgi.condition.id=true)".equals(t)).collect(Collectors.joining(", "));
+        return new SimpleStringProperty(joined);
     }
 
     @Inject

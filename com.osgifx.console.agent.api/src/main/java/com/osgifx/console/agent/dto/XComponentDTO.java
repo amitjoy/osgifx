@@ -90,4 +90,7 @@ public class XComponentDTO extends DTO {
     /** A list of unsatisfied references for this component. */
     public List<XUnsatisfiedReferenceDTO> unsatisfiedReferences;
 
+    /** A list of satisfying condition targets (LDAP filters) for this component. */
+    public List<String> satisfyingConditionTargets;
+
 }

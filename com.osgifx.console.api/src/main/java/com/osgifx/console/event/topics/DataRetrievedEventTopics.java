@@ -43,5 +43,6 @@ public final class DataRetrievedEventTopics {
     public static final String DATA_RETRIEVED_THREADS_TOPIC         = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "threads";
     public static final String DATA_RETRIEVED_CAPABILITIES_TOPIC    = DATA_RETRIEVED_EVENT_TOPIC_PREFIX
             + "capabilities";
+    public static final String DATA_RETRIEVED_CONDITIONS_TOPIC      = DATA_RETRIEVED_EVENT_TOPIC_PREFIX + "conditions";
 
 }

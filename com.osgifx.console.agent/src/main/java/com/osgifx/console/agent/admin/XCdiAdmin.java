@@ -109,24 +109,10 @@ public final class XCdiAdmin extends AbstractSnapshotAdmin<XCdiContainerDTO> {
     }
 
     @Override
-    public List<XCdiContainerDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
-        try {
-            return decoder.decodeList(current, XCdiContainerDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode CDI snapshot").throwable(e).log();
-            return Collections.emptyList();
-        }
-    }
-
-    @Override
     protected List<XCdiContainerDTO> map() throws Exception {
         final CDIComponentRuntime runtime = (CDIComponentRuntime) cdiRuntimeSupplier.get();
         if (runtime == null) {
-            logger.atWarn().msg("OSGi CDI Runtime service is unavailable").log();
+            logger.atDebug().msg("OSGi CDI Runtime service is unavailable").log();
             return Collections.emptyList();
         }
         return runtime.getContainerDTOs().stream().map(this::toXCdiContainerDTO).collect(toList());

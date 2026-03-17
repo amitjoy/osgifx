@@ -34,6 +34,7 @@ import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.agent.dto.XBundleLoggerContextDTO;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
 import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConfigurationDTO;
 import com.osgifx.console.agent.dto.XDmtNodeDTO;
 import com.osgifx.console.agent.dto.XHealthCheckDTO;
@@ -293,6 +294,30 @@ public interface Agent extends AgentSnapshot {
      * @return any errors that occurred
      */
     String uninstall(long... id) throws Exception;
+
+    /**
+     * Returns all OSGi conditions in the framework.
+     *
+     * @return the list of conditions
+     */
+    List<XConditionDTO> getAllConditions();
+
+    /**
+     * Injects a mock condition into the framework.
+     *
+     * @param identifier the condition identifier
+     * @param properties the condition properties
+     * @return the operation result
+     */
+    XResultDTO injectMockCondition(String identifier, Map<String, Object> properties);
+
+    /**
+     * Revokes a previously injected mock condition.
+     *
+     * @param identifier the condition identifier
+     * @return the operation result
+     */
+    XResultDTO revokeMockCondition(String identifier);
 
     /**
      * Returns the Bundle Revisions for the given bundle IDs. If no IDs are given,

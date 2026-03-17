@@ -15,6 +15,7 @@
                                                 org.osgi.service.component,\
                                                 org.osgi.service.component.annotations,\
                                                 org.osgi.service.coordinator,\
+                                                org.osgi.service.condition,\
                                                 org.osgi.service.configurator,\
                                                 org.osgi.service.dmt,\
                                                 org.osgi.service.event,\

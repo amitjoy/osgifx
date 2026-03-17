@@ -54,6 +54,7 @@ public abstract class AbstractSnapshotAdmin<T> {
     protected final SnapshotDecoder                     decoder;
     protected final ScheduledExecutorService            executor;
     protected final AtomicReference<byte[]>             snapshot      = new AtomicReference<>();
+    protected final AtomicReference<List<T>>            cachedDtos    = new AtomicReference<>(Collections.emptyList());
     protected final AtomicReference<ScheduledFuture<?>> scheduledTask = new AtomicReference<>();
 
     protected final AtomicLong lastEventTime      = new AtomicLong(0);
@@ -72,16 +73,16 @@ public abstract class AbstractSnapshotAdmin<T> {
     }
 
     /**
-     * Returns the current snapshot. If no snapshot exists, one is generated synchronously.
+     * Returns the current snapshot. If no snapshot exists or if an update is pending,
+     * one is generated synchronously.
      *
      * @return the binary snapshot data
      */
     public byte[] snapshot() {
-        byte[] current = snapshot.get();
-        if (current == null) {
+        if (snapshot.get() == null || pendingChangeCount.get() > lastChangeCount.get()) {
             performSnapshot(pendingChangeCount.get());
-            current = snapshot.get();
         }
+        final byte[] current = snapshot.get();
         return current != null ? current : new byte[0];
     }
 
@@ -150,6 +151,7 @@ public abstract class AbstractSnapshotAdmin<T> {
             final byte[] encoded    = codec.encode(dtos);
             final byte[] compressed = Lz4Codec.compressWithLength(encoded);
             this.snapshot.set(compressed);
+            this.cachedDtos.set(dtos);
             this.lastChangeCount.set(changeCount);
         } catch (final Exception e) {
             logger.atError().msg("Snapshot failed for " + getClass().getSimpleName()).throwable(e).log();
@@ -186,17 +188,24 @@ public abstract class AbstractSnapshotAdmin<T> {
     protected abstract List<T> map() throws Exception;
 
     /**
-     * Returns the decoded DTOs. Mostly for backward compatibility or internal use.
-     *
-     * @return the list of DTOs
+     * Invalidate the current snapshot and change count.
      */
     public void invalidate() {
         snapshot.set(null);
+        cachedDtos.set(Collections.emptyList());
         lastChangeCount.set(-1);
     }
 
+    /**
+     * Returns the cached DTOs. If an update is pending, a new snapshot is generated synchronously.
+     *
+     * @return the list of DTOs
+     */
     public List<T> get() {
-        return Collections.emptyList(); // Default implementation, override if needed for DTO path
+        if (snapshot.get() == null || pendingChangeCount.get() > lastChangeCount.get()) {
+            performSnapshot(pendingChangeCount.get());
+        }
+        return cachedDtos.get();
     }
 
     public void stop() {
