@@ -34,6 +34,13 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface AgentSnapshot {
 
     /**
+     * Returns a compressed binary snapshot of all conditions.
+     *
+     * @return the compressed binary snapshot
+     */
+    byte[] conditions();
+
+    /**
      * Returns a compressed binary snapshot of all bundles.
      *
      * @return the compressed byte array containing the bundle information

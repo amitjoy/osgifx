@@ -70,6 +70,7 @@ port                              :   1729
                                       bnd.identity;id='com.osgifx.console.ui.batchinstall',\
                                       bnd.identity;id='com.osgifx.console.ui.search',\
                                       bnd.identity;id='com.osgifx.console.ui.components',\
+                                      bnd.identity;id='com.osgifx.console.ui.conditions',\
                                       bnd.identity;id='com.osgifx.console.ui.configurations',\
                                       bnd.identity;id='com.osgifx.console.ui.mcp',\
                                       bnd.identity;id='com.osgifx.console.ui.dmt',\
@@ -118,6 +119,7 @@ install.order                     :   \
                                       com.osgifx.console.ui.leaks,\
                                       com.osgifx.console.ui.mcp,\
                                       com.osgifx.console.ui.chaos,\
+                                      com.osgifx.console.ui.conditions,\
                                       com.osgifx.console.ui.http,\
                                       com.osgifx.console.ui.jaxrs,\
                                       com.osgifx.console.ui.cdi,\
@@ -233,6 +235,7 @@ install.order                     :   \
 	org.glassfish.jakarta.json;version='[2.0.1,2.0.2)';startlevel=10,\
 	org.osgi.service.cm;version='[1.6.1,1.6.2)';startlevel=10,\
 	org.osgi.service.component;version='[1.5.1,1.5.2)';startlevel=10,\
+	org.osgi.service.condition;version='[1.0.0,1.1.0)';startlevel=10,\
 	org.osgi.service.device;version='[1.1.1,1.1.2)';startlevel=10,\
 	org.osgi.service.event;version='[1.4.1,1.4.2)';startlevel=10,\
 	org.osgi.service.metatype;version='[1.4.1,1.4.2)';startlevel=10,\

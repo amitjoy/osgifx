@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.conditions.ConditionsFxController">
+   <center>
+      <TableView fx:id="conditionsTable" style="-fx-table-cell-border-color: transparent;" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <placeholder>
+            <Label text="No conditions found" />
+         </placeholder>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </center>
+</BorderPane>
