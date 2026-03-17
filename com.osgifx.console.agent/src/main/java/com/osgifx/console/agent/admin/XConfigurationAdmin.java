@@ -121,7 +121,7 @@ public final class XConfigurationAdmin extends AbstractSnapshotAdmin<XConfigurat
             public void removedService(final ServiceReference<ConfigurationAdmin> reference,
                                        final ConfigurationAdmin service) {
                 unregisterConfigListener();
-                snapshot.set(null);
+                invalidate();
                 super.removedService(reference, service);
             }
         };
@@ -241,24 +241,10 @@ public final class XConfigurationAdmin extends AbstractSnapshotAdmin<XConfigurat
         return prop instanceof Long ? (Long) prop : 0L;
     }
 
-    @Override
-    public List<XConfigurationDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return new ArrayList<>();
-        }
-        try {
-            return decoder.decodeList(current, XConfigurationDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode configuration snapshot").throwable(e).log();
-            return new ArrayList<>();
-        }
-    }
-
     public XResultDTO createOrUpdateConfiguration(final String pid, final Map<String, Object> newProperties) {
         final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(CM)).log();
+            logger.atDebug().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;
@@ -282,7 +268,7 @@ public final class XConfigurationAdmin extends AbstractSnapshotAdmin<XConfigurat
     public XResultDTO deleteConfiguration(final String pid) {
         final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(CM)).log();
+            logger.atDebug().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
         try {
@@ -301,7 +287,7 @@ public final class XConfigurationAdmin extends AbstractSnapshotAdmin<XConfigurat
     public XResultDTO createFactoryConfiguration(final String factoryPid, final Map<String, Object> newProperties) {
         final ConfigurationAdmin configAdmin = getConfigAdmin();
         if (configAdmin == null) {
-            logger.atWarn().msg(serviceUnavailable(CM)).log();
+            logger.atDebug().msg(serviceUnavailable(CM)).log();
             return createResult(SKIPPED, serviceUnavailable(CM));
         }
         XResultDTO result = null;

@@ -23,6 +23,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XCdiContainerDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
@@ -158,6 +159,15 @@ public interface Supervisor {
      */
     default List<XCdiContainerDTO> getCdiContainers() {
         return getAgent() == null ? Collections.emptyList() : getAgent().getCdiContainers();
+    }
+
+    /**
+     * Returns the list of registered OSGi conditions in the runtime
+     *
+     * @return the list of conditions
+     */
+    default List<XConditionDTO> getConditions() {
+        return getAgent() == null ? Collections.emptyList() : getAgent().getAllConditions();
     }
 
     /**

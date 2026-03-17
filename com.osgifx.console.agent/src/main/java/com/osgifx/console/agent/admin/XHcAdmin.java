@@ -114,20 +114,6 @@ public final class XHcAdmin extends AbstractSnapshotAdmin<XHealthCheckDTO> {
         return findAllHealthChecks();
     }
 
-    @Override
-    public List<XHealthCheckDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
-        try {
-            return decoder.decodeList(current, XHealthCheckDTO.class);
-        } catch (final Exception e) {
-            logger.atError().msg("Failed to decode health check snapshot").throwable(e).log();
-            return Collections.emptyList();
-        }
-    }
-
     public List<XHealthCheckResultDTO> executeHealthChecks(List<String> tags, List<String> names) {
         final HealthCheckExecutor felixHcExecutor = (HealthCheckExecutor) felixHcExecutorSupplier.get();
         if (felixHcExecutor == null) {

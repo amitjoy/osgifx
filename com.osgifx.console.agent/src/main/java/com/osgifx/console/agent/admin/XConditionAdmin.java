@@ -1,0 +1,313 @@
+/*******************************************************************************
+ * Copyright 2021-2026 Amit Kumar Mondal
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License.  You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************/
+package com.osgifx.console.agent.admin;
+
+import static org.osgi.framework.Constants.SERVICE_ID;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.condition.Condition;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
+import com.osgifx.console.agent.dto.XComponentDTO;
+import com.osgifx.console.agent.dto.XConditionDTO;
+import com.osgifx.console.agent.dto.XConditionState;
+import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.helper.AgentHelper;
+import com.osgifx.console.agent.rpc.codec.BinaryCodec;
+import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+@Singleton
+public final class XConditionAdmin extends AbstractSnapshotAdmin<XConditionDTO> {
+
+    private static final String CONDITION_ID = "osgi.condition.id";
+
+    private final BundleContext                                              context;
+    private final XComponentAdmin                                            componentAdmin;
+    private final Map<String, ServiceRegistration<?>>                        mockRegistrations = new ConcurrentHashMap<>();
+    private ServiceTracker<Condition, Condition>                             conditionTracker;
+    private ServiceTracker<ServiceComponentRuntime, ServiceComponentRuntime> scrTracker;
+
+    @Inject
+    public XConditionAdmin(final BundleContext context,
+                           final XComponentAdmin componentAdmin,
+                           final BinaryCodec codec,
+                           final SnapshotDecoder decoder,
+                           final ScheduledExecutorService executor) {
+        super(codec, decoder, executor);
+        this.context        = context;
+        this.componentAdmin = componentAdmin;
+    }
+
+    public void init() {
+        conditionTracker = new ServiceTracker<Condition, Condition>(context, Condition.class, null) {
+            @Override
+            public Condition addingService(final ServiceReference<Condition> reference) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+                return context.getService(reference);
+            }
+
+            @Override
+            public void modifiedService(final ServiceReference<Condition> reference, final Condition service) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+            }
+
+            @Override
+            public void removedService(final ServiceReference<Condition> reference, final Condition service) {
+                scheduleUpdate(pendingChangeCount.incrementAndGet());
+                context.ungetService(reference);
+            }
+        };
+        conditionTracker.open();
+
+        scrTracker = new ServiceTracker<>(context, ServiceComponentRuntime.class,
+                                          new ServiceTrackerCustomizer<ServiceComponentRuntime, ServiceComponentRuntime>() {
+
+                                              @Override
+                                              public ServiceComponentRuntime addingService(final ServiceReference<ServiceComponentRuntime> reference) {
+                                                  scheduleUpdate(getChangeCount(reference));
+                                                  return context.getService(reference);
+                                              }
+
+                                              @Override
+                                              public void modifiedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                                                          final ServiceComponentRuntime service) {
+                                                  scheduleUpdate(getChangeCount(reference));
+                                              }
+
+                                              @Override
+                                              public void removedService(final ServiceReference<ServiceComponentRuntime> reference,
+                                                                         final ServiceComponentRuntime service) {
+                                                  invalidate(); // Clear cache when SCR stops
+                                                  context.ungetService(reference);
+                                              }
+                                          });
+        scrTracker.open();
+
+        // Trigger initial snapshot
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
+    }
+
+    private long getChangeCount(final ServiceReference<?> ref) {
+        final Object prop = ref.getProperty("service.changecount");
+        return prop instanceof Long ? (Long) prop : 0L;
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if (conditionTracker != null) {
+            conditionTracker.close();
+        }
+        if (scrTracker != null) {
+            scrTracker.close();
+        }
+        mockRegistrations.values().forEach(ServiceRegistration::unregister);
+        mockRegistrations.clear();
+    }
+
+    @Override
+    protected List<XConditionDTO> map() throws Exception {
+        final List<XConditionDTO>           dtos       = new ArrayList<>();
+        final List<XComponentDTO>           components = componentAdmin.get();
+        final ServiceReference<Condition>[] refs       = conditionTracker.getServiceReferences();
+
+        // 1. Map all ACTIVE conditions by their unique OSGi service.id
+        final Map<Long, XConditionDTO> activeConditions = new ConcurrentHashMap<>();
+        if (refs != null) {
+            for (final ServiceReference<Condition> ref : refs) {
+                final Long   serviceId = (Long) ref.getProperty(SERVICE_ID);
+                final String id        = (String) ref.getProperty(CONDITION_ID);
+
+                if ("true".equals(id)) {
+                    continue; // Skip default framework condition to reduce UI noise
+                }
+
+                final String mockIdentifier = getMockIdentifier(ref);
+
+                final XConditionDTO dto = new XConditionDTO();
+                if (mockIdentifier != null) {
+                    dto.identifier = mockIdentifier;
+                    dto.state      = XConditionState.MOCKED;
+                } else {
+                    // Fallback to service.id if the developer didn't provide an osgi.condition.id
+                    dto.identifier = id != null ? "(" + CONDITION_ID + "=" + id + ")"
+                            : "(service.id=" + serviceId + ")";
+                    dto.state      = XConditionState.ACTIVE;
+                }
+                dto.providerBundleId      = ref.getBundle().getBundleId();
+                dto.properties            = AgentHelper.createProperties(ref);
+                dto.satisfiedComponents   = new ArrayList<>();
+                dto.unsatisfiedComponents = new ArrayList<>();
+
+                activeConditions.put(serviceId, dto);
+            }
+        }
+
+        // 2. Map to track filters that have NO matching conditions
+        final Map<String, XConditionDTO> missingFilters = new ConcurrentHashMap<>();
+
+        // 3. Process all components and evaluate their requirements
+        for (final XComponentDTO component : components) {
+            final Set<String> targets = getConditionTargets(component);
+            for (final String rawTarget : targets) {
+                final String target = cleanTarget(rawTarget);
+                if (isDefaultCondition(target)) {
+                    continue; // Skip components waiting on the default true condition
+                }
+
+                boolean matchedAtLeastOneActive = false;
+
+                // Test the component's filter against ALL active conditions
+                if (refs != null) {
+                    for (final ServiceReference<Condition> ref : refs) {
+                        final String id = (String) ref.getProperty(CONDITION_ID);
+                        if ("true".equals(id)) {
+                            continue;
+                        }
+
+                        if (matches(target, ref)) {
+                            matchedAtLeastOneActive = true;
+                            final Long          serviceId = (Long) ref.getProperty(SERVICE_ID);
+                            final XConditionDTO activeDto = activeConditions.get(serviceId);
+
+                            // Link the satisfied component to the active condition
+                            if (activeDto != null && !activeDto.satisfiedComponents.contains(component.name)) {
+                                activeDto.satisfiedComponents.add(component.name);
+                            }
+                        }
+                    }
+                }
+
+                // If the filter matched NOTHING, the component is blocked by a MISSING condition
+                if (!matchedAtLeastOneActive) {
+                    XConditionDTO missingDto = missingFilters.get(target);
+                    if (missingDto == null) {
+                        missingDto                       = new XConditionDTO();
+                        missingDto.identifier            = target;
+                        missingDto.state                 = mockRegistrations.containsKey(target)
+                                ? XConditionState.MOCKED
+                                : XConditionState.MISSING;
+                        missingDto.providerBundleId      = -1L;
+                        missingDto.properties            = new HashMap<>();
+                        missingDto.satisfiedComponents   = new ArrayList<>();
+                        missingDto.unsatisfiedComponents = new ArrayList<>();
+                        missingFilters.put(target, missingDto);
+                    }
+                    if (!missingDto.unsatisfiedComponents.contains(component.name)) {
+                        missingDto.unsatisfiedComponents.add(component.name);
+                    }
+                }
+            }
+        }
+
+        // 4. Combine both lists
+        dtos.addAll(activeConditions.values());
+        dtos.addAll(missingFilters.values());
+
+        return dtos;
+    }
+
+    private String getMockIdentifier(final ServiceReference<?> ref) {
+        for (final Map.Entry<String, ServiceRegistration<?>> entry : mockRegistrations.entrySet()) {
+            if (entry.getValue().getReference().equals(ref)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private Set<String> getConditionTargets(final XComponentDTO component) {
+        if (component.satisfyingConditionTargets == null) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(component.satisfyingConditionTargets);
+    }
+
+    private boolean isDefaultCondition(final String target) {
+        if (target == null) {
+            return false;
+        }
+        // Remove spaces to prevent formatting from hiding default true filters
+        final String cleanTarget = target.replaceAll("\\s", "");
+        return ("(" + CONDITION_ID + "=true)").equals(cleanTarget) || "true".equals(cleanTarget);
+    }
+
+    private String cleanTarget(final String target) {
+        if (target == null) {
+            return "";
+        }
+        String clean = target.trim();
+        // Array brackets [ ] might exist if the property was parsed as an array string representation
+        if (clean.startsWith("[") && clean.endsWith("]")) {
+            clean = clean.substring(1, clean.length() - 1).trim();
+        }
+        return clean;
+    }
+
+    private boolean matches(final String target, final ServiceReference<Condition> ref) {
+        try {
+            final Filter filter = context.createFilter(target);
+            return filter.match(ref);
+        } catch (final InvalidSyntaxException e) {
+            return false; // Safely ignore malformed LDAP filters
+        }
+    }
+
+    public XResultDTO injectMockCondition(final String identifier, final Map<String, Object> properties) {
+        if (mockRegistrations.containsKey(identifier)) {
+            return AgentHelper.createResult(XResultDTO.SKIPPED, "Condition '" + identifier + "' is already mocked");
+        }
+        final Map<String, Object> props = new ConcurrentHashMap<>(properties);
+
+        final ServiceRegistration<Condition> reg = context.registerService(Condition.class, Condition.INSTANCE,
+                new Hashtable<>(props));
+        mockRegistrations.put(identifier, reg);
+        scheduleUpdate(pendingChangeCount.incrementAndGet());
+        return AgentHelper.createResult(XResultDTO.SUCCESS,
+                "Condition '" + identifier + "' has been successfully mocked");
+    }
+
+    public XResultDTO revokeMockCondition(final String identifier) {
+        final ServiceRegistration<?> reg = mockRegistrations.remove(identifier);
+        if (reg != null) {
+            reg.unregister();
+            scheduleUpdate(pendingChangeCount.incrementAndGet());
+            return AgentHelper.createResult(XResultDTO.SUCCESS, "Mock condition '" + identifier + "' has been revoked");
+        }
+        return AgentHelper.createResult(XResultDTO.SKIPPED, "Condition '" + identifier + "' was not mocked");
+    }
+
+}

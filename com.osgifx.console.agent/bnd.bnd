@@ -16,6 +16,7 @@ javac.compliance      : ${javac.source}
                         org.apache.commons.commons-exec,\
                         org.apache.felix.healthcheck.api,\
                         org.osgi.service.cdi,\
+                        org.osgi.service.condition,\
                         org.osgi.service.jaxrs,\
                         org.osgi.service.log,\
                         org.osgi.service.messaging,\
@@ -52,6 +53,7 @@ Import-Package: \
 	org.osgi.service.http.runtime.dto;'resolution:'=optional,\
 	org.osgi.service.cdi*;'resolution:'=optional,\
 	org.osgi.service.cm;'resolution:'=optional,\
+	org.osgi.service.condition;'resolution:'=optional,\
 	org.osgi.service.dmt;'resolution:'=optional,\
 	org.osgi.service.event;'resolution:'=optional,\
 	org.osgi.service.jaxrs*;'resolution:'=optional,\

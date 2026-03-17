@@ -222,4 +222,31 @@ public final class PropertiesForm {
         return entries;
     }
 
+    public void addFieldPair(final VBox content, final String key, final String value, final XAttributeDefType type) {
+        final var formContent = new FormContent(content);
+        formContent.txtKey.setText(key);
+
+        // This is a bit tricky since FormContent encapsulates the fields heavily,
+        // but we can try to find the combobox and value field.
+        for (final Node n : formContent.getChildren()) {
+            if (n instanceof ComboBox) {
+                @SuppressWarnings("unchecked")
+                final var cb = (ComboBox<XAttributeDefType>) n;
+                cb.getSelectionModel().select(type);
+            }
+        }
+
+        for (final Node n : formContent.getChildren()) {
+            if (n instanceof TextField tf) {
+                if (tf != formContent.txtKey) {
+                    tf.setText(value);
+                }
+            } else if (n instanceof CheckBox cb) {
+                cb.setSelected(Boolean.parseBoolean(value));
+            }
+        }
+
+        content.getChildren().add(formContent);
+        dialogPane.getScene().getWindow().sizeToScene();
+    }
 }

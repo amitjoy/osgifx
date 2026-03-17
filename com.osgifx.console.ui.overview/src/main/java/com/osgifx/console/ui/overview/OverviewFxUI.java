@@ -761,6 +761,7 @@ public final class OverviewFxUI {
         dataProvider.retrieveInfo("bundles", true);
         dataProvider.retrieveInfo("services", true);
         dataProvider.retrieveInfo("components", true);
+        dataProvider.retrieveInfo("conditions", true);
         dataProvider.retrieveInfo("threads", true);
         dataProvider.retrieveInfo("properties", true);
         dataProvider.retrieveInfo("logs", true);

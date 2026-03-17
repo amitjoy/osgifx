@@ -63,14 +63,9 @@ public final class XPropertyAdmin extends AbstractSnapshotAdmin<XPropertyDTO> {
 
     @Override
     public List<XPropertyDTO> get() {
-        final byte[] current = snapshot();
-        if (current == null || current.length == 0) {
-            return Collections.emptyList();
-        }
         try {
-            return decoder.decodeList(current, XPropertyDTO.class);
+            return map();
         } catch (final Exception e) {
-            logger.atError().msg("Failed to decode property snapshot").throwable(e).log();
             return Collections.emptyList();
         }
     }

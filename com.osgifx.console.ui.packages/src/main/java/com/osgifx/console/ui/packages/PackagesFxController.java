@@ -145,8 +145,8 @@ public final class PackagesFxController {
         table.getColumns().add(hasDuplicatesColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
+        filteredList = new FilteredList<>(dataProvider.packages());
         threadSync.asyncExec(() -> {
-            filteredList = new FilteredList<>(dataProvider.packages());
             table.setItems(filteredList);
             TableFilter.forTableView(table).lazy(true).apply();
             table.getSortOrder().add(nameColumn);

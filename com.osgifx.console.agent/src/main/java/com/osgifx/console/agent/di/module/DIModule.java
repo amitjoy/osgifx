@@ -33,6 +33,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
+import com.osgifx.console.agent.admin.XConditionAdmin;
 import com.osgifx.console.agent.admin.XConfigurationAdmin;
 import com.osgifx.console.agent.admin.XDmtAdmin;
 import com.osgifx.console.agent.admin.XDtoAdmin;
@@ -89,6 +90,7 @@ public final class DIModule {
     private XServiceAdmin             xServiceAdmin;
     private XConfigurationAdmin       xConfigurationAdmin;
     private XComponentAdmin           xComponentAdmin;
+    private XConditionAdmin           xConditionAdmin;
     private XMetaTypeAdmin            xMetaTypeAdmin;
     private XPropertyAdmin            xPropertyAdmin;
     private XHcAdmin                  xHcAdmin;
@@ -139,6 +141,11 @@ public final class DIModule {
         if (wirings.isMetatypeWired() && wirings.isConfigAdminWired()) {
             xMetaTypeAdmin = new XMetaTypeAdmin(context, executor);
             di.bindInstance(XMetaTypeAdmin.class, xMetaTypeAdmin);
+        }
+
+        if (wirings.isConditionWired()) {
+            xConditionAdmin = new XConditionAdmin(context, xComponentAdmin, codec, decoder, executor);
+            di.bindInstance(XConditionAdmin.class, xConditionAdmin);
         }
 
         if (wirings.isConfigAdminWired()) {
@@ -208,11 +215,14 @@ public final class DIModule {
         if (xComponentAdmin != null) {
             xComponentAdmin.init();
         }
-        if (xConfigurationAdmin != null) {
-            xConfigurationAdmin.init();
+        if (xConditionAdmin != null) {
+            xConditionAdmin.init();
         }
         if (xMetaTypeAdmin != null) {
             xMetaTypeAdmin.init();
+        }
+        if (xConfigurationAdmin != null) {
+            xConfigurationAdmin.init();
         }
         if (xHcAdmin != null) {
             xHcAdmin.init();
@@ -269,6 +279,9 @@ public final class DIModule {
         }
         if (xServiceAdmin != null) {
             xServiceAdmin.stop();
+        }
+        if (xConditionAdmin != null) {
+            xConditionAdmin.stop();
         }
         if (xConfigurationAdmin != null) {
             xConfigurationAdmin.stop();
