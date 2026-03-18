@@ -18,21 +18,17 @@ package com.osgifx.console.agent.admin;
 import static org.osgi.framework.Constants.SERVICE_ID;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.condition.Condition;
 import org.osgi.util.tracker.ServiceTracker;
@@ -41,7 +37,10 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XConditionDTO;
 import com.osgifx.console.agent.dto.XConditionState;
+import com.osgifx.console.agent.dto.XReferenceDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
+import com.osgifx.console.agent.dto.XSatisfiedReferenceDTO;
+import com.osgifx.console.agent.dto.XUnsatisfiedReferenceDTO;
 import com.osgifx.console.agent.helper.AgentHelper;
 import com.osgifx.console.agent.rpc.codec.BinaryCodec;
 import com.osgifx.console.agent.rpc.codec.SnapshotDecoder;
@@ -140,104 +139,160 @@ public final class XConditionAdmin extends AbstractSnapshotAdmin<XConditionDTO> 
 
     @Override
     protected List<XConditionDTO> map() throws Exception {
-        final List<XConditionDTO>           dtos       = new ArrayList<>();
-        final List<XComponentDTO>           components = componentAdmin.get();
-        final ServiceReference<Condition>[] refs       = conditionTracker.getServiceReferences();
+        componentAdmin.invalidate();
+        final List<XComponentDTO>        components      = componentAdmin.get();
+        final List<XConditionDTO>        dtos            = new ArrayList<>();
+        final Map<String, XConditionDTO> map             = new HashMap<>();
+        final List<Long>                 boundServiceIds = new ArrayList<>();
 
-        // 1. Map all ACTIVE conditions by their unique OSGi service.id
-        final Map<Long, XConditionDTO> activeConditions = new ConcurrentHashMap<>();
-        if (refs != null) {
-            for (final ServiceReference<Condition> ref : refs) {
-                final Long   serviceId = (Long) ref.getProperty(SERVICE_ID);
-                final String id        = (String) ref.getProperty(CONDITION_ID);
-
-                if ("true".equals(id)) {
-                    continue; // Skip default framework condition to reduce UI noise
-                }
-
-                final String mockIdentifier = getMockIdentifier(ref);
-
-                final XConditionDTO dto = new XConditionDTO();
-                if (mockIdentifier != null) {
-                    dto.identifier = mockIdentifier;
-                    dto.state      = XConditionState.MOCKED;
-                } else {
-                    // Fallback to service.id if the developer didn't provide an osgi.condition.id
-                    dto.identifier = id != null ? "(" + CONDITION_ID + "=" + id + ")"
-                            : "(service.id=" + serviceId + ")";
-                    dto.state      = XConditionState.ACTIVE;
-                }
-                dto.providerBundleId      = ref.getBundle().getBundleId();
-                dto.properties            = AgentHelper.createProperties(ref);
-                dto.satisfiedComponents   = new ArrayList<>();
-                dto.unsatisfiedComponents = new ArrayList<>();
-
-                activeConditions.put(serviceId, dto);
-            }
-        }
-
-        // 2. Map to track filters that have NO matching conditions
-        final Map<String, XConditionDTO> missingFilters = new ConcurrentHashMap<>();
-
-        // 3. Process all components and evaluate their requirements
         for (final XComponentDTO component : components) {
-            final Set<String> targets = getConditionTargets(component);
-            for (final String rawTarget : targets) {
-                final String target = cleanTarget(rawTarget);
-                if (isDefaultCondition(target)) {
-                    continue; // Skip components waiting on the default true condition
-                }
-
-                boolean matchedAtLeastOneActive = false;
-
-                // Test the component's filter against ALL active conditions
-                if (refs != null) {
-                    for (final ServiceReference<Condition> ref : refs) {
-                        final String id = (String) ref.getProperty(CONDITION_ID);
-                        if ("true".equals(id)) {
+            // 1. Process Satisfied References
+            if (component.satisfiedReferences != null) {
+                for (final XSatisfiedReferenceDTO ref : component.satisfiedReferences) {
+                    if (isConditionReference(component, ref.name)) {
+                        final String target = cleanTarget(ref.target);
+                        if (isDefaultCondition(target)) {
                             continue;
                         }
+                        final XConditionDTO dto = map.computeIfAbsent(target, k -> createDTO(target));
+                        if (ref.serviceReferences != null && ref.serviceReferences.length > 0) {
+                            final ServiceReferenceDTO         sref    = ref.serviceReferences[0];
+                            final ServiceReference<Condition> realRef = getRealReference(sref.id);
 
-                        if (matches(target, ref)) {
-                            matchedAtLeastOneActive = true;
-                            final Long          serviceId = (Long) ref.getProperty(SERVICE_ID);
-                            final XConditionDTO activeDto = activeConditions.get(serviceId);
+                            if (realRef != null) {
+                                final Long serviceId = (Long) realRef.getProperty(SERVICE_ID);
+                                boundServiceIds.add(serviceId);
 
-                            // Link the satisfied component to the active condition
-                            if (activeDto != null && !activeDto.satisfiedComponents.contains(component.name)) {
-                                activeDto.satisfiedComponents.add(component.name);
+                                final String mockIdentifier = getMockIdentifier(realRef);
+                                if (mockIdentifier != null) {
+                                    dto.state = XConditionState.MOCKED;
+                                } else {
+                                    dto.state = XConditionState.ACTIVE;
+                                }
+                                dto.providerBundleId = realRef.getBundle().getBundleId();
+                                dto.properties       = AgentHelper.createProperties(realRef);
+                            } else {
+                                // Fallback: if we can't find the real reference, we know it's at least ACTIVE
+                                if (mockRegistrations.containsKey(target)) {
+                                    dto.state = XConditionState.MOCKED;
+                                } else {
+                                    dto.state = XConditionState.ACTIVE;
+                                }
                             }
+                        }
+                        if (!dto.satisfiedComponents.contains(component.name)) {
+                            dto.satisfiedComponents.add(component.name);
                         }
                     }
                 }
-
-                // If the filter matched NOTHING, the component is blocked by a MISSING condition
-                if (!matchedAtLeastOneActive) {
-                    XConditionDTO missingDto = missingFilters.get(target);
-                    if (missingDto == null) {
-                        missingDto                       = new XConditionDTO();
-                        missingDto.identifier            = target;
-                        missingDto.state                 = mockRegistrations.containsKey(target)
-                                ? XConditionState.MOCKED
-                                : XConditionState.MISSING;
-                        missingDto.providerBundleId      = -1L;
-                        missingDto.properties            = new HashMap<>();
-                        missingDto.satisfiedComponents   = new ArrayList<>();
-                        missingDto.unsatisfiedComponents = new ArrayList<>();
-                        missingFilters.put(target, missingDto);
-                    }
-                    if (!missingDto.unsatisfiedComponents.contains(component.name)) {
-                        missingDto.unsatisfiedComponents.add(component.name);
+            }
+            // 2. Process Unsatisfied References
+            if (component.unsatisfiedReferences != null) {
+                for (final XUnsatisfiedReferenceDTO ref : component.unsatisfiedReferences) {
+                    if (isConditionReference(component, ref.name)) {
+                        final String target = cleanTarget(ref.target);
+                        if (isDefaultCondition(target)) {
+                            continue;
+                        }
+                        final XConditionDTO dto = map.computeIfAbsent(target, k -> createDTO(target));
+                        if (dto.state != XConditionState.ACTIVE && dto.state != XConditionState.MOCKED) {
+                            dto.state = mockRegistrations.containsKey(target) ? XConditionState.MOCKED
+                                    : XConditionState.MISSING;
+                        }
+                        if (!dto.unsatisfiedComponents.contains(component.name)) {
+                            dto.unsatisfiedComponents.add(component.name);
+                        }
                     }
                 }
             }
         }
 
-        // 4. Combine both lists
-        dtos.addAll(activeConditions.values());
-        dtos.addAll(missingFilters.values());
+        // 3. Process Orphaned Conditions (Active services not bound to any component)
+        final ServiceReference<Condition>[] refs = conditionTracker.getServiceReferences();
+        if (refs != null) {
+            for (final ServiceReference<Condition> ref : refs) {
+                final Long serviceId = (Long) ref.getProperty(SERVICE_ID);
+                if (boundServiceIds.contains(serviceId)) {
+                    continue; // Already processed via component reference
+                }
+                final String mockIdentifier = getMockIdentifier(ref);
+                if (mockIdentifier != null && map.containsKey(mockIdentifier)) {
+                    // Update the existing DTO with provider info if not already set (e.g. from Step 2)
+                    final XConditionDTO existing = map.get(mockIdentifier);
+                    if (existing.providerBundleId == -1) {
+                        existing.providerBundleId = ref.getBundle().getBundleId();
+                        existing.properties       = AgentHelper.createProperties(ref);
+                        // If it's a mock service and the identifier is already in the list, mark as MOCKED
+                        existing.state = XConditionState.MOCKED;
+                    }
+                    continue;
+                }
+                final String id = (String) ref.getProperty(CONDITION_ID);
+                if ("true".equals(id)) {
+                    continue; // Skip default true condition
+                }
+                final String identifier = id != null ? "(" + CONDITION_ID + "=" + id + ")"
+                        : "(" + SERVICE_ID + "=" + serviceId + ")";
 
+                final XConditionDTO dto = map.computeIfAbsent(identifier, k -> createDTO(identifier));
+                if (mockIdentifier != null) {
+                    dto.state = XConditionState.MOCKED;
+                } else {
+                    dto.state = XConditionState.ACTIVE;
+                }
+                dto.providerBundleId = ref.getBundle().getBundleId();
+                dto.properties       = AgentHelper.createProperties(ref);
+            }
+        }
+
+        // 4. Process Orphaned Mocks (Mock registrations not matched by any service or component)
+        for (final String mockIdentifier : mockRegistrations.keySet()) {
+            if (!map.containsKey(mockIdentifier)) {
+                final XConditionDTO dto = createDTO(mockIdentifier);
+                dto.state = XConditionState.MOCKED;
+                map.put(mockIdentifier, dto);
+            }
+        }
+
+        dtos.addAll(map.values());
         return dtos;
+    }
+
+    private XConditionDTO createDTO(final String identifier) {
+        final XConditionDTO dto = new XConditionDTO();
+        dto.identifier            = identifier;
+        dto.state                 = XConditionState.MISSING;
+        dto.providerBundleId      = -1L;
+        dto.properties            = new HashMap<>();
+        dto.satisfiedComponents   = new ArrayList<>();
+        dto.unsatisfiedComponents = new ArrayList<>();
+        return dto;
+    }
+
+    private boolean isConditionReference(final XComponentDTO component, final String refName) {
+        if (component.references == null || refName == null) {
+            return false;
+        }
+        for (final XReferenceDTO ref : component.references) {
+            if (refName.equals(ref.name)) {
+                return "osgi.ds.satisfying.condition".equals(ref.name)
+                        || Condition.class.getName().equals(ref.interfaceName);
+            }
+        }
+        return false;
+    }
+
+    private ServiceReference<Condition> getRealReference(final long serviceId) {
+        final ServiceReference<Condition>[] refs = conditionTracker.getServiceReferences();
+        if (refs != null) {
+            for (final ServiceReference<Condition> ref : refs) {
+                final Object property = ref.getProperty(SERVICE_ID);
+                if (property instanceof Number && ((Number) property).longValue() == serviceId) {
+                    return ref;
+                }
+            }
+        }
+        return null;
     }
 
     private String getMockIdentifier(final ServiceReference<?> ref) {
@@ -247,13 +302,6 @@ public final class XConditionAdmin extends AbstractSnapshotAdmin<XConditionDTO> 
             }
         }
         return null;
-    }
-
-    private Set<String> getConditionTargets(final XComponentDTO component) {
-        if (component.satisfyingConditionTargets == null) {
-            return Collections.emptySet();
-        }
-        return new HashSet<>(component.satisfyingConditionTargets);
     }
 
     private boolean isDefaultCondition(final String target) {
@@ -275,15 +323,6 @@ public final class XConditionAdmin extends AbstractSnapshotAdmin<XConditionDTO> 
             clean = clean.substring(1, clean.length() - 1).trim();
         }
         return clean;
-    }
-
-    private boolean matches(final String target, final ServiceReference<Condition> ref) {
-        try {
-            final Filter filter = context.createFilter(target);
-            return filter.match(ref);
-        } catch (final InvalidSyntaxException e) {
-            return false; // Safely ignore malformed LDAP filters
-        }
     }
 
     public XResultDTO injectMockCondition(final String identifier, final Map<String, Object> properties) {
