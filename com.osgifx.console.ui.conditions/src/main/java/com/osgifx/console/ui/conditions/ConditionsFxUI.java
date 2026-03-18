@@ -124,6 +124,10 @@ public final class ConditionsFxUI {
             @Override
             protected Void call() throws Exception {
                 tabContent = Fx.loadFXML(loader, context, ROOT_FXML);
+                final var controller = (ConditionsFxController) loader.getController();
+                if (searchFilter != null) {
+                    controller.onFilterUpdateEvent(searchFilter);
+                }
                 return null;
             }
 
