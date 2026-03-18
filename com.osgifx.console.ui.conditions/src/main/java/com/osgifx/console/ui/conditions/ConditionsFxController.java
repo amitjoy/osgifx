@@ -43,6 +43,7 @@ import com.osgifx.console.util.fx.DTOCellValueFactory;
 import com.osgifx.console.util.fx.Fx;
 import com.osgifx.console.util.fx.NullTableViewSelectionModel;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -127,18 +128,35 @@ public final class ConditionsFxController {
 
         final var identifierColumn = new TableColumn<XConditionDTO, String>("Identifier");
         identifierColumn.setCellValueFactory(new DTOCellValueFactory<>("identifier", String.class));
+        Fx.addCellFactory(identifierColumn, b -> b.satisfiedComponents.isEmpty() && b.unsatisfiedComponents.isEmpty(),
+                Color.SLATEBLUE, Color.BLACK);
 
         final var stateColumn = new TableColumn<XConditionDTO, XConditionState>("State");
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", XConditionState.class));
         Fx.addCellFactory(stateColumn, s -> s.state == XConditionState.MOCKED, Color.ORANGE, Color.BLACK);
 
-        final var providerBundleIdColumn = new TableColumn<XConditionDTO, Long>("Provider Bundle ID");
-        providerBundleIdColumn.setCellValueFactory(new DTOCellValueFactory<>("providerBundleId", Long.class));
+        final var providerBundleIdColumn = new TableColumn<XConditionDTO, String>("Provider Bundle ID");
+        providerBundleIdColumn.setCellValueFactory(p -> {
+            final var id = p.getValue().providerBundleId;
+            return new SimpleStringProperty(id == -1 ? "" : String.valueOf(id));
+        });
+
+        final var providerBundleSymbolicNameColumn = new TableColumn<XConditionDTO, String>("Provider Bundle Symbolic Name");
+        providerBundleSymbolicNameColumn.setCellValueFactory(p -> {
+            final var id = p.getValue().providerBundleId;
+            if (id == -1) {
+                return new SimpleStringProperty("");
+            }
+            final var bundle = dataProvider.bundles().stream().filter(b -> b.id == id).findFirst()
+                    .map(b -> b.symbolicName).orElse("");
+            return new SimpleStringProperty(bundle);
+        });
 
         conditionsTable.getColumns().add(expanderColumn);
         conditionsTable.getColumns().add(identifierColumn);
         conditionsTable.getColumns().add(stateColumn);
         conditionsTable.getColumns().add(providerBundleIdColumn);
+        conditionsTable.getColumns().add(providerBundleSymbolicNameColumn);
 
         conditionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
         conditionsTable.setSelectionModel(new NullTableViewSelectionModel<>(conditionsTable));

@@ -136,9 +136,11 @@ public final class ComponentsFxController {
         expanderColumn.setMaxWidth(48);
         expanderColumn.setMinWidth(48);
 
-        final var idColumn = new TableColumn<XComponentDTO, Integer>("ID");
-
-        idColumn.setCellValueFactory(new DTOCellValueFactory<>("id", Integer.class));
+        final var idColumn = new TableColumn<XComponentDTO, String>("ID");
+        idColumn.setCellValueFactory(p -> {
+            final var id = p.getValue().id;
+            return new SimpleStringProperty(id == -1 ? "" : String.valueOf(id));
+        });
 
         final var componentNameColumn = new TableColumn<XComponentDTO, String>("Name");
 
