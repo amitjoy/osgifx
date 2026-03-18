@@ -12,12 +12,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.controlsfx.glyphfont.Glyph?>
 
-<GridPane hgap="20.0" prefHeight="700.0" prefWidth="900.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.conditions.ConditionDetailsFxController">
+<GridPane hgap="20.0" prefHeight="800.0" prefWidth="900.0" vgap="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.osgifx.console.ui.conditions.ConditionDetailsFxController">
   <columnConstraints>
     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="70.0" />
   </columnConstraints>
   <rowConstraints>
+    <RowConstraints minHeight="10.0" vgrow="NEVER" />
     <RowConstraints minHeight="10.0" vgrow="NEVER" />
     <RowConstraints minHeight="10.0" vgrow="NEVER" />
     <RowConstraints minHeight="10.0" vgrow="NEVER" />
@@ -46,16 +47,18 @@
       <Label style="-fx-font-weight: bold;" text="Identifier:" GridPane.rowIndex="1" />
       <Label style="-fx-font-weight: bold;" text="State:" GridPane.rowIndex="2" />
       <Label style="-fx-font-weight: bold;" text="Provider Bundle ID:" GridPane.rowIndex="3" />
-      <Label style="-fx-font-weight: bold;" text="Properties:" GridPane.rowIndex="4" GridPane.valignment="TOP" />
-      <Label style="-fx-font-weight: bold;" text="Satisfied Components:" GridPane.rowIndex="5" GridPane.valignment="TOP" />
-      <Label style="-fx-font-weight: bold;" text="Unsatisfied Components:" GridPane.rowIndex="6" GridPane.valignment="TOP" />
+      <Label style="-fx-font-weight: bold;" text="Provider Bundle Symbolic Name:" GridPane.rowIndex="4" />
+      <Label style="-fx-font-weight: bold;" text="Properties:" GridPane.rowIndex="5" GridPane.valignment="TOP" />
+      <Label style="-fx-font-weight: bold;" text="Satisfied Components:" GridPane.rowIndex="6" GridPane.valignment="TOP" />
+      <Label style="-fx-font-weight: bold;" text="Unsatisfied Components:" GridPane.rowIndex="7" GridPane.valignment="TOP" />
       
       <TextField fx:id="identifierLabel" editable="false" styleClass="copyable-label" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <TextField fx:id="stateLabel" editable="false" styleClass="copyable-label" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <TextField fx:id="providerBundleIdLabel" editable="false" styleClass="copyable-label" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-      <TextArea fx:id="propertiesArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-      <TextArea fx:id="satisfiedComponentsArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-      <TextArea fx:id="unsatisfiedComponentsArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <TextField fx:id="providerBundleBsnLabel" editable="false" styleClass="copyable-label" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      <TextArea fx:id="propertiesArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+      <TextArea fx:id="satisfiedComponentsArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+      <TextArea fx:id="unsatisfiedComponentsArea" editable="false" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
    </children>
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
