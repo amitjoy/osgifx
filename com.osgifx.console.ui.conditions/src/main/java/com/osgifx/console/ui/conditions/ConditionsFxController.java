@@ -128,6 +128,8 @@ public final class ConditionsFxController {
 
         final var identifierColumn = new TableColumn<XConditionDTO, String>("Identifier");
         identifierColumn.setCellValueFactory(new DTOCellValueFactory<>("identifier", String.class));
+        Fx.addCellFactory(identifierColumn, b -> b.satisfiedComponents.isEmpty() && b.unsatisfiedComponents.isEmpty(),
+                Color.SLATEBLUE, Color.BLACK);
 
         final var stateColumn = new TableColumn<XConditionDTO, XConditionState>("State");
         stateColumn.setCellValueFactory(new DTOCellValueFactory<>("state", XConditionState.class));
