@@ -150,9 +150,13 @@ public final class ConditionsFxUI {
         statusBar.addTo(parent);
         if (isConnected) {
             statusBar.enableRpcProgressTracking();
-            final var node = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
-            statusBar.addToRight(node);
+            final var infoNode = Fx.initStatusBarButton(this::showInfoDialog, "Info", "INFO");
+            statusBar.addToRight(infoNode);
+            statusBar.addToRight(new Separator(VERTICAL));
+            final var refreshNode = Fx.initStatusBarButton(this::refreshData, "Sync", "REFRESH");
+            statusBar.addToRight(refreshNode);
             if (searchFilter != null && searchFilter.predicate != null) {
+
                 statusBar.addToRight(new Separator(VERTICAL));
                 final var description           = "Are you sure you want to reset the applied search filter?";
                 final var searchFilterResetNode = Fx
@@ -172,6 +176,12 @@ public final class ConditionsFxUI {
 
     private void refreshData() {
         dataProvider.retrieveInfo("conditions", true);
+    }
+
+    private void showInfoDialog() {
+        final var title   = "Condition Color Information";
+        final var message = "Slate Blue colored entries are registered in the OSGi registry but currently not referenced by any component (orphaned).";
+        FxDialog.showInfoDialog(title, message, getClass().getClassLoader());
     }
 
 }

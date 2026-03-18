@@ -419,7 +419,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         // 3. Check for satisfied references (overridden targets)
         if (component.satisfiedReferences != null) {
             for (final XSatisfiedReferenceDTO ref : component.satisfiedReferences) {
-                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || ref.objectClass.contains(CONDITION_INTERFACE)) {
+                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || isConditionReference(component, ref.name)) {
                     final String target = cleanTarget(ref.target);
                     if (!target.isEmpty()) {
                         targets.add(target);
@@ -431,7 +431,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         // 4. Check for unsatisfied references (overridden targets)
         if (component.unsatisfiedReferences != null) {
             for (final XUnsatisfiedReferenceDTO ref : component.unsatisfiedReferences) {
-                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || ref.objectClass.contains(CONDITION_INTERFACE)) {
+                if (SATISFYING_CONDITION_REF_NAME.equals(ref.name) || isConditionReference(component, ref.name)) {
                     final String target = cleanTarget(ref.target);
                     if (!target.isEmpty()) {
                         targets.add(target);
@@ -440,6 +440,18 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
             }
         }
         return new ArrayList<>(targets);
+    }
+
+    private boolean isConditionReference(final XComponentDTO component, final String refName) {
+        if (component.references == null || refName == null) {
+            return false;
+        }
+        for (final XReferenceDTO ref : component.references) {
+            if (refName.equals(ref.name) && CONDITION_INTERFACE.equals(ref.interfaceName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String cleanTarget(final String target) {
