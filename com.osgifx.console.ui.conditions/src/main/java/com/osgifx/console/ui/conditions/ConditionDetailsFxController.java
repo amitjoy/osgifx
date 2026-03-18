@@ -55,6 +55,8 @@ public final class ConditionDetailsFxController {
     @FXML
     private TextField         providerBundleIdLabel;
     @FXML
+    private TextField         providerBundleBsnLabel;
+    @FXML
     private TextArea          propertiesArea;
     @FXML
     private TextArea          satisfiedComponentsArea;
@@ -84,7 +86,17 @@ public final class ConditionDetailsFxController {
     public void initControls(final XConditionDTO condition) {
         identifierLabel.setText(condition.identifier);
         stateLabel.setText(condition.state.toString());
-        providerBundleIdLabel.setText(String.valueOf(condition.providerBundleId));
+
+        final var id = condition.providerBundleId;
+        providerBundleIdLabel.setText(id == -1 ? "" : String.valueOf(id));
+
+        if (id == -1) {
+            providerBundleBsnLabel.setText("");
+        } else {
+            final var bundle = dataProvider.bundles().stream().filter(b -> b.id == id).findFirst()
+                    .map(b -> b.symbolicName).orElse("");
+            providerBundleBsnLabel.setText(bundle);
+        }
 
         if (condition.properties != null) {
             propertiesArea.setText(condition.properties.entrySet().stream().map(e -> e.getKey() + " = " + e.getValue())

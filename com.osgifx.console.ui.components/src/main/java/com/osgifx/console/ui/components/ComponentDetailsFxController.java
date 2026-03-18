@@ -153,7 +153,7 @@ public final class ComponentDetailsFxController {
         selectedComponent = component;
         registerButtonHandlers(component);
 
-        idLabel.setText(String.valueOf(component.id));
+        idLabel.setText(component.id == -1 ? "" : String.valueOf(component.id));
         componentNameLabel.setText(component.name);
         stateLabel.setText(component.state);
         bundleLabel.setText(component.registeringBundle);
