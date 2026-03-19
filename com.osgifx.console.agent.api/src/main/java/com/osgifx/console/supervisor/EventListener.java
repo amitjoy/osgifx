@@ -41,6 +41,15 @@ public interface EventListener {
     }
 
     /**
+     * Specifies the LDAP filter to be used to intercept events.
+     *
+     * @return the LDAP filter, or {@code null} if no filter is specified
+     */
+    default String filter() {
+        return null;
+    }
+
+    /**
      * The callback to be executed when the event will be received
      *
      * @param event the remote event

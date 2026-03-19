@@ -17,11 +17,11 @@ package com.osgifx.console.ui.events.dialog;
 
 import static com.google.common.base.Verify.verify;
 import static com.osgifx.console.constants.FxConstants.STANDARD_CSS;
+import static com.osgifx.console.util.fx.ConsoleFxHelper.validateFilter;
 import static com.osgifx.console.util.fx.ConsoleFxHelper.validateTopic;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -32,28 +32,37 @@ import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.glyphfont.Glyph;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.fx.core.ThreadSynchronize;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.Log;
 
 import com.google.common.collect.Lists;
 import com.osgifx.console.util.fx.FxDialog;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
 
-public final class TopicEntryDialog extends Dialog<Set<String>> {
+public final class TopicEntryDialog extends Dialog<EventSubscriptionDTO> {
 
     @Log
     @Inject
-    private FluentLogger logger;
+    private FluentLogger      logger;
+    @Inject
+    private ThreadSynchronize threadSync;
+    @Inject
+    private IEclipseContext   eclipseContext;
 
     private final List<PropertiesForm> entries           = Lists.newArrayList();
     private final ValidationSupport    validationSupport = new ValidationSupport();
@@ -73,8 +82,36 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
         lbMessage.setVisible(false);
         lbMessage.setManaged(false);
 
-        final var content = new VBox(10);
-        addFieldPair(content);
+        final var topicsContainer = new VBox(5);
+        final var content         = new VBox(10);
+        content.setPadding(new Insets(10));
+        addFieldPair(topicsContainer);
+
+        final var filterHBox = new HBox(5);
+        filterHBox.setAlignment(Pos.CENTER_LEFT);
+
+        final CustomTextField textFilter = (CustomTextField) TextFields.createClearableTextField();
+        textFilter.setLeft(new ImageView(getClass().getResource("/graphic/icons/filter.png").toExternalForm()));
+        textFilter.setPromptText("Event Filter (LDAP syntax)");
+
+        final var btnFilterBuilder = new Button();
+        btnFilterBuilder.setGraphic(new Glyph("FontAwesome", FontAwesome.Glyph.MAGIC));
+        btnFilterBuilder.setTooltip(new Tooltip("Open Filter Builder"));
+        btnFilterBuilder.setOnAction(_ -> {
+            final var filterBuilderDialog = new EventFilterBuilderDialog();
+            ContextInjectionFactory.inject(filterBuilderDialog, eclipseContext);
+            filterBuilderDialog.init(textFilter.getText());
+            final var result = filterBuilderDialog.showAndWait();
+            result.ifPresent(textFilter::setText);
+        });
+
+        threadSync.asyncExec(() -> {
+            validationSupport.registerValidator(textFilter, Validator
+                    .createPredicateValidator(value -> validateFilter(value.toString()), "Invalid Event Filter"));
+        });
+
+        filterHBox.getChildren().addAll(textFilter, btnFilterBuilder);
+        content.getChildren().addAll(topicsContainer, filterHBox);
 
         dialogPane.setContent(content);
 
@@ -103,7 +140,13 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
             try {
                 if (data == ButtonData.OK_DONE) {
                     verify(!validationSupport.isInvalid(), "Topic validation failed");
-                    return getInput();
+                    // @formatter:off
+                    final var topics = entries.stream()
+                                              .map(f -> f.textTopic.getText())
+                                              .filter(StringUtils::isNotBlank)
+                                              .collect(toSet());
+                    return new EventSubscriptionDTO(topics, textFilter.getText());
+                    // @formatter:on
                 }
                 return null;
             } catch (final Exception e) {
@@ -111,15 +154,7 @@ public final class TopicEntryDialog extends Dialog<Set<String>> {
                 throw e;
             }
         });
-    }
 
-    private Set<String> getInput() {
-        // @formatter:off
-        return entries.stream()
-                      .map(f -> f.textTopic.getText())
-                      .filter(StringUtils::isNotBlank)
-                      .collect(toSet());
-        // @formatter:on
     }
 
     private class PropertiesForm extends HBox {

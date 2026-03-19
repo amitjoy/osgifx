@@ -49,7 +49,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
@@ -168,23 +167,39 @@ public final class EventsFxUI {
             popover.hide();
             return;
         }
-        final var content = new VBox();
-        content.setPadding(new Insets(10));
-        content.setPrefWidth(500);
-        content.setPrefHeight(300);
+        final var content = new VBox(10);
+        content.setPadding(new Insets(15));
+        content.setPrefWidth(400);
 
-        final var listView = new ListView<String>();
-        final var topics   = (Set<String>) eclipseContext.get("subscribed_topics");
-        if (topics != null) {
-            listView.getItems().addAll(topics);
+        final var topics = (Set<String>) eclipseContext.get("subscribed_topics");
+        final var filter = (String) eclipseContext.get("subscribed_filter");
+
+        if (topics == null || topics.isEmpty()) {
+            content.getChildren().add(new Label("No subscribed topics"));
+        } else {
+            final var topicsHeader = new Label("Subscribed Topics");
+            topicsHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 1.1em;");
+
+            final var topicsLabel = new Label(String.join(", ", topics));
+            topicsLabel.setWrapText(true);
+
+            content.getChildren().addAll(topicsHeader, topicsLabel);
+
+            if (filter != null && !filter.isBlank()) {
+                final var filterHeader = new Label("Associated LDAP Filter");
+                filterHeader.setStyle("-fx-font-weight: bold; -fx-font-size: 1.1em; -fx-padding: 15 0 0 0;");
+
+                final var filterLabel = new Label(filter);
+                filterLabel.setWrapText(true);
+                filterLabel.setStyle(
+                        "-fx-font-weight: bold; -fx-font-family: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace; -fx-background-color: #f8f9fa; -fx-padding: 10; -fx-border-color: #dee2e6; -fx-border-radius: 5; -fx-background-radius: 5; -fx-text-fill: #495057;");
+
+                content.getChildren().addAll(filterHeader, filterLabel);
+            }
         }
-        final var placeholder = new Label("No subscribed topic");
-        listView.setPlaceholder(placeholder);
-
-        content.getChildren().add(listView);
 
         popover = new PopOver(content);
-        popover.setTitle("Subscribed Event Topics");
+        popover.setTitle("Subscription Details");
         popover.setArrowLocation(PopOver.ArrowLocation.BOTTOM_RIGHT);
         popover.setDetachable(false);
         popover.show(source);

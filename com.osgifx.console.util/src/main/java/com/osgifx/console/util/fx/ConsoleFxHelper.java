@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.FrameworkUtil;
 
 import com.google.common.base.CharMatcher;
 
@@ -80,6 +81,18 @@ public final class ConsoleFxHelper {
             }
         }
         return true;
+    }
+
+    public static boolean validateFilter(final String filter) {
+        if (filter == null || filter.isBlank()) {
+            return true;
+        }
+        try {
+            FrameworkUtil.createFilter(filter);
+            return true;
+        } catch (final Exception _) {
+            return false;
+        }
     }
 
 }
