@@ -61,6 +61,8 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
 
     @interface Configuration {
         String[] topics();
+
+        String filter();
     }
 
     public static final String EVENTS_ID = "events";
@@ -125,6 +127,11 @@ public final class EventsInfoSupplier implements RuntimeInfoSupplier, EventListe
     @Override
     public Collection<String> topics() {
         return configuration != null ? Sets.newHashSet(configuration.topics()) : Set.of();
+    }
+
+    @Override
+    public String filter() {
+        return configuration != null ? configuration.filter() : null;
     }
 
     @Override
