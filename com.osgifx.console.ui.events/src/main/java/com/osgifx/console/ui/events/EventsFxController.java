@@ -21,7 +21,7 @@ import static com.osgifx.console.event.topics.EventReceiveEventTopics.EVENT_RECE
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -50,6 +50,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationAdmin;
 
+import com.google.common.base.Strings;
 import com.osgifx.console.agent.Agent;
 import com.osgifx.console.agent.dto.XEventDTO;
 import com.osgifx.console.agent.dto.XResultDTO;
@@ -112,6 +113,10 @@ public final class EventsFxController {
     @Optional
     @ContextValue("subscribed_topics")
     private ContextBoundValue<Set<String>> subscribedTopics;
+    @Inject
+    @Optional
+    @ContextValue("subscribed_filter")
+    private ContextBoundValue<String>      subscribedFilter;
     @Inject
     @Service(filterExpression = "(supplier.id=events)")
     private EventListener                  eventListener;
@@ -177,12 +182,16 @@ public final class EventsFxController {
             if (!event.isPresent()) {
                 return;
             }
-            final var topics = event.get();
-            if (topics.isEmpty()) {
+            final var subscription = event.get();
+            final var topics       = subscription.topics();
+            final var filter       = subscription.filter();
+
+            if (topics.isEmpty() && Strings.isNullOrEmpty(filter)) {
                 return;
             }
             subscribedTopics.publish(topics);
-            updateConfig(topics);
+            subscribedFilter.publish(filter);
+            updateConfig(topics, filter);
 
             // @formatter:off
             executor.runAsync(agent::enableReceivingEvent)
@@ -196,7 +205,8 @@ public final class EventsFxController {
             // @formatter:on
         } else {
             subscribedTopics.publish(Set.of());
-            updateConfig(Set.of());
+            subscribedFilter.publish(null);
+            updateConfig(Set.of(), null);
 
             // @formatter:off
             executor.runAsync(agent::disableReceivingEvent)
@@ -304,13 +314,14 @@ public final class EventsFxController {
         return imageView;
     }
 
-    private void updateConfig(final Set<String> topics) {
+    private void updateConfig(final Set<String> topics, final String filter) {
         try {
             final var configuration = configAdmin.getConfiguration(PID, "?");
-            if (!topics.isEmpty()) {
-                final Dictionary<String, String[]> properties = FrameworkUtil
-                        .asDictionary(Map.of("topics", topics.toArray(new String[0])));
-                configuration.update(properties);
+            if (!topics.isEmpty() || !Strings.isNullOrEmpty(filter)) {
+                final Map<String, Object> props = new HashMap<>();
+                props.put("topics", topics.toArray(new String[0]));
+                props.put("filter", filter);
+                configuration.update(FrameworkUtil.asDictionary(props));
             } else {
                 configuration.delete();
             }
