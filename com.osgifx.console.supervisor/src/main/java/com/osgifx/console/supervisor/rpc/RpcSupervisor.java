@@ -28,6 +28,7 @@ import static org.osgi.service.condition.Condition.CONDITION_ID;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +39,7 @@ import org.apache.aries.component.dsl.OSGiResult;
 import org.eclipse.fx.core.log.FluentLogger;
 import org.eclipse.fx.core.log.LoggerFactory;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -195,7 +197,7 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
     public void onOSGiEvent(final XEventDTO event) {
         checkNotNull(event, "'event' cannot be null");
         for (final EventListener listener : eventListeners) {
-            if (matchTopic(event.topic, listener.topics())) {
+            if (matchTopic(event.topic, listener.topics()) && matchFilter(event, listener.filter())) {
                 listener.onEvent(event);
             }
         }
@@ -366,6 +368,19 @@ public final class RpcSupervisor extends AbstractRpcSupervisor<Supervisor, Agent
             }
         }
         return false;
+    }
+
+    private boolean matchFilter(final XEventDTO event, final String filter) {
+        if (Strings.isNullOrEmpty(filter)) {
+            return true;
+        }
+        try {
+            final var osgiFilter = FrameworkUtil.createFilter(filter);
+            return osgiFilter.match(new Hashtable<>(event.properties));
+        } catch (final Exception e) {
+            logger.atError().withException(e).log("Invalid LDAP filter: %s", filter);
+            return false;
+        }
     }
 
     private void sendEvent(final String topic) {
