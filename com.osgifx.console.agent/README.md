@@ -530,10 +530,10 @@ The agent behavior is controlled via OSGi Framework Properties (or System Proper
 ### 🛡️ Resource Protection (Injection Attacks)
 | Property | Default | Description |
 | :--- | :--- | :--- |
-| `osgi.fx.agent.rpc.max.decompressed.size` | `10MB` | Max LZ4 decompression size (Zip Bomb Protection). |
-| `osgi.fx.agent.rpc.max.collection.size` | `10000` | Max elements in decoded collections. |
-| `osgi.fx.agent.rpc.max.map.size` | `10000` | Max entries in decoded maps. |
-| `osgi.fx.agent.rpc.max.byte.array.size`| `1MB` | Max length of decoded byte arrays. |
+| `osgi.fx.agent.rpc.max.decompressed.size` | `250MB` | Max GZIP decompression size (Zip Bomb Protection). |
+| `osgi.fx.agent.rpc.max.collection.size` | `1,000,000` | Max elements in decoded collections. |
+| `osgi.fx.agent.rpc.max.map.size` | `500,000` | Max entries in decoded maps. |
+| `osgi.fx.agent.rpc.max.byte.array.size`| `100MB` | Max length of decoded byte arrays. |
 | `osgi.fx.agent.gogo.allowlist` | `*` | Allowed Gogo commands (e.g., `osgi:*, equinox:start`). |
 | `osgi.fx.agent.cli.allowlist` | `*` | Allowed OS shell commands. |
 
