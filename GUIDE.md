@@ -21,8 +21,11 @@ The agent supports **Socket** and **MQTT** communication protocols.
 
 **Basic Configuration:**
 Set the `osgi.fx.agent.socket.port` system property in your runtime.
-*   `2000`: Allows connections only from localhost.
-*   `0.0.0.0:2000`: Allows remote connections.
+*   `1099`: Allows connections only from localhost.
+*   `0.0.0.0:1099`: Allows remote connections.
+
+> [!NOTE]
+> There is no hardcoded default port. You must explicitly configure `osgi.fx.agent.socket.port` or use the `osgifx:startSocket` Gogo command (which defaults to `1099`).
 
 **Password Authentication:**
 To require password authentication for socket connections:
@@ -46,7 +49,13 @@ To secure the socket connection:
 
 #### B. MQTT Communication
 
-To use MQTT, install `in.bytehue.messaging.mqtt5.provider.jar` (from OSGi Messaging project) and configure the `in.bytehue.messaging.client` PID.
+To use MQTT, install the OSGi Messaging MQTT 5 provider and configure the client:
+
+**Installation:**
+*   **Maven Coordinates**: `in.bytehue:in.bytehue.messaging.mqtt5.provider:LATEST` (available from Maven Central)
+*   **Configuration PID**: `in.bytehue.messaging.client`
+
+**Alternative:** Set `osgi.fx.agent.mqtt.provider=custom` and register your own `Mqtt5Publisher` and `Mqtt5Subscriber` OSGi services.
 
 > [!NOTE]
 > You must configure `maximumPacketSize` and `sendMaximumPacketSize` to `268435456` (256 MB) in the MQTT client configuration to handle large data payloads.
@@ -95,7 +104,7 @@ If your MQTT broker requires OAuth tokens:
 We provide a robust Java script to launch the client with all necessary modularity flags.
 
 **Prerequisites:**
-*   Java 25+
+*   Java 25+ (required for the OSGi.fx UI client)
 
 **Setup:**
 1.  Download `RunOSGiFx` locally.
@@ -132,8 +141,20 @@ To prevent attacks such as Zip Bombs or Collection Bombs during RPC communicatio
 | :--- | :--- | :--- |
 | `osgi.fx.agent.rpc.max.decompressed.size` | 250 MB | Maximum allowed decompressed size for GZIP streams. Prevents Zip Bomb attacks. |
 | `osgi.fx.agent.rpc.max.collection.size` | 1,000,000 | Maximum number of elements in a decoded collection. Prevents Collection Bomb attacks. |
-| `osgi.fx.agent.rpc.max.map.size` | 1,000,000 | Maximum number of entries in a decoded map. Prevents Collection Bomb attacks. |
+| `osgi.fx.agent.rpc.max.map.size` | 500,000 | Maximum number of entries in a decoded map. Prevents Collection Bomb attacks. |
 | `osgi.fx.agent.rpc.max.byte.array.size` | 100 MB | Maximum allowed length for a decoded byte array. Prevents memory exhaustion. |
+| `osgi.fx.agent.gogo.allowlist` | `*` | Comma-separated allowlist for Gogo commands (e.g., `osgi:*, equinox:start`). Use `*` to allow all. |
+| `osgi.fx.agent.cli.allowlist` | `*` | Comma-separated allowlist for OS shell commands. Use `*` to allow all. |
+
+### Feature Control
+
+| Property | Default | Description |
+| :--- | :--- | :--- |
+| `osgi.fx.enable.logging` | `false` | Enable real-time log streaming to the supervisor. |
+| `osgi.fx.enable.eventing` | `false` | Enable real-time OSGi event streaming to the supervisor. |
+| `osgi.fx.agent.auto.start.log.capture` | `false` | Start circular log buffer immediately on bundle activation. |
+| `osgi.fx.agent.cli.enabled` | `true` | Globally enable/disable OS shell command execution. |
+| `osgi.fx.agent.gogo.enabled` | `true` | Globally enable/disable Gogo shell command execution. |
 
 ---
 
@@ -143,27 +164,82 @@ The OSGi.fx agent registers several Gogo commands under the `osgifx` scope. Thes
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
-| `osgifx:startSocket` | Starts the socket agent | `osgifx:startSocket [port=1234 host=0.0.0.0]` |
+| `osgifx:startSocket` | Starts the socket agent | `osgifx:startSocket [port=1099 host=0.0.0.0 secure=true]` |
 | `osgifx:stopSocket` | Stops the socket agent | `osgifx:stopSocket` |
-| `osgifx:startMqtt` | Starts the MQTT agent | `osgifx:startMqtt [pubTopic=/out subTopic=/in]` |
+| `osgifx:startMqtt` | Starts the MQTT agent | `osgifx:startMqtt [provider=osgi-messaging pubTopic=/out subTopic=/in]` |
 | `osgifx:stopMqtt` | Stops the MQTT agent | `osgifx:stopMqtt` |
 | `osgifx:status` | Prints the agent status | `osgifx:status` |
 
 ### Starting Socket Agent
-You can start the socket agent with optional arguments for port, host, security, and SSL context filter:
+You can start the socket agent with optional arguments:
 ```bash
-g! osgifx:startSocket [port=4567 host=localhost secure=true]
+g! osgifx:startSocket [port=1099 host=localhost secure=true sslContextFilter=(name=my_sslcontext)]
 ```
 
+**Parameters:**
+*   `port` - TCP port number (default: `1099`)
+*   `host` - Interface to bind to (default: `localhost`)
+*   `secure` - Enable TLS/SSL (default: `false`)
+*   `sslContextFilter` - OSGi filter for custom `SSLContext` service (optional)
+
 ### Starting MQTT Agent
-You can start the MQTT agent with optional arguments for provider, pubTopic, and subTopic:
+You can start the MQTT agent with optional arguments:
 ```bash
 g! osgifx:startMqtt [provider=osgi-messaging pubTopic=osgifx/out subTopic=osgifx/in]
 ```
 
+**Parameters:**
+*   `provider` - MQTT provider (`osgi-messaging` or `custom`, default: `osgi-messaging`)
+*   `pubTopic` - Topic for agent responses (required)
+*   `subTopic` - Topic for agent requests (required)
+
 ---
 
-## 5. Large Payload Handling (SPI)
+## 5. Agent Extension SPI
+
+The agent provides an **AgentExtension** SPI that allows you to execute custom code in the remote runtime and return JSON-compliant results.
+
+### The SPI Interface
+
+Implement the `AgentExtension` interface and register it as an OSGi service:
+
+```java
+public interface AgentExtension<C, R> {
+    /**
+     * Executes the extension logic.
+     *
+     * @param context the input context (must be DTO-compliant)
+     * @return the result (must be DTO-compliant)
+     */
+    R execute(C context);
+}
+```
+
+### Service Registration
+
+Register your extension with a unique name:
+
+```java
+@Component(
+    service = AgentExtension.class,
+    property = "agent.extension.name=my-custom-extension"
+)
+public class MyExtension implements AgentExtension<Map<String, Object>, Map<String, Object>> {
+    @Override
+    public Map<String, Object> execute(Map<String, Object> context) {
+        // Your custom logic here
+        Map<String, Object> result = new HashMap<>();
+        result.put("status", "success");
+        return result;
+    }
+}
+```
+
+The supervisor can then invoke your extension via `agent.executeExtension("my-custom-extension", context)`.
+
+---
+
+## 6. Large Payload Handling (SPI)
 
 For remote runtimes where transferring large files (e.g., several hundred MBs of heap dumps) over RPC is inefficient or restricted, OSGi.fx provides the `LargePayloadHandler` Service Provider Interface (SPI).
 
