@@ -172,7 +172,7 @@ public class ConfigHelper<T> {
             configuration = cm.getConfiguration(pid, "?");
             configuration.update(FrameworkUtil.asDictionary(properties));
         } catch (final IOException e) {
-            // highly unlikely to occur
+            // ignore
         }
     }
 
@@ -189,7 +189,7 @@ public class ConfigHelper<T> {
             configuration = cm.getConfiguration(pid, "?");
             configuration.delete();
         } catch (final IOException e) {
-            // highly unlikely to occur
+            // ignore
         }
     }
 

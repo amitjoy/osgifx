@@ -347,7 +347,6 @@ public final class McpFxController {
     private void clearLogs() {
         logsTable.getSelectionModel().clearSelection();
         logs.clear();
-        // Ideally clear server logs too if we had an API for that
         Fx.showSuccessNotification("MCP Logs", "Log list has been cleared");
     }
 

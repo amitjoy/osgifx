@@ -172,7 +172,7 @@ public final class XConditionAdmin extends AbstractSnapshotAdmin<XConditionDTO> 
                                 dto.providerBundleId = realRef.getBundle().getBundleId();
                                 dto.properties       = AgentHelper.createProperties(realRef);
                             } else {
-                                // Fallback: if we can't find the real reference, we know it's at least ACTIVE
+                                // Fallback when reference not found
                                 if (mockRegistrations.containsKey(target)) {
                                     dto.state = XConditionState.MOCKED;
                                 } else {

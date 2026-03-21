@@ -82,8 +82,7 @@ public final class ThreadFactoryBuilder {
      *            ThreadFactory
      */
     public ThreadFactoryBuilder setThreadNameFormat(final String threadNameFormat) {
-        // just testing the if it's possible to create a name for a thread using this
-        // name format
+        // Test format validity
         final String sampleFormattedThreadName = String.format(threadNameFormat, 7);
 
         if (threadNameFormat.equals(sampleFormattedThreadName)) {
@@ -157,7 +156,6 @@ public final class ThreadFactoryBuilder {
         private final Integer     threadPriority;
 
         public CustomizedThreadFactory(final ThreadFactoryBuilder builder) {
-            // in case there is no thread factory name set
             threadFactoryName = builder.getThreadFactoryName();
             threadNameFormat  = builder.threadNameFormat;
             daemon            = builder.daemon;
