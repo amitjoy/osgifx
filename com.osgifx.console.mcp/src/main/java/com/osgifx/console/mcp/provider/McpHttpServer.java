@@ -111,9 +111,6 @@ public class McpHttpServer implements FxMcpServer {
 
             // Streamable HTTP Endpoint (GET/POST /mcp)
             if ("/mcp".equals(path) || path.startsWith("/mcp?")) {
-                // Handle Preflight OPTIONS request for CORS (if needed later)
-                // For now, implementing standard interactions.
-
                 // POST: Message Handling (Stateless)
                 if (HTTPMethod.POST == req.getMethod()) {
                     handleMessage(req, res);
@@ -182,8 +179,7 @@ public class McpHttpServer implements FxMcpServer {
                 res.flush();
             } catch (final IOException e) {
                 logger.atWarning().withException(e).log("Failed to broadcast to SSE client");
-                // We cannot remove the client here easily as it's managed by the handler thread lock.
-                // The handler thread will likely exit if writing fails eventually.
+                // Client managed by handler thread lock; will exit on write failure
             }
         });
     }
@@ -203,16 +199,13 @@ public class McpHttpServer implements FxMcpServer {
             // Reflect Protocol Version if requested
             String protocolVersion = req.getHeader("MCP-Protocol-Version");
             if (protocolVersion != null) {
-                res.setHeader("MCP-Protocol-Version", protocolVersion); // Or negotiate supported version
+                res.setHeader("MCP-Protocol-Version", protocolVersion);
             }
 
-            // If Session ID is missing, we could generate one (optional in new spec for stateless,
-            // but good for tracking if we add state later).
+            // Generate session ID if missing
             if (sessionId == null) {
                 sessionId = UUID.randomUUID().toString();
-                // In Streamable HTTP, we might want to return this, but SSE is a stream.
-                // We can't easily validly set a response header for the *stream* if headers are already flushed?
-                // But strictly, we haven't flushed yet.
+                // Set session header before stream flush
                 res.setHeader("Mcp-Session-Id", sessionId);
             }
 
@@ -254,8 +247,8 @@ public class McpHttpServer implements FxMcpServer {
             // Read the JSON body
             final String body = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
-            // Generate Session ID if missing (especially on 'initialize')
-            if (sessionId == null && body.contains("\"method\":\"initialize\"")) { // Simple check, ideally parse JSON
+            // Generate Session ID on initialize
+            if (sessionId == null && body.contains("\"method\":\"initialize\"")) {
                 sessionId = UUID.randomUUID().toString();
                 logger.atDebug().log("Generated new session ID for initialization: %s", sessionId);
             }

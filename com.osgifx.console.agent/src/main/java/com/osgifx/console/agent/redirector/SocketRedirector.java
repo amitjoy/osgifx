@@ -50,8 +50,7 @@ public final class SocketRedirector implements Redirector {
      * @param port the shell port
      */
     public SocketRedirector(final AgentServer agentServer, final int port) throws Exception {
-        // We need a thread to read any output from the shell processor
-        // which is then forwarded to the supervisor
+        // Thread to read shell output and forward to supervisor
         out = new Thread() {
             @Override
             public void run() {
@@ -76,9 +75,8 @@ public final class SocketRedirector implements Redirector {
                             for (int i = 0; i < size; i++) {
                                 int b = 0xFF & buffer[i];
 
-                                // Since we have a telnet protocol, there are some special characters we should
-                                // ignore. We assume that all parts of the command are in the same buffer, which
-                                // is highly likely since they are usually tramsmitted in a single go
+                                // Telnet protocol: ignore special characters
+                                // Assumes command parts are in same buffer
                                 if (b == IAC) {
                                     // Next is the command type
                                     i++;
@@ -127,15 +125,13 @@ public final class SocketRedirector implements Redirector {
         }
 
         try {
-            // Some Unix's use 127.0.1.1 for some unknown reason but the Gogo shell delivers
-            // at 127.0.0.1
+            // Some Unix systems use 127.0.1.1; Gogo shell uses 127.0.0.1
             final InetAddress oldStyle = InetAddress.getByName(null);
             return new Socket(oldStyle, port);
         } catch (final Exception e) {
             // ignore
         }
-        // Maybe they did change their mind, so let's look at localhost as
-        // well.
+        // Also try localhost
         try {
             final InetAddress localhost = InetAddress.getLocalHost();
             return new Socket(localhost, port);
