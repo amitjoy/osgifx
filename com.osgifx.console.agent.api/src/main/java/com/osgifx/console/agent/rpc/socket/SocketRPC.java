@@ -75,7 +75,7 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
     private final ThreadLocal<Integer>    msgId    = new ThreadLocal<>();
     private final FluentLogger            logger   = LoggerFactory.getFluentLogger(getClass());
 
-    // Optimization: Shared Codec & Reuse Buffers
+    // Shared codec and reusable buffers
     private final BinaryCodec                            codec;
     private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal

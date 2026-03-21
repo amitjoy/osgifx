@@ -581,16 +581,7 @@ public class BinaryCodec {
 
     private FieldAccessor[] getAccessors(Class<?> clz) {
         return accessorCache.computeIfAbsent(clz, c -> {
-            return Arrays.stream(c.getFields()) // Public fields only implies DTO contract is cleaner, but getFields()
-                                                // returns public.
-                    // Wait! Unsafe could read private fields.
-                    // If we use 'unsafe', we should prefer 'getDeclaredFields()', but standard 'getFields()' is
-                    // consistent for DTOs.
-                    // Let's stick to getFields() for now as user DTOs are likely public.
-                    // UPDATE: To mimic Unsafe strategy correctly, we should use getDeclaredFields() if unsafe is
-                    // present?
-                    // No, existing code used getFields() + accessible check logic implicitly or getFields().
-                    // Standard OSGi DTOs use public fields. Let's use getFields() to be safe and spec compliant.
+            return Arrays.stream(c.getFields()) // OSGi DTOs use public fields
                     .filter(f -> !Modifier.isStatic(f.getModifiers())).sorted(FIELD_NAME_COMPARATOR)
                     .map(f -> unsafe != null ? createUnsafeAccessor(f) : createStandardAccessor(f))
                     .toArray(FieldAccessor[]::new);
