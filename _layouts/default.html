@@ -25,11 +25,13 @@
       </h1>
       <nav>
         <ul>
-          <li><a href="{{ "/" | relative_url }}">Home</a></li>
-          <li><a href="{{ "/mcp-server" | relative_url }}">MCP Server</a></li>
-          <li><a href="{{ "/extension-dev" | relative_url }}">Extensions</a></li>
-          <li><a href="{{ "/development" | relative_url }}">Development</a></li>
-          <li><a href="{{ "/headless-launch" | relative_url }}">Headless Launch</a></li>
+          <li><a href="{{ "/" | relative_url }}" class="{% if page.url == "/" or page.url == "/index.html" %}active{% endif %}">Home</a></li>
+          <li><a href="{{ "/mcp-server" | relative_url }}" class="{% if page.url contains "mcp-server" %}active{% endif %}">MCP Server</a></li>
+          <li><a href="{{ "/extension-dev" | relative_url }}" class="{% if page.url contains "extension-dev" %}active{% endif %}">Extensions</a></li>
+          <li><a href="{{ "/development" | relative_url }}" class="{% if page.url contains "development" %}active{% endif %}">Development</a></li>
+          <li><a href="{{ "/headless-launch" | relative_url }}" class="{% if page.url contains "headless-launch" %}active{% endif %}">Headless Launch</a></li>
+          <li><a href="{{ "/agent" | relative_url }}" class="{% if page.url contains "agent" %}active{% endif %}">Agent</a></li>
+          <li><a href="{{ "/eclipse-plugin" | relative_url }}" class="{% if page.url contains "eclipse-plugin" %}active{% endif %}">Eclipse Plugin</a></li>
           <li><a href="{{ site.github_url | default: site.github.repository_url }}" target="_blank" rel="noopener"><i class="fab fa-github"></i>
               GitHub</a></li>
         </ul>
@@ -42,9 +44,15 @@
     <div class="wrapper">
       <h1>Manage OSGi Runtimes<br><span style="color: var(--primary-color);">Remotely & Efficiently</span></h1>
       <p>{{ site.description }}</p>
-      <div class="hero-actions">
-        <a href="{{ site.jdeploy.url }}" class="btn btn-primary">Download App</a>
-        <a href="{{ site.agent.url }}" class="btn btn-secondary">Get Agent</a>
+      <div class="hero-actions hero-actions-multi">
+        <div class="hero-main-buttons">
+          <a href="{{ site.jdeploy.url }}" class="btn btn-primary">Download App</a>
+          <a href="{{ site.agent.url }}" class="btn btn-secondary">Get Agent</a>
+        </div>
+        <a href="{{ "/eclipse-plugin" | relative_url }}" class="btn btn-secondary btn-plugin">
+          <span class="btn-title">Get Eclipse Plugin</span>
+          <span class="btn-subtitle">No separate app installation required!</span>
+        </a>
       </div>
     </div>
   </div>

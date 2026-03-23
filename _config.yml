@@ -7,7 +7,7 @@ theme: jekyll-theme-minimal
 jdeploy:
   url: https://www.jdeploy.com/~osgifx
 agent:
-  url: https://central.sonatype.com/artifact/com.osgifx/com.osgifx.console.agent/2.4.5
+  url: https://central.sonatype.com/artifact/com.osgifx/com.osgifx.console.agent/3.0.0
 headless:
-  url: https://central.sonatype.com/artifact/com.osgifx/osgifx/2.4.5
+  url: https://central.sonatype.com/artifact/com.osgifx/osgifx/3.0.0
 github_url: https://github.com/amitjoy/osgifx

@@ -1,7 +1,7 @@
 ---
 ---
 
-@use "jekyll-theme-minimal";
+@import "jekyll-theme-minimal";
 
 /* Modern Reset & typography */
 :root {
@@ -123,21 +123,52 @@ nav ul {
   padding: 0;
   display: flex;
   gap: 2rem;
+  /* Reset jekyll-theme-minimal default styles that break the menu */
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+nav ul:hover {
+  box-shadow: none !important;
+}
+
+nav ul li {
+  width: auto !important;
+  float: none !important;
+  border: none !important;
+  height: auto !important;
 }
 
 nav a {
-  color: var(--secondary-color);
-  font-weight: 500;
+  color: var(--secondary-color) !important;
+  font-weight: 400 !important;
   text-transform: capitalize;
   /* Ensure nice casing */
-  transition: color 0.2s;
+  transition: all 0.2s ease;
   text-decoration: none;
+  /* Reset minimal theme's a styling */
+  background: none !important;
+  padding: 0 0 4px 0 !important;
+  display: inline-block !important;
+  text-align: left !important;
+  height: auto !important;
+  border-bottom: 2px solid transparent !important;
 }
 
-nav a:hover,
-nav a.active {
-  color: var(--primary-color);
+nav a:hover {
+  color: var(--accent-color) !important;
+  background: none !important;
 }
+
+nav a.active {
+  color: var(--primary-color) !important;
+  background: none !important;
+  border-bottom: 2px solid var(--primary-color) !important;
+}
+
 
 /* Hero Section */
 .hero {
@@ -167,6 +198,44 @@ nav a.active {
   display: flex;
   gap: 1rem;
   justify-content: center;
+}
+
+.hero-actions-multi {
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem !important;
+}
+
+.hero-main-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-plugin {
+  display: inline-flex !important;
+  flex-direction: column;
+  padding: 0.75rem 1.5rem !important;
+  border: 2px solid var(--accent-color) !important;
+  line-height: 1.2;
+}
+
+.btn-plugin .btn-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.btn-plugin .btn-subtitle {
+  font-size: 0.85rem;
+  font-weight: normal;
+  margin-top: 0.25rem;
+  color: var(--text-light);
+  transition: color 0.2s;
+}
+
+.btn-plugin:hover .btn-subtitle {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .btn {
@@ -248,20 +317,38 @@ a:hover {
 pre,
 code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9em;
   overflow-wrap: anywhere;
 }
 
 pre {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: #0f172a;
+  color: #cbd5e1;
   padding: 1.5rem;
   border-radius: var(--radius-lg);
   overflow-x: auto;
   margin: 1.5rem 0;
-  border: 1px solid #334155;
-  box-shadow: var(--shadow-md);
+  border: 1px solid #1e293b;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
+
+pre code {
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+
+/* Syntax Highlighting for Dark Background (Rouge) */
+pre .k, pre .kd, pre .kp, pre .kt { color: #818cf8; font-weight: 500; } /* keywords */
+pre .nf, pre .fm { color: #38bdf8; } /* functions */
+pre .nc, pre .nt { color: #fbbf24; } /* class / tags */
+pre .s, pre .s1, pre .s2, pre .sc { color: #34d399; } /* strings */
+pre .c, pre .c1, pre .cm { color: #64748b; font-style: italic; } /* comments */
+pre .m, pre .mi, pre .mf { color: #f472b6; } /* numbers */
+pre .o, pre .ow { color: #94a3b8; } /* operators */
+pre .nd { color: #a78bfa; } /* decorators */
+pre .na { color: #818cf8; } /* attributes */
 
 code.highlighter-rouge {
   background-color: #f1f5f9;
@@ -649,7 +736,14 @@ blockquote.markdown-alert>*:last-child {
   table {
     display: block;
     overflow-x: auto;
-    white-space: nowrap;
+    font-size: 0.85rem;
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
+    white-space: normal;
+    min-width: 100px;
   }
 
   /* Footer adjustments: Hide on mobile */

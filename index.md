@@ -28,6 +28,8 @@ title: Home
   <img src="screenshots/4.png" width="45%" style="border: 1px solid #e2e8f0;" />
   <img src="screenshots/5.png" width="45%" style="border: 1px solid #e2e8f0;" />
   <img src="screenshots/6.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/7.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/8.png" width="45%" style="border: 1px solid #e2e8f0;" />
 </div>
 
 ---
@@ -48,7 +50,7 @@ title: Home
 
 ### 🚀 Getting Started
 
-The latest released version is **2.4.5**.
+The latest released version is **3.0.0**.
 
 #### 📥 Download & Install
 Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
@@ -57,17 +59,20 @@ Visit the [Project Website](http://osgifx.com) to download and install the lates
 > **Important Notes for Download and Update:**
 > *   The required VM will directly be downloaded while installing the application using `jdeploy`.
 > *   If the auto-update feature is enabled, every new version will be automatically downloaded while starting the application.
-> *   **Upgrade Note:** Due to the update, the application might not work as expected as the old bundle cache (OSGi storage) still exists. Ensure you delete the existing OSGi storage area located in `~/.osgifx-ws`.
+> *   **Storage Structure:** The `.osgifx-ws` directory now contains logs, OSGi storage, and your user connection settings. Configured connections are never lost!
 
 #### Remote Agent Setup
 
 > [!NOTE]
 > **Minimum Requirements:** Java 1.8 & OSGi R6.
 
-To manage an OSGi framework, install the `com.osgifx.console.agent` bundle.
+To manage an OSGi framework, install the `com.osgifx.console.agent` bundle. Refer to the **[Agent Documentation](/agent)** for more details.
 
 **1. Socket Connection**
 Set `osgi.fx.agent.socket.port` system property in the runtime (e.g., `2000` or `0.0.0.0:2000`).
+
+**Password Authentication:**
+Set the `osgi.fx.agent.socket.password=your-secure-password` system property to require password authentication.
 
 **Secure Sockets (SSL):**
 To secure sockets, set:
@@ -88,7 +93,7 @@ Install `in.bytehue.messaging.mqtt5.provider.jar`.
 **OAuth Support:**
 You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx application settings.
 
----
+
 
 ### ✨ Features
 
@@ -134,20 +139,48 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 | **ℹ️ DTO Inspector** <br> _Explore standard OSGi Runtime DTOs_ | 2.4.4 | ✅ | 🚀 |
 | **🔍 Advanced Search** <br> _Powerful search across the OSGi framework_ | 2.4.4 | ✅ | 🚀 |
 | **🤖 MCP Support** <br> _Model Context Protocol integration for AI agents. [Read More](/mcp-server)_ | 2.4.5 | ✅ | 🚀 |
-| **👻 Headless Launch** <br> _Start application with pre-configured connection_ | 2.4.5 | ✅ | 🚀 |
+| **👻 Headless Launch** <br> _Start application with pre-configured connection. [Read More](/headless-launch)_ | 2.4.5 | ✅ | 🚀 |
+| **🌐 JAX-RS View** <br> _Inspect JAX-RS Applications, Resources, and Extensions_ | 3.0.0 | ✅ | 🚀 |
+| **📦 CDI View** <br> _Inspect CDI Containers, Components, and Extensions_ | 3.0.0 | ✅ | 🚀 |
+| **🔐 Authentication & Security** <br> _Password authentication with AES-256 encryption, TLS/SSL, and OAuth/Token support_ | 3.0.0 | ✅ | 🚀 |
+| **💥 Blast Radius Analysis** <br> _Pre-flight simulation of impact when stopping bundles or disabling components_ | 3.0.0 | ✅ | 🚀 |
+| **🌊 Activation Cascade Analysis** <br> _Predictive analysis of service activations and hijacking when starting bundles or enabling components_ | 3.0.0 | ✅ | 🚀 |
+| **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components_ | 3.0.0 | ✅ | 🚀 |
+| **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks_ | 3.0.0 | ✅ | 🚀 |
 
 ---
 
-### Advanced Capabilities
+### 🚀 OSGi.fx Client Features & Capabilities
 
-#### Batch Operations
-You can install multiple bundles and create multiple configurations in one go.
-1.  Select `Actions -> Batch Install`.
-2.  Choose a directory containing your JARs and JSON configuration files. (*Note:* JSON files must comply with the [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html).)
-3.  Select which resources to process from the list.
+OSGi.fx comes loaded with a plethora of features designed to make remote OSGi management seamless. While most of the options reflect standard capabilities expected by developers familiar with OSGi, several advanced features significantly enhance productivity and diagnostics.
 
-#### Extension System
-OSGi.fx is extensible. You can build your own plugins using OSGi and JavaFX.
+#### 🩺 Advanced Diagnostics
+*   **Thread Dump & Heap Dump**: Capture and analyze threads and heap memory directly from the remote runtime. Thread dumps assist in detecting deadlocks or CPU spikes natively, while heap dumps help pinpoint memory leaks. Heap dumps utilize the Large Payload Handling SPI for efficient transferring and local storage.
+*   **Snapshot Functionality**: Take a complete snapshot of the remote runtime state (bundles, services, components, properties, etc.). This is incredibly useful for capturing the state at a specific point in time, comparing multiple states to trace issues, attaching to bug reports, or reviewing the environment offline for root-cause analysis without requiring a persistent connection to the agent.
+
+#### ⚙️ Advanced Component Management
+*   **Conditions (with Injection)**: OSGi Declarative Services (DS) components often define conditions for activation. You can seamlessly inject these conditions directly from the UI to satisfy and simulate requirements, triggering component activations on demand. This is an awesome functionality for testing component lifecycles without writing any additional scaffolding code or manual configurations.
+*   **Batch Operations**: Install multiple bundles and create multiple configurations simultaneously by selecting a directory or multiple JAR files in the Bundles tab. This drastically reduces the time needed to deploy updates, install third-party libraries, or set up a new remote environment. (*Note:* JSON files must comply with the [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html).)
+
+#### 📢 Event Administration
+*   **Sending and Receiving Events**: You can both listen to and emit OSGi events through the EventAdmin interface. Use the intuitive **Event Filter Dialog** to easily construct LDAP filters for subscribing to specific topics. The dialog features an autocomplete dropdown that displays options recognized by OSGi in event filters, drastically simplifying the manual creation of complex filtering rules.
+
+#### 🐒 Chaos Monkey - Resilience Testing
+The **Chaos Monkey** is a powerful fault-injection tool designed to test the resilience, self-healing, and dynamic rebinding capabilities of your OSGi applications. It randomly disrupts bundles and SCR components based on your configuration.
+*   **4-Layer Safety Architecture**: Prevents accidental "suicide" of the remote environment (protects System Bundle, Agent Bundle, Infrastructure Bundles, and enforces strict Regex Scopes).
+*   **Use Cases**: Test bundle refresh cascades, component rebinding scenarios, and ensure your services degrade securely over an Auto-Stop Timer.
+
+#### 🔍 Global Search and Table Filtering
+*   **Menu Search Option**: Quickly find functions, specific tabs, and preferences by using the global search field located directly in the application menu.
+*   **Table Column Search**: Every table in OSGi.fx allows for advanced inline searching. **Right-click on any column header** to see the option to search for matching entries within that specific column. It makes locating specific bundles, components, or properties trivial even within enormous datasets.
+
+#### 📊 Bottom Status Bar
+The bottom status bar of the OSGi.fx UI provides vital connection health and synchronization utilities:
+*   **RPC Progress Dialog**: A spinner/icon indicates ongoing Remote Procedure Calls (RPC). Clicking it opens the RPC Progress Dialog, which is highly beneficial for debugging and monitoring slow or long-running network requests, giving visibility into what operations are actively communicating with the runtime.
+*   **Sync Button**: Allows you to force-synchronize the client's localized state with the remote runtime. Using the **"Sync All"** menu option immediately invalidates all client-side caches and pulls the freshest data from the remote runtime, ensuring you always observe the most accurate state if the runtime was modified externally.
+
+#### 🧩 Extension System
+OSGi.fx is deeply extensible. You can build your own plugins using OSGi and JavaFX.
 *   **[Read the Extension Development Guide](/extension-dev)**
 *   See the [Tic-Tac-Toe Extension](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe) for a complete sample.
 
@@ -160,7 +193,7 @@ OSGi.fx is extensible. You can build your own plugins using OSGi and JavaFX.
 
 ---
 
-### 👨💻 Maintainer
+### 👨‍💻 Maintainer
 
 [Amit Kumar Mondal](https://github.com/amitjoy) (admin@amitinside.com)
 

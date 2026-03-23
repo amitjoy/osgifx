@@ -6,7 +6,7 @@ permalink: /headless-launch
 
 # Headless Launch Configuration
 
-**OSGi.fx** supports a "Headless" launch mode, which allows you to start the application with a pre-defined connection configuration. This skips the initial connection wizard and automatically connects to the configured agent.
+**OSGi.fx** supports a "Headless" launch mode, which allows you to start the application with a pre-defined connection configuration. This skips the initial connection wizard and automatically connects to the configured agent. The **Eclipse SWT Plugin** also uses the headless launcher internally to power its IDE integration.
 
 > [!NOTE]
 > "Headless" in this context means "without the connection wizard UI", not necessarily without any UI at all. The main application window will still open after connection.
@@ -19,11 +19,11 @@ To use this feature, you need to provide a JSON configuration file via the `osgi
 java -Dosgifx.config=/path/to/config.json -jar osgifx.jar
 ```
 
-### Using Launch Script
-
 <div style="text-align: left; margin: 1.5rem 0;">
-  <a href="{{ site.headless.url }}" class="btn btn-secondary">Download Headless JAR</a>
+  <a href="https://central.sonatype.com/artifact/com.osgifx/osgifx/3.0.0" class="btn btn-secondary">Download Headless JAR</a>
 </div>
+
+### Using Launch Script
 
 You can also use the `RunOSGiFx` script which simplifies the process by handling all modularity flags for you.
 
@@ -38,13 +38,8 @@ You can also use the `RunOSGiFx` script which simplifies the process by handling
 ./RunOSGiFx --jar path/to/osgifx.jar -Dosgifx.config=/path/to/config.json
 
 # Run with auto-download from Maven
-./RunOSGiFx --gav com.osgifx:osgifx:2.4.5 -Dosgifx.config=/path/to/config.json
+./RunOSGiFx --gav com.osgifx:osgifx:LATEST -Dosgifx.config=/path/to/config.json
 ```
-
-> [!IMPORTANT]
-> Avoid using `java -jar` directly, as it requires manual configuration of complex JPMS flags. Use the module-aware launcher `RunOSGiFx`.
-
----
 
 ## Configuration Format
 
@@ -59,6 +54,7 @@ The configuration file must be a valid JSON file. You can configure either a **S
     "host": "localhost",
     "port": 4567,
     "timeout": 10000,
+    "password": "mypassword",
     "trustStorePath": "/path/to/truststore",
     "trustStorePassword": "password"
   }
@@ -71,6 +67,7 @@ The configuration file must be a valid JSON file. You can configure either a **S
 | `host` | String | The hostname or IP address of the OSGi agent |
 | `port` | Number | The port number of the OSGi agent |
 | `timeout` | Number | Connection timeout in milliseconds |
+| `password` | String | (Optional) Authentication password |
 | `trustStorePath` | String | (Optional) Path to the SSL truststore |
 | `trustStorePassword` | String | (Optional) Password for the SSL truststore |
 
@@ -86,6 +83,13 @@ The configuration file must be a valid JSON file. You can configure either a **S
     "clientId": "osgifx-client",
     "username": "myuser",
     "password": "mypassword",
+    "tokenConfig": {
+      "authServerURL": "https://auth.server/token",
+      "clientId": "osgifx-client",
+      "clientSecret": "secret",
+      "audience": "osgifx",
+      "scope": "openid"
+    },
     "pubTopic": "osgifx/pub",
     "subTopic": "osgifx/sub",
     "lwtTopic": "osgifx/lwt"
@@ -102,6 +106,7 @@ The configuration file must be a valid JSON file. You can configure either a **S
 | `clientId` | String | MQTT Client ID |
 | `username` | String | (Optional) MQTT username |
 | `password` | String | (Optional) MQTT password |
+| `tokenConfig` | Object | (Optional) OAuth2 configuration object |
 | `pubTopic` | String | Topic to publish requests to |
 | `subTopic` | String | Topic to subscribe for responses |
 | `lwtTopic` | String | Last Will and Testament topic |
