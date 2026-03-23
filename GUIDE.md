@@ -314,7 +314,7 @@ public class S3PayloadHandler implements LargePayloadHandler {
 
 ---
 
-## 6. Chaos Monkey - Resilience Testing
+## 7. Chaos Monkey - Resilience Testing
 
 The **Chaos Monkey** is a powerful fault-injection tool designed to test the resilience, self-healing, and dynamic rebinding capabilities of your OSGi applications. It randomly disrupts bundles and SCR components based on your configuration.
 
@@ -333,3 +333,32 @@ To prevent accidental "suicide" of the remote environment, Chaos Monkey implemen
 *   **Test Bundle Refresh**: Use Chaos Monkey to stop bundles that provide common services. This verifies if dependent bundles correctly handle service disappearance and refresh.
 *   **Component Rebinding**: Randomly disable single DS components to ensure that consumers correctly rebind to alternatives or transition into a safe "unsatisfied" state without crashing.
 *   **Safety Timers**: Always use the **Auto-Stop Timer** to ensure that a chaos session doesn't run indefinitely in shared development environments.
+
+---
+
+## 8. OSGi.fx Client Features
+
+OSGi.fx comes loaded with a plethora of features designed to make remote OSGi management seamless. While most of the options in the various tabs reflect standard capabilities expected by developers familiar with OSGi, several advanced features significantly enhance productivity and diagnostics. 
+
+### Advanced Diagnostics
+*   **Thread Dump & Heap Dump**: Capture and analyze threads and heap memory directly from the remote runtime. Thread dumps assist in detecting deadlocks or CPU spikes natively, while heap dumps help pinpoint memory leaks. Heap dumps utilize the Large Payload Handling SPI for efficient transferring and local storage.
+*   **Snapshot Functionality**: Take a complete snapshot of the remote runtime state (bundles, services, components, properties, etc.). This is incredibly useful for capturing the state at a specific point in time, comparing multiple states to trace issues, attaching to bug reports, or reviewing the environment offline for root-cause analysis without requiring a persistent connection to the agent.
+
+### Advanced Component Management
+*   **Conditions (with Injection)**: OSGi Declarative Services (DS) components often define conditions for activation. You can seamlessly inject these conditions directly from the UI to satisfy and simulate requirements, triggering component activations on demand. This is an awesome functionality for testing component lifecycles without writing any additional scaffolding code or manual configurations.
+*   **Batch Install**: Install multiple bundles simultaneously by selecting a directory or selecting multiple JAR files in the Bundles tab. This drastically reduces the time needed to deploy updates, install third-party libraries, or set up a new remote environment.
+
+### Event Administration
+*   **Sending and Receiving Events**: You can both listen to and emit OSGi events through the EventAdmin interface. Use the intuitive **Event Filter Dialog** to easily construct LDAP filters for subscribing to specific topics. The dialog features an autocomplete dropdown that displays options recognized by OSGi in event filters, drastically simplifying the manual creation of complex filtering rules.
+
+### Model Context Protocol (MCP) Server
+OSGi.fx deeply integrates an **[MCP Server](MCP_SERVER.md)** that securely connects Large Language Models (LLMs) to your running OSGi framework. This unlocks natural language interactions for deep diagnostics, real-time monitoring, and context-aware log analysis directly from tools like Claude Desktop. You can find detailed capabilities and configuration instructions in the [MCP Server Guide](MCP_SERVER.md).
+
+### Global Search and Table Filtering
+*   **Menu Search Option**: Quickly find functions, specific tabs, and preferences by using the global search field located directly in the application menu.
+*   **Table Column Search**: Every table in OSGi.fx allows for advanced inline searching. **Right-click on any column header** to see the option to search for matching entries within that specific column. It makes locating specific bundles, components, or properties trivial even within enormous datasets.
+
+### Bottom Status Bar
+The bottom status bar of the OSGi.fx UI provides vital connection health and synchronization utilities:
+*   **RPC Progress Dialog**: A spinner/icon indicates ongoing Remote Procedure Calls (RPC). Clicking it opens the RPC Progress Dialog, which is highly beneficial for debugging and monitoring slow or long-running network requests, giving visibility into what operations are actively communicating with the runtime.
+*   **Sync Button**: Allows you to force-synchronize the client's localized state with the remote runtime. Using the **"Sync All"** menu option immediately invalidates all client-side caches and pulls the freshest data from the remote runtime, ensuring you always observe the most accurate state if the runtime was modified externally.
