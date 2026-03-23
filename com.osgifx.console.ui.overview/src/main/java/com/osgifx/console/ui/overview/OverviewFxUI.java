@@ -16,6 +16,7 @@
 package com.osgifx.console.ui.overview;
 
 import static com.osgifx.console.event.topics.DataRetrievedEventTopics.DATA_RETRIEVED_ANY_TOPIC;
+import static com.osgifx.console.event.topics.LogReceiveEventTopics.LOG_RECEIVE_EVENT_TOPICS;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_CONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.supervisor.Supervisor.AGENT_DISCONNECTED_EVENT_TOPIC;
 import static com.osgifx.console.ui.overview.OverviewFxUI.TimelineButtonType.PAUSE;
@@ -234,6 +235,7 @@ public final class OverviewFxUI {
 
     private void retrieveRuntimeData() {
         // @formatter:off
+        updateLogErrorTileDescription();
         final var runtimeInfo = retrieveRuntimeInfo();
 
         noOfServicesTile.setValue(runtimeInfo.noOfServices());
@@ -249,6 +251,7 @@ public final class OverviewFxUI {
         // Update Log Error Tile
         final var logErrors = runtimeInfo.noOfLogErrors();
         logErrorTile.setValue(logErrors);
+        updateLogErrorTileDescription();
 
         if (isConnected) {
             noOfLeaksTile.setBackgroundColor(leaks > 0 ? MUTED_RED : MUTED_GREEN);
@@ -533,11 +536,11 @@ public final class OverviewFxUI {
         final var xAxis = new CategoryAxis();
         final var yAxis = new NumberAxis();
         yAxis.setLabel("Memory (MB)");
-        
+
         final var areaChart = new AreaChart<>(xAxis, yAxis);
         areaChart.setLegendVisible(false);
         areaChart.setCreateSymbols(false);
-        
+
         memoryDataSeries = new XYChart.Series<>();
         memoryDataSeries.setName("Heap Usage");
         areaChart.getData().add(memoryDataSeries);
@@ -549,13 +552,14 @@ public final class OverviewFxUI {
                                        .graphic(areaChart)
                                        .roundedCorners(false)
                                        .build();
-        
+
         // Log Error Tile
         logErrorTile = TileBuilder.create()
                                   .skinType(SkinType.NUMBER)
                                   .numberFormat(new DecimalFormat("#"))
                                   .title("Error Logs")
-                                  .text("Count of ERROR logs")
+                                  .text(Boolean.getBoolean("is_receiving_log") ? "Number of ERROR logs"
+                                          : "Enable logging reception in Logs tab to receive the count")
                                   .textVisible(true)
                                   .decimals(0)
                                   .decimals(0)
@@ -737,6 +741,27 @@ public final class OverviewFxUI {
         updateStaticOverviewInfo();
         initStatusBar(parent);
         retrieveRuntimeData();
+    }
+
+    @Inject
+    @Optional
+    private void updateOnLogReceiveEvent(@UIEventTopic(LOG_RECEIVE_EVENT_TOPICS) final String data) {
+        updateLogErrorTileDescription(Boolean.parseBoolean(data));
+    }
+
+    private void updateLogErrorTileDescription() {
+        updateLogErrorTileDescription(Boolean.getBoolean("is_receiving_log"));
+    }
+
+    private void updateLogErrorTileDescription(final boolean isReceivingLog) {
+        if (logErrorTile == null) {
+            return;
+        }
+        if (isReceivingLog) {
+            logErrorTile.setText("Number of ERROR logs");
+        } else {
+            logErrorTile.setText("Enable logging reception in Logs tab to receive the count");
+        }
     }
 
     private void initStatusBar(final BorderPane parent) {

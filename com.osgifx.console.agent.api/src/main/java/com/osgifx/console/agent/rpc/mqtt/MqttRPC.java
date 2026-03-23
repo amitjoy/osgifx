@@ -85,7 +85,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
     private final AtomicBoolean stopped = new AtomicBoolean();
     private final FluentLogger  logger  = LoggerFactory.getFluentLogger(getClass());
 
-    // Optimization: Shared Codec & Buffers
+    // Shared codec and buffers
     private final BinaryCodec                            codec;
     private final long                                   maxDecompressedSize;
     private final ThreadLocal<FastByteArrayOutputStream> buffer          = ThreadLocal

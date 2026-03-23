@@ -149,8 +149,7 @@ public final class ClassloaderLeakDetector implements Runnable {
                 final BundleReference ref = new BundleReference(bundle, cl);
                 refs.add(ref);
 
-                // Note that a bundle can be started multiple times e.g. when refreshed
-                // so we need to account for that also
+                // Bundle can be started multiple times (e.g., after refresh)
                 final BundleInfo bi = bundleInfos.computeIfAbsent(bundle.getBundleId(), id -> new BundleInfo(bundle));
                 bi.incrementUsageCount(ref);
             }

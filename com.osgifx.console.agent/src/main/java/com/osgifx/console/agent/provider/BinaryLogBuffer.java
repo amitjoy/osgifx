@@ -107,7 +107,7 @@ public class BinaryLogBuffer {
             int  startOffset = index[startIndex];
 
             if (startOffset == -1) {
-                // Should not happen if logic is correct, but safe fallback
+                // Safeguard
                 return new byte[0];
             }
 
@@ -199,7 +199,7 @@ public class BinaryLogBuffer {
                 dos.writeLong(writeCount);
                 dos.writeInt(data.length);
                 dos.write(data);
-                // We generally assume index size is constant, but could save it too
+                // Index size (constant)
                 dos.writeInt(index.length);
                 for (int i : index) {
                     dos.writeInt(i);
@@ -258,11 +258,9 @@ public class BinaryLogBuffer {
             int totalSize = 0;
             // Iterate backward from most recent entry
             long entriesToCheck = Math.min(writeCount, indexCapacity);
-            // Stores the start offset of each matching entry
-            // Optimization: Reusing the existing index concept, but since we can't easily store a dynamic list of
-            // matching offsets without allocation, we'll re-scan in Pass 2.
-            // But wait, re-scanning 1024 items is cheap (CPU) compared to allocation (Memory).
-            // So we'll just find the start and end logical indices.
+            // Re-scan to find matching entries instead of allocating a list.
+            // CPU cost of scanning 1024 items is cheaper than memory allocation.
+            // Find start and end logical indices for matching range.
 
             // Logical index of the most recent entry
             long newestLogicalIndex = writeCount - 1;
@@ -276,7 +274,7 @@ public class BinaryLogBuffer {
                 int  offset       = index[(int) (logicalIndex % indexCapacity)];
 
                 if (offset == -1) {
-                    continue; // Should not happen given writeCount logic, but safe guard
+                    continue; // Safeguard
                 }
 
                 long timestamp = readLong(offset);
@@ -285,7 +283,7 @@ public class BinaryLogBuffer {
                     continue; // Too new
                 }
                 if (timestamp < fromTime) {
-                    break; // Too old, and since we iterate backward, all subsequent are also too old
+                    break; // Too old (backward iteration)
                 }
 
                 // Match!
@@ -309,9 +307,7 @@ public class BinaryLogBuffer {
             byte[] result  = new byte[totalSize];
             int    destPos = 0;
 
-            // Iterate forward from oldest match to newest match
-            // Note: startMatchIndex is the *oldest* logical index (smaller value)
-            // endMatchIndex is the *newest* logical index (larger value)
+            // Iterate from oldest to newest match
             for (long i = startMatchIndex; i <= endMatchIndex; i++) {
                 int offset = index[(int) (i % indexCapacity)];
                 int msgLen = readInt(offset + 20);

@@ -23,6 +23,34 @@ The agent is designed for broad compatibility across legacy and modern environme
 
 ---
 
+## 🏗️ Module Architecture
+
+The agent is split into three OSGi bundles for clean separation of concerns:
+
+### `com.osgifx.console.agent.api`
+The architectural contract defining:
+- **`Agent` / `AgentSnapshot`**: Primary management interfaces for control and inspection
+- **`dto`**: Comprehensive DTO suite optimized for minimal serialization footprints
+- **`rpc`**: Binary codec (`BinaryCodec`), LZ4 compression (`Lz4Codec`), transport abstractions, and `SnapshotDecoder`
+- **`spi`**: Extension points (`AgentExtension`, `LargePayloadHandler`) for custom logic
+
+### `com.osgifx.console.agent`
+The core implementation containing:
+- **`admin`**: Domain-specific managers (Bundles, Components, Configurations, Services, Conditions, etc.)
+- **`redirector`**: I/O hijacking engine for multi-mode terminal proxies (Console, Gogo, Socket, Telnet)
+- **`provider`**: Agent server, binary log buffer, classloader leak detector, startup time calculator
+- **`starter`**: Zero-dependency `Activator` and Gogo command bridge
+- **`helper`**: Utility classes for OSGi compendium service detection and agent operations
+
+### `com.osgifx.console.agent.di`
+Standalone micro-DI container:
+- **JSR-330 compliant**: Full support for `@Inject`, `@Singleton`, and `Provider<T>`
+- **Lambda-accelerated**: Injection optimized via `LambdaMetafactory` for high-speed instantiation
+- **Zero dependencies**: Operates without OSGi SCR, making it portable across minimal runtimes
+- **Dynamic binding**: Runtime binding of interfaces to implementations and custom providers
+
+---
+
 ## 🏗️ Architecture
 
 The agent is built on a modular, DI-based architecture to ensure extensibility and clean lifecycle management.
@@ -109,6 +137,7 @@ Most data points (Bundles, Services, Configs) are served via a thread-safe cachi
 | **Bundles** | `BundleTracker` + `FrameworkListener` | Bundle lifecycle, Startlevel changes |
 | **Services** | `ServiceTracker` | Service registration/modification/removal |
 | **Components** | `ServiceComponentRuntime` Tracker | SCR Component state changes (`changecount`) |
+| **Conditions** | `ServiceTracker` | Condition service registration/modification/removal |
 | **Configurations**| `ConfigurationListener` | ConfigAdmin PID/Factory updates |
 | **HTTP/JAX-RS/CDI**| `changecount` Monitoring | Remote DTO state changes via R7/R8 specs |
 | **User Admin** | `UserAdminListener` | Roles, Groups, and Credential changes |
@@ -157,6 +186,7 @@ All the following data points are available as binary snapshots via the `AgentSn
 | :--- | :--- | :--- |
 | `bundles()` | `XBundleDTO` | Comprehensive bundle metadata and wiring |
 | `components()` | `XComponentDTO` | Declarative Services (SCR) state |
+| `conditions()` | `XConditionDTO` | OSGi R8 Condition services and component dependencies |
 | `services()` | `XServiceDTO` | OSGi service registry snapshot |
 | `configurations()` | `XConfigurationDTO` | ConfigAdmin properties and Metatype info |
 | `properties()` | `XPropertyDTO` | System and Framework properties |
@@ -166,11 +196,11 @@ All the following data points are available as binary snapshots via the `AgentSn
 | `httpComponents()` | `XHttpComponentDTO` | Servlets, Filters, Resources (R7/R8) |
 | `jaxRsComponents()` | `XJaxRsComponentDTO` | JAX-RS Whiteboard components |
 | `cdiContainers()` | `XCdiContainerDTO` | CDI Container and Component status |
-| `loggerContexts()` | `XBundleLoggerContextDTO`| R7 Logger Admin contexts |
+| `bundleLoggerContexts()` | `XBundleLoggerContextDTO`| R7 Logger Admin contexts |
 | `leaks()` | `XBundleDTO` | Potential classloader leaks |
 | `runtime()` | `RuntimeDTO` | Framework and System information |
 | `heapUsage()` | `XHeapUsageDTO` | Real-time memory/heap statistics |
-| `capabilities()` | `XRuntimeCapabilityDTO` | Detected framework capabilities |
+| `runtimeCapabilities()` | `XRuntimeCapabilityDTO` | Detected framework capabilities |
 
 #### 🔍 Live vs. Cached Snapshots
 
@@ -181,6 +211,7 @@ The agent intelligently distinguishes between data that benefits from reactive c
 | **Bundles** | **Cached** | Expensive to build (wiring, packages, services). Infrequent changes. |
 | **Services** | **Cached** | Moderate cost. Service registry changes trigger re-snapshot. |
 | **Components** | **Cached** | Moderate cost. SCR component state tracked via `changecount`. |
+| **Conditions** | **Cached** | Moderate cost. Condition services tracked via `ServiceTracker`. |
 | **Configurations** | **Cached** | Moderate cost. ConfigAdmin + Metatype processing. |
 | **User Roles** | **Cached** | Cheap but infrequent changes. Caching prevents redundant processing. |
 | **Health Checks** | **Cached** | Service tracker monitors HealthCheck registrations. |
@@ -235,15 +266,21 @@ The `SnapshotDecoder` utility simplifies decoding compressed snapshots on the su
 BinaryCodec codec = new BinaryCodec(bundleContext);
 SnapshotDecoder decoder = new SnapshotDecoder(codec);
 
-// Decode snapshots
+// Decode list snapshots
 byte[] bundlesSnapshot = agent.bundles();
 List<XBundleDTO> bundles = decoder.decodeList(bundlesSnapshot, XBundleDTO.class);
 
+// Decode set snapshots
 byte[] leaksSnapshot = agent.leaks();
 Set<XBundleDTO> leaks = decoder.decodeSet(leaksSnapshot, XBundleDTO.class);
 
+// Decode single object snapshots
 byte[] runtimeSnapshot = agent.runtime();
 RuntimeDTO runtime = decoder.decode(runtimeSnapshot, RuntimeDTO.class);
+
+// Decode single bundle snapshot (efficient for detail views)
+byte[] bundleSnapshot = agent.bundle(42L);
+XBundleDTO bundle = decoder.decode(bundleSnapshot, XBundleDTO.class);
 ```
 
 **Key Features:**
@@ -251,6 +288,7 @@ RuntimeDTO runtime = decoder.decode(runtimeSnapshot, RuntimeDTO.class);
 - **Automatic decompression:** Handles `Lz4Codec.decompressWithLength()` format transparently
 - **Null-safe:** Returns empty collections for null/empty snapshots
 - **Exception handling:** Wraps decompression failures in `RuntimeException` with clear error messages
+- **Single-object snapshots:** Use `agent.bundle(id)` for efficient retrieval of individual bundle details without fetching the entire list
 
 ---
 
@@ -262,7 +300,7 @@ While `AgentSnapshot` is strictly for reading state, the `Agent` interface provi
 | :--- | :--- | :--- |
 | **Bundle Management** | `installWithData`, `installWithMultipleData`, `installFromURL`, `start`, `stop`, `uninstall` | Lifecycle management. `installWithMultipleData` batch-installs bundles and performs a single refresh to avoid internal framework thrashing. |
 | **Bundle Introspection** | `getBundleRevisons`, `getBundleDataFile` | Inspecting wiring revisions and reading persistent data files from the bundle's private `getDataFile()` area. |
-| **Resource Browsing** | `findBundleEntries`, `listBundleResources`, `getBundleEntryBytes`, `getBundleResourceBytes` | Deep inspection of jar contents. `findBundleEntries` searches strictly inside the physical JAR (bypassing the classloader), while `listBundleResources` searches the entire class space (including imports and fragments). |
+| **Resource Browsing** | `findBundleEntries`, `listBundleResources`, `getBundleEntryBytes`, `getBundleResourceBytes` | Deep inspection of bundle contents. **Physical JAR search**: `findBundleEntries` searches strictly inside the physical JAR (bypassing the classloader). **Classpath search**: `listBundleResources` searches the entire class space (including imports and fragments). The `*Bytes` variants retrieve raw content from either the physical JAR (`getBundleEntryBytes`) or the classloader (`getBundleResourceBytes`). |
 | **Component Management** | `enableComponentByName`, `enableComponentById`, `disableComponentByName`, `disableComponentById` | Fine-grained control over Declarative Services (SCR) components. |
 | **Configuration Admin** | `createOrUpdateConfigurations`, `deleteConfiguration`, `createFactoryConfiguration` | Create, update, and delete standard and factory configurations natively. |
 | **User Admin** | `createRole`, `updateRole`, `removeRole` | Modifying roles, groups, and credentials within the OSGi User Admin service. |
@@ -272,6 +310,7 @@ While `AgentSnapshot` is strictly for reading state, the `Agent` interface provi
 | **DMT Admin** | `readDmtNode`, `updateDmtNode` | Reads and updates nodes in the Device Management Tree. |
 | **Process & Shell** | `execGogoCommand`, `execCliCommand` | Remote execution of Gogo commands or underlying OS shell (CLI) commands (tightly protected by allowlists). |
 | **JMX / Memory** | `heapdump`, `getMemoryInfo`, `gc` | Triggering garbage collection, inspecting OS vs JVM memory, or requesting full JVM heap dumps over the wire. |
+| **Diagnostics** | `threadDump`, `estimateThreadDumpSize`, `createThreadDumpLocally` | Generate jstack-style thread dumps (GZIP-compressed), estimate size, or save locally for later retrieval. |
 | **Agent Lifecycle** | `disconnect`, `ping`, `refresh` | Checking connectivity, safely detaching the agent, or triggering a framework wiring refresh. |
 
 ## 🔌 SPIs & Extension Points
@@ -438,34 +477,6 @@ The agent registers several commands under the `osgifx` scope for dynamic contro
 
 ---
 
-## ⚙️ Configuration Reference
-
-The agent behavior is meticulously controlled via OSGi system properties or framework properties.
-
-### Connectivity & Transport
-| Property | Default | Description |
-| :--- | :--- | :--- |
-| `osgi.fx.agent.socket.port` | `1234` | Socket port. Format: `[interface:]port`. |
-| `osgi.fx.agent.socket.password` | `null` | Optional password for authentication. |
-| `osgi.fx.agent.socket.secure` | `false` | Enable TLS/SSL encryption. |
-| `osgi.fx.agent.socket.secure.sslcontext.filter` | `null` | OSGi filter for a custom `SSLContext`. |
-| `osgi.fx.agent.mqtt.provider` | `osgi-messaging` | `osgi-messaging` or `custom`. When using `custom`, the agent expects `Mqtt5Publisher` and `Mqtt5Subscriber` OSGi services to be registered in the framework. |
-| `osgi.fx.agent.mqtt.pubtopic` | `null` | MQTT Publish Topic (Required for MQTT). |
-| `osgi.fx.agent.mqtt.subtopic` | `null` | MQTT Subscription Topic (Required for MQTT). |
-
-### Feature Control
-| Property | Default | Description |
-| :--- | :--- | :--- |
-| `osgi.fx.enable.logging` | `false` | Enable real-time log streaming. |
-| `osgi.fx.enable.eventing` | `false` | Enable real-time OSGi event streaming. |
-| `osgi.fx.agent.auto.start.log.capture` | `false` | Start log listener immediately on activator start. |
-| `osgi.fx.agent.cli.enabled` | `true` | Enable process-based CLI command execution. |
-| `osgi.fx.agent.gogo.enabled` | `true` | Enable Gogo shell command execution. |
-| `osgi.fx.agent.cli.allowlist` | `*` | Comma-separated allowlist for CLI commands. |
-| `osgi.fx.agent.gogo.allowlist` | `*` | Comma-separated allowlist for Gogo commands. |
-
----
-
 ## 📦 Optional Dependencies & Dynamic Wiring (Graceful Degradation)
 
 To ensure the agent remains ultra-lightweight and heavily portable, it does **not** rely on strict `Import-Package` manifest headers for heavily utilized OSGi compendium specifications (like ConfigAdmin, SCR, EventAdmin).
@@ -508,26 +519,29 @@ The agent behavior is controlled via OSGi Framework Properties (or System Proper
 ### 🌐 Connectivity & Transport
 | Property | Default | Description |
 | :--- | :--- | :--- |
-| `osgi.fx.agent.socket.port` | `1099` | TCP port for the management server. |
+| `osgi.fx.agent.socket.port` | `1234` | TCP port for the management server. Format: `[interface:]port`. |
 | `osgi.fx.agent.socket.password` | `(none)` | Shared secret for Socket authentication. |
 | `osgi.fx.agent.socket.secure` | `false` | Enable TLS/SSL for the socket server. |
-| `osgi.fx.agent.mqtt.provider` | `osgi-messaging` | MQTT implementation (`osgi-messaging` or `custom`). |
-| `osgi.fx.agent.mqtt.pubtopic` | `(none)` | MQTT topic for outbound messages. |
-| `osgi.fx.agent.mqtt.subtopic` | `(none)` | MQTT topic for inbound messages. |
+| `osgi.fx.agent.socket.secure.sslcontext.filter` | `(none)` | OSGi filter for a custom `SSLContext`. |
+| `osgi.fx.agent.mqtt.provider` | `osgi-messaging` | MQTT implementation (`osgi-messaging` or `custom`). When using `custom`, the agent expects `Mqtt5Publisher` and `Mqtt5Subscriber` OSGi services to be registered. |
+| `osgi.fx.agent.mqtt.pubtopic` | `(none)` | MQTT topic for outbound messages (Required for MQTT). |
+| `osgi.fx.agent.mqtt.subtopic` | `(none)` | MQTT topic for inbound messages (Required for MQTT). |
 
 ### 🛡️ Resource Protection (Injection Attacks)
 | Property | Default | Description |
 | :--- | :--- | :--- |
-| `osgi.fx.agent.rpc.max.decompressed.size` | `10MB` | Max LZ4 decompression size (Zip Bomb Protection). |
-| `osgi.fx.agent.rpc.max.collection.size` | `10000` | Max elements in decoded collections. |
-| `osgi.fx.agent.rpc.max.map.size` | `10000` | Max entries in decoded maps. |
-| `osgi.fx.agent.rpc.max.byte.array.size`| `1MB` | Max length of decoded byte arrays. |
+| `osgi.fx.agent.rpc.max.decompressed.size` | `250MB` | Max GZIP decompression size (Zip Bomb Protection). |
+| `osgi.fx.agent.rpc.max.collection.size` | `1,000,000` | Max elements in decoded collections. |
+| `osgi.fx.agent.rpc.max.map.size` | `500,000` | Max entries in decoded maps. |
+| `osgi.fx.agent.rpc.max.byte.array.size`| `100MB` | Max length of decoded byte arrays. |
 | `osgi.fx.agent.gogo.allowlist` | `*` | Allowed Gogo commands (e.g., `osgi:*, equinox:start`). |
 | `osgi.fx.agent.cli.allowlist` | `*` | Allowed OS shell commands. |
 
 ### 📝 Behavioral Configuration
 | Property | Default | Description |
 | :--- | :--- | :--- |
+| `osgi.fx.enable.logging` | `false` | Enable real-time log streaming. |
+| `osgi.fx.enable.eventing` | `false` | Enable real-time OSGi event streaming. |
 | `osgi.fx.agent.auto.start.log.capture` | `false` | Start circular log buffer on bundle activation. |
 | `osgi.fx.agent.cli.enabled` | `true` | Globally enable/disable underlying shell execution. |
 | `osgi.fx.agent.gogo.enabled` | `true` | Globally enable/disable Gogo shell execution. |

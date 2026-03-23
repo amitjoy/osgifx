@@ -173,9 +173,9 @@ public class McpJsonRpcServer {
     // --- Handlers ---
 
     private String handleInitialize(final JsonRpc.Request req) {
-        // We declare what we support (only Tools, no Resources/Prompts yet)
-        final var capabilities = Map.of("tools", Map.of("listChanged", true), // We can notify if tools change
-                "resources", Map.of("listChanged", false), "prompts", Map.of("listChanged", false));
+        // Declare capabilities: Tools only (no Resources/Prompts)
+        final var capabilities = Map.of("tools", Map.of("listChanged", true), "resources", Map.of("listChanged", false),
+                "prompts", Map.of("listChanged", false));
 
         final var result = Map.of("protocolVersion", LATEST_PROTOCOL_VERSION, "capabilities", capabilities,
                 "serverInfo", Map.of("name", "OSGi.fx", "version", "1.0.0"));
