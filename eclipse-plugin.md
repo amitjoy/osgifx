@@ -29,6 +29,22 @@ If you prefer to install it manually without the marketplace, you can use `Help 
 -   **🚀 Latest Release:** `https://osgifx.com/eclipse`
 -   **🧪 Staging / Beta:** `https://osgifx.com/eclipse-staging`
 
+## Plugin Features in Action
+
+### Connect Dialog
+
+Seamlessly manage and connect to your remote OSGi frameworks using the dedicated connection dialog integrated within your Eclipse workspace.
+
 <div style="text-align: center; margin: 2rem 0;">
-  <img src="{{ "/screenshots/thumbnail.png" | relative_url }}" alt="OSGi.fx Eclipse Plugin" style="border: 1px solid #e2e8f0; border-radius: 0.5rem; max-width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
+  <img src="{{ "/screenshots/osgifx_plugin_dialog.png" | relative_url }}" alt="OSGi.fx Connect Dialog" style="border: 1px solid #e2e8f0; border-radius: 0.5rem; max-width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
 </div>
+
+### Preferences Configuration
+
+Tailor the plugin's behavior to your requirements, such as configuring the JVM and OSGi.fx launcher settings, conveniently through Eclipse Preferences.
+
+<div style="text-align: center; margin: 2rem 0;">
+  <img src="{{ "/screenshots/osgifx_plugin_preferences.png" | relative_url }}" alt="OSGi.fx Preferences Dialog" style="border: 1px solid #e2e8f0; border-radius: 0.5rem; max-width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
+</div>
+
+
