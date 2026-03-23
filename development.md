@@ -15,7 +15,7 @@ To setup the development environment for **OSGi.fx**, follow these steps:
     > Currently, distributions like [Zulu](https://www.azul.com/downloads/?version=java-25&package=jdk-fx) often include JavaFX modules.
 2.  **Set JAVA_HOME**: specific the newly installed JDK 25 to your `JAVA_HOME`.
 3.  **Install Eclipse**: Get `Eclipse IDE for RCP/RAP Developers` and make sure it starts with your JDK 25.
-4.  **Install Plugins**: Install `Bndtools` and `e(fx)clipse` from the Eclipse Marketplace.
+4.  **Install Plugins**: Install `Bndtools` from the Eclipse Marketplace.
 5.  **Configure Compiler**: Go to `Java -> Compiler` in Preferences and set Compliance Level to **25**.
 6.  **Configure JREs**: 
     - Go to `Java -> Installed JREs` and add your JDK 25.

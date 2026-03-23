@@ -4,46 +4,18 @@ title: MCP Server
 permalink: /mcp-server
 ---
 
-# Model Context Protocol (MCP)
+# OSGi.fx Console MCP Server
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that connects LLMs (like Claude) to a running OSGi framework. This allows you to diagnose, monitor, and debug remote OSGi runtimes using natural language.
 
-<div style="text-align: center; margin: 2rem 0;">
-  <img src="screenshots/7.png" alt="OSGi.fx MCP Server" style="border: 1px solid #e2e8f0; border-radius: 0.5rem; max-width: 100%; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
-</div>
+![MCP Server](screenshots/9.png)
 
----
+## Features
 
-## <span style="color: var(--primary-color)">Features</span>
-
-<div class="features-grid">
-    <div class="feature-card">
-        <h3>🔍 Deep Diagnostics</h3>
-        <p>Inspect bundles, services, components (DS), and configurations.</p>
-    </div>
-    <div class="feature-card">
-        <h3>🛡️ Safety First</h3>
-        <p>Read-only by default. Dangerous Gogo commands are blocked.</p>
-    </div>
-    <div class="feature-card">
-        <h3>📊 Real-time Monitoring</h3>
-        <p>Check heap usage, threads, and memory pools.</p>
-    </div>
-    <div class="feature-card">
-        <h3>⚡ Log Analysis</h3>
-        <p>Fetch and filter logs by time range or count.</p>
-    </div>
-    <div class="feature-card">
-        <h3>🛠️ Full Control</h3>
-        <p>Start/stop bundles, toggle components, and update configurations (when permitted).</p>
-    </div>
-    <div class="feature-card">
-        <h3>🔌 Extensibility</h3>
-        <p>Run custom Agent Extensions to interact with your specific domain logic.</p>
-    </div>
-</div>
-
----
+* **🔍 Deep Diagnostics:** Inspect bundles, services, components (DS), and configurations.
+* **🛡️ Safety First:** Read-only by default. Dangerous Gogo commands are blocked.
+* **📊 Real-time Monitoring:** Check heap usage, threads, and memory pools.
+* **⚡ Log Analysis:** Fetch and filter logs by time range or count.
 
 ## Getting Started
 
@@ -54,8 +26,7 @@ The MCP server is built into the **OSGi.fx** application.
 2.  Connect to your remote OSGi framework (Agent).
 3.  Navigate to the **MCP** tab.
 4.  Click **Start MCP Server**.
-    > [!NOTE]
-    > The button is disabled if the agent is not connected.
+    *   *Note:* The button is disabled if the agent is not connected.
 5.  The server will start on port `8080` (default) or your configured port.
 
 ### 2. Server Management
@@ -67,15 +38,9 @@ The MCP server is built into the **OSGi.fx** application.
 
 ### 3. Client Configuration (SSE)
 
-Configure your MCP client (e.g., Claude Desktop, Windsurf, Antigravity) to connect via Server-Sent Events (SSE).
+Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Events (SSE).
 
-**Common Configuration Files:**
-*   **Claude Desktop:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-*   **Windsurf:** `~/.codeium/windsurf/mcp_config.json`
-*   **GitHub Copilot:** `~/.config/github-copilot/mcp.json`
-*   **Antigravity:** `~/.gemini/antigravity/mcp_config.json`
-
-**Configuration JSON:**
+**Example Configuration:**
 
 ```json
 {
@@ -89,12 +54,10 @@ Configure your MCP client (e.g., Claude Desktop, Windsurf, Antigravity) to conne
 }
 ```
 
----
-
 ## Available Tools
 
 | Tool Name | Description |
-| :--- | :--- |
+| --- | --- |
 | **`list_bundles`** | Lists all installed OSGi bundles with state, version, and ID. |
 | **`list_services`** | Lists all registered services and their properties. |
 | **`list_components`** | Lists Declarative Services (DS) components and their satisfaction state. |
@@ -128,13 +91,14 @@ Configure your MCP client (e.g., Claude Desktop, Windsurf, Antigravity) to conne
 | **`execute_agent_extension`** | Executes a named Agent Extension with a context map. |
 | **`find_bundle_entries`** | Finds files strictly inside the bundle (and its attached fragments). |
 | **`list_bundle_resources`** | Finds resources in the bundle's classpath (includes imports). |
+| **`get_bundle_data_file`** | Retrieves the content of a file from a bundle's persistent storage area. |
 | **`list_health_checks`** | Lists the status of all registered Health Checks (Felix HC). |
 | **`get_logger_contexts`** | Lists the Logger Context configuration for bundles, showing effective log levels. |
 | **`list_user_admin_roles`** | Lists all configured user roles and permissions from the UserAdmin service. |
 | **`list_gogo_commands`** | Lists all available Gogo shell commands across all scopes. |
 | **`get_framework_info`** | Retrieves the full OSGi Core Framework DTO, providing a hierarchical view of the system state. |
-
----
+| **`decompile_class`** | Decompiles a Java class from a remote OSGi bundle, returning its source code. |
+| **`refresh_packages`** | Refreshes the framework wiring (package refresh). |
 
 ## System Prompt / Guiding Principles
 
@@ -159,7 +123,7 @@ When configuring your LLM (e.g., Claude), provides these principles to ensure sa
 ## Troubleshooting
 
 **"Agent is not connected"**
-Ensure the OSGi Agent bundle is installed and running on the target framework and that **the OSGi.fx app** is configured to connect to the correct host/port.
+Ensure the OSGi Agent bundle is installed and running on the target framework and that the supervisor is configured to connect to the correct host/port.
 
 **"Tool execution timed out"**
-Heavy operations like `capture_heap_dump` may take time. Ask the model to wait or try again.
+Heavy operations like `analyze_classloader_leaks` or `capture_heap_dump` may take time. Ask the model to wait or try again.
