@@ -94,7 +94,7 @@ public final class Lz4RawDecompressor {
                 break;
             }
 
-            // fast copy. We may overcopy but there's enough room in input and output to not overrun them
+            // Fast copy (may overcopy but safe)
             int index = 0;
             do {
                 UnsafeMemory.putLong(outputBase, output, UnsafeMemory.getLong(inputBase, input));
@@ -136,8 +136,7 @@ public final class Lz4RawDecompressor {
 
             long matchOutputLimit = output + matchLength;
 
-            // at this point we have at least 12 bytes of space in the output buffer
-            // due to the fastLimit check before copying a literal, so no need to check again
+            // At least 12 bytes available (fastLimit check ensures this)
 
             // copy repeated sequence
             if (offset < SIZE_OF_LONG) {

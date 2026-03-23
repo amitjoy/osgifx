@@ -226,8 +226,7 @@ public final class PropertiesForm {
         final var formContent = new FormContent(content);
         formContent.txtKey.setText(key);
 
-        // This is a bit tricky since FormContent encapsulates the fields heavily,
-        // but we can try to find the combobox and value field.
+        // Find combobox and value field in encapsulated FormContent
         for (final Node n : formContent.getChildren()) {
             if (n instanceof ComboBox) {
                 @SuppressWarnings("unchecked")

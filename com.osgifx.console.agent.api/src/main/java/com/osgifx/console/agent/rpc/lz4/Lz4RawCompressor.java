@@ -242,7 +242,7 @@ public final class Lz4RawCompressor {
 
         int remaining = (int) (inputLimit - inputAddress);
 
-        // first, compare long at a time
+        // Compare long at a time
         int count = 0;
         while (count < remaining - (SIZE_OF_LONG - 1)) {
             long diff = UnsafeMemory.getLong(inputBase, match) ^ UnsafeMemory.getLong(inputBase, input);

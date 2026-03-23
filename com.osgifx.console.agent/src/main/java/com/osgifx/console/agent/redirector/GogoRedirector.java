@@ -118,7 +118,7 @@ public final class GogoRedirector implements Redirector {
     private <T> T proxy(final Class<T> clazz, final Object target) {
         final Class<?> targetClass = target.getClass();
 
-        // We could also be in the same class space, in that case we can just return the value
+        // Same class space - no proxy needed
         if (targetClass == clazz) {
             return clazz.cast(target);
         }
