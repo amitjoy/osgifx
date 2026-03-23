@@ -1,5 +1,6 @@
 -buildpath          : biz.aQute.bndlib;packages=*,\
                       biz.aQute.bnd.util;packages=*,\
+                      com.osgifx.console.assets.common,\
                       org.apache.commons.lang3,\
                       org.apache.felix.converter,\
                       org.eclipse.fx.core,\
