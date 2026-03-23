@@ -79,7 +79,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         MethodHandle               parameter      = null;
         MethodHandle               collectionType = null;
         try {
-            // Attempt to resolve R7+ fields safely
+            // Resolve R7+ fields
             failure        = lookup.findGetter(ComponentConfigurationDTO.class, "failure", String.class);
             parameter      = lookup.findGetter(ReferenceDTO.class, "parameter", Integer.class);
             collectionType = lookup.findGetter(ReferenceDTO.class, "collectionType", String.class);
@@ -114,7 +114,6 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
                                               @Override
                                               public ServiceComponentRuntime addingService(final ServiceReference<ServiceComponentRuntime> reference) {
                                                   final ServiceComponentRuntime service = context.getService(reference);
-                                                  // Trigger immediate update on start
                                                   scheduleUpdate(getChangeCount(reference));
                                                   return service;
                                               }
@@ -122,16 +121,12 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
                                               @Override
                                               public void modifiedService(final ServiceReference<ServiceComponentRuntime> reference,
                                                                           final ServiceComponentRuntime service) {
-                                                  // This is the heartbeat of the system.
-                                                  // Every time 'service.changecount' increments, the timer is reset.
                                                   scheduleUpdate(getChangeCount(reference));
                                               }
 
                                               @Override
                                               public void removedService(final ServiceReference<ServiceComponentRuntime> reference,
                                                                          final ServiceComponentRuntime service) {
-                                                  // Critical: Clear cache immediately if SCR stops.
-                                                  // Prevents UI from showing "ghost" components that no longer exist.
                                                   invalidate();
                                                   context.ungetService(reference);
                                               }
@@ -155,7 +150,6 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         }
         final List<XComponentDTO> allDTOs = new ArrayList<>();
 
-        // Optimization: Iterate descriptions directly
         for (final ComponentDescriptionDTO desc : scr.getComponentDescriptionDTOs()) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
@@ -200,12 +194,12 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
             return createResult(SKIPPED, serviceUnavailable(SCR));
         }
 
-        // Optimization 1: Locate cached info
+        // Locate cached info
         final XComponentDTO cachedDto = findCachedDTO(id);
 
         Collection<ComponentDescriptionDTO> descriptionDTOs = null;
 
-        // Optimization 2: Surgical Lookup
+        // Surgical lookup if cached
         if (cachedDto != null) {
             final Bundle bundle = context.getBundle(cachedDto.registeringBundleId);
             if (bundle != null) {
@@ -213,7 +207,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
             }
         }
 
-        // Fallback: Full scan if cache is stale or missing
+        // Full scan if cache miss
         if (descriptionDTOs == null) {
             descriptionDTOs = scr.getComponentDescriptionDTOs();
         }
@@ -221,9 +215,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         final StringBuilder builder = new StringBuilder();
 
         for (final ComponentDescriptionDTO dto : descriptionDTOs) {
-            // Optimization 3: NAME CHECK
-            // If we found the cached DTO, we KNOW the component name.
-            // Skip all descriptions that don't match.
+            // Skip non-matching component names when cached
             if (cachedDto != null && !dto.name.equals(cachedDto.name)) {
                 continue;
             }
@@ -529,7 +521,7 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         ref.fieldOption   = reference.fieldOption;
         ref.scope         = reference.scope;
 
-        // Fast R7 access
+        // R7 field access
         ref.parameter      = getR7FieldInt(reference, PARAMETER_GETTER);
         ref.collectionType = getR7FieldString(reference, COLLECTION_TYPE_GETTER);
         return ref;
@@ -557,8 +549,6 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
             return "";
         }
 
-        // Optimization: Use ArrayList + StringBuilder instead of HashSet + String.join
-        // This avoids calculating hash codes for object classes (which are just strings)
         final List<String> allClasses = new ArrayList<>();
         for (final ServiceReferenceDTO dto : services) {
             if (dto.properties != null) {
@@ -574,7 +564,6 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
             }
         }
 
-        // Fast String Join
         if (allClasses.isEmpty()) {
             return "";
         }
@@ -588,7 +577,6 @@ public final class XComponentAdmin extends AbstractSnapshotAdmin<XComponentDTO> 
         return sb.toString();
     }
 
-    // Optimization: Handle primitive arrays robustly
     private String arrayToString(final Object value) {
         if (value == null) {
             return "null";

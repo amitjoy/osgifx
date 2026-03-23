@@ -1006,8 +1006,7 @@ public final class AgentServer implements Agent, Closeable {
     public long estimateHeapdumpSize() {
         final Runtime runtime    = Runtime.getRuntime();
         final long    usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        // Estimate compressed size: GZIP typically achieves 20-30% compression for heap dumps
-        // We use 25% as a conservative estimate
+        // GZIP compression estimate: 25% of heap size
         return (long) (usedMemory * 0.25);
     }
 

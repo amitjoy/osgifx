@@ -218,8 +218,7 @@ public final class GraphFxBundleController implements GraphController {
         });
         try {
             final var dotFile = new File(location, generateDotFileName("Bundles"));
-            // Cast to raw Graph first to bypass generic type checks, then to the specific type expected by exporter
-            // This is safe because we are only reading from the graph and GraphEdge extends DefaultEdge
+            // Raw cast for exporter compatibility (GraphEdge extends DefaultEdge)
             exporter.exportGraph((Graph) currentGraph, dotFile);
         } catch (final ExportException e) {
             logger.atError().withException(e).log("Cannot export the graph to '%s'", location);
