@@ -1,3 +1,2 @@
 tasks.named('wrapper') {
-  jarFile = rootProject.file('.gradle-wrapper/gradle-wrapper.jar')
 }
