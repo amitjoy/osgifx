@@ -81,10 +81,11 @@ To secure sockets, set:
 
 **2. MQTT Connection**
 Install `in.bytehue.messaging.mqtt5.provider.jar`.
-<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; align-items: center;">
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; margin-bottom: 1.5rem; align-items: center;">
   <a href="https://central.sonatype.com/artifact/in.bytehue/in.bytehue.messaging.mqtt5.provider/1.1.0" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">Download MQTT JAR</a>
   <a href="https://github.com/amitjoy/osgi-messaging" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">OSGi Messaging Project</a>
 </div>
+
 *   Configure `in.bytehue.messaging.client` PID.
 *   Set Agent Properties:
     *   `osgi.fx.agent.mqtt.pubtopic`: Topic for agent responses.
