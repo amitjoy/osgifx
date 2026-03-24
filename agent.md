@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Agent
+title: Remote Agent
 permalink: /agent
 ---
 
-# OSGi.fx Remote Agent
+# Remote Agent
 
 The **OSGi.fx Remote Agent** is a lightweight, high-performance management agent designed to run inside a target OSGi framework. It acts as the bridge between the remote runtime and the **OSGi.fx Desktop Console**, enabling deep introspection, real-time diagnostics, and lifecycle management of OSGi systems.
 
