@@ -33,27 +33,24 @@ The agent is designed for broad compatibility across legacy and modern environme
 
 The agent is split into three OSGi bundles for clean separation of concerns:
 
-### `com.osgifx.console.agent.api`
-The architectural contract defining:
-- **`Agent` / `AgentSnapshot`**: Primary management interfaces for control and inspection
-- **`dto`**: Comprehensive DTO suite optimized for minimal serialization footprints
-- **`rpc`**: Binary codec (`BinaryCodec`), LZ4 compression (`Lz4Codec`), transport abstractions, and `SnapshotDecoder`
-- **`spi`**: Extension points (`AgentExtension`, `LargePayloadHandler`) for custom logic
+- **`com.osgifx.console.agent.api`**: The architectural contract defining:
+  - **`Agent` / `AgentSnapshot`**: Primary management interfaces for control and inspection
+  - **`dto`**: Comprehensive DTO suite optimized for minimal serialization footprints
+  - **`rpc`**: Binary codec (`BinaryCodec`), LZ4 compression (`Lz4Codec`), transport abstractions, and `SnapshotDecoder`
+  - **`spi`**: Extension points (`AgentExtension`, `LargePayloadHandler`) for custom logic
 
-### `com.osgifx.console.agent`
-The core implementation containing:
-- **`admin`**: Domain-specific managers (Bundles, Components, Configurations, Services, Conditions, etc.)
-- **`redirector`**: I/O hijacking engine for multi-mode terminal proxies (Console, Gogo, Socket, Telnet)
-- **`provider`**: Agent server, binary log buffer, classloader leak detector, startup time calculator
-- **`starter`**: Zero-dependency `Activator` and Gogo command bridge
-- **`helper`**: Utility classes for OSGi compendium service detection and agent operations
+- **`com.osgifx.console.agent`**: The core implementation containing:
+  - **`admin`**: Domain-specific managers (Bundles, Components, Configurations, Services, Conditions, etc.)
+  - **`redirector`**: I/O hijacking engine for multi-mode terminal proxies (Console, Gogo, Socket, Telnet)
+  - **`provider`**: Agent server, binary log buffer, classloader leak detector, startup time calculator
+  - **`starter`**: Zero-dependency `Activator` and Gogo command bridge
+  - **`helper`**: Utility classes for OSGi compendium service detection and agent operations
 
-### `com.osgifx.console.agent.di`
-Standalone micro-DI container:
-- **JSR-330 compliant**: Full support for `@Inject`, `@Singleton`, and `Provider<T>`
-- **Lambda-accelerated**: Injection optimized via `LambdaMetafactory` for high-speed instantiation
-- **Zero dependencies**: Operates without OSGi SCR, making it portable across minimal runtimes
-- **Dynamic binding**: Runtime binding of interfaces to implementations and custom providers
+- **`com.osgifx.console.agent.di`**: Standalone micro-DI container:
+  - **JSR-330 compliant**: Full support for `@Inject`, `@Singleton`, and `Provider<T>`
+  - **Lambda-accelerated**: Injection optimized via `LambdaMetafactory` for high-speed instantiation
+  - **Zero dependencies**: Operates without OSGi SCR, making it portable across minimal runtimes
+  - **Dynamic binding**: Runtime binding of interfaces to implementations and custom providers
 
 ---
 
