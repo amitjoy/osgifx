@@ -8,9 +8,12 @@ permalink: /eclipse-plugin
 
 Experience **OSGi.fx** directly within your development environment with the **[OSGi.fx Eclipse Plugin](https://github.com/amitjoy/osgifx-eclipse-plugin)**.
 
-<div style="text-align: center; margin: 2rem 0;">
-  <a href="https://marketplace.eclipse.org/content/osgifx" class="btn btn-primary" target="_blank" style="font-size: 1.25rem; padding: 1rem 2rem;">
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 2rem 0;">
+  <a href="https://marketplace.eclipse.org/content/osgifx" class="btn btn-primary" target="_blank" style="font-size: 1.2rem; padding: 0.75rem 1.5rem;">
     View on Eclipse Marketplace
+  </a>
+  <a href="https://github.com/amitjoy/osgifx-eclipse-plugin" class="btn btn-secondary" target="_blank" style="font-size: 1.2rem; padding: 0.75rem 1.5rem;">
+    View on GitHub
   </a>
 </div>
 
