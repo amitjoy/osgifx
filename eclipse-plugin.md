@@ -4,7 +4,7 @@ title: Eclipse Plugin
 permalink: /eclipse-plugin
 ---
 
-# OSGi.fx Eclipse Plugin
+# Eclipse Plugin
 
 Experience **OSGi.fx** directly within your development environment with the **[OSGi.fx Eclipse Plugin](https://github.com/amitjoy/osgifx-eclipse-plugin)**.
 
