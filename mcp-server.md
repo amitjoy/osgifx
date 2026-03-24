@@ -4,7 +4,7 @@ title: MCP Server
 permalink: /mcp-server
 ---
 
-# OSGi.fx Console MCP Server
+# MCP Server
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server that connects LLMs (like Claude) to a running OSGi framework. This allows you to diagnose, monitor, and debug remote OSGi runtimes using natural language.
 
