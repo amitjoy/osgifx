@@ -6,7 +6,7 @@ permalink: /extension-dev
 
 # Extension Development
 
-External plugins or extensions can easily be developed for **OSGi.fx**. Since `OSGi.fx` has itself been developed using **OSGi** and **Eclipse e4**, you can easily leverage their modular capabilities to build your own extensions.
+External plugins or extensions can easily be developed for **OSGi.fx**. Since **OSGi.fx** has itself been developed using **OSGi** and **Eclipse e4**, you can easily leverage their modular capabilities to build your own extensions.
 
 ## Getting Started
 
