@@ -2,7 +2,7 @@
   <properties size="4">
     <property name="publishPackFilesAsSiblings" value="true"/>
     <property name="p2.compressed" value="true"/>
-    <property name="p2.timestamp" value="1774353683145"/>
+    <property name="p2.timestamp" value="1774383206233"/>
     <property name="pgp.publicKeys" value="-----BEGIN PGP PUBLIC KEY BLOCK-----&#10;&#10;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&#10;40O1fX8h&#10;=fr4v&#10;-----END PGP PUBLIC KEY BLOCK-----&#10;"/>
   </properties>
   <mappings size="5">
@@ -12,61 +12,36 @@
     <rule filter="(&amp; (classifier=org.eclipse.update.feature) (format=packed))" output="${repoUrl}/features/${id}_${version}.jar.pack.gz"/>
     <rule filter="(&amp; (classifier=org.eclipse.update.feature))" output="${repoUrl}/features/${id}_${version}.jar"/>
   </mappings>
-  <artifacts size="4">
+  <artifacts size="2">
     <artifact classifier="osgi.bundle" id="com.osgifx.eclipse.plugin" version="1.0.0">
       <properties size="12">
-        <property name="artifact.size" value="73935"/>
-        <property name="download.size" value="73935"/>
+        <property name="artifact.size" value="338569"/>
+        <property name="download.size" value="338569"/>
         <property name="maven-groupId" value="com.osgifx"/>
         <property name="maven-artifactId" value="com.osgifx.eclipse.plugin"/>
         <property name="maven-version" value="1.0.0"/>
         <property name="maven-type" value="eclipse-plugin"/>
-        <property name="download.md5" value="6fedf328556309c9667298babd81f75f"/>
-        <property name="download.checksum.sha-512" value="cc830f2d028a3aac220fa7bf46a8447b42aba7386903d9f2dcde02029ae980f02d271d3c8dedd3eb4b6acc404e0a4b6a73a267b243ce82576e842484472f0443"/>
-        <property name="download.checksum.md5" value="6fedf328556309c9667298babd81f75f"/>
-        <property name="download.checksum.sha-256" value="6e9eea599a272e511c7fa84a9fa79a5e774af3c1167a169fa62c585f7b9d31c3"/>
-        <property name="pgp.signatures" value="-----BEGIN PGP SIGNATURE-----&#10;&#10;iQIzBAABCgAdFiEEebntwBmIJ3gf2ejWrQmcbuBEhLwFAmnCfRQACgkQrQmcbuBE&#10;hLzB2A/+NnV+sXkpU/Uh8Zq4+21hvXHQCnU7fYL0g6dXiD2iGtlf2czVSFP2YZ8r&#10;9tXCfuQ2zbfbNrf9sD4DQbHdnS5ZuuxuOn5xunYlPgqrkRFldfSfjV3VS1EujDWi&#10;4RFFbW9LcNjSdjsn5+rJqD01kWoAyM1zj17U7ukpWghWpFEj9DT9AlkXO/qFhICz&#10;meBGe3xIFyffm983Vo9TmItv4uHUfgfiINCHDBuHzWSNekPYuPL6EjNfoTKdOR5D&#10;70BLliCVkH2JCT2aR2w/UvXP7amQW1QercjUqkv9UY9MWr3a8+Sm6GsIfP6PFbi1&#10;bMfwWuXqwa39+1WFM7GFlRBY0YZgiwoqGQ0I3i97E+KlBtOhcxqJQMm5xqrPORH5&#10;LWV0bGKmrPBNYH6ayCiJ+R4DBhzqpDSLMieGssKi3WRTwX5Psl9e7MiWLSS2xvae&#10;x/tqrUhs2bPrsclGByJeTQveWOuk7wUQhCyYXTVa1rqSnK6N4cNREVZmun2CDCR0&#10;tWoqrDmzTIQxgLr1ojJumo9MMdpZmH4OUGohGJd738alMbwkKY6MGddA/9QmLf/Y&#10;A44TMPfwnJqt3ZCL888RuGYNU6lbMdC87mrSrdF4VWk5pvTIVCB4dksxKNN0lxuF&#10;CREAMRYokrddJ2ZhlhW4Ji8ZXARyfQvEdr0YJ7jfJT5ZfdzfW/c=&#10;=c/o/&#10;-----END PGP SIGNATURE-----&#10;"/>
+        <property name="download.md5" value="9e4aa5d6f80ef0292b275ecc209a485a"/>
+        <property name="download.checksum.sha-512" value="d94a071dab07d29ad0a2ac254b2eb2b21331cc2ab3c3f49d2ef23e781041731f6e625efadcd9d292027f2911bf432d2008ea434868433274eb6bee26fb85be5c"/>
+        <property name="download.checksum.md5" value="9e4aa5d6f80ef0292b275ecc209a485a"/>
+        <property name="download.checksum.sha-256" value="4ddaca63ae5a3df88f0fae38ce52ada4f62e6db2ec4f0516ee5de9f880bc4655"/>
+        <property name="pgp.signatures" value="-----BEGIN PGP SIGNATURE-----&#10;&#10;iQIzBAABCgAdFiEEebntwBmIJ3gf2ejWrQmcbuBEhLwFAmnC8GcACgkQrQmcbuBE&#10;hLyTnBAAxWAxZJn6kWdyn/IeIYjxQs61Hd883houLn6Kurjc8uynZy8y72V5DwKv&#10;bq5gszRKNxYznC4kJAzs1OYEWOcVhSeZnE0f04FwHsw09/j2ftL7KmGYoZNJfEL5&#10;g+P7v2sy6+HnFXjX2zMxMJJvvfm2huY7AVcYSSgDno+XwMBhXiHbBMsPDZHpikPW&#10;r534bLeMKcR45rYiL0a+ykUH7IJYL3v6+f5MNKZdnkv6kApXwFJpkqctCy+kAdgw&#10;X03tWyZA7AuoNn6ZdeHeAEr71X9kwvViIrmLPR3Puy0yPdqTwYvTtIYUI86cxHQ5&#10;rHPOrAr9gS4Bz1nvBEhCxnNpi/rKYFxLXAOv3kIr6d6L26cORH3SuZd8lPfEhxB3&#10;UCCAvIW+LyIk05yefAHZTVa2FT/JEd6d+UkS2A+islx1dn+AiNTjLbST9gfUFyac&#10;2N6aKZEBiGFpbNXHgzhN/zVSHylZsuJ1+vg2DNOo0T3w3zsx8QG+nIZKcu9lUtFL&#10;ElYScFCf7ydf6pDR+7PJQGS/DcfWKIg8uzhNkIk1wPi3jbKXDG3D7oFbRI9j6Sxq&#10;A1kThMQKpKbOZgDQu48ZMACskzttIsho4cj39FU3DDKAiaq6Ffx1FVEeefplBH/a&#10;JgO+ulB2tOz3gTbHUj6XqdQskpMg44OlnsmHWhk1kc8LdZ7IvMQ=&#10;=+8Ja&#10;-----END PGP SIGNATURE-----&#10;"/>
         <property name="pgp.publicKeys" value="-----BEGIN PGP PUBLIC KEY BLOCK-----&#10;&#10;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&#10;40O1fX8h&#10;=fr4v&#10;-----END PGP PUBLIC KEY BLOCK-----&#10;"/>
       </properties>
     </artifact>
     <artifact classifier="org.eclipse.update.feature" id="com.osgifx.eclipse.feature" version="1.0.0">
       <properties size="11">
-        <property name="artifact.size" value="1136"/>
-        <property name="download.size" value="1136"/>
+        <property name="artifact.size" value="1056"/>
+        <property name="download.size" value="1056"/>
         <property name="maven-groupId" value="com.osgifx"/>
         <property name="maven-artifactId" value="com.osgifx.eclipse.feature"/>
         <property name="maven-version" value="1.0.0"/>
         <property name="maven-type" value="eclipse-feature"/>
         <property name="download.contentType" value="application/zip"/>
-        <property name="download.md5" value="0270042c0b56e97939fb6996d5373c13"/>
-        <property name="download.checksum.sha-512" value="305829ddd41b4156559e09e10cd247bcac91474c467cec979c44c3c47d77dc2e1cf265016f6ac3707818d79ef61ceeac6c600701690042b8d2897d60df1e2df7"/>
-        <property name="download.checksum.md5" value="0270042c0b56e97939fb6996d5373c13"/>
-        <property name="download.checksum.sha-256" value="11ab308683110d827250c4d2587e927811a49a68af60e6c446905174b3632842"/>
-      </properties>
-    </artifact>
-    <artifact classifier="osgi.bundle" id="com.google.gson" version="2.8.2.v20180104-1110">
-      <properties size="11">
-        <property name="artifact.size" value="259868"/>
-        <property name="download.size" value="259868"/>
-        <property name="download.md5" value="a4bcfd161d43f14cc26e751cd5c75270"/>
-        <property name="download.checksum.md5" value="a4bcfd161d43f14cc26e751cd5c75270"/>
-        <property name="download.checksum.sha-256" value="da52286d82d1415ff469fbe2f9360ea8b162bbd8dab2a207a445b41803d7a47f"/>
-        <property name="maven-version" value="2.8.2-SNAPSHOT"/>
-        <property name="maven-artifactId" value="com.google.gson"/>
-        <property name="maven-extension" value="jar"/>
-        <property name="maven-groupId" value="org.eclipse.orbit.bundles"/>
-        <property name="maven-type" value="eclipse-plugin"/>
-        <property name="download.checksum.sha-512" value="f633b1b3ead89e9d8b81bd0eccbd974d18dbd1a711f597b99d82568e3b8e3cc365aeba15dccf262ee0d440c493577e5850f5a443e422640b3175a97b2ef91fb7"/>
-      </properties>
-    </artifact>
-    <artifact classifier="osgi.bundle" id="org.apache.commons.lang" version="2.6.0.v201404270220">
-      <properties size="6">
-        <property name="artifact.size" value="298623"/>
-        <property name="download.size" value="298623"/>
-        <property name="download.md5" value="b829a6c694dcbd23eac502a7d8aad072"/>
-        <property name="download.checksum.sha-512" value="ab4f9bb47819df78c6c30e1a859ec537df860d9c88841a0c6f7a74c7cdd5867d07bbb87e4da1c1ffe45b2c7014f2168c96da31749349793e9ca2ae5e4af337c8"/>
-        <property name="download.checksum.md5" value="b829a6c694dcbd23eac502a7d8aad072"/>
-        <property name="download.checksum.sha-256" value="b37d5583dd3c73c69030bb7433509cc2f00bf4de282e90f6d9f724528da13b2a"/>
+        <property name="download.md5" value="ddb1ede6a455ca7e32a24e93b2529835"/>
+        <property name="download.checksum.sha-512" value="7e050e26c8eca1a5ef03b7d7c6575cb1432da753945a401af3a34eef3edca156386cfef57478c0d3f4a0810c07f20eed33d8195ac35992f59b5f6cf7fdef7bed"/>
+        <property name="download.checksum.md5" value="ddb1ede6a455ca7e32a24e93b2529835"/>
+        <property name="download.checksum.sha-256" value="0577f0c6ab639bcfc17496e73cafcade6d12b53ccd78202dcd1885999123b022"/>
       </properties>
     </artifact>
   </artifacts>
