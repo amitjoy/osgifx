@@ -4,7 +4,7 @@ title: Home
 ---
 
 <div style="text-align: center; margin-bottom: 0;">
-  <img width="300" alt="OSGi.fx Logo" src="assets/img/logo.png" style="box-shadow: none; border-radius: 0;" />
+  <img width="300" alt="OSGi.fx Logo" src="assets/img/logo.png" class="no-zoom" style="box-shadow: none; border-radius: 0;" />
   <br/>
   <p style="font-size: 1.25rem; color: var(--text-light); margin-top: 1rem; margin-bottom: 0;">An easy-to-use desktop application to manage OSGi frameworks remotely</p>
 </div>
