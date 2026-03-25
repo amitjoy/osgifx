@@ -23,6 +23,7 @@
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* Global Reset */
@@ -108,7 +109,13 @@ header h1 {
 }
 
 header h1 a {
-  color: var(--text-color);
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   text-decoration: none;
 }
 
@@ -341,15 +348,66 @@ pre code {
 }
 
 /* Syntax Highlighting for Dark Background (Rouge) */
-pre .k, pre .kd, pre .kp, pre .kt { color: #818cf8; font-weight: 500; } /* keywords */
-pre .nf, pre .fm { color: #38bdf8; } /* functions */
-pre .nc, pre .nt { color: #fbbf24; } /* class / tags */
-pre .s, pre .s1, pre .s2, pre .sc { color: #34d399; } /* strings */
-pre .c, pre .c1, pre .cm { color: #64748b; font-style: italic; } /* comments */
-pre .m, pre .mi, pre .mf { color: #f472b6; } /* numbers */
-pre .o, pre .ow { color: #94a3b8; } /* operators */
-pre .nd { color: #a78bfa; } /* decorators */
-pre .na { color: #818cf8; } /* attributes */
+pre .k,
+pre .kd,
+pre .kp,
+pre .kt {
+  color: #818cf8;
+  font-weight: 500;
+}
+
+/* keywords */
+pre .nf,
+pre .fm {
+  color: #38bdf8;
+}
+
+/* functions */
+pre .nc,
+pre .nt {
+  color: #fbbf24;
+}
+
+/* class / tags */
+pre .s,
+pre .s1,
+pre .s2,
+pre .sc {
+  color: #34d399;
+}
+
+/* strings */
+pre .c,
+pre .c1,
+pre .cm {
+  color: #64748b;
+  font-style: italic;
+}
+
+/* comments */
+pre .m,
+pre .mi,
+pre .mf {
+  color: #f472b6;
+}
+
+/* numbers */
+pre .o,
+pre .ow {
+  color: #94a3b8;
+}
+
+/* operators */
+pre .nd {
+  color: #a78bfa;
+}
+
+/* decorators */
+pre .na {
+  color: #818cf8;
+}
+
+/* attributes */
 
 code.highlighter-rouge {
   background-color: #f1f5f9;
