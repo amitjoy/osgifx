@@ -383,7 +383,7 @@ byte[] logSnapshot = logBuffer.snapshot(fiveMinsAgo, Long.MAX_VALUE);
 // Result is a packed binary blob, ready for LZ4 compression and transmission
 ```
 
-#### 5. Advanced Path Resolution & Variable Substitution
+#### Advanced Path Resolution & Variable Substitution
 The agent provides a powerful variable substitution engine for all filesystem-related RPC calls (Heap Dumps, Snapshots, Data-File retrieval). Paths can contain placeholders that are resolved against System Properties, Framework Properties, or Environment Variables.
 
 **Supported Placeholders:**
@@ -419,8 +419,8 @@ The agent provides a flexible **Redirection SPI** (`com.osgifx.console.agent.red
 
 - **Gogo Redirector** (`COMMAND_SESSION` / `-1`): Connects a remote Gogo `CommandSession` to the Supervisor's terminal. Uses proxied access to Gogo APIs to avoid classloader constraints.
 - **Console Redirector** (`CONSOLE` / `-2`): Captures `System.out` and `System.err` and streams them as remote events.
-- **Socket Redirector** (`PORT`): Pipes I/O directly over the active agent socket or a dedicated secondary port.
-- **Telnet Redirector** (`PORT`): Acts as a transparent bridge. If the agent detects a Telnet-based shell (e.g. Felix Shell TUI) running on a specific port, it connects to it and pipes I/O through the RPC channel.
+- **Socket Redirector** (`SOCKET`): Pipes I/O directly over the active agent socket or a dedicated secondary port.
+- **Telnet Redirector** (`TELNET`): Acts as a transparent bridge. If the agent detects a Telnet-based shell (e.g. Felix Shell TUI) running on a specific port, it connects to it and pipes I/O through the RPC channel.
 - **Null Redirector** (`NONE` / `0`): Silently discards I/O or detaches active redirectors.
 
 This sub-system leverages the `redirect(int port)` and `stdin(String)` remote APIs to hook into and push characters to the chosen backend stream.
@@ -599,7 +599,7 @@ The agent can be dynamically reconfigured at runtime without restarting the bund
 | `osgifx:startSocket` | `osgifx:startSocket [port=X host=Y]` | Starts the socket server with optional overrides. |
 | `osgifx:stopSocket` | `osgifx:stopSocket` | Gracefully shuts down the socket server. |
 | `osgifx:startMqtt` | `osgifx:startMqtt [provider=A pubTopic=B subTopic=C]` | Starts the MQTT bridge. |
-| `osgifx:stopMqtt` | `osgifx:stopMqtt` | shuts down the MQTT bridge. |
+| `osgifx:stopMqtt` | `osgifx:stopMqtt` | Shuts down the MQTT bridge. |
 | `osgifx:status` | `osgifx:status` | Displays running endpoints and active configs. |
 
 **Pro Tip:** You can change the RPC behavior on-the-fly:
@@ -616,4 +616,9 @@ The agent is designed to be "Future-Proof" and compatible with Java 8 through Ja
 - **Zero-Dependency Core**: It does not depend on any third-party libraries (except the optional MQTT provider), making it immune to "Dependency Hell".
 
 ---
-© 2021-2026 Amit Kumar Mondal. Licensed under the Apache License, Version 2.0.
+
+### Related Pages
+
+*   [MCP Server Documentation](/mcp-server)
+*   [Extension Development](/extension-dev)
+*   [Getting Started](/)

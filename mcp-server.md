@@ -27,7 +27,7 @@ The MCP server is built into the **OSGi.fx** application.
 3.  Navigate to the **MCP** tab.
 4.  Click **Start MCP Server**.
     *   *Note:* The button is disabled if the agent is not connected.
-5.  The server will start on port `8080` (default) or your configured port.
+5.  The server will start on port `8080` (default).
 
 ### 2. Server Management
 *   **Start/Stop:** Use the toggle button to control the server.
@@ -102,7 +102,7 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 
 ## System Prompt / Guiding Principles
 
-When configuring your LLM (e.g., Claude), provides these principles to ensure safe and effective operation:
+When configuring your LLM (e.g., Claude), use these principles to ensure safe and effective operation:
 
 ```markdown
 ### Guiding Principles
@@ -119,6 +119,9 @@ When configuring your LLM (e.g., Claude), provides these principles to ensure sa
 
 *   **Restricted Commands:** State-changing Gogo commands (e.g., `stop`, `uninstall`, `update`) are **blocked** in `run_gogo_command` to encourage using the dedicated tools (`stop_bundle`).
 *   **Heap Dumps:** The `capture_heap_dump` tool returns large binary blobs; ensure your client can handle them.
+*   **No Authentication:** By default, the MCP server does not require authentication as it only listens on `localhost`. Ensure your host is appropriately secured if exposing it further.
+
+---
 
 ## Troubleshooting
 
@@ -127,3 +130,10 @@ Ensure the OSGi Agent bundle is installed and running on the target framework an
 
 **"Tool execution timed out"**
 Heavy operations like `analyze_classloader_leaks` or `capture_heap_dump` may take time. Ask the model to wait or try again.
+
+---
+
+### Related Pages
+
+*   [Remote Agent Documentation](/agent) — learn how the agent connects to your OSGi framework.
+*   [Getting Started](/)

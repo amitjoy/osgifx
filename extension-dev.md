@@ -10,14 +10,16 @@ External plugins or extensions can easily be developed for **OSGi.fx**. Since **
 
 ## Getting Started
 
-Please have a look at how the bundles with `com.osgifx.console.ui.*` project name pattern are developed. 
+See how the bundles with the `com.osgifx.console.ui.*` project name pattern are developed as a reference.
 
 > [!TIP]
 > As a starting point, refer to the sample [Tic-Tac-Toe Extension](https://github.com/amitjoy/osgifx/tree/main/com.osgifx.console.extension.ui.tictactoe).
 
 ## Installation
 
-Once the extension is developed, you can test it by installing it from the `Actions -> Install Extension` menu option.
+Once the extension is developed, install it via **`Actions -> Install Extension`** in the OSGi.fx menu.
+
+---
 
 ## Deployment Packages
 
@@ -26,7 +28,9 @@ To develop an extension, you need to provide an **OSGi Deployment Package** arch
 
 ## Developer Workspace
 
-For ease of development, you can use the **OSGi.fx workspace** to further develop your own extensions. The workspace comprises a new bnd plugin which will enable you to automatically generate a deployment package from a `bndrun` file.
+For ease of development, use the **[OSGi.fx workspace](https://github.com/amitjoy/osgifx)** to build your own extensions. The workspace includes a bnd plugin that automatically generates a deployment package from a `bndrun` file.
+
+---
 
 ## Agent Extension SPI
 
@@ -68,7 +72,7 @@ public class MyExtension implements AgentExtension<Map<String, Object>, Map<Stri
 }
 ```
 
-The supervisor can then invoke your extension via `agent.executeExtension("my-custom-extension", context)`.
+The [supervisor (OSGi.fx)](/agent) can then invoke your extension via `agent.executeExtension("my-custom-extension", context)`.
 
 ---
 
@@ -144,3 +148,10 @@ public class S3PayloadHandler implements LargePayloadHandler {
     }
 }
 ```
+
+---
+
+### Related Pages
+
+*   [Remote Agent Documentation](/agent) — full SPI reference and architecture details.
+*   [Getting Started](/)

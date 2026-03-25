@@ -6,7 +6,7 @@ permalink: /headless-launch
 
 # Headless Launch Configuration
 
-**OSGi.fx** supports a "Headless" launch mode, which allows you to start the application with a pre-defined connection configuration. This skips the initial connection wizard and automatically connects to the configured agent. The **Eclipse SWT Plugin** also uses the headless launcher internally to power its IDE integration.
+**OSGi.fx** supports a "Headless" launch mode, which allows you to start the application with a pre-defined connection configuration. This skips the initial connection wizard and automatically connects to the configured agent. It is particularly useful for scenarios where interactive setup is impractical. The **Eclipse Plugin** also uses the headless launcher internally to power its IDE integration.
 
 > [!NOTE]
 > "Headless" in this context means "without the connection wizard UI", not necessarily without any UI at all. The main application window will still open after connection.
@@ -61,15 +61,15 @@ The configuration file must be a valid JSON file. You can configure either a **S
 }
 ```
 
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `type` | String | Must be `SOCKET` |
-| `host` | String | The hostname or IP address of the OSGi agent |
-| `port` | Number | The port number of the OSGi agent |
-| `timeout` | Number | Connection timeout in milliseconds |
-| `password` | String | (Optional) Authentication password |
-| `trustStorePath` | String | (Optional) Path to the SSL truststore |
-| `trustStorePassword` | String | (Optional) Password for the SSL truststore |
+| Field | Type | Required | Description |
+| :--- | :--- | :---: | :--- |
+| `type` | String | ✅ | Must be `SOCKET` |
+| `host` | String | ✅ | The hostname or IP address of the OSGi agent |
+| `port` | Number | ✅ | The port number of the OSGi agent |
+| `timeout` | Number | ✅ | Connection timeout in milliseconds |
+| `password` | String | — | (Optional) Authentication password |
+| `trustStorePath` | String | — | (Optional) Path to the SSL truststore |
+| `trustStorePassword` | String | — | (Optional) Password for the SSL truststore |
 
 ### MQTT Connection Example
 
@@ -110,3 +110,11 @@ The configuration file must be a valid JSON file. You can configure either a **S
 | `pubTopic` | String | Topic to publish requests to |
 | `subTopic` | String | Topic to subscribe for responses |
 | `lwtTopic` | String | Last Will and Testament topic |
+
+---
+
+### Related Pages
+
+*   [Remote Agent Documentation](/agent) — full connectivity and transport configuration.
+*   [Eclipse Plugin](/eclipse-plugin) — uses headless launch internally.
+*   [Getting Started](/)
