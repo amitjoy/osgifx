@@ -210,4 +210,4 @@ Want to contribute? Great! Check out our **[Development Guide](/development)** f
 
 ### 📄 License
 
-This project is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+This project is licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache License, Version 2.0</a>.
