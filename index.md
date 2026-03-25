@@ -151,7 +151,7 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 
 ---
 
-### 🚀 OSGi.fx Client Features & Capabilities
+### 🚀 OSGi.fx Features & Capabilities
 
 OSGi.fx comes loaded with a plethora of features designed to make remote OSGi management seamless. While most of the options reflect standard capabilities expected by developers familiar with OSGi, several advanced features significantly enhance productivity and diagnostics.
 
