@@ -21,15 +21,18 @@ title: Home
 ---
 
 ### 📸 Gallery
+
+> Click any image to view it in full resolution.
+
 <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 2rem 0;">
-  <img src="screenshots/1.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/2.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/3.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/4.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/5.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/6.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/7.png" width="45%" style="border: 1px solid #e2e8f0;" />
-  <img src="screenshots/8.png" width="45%" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/1.png" width="45%" alt="OSGi.fx Screenshot 1" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/2.png" width="45%" alt="OSGi.fx Screenshot 2" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/3.png" width="45%" alt="OSGi.fx Screenshot 3" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/4.png" width="45%" alt="OSGi.fx Screenshot 4" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/5.png" width="45%" alt="OSGi.fx Screenshot 5" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/6.png" width="45%" alt="OSGi.fx Screenshot 6" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/7.png" width="45%" alt="OSGi.fx Screenshot 7" style="border: 1px solid #e2e8f0;" />
+  <img src="screenshots/8.png" width="45%" alt="OSGi.fx Screenshot 8" style="border: 1px solid #e2e8f0;" />
 </div>
 
 ---
@@ -56,10 +59,9 @@ The latest released version is **3.0.0**.
 Download and install the latest version for your platform
 
 > [!IMPORTANT]
-> **Important Notes for Download and Update:**
-> *   The required VM will directly be downloaded while installing the application using `jdeploy`.
-> *   If the auto-update feature is enabled, every new version will be automatically downloaded while starting the application.
-> *   **Storage Structure:** The `.osgifx-ws` directory now contains logs, OSGi storage, and your user connection settings. Configured connections are never lost!
+> *   The required VM will be downloaded automatically during installation via `jdeploy`.
+> *   If the auto-update feature is enabled, every new version will be downloaded automatically on launch.
+> *   **Storage Structure:** The `.osgifx-ws` directory contains logs, OSGi storage, and your connection settings. Configured connections are never lost!
 
 #### Remote Agent Setup
 
@@ -113,7 +115,7 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 | **🐚 Gogo Shell** <br> _Execute Gogo commands remotely_ | 2.4.4 | ✅ | 🚀 |
 | **💻 CLI Executor** <br> _Run system CLI commands directly_ | 2.4.4 | ✅ | 🚀 |
 | **✨ Smart Auto-Complete** <br> _Intelligent suggestion for remote Gogo commands_ | 2.4.4 | ✅ | 🚀 |
-| **📥 Bundle Manager** <br> _Install, update, starting and stopping bundles_ | 2.4.4 | ✅ | 🚀 |
+| **📥 Bundle Manager** <br> _Install, update, start and stop bundles_ | 2.4.4 | ✅ | 🚀 |
 | **🖱️ Drag & Drop Install** <br> _Effortless bundle installation via drag-and-drop_ | 2.4.4 | ✅ | 🚀 |
 | **🔧 Config Admin** <br> _Manage configurations via `ConfigurationAdmin`_ | 2.4.4 | ✅ | 🚀 |
 | **📋 Metatype Inspector** <br> _Browse OCDs and property descriptors_ | 2.4.4 | ✅ | 🚀 |
@@ -153,14 +155,14 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 
 ### 🚀 OSGi.fx Features & Capabilities
 
-OSGi.fx comes loaded with a plethora of features designed to make remote OSGi management seamless. While most of the options reflect standard capabilities expected by developers familiar with OSGi, several advanced features significantly enhance productivity and diagnostics.
+OSGi.fx offers a rich set of features designed to make remote OSGi management seamless. While most capabilities will be familiar to OSGi developers, several advanced features significantly enhance productivity and diagnostics.
 
 #### 🩺 Advanced Diagnostics
 *   **Thread Dump & Heap Dump**: Capture and analyze threads and heap memory directly from the remote runtime. Thread dumps assist in detecting deadlocks or CPU spikes natively, while heap dumps help pinpoint memory leaks. Heap dumps utilize the Large Payload Handling SPI for efficient transferring and local storage.
 *   **Snapshot Functionality**: Take a complete snapshot of the remote runtime state (bundles, services, components, properties, etc.). This is incredibly useful for capturing the state at a specific point in time, comparing multiple states to trace issues, attaching to bug reports, or reviewing the environment offline for root-cause analysis without requiring a persistent connection to the agent.
 
 #### ⚙️ Advanced Component Management
-*   **Conditions (with Injection)**: OSGi Declarative Services (DS) components often define conditions for activation. You can seamlessly inject these conditions directly from the UI to satisfy and simulate requirements, triggering component activations on demand. This is an awesome functionality for testing component lifecycles without writing any additional scaffolding code or manual configurations.
+*   **Conditions (with Injection)**: OSGi Declarative Services (DS) components often define conditions for activation. You can seamlessly inject these conditions directly from the UI to satisfy and simulate requirements, triggering component activations on demand. This is an elegant capability for testing component lifecycles without writing any additional scaffolding code or manual configurations.
 *   **Batch Operations**: Install multiple bundles and create multiple configurations simultaneously by selecting a directory or multiple JAR files in the Bundles tab. This drastically reduces the time needed to deploy updates, install third-party libraries, or set up a new remote environment. (*Note:* JSON files must comply with the [OSGi Configurator Specification](http://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.configurator.html).)
 
 #### 📢 Event Administration
@@ -208,4 +210,4 @@ Want to contribute? Great! Check out our **[Development Guide](/development)** f
 
 ### 📄 License
 
-This project is licensed under Apache License Version 2.0
+This project is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
