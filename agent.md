@@ -108,11 +108,6 @@ The agent's state-retrieval mechanism is built for **extreme efficiency** in hig
 The agent uses a custom-built, schema-less binary codec that outperforms standard Java serialization and JSON by orders of magnitude:
 *   **JIT-Inlined Raw Memory Access (With Graceful Fallback)**: Uses `sun.misc.Unsafe` wrapped seamlessly via `LambdaMetafactory`. This dynamically spins up `@FunctionalInterface` implementations at runtime invoking precise `MethodHandle`s, guaranteeing the HotSpot JIT compiler completely inlines the memory access. 
     *   **Future-Proof (`Java 25+`)**: Direct references to `sun.misc.Unsafe` break strict Gradle builds and module boundaries (`Jigsaw`) in modern JVMs. The agent strictly loads `Unsafe` dynamically via `Class.forName()`. If restricted or removed in future JVMs (like Java 25+), the agent implements a zero-exception **Standard Fallback** strategy. It gracefully degrades to standard `MethodHandle` unreflected getters/setters (`lookup.unreflectGetter()`). Crucially, these fallback handles are *also* passed through `LambdaMetafactory` to guarantee the exact same JIT inlining speed, executing natively without ever touching `sun.misc`.
-*   **Internal Micro-DI Engine (`com.osgifx.console.agent.di`)**: The agent does not rely on heavy frameworks like Spring or Guice, nor does it use native OSGi SCR for its internal plumbing. It utilizes a bespoke, zero-dependency Dependency Injection engine that supports:
-    *   **JSR-330 Compliance**: Full support for `@Inject`, `@Singleton`, and `Provider<T>`.
-    *   **Dynamic Binding**: Runtime binding of interfaces to implementations and custom providers.
-    *   **Lambda-Accelerated Injection**: Constructor and field injection are optimized to bypass standard reflection overhead where possible.
-    *   **Ultra-Portable**: Operates in environments where full OSGi component runtimes are unavailable or restricted.
 *   **Schema-less Payload**: Field names are never sent. Data is serialized in a deterministic order (sorted by field name), drastically reducing payload size.
 *   **Zero-Boxing**: Primitive fields (int, long, double, etc.) are packed directly into the binary stream without object allocation.
 *   **Non-Blocking I/O**: Utilizes internal `FastByteArray` streams that eliminate synchronization overhead and defensive array copies.
@@ -123,15 +118,7 @@ To prevent the agent from thrashing the CPU during high-frequency OSGi events (e
 *   **Hard Deadline**: 5000ms maximum wait. If events keep flooding in, the snapshot is forced at the deadline to ensure the Console isn't starved of data.
 *   **Change-Count Synchronization**: Snapshots are only recalculated if the internal `pendingChangeCount` exceeds the `lastChangeCount`, ensuring zero CPU cycles are wasted on redundant serializations.
 *   **Lazy Serialization**: Snapshots are encoded/compressed on a background thread and cached as immutable byte arrays, minimizing the duration of locks on core OSGi structures.
-
-
-Most data points (Bundles, Services, Configs) are served via a thread-safe caching mechanism:
-
-1.  **Change Detection**: The agent monitors framework change counts (e.g. `SERVICE_CHANGECOUNT`).
-2.  **Debouncing (200ms)**: During "event storms" (e.g., a burst of 50 service registrations), the agent waits for a 200ms silence period before triggering a re-snapshot.
-3.  **The Deadline (5s)**: If the system is in constant flux and never reaches the "silence" threshold, a snapshot is forced every 5 seconds to ensure the remote UI stays reasonably fresh.
-4.  **Atomic Binary Cache**: The resulting `byte[]` is stored in an `AtomicReference`.
-    *   **Direct-to-Wire**: If a supervisor requests the same data multiple times, the agent sends the *same byte array* directly to the socket/MQTT link. **Zero serialization** is performed for subsequent requests until the next framework change.
+*   **Atomic Binary Cache**: The resulting `byte[]` is stored in an `AtomicReference`. If a supervisor requests the same data multiple times, the agent sends the *same byte array* directly to the socket/MQTT link. **Zero serialization** is performed for subsequent requests until the next framework change.
 
 #### 📸 Snapshot Tracking Strategy
 
@@ -358,13 +345,6 @@ For massive files (e.g., a 2GB Heap Dump) that exceed RPC transport limits or ne
 **Example Use Case:**
 On a factory-floor IoT device with limited RAM, a Heap Dump cannot be streamed over the socket. A registered `S3PayloadHandler` can upload the file to AWS and return a pre-signed URL to the engineer's OSGi.fx console.
 
-### 3. I/O Redirection & Telnet Bridge
-The agent can dynamically redirect the terminal I/O of the remote framework.
-
-- **`CONSOLE` Mode**: Global hijacking of `System.in`, `System.out`, and `System.err`. All log messages and standard output are streamed back to the Supervisor in real-time.
-- **`COMMAND_SESSION` Mode**: Creates a fresh, virtual Gogo `CommandSession`. This allows executing commands in a private context without interfering with other administrators.
-- **`Telnet` Mode**: Acts as a transparent bridge. If the agent detects a Telnet-based shell (e.g. Felix Shell TUI) running on a specific port, it can connect to it and pipe the I/O through the RPC channel.
-
 ---
 
 ## 🪵 Logging & Eventing Architecture
@@ -399,6 +379,8 @@ The buffer doesn't store Strings directly to avoid heap fragmentation. Instead:
 ```java
 // Retrieve logs from the last 5 minutes
 long fiveMinsAgo = System.currentTimeMillis() - 300_000;
+byte[] logSnapshot = logBuffer.snapshot(fiveMinsAgo, Long.MAX_VALUE);
+// Result is a packed binary blob, ready for LZ4 compression and transmission
 ```
 
 #### 5. Advanced Path Resolution & Variable Substitution
@@ -410,16 +392,6 @@ The agent provides a powerful variable substitution engine for all filesystem-re
 - `{timestamp}`: Resolves to the current time in `yyyy-MM-dd-HH-mm-ss` format.
 
 *Example Path:* `/tmp/osgifx/{framework.name}/heap-{timestamp}.hprof.gz`
-
-#### 6. Internal "Micro-DI" Engine (`com.osgifx.console.agent.di`)
-To maintain a small footprint (< 200KB) and zero external dependencies, the agent uses a custom, high-performance Dependency Injection engine.
-
-- **Jakarta Inject Support**: Native support for `@Inject`, `@Singleton`, and `Provider<T>`.
-- **Zero-Annotation Wiring**: Interfaces can be bound to implementations manually via `DI.bindInterface()`.
-- **Fast Startup**: No classpath scanning or heavy reflection. All bindings are resolved lazily upon first request.
-- **Provider Pattern**: Supports lazy-loaded services that are only instantiated when an RPC call actually requires them.
-byte[] logSnapshot = logBuffer.snapshot(fiveMinsAgo, Long.MAX_VALUE);
-// Result is a packed binary blob, ready for LZ4 compression and transmission
 
 ### Remote Eventing
 When enabled (`osgi.fx.enable.eventing=true`), the agent subscribes to all OSGi `EventAdmin` topics and streams them in real-time to the Supervisor. Events are debounced and batched to prevent flooding over slow MQTT or Socket links.
@@ -448,6 +420,7 @@ The agent provides a flexible **Redirection SPI** (`com.osgifx.console.agent.red
 - **Gogo Redirector** (`COMMAND_SESSION` / `-1`): Connects a remote Gogo `CommandSession` to the Supervisor's terminal. Uses proxied access to Gogo APIs to avoid classloader constraints.
 - **Console Redirector** (`CONSOLE` / `-2`): Captures `System.out` and `System.err` and streams them as remote events.
 - **Socket Redirector** (`PORT`): Pipes I/O directly over the active agent socket or a dedicated secondary port.
+- **Telnet Redirector** (`PORT`): Acts as a transparent bridge. If the agent detects a Telnet-based shell (e.g. Felix Shell TUI) running on a specific port, it connects to it and pipes I/O through the RPC channel.
 - **Null Redirector** (`NONE` / `0`): Silently discards I/O or detaches active redirectors.
 
 This sub-system leverages the `redirect(int port)` and `stdin(String)` remote APIs to hook into and push characters to the chosen backend stream.
@@ -465,18 +438,6 @@ To prevent accidental or malicious execution of sensitive commands, the agent im
     - Defaults to `*`.
 
 **How it works**: Before any execution, the agent checks the command against these patterns. If a match is not found, the operation is blocked with a security exception, protecting the underlying host OS.
-
----
-
-The agent registers several commands under the `osgifx` scope for dynamic control via the Gogo shell.
-
-| Command | Usage | Description |
-| :--- | :--- | :--- |
-| `osgifx:startSocket` | `startSocket [host=.. port=.. secure=..]`| Starts the Socket RPC server. |
-| `osgifx:stopSocket` | `stopSocket` | Stops the Socket RPC server and clears properties. |
-| `osgifx:startMqtt` | `startMqtt [provider=.. pubTopic=.. subTopic=..]`| Starts the MQTT RPC endpoint. |
-| `osgifx:stopMqtt` | `stopMqtt` | Stops the MQTT RPC endpoint. |
-| `osgifx:status` | `status` | Displays running status and current configuration. |
 
 ---
 
@@ -596,8 +557,6 @@ The agent implements several layers of protection to ensure secure and stable op
 
 ---
 
----
-
 ## 🔍 Advanced Diagnostics
 
 ### 🕵️ Classloader Leaks (Phantom Reference Graph)
@@ -629,25 +588,7 @@ For environments with strict network limits (e.g., narrow-band IoT), the agent s
     - `createThreadDumpLocally(path)` 
    The resulting file can then be retrieved later or via a `LargePayloadHandler`.
 
-### 📡 MQTT RPC & OSGi Messaging
-The agent supports a fully decoupled MQTT 5 transport, which is essential for managing devices behind restrictive firewalls or NATs.
-
-- **OSGi Messaging Integration**: By default, it leverages the [osgi-messaging](https://github.com/amitjoy/osgi-messaging) library (specifically `in.bytehue.messaging.mqtt5.provider`). This provides a standardized, industrial-strength way to handle asynchronous RPC over MQTT.
-- **Payload Compression**: Just like the socket transport, MQTT payloads are LZ4 compressed and binary-encoded to stay within typical MQTT broker message limits (e.g., 256KB).
-- **Topic-Based Routing**: Communication is Multiplexed over a pair of `pubtopic` and `subtopic`, allowing a single broker to manage thousands of agents.
-
 ---
-
-- `com.osgifx.console.agent`: The core implementation bundle.
-    - **`admin`**: Domain-specific managers for OSGi services (Components, Config, Events, Metatype, etc.).
-    - **`di`**: A high-performance, Jakarta-compliant Micro-DI engine.
-    - **`redirector`**: The I/O hijacking engine supporting multi-mode terminal proxies.
-    - **`rpc`**: The heart of the agent. Contains the `BinaryCodec`, LZ4 compression logic, and transport-agnostic framing.
-    - **`starter`**: Contains the zero-dependency `Activator` and Gogo command bridge.
-- `com.osgifx.console.agent.api`: The architectural contract.
-    - **`Agent` / `AgentSnapshot`**: The primary management interfaces.
-    - **`dto`**: A comprehensive suite of "Anemic" DTOs designed for minimal serialization footprints.
-    - **`spi`**: Extension points for custom diagnostic logic and large payload offloading.
 
 ## 🕹️ Runtime Calibration (Gogo Shell)
 
