@@ -146,10 +146,10 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 | **🌐 JAX-RS View** <br> _Inspect JAX-RS Applications, Resources, and Extensions_ | 3.0.0 | ✅ | 🚀 |
 | **📦 CDI View** <br> _Inspect CDI Containers, Components, and Extensions_ | 3.0.0 | ✅ | 🚀 |
 | **🔐 Authentication & Security** <br> _Password authentication with AES-256 encryption, TLS/SSL, and OAuth/Token support_ | 3.0.0 | ✅ | 🚀 |
-| **💥 Blast Radius Analysis** <br> _Pre-flight simulation of impact when stopping bundles or disabling components_ | 3.0.0 | ✅ | 🚀 |
-| **🌊 Activation Cascade Analysis** <br> _Predictive analysis of service activations and hijacking when starting bundles or enabling components_ | 3.0.0 | ✅ | 🚀 |
-| **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components_ | 3.0.0 | ✅ | 🚀 |
-| **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks_ | 3.0.0 | ✅ | 🚀 |
+| **💥 Blast Radius Analysis** <br> _Pre-flight simulation of impact when stopping bundles or disabling components. [Read More](/resilience#-blast-radius-analysis--pre-flight-stop-simulation)_ | 3.0.0 | ✅ | 🚀 |
+| **🌊 Activation Cascade Analysis** <br> _Predictive analysis of service activations and hijacking when starting bundles or enabling components. [Read More](/resilience#-activation-cascade-analysis--predict-service-hijacking-before-it-happens)_ | 3.0.0 | ✅ | 🚀 |
+| **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components. [Read More](/resilience#-chaos-monkey--fault-injection-testing)_ | 3.0.0 | ✅ | 🚀 |
+| **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks. [Read More](/resilience#️-conditions-monitor--inject--revoke-mocked-osgi-conditions-live)_ | 3.0.0 | ✅ | 🚀 |
 
 ---
 
@@ -168,10 +168,18 @@ OSGi.fx offers a rich set of features designed to make remote OSGi management se
 #### 📢 Event Administration
 *   **Sending and Receiving Events**: You can both listen to and emit OSGi events through the EventAdmin interface. Use the intuitive **Event Filter Dialog** to easily construct LDAP filters for subscribing to specific topics. The dialog features an autocomplete dropdown that displays options recognized by OSGi in event filters, drastically simplifying the manual creation of complex filtering rules.
 
-#### 🐒 Chaos Monkey - Resilience Testing
-The **Chaos Monkey** is a powerful fault-injection tool designed to test the resilience, self-healing, and dynamic rebinding capabilities of your OSGi applications. It randomly disrupts bundles and SCR components based on your configuration.
-*   **4-Layer Safety Architecture**: Prevents accidental "suicide" of the remote environment (protects System Bundle, Agent Bundle, Infrastructure Bundles, and enforces strict Regex Scopes).
-*   **Use Cases**: Test bundle refresh cascades, component rebinding scenarios, and ensure your services degrade securely over an Auto-Stop Timer.
+#### 🛡️ Resilience & Observability
+
+OSGi's dynamic service model is its greatest strength — but it is also the most common source of subtle, hard-to-diagnose failures in production. OSGi.fx ships four advanced features that make runtime dynamism **observable, testable, and safe before you act**.
+
+*   **🐒 Chaos Monkey** — A live, automated fault-injector that randomly stops bundles and disables DS components on a configurable schedule, then automatically reverts them. Proves that your system is actually resilient rather than assuming it.
+*   **💥 Blast Radius Analysis** — Before you stop a bundle or disable a component, shows you a complete categorised impact report: which components will deactivate, which service bindings will be lost, and which package wires will go stale. No guessing, no surprises.
+*   **🌊 Activation Cascade Analysis** — Before you start a bundle or enable a component, predicts what will activate and flags potential **service hijacking** — where a newly started bundle silently outranks and replaces an existing service provider.
+*   **🕵️ Conditions Monitor** — Surfaces all OSGi R8 Conditions in the runtime (active, missing, or mocked), shows which DS components each one gates, and lets you inject or revoke synthetic conditions live — essential for testing hardware-contingent features in IoT environments without physical hardware.
+
+<div style="margin-top: 1.5rem; margin-bottom: 2rem;">
+  <a href="/resilience" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.95rem;">→ Read the full Resilience & Observability documentation</a>
+</div>
 
 #### 🔍 Global Search and Table Filtering
 *   **Menu Search Option**: Quickly find functions, specific tabs, and preferences by using the global search field located directly in the application menu.
