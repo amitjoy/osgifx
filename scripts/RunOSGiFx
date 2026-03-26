@@ -104,10 +104,12 @@ public class RunOSGiFx {
             launch(executableJar, jvmArgs, programArgs);
 
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("Error: (" + e.getClass().getSimpleName() + ") " + e.getMessage());
             if (e.getCause() != null) {
-                System.err.println("Cause: " + e.getCause().getMessage());
+                System.err.println("Cause: (" + e.getCause().getClass().getSimpleName() + ") "
+                        + e.getCause().getMessage());
             }
+            e.printStackTrace(System.err);
             System.exit(1);
         }
     }
@@ -169,19 +171,11 @@ public class RunOSGiFx {
 
         Path tempFile = Files.createTempFile("osgifx-download-", ".jar");
 
-        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL)
-                .connectTimeout(Duration.ofSeconds(10)).build();
-
-        HttpRequest               request  = HttpRequest.newBuilder(uri).GET().build();
-        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-        if (response.statusCode() != 200) {
-            Files.deleteIfExists(tempFile);
-            failFast("Failed to download artifact. HTTP " + response.statusCode() + " from " + uri);
-        }
-
-        try (InputStream in = response.body()) {
+        try (InputStream in = fetchStreamWithFallback(uri)) {
             Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            Files.deleteIfExists(tempFile);
+            failFast("Failed to download artifact: " + e.getMessage());
         }
 
         tempFile.toFile().deleteOnExit();
@@ -194,16 +188,7 @@ public class RunOSGiFx {
         String metadataUrl = MAVEN_CENTRAL + group.replace('.', '/') + "/" + artifact + "/maven-metadata.xml";
         System.out.println("Resolving LATEST version from " + metadataUrl + "...");
 
-        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL)
-                .connectTimeout(Duration.ofSeconds(10)).build();
-        HttpRequest          request  = HttpRequest.newBuilder(URI.create(metadataUrl)).GET().build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() != 200) {
-            failFast("Failed to resolve LATEST version. HTTP " + response.statusCode());
-        }
-
-        String xml     = response.body();
+        String xml = fetchStringWithFallback(URI.create(metadataUrl));
         Matcher matcher = Pattern.compile("<release>(.*?)</release>").matcher(xml);
         if (matcher.find()) {
             return matcher.group(1);
@@ -245,5 +230,73 @@ public class RunOSGiFx {
             System.err.println("OSGi.fx exited with code " + exitCode);
             System.exit(exitCode);
         }
+    }
+
+    private static String fetchStringWithFallback(URI uri) throws IOException, InterruptedException {
+        try {
+            return sendStringRequest(uri, HttpClient.Version.HTTP_2);
+        } catch (IOException e) {
+            if (isAlpnInternalError(e)) {
+                System.err.println("[WARN] HTTP/2 failed (" + e.getMessage() + "), retrying with HTTP/1.1...");
+                return sendStringRequest(uri, HttpClient.Version.HTTP_1_1);
+            }
+            throw e;
+        }
+    }
+
+    private static InputStream fetchStreamWithFallback(URI uri) throws IOException, InterruptedException {
+        try {
+            return sendStreamRequest(uri, HttpClient.Version.HTTP_2);
+        } catch (IOException e) {
+            if (isAlpnInternalError(e)) {
+                System.err.println("[WARN] HTTP/2 failed (" + e.getMessage() + "), retrying with HTTP/1.1...");
+                return sendStreamRequest(uri, HttpClient.Version.HTTP_1_1);
+            }
+            throw e;
+        }
+    }
+
+    private static String sendStringRequest(URI uri, HttpClient.Version version)
+            throws IOException, InterruptedException {
+        HttpClient client = buildClient(version);
+        HttpResponse<String> response = client.send(
+                HttpRequest.newBuilder(uri).GET().build(),
+                HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            failFast("Unexpected HTTP " + response.statusCode() + " from " + uri);
+        }
+        return response.body();
+    }
+
+    private static InputStream sendStreamRequest(URI uri, HttpClient.Version version)
+            throws IOException, InterruptedException {
+        HttpClient client = buildClient(version);
+        HttpResponse<InputStream> response = client.send(
+                HttpRequest.newBuilder(uri).GET().build(),
+                HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() != 200) {
+            failFast("Unexpected HTTP " + response.statusCode() + " from " + uri);
+        }
+        return response.body();
+    }
+
+    private static HttpClient buildClient(HttpClient.Version version) {
+        return HttpClient.newBuilder()
+                .version(version)
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+    }
+
+    private static boolean isAlpnInternalError(IOException e) {
+        Throwable cause = e;
+        while (cause != null) {
+            String msg = cause.getMessage();
+            if (msg != null && (msg.contains("internal_error") || msg.contains("INTERNAL_ERROR"))) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 }
