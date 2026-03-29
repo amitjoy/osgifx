@@ -151,4 +151,11 @@ public interface AgentSnapshot {
      * @return the compressed byte array containing the runtime capabilities information
      */
     byte[] runtimeCapabilities();
+
+    /**
+     * Returns a compressed binary snapshot of the remote services.
+     *
+     * @return the compressed byte array containing the remote service information
+     */
+    byte[] remoteServices();
 }
