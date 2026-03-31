@@ -30,6 +30,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+import com.osgifx.console.agent.admin.RemoteServiceAdminManager;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
@@ -102,6 +103,7 @@ public final class DIModule {
     private XLogReaderAdmin           xLogReaderAdmin;
     private XJmxAdmin                 xJmxAdmin;
     private XThreadAdmin              xThreadAdmin;
+    private RemoteServiceAdminManager remoteServiceAdminManager;
 
     public DIModule(final BundleContext context) {
         di           = new DI();
@@ -160,6 +162,11 @@ public final class DIModule {
         if (wirings.isFelixHcWired()) {
             xHcAdmin = new XHcAdmin(context, codec, decoder, () -> felixHcExecutorTracker.getService(), executor);
             di.bindInstance(XHcAdmin.class, xHcAdmin);
+        }
+
+        if (wirings.isRemoteServiceAdminWired()) {
+            remoteServiceAdminManager = new RemoteServiceAdminManager(context, codec, decoder, executor);
+            di.bindInstance(RemoteServiceAdminManager.class, remoteServiceAdminManager);
         }
 
         if (wirings.isJaxRsWired()) {
@@ -248,6 +255,9 @@ public final class DIModule {
         if (xJmxAdmin != null) {
             xJmxAdmin.init();
         }
+        if (remoteServiceAdminManager != null) {
+            remoteServiceAdminManager.init();
+        }
         xThreadAdmin.init();
         xPropertyAdmin.init();
 
@@ -309,6 +319,9 @@ public final class DIModule {
         }
         if (xPropertyAdmin != null) {
             xPropertyAdmin.stop();
+        }
+        if (remoteServiceAdminManager != null) {
+            remoteServiceAdminManager.stop();
         }
         if (xThreadAdmin != null) {
             xThreadAdmin.stop();
