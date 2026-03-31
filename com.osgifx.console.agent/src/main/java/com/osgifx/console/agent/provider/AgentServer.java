@@ -95,6 +95,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import com.j256.simplelogging.FluentLogger;
 import com.j256.simplelogging.LoggerFactory;
 import com.osgifx.console.agent.Agent;
+import com.osgifx.console.agent.admin.RemoteServiceAdminManager;
 import com.osgifx.console.agent.admin.XBundleAdmin;
 import com.osgifx.console.agent.admin.XCdiAdmin;
 import com.osgifx.console.agent.admin.XComponentAdmin;
@@ -1600,6 +1601,15 @@ public final class AgentServer implements Agent, Closeable {
         final boolean isR7LoggerAdminWired = di.getInstance(PackageWirings.class).isR7LoggerAdminWired();
         if (isR7LoggerAdminWired) {
             return di.getInstance(XLoggerAdmin.class).snapshot();
+        }
+        return encode(Collections.emptyList());
+    }
+
+    @Override
+    public byte[] remoteServices() {
+        final boolean isRemoteServiceAdminWired = di.getInstance(PackageWirings.class).isRemoteServiceAdminWired();
+        if (isRemoteServiceAdminWired) {
+            return di.getInstance(RemoteServiceAdminManager.class).snapshot();
         }
         return encode(Collections.emptyList());
     }
