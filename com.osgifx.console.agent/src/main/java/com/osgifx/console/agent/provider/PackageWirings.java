@@ -50,6 +50,7 @@ public final class PackageWirings {
         JMX("JMX"),
         HC("Felix Healthcheck"),
         CONDITION("Condition"),
+        RSA("Remote Service Admin"),
         GOGO("Gogo");
 
         public String comprehensibleName;
@@ -149,6 +150,10 @@ public final class PackageWirings {
         return isWired("org.osgi.service.condition");
     }
 
+    public boolean isRemoteServiceAdminWired() {
+        return isWired("org.osgi.service.remoteserviceadmin");
+    }
+
     public boolean isGogoWired() {
         return isWired("org.apache.felix.gogo.runtime");
     }
@@ -187,6 +192,8 @@ public final class PackageWirings {
                 return isFelixHcWired();
             case CONDITION:
                 return isConditionWired();
+            case RSA:
+                return isRemoteServiceAdminWired();
             case GOGO:
                 return isGogoWired();
             default:
@@ -237,6 +244,8 @@ public final class PackageWirings {
                 return "org.apache.felix.hc.api";
             case CONDITION:
                 return "org.osgi.service.condition";
+            case RSA:
+                return "org.osgi.service.remoteserviceadmin";
             case GOGO:
                 return "org.apache.felix.gogo.runtime";
             default:
