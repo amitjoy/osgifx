@@ -563,6 +563,11 @@ public final class SnapshotAgent implements Agent {
         return encode(snapshotDTO.runtimeCapabilities);
     }
 
+    @Override
+    public byte[] remoteServices() {
+        return encode(snapshotDTO.remoteServices);
+    }
+
     private byte[] encode(Object data) {
         if (data == null) {
             return new byte[0];
