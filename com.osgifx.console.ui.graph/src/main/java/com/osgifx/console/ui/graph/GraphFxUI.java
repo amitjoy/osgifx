@@ -85,6 +85,7 @@ public final class GraphFxUI {
     private HBox              toolBar;
     private ToggleButton      bundleBtn;
     private ToggleButton      componentBtn;
+    private ToggleButton      rsaBtn;
     private SegmentedButton   segmentedButton;
 
     @PostConstruct
@@ -98,6 +99,7 @@ public final class GraphFxUI {
         if (isConnected) {
             dataProvider.retrieveInfo("bundles", true);
             dataProvider.retrieveInfo("components", true);
+            dataProvider.retrieveInfo("remoteServices", true);
         }
     }
 
@@ -139,8 +141,10 @@ public final class GraphFxUI {
         String resource;
         if (type == GraphController.Type.BUNDLES) {
             resource = "/fxml/tab-content-for-bundles.fxml";
-        } else {
+        } else if (type == GraphController.Type.COMPONENTS) {
             resource = "/fxml/tab-content-for-components.fxml";
+        } else {
+            resource = "/fxml/tab-content-for-rsa.fxml";
         }
         final var data = loadFXML(resource);
         if (data == null) {
@@ -174,7 +178,10 @@ public final class GraphFxUI {
         componentBtn = new ToggleButton("Component Topology");
         componentBtn.setOnAction(_ -> switchContent(GraphController.Type.COMPONENTS));
 
-        segmentedButton = new SegmentedButton(bundleBtn, componentBtn);
+        rsaBtn = new ToggleButton("RSA Topology");
+        rsaBtn.setOnAction(_ -> switchContent(GraphController.Type.RSA));
+
+        segmentedButton = new SegmentedButton(bundleBtn, componentBtn, rsaBtn);
         segmentedButton.getStyleClass().add(STYLE_CLASS_DARK);
         toolBar.getChildren().add(segmentedButton);
         updateButtonStates();
@@ -194,9 +201,15 @@ public final class GraphFxUI {
         if (type == GraphController.Type.BUNDLES) {
             bundleBtn.setSelected(true);
             componentBtn.setSelected(false);
-        } else {
+            rsaBtn.setSelected(false);
+        } else if (type == GraphController.Type.COMPONENTS) {
             bundleBtn.setSelected(false);
             componentBtn.setSelected(true);
+            rsaBtn.setSelected(false);
+        } else {
+            bundleBtn.setSelected(false);
+            componentBtn.setSelected(false);
+            rsaBtn.setSelected(true);
         }
     }
 
@@ -230,6 +243,8 @@ public final class GraphFxUI {
                 dataProvider.retrieveInfo("bundles", true);
             } else if (type == GraphController.Type.COMPONENTS) {
                 dataProvider.retrieveInfo("components", true);
+            } else if (type == GraphController.Type.RSA) {
+                dataProvider.retrieveInfo("remoteServices", true);
             }
         }
     }
