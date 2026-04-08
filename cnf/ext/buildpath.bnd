@@ -17,6 +17,7 @@
                                                 org.osgi.service.coordinator,\
                                                 org.osgi.service.condition,\
                                                 org.osgi.service.configurator,\
+                                                org.osgi.service.remoteserviceadmin,\
                                                 org.osgi.service.dmt,\
                                                 org.osgi.service.event,\
                                                 org.osgi.service.http,\
