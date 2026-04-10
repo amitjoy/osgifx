@@ -31,10 +31,21 @@ import com.dlsc.formsfx.view.renderer.FormRenderer;
 import com.osgifx.console.agent.dto.XRemoteServiceDTO;
 import com.osgifx.console.util.fx.Fx;
 
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 
 public final class RsaDetailsFxController {
 
@@ -55,7 +66,91 @@ public final class RsaDetailsFxController {
             rootPanel.getChildren().remove(formRenderer);
         }
         formRenderer = createForm(rsaEntry);
+        formRenderer.setOpacity(0.0);
         rootPanel.setCenter(formRenderer);
+
+        scheduleLayoutFix(formRenderer, 0);
+    }
+
+    private void scheduleLayoutFix(final Node node, final int attempt) {
+        if (attempt > 50) {
+            logger.atWarning().log("Could not find GridPanes after 50 attempts");
+            return;
+        }
+
+        final List<GridPane> grids = findAllGridPanesRecursively(node);
+
+        if (!grids.isEmpty()) {
+            applyGridConstraints(grids);
+            Fx.makeReadOnlyLabelsCopyable(node);
+            node.setOpacity(1.0);
+        } else {
+            if (node instanceof Parent p) {
+                p.layout();
+            }
+            final var timer = new PauseTransition(Duration.millis(200));
+            timer.setOnFinished(_ -> scheduleLayoutFix(node, attempt + 1));
+            timer.play();
+        }
+    }
+
+    private List<GridPane> findAllGridPanesRecursively(final Node node) {
+        final List<GridPane> results = new ArrayList<>();
+        if (node instanceof GridPane grid) {
+            results.add(grid);
+        }
+        if (node instanceof final Parent parent) {
+            for (final Node child : parent.getChildrenUnmodifiable()) {
+                results.addAll(findAllGridPanesRecursively(child));
+            }
+        }
+        return results;
+    }
+
+    private void applyGridConstraints(final List<GridPane> grids) {
+        for (final GridPane grid : grids) {
+            grid.setHgap(5);
+
+            grid.getRowConstraints().clear();
+
+            grid.getColumnConstraints().clear();
+
+            for (final Node child : grid.getChildren()) {
+                if (child instanceof Label label && label.getStyleClass().contains("formsfx-label")) {
+                    label.setWrapText(true);
+                    label.setMinHeight(Region.USE_COMPUTED_SIZE);
+                    label.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                    label.setMaxHeight(Double.MAX_VALUE);
+
+                    label.setAlignment(Pos.TOP_LEFT);
+                    label.setTextAlignment(TextAlignment.LEFT);
+                    label.setMaxWidth(Double.MAX_VALUE);
+                    GridPane.setHalignment(label, HPos.LEFT);
+                    GridPane.setFillWidth(label, true);
+
+                    label.setPadding(new Insets(3, 0, 0, 0));
+                    GridPane.setValignment(label, VPos.TOP);
+                }
+            }
+
+            // Enforce a symmetric 12-column grid
+            // Columns 0,1 (Label 1) and 6,7 (Label 2) get 17.5% each (35% total per label)
+            // Remaining columns (Inputs) get 3.75% each (15% total per input in 2-col layout)
+            final List<ColumnConstraints> constraints = new ArrayList<>();
+
+            for (int i = 0; i < 12; i++) {
+                final var col = new ColumnConstraints();
+                if (i == 0 || i == 1 || i == 6 || i == 7) {
+                    col.setPercentWidth(17.5);
+                } else {
+                    col.setPercentWidth(3.75);
+                }
+                constraints.add(col);
+            }
+
+            grid.getColumnConstraints().clear();
+            grid.getColumnConstraints().addAll(constraints);
+        }
     }
 
     private FormRenderer createForm(final XRemoteServiceDTO rsaEntry) {
@@ -66,11 +161,6 @@ public final class RsaDetailsFxController {
                 .title("Remote Service Details");
 
         final var renderer = new FormRenderer(form);
-
-        GridPane.setColumnSpan(renderer, 2);
-        GridPane.setRowIndex(renderer, 3);
-        GridPane.setRowSpan(renderer, Integer.MAX_VALUE);
-        GridPane.setMargin(renderer, new Insets(0, 0, 0, 50));
 
         Fx.addCopySupportToReadOnlyLabels(renderer);
         return renderer;
