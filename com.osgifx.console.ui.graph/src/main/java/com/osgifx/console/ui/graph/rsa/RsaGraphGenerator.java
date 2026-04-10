@@ -20,9 +20,8 @@ public final class RsaGraphGenerator {
         final Graph<RsaVertex, GraphEdge> graph = new DefaultDirectedGraph<>(GraphEdge.class);
 
         // Add Local Framework Vertex
-        final RsaVertex localVertex = new RsaVertex(
-                localFrameworkUUID == null ? "local" : localFrameworkUUID,
-                "Local Framework");
+        final RsaVertex localVertex = new RsaVertex(localFrameworkUUID == null ? "local" : localFrameworkUUID,
+                                                    "Local Framework");
         graph.addVertex(localVertex);
 
         // Create one vertex per endpoint (not per framework)
@@ -31,8 +30,7 @@ public final class RsaGraphGenerator {
             index++;
 
             // Extract service interface name
-            final String fullInterface = dto.objectClass != null && !dto.objectClass.isEmpty()
-                    ? dto.objectClass.get(0)
+            final String fullInterface  = dto.objectClass != null && !dto.objectClass.isEmpty() ? dto.objectClass.get(0)
                     : "UnknownService";
             final String shortInterface = extractSimpleName(fullInterface);
 
@@ -41,13 +39,13 @@ public final class RsaGraphGenerator {
             final String label     = String.format("%s (%s)", shortInterface, direction);
 
             // Use endpoint ID or index as unique identifier
-            final String vertexId    = dto.id != null ? dto.id : "endpoint-" + index;
+            final String    vertexId       = dto.id != null ? dto.id : "endpoint-" + index;
             final RsaVertex endpointVertex = new RsaVertex(vertexId, label);
             graph.addVertex(endpointVertex);
 
             // Create edge with framework info
-            final String frameworkLabel = "Framework: " + RsaVertex.shortenUUID(
-                    dto.frameworkUUID != null ? dto.frameworkUUID : "unknown");
+            final String frameworkLabel = "Framework: "
+                    + RsaVertex.shortenUUID(dto.frameworkUUID != null ? dto.frameworkUUID : "unknown");
 
             if (dto.direction == RemoteServiceDirection.EXPORT) {
                 // EXPORT: Local -> Remote
