@@ -56,6 +56,7 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 | **`list_services`** | Lists all registered services and their properties. |
 | **`list_components`** | Lists Declarative Services (DS) components and their satisfaction state. |
 | **`list_configurations`** | Lists OSGi Configuration Admin configurations (PIDs). |
+| **`list_remote_services`** | Lists OSGi Remote Services Admin endpoints (exports and imports). Filter by direction. |
 | **`list_http_components`** | Lists registered Servlets, Filters, and Resources (HttpService). |
 | **`list_threads`** | Lists JVM threads with states (use for deadlock detection). |
 | **`get_system_properties`** | Retrieves Java System Properties (e.g., `java.version`) and Framework properties. |

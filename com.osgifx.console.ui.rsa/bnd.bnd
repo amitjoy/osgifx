@@ -1,0 +1,18 @@
+Bundle-SymbolicName : ${p}; singleton:=true
+Model-Fragment      : fragment.e4xmi
+-includeresource    : \
+					  fragment.e4xmi = fragment.e4xmi,\
+					  css = css,\
+					  fxml = fxml,\
+					  graphic = graphic,\
+					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
+-buildpath          : \
+                      ${bundles.required},\
+                      org.osgi.service.remoteserviceadmin
+-privatepackage     : \
+                      com.osgifx.console.ui.rsa.*
+Import-Package      : \
+                      org.controlsfx.glyphfont,\
+                      org.controlsfx.control,\
+                      com.dlsc.formsfx.*,\
+                      *

@@ -34,6 +34,7 @@ import com.osgifx.console.agent.dto.XHttpComponentDTO;
 import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XRemoteServiceDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -93,6 +94,9 @@ public class SnapshotDTO extends DTO {
 
     /** A list of runtime capability data transfer objects. */
     public List<XRuntimeCapabilityDTO> runtimeCapabilities;
+
+    /** A list of remote service data transfer objects. */
+    public List<XRemoteServiceDTO> remoteServices;
 
     /** A list of condition data transfer objects. */
     public List<XConditionDTO> conditions;

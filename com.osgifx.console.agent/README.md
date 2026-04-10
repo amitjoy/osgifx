@@ -140,6 +140,7 @@ Most data points (Bundles, Services, Configs) are served via a thread-safe cachi
 | **Conditions** | `ServiceTracker` | Condition service registration/modification/removal |
 | **Configurations**| `ConfigurationListener` | ConfigAdmin PID/Factory updates |
 | **HTTP/JAX-RS/CDI**| `changecount` Monitoring | Remote DTO state changes via R7/R8 specs |
+| **Remote Services** | `EndpointEventListener` | RSA Endpoint registration/modification/removal |
 | **User Admin** | `UserAdminListener` | Roles, Groups, and Credential changes |
 | **Loggers** | `BundleListener` | Bundle attachment (logger context availability) |
 | **Health Checks** | `ServiceTracker` | HealthCheck service registration changes |
@@ -196,6 +197,7 @@ All the following data points are available as binary snapshots via the `AgentSn
 | `httpComponents()` | `XHttpComponentDTO` | Servlets, Filters, Resources (R7/R8) |
 | `jaxRsComponents()` | `XJaxRsComponentDTO` | JAX-RS Whiteboard components |
 | `cdiContainers()` | `XCdiContainerDTO` | CDI Container and Component status |
+| `remoteServices()` | `XRemoteServiceDTO` | Remote Service Admin endpoints (imports/exports) |
 | `bundleLoggerContexts()` | `XBundleLoggerContextDTO`| R7 Logger Admin contexts |
 | `leaks()` | `XBundleDTO` | Potential classloader leaks |
 | `runtime()` | `RuntimeDTO` | Framework and System information |
@@ -218,6 +220,7 @@ The agent intelligently distinguishes between data that benefits from reactive c
 | **HTTP Components** | **Cached** | R7/R8 Whiteboard runtime tracked via `changecount`. |
 | **JAX-RS Components** | **Cached** | JAX-RS runtime tracked via `changecount`. |
 | **CDI Containers** | **Cached** | CDI runtime tracked via `changecount`. |
+| **Remote Services** | **Cached** | RSA endpoints tracked via `EndpointEventListener`. |
 | **Logger Contexts** | **Cached** | Bundle-based logger contexts change with bundle lifecycle. |
 | **Classloader Leaks** | **Cached** | Phantom reference tracking updates on GC events. |
 | **Threads** | **Live** | Constantly changing. Caching would provide stale data. |
@@ -504,6 +507,7 @@ The following specifications are dynamically detected via `PackageWirings`. If i
 *   **Log Service & R7 Logger** (`org.osgi.service.log` / `org.osgi.service.log.admin`)
 *   **HTTP & JAX-RS Whiteboard** (`org.osgi.service.http.runtime` / `org.osgi.service.jaxrs.runtime`)
 *   **CDI Integration** (`org.osgi.service.cdi.runtime`)
+*   **Remote Service Admin** (`org.osgi.service.remoteserviceadmin`)
 *   **Felix Health Checks** (`org.apache.felix.hc.api`)
 *   **Gogo Shell** (`org.apache.felix.gogo.runtime`)
 *   **DMT Admin** (`org.osgi.service.dmt`)

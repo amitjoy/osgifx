@@ -19,7 +19,8 @@ public interface GraphController {
 
     enum Type {
         BUNDLES,
-        COMPONENTS;
+        COMPONENTS,
+        RSA;
     }
 
     void updateModel();
