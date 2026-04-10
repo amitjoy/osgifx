@@ -61,6 +61,7 @@ Import-Package: \
 	org.osgi.service.log.admin;'resolution:'=optional,\
 	org.osgi.service.messaging;'resolution:'=optional,\
 	org.osgi.service.metatype;'resolution:'=optional,\
+	org.osgi.service.remoteserviceadmin;'resolution:'=optional,\
 	org.osgi.service.useradmin;'resolution:'=optional,\
 	org.osgi.util.promise;'resolution:'=optional,\
 	org.osgi.util.pushstream;'resolution:'=optional,\

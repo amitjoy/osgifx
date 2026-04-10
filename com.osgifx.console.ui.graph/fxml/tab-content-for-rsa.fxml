@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2021-2026 Amit Kumar Mondal
+  
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License.  You may obtain a copy
+  of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+  License for the specific language governing permissions and limitations under
+  the License.
+-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ListView?>
+<?import org.controlsfx.glyphfont.Glyph?>
+
+<SplitPane dividerPositions="0.27728285077951004" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.graph.rsa.GraphFxRsaController">
+   <items>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <top>
+            <VBox spacing="5.0" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <children>
+                  <HBox alignment="CENTER_LEFT" spacing="5.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#selectAll" text="Select All" />
+                        <Button mnemonicParsing="false" onAction="#deselectAll" text="Deselect All" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#generateGraph" prefHeight="27.0">
+                           <graphic>
+              				<Glyph fontFamily="FontAwesome" icon="PLAY" />
+          				 </graphic>
+                           <tooltip>
+                              <Tooltip text="Generate Graph" />
+                           </tooltip>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <ChoiceBox fx:id="directionFilter" maxWidth="1.7976931348623157E308" />
+                  <HBox alignment="CENTER_LEFT" spacing="10.0">
+                     <children>
+                        <CheckBox fx:id="showSelectedOnlyView" mnemonicParsing="false" text="Show Selected Only" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <center>
+                  <ListView fx:id="servicesList" prefHeight="498.0" prefWidth="245.0" BorderPane.alignment="CENTER" />
+               </center>
+               <top>
+                   <TextField fx:id="searchText" maxWidth="1.7976931348623157E308" prefHeight="30.0" promptText="Search Filter" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </BorderPane.margin></TextField>
+               </top>
+            </BorderPane>
+         </center>
+      </BorderPane>
+      <BorderPane fx:id="graphPane">
+         <top>
+            <HBox alignment="CENTER_RIGHT" spacing="3.0" style="-fx-padding: 3;">
+               <children>
+                  <ChoiceBox fx:id="layoutSelection" />
+                  <Button mnemonicParsing="false" onAction="#zoomIn">
+                     <graphic>
+                        <Glyph fontFamily="FontAwesome" icon="SEARCH_PLUS" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Zoom In" />
+                     </tooltip>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#zoomOut">
+                     <graphic>
+                        <Glyph fontFamily="FontAwesome" icon="SEARCH_MINUS" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Zoom Out" />
+                     </tooltip>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#fitToScreen">
+                     <graphic>
+                        <Glyph fontFamily="FontAwesome" icon="EXPAND" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Fit to Screen" />
+                     </tooltip>
+                  </Button>
+               </children>
+            </HBox>
+         </top>
+      </BorderPane>
+   </items>
+</SplitPane>
