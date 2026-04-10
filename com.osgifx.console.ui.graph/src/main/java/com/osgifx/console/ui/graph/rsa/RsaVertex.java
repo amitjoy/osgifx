@@ -5,13 +5,19 @@ import java.util.Objects;
 public final class RsaVertex {
 
     private final String uuid;
+    private final String label;
 
-    public RsaVertex(final String uuid) {
-        this.uuid = uuid;
+    public RsaVertex(final String uuid, final String label) {
+        this.uuid  = uuid;
+        this.label = label;
     }
 
     public String uuid() {
         return uuid;
+    }
+
+    public String label() {
+        return label;
     }
 
     public String toDotID() {
@@ -37,6 +43,16 @@ public final class RsaVertex {
 
     @Override
     public String toString() {
-        return uuid;
+        return label;
+    }
+
+    /**
+     * Shortens a UUID to first 8 characters for display
+     */
+    public static String shortenUUID(final String uuid) {
+        if (uuid == null || uuid.length() <= 8) {
+            return uuid;
+        }
+        return uuid.substring(0, 8) + "...";
     }
 }
