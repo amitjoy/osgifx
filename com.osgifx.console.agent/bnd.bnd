@@ -5,23 +5,25 @@ javac.target          : ${javac.source}
 javac.compliance      : ${javac.source}
 -noimportjava         : true
 -buildpath.osgi       : \
-                        osgi.annotation,\
-                        osgi.cmpn;version='6.0.0',\
-                        osgi.core;version='6.0.0'
+                        osgi.annotation;maven-scope=provided,\
+                        osgi.cmpn;version='6.0.0';maven-scope=provided,\
+                        osgi.core;version='6.0.0';maven-scope=provided
 -buildpath            : \
-                        biz.aQute.remote.agent;packages=*,\
-                        com.j256.simplelogging:simplelogging;packages=*,\
-                        com.osgifx.console.agent.api;version=snapshot;packages=*,\
-                        com.osgifx.console.agent.di;packages=*,\
-                        org.apache.commons.commons-exec,\
-                        org.apache.felix.healthcheck.api,\
-                        org.osgi.service.cdi,\
-                        org.osgi.service.condition,\
-                        org.osgi.service.jaxrs,\
-                        org.osgi.service.log,\
-                        org.osgi.service.messaging,\
-                        org.osgi.util.pushstream,\
-                        slf4j.api
+                        biz.aQute.remote.agent;packages=*;maven-scope=provided,\
+                        com.j256.simplelogging:simplelogging;packages=*;maven-scope=provided,\
+                        com.osgifx.console.api;version=snapshot;packages=*;maven-scope=provided,\
+                        com.osgifx.console.agent.api;version=snapshot;packages=*;maven-scope=provided,\
+                        com.osgifx.console.agent.di;packages=*;maven-scope=provided,\
+                        in.bytehue.messaging.mqtt5.api;maven-scope=provided,\
+                        org.apache.commons.commons-exec;maven-scope=provided,\
+                        org.apache.felix.healthcheck.api;maven-scope=provided,\
+                        org.osgi.service.cdi;maven-scope=provided,\
+                        org.osgi.service.condition;maven-scope=provided,\
+                        org.osgi.service.jaxrs;maven-scope=provided,\
+                        org.osgi.service.log;maven-scope=provided,\
+                        org.osgi.service.messaging;maven-scope=provided,\
+                        org.osgi.util.pushstream;maven-scope=provided,\
+                        slf4j.api;maven-scope=provided
 -testpath             : \
                         osgi.enroute.hamcrest.wrapper,\
                         osgi.enroute.junit.wrapper
