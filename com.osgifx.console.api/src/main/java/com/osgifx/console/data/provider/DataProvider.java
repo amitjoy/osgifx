@@ -35,6 +35,7 @@ import com.osgifx.console.agent.dto.XJaxRsComponentDTO;
 import com.osgifx.console.agent.dto.XLogEntryDTO;
 import com.osgifx.console.agent.dto.XMemoryInfoDTO;
 import com.osgifx.console.agent.dto.XPropertyDTO;
+import com.osgifx.console.agent.dto.XRemoteServiceDTO;
 import com.osgifx.console.agent.dto.XRoleDTO;
 import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.agent.dto.XServiceDTO;
@@ -219,4 +220,11 @@ public interface DataProvider {
      * @since 12.0
      */
     ObservableList<XRuntimeCapabilityDTO> runtimeCapabilities();
+
+    /**
+     * Returns an observable list of remote services.
+     *
+     * @return the observable list of remote services
+     */
+    ObservableList<XRemoteServiceDTO> remoteServices();
 }
