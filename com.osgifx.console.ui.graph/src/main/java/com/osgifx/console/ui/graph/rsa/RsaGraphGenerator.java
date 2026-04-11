@@ -30,13 +30,10 @@ public final class RsaGraphGenerator {
             index++;
 
             // Extract service interface name
-            final String fullInterface  = dto.objectClass != null && !dto.objectClass.isEmpty() ? dto.objectClass.get(0)
+            final String fullInterface = dto.objectClass != null && !dto.objectClass.isEmpty() ? dto.objectClass.get(0)
                     : "UnknownService";
-            final String shortInterface = extractSimpleName(fullInterface);
-
-            // Create readable label: "PaymentService (EXPORT)"
-            final String direction = dto.direction != null ? dto.direction.name() : "UNKNOWN";
-            final String label     = String.format("%s (%s)", shortInterface, direction);
+            // Create readable label: "com.example.Service"
+            final String label = fullInterface;
 
             // Use endpoint ID or index as unique identifier
             final String    vertexId       = dto.id != null ? dto.id : "endpoint-" + index;
@@ -57,18 +54,6 @@ public final class RsaGraphGenerator {
         }
 
         return graph;
-    }
-
-    /**
-     * Extracts simple class name from fully qualified name
-     * e.g., "com.osgifx.mock.PaymentService" -> "PaymentService"
-     */
-    private static String extractSimpleName(final String fullyQualified) {
-        if (fullyQualified == null) {
-            return "UnknownService";
-        }
-        final int lastDot = fullyQualified.lastIndexOf('.');
-        return lastDot >= 0 ? fullyQualified.substring(lastDot + 1) : fullyQualified;
     }
 
 }

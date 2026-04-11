@@ -50,6 +50,8 @@ import com.osgifx.console.agent.dto.RemoteServiceDirection;
 import com.osgifx.console.agent.dto.XRemoteServiceDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.graph.AbbreviationSettings;
+import com.osgifx.console.ui.graph.AbbreviationSettingsDialog;
 import com.osgifx.console.ui.graph.GraphController;
 import com.osgifx.console.ui.graph.GraphEdge;
 import com.osgifx.console.ui.graph.GraphJsonConverter;
@@ -105,6 +107,7 @@ public final class GraphFxRsaController implements GraphController {
     private Future<?>                      graphGenFuture;
     private Graph<RsaVertex, GraphEdge>    currentGraph;
     private ObservableList<RsaServiceItem> masterServiceList;
+    private AbbreviationSettings           abbreviationSettings;
 
     @FXML
     public void initialize() {
@@ -127,6 +130,7 @@ public final class GraphFxRsaController implements GraphController {
             layoutSelection.setDisable(false);
             showSelectedOnlyView.setDisable(false);
 
+            abbreviationSettings = new AbbreviationSettings();
             addExportToDotContextMenu();
             initServicesList();
             progressPane = new MaskerPane();
@@ -311,7 +315,7 @@ public final class GraphFxRsaController implements GraphController {
             protected void succeeded() {
                 // Select all vertices by default for RSA (simple topology view)
                 final var json = GraphJsonConverter.toJson((Graph) currentGraph, RsaVertex::toDotID,
-                        RsaVertex::toString, _ -> true);
+                        v -> abbreviationSettings.applyAbbreviations(v.toString()), _ -> true);
 
                 graphView = new WebGraphView();
                 progressPane.setVisible(false);
@@ -370,6 +374,32 @@ public final class GraphFxRsaController implements GraphController {
         if (masterServiceList != null) {
             masterServiceList.forEach(s -> s.setSelected(true));
         }
+    }
+
+    @FXML
+    private void openAbbreviationSettings(final ActionEvent event) {
+        final var dialog = new AbbreviationSettingsDialog(abbreviationSettings.getRules());
+        final var result = dialog.showAndWait();
+        result.ifPresent(rules -> {
+            abbreviationSettings.setRules(rules);
+            if (currentGraph != null && graphView != null) {
+                regenerateGraphView();
+            }
+        });
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void regenerateGraphView() {
+        // Select all vertices for RSA re-generation as it is a global view of selected services
+        final var json = GraphJsonConverter.toJson((Graph) currentGraph, RsaVertex::toDotID,
+                v -> abbreviationSettings.applyAbbreviations(v.toString()), _ -> true);
+
+        graphView = new WebGraphView();
+        graphPane.setCenter(graphView);
+        graphView.loadGraph(json);
+
+        final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
+        graphView.setLayout(getLayoutName(layoutIndex));
     }
 
     @Inject
