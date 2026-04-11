@@ -10,7 +10,8 @@ Model-Fragment      : fragment.e4xmi
 -buildpath          : \
                       ${bundles.required},\
                       org.jgrapht.core,\
-                      org.jgrapht.io
+                      org.jgrapht.io,\
+                      com.google.gson
 -privatepackage     : \
                       com.osgifx.console.ui.graph.*
 Import-Package      : \
