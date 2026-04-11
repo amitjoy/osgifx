@@ -49,6 +49,8 @@ import com.osgifx.console.agent.dto.XComponentDTO;
 import com.osgifx.console.agent.dto.XRuntimeCapabilityDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.graph.AbbreviationSettings;
+import com.osgifx.console.ui.graph.AbbreviationSettingsDialog;
 import com.osgifx.console.ui.graph.GraphController;
 import com.osgifx.console.ui.graph.GraphJsonConverter;
 import com.osgifx.console.ui.graph.WebGraphView;
@@ -110,6 +112,7 @@ public final class GraphFxComponentController implements GraphController {
     private Future<?>                           graphGenFuture;
     private Graph<ComponentVertex, DefaultEdge> currentGraph;
     private ObservableList<ComponentItem>       masterComponentList;
+    private AbbreviationSettings                abbreviationSettings;
 
     @FXML
     public void initialize() {
@@ -144,6 +147,7 @@ public final class GraphFxComponentController implements GraphController {
             transitiveView.setDisable(false);
             showSelectedOnlyView.setDisable(false);
 
+            abbreviationSettings = new AbbreviationSettings();
             addExportToDotContextMenu();
             initComponentsList();
             progressPane = new MaskerPane();
@@ -324,7 +328,7 @@ public final class GraphFxComponentController implements GraphController {
                         .map(c -> ComponentVertex.DOT_ID_FUNCTION.apply(c.name)).toList();
 
                 final var json = GraphJsonConverter.toJson(currentGraph, ComponentVertex::toDotID,
-                        ComponentVertex::name, v -> selectedIds.contains(v.toDotID()));
+                        v -> abbreviationSettings.applyAbbreviations(v.name()), v -> selectedIds.contains(v.toDotID()));
 
                 graphView = new WebGraphView();
                 progressPane.setVisible(false);
@@ -383,6 +387,33 @@ public final class GraphFxComponentController implements GraphController {
         if (masterComponentList != null) {
             masterComponentList.forEach(c -> c.setSelected(true));
         }
+    }
+
+    @FXML
+    private void openAbbreviationSettings(final ActionEvent event) {
+        final var dialog = new AbbreviationSettingsDialog(abbreviationSettings.getRules());
+        final var result = dialog.showAndWait();
+        result.ifPresent(rules -> {
+            abbreviationSettings.setRules(rules);
+            if (currentGraph != null && graphView != null) {
+                regenerateGraphView();
+            }
+        });
+    }
+
+    private void regenerateGraphView() {
+        final var selectedIds = masterComponentList.stream().filter(ComponentItem::isSelected)
+                .map(ComponentItem::getComponent).map(c -> ComponentVertex.DOT_ID_FUNCTION.apply(c.name)).toList();
+
+        final var json = GraphJsonConverter.toJson(currentGraph, ComponentVertex::toDotID,
+                v -> abbreviationSettings.applyAbbreviations(v.name()), v -> selectedIds.contains(v.toDotID()));
+
+        graphView = new WebGraphView();
+        graphPane.setCenter(graphView);
+        graphView.loadGraph(json);
+
+        final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
+        graphView.setLayout(getLayoutName(layoutIndex));
     }
 
     @Inject
