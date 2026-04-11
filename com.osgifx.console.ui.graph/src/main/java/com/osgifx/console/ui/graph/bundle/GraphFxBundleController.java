@@ -52,6 +52,8 @@ import com.google.common.collect.Lists;
 import com.osgifx.console.agent.dto.XBundleDTO;
 import com.osgifx.console.data.provider.DataProvider;
 import com.osgifx.console.executor.Executor;
+import com.osgifx.console.ui.graph.AbbreviationSettings;
+import com.osgifx.console.ui.graph.AbbreviationSettingsDialog;
 import com.osgifx.console.ui.graph.GraphController;
 import com.osgifx.console.ui.graph.GraphEdge;
 import com.osgifx.console.ui.graph.GraphJsonConverter;
@@ -113,6 +115,7 @@ public final class GraphFxBundleController implements GraphController {
     private Future<?>                                  graphGenFuture;
     private Graph<BundleVertex, ? extends DefaultEdge> currentGraph;
     private ObservableList<BundleItem>                 masterBundleList;
+    private AbbreviationSettings                       abbreviationSettings;
 
     @FXML
     public void initialize() {
@@ -137,6 +140,7 @@ public final class GraphFxBundleController implements GraphController {
             transitiveView.setDisable(false);
             showSelectedOnlyView.setDisable(false);
 
+            abbreviationSettings = new AbbreviationSettings();
             addExportToDotContextMenu();
             initBundlesList();
             progressPane = new MaskerPane();
@@ -322,7 +326,8 @@ public final class GraphFxBundleController implements GraphController {
                         .map(b -> BundleVertex.DOT_ID_FUNCTION.apply(b.symbolicName, b.id)).toList();
 
                 final var json = GraphJsonConverter.toJson((Graph) currentGraph, BundleVertex::toDotID,
-                        BundleVertex::symbolicName, v -> selectedIds.contains(v.toDotID()));
+                        v -> abbreviationSettings.applyAbbreviations(v.symbolicName()),
+                        v -> selectedIds.contains(v.toDotID()));
 
                 graphView = new WebGraphView();
                 progressPane.setVisible(false);
@@ -382,6 +387,34 @@ public final class GraphFxBundleController implements GraphController {
         if (masterBundleList != null) {
             masterBundleList.forEach(b -> b.setSelected(true));
         }
+    }
+
+    @FXML
+    private void openAbbreviationSettings(final ActionEvent event) {
+        final var dialog = new AbbreviationSettingsDialog(abbreviationSettings.getRules());
+        final var result = dialog.showAndWait();
+        result.ifPresent(rules -> {
+            abbreviationSettings.setRules(rules);
+            if (currentGraph != null && graphView != null) {
+                regenerateGraphView();
+            }
+        });
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void regenerateGraphView() {
+        final var selectedIds = masterBundleList.stream().filter(BundleItem::isSelected).map(BundleItem::getBundle)
+                .map(b -> BundleVertex.DOT_ID_FUNCTION.apply(b.symbolicName, b.id)).toList();
+
+        final var json = GraphJsonConverter.toJson((Graph) currentGraph, BundleVertex::toDotID,
+                v -> abbreviationSettings.applyAbbreviations(v.symbolicName()), v -> selectedIds.contains(v.toDotID()));
+
+        graphView = new WebGraphView();
+        graphPane.setCenter(graphView);
+        graphView.loadGraph(json);
+
+        final var layoutIndex = layoutSelection.getSelectionModel().getSelectedIndex();
+        graphView.setLayout(getLayoutName(layoutIndex));
     }
 
     @Inject
