@@ -80,6 +80,14 @@
          <top>
             <HBox alignment="CENTER_RIGHT" spacing="3.0" style="-fx-padding: 3;">
                <children>
+                  <Button mnemonicParsing="false" onAction="#openAbbreviationSettings">
+                     <graphic>
+                        <Glyph fontFamily="FontAwesome" icon="COG" />
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Abbreviation Settings" />
+                     </tooltip>
+                  </Button>
                   <ChoiceBox fx:id="layoutSelection" />
                   <Button mnemonicParsing="false" onAction="#zoomIn">
                      <graphic>
