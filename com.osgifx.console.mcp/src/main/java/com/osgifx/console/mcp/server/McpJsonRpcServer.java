@@ -49,9 +49,6 @@ public class McpJsonRpcServer {
     private final List<McpLogEntry> logs  = new ArrayList<>();
     private static final int        LIMIT = 100;
 
-    // MCP Spec Version
-    private static final String LATEST_PROTOCOL_VERSION = "2024-11-05";
-
     public McpJsonRpcServer(final Gson gson) {
         this.gson = gson;
     }
@@ -173,12 +170,21 @@ public class McpJsonRpcServer {
     // --- Handlers ---
 
     private String handleInitialize(final JsonRpc.Request req) {
+        // Extract the client's requested version
+        String clientVersion = null;
+        if (req.params != null && req.params.containsKey("protocolVersion")) {
+            clientVersion = (String) req.params.get("protocolVersion");
+        }
+
+        // Negotiate the protocol version
+        final String negotiatedVersion = McpProtocol.negotiateVersion(clientVersion);
+
         // Declare capabilities: Tools only (no Resources/Prompts)
         final var capabilities = Map.of("tools", Map.of("listChanged", true), "resources", Map.of("listChanged", false),
                 "prompts", Map.of("listChanged", false));
 
-        final var result = Map.of("protocolVersion", LATEST_PROTOCOL_VERSION, "capabilities", capabilities,
-                "serverInfo", Map.of("name", "OSGi.fx", "version", "1.0.0"));
+        final var result = Map.of("protocolVersion", negotiatedVersion, "capabilities", capabilities, "serverInfo",
+                Map.of("name", "OSGi.fx", "version", "1.0.0"));
         return success(req.id, result);
     }
 
