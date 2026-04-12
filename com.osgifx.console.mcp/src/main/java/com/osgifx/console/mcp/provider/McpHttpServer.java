@@ -21,6 +21,7 @@ import static org.osgi.service.component.annotations.ReferencePolicy.STATIC;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +41,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 import com.osgifx.console.mcp.FxMcpServer;
 import com.osgifx.console.mcp.provider.McpHttpServer.Configuration;
+import com.osgifx.console.mcp.server.McpProtocol;
 
 import io.fusionauth.http.HTTPMethod;
 import io.fusionauth.http.server.HTTPHandler;
@@ -109,17 +111,43 @@ public class McpHttpServer implements FxMcpServer {
             final String path = req.getPath();
             logger.atInfo().log("Incoming Request: %s %s", req.getMethod(), path);
 
-            // Streamable HTTP Endpoint (GET/POST /mcp)
+            // Streamable HTTP Endpoint (Legacy OSGi.fx implementation)
             if ("/mcp".equals(path) || path.startsWith("/mcp?")) {
-                // POST: Message Handling (Stateless)
                 if (HTTPMethod.POST == req.getMethod()) {
-                    handleMessage(req, res);
+                    handleMessage(req, res, req.getHeader("Mcp-Session-Id"));
                     return;
                 }
-
-                // GET: Optional SSE Streaming
                 if (HTTPMethod.GET == req.getMethod() && "text/event-stream".equals(req.getHeader("Accept"))) {
-                    handleSseConnection(req, res);
+                    handleSseConnection(req, res, false); // false = streamable HTTP mode
+                    return;
+                }
+            }
+
+            // Traditional SSE Endpoint (Expected by Claude Code, Cursor, etc.)
+            if ("/sse".equals(path) || path.startsWith("/sse?")) {
+                if (HTTPMethod.GET == req.getMethod() && "text/event-stream".equals(req.getHeader("Accept"))) {
+                    handleSseConnection(req, res, true); // true = traditional SSE mode
+                    return;
+                }
+            }
+
+            // Traditional Message Endpoint
+            if ("/messages".equals(path) || path.startsWith("/messages?")) {
+                if (HTTPMethod.POST == req.getMethod()) {
+                    // Extract session ID from query parameters
+                    final Map<String, List<String>> params = req.getURLParameters();
+                    String                          sessionId;
+                    if (params != null && params.containsKey("sessionId")) {
+                        final List<String> sessionIds = params.get("sessionId");
+                        sessionId = (sessionIds == null || sessionIds.isEmpty()) ? null : sessionIds.get(0);
+                        if (sessionId != null && sessionId.contains("[")) {
+                            // FusionAuth might wrap params in arrays depending on parsing
+                            sessionId = sessionId.replaceAll("[\\[\\]]", "");
+                        }
+                    } else {
+                        sessionId = null;
+                    }
+                    handleMessage(req, res, sessionId);
                     return;
                 }
             }
@@ -184,11 +212,11 @@ public class McpHttpServer implements FxMcpServer {
         });
     }
 
-    private void handleSseConnection(final HTTPRequest req, final HTTPResponse res) {
+    private void handleSseConnection(final HTTPRequest req, final HTTPResponse res, final boolean isTraditionalMode) {
         try {
             // Log Streamable HTTP headers for debugging/context
-            String sessionId   = req.getHeader("Mcp-Session-Id");
-            String lastEventId = req.getHeader("Last-Event-ID");
+            String       sessionId   = req.getHeader("Mcp-Session-Id");
+            final String lastEventId = req.getHeader("Last-Event-ID");
             logger.atDebug().log("SSE Connection Request - Session: %s, Last-Event-ID: %s", sessionId, lastEventId);
 
             // Standard SSE Headers
@@ -196,24 +224,34 @@ public class McpHttpServer implements FxMcpServer {
             res.setHeader("Cache-Control", "no-cache");
             res.setHeader("Connection", "keep-alive");
 
-            // Reflect Protocol Version if requested
-            String protocolVersion = req.getHeader("MCP-Protocol-Version");
-            if (protocolVersion != null) {
-                res.setHeader("MCP-Protocol-Version", protocolVersion);
+            // Negotiate Protocol Version at the transport level
+            final String requestedVersion = req.getHeader("MCP-Protocol-Version");
+            if (requestedVersion != null) {
+                final String negotiatedVersion = McpProtocol.negotiateVersion(requestedVersion);
+                res.setHeader("MCP-Protocol-Version", negotiatedVersion);
             }
 
             // Generate session ID if missing
             if (sessionId == null) {
                 sessionId = UUID.randomUUID().toString();
-                // Set session header before stream flush
+            }
+
+            // Streamable HTTP requires header reflection
+            if (!isTraditionalMode) {
                 res.setHeader("Mcp-Session-Id", sessionId);
             }
 
             res.setStatus(200);
             res.flush(); // Send headers
 
-            // In Streamable HTTP, we don't need to send the 'endpoint' handshake event.
-            // We just keep the connection open for any potential server-initiated notifications.
+            // Traditional SSE requires an endpoint event immediately
+            if (isTraditionalMode) {
+                final String endpointUri   = "/messages?sessionId=" + sessionId;
+                final String endpointEvent = "event: endpoint\ndata: " + endpointUri + "\n\n";
+                res.getOutputStream().write(endpointEvent.getBytes(StandardCharsets.UTF_8));
+                res.flush();
+                logger.atDebug().log("Emitted traditional SSE endpoint: %s", endpointUri);
+            }
 
             // Keep connection open by blocking
             final ConnectionContext ctx = new ConnectionContext();
@@ -238,16 +276,15 @@ public class McpHttpServer implements FxMcpServer {
         }
     }
 
-    private void handleMessage(final HTTPRequest req, final HTTPResponse res) {
+    private void handleMessage(final HTTPRequest req, final HTTPResponse res, String sessionId) {
         try {
             // Log session context
-            String sessionId = req.getHeader("Mcp-Session-Id");
             logger.atDebug().log("MCP Message - Session: %s", sessionId);
 
             // Read the JSON body
             final String body = new String(req.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
-            // Generate Session ID on initialize
+            // Generate Session ID on initialize if somehow missing
             if (sessionId == null && body.contains("\"method\":\"initialize\"")) {
                 sessionId = UUID.randomUUID().toString();
                 logger.atDebug().log("Generated new session ID for initialization: %s", sessionId);
@@ -265,10 +302,11 @@ public class McpHttpServer implements FxMcpServer {
                     res.setHeader("Mcp-Session-Id", sessionId);
                 }
 
-                // Reflect Protocol Version if requested
-                String protocolVersion = req.getHeader("MCP-Protocol-Version");
-                if (protocolVersion != null) {
-                    res.setHeader("MCP-Protocol-Version", protocolVersion);
+                // Negotiate Protocol Version at the transport level
+                final String requestedVersion = req.getHeader("MCP-Protocol-Version");
+                if (requestedVersion != null) {
+                    final String negotiatedVersion = McpProtocol.negotiateVersion(requestedVersion);
+                    res.setHeader("MCP-Protocol-Version", negotiatedVersion);
                 }
 
                 res.setStatus(200);

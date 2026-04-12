@@ -32,9 +32,25 @@ The MCP server is built into the **OSGi.fx** application.
 
 ### 3. Client Configuration (SSE)
 
-Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Events (SSE).
+Configure your MCP client (e.g., Claude Desktop, Cursor, Windsurf) to connect via Server-Sent Events (SSE).
 
-**Example Configuration:**
+**Recommended Configuration (Traditional SSE):**
+Traditional SSE uses separate endpoints for the stream and messages, providing the best compatibility with most modern clients.
+
+```json
+{
+  "mcpServers": {
+    "osgifx": {
+      "serverUrl": "http://localhost:8080/sse",
+      "type": "sse",
+      "disabled": false
+    }
+  }
+}
+```
+
+**Alternative Configuration (Streamable HTTP):**
+This uses a single endpoint for both streaming and messages. Use this if your client explicitly supports Streamable HTTP.
 
 ```json
 {
@@ -47,6 +63,15 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
   }
 }
 ```
+
+### 4. Protocol Compatibility
+
+The OSGi.fx MCP Server actively negotiates the Model Context Protocol version during initialization.
+
+*   **Primary Supported Version:** `2025-03-26` (Ensures seamless compatibility with modern AI clients).
+*   **Backward Compatibility:** `2024-11-05` is fully supported for older clients.
+
+Clients requesting unsupported versions will be offered `2025-03-26` as the fallback negotiated version.
 
 ## Available Tools
 
