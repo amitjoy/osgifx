@@ -160,6 +160,7 @@ public final class RsaDetailsFxController {
         final var          service        = initServiceProperties(rsaEntry, handledKeys);
         final var          distribution   = initDistributionProperties(rsaEntry, handledKeys);
         final var          ecf            = initEcfProperties(rsaEntry.properties, handledKeys);
+        final var          aries          = initAriesProperties(rsaEntry.properties, handledKeys);
         final var          custom         = initCustomProperties(rsaEntry.properties, handledKeys);
 
         final List<Section> sections = new ArrayList<>();
@@ -174,6 +175,9 @@ public final class RsaDetailsFxController {
         }
         if (!ecf.isEmpty()) {
             sections.add(Section.of(ecf.toArray(new Field[0])).title("ECF Metadata"));
+        }
+        if (!aries.isEmpty()) {
+            sections.add(Section.of(aries.toArray(new Field[0])).title("Aries Metadata"));
         }
         if (!custom.isEmpty()) {
             sections.add(Section.of(custom.toArray(new Field[0])).title("Custom Properties"));
@@ -280,11 +284,15 @@ public final class RsaDetailsFxController {
                 .label("Direction"));
 
         if (rsaEntry.provider != null) {
-            final String label = rsaEntry.provider.startsWith("ecf") ? "Container ID" : "Provider";
+            final String label = (rsaEntry.provider.startsWith("ecf") || rsaEntry.provider.startsWith("aries"))
+                    ? "Container ID"
+                    : "Provider";
             fields.add(Field.ofStringType(rsaEntry.provider).editable(false).label(label));
         }
         handledKeys.add("endpoint.service.sender.id");
         handledKeys.add("ecf.endpoint.id");
+        handledKeys.add("aries.tcp.id");
+        handledKeys.add("aries.fastbin.id");
 
         final Object importedConfigs = rsaEntry.properties.get("service.imported.configs");
         if (importedConfigs != null) {
@@ -364,7 +372,25 @@ public final class RsaDetailsFxController {
 
         if (properties != null) {
             properties.forEach((key, value) -> {
-                if ((key.startsWith("ecf.") || key.startsWith("org.eclipse.ecf.")) && !handledKeys.contains(key)) {
+                if ((key.startsWith("ecf.") || key.startsWith("org.eclipse.ecf.") || key.startsWith("zoodiscovery."))
+                        && !handledKeys.contains(key)) {
+                    final String strValue = value == null ? "" : value.toString();
+                    fields.add(Field.ofStringType(strValue).editable(false).label(key));
+                    handledKeys.add(key);
+                }
+            });
+        }
+
+        return fields;
+    }
+
+    private List<Field<?>> initAriesProperties(final Map<String, Object> properties, final List<String> handledKeys) {
+        final List<Field<?>> fields = new ArrayList<>();
+
+        if (properties != null) {
+            properties.forEach((key, value) -> {
+                if ((key.startsWith("aries.") || key.startsWith("org.apache.aries.") || key.startsWith("zookeeper."))
+                        && !handledKeys.contains(key)) {
                     final String strValue = value == null ? "" : value.toString();
                     fields.add(Field.ofStringType(strValue).editable(false).label(key));
                     handledKeys.add(key);
