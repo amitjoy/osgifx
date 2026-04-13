@@ -28,6 +28,7 @@ import com.dlsc.formsfx.model.structure.Field;
 import com.dlsc.formsfx.model.structure.Form;
 import com.dlsc.formsfx.model.structure.Section;
 import com.dlsc.formsfx.view.renderer.FormRenderer;
+import com.osgifx.console.agent.dto.RemoteServiceDirection;
 import com.osgifx.console.agent.dto.XRemoteServiceDTO;
 import com.osgifx.console.util.fx.Fx;
 
@@ -154,11 +155,35 @@ public final class RsaDetailsFxController {
     }
 
     private FormRenderer createForm(final XRemoteServiceDTO rsaEntry) {
-        final var form = Form
-                .of(Section.of(initBasicProperties(rsaEntry).toArray(new Field[0])).title("Endpoint Information"),
-                        Section.of(initCustomProperties(rsaEntry.properties).toArray(new Field[0]))
-                                .title("Endpoint Properties"))
-                .title("Remote Service Details");
+        final List<String> handledKeys    = new ArrayList<>();
+        final var          identification = initIdentificationProperties(rsaEntry, handledKeys);
+        final var          service        = initServiceProperties(rsaEntry, handledKeys);
+        final var          distribution   = initDistributionProperties(rsaEntry, handledKeys);
+        final var          ecf            = initEcfProperties(rsaEntry.properties, handledKeys);
+        final var          aries          = initAriesProperties(rsaEntry.properties, handledKeys);
+        final var          custom         = initCustomProperties(rsaEntry.properties, handledKeys);
+
+        final List<Section> sections = new ArrayList<>();
+        if (!identification.isEmpty()) {
+            sections.add(Section.of(identification.toArray(new Field[0])).title("Endpoint Identification"));
+        }
+        if (!service.isEmpty()) {
+            sections.add(Section.of(service.toArray(new Field[0])).title("Service Attributes"));
+        }
+        if (!distribution.isEmpty()) {
+            sections.add(Section.of(distribution.toArray(new Field[0])).title("Distribution Metadata"));
+        }
+        if (!ecf.isEmpty()) {
+            sections.add(Section.of(ecf.toArray(new Field[0])).title("ECF Metadata"));
+        }
+        if (!aries.isEmpty()) {
+            sections.add(Section.of(aries.toArray(new Field[0])).title("Aries Metadata"));
+        }
+        if (!custom.isEmpty()) {
+            sections.add(Section.of(custom.toArray(new Field[0])).title("Custom Properties"));
+        }
+
+        final var form = Form.of(sections.toArray(new Section[0])).title("Remote Service Details");
 
         final var renderer = new FormRenderer(form);
 
@@ -166,42 +191,228 @@ public final class RsaDetailsFxController {
         return renderer;
     }
 
-    private List<Field<?>> initBasicProperties(final XRemoteServiceDTO rsaEntry) {
+    private List<Field<?>> initIdentificationProperties(final XRemoteServiceDTO rsaEntry,
+                                                        final List<String> handledKeys) {
         final List<Field<?>> fields = new ArrayList<>();
 
-        fields.add(Field.ofStringType(rsaEntry.id == null ? "" : rsaEntry.id).editable(false).label("Endpoint ID"));
-
-        fields.add(Field.ofStringType(rsaEntry.direction == null ? "" : rsaEntry.direction.toString()).editable(false)
-                .label("Direction"));
-
-        fields.add(Field.ofStringType(rsaEntry.frameworkUUID == null ? "" : rsaEntry.frameworkUUID).editable(false)
-                .label("Framework UUID"));
-
-        if (rsaEntry.objectClass != null) {
-            fields.add(Field.ofMultiSelectionType(rsaEntry.objectClass).label("Object Classes"));
-        }
+        final String endpointId = (String) rsaEntry.properties.getOrDefault("endpoint.id", rsaEntry.id);
+        fields.add(Field.ofStringType(endpointId == null ? "" : endpointId).editable(false).label("Endpoint ID"));
+        handledKeys.add("endpoint.id");
+        handledKeys.add("service.remote.endpoint.id");
 
         if (rsaEntry.localServiceId != null) {
-            fields.add(
-                    Field.ofStringType(rsaEntry.localServiceId.toString()).editable(false).label("Local Service ID"));
+            final String label = rsaEntry.direction == RemoteServiceDirection.IMPORT ? "Remote Service ID"
+                    : "Local Service ID";
+            fields.add(Field.ofStringType(rsaEntry.localServiceId.toString()).editable(false).label(label));
+        }
+        handledKeys.add("endpoint.service.id");
+
+        final String frameworkUUID = (String) rsaEntry.properties.getOrDefault("endpoint.framework.uuid",
+                rsaEntry.frameworkUUID);
+        fields.add(
+                Field.ofStringType(frameworkUUID == null ? "" : frameworkUUID).editable(false).label("Framework UUID"));
+        handledKeys.add("endpoint.framework.uuid");
+        handledKeys.add("service.remote.framework.uuid");
+
+        return fields;
+    }
+
+    private List<Field<?>> initServiceProperties(final XRemoteServiceDTO rsaEntry, final List<String> handledKeys) {
+        final List<Field<?>> fields = new ArrayList<>();
+
+        final Object objectClass = rsaEntry.properties.getOrDefault("objectClass", rsaEntry.objectClass);
+        if (objectClass instanceof final Iterable<?> iterable) {
+            final List<String> stringList = new ArrayList<>();
+            iterable.forEach(o -> stringList.add(o.toString()));
+            fields.add(Field.ofMultiSelectionType(stringList).label("Object Classes"));
+        } else if (objectClass instanceof final String[] array) {
+            fields.add(Field.ofMultiSelectionType(List.of(array)).label("Object Classes"));
+        } else if (objectClass != null) {
+            fields.add(Field.ofStringType(objectClass.toString()).editable(false).label("Object Classes"));
+        }
+        handledKeys.add("objectClass");
+
+        final Object exportedInterfaces = rsaEntry.properties.get("service.exported.interfaces");
+        if (exportedInterfaces != null) {
+            if (exportedInterfaces instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Exported Interfaces"));
+            } else if (exportedInterfaces instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Exported Interfaces"));
+            } else {
+                fields.add(
+                        Field.ofStringType(exportedInterfaces.toString()).editable(false).label("Exported Interfaces"));
+            }
+            handledKeys.add("service.exported.interfaces");
         }
 
-        if (rsaEntry.provider != null) {
-            fields.add(Field.ofStringType(rsaEntry.provider).editable(false).label("Provider"));
+        final Object asyncInterfaces = rsaEntry.properties.get("ecf.exported.async.interfaces");
+        if (asyncInterfaces != null) {
+            if (asyncInterfaces instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Async Interfaces"));
+            } else if (asyncInterfaces instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Async Interfaces"));
+            } else {
+                fields.add(Field.ofStringType(asyncInterfaces.toString()).editable(false).label("Async Interfaces"));
+            }
+            handledKeys.add("ecf.exported.async.interfaces");
         }
 
-        if (rsaEntry.intents != null && !rsaEntry.intents.isEmpty()) {
-            fields.add(Field.ofMultiSelectionType(rsaEntry.intents).label("Intents"));
+        final List<String> packageVersions = new ArrayList<>();
+        rsaEntry.properties.forEach((k, v) -> {
+            if (k.startsWith("endpoint.package.version.")) {
+                final String packageName = k.substring("endpoint.package.version.".length());
+                packageVersions.add(packageName + "=" + v);
+                handledKeys.add(k);
+            }
+        });
+        if (!packageVersions.isEmpty()) {
+            fields.add(Field.ofMultiSelectionType(packageVersions).label("Package Versions"));
         }
 
         return fields;
     }
 
-    private List<Field<?>> initCustomProperties(final Map<String, Object> properties) {
+    private List<Field<?>> initDistributionProperties(final XRemoteServiceDTO rsaEntry,
+                                                      final List<String> handledKeys) {
+        final List<Field<?>> fields = new ArrayList<>();
+
+        fields.add(Field.ofStringType(rsaEntry.direction == null ? "" : rsaEntry.direction.toString()).editable(false)
+                .label("Direction"));
+
+        if (rsaEntry.provider != null) {
+            final String label = (rsaEntry.provider.startsWith("ecf") || rsaEntry.provider.startsWith("aries"))
+                    ? "Container ID"
+                    : "Provider";
+            fields.add(Field.ofStringType(rsaEntry.provider).editable(false).label(label));
+        }
+        handledKeys.add("endpoint.service.sender.id");
+        handledKeys.add("ecf.endpoint.id");
+        handledKeys.add("aries.tcp.id");
+        handledKeys.add("aries.fastbin.id");
+        handledKeys.add("service.imported");
+        handledKeys.add("remote.configs.supported");
+        handledKeys.add("remote.intents.supported");
+
+        final Object importedConfigs = rsaEntry.properties.get("service.imported.configs");
+        if (importedConfigs != null) {
+            if (importedConfigs instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Used Configurations"));
+            } else if (importedConfigs instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Used Configurations"));
+            } else {
+                fields.add(Field.ofStringType(importedConfigs.toString()).editable(false).label("Used Configurations"));
+            }
+            handledKeys.add("service.imported.configs");
+        }
+
+        final Object exportedConfigs = rsaEntry.properties.get("service.exported.configs");
+        if (exportedConfigs != null) {
+            if (exportedConfigs instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Requested Configurations"));
+            } else if (exportedConfigs instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Requested Configurations"));
+            } else {
+                fields.add(Field.ofStringType(exportedConfigs.toString()).editable(false)
+                        .label("Requested Configurations"));
+            }
+            handledKeys.add("service.exported.configs");
+        }
+
+        final Object intents = rsaEntry.properties.getOrDefault("service.intents", rsaEntry.intents);
+        if (intents instanceof final Iterable<?> iterable) {
+            final List<String> stringList = new ArrayList<>();
+            iterable.forEach(o -> stringList.add(o.toString()));
+            fields.add(Field.ofMultiSelectionType(stringList).label("Intents"));
+        } else if (intents instanceof final String[] array) {
+            fields.add(Field.ofMultiSelectionType(List.of(array)).label("Intents"));
+        } else if (intents != null) {
+            fields.add(Field.ofStringType(intents.toString()).editable(false).label("Intents"));
+        }
+        handledKeys.add("service.intents");
+
+        final Object exportedIntents = rsaEntry.properties.get("service.exported.intents");
+        if (exportedIntents != null) {
+            if (exportedIntents instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Exported Intents"));
+            } else if (exportedIntents instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Exported Intents"));
+            } else {
+                fields.add(Field.ofStringType(exportedIntents.toString()).editable(false).label("Exported Intents"));
+            }
+            handledKeys.add("service.exported.intents");
+        }
+
+        final Object extraExportedIntents = rsaEntry.properties.get("service.exported.intents.extra");
+        if (extraExportedIntents != null) {
+            if (extraExportedIntents instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Extra Exported Intents"));
+            } else if (extraExportedIntents instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Extra Exported Intents"));
+            } else {
+                fields.add(Field.ofStringType(extraExportedIntents.toString()).editable(false)
+                        .label("Extra Exported Intents"));
+            }
+            handledKeys.add("service.exported.intents.extra");
+        }
+
+        return fields;
+    }
+
+    private List<Field<?>> initEcfProperties(final Map<String, Object> properties, final List<String> handledKeys) {
         final List<Field<?>> fields = new ArrayList<>();
 
         if (properties != null) {
             properties.forEach((key, value) -> {
+                if ((key.startsWith("ecf.") || key.startsWith("org.eclipse.ecf.") || key.startsWith("zoodiscovery."))
+                        && !handledKeys.contains(key)) {
+                    final String strValue = value == null ? "" : value.toString();
+                    fields.add(Field.ofStringType(strValue).editable(false).label(key));
+                    handledKeys.add(key);
+                }
+            });
+        }
+
+        return fields;
+    }
+
+    private List<Field<?>> initAriesProperties(final Map<String, Object> properties, final List<String> handledKeys) {
+        final List<Field<?>> fields = new ArrayList<>();
+
+        if (properties != null) {
+            properties.forEach((key, value) -> {
+                if ((key.startsWith("aries.") || key.startsWith("org.apache.aries.") || key.startsWith("zookeeper."))
+                        && !handledKeys.contains(key)) {
+                    final String strValue = value == null ? "" : value.toString();
+                    fields.add(Field.ofStringType(strValue).editable(false).label(key));
+                    handledKeys.add(key);
+                }
+            });
+        }
+
+        return fields;
+    }
+
+    private List<Field<?>> initCustomProperties(final Map<String, Object> properties, final List<String> handledKeys) {
+        final List<Field<?>> fields = new ArrayList<>();
+
+        if (properties != null) {
+            properties.forEach((key, value) -> {
+                if (handledKeys.contains(key) || key.startsWith("service.imported")
+                        || key.startsWith("endpoint.package.version.")) {
+                    return;
+                }
                 final String strValue = value == null ? "" : value.toString();
                 fields.add(Field.ofStringType(strValue).editable(false).label(key));
             });
