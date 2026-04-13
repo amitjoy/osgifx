@@ -65,3 +65,211 @@
     border-width: 1px 0px 0px 0px;
     /* Standard property */
 }
+
+/* ========== AI Panel Styles ========== */
+
+.ai-panel {
+    -fx-background-color: #252525;
+    background-color: #252525;
+}
+
+.ai-header {
+    -fx-background-color: #1e1e1e;
+    background-color: #1e1e1e;
+    -fx-border-color: #3c3c3c;
+    -fx-border-width: 0 0 1 0;
+}
+
+.ai-title {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #cccccc;
+}
+
+.ai-status {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: #808080;
+    -fx-padding: 2 6 2 6;
+    -fx-background-color: #333333;
+    -fx-background-radius: 3;
+}
+
+.ai-status.ready {
+    -fx-text-fill: #4ec9b0;
+    -fx-background-color: #1e3a2f;
+}
+
+.ai-status.loading {
+    -fx-text-fill: #dcdcaa;
+    -fx-background-color: #3a3520;
+}
+
+.ai-status.error {
+    -fx-text-fill: #f44747;
+    -fx-background-color: #3a1e1e;
+}
+
+.ai-section-label {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: #888888;
+    -fx-padding: 4 0 2 0;
+}
+
+.prompt-area {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 13px;
+    -fx-text-fill: #d4d4d4;
+    -fx-background-color: #1e1e1e;
+    -fx-control-inner-background: #1e1e1e;
+    -fx-highlight-fill: #264f78;
+    -fx-highlight-text-fill: #ffffff;
+    -fx-prompt-text-fill: #555555;
+    -fx-border-color: #3c3c3c;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.prompt-area .content {
+    -fx-background-color: #1e1e1e;
+    -fx-background-radius: 3;
+}
+
+.staging-area {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 13px;
+    -fx-text-fill: #00ff00;
+    -fx-background-color: #1a1a1a;
+    -fx-control-inner-background: #1a1a1a;
+    -fx-highlight-fill: #264f78;
+    -fx-highlight-text-fill: #ffffff;
+    -fx-prompt-text-fill: #555555;
+    -fx-border-color: #3c3c3c;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.staging-area .content {
+    -fx-background-color: #1a1a1a;
+    -fx-background-radius: 3;
+}
+
+.execution-toolbar {
+    -fx-background-color: #252525;
+    -fx-padding: 4 0 4 0;
+    -fx-spacing: 5;
+}
+
+.ai-button {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: #cccccc;
+    -fx-background-color: #3c3c3c;
+    -fx-background-radius: 3;
+    -fx-border-color: #555555;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-padding: 4 10 4 10;
+    -fx-cursor: hand;
+}
+
+.ai-button:hover {
+    -fx-background-color: #4a4a4a;
+    -fx-border-color: #007acc;
+}
+
+.ai-button:pressed {
+    -fx-background-color: #333333;
+}
+
+.ai-button:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.step-highlight {
+    -fx-background-color: #264f78;
+}
+
+.step-success {
+    -fx-background-color: #1e3a2f;
+}
+
+.step-failed {
+    -fx-background-color: #3a1e1e;
+}
+
+/* ========== Token Input Styles ========== */
+
+.token-input {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: #d4d4d4;
+    -fx-background-color: #1e1e1e;
+    -fx-control-inner-background: #1e1e1e;
+    -fx-prompt-text-fill: #555555;
+    -fx-border-color: #555555;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 4 8 4 8;
+    -fx-max-height: 28;
+    -fx-min-height: 28;
+}
+
+.token-input:focused {
+    -fx-border-color: #007acc;
+}
+
+/* ========== Config Input Styles ========== */
+
+.config-input {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: #d4d4d4;
+    -fx-background-color: #1e1e1e;
+    -fx-control-inner-background: #1e1e1e;
+    -fx-prompt-text-fill: #555555;
+    -fx-border-color: #555555;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 4 8 4 8;
+    -fx-max-height: 28;
+    -fx-min-height: 28;
+}
+
+.config-input:focused {
+    -fx-border-color: #007acc;
+}
+
+/* ========== AI ComboBox Styles ========== */
+
+.ai-combo {
+    -fx-font-family: "Consolas", "Monaco", "Courier New", monospace;
+    -fx-font-size: 12px;
+    -fx-background-color: #3c3c3c;
+    -fx-border-color: #555555;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-max-height: 28;
+    -fx-min-height: 28;
+}
+
+.ai-combo .list-cell {
+    -fx-text-fill: #d4d4d4;
+    -fx-background-color: #3c3c3c;
+}
+
+.ai-combo .list-view .list-cell:hover {
+    -fx-background-color: #4a4a4a;
+}
+
+.ai-combo .list-view .list-cell:selected {
+    -fx-background-color: #264f78;
+}
