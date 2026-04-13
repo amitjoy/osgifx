@@ -293,6 +293,9 @@ public final class RsaDetailsFxController {
         handledKeys.add("ecf.endpoint.id");
         handledKeys.add("aries.tcp.id");
         handledKeys.add("aries.fastbin.id");
+        handledKeys.add("service.imported");
+        handledKeys.add("remote.configs.supported");
+        handledKeys.add("remote.intents.supported");
 
         final Object importedConfigs = rsaEntry.properties.get("service.imported.configs");
         if (importedConfigs != null) {
