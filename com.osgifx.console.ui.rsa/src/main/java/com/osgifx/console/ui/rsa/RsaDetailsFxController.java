@@ -161,12 +161,21 @@ public final class RsaDetailsFxController {
         final var          distribution   = initDistributionProperties(rsaEntry, handledKeys);
         final var          custom         = initCustomProperties(rsaEntry.properties, handledKeys);
 
-        final var form = Form
-                .of(Section.of(identification.toArray(new Field[0])).title("Endpoint Identification"),
-                        Section.of(service.toArray(new Field[0])).title("Service Attributes"),
-                        Section.of(distribution.toArray(new Field[0])).title("Distribution Metadata"),
-                        Section.of(custom.toArray(new Field[0])).title("Custom Properties"))
-                .title("Remote Service Details");
+        final List<Section> sections = new ArrayList<>();
+        if (!identification.isEmpty()) {
+            sections.add(Section.of(identification.toArray(new Field[0])).title("Endpoint Identification"));
+        }
+        if (!service.isEmpty()) {
+            sections.add(Section.of(service.toArray(new Field[0])).title("Service Attributes"));
+        }
+        if (!distribution.isEmpty()) {
+            sections.add(Section.of(distribution.toArray(new Field[0])).title("Distribution Metadata"));
+        }
+        if (!custom.isEmpty()) {
+            sections.add(Section.of(custom.toArray(new Field[0])).title("Custom Properties"));
+        }
+
+        final var form = Form.of(sections.toArray(new Section[0])).title("Remote Service Details");
 
         final var renderer = new FormRenderer(form);
 
