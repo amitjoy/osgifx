@@ -17,6 +17,7 @@ package com.osgifx.console.mcp.server;
 
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -109,61 +110,75 @@ public class McpJsonRpcServer {
 
     /**
      * Processes an incoming JSON-RPC message string.
+     * Supports both single requests and JSON-RPC batch arrays (per 2025-03-26 spec).
      *
      * @param jsonBody The raw JSON string received from the transport.
      * @return A JSON string response (success, error, or null if no response needed).
      */
     public String handleMessage(final String jsonBody) {
         addLog(McpLogEntry.Type.REQUEST, jsonBody);
-        JsonRpc.Request req;
-        try {
-            req = gson.fromJson(jsonBody, JsonRpc.Request.class);
-        } catch (final Exception e) {
-            final var error = error(null, -32700, "Parse error");
-            addLog(McpLogEntry.Type.RESPONSE, error);
-            return error;
-        }
 
         try {
-            String response;
-            switch (req.method) {
-                // HANDSHAKE: Client says "Hello"
-                case "initialize":
-                    response = handleInitialize(req);
-                    break;
+            final String trimmed = jsonBody.trim();
+            String       response;
 
-                // HANDSHAKE: Client says "I got your hello"
-                case "notifications/initialized":
-                    response = null; // No response allowed for notifications
-                    break;
-
-                // DISCOVERY: Client asks "What can you do?"
-                case "tools/list":
-                    response = handleListTools(req);
-                    break;
-
-                // EXECUTION: Client says "Do this"
-                case "tools/call":
-                    response = handleToolCall(req);
-                    break;
-
-                case "ping":
-                    response = success(req.id, Map.of());
-                    break;
-
-                default:
-                    // If it's a notification (no ID), ignore it. If request, send error.
-                    response = req.id == null ? null : error(req.id, -32601, "Method not found: " + req.method);
-                    break;
+            if (trimmed.startsWith("[")) {
+                response = handleBatch(trimmed);
+            } else {
+                response = processSingleRequest(trimmed);
             }
+
             if (response != null) {
                 addLog(McpLogEntry.Type.RESPONSE, response);
             }
             return response;
         } catch (final Exception e) {
-            final var error = error(req.id, -32000, "Server error: " + e.getMessage());
-            addLog(McpLogEntry.Type.RESPONSE, error);
-            return error;
+            final var err = error(null, -32700, "Parse error");
+            addLog(McpLogEntry.Type.RESPONSE, err);
+            return err;
+        }
+    }
+
+    private String handleBatch(final String jsonBody) {
+        final com.google.gson.JsonArray batch     = gson.fromJson(jsonBody, com.google.gson.JsonArray.class);
+        final List<String>              responses = new ArrayList<>();
+        for (final var element : batch) {
+            final String singleResponse = processSingleRequest(element.toString());
+            if (singleResponse != null) {
+                responses.add(singleResponse);
+            }
+        }
+        if (responses.isEmpty()) {
+            return null;
+        }
+        return "[" + String.join(",", responses) + "]";
+    }
+
+    private String processSingleRequest(final String jsonBody) {
+        JsonRpc.Request req;
+        try {
+            req = gson.fromJson(jsonBody, JsonRpc.Request.class);
+        } catch (final Exception e) {
+            return error(null, -32700, "Parse error");
+        }
+
+        try {
+            switch (req.method) {
+                case "initialize":
+                    return handleInitialize(req);
+                case "notifications/initialized":
+                    return null;
+                case "tools/list":
+                    return handleListTools(req);
+                case "tools/call":
+                    return handleToolCall(req);
+                case "ping":
+                    return success(req.id, Map.of());
+                default:
+                    return req.id == null ? null : error(req.id, -32601, "Method not found: " + req.method);
+            }
+        } catch (final Exception e) {
+            return error(req.id, -32000, "Server error: " + e.getMessage());
         }
     }
 
@@ -179,21 +194,47 @@ public class McpJsonRpcServer {
         // Negotiate the protocol version
         final String negotiatedVersion = McpProtocol.negotiateVersion(clientVersion);
 
-        // Declare capabilities: Tools only (no Resources/Prompts)
-        final var capabilities = Map.of("tools", Map.of("listChanged", true), "resources", Map.of("listChanged", false),
-                "prompts", Map.of("listChanged", false));
+        // Declare capabilities: only tools are currently supported
+        final var capabilities = Map.of("tools", Map.of("listChanged", true));
 
-        final var result = Map.of("protocolVersion", negotiatedVersion, "capabilities", capabilities, "serverInfo",
-                Map.of("name", "OSGi.fx", "version", "1.0.0"));
+        final var result = new HashMap<String, Object>();
+        result.put("protocolVersion", negotiatedVersion);
+        result.put("capabilities", capabilities);
+        result.put("serverInfo", Map.of("name", "OSGi.fx", "version", "1.0.0"));
+        result.put("instructions",
+                "OSGi.fx MCP server provides tools for managing and inspecting remote OSGi runtimes. "
+                        + "Use the available tools to list bundles, services, components, configurations, and more.");
         return success(req.id, result);
     }
 
     private String handleListTools(final JsonRpc.Request req) {
-        final List<Map<String, Object>> toolList = new ArrayList<>();
+        final List<Map<String, Object>> allTools = new ArrayList<>();
         for (final ToolRegistration t : tools.values()) {
-            toolList.add(Map.of("name", t.name, "description", t.description, "inputSchema", t.inputSchema));
+            allTools.add(Map.of("name", t.name, "description", t.description, "inputSchema", t.inputSchema));
         }
-        return success(req.id, Map.of("tools", toolList));
+
+        // Pagination support (per MCP spec)
+        int startIndex = 0;
+        if (req.params != null && req.params.containsKey("cursor")) {
+            try {
+                startIndex = Integer.parseInt((String) req.params.get("cursor"));
+            } catch (final Exception e) {
+                return error(req.id, -32602, "Invalid cursor");
+            }
+            if (startIndex < 0 || startIndex >= allTools.size()) {
+                startIndex = 0;
+            }
+        }
+
+        final int pageSize = 50;
+        final int endIndex = Math.min(startIndex + pageSize, allTools.size());
+        final var page     = allTools.subList(startIndex, endIndex);
+        final var result   = new HashMap<String, Object>();
+        result.put("tools", page);
+        if (endIndex < allTools.size()) {
+            result.put("nextCursor", String.valueOf(endIndex));
+        }
+        return success(req.id, result);
     }
 
     @SuppressWarnings("unchecked")
