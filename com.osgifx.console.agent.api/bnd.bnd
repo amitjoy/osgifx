@@ -2,6 +2,7 @@ javac.source         : 1.8
 javac.target         : ${javac.source}
 javac.compliance     : ${javac.source}
 -noimportjava        : true
+-maven-dependencies  : 
 -baseline            : com.osgifx.console.agent.api;version=2.4.5
 -buildpath.osgi      : \
                        biz.aQute.remote.agent;packages=*,\
