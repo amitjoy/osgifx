@@ -159,6 +159,7 @@ public final class RsaDetailsFxController {
         final var          identification = initIdentificationProperties(rsaEntry, handledKeys);
         final var          service        = initServiceProperties(rsaEntry, handledKeys);
         final var          distribution   = initDistributionProperties(rsaEntry, handledKeys);
+        final var          ecf            = initEcfProperties(rsaEntry.properties, handledKeys);
         final var          custom         = initCustomProperties(rsaEntry.properties, handledKeys);
 
         final List<Section> sections = new ArrayList<>();
@@ -170,6 +171,9 @@ public final class RsaDetailsFxController {
         }
         if (!distribution.isEmpty()) {
             sections.add(Section.of(distribution.toArray(new Field[0])).title("Distribution Metadata"));
+        }
+        if (!ecf.isEmpty()) {
+            sections.add(Section.of(ecf.toArray(new Field[0])).title("ECF Metadata"));
         }
         if (!custom.isEmpty()) {
             sections.add(Section.of(custom.toArray(new Field[0])).title("Custom Properties"));
@@ -239,6 +243,20 @@ public final class RsaDetailsFxController {
             handledKeys.add("service.exported.interfaces");
         }
 
+        final Object asyncInterfaces = rsaEntry.properties.get("ecf.exported.async.interfaces");
+        if (asyncInterfaces != null) {
+            if (asyncInterfaces instanceof final Iterable<?> iterable) {
+                final List<String> stringList = new ArrayList<>();
+                iterable.forEach(o -> stringList.add(o.toString()));
+                fields.add(Field.ofMultiSelectionType(stringList).label("Async Interfaces"));
+            } else if (asyncInterfaces instanceof final String[] array) {
+                fields.add(Field.ofMultiSelectionType(List.of(array)).label("Async Interfaces"));
+            } else {
+                fields.add(Field.ofStringType(asyncInterfaces.toString()).editable(false).label("Async Interfaces"));
+            }
+            handledKeys.add("ecf.exported.async.interfaces");
+        }
+
         final List<String> packageVersions = new ArrayList<>();
         rsaEntry.properties.forEach((k, v) -> {
             if (k.startsWith("endpoint.package.version.")) {
@@ -262,7 +280,8 @@ public final class RsaDetailsFxController {
                 .label("Direction"));
 
         if (rsaEntry.provider != null) {
-            fields.add(Field.ofStringType(rsaEntry.provider).editable(false).label("Provider"));
+            final String label = rsaEntry.provider.startsWith("ecf") ? "Container ID" : "Provider";
+            fields.add(Field.ofStringType(rsaEntry.provider).editable(false).label(label));
         }
         handledKeys.add("endpoint.service.sender.id");
         handledKeys.add("ecf.endpoint.id");
@@ -335,6 +354,22 @@ public final class RsaDetailsFxController {
                         .label("Extra Exported Intents"));
             }
             handledKeys.add("service.exported.intents.extra");
+        }
+
+        return fields;
+    }
+
+    private List<Field<?>> initEcfProperties(final Map<String, Object> properties, final List<String> handledKeys) {
+        final List<Field<?>> fields = new ArrayList<>();
+
+        if (properties != null) {
+            properties.forEach((key, value) -> {
+                if ((key.startsWith("ecf.") || key.startsWith("org.eclipse.ecf.")) && !handledKeys.contains(key)) {
+                    final String strValue = value == null ? "" : value.toString();
+                    fields.add(Field.ofStringType(strValue).editable(false).label(key));
+                    handledKeys.add(key);
+                }
+            });
         }
 
         return fields;
