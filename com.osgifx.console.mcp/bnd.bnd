@@ -6,3 +6,6 @@
 -privatepackage     : com.osgifx.console.mcp.*
 -conditionalpackage : io.fusionauth*
 -fixupmessages      : 'split'
+-testpath           : \
+                      osgi.enroute.junit.wrapper,\
+                      osgi.enroute.hamcrest.wrapper
