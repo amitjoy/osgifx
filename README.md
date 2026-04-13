@@ -139,12 +139,12 @@ For detailed setup instructions, see the [User Guide](GUIDE.md).
 | **👻 Headless Launch** <br> _Start application with pre-configured connection. [Read More](HEADLESS_LAUNCH.md)_ | 2.4.5 | ✅ | 🚀 |
 | **🌐 JAX-RS View** <br> _Inspect JAX-RS Applications, Resources, and Extensions_ | 3.0.0 | ✅ | 🚀 |
 | **📦 CDI View** <br> _Inspect CDI Containers, Components, and Extensions_ | 3.0.0 | ✅ | 🚀 |
-| **🌍 Remote Services Admin** <br> _Monitor OSGi Remote Services endpoints (imports and exports) with graph visualization_ | 3.1.0 | ✅ | 🚀 |
 | **🔐 Authentication & Security** <br> _Password authentication with AES-256 encryption, TLS/SSL, and OAuth/Token support_ | 3.0.0 | ✅ | 🚀 |
 | **💥 Blast Radius Analysis** <br> _Pre-flight simulation of impact when stopping bundles or disabling components_ | 3.0.0 | ✅ | 🚀 |
 | **🌊 Activation Cascade Analysis** <br> _Predictive analysis of service activations and hijacking when starting bundles or enabling components_ | 3.0.0 | ✅ | 🚀 |
 | **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components_ | 3.0.0 | ✅ | 🚀 |
 | **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks_ | 3.0.0 | ✅ | 🚀 |
+| **🌍 Remote Services Admin** <br> _Monitor OSGi Remote Services endpoints (imports and exports) with graph visualization_ | 3.1.0 | ✅ | 🚀 |
 
 --------------------------------------------------------------------------------------------------------------
 
