@@ -14,15 +14,111 @@
   License for the specific language governing permissions and limitations under
   the License.
 -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.gogo.GogoFxController" stylesheets="@../css/gogo.css">
-    <center>
-        <TextArea editable="false" fx:id="output" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" wrapText="true" />
-    </center>
-    <bottom>
-        <TextField fx:id="input" onKeyPressed="#handleInput" prefHeight="30.0" promptText="Type Gogo Command ... (Press 'Enter' to execute, 'Up/Down' for history)" BorderPane.alignment="CENTER" />
-    </bottom>
-</BorderPane>
+<SplitPane fx:id="rootSplitPane" dividerPositions="0.32" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="com.osgifx.console.ui.gogo.GogoFxController" stylesheets="@../css/gogo.css">
+
+    <!-- Left: AI Panel -->
+    <BorderPane fx:id="aiPanel" styleClass="ai-panel">
+        <top>
+            <VBox styleClass="ai-header" spacing="5">
+                <padding><Insets top="8" right="8" bottom="8" left="8" /></padding>
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="AI Command Builder" styleClass="ai-title" />
+                    <Label fx:id="aiStatusLabel" text="Ready" styleClass="ai-status" />
+                </HBox>
+                <GridPane hgap="8" vgap="5">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="75" prefWidth="75" halignment="LEFT" />
+                        <ColumnConstraints hgrow="ALWAYS" fillWidth="true" />
+                    </columnConstraints>
+                    <Label text="Mode:" styleClass="ai-section-label" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <ComboBox fx:id="modeCombo" styleClass="ai-combo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                </GridPane>
+                <VBox fx:id="providerConfigBox" spacing="0" managed="false" visible="false">
+                    <GridPane hgap="8" vgap="5">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="75" prefWidth="75" halignment="LEFT" />
+                            <ColumnConstraints hgrow="ALWAYS" fillWidth="true" />
+                        </columnConstraints>
+                        <Label text="Provider:" styleClass="ai-section-label" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="providerCombo" styleClass="ai-combo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <Label text="API Key:" styleClass="ai-section-label" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <PasswordField fx:id="apiKeyInput" promptText="sk-..." styleClass="token-input" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label text="Base URL:" styleClass="ai-section-label" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <TextField fx:id="baseUrlInput" promptText="https://api.openai.com/v1" styleClass="config-input" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="Model:" styleClass="ai-section-label" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextField fx:id="modelInput" promptText="gpt-4o-mini" styleClass="config-input" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <HBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                            <Button fx:id="saveConfigBtn" text="Save" onAction="#handleSaveConfig" styleClass="ai-button">
+                                <tooltip><Tooltip text="Save provider configuration" /></tooltip>
+                            </Button>
+                            <Button fx:id="resetConfigBtn" text="Reset" onAction="#handleResetConfig" styleClass="ai-button">
+                                <tooltip><Tooltip text="Clear provider configuration and switch to Smart Match" /></tooltip>
+                            </Button>
+                        </HBox>
+                    </GridPane>
+                </VBox>
+            </VBox>
+        </top>
+        <center>
+            <VBox spacing="5" VBox.vgrow="ALWAYS">
+                <padding><Insets top="4" right="8" bottom="4" left="8" /></padding>
+                <Label text="Describe what you want to do:" styleClass="ai-section-label" />
+                <TextArea fx:id="promptInput" promptText="e.g., Find all web bundles and stop them" prefRowCount="4" wrapText="true" styleClass="prompt-area" />
+                <HBox spacing="5" alignment="CENTER_LEFT">
+                    <Button fx:id="generateBtn" text="Generate" onAction="#handleGenerate" styleClass="ai-button">
+                        <tooltip><Tooltip text="Generate Gogo commands from prompt (Ctrl+Enter)" /></tooltip>
+                    </Button>
+                    <Button fx:id="clearBtn" text="Clear" onAction="#handleClear" styleClass="ai-button">
+                        <tooltip><Tooltip text="Clear prompt and staging area" /></tooltip>
+                    </Button>
+                </HBox>
+                <Label text="Generated Commands (editable):" styleClass="ai-section-label" />
+                <TextArea fx:id="stagingArea" promptText="Generated Gogo commands will appear here..." wrapText="true" styleClass="staging-area" VBox.vgrow="ALWAYS" />
+                <ToolBar styleClass="execution-toolbar">
+                    <Button fx:id="executeAllBtn" text="Run All" onAction="#handleExecuteAll" styleClass="ai-button">
+                        <tooltip><Tooltip text="Execute all commands (Ctrl+Shift+Enter)" /></tooltip>
+                    </Button>
+                    <Button fx:id="executeSelectionBtn" text="Run Selection" onAction="#handleExecuteSelection" styleClass="ai-button">
+                        <tooltip><Tooltip text="Execute selected text (Ctrl+E)" /></tooltip>
+                    </Button>
+                    <Button fx:id="stepBtn" text="Step" onAction="#handleStep" styleClass="ai-button">
+                        <tooltip><Tooltip text="Execute next statement (F8)" /></tooltip>
+                    </Button>
+                    <Button fx:id="resetBtn" text="Reset" onAction="#handleReset" styleClass="ai-button">
+                        <tooltip><Tooltip text="Reset step pointer to beginning" /></tooltip>
+                    </Button>
+                    <Button fx:id="copyBtn" text="Copy" onAction="#handleCopy" styleClass="ai-button">
+                        <tooltip><Tooltip text="Copy commands to clipboard" /></tooltip>
+                    </Button>
+                </ToolBar>
+            </VBox>
+        </center>
+    </BorderPane>
+
+    <!-- Right: Existing Terminal -->
+    <BorderPane fx:id="terminalPane">
+        <center>
+            <TextArea editable="false" fx:id="output" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" wrapText="true" />
+        </center>
+        <bottom>
+            <TextField fx:id="input" onKeyPressed="#handleInput" prefHeight="30.0" promptText="Type Gogo Command ... (Press 'Enter' to execute, 'Up/Down' for history)" BorderPane.alignment="CENTER" />
+        </bottom>
+    </BorderPane>
+
+</SplitPane>
