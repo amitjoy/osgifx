@@ -23,7 +23,7 @@ public final class McpProtocol {
     }
 
     // Ordered from newest to oldest
-    public static final List<String> SUPPORTED_VERSIONS = List.of("2025-03-26", "2024-11-05");
+    public static final List<String> SUPPORTED_VERSIONS = List.of("2025-11-25", "2025-03-26", "2024-11-05");
 
     /**
      * Negotiates the protocol version.
