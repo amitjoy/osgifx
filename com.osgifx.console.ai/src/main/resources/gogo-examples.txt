@@ -1,0 +1,2614 @@
+# Gogo Command Examples Corpus
+# Format: P: <natural language prompt>
+# A: <gogo command(s)>
+# Blank line separates entries
+
+P: show all bundles
+A: felix:lb
+
+P: list all bundles
+A: felix:lb
+
+P: show all bundles that have xyz in their symbolic names
+A: felix:lb xyz
+
+P: show all bundles that have abc in their bsn
+A: felix:lb abc
+
+P: show all bundles that have mno in their bsn and list them by bundle symbolic names
+A: felix:lb mno -s
+
+P: show all bundles that have wxy in their bundle symbolic names and list them by bsn
+A: felix:lb wxy -s
+
+P: show all bundles that have anx in their bsn and list them by their update locations
+A: felix:lb anx -u
+
+P: show help for 'echo' command
+A: felix:help echo
+
+P: show help information for 'ls' command
+A: felix:help ls
+
+P: get help for 'lb' command
+A: felix:help lb
+
+P: Show all system properties
+A: properties
+
+P: list all system properties
+A: properties
+
+P: list contents of a directory
+A: felix:ls 'directory'
+
+P: change directory
+A: felix:cd 'directory'
+
+P: determine from where a bundle loads a class
+A: felix:which 'class'
+
+P: install a bundle using its location
+A: felix:install 'file:/path_to_jar.jar'
+
+P: uninstall bundle with id 10
+A: felix:uninstall 10
+
+P: uninstall bundles 13 38 62 77
+A: felix:uninstall 13 38 62 77
+
+P: refresh bundle with id 10
+A: felix:refresh 10
+
+P: resolve bundle with id 15
+A: felix:resolve 15
+
+P: resolve bundles with ids 19 40 32
+A: felix:resolve 19 40 32
+
+P: start bundle with id 20
+A: felix:start 20
+
+P: start bundle id 58 transiently
+A: felix:start 58 -t
+
+P: start bundles with ids 20 30 59 53
+A: felix:start 20 30 59 53
+
+P: stop bundle 65
+A: felix:stop 65
+
+P: stop bundle with id 25
+A: felix:stop 25
+
+P: stop bundle id 91 transiently
+A: felix:stop 91 -t
+
+P: stop bundles with ids 25 50 39 22
+A: felix:stop 25 50 39 22
+
+P: show bundle start level of bundle with id 30
+A: felix:bundlelevel 30
+
+P: set bundle start level to 11 of bundle with id 30
+A: felix:bundlelevel 11 30
+
+P: show start level of framework bundle
+A: felix:frameworklevel
+
+P: change framework start level to 20
+A: felix:frameworklevel 20
+
+P: list bundles matching a substring
+A: felix:lb substring
+
+P: list bundle matching xyz and show locations
+A: felix:lb -l xyz
+
+P: list bundles matching a substring and show symbolic names
+A: felix:lb -s substring
+
+P: list bundles matching a substring and show update location
+A: felix:lb -u substring
+
+P: show all capabilities of all bundles
+A: felix:inspect cap *
+
+P: show all capabilities of a bundle having id 1
+A: felix:inspect cap * 1
+
+P: show all package capabilities of a bundle having id 1
+A: felix:inspect cap package 1
+
+P: show all service capabilities of bundle 93
+A: felix:inspect cap service 93
+
+P: show all requirements of all bundles
+A: felix:inspect req *
+
+P: show all requirements of a bundle having id 1
+A: felix:inspect req * 1
+
+P: show all package requirements of a bundle 68
+A: felix:inspect req package 68
+
+P: show all service requirements of all bundles
+A: felix:inspect req service
+
+P: show session context
+A: gogo:set
+
+P: set a variable into session context
+A: variable = value
+
+P: get value of the variable set in the session context
+A: $variable
+
+P: print the variable set in the session context
+A: echo $variable
+
+P: Match input using regular expression (grep)
+A: echo test | grep '[tT]est'
+
+P: Read the content of a resource from path
+A: cat a/b/c.txt
+
+P: Collect contents of a/b/c.txt into one line
+A: cat a/b/c.txt | tac
+
+P: Collect contents of a/b/c.txt into a variable
+A: my_var = (cat a/b/c.txt | tac)
+
+P: Print Hello World
+A: echo Hello World
+
+P: Show history
+A: history
+
+P: Execute the 1st command from the history
+A: !1
+
+P: Execute the command from the history that starts with x
+A: !x
+
+P: Show the current time in milliseconds
+A: currenttimemillis
+
+P: Show the system property named my_property
+A: property my_property
+
+P: Show the user directory system property
+A: property user.dir
+
+P: Show the java home system property
+A: property java.home
+
+P: Show the java version system property
+A: property java.version
+
+P: Show the operating system name system property
+A: property os.name
+
+P: Set the property A.B to value my_value
+A: property A.B my_value
+
+P: Show the nano time
+A: nanotime
+
+P: Show line separator
+A: lineSeparator
+
+P: Generate identity hashcode of string abc
+A: identityhashcode abc
+
+P: List all environment variables
+A: env
+
+P: Show or get the environment variable JAVA_HOME
+A: env JAVA_HOME
+
+P: Perform garbage collection
+A: gc
+
+P: Remove the property abc
+A: clearProperty abc
+
+P: List all the components
+A: scr:list
+
+P: List all the components of bundle with id 57
+A: scr:list 57
+
+P: Show the components that contain the string abc
+A: scr:list | grep -A 1 abc
+
+P: Show the info of the component having id 10
+A: scr:info 10
+
+P: Show the component info by name
+A: scr:info com.example.MyComponent
+
+P: Enable the component with name abc
+A: scr:enable abc
+
+P: Disable the component with name abc
+A: scr:disable abc
+
+P: Show the SCR configuration
+A: scr:config
+
+P: Show the headers of bundle with id 4
+A: bundle = bundle 4 | $bundle headers
+
+P: Show the bundle name of bundle with id 4
+A: bundle = bundle 4 | $bundle tostring
+
+P: Show the bundle context of bundle with id 4
+A: bundle = bundle 4 | $bundle bundlecontext
+
+P: Show the symbolic name of bundle with id 10
+A: bundle = bundle 10 | $bundle symbolicname
+
+P: Show the location of bundle with id 12
+A: bundle = bundle 12 | $bundle location
+
+P: Show the registered services of bundle id 15
+A: bundle = bundle 15 | $bundle registeredservices
+
+P: Show the used services of bundle id 15
+A: bundle = bundle 15 | $bundle servicesinuse
+
+P: Show the version of bundle id 16
+A: bundle = bundle 16 | $bundle version
+
+P: Load a class by the bundle id 4
+A: bundle = bundle 4 | $bundle loadclass a.b.c
+
+P: List all configurations
+A: cm:listconfigurations "(service.pid=*)"
+
+P: List the configurations that have PID set to abc
+A: cm:listconfigurations "(service.pid=abc)"
+
+P: List the configurations whose PID contains xyz
+A: cm:listconfigurations "(service.pid=*xyz*)"
+
+P: List the configurations whose PID begins with mno
+A: cm:listconfigurations "(service.pid=mno*)"
+
+P: List the configurations whose PID ends with uvw
+A: cm:listconfigurations "(service.pid=*uvw)"
+
+P: List all configurations using null filter
+A: cm:listconfigurations null
+
+P: List the configurations whose factory PID is wxy
+A: cm:listconfigurations "(service.factoryPid=wxy)"
+
+P: List the configurations whose factory PID contains jkl
+A: cm:listconfigurations "(service.factoryPid=*jkl*)"
+
+P: Get the configuration with PID foo
+A: cm:getconfiguration "foo"
+
+P: Create a dictionary and assign it to variable d
+A: d = (((bundle 0) loadclass java.util.Hashtable) newInstance)
+
+P: Add foo key to the dictionary d and associate bar value
+A: $d put "foo" "bar"
+
+P: Create a configuration abc.xyz and assign it to variable c
+A: c = cm:getconfiguration "abc.xyz"
+
+P: Update the configuration c with the dictionary d
+A: $c update $d
+
+P: Create a factory configuration under factory PID abc
+A: f = cm:createfactoryconfiguration "abc" "?"
+
+P: Change prompt to $ sign
+A: prompt = "$ "
+
+P: List information about why the specified bundle with ID 100 is not working
+A: diag 100
+
+P: List all of the services that have been registered
+A: services
+
+P: Show the headers of bundle 66
+A: felix:headers 66
+
+P: Show all info log entries
+A: felix:log info
+
+P: Show all debug log entries
+A: felix:log debug
+
+P: Show all warn log entries
+A: felix:log warn
+
+P: Show all error log entries
+A: felix:log error
+
+P: Display max of 20 error log entries
+A: felix:log 20 error
+
+P: Check if abc.def class is loaded by bundle id 40
+A: felix:which 40 abc.def
+
+P: Show SCR config
+A: scr:config
+
+P: Add a command named math containing all functions available in Math class
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+
+P: Show the content of file xyz.txt
+A: cat xyz.txt
+
+P: Display the content of URI http://a.b/c.txt
+A: cat http://a.b/c.txt
+
+# ========== Discovery-First Patterns ==========
+
+P: find all web bundles and stop them
+A: b = (lb | grep -i web)
+felix:stop $b
+
+P: find bundles related to http and restart them
+A: b = (lb | grep -i http)
+felix:stop $b
+felix:start $b
+
+P: discover all active bundles
+A: lb | grep Active
+
+P: find and uninstall all test bundles
+A: b = (lb | grep -i test)
+felix:uninstall $b
+
+P: find bundles with errors and diagnose them
+A: lb | grep -i installed
+diag $b
+
+P: list all services provided by web bundles
+A: b = (lb | grep -i web)
+felix:inspect cap service $b
+
+P: find configuration PIDs related to http
+A: cm:listconfigurations "(service.pid=*http*)"
+
+P: find and disable all components containing scheduler
+A: scr:list | grep -i scheduler
+
+P: restart the framework
+A: felix:stop 0
+
+P: update bundle with id 42
+A: felix:update 42
+
+P: show all packages exported by bundle 5
+A: felix:inspect cap package 5
+
+P: show all packages imported by bundle 5
+A: felix:inspect req package 5
+
+P: find duplicate packages across bundles
+A: felix:inspect cap package
+
+P: find all bundles in installed state
+A: lb | grep Installed
+
+P: find all bundles in resolved state
+A: lb | grep Resolved
+
+P: find all active bundles with apache in name
+A: lb -s | grep -i apache | grep Active
+
+P: show wire information for bundle 10
+A: felix:inspect req * 10
+
+P: create a new configuration with PID my.service.pid
+A: c = cm:getconfiguration "my.service.pid"
+d = (((bundle 0) loadclass java.util.Hashtable) newInstance)
+$d put "key" "value"
+$c update $d
+
+P: delete configuration with PID my.config
+A: c = cm:getconfiguration "my.config"
+$c delete
+
+P: find all DS components in satisfied state
+A: scr:list | grep -i satisfied
+
+P: find all DS components in unsatisfied state
+A: scr:list | grep -i unsatisfied
+
+P: show thread count
+A: property java.lang.Thread.activeCount
+
+P: show available processors
+A: property java.lang.Runtime.availableProcessors
+
+P: show free memory
+A: ((bundle 0) loadclass java.lang.Runtime) getRuntime | $it freeMemory
+
+P: show total memory
+A: ((bundle 0) loadclass java.lang.Runtime) getRuntime | $it totalMemory
+
+P: show max memory
+A: ((bundle 0) loadclass java.lang.Runtime) getRuntime | $it maxMemory
+
+# ========== Command Discovery & Help ==========
+
+P: list all available commands
+A: help
+
+P: show all commands in all scopes
+A: help
+
+P: show the type of a command
+A: gogo:type commandname
+
+P: check what the 'lb' command is
+A: gogo:type lb
+
+P: find out the scope of 'list' command
+A: gogo:type list
+
+# ========== Service Queries ==========
+
+P: list all services matching an LDAP filter
+A: services "(objectClass=*Http*)"
+
+P: show services registered by bundle 10
+A: services 10
+
+P: find all services containing EventAdmin
+A: services "(objectClass=*EventAdmin*)"
+
+P: show all services with a specific property
+A: services "(service.vendor=Apache*)"
+
+P: find all servlet services
+A: services "(objectClass=*Servlet*)"
+
+P: show services provided by bundle 15
+A: services 15
+
+# ========== Gogo Flow Control ==========
+
+P: iterate over all bundles and print symbolic names
+A: each (lb) { echo ($it symbolicname) }
+
+P: iterate over a list and print each item
+A: each [1 2 3 4 5] { echo $it }
+
+P: conditionally execute a command
+A: if { $condition } { echo "true" } { echo "false" }
+
+P: loop while a condition is true
+A: while { $running } { echo "still running" }
+
+P: try a command and catch errors
+A: try { risky-command } catch { echo "command failed" }
+
+P: negate a command result
+A: not { some-command }
+
+P: evaluate a string as a command
+A: gogo:eval "echo Hello World"
+
+P: sleep for 2 seconds
+A: gogo:sleep 2000
+
+P: sleep for 5 seconds
+A: gogo:sleep 5000
+
+# ========== Object Instantiation ==========
+
+P: create a new ArrayList
+A: l = (new java.util.ArrayList)
+
+P: create a new HashMap
+A: m = (new java.util.HashMap)
+
+P: create a HashMap and add entries
+A: m = (new java.util.HashMap)
+$m put "key1" "value1"
+$m put "key2" "value2"
+
+P: create an ArrayList and add items
+A: l = (new java.util.ArrayList)
+$l add "item1"
+$l add "item2"
+
+# ========== Closures & Scripting ==========
+
+P: define a function and call it
+A: f = { echo $args }
+$f hello
+
+P: create a closure that prints its argument
+A: greet = { echo "Hello" $args }
+$greet World
+
+P: use implicit variable in a pipe
+A: echo test | $it toUpperCase
+
+P: get the class of an object
+A: "hello" getclass
+
+P: list methods of an object
+A: "hello" getclass | $it getmethods
+
+# ========== Session & Shell Management ==========
+
+P: exit the gogo shell
+A: exit
+
+P: close the gogo session
+A: close
+
+P: disconnect from telnet session
+A: disconnect
+
+P: change the shell prompt
+A: prompt = "$ "
+
+P: change the prompt to show current directory
+A: prompt = "${user.dir}> "
+
+# ========== Advanced Bundle Operations ==========
+
+P: get the state of bundle with id 5
+A: bundle = bundle 5 | $bundle state
+
+P: find a resource in bundle 4
+A: bundle = bundle 4 | $bundle getresource META-INF/MANIFEST.MF
+
+P: list entries in a bundle
+A: bundle = bundle 4 | $bundle findentries / "*.xml" true
+
+P: get the bundle wiring for bundle 10
+A: bundle = bundle 10 | $bundle adapt org.osgi.framework.wiring.BundleWiring
+
+P: show the fragment host of bundle 20
+A: felix:inspect cap host 20
+
+P: show the fragment host requirement of bundle 20
+A: felix:inspect req host 20
+
+P: show all osgi.identity capabilities of bundle 5
+A: felix:inspect cap osgi.identity 5
+
+P: show the bundle wiring of all bundles
+A: felix:inspect cap osgi.wiring.bundle
+
+P: show all osgi.ee capabilities
+A: felix:inspect cap osgi.ee 0
+
+# ========== Advanced Configuration Admin ==========
+
+P: delete a configuration
+A: c = cm:getconfiguration "my.config.pid"
+$c delete
+
+P: list factory configurations for factory PID abc
+A: cm:listconfigurations "(service.factoryPid=abc)"
+
+P: create and update a configuration
+A: c = cm:getconfiguration "my.pid"
+d = (new java.util.Hashtable)
+$d put "key" "value"
+$c update $d
+
+P: show all configuration properties for PID my.service
+A: cm:listconfigurations "(service.pid=my.service)"
+
+P: remove a configuration property
+A: c = cm:getconfiguration "my.pid"
+d = (new java.util.Hashtable)
+$c update $d
+
+# ========== Log Filtering ==========
+
+P: show log entries for bundle 10
+A: felix:log 10
+
+P: show last 50 log entries
+A: felix:log 50
+
+P: show error log entries for bundle 5
+A: felix:log 5 error
+
+P: show all trace log entries
+A: felix:log trace
+
+# ========== Framework Lifecycle ==========
+
+P: shut down the framework
+A: felix:stop 0
+
+P: shut down OSGi
+A: felix:stop 0
+
+P: stop the framework
+A: felix:stop 0
+
+# ========== OBR Commands ==========
+
+P: list OBR repositories
+A: obr:repos
+
+P: list available bundles in OBR
+A: obr:list
+
+P: search for a bundle in OBR
+A: obr:list bundlename
+
+P: show info for an OBR resource
+A: obr:info bundlename
+
+P: deploy a bundle from OBR
+A: obr:deploy bundlename
+
+# ========== Pipeline & Variable Patterns ==========
+
+P: count the number of bundles
+A: lb | tac | wc -l
+
+P: find bundles by symbolic name pattern
+A: lb -s | grep pattern
+
+P: store command output in a variable
+A: result = (echo hello)
+
+P: pipe output through multiple filters
+A: lb | grep Active | grep -i web
+
+P: find active bundles containing a specific name
+A: lb | grep Active | grep -i myname
+
+P: chain multiple commands
+A: felix:stop 10 ; felix:start 10
+
+P: assign bundle object and call methods
+A: b = (bundle 10)
+$b symbolicname
+$b version
+
+P: get a service reference and use it
+A: ref = ($ctx getservicereference org.osgi.service.cm.ConfigurationAdmin)
+svc = ($ctx getservice $ref)
+
+# ========== Gogo Introspection ==========
+
+P: show all command scopes
+A: scopes = (gogo:set | grep "scope")
+
+P: show session variables
+A: gogo:set
+
+P: show value of a session variable
+A: echo $variablename
+
+P: unset a session variable
+A: variablename =
+
+# ========== Inspection Short Forms ==========
+
+P: show what bundle 10 requires
+A: felix:inspect req * 10
+
+P: show what bundle 10 provides
+A: felix:inspect cap * 10
+
+P: show package imports of bundle 5
+A: felix:inspect req package 5
+
+P: show package exports of bundle 5
+A: felix:inspect cap package 5
+
+P: show service requirements of bundle 8
+A: felix:inspect req service 8
+
+P: show service capabilities of bundle 8
+A: felix:inspect cap service 8
+
+# ========== Multi-Command Workflows ==========
+
+P: update a bundle and refresh it
+A: felix:update 10
+felix:refresh 10
+
+P: stop, update, and start a bundle
+A: felix:stop 10
+felix:update 10
+felix:start 10
+
+P: find and restart all bundles matching http
+A: b = (lb | grep -i http)
+felix:stop $b
+felix:start $b
+
+P: install and start a bundle
+A: felix:install file:/path/to/bundle.jar
+felix:start $result
+
+P: uninstall all test bundles
+A: each (lb | grep -i test) { felix:uninstall $it }
+
+P: refresh all bundles
+A: felix:refresh
+
+P: resolve all bundles
+A: felix:resolve
+
+# ========== Each Command Variations ==========
+
+P: print symbolic name of each bundle
+A: each (lb) { echo ($it symbolicname) }
+
+P: print version of each bundle
+A: each (lb) { echo ($it version) }
+
+P: print each bundle id and symbolic name
+A: each (lb) { echo ($it bundleid) ($it symbolicname) }
+
+P: stop each active bundle matching http
+A: each (lb | grep -i http | grep Active) { felix:stop $it }
+
+P: start each resolved bundle matching web
+A: each (lb | grep -i web | grep Resolved) { felix:start $it }
+
+P: refresh each bundle matching a pattern
+A: each (lb | grep -i mypattern) { felix:refresh $it }
+
+P: show headers of each bundle matching abc
+A: each (lb | grep -i abc) { felix:headers $it }
+
+P: diagnose each installed bundle
+A: each (lb | grep Installed) { diag $it }
+
+P: print location of each bundle
+A: each (lb) { echo ($it location) }
+
+P: list services registered by each bundle
+A: each (lb) { echo ($it registeredservices) }
+
+P: enable each component matching scheduler
+A: each (scr:list | grep -i scheduler) { scr:enable $it }
+
+P: disable each component matching test
+A: each (scr:list | grep -i test) { scr:disable $it }
+
+P: print info for each component matching abc
+A: each (scr:list | grep -i abc) { scr:info $it }
+
+P: uninstall each bundle in installed state
+A: each (lb | grep Installed) { felix:uninstall $it }
+
+P: update each bundle matching a name
+A: each (lb | grep -i myname) { felix:update $it }
+
+P: iterate over numbers and echo each
+A: each [1 2 3 4 5] { echo $it }
+
+P: iterate over strings and echo each
+A: each [hello world foo bar] { echo $it }
+
+P: iterate over items and perform an action on each
+A: items = [a b c d]
+each $items { echo "Processing:" $it }
+
+P: count active bundles using each
+A: count = 0
+each (lb | grep Active) { count = (($count + 1)) }
+echo $count
+
+P: resolve each bundle matching a pattern
+A: each (lb | grep -i mypattern) { felix:resolve $it }
+
+P: show capabilities of each bundle matching web
+A: each (lb | grep -i web) { felix:inspect cap * $it }
+
+P: show requirements of each bundle matching http
+A: each (lb | grep -i http) { felix:inspect req * $it }
+
+# ========== Gogo Built-in Commands ==========
+
+P: format the output of a command
+A: gogo:format $result
+
+P: collect piped input into a single object
+A: lb | gogo:tac
+
+P: collect multi-line output into one string
+A: echo line1 ; echo line2 | gogo:tac
+
+P: throw an exception with a message
+A: gogo:throw "something went wrong"
+
+P: negate a command result
+A: gogo:not { echo test }
+
+P: check if a command succeeds
+A: gogo:not { gogo:not { some-command } }
+
+P: evaluate a dynamic command string
+A: cmd = "echo hello"
+gogo:eval $cmd
+
+P: sleep for 1 second
+A: gogo:sleep 1000
+
+P: sleep for 3 seconds
+A: gogo:sleep 3000
+
+P: sleep for 10 seconds
+A: gogo:sleep 10000
+
+P: create a new instance of a Java class
+A: gogo:new java.util.ArrayList
+
+P: create a new HashMap using gogo new
+A: gogo:new java.util.HashMap
+
+P: create a new Properties instance
+A: gogo:new java.util.Properties
+
+P: check what type of command lb is
+A: gogo:type lb
+
+P: check what type of command services is
+A: gogo:type services
+
+P: check what type of command scr:list is
+A: gogo:type scr:list
+
+P: list all session variables
+A: gogo:set
+
+P: show the current session context
+A: gogo:set
+
+# ========== Script Execution ==========
+
+P: run a gogo script file
+A: gogo:sh ./script.sh
+
+P: execute a shell script
+A: gogo:sh ./myscript.sh
+
+P: run a gogo script using gosh
+A: gogo:gosh ./script.sh
+
+P: source a script file
+A: gogo:source ./script.sh
+
+P: run a script in the current directory
+A: gogo:source ./commands.sh
+
+# ========== Gogo Type & Introspection ==========
+
+P: show full type information for a command
+A: gogo:type -a -t echo
+
+P: show all matches for a command name
+A: gogo:type -a lb
+
+P: show full java type of a command
+A: gogo:type -t services
+
+P: list all commands in a specific scope
+A: gogo:type -s felix
+
+P: list all commands in the gogo scope
+A: gogo:type -s gogo
+
+P: list all commands in the scr scope
+A: gogo:type -s scr
+
+P: quietly check if a command exists
+A: gogo:type -q mycommand
+
+# ========== Return Value & Exception Handling ==========
+
+P: get the return value of the last command
+A: echo $_
+
+P: show the last command return value
+A: $_
+
+P: show the last exception
+A: $exception
+
+P: print the last exception stack trace
+A: $exception printStackTrace
+
+P: print the last error stack trace
+A: $e
+
+P: show the current scope
+A: echo $SCOPE
+
+# ========== Tac Options ==========
+
+P: collect piped input into a list
+A: lb | gogo:tac -l
+
+P: append piped output to a file
+A: lb | gogo:tac -a output.txt
+
+P: collect output into a single line
+A: cat file.txt | gogo:tac
+
+P: collect multi-line command output into a variable
+A: data = (cat file.txt | gogo:tac)
+
+# ========== Getopt & Telnet ==========
+
+P: parse command arguments
+A: gogo:getopt 'Usage: mycmd [OPTIONS] [args] -v --verbose be verbose -o --output=FILE output file'
+
+P: start the telnet daemon
+A: gogo:telnetd
+
+P: manage the gogo telnet server
+A: gogo:telnetd
+
+# ========== Gogo Loop Constructs ==========
+
+P: loop until a condition is met
+A: gogo:until { condition } { echo waiting }
+
+P: repeat a command until it succeeds
+A: gogo:until { some-command } { gogo:sleep 1000 }
+
+# ========== OBR Repository Management ==========
+
+P: add an OBR repository
+A: obr:repos add 'file:/path/to/repository.xml'
+
+P: list all registered OBR repositories
+A: obr:repos list
+
+P: refresh an OBR repository
+A: obr:repos refresh 'file:/path/to/repository.xml'
+
+P: remove an OBR repository
+A: obr:repos remove 'file:/path/to/repository.xml'
+
+P: get source for an OBR resource
+A: obr:source bundlename
+
+P: get javadoc for an OBR resource
+A: obr:javadoc bundlename
+
+# ========== Variable & Scope Patterns ==========
+
+P: access a variable using braces
+A: echo ${variable}
+
+P: use a variable in a command
+A: id = 10
+felix:start $id
+
+P: store and reuse a bundle reference
+A: b = (bundle 10)
+echo ($b symbolicname) ($b version)
+
+P: assign a command result and use it
+A: bsn = (bundle 10 | $it symbolicname)
+echo $bsn
+
+P: use wildcard pattern in inspect
+A: felix:inspect cap *package* 1
+
+P: show all package-related capabilities using wildcard
+A: felix:inspect cap *package*
+
+P: show all package-related requirements using wildcard
+A: felix:inspect req *package*
+
+P: show package capabilities of a specific bundle using wildcard
+A: felix:inspect cap *package* 5
+
+P: show package requirements of a specific bundle using wildcard
+A: felix:inspect req *package* 5
+
+# ========== Logging ==========
+
+P: log a message to the log service
+A: felix:log "my log message"
+
+P: log an error message
+A: felix:log "error occurred in processing"
+
+P: show log entries filtered by bundle id
+A: felix:log 10
+
+P: show the last 100 log entries
+A: felix:log 100
+
+# ========== Literals: Lists & Maps ==========
+
+P: create a list literal
+A: [1 2 3]
+
+P: get the size of a list
+A: [1 2 3] size
+
+P: check if a list is empty
+A: [1 2 3] isempty
+
+P: create a map literal
+A: [a=1 b=2 c=3]
+
+P: get a value from a map literal
+A: [a=1 b=2 c=3] get b
+
+P: create a map and get a key
+A: [name=hello version=1.0] get name
+
+P: create an empty list
+A: l = []
+
+P: add an item to a list
+A: l = []
+$l add hello
+
+P: check if a list is empty
+A: l = []
+$l isempty
+
+# ========== Expressions & Nested Commands ==========
+
+P: get a specific header from a bundle
+A: ($bundle headers) get Bundle-Version
+
+P: get the bundle version of bundle 10
+A: (bundle 10 | $it headers) get Bundle-Version
+
+P: get the symbolic name of bundle 4
+A: (bundle 4) symbolicname
+
+P: get bundle id and name using nested expressions
+A: echo Bundle ($bundle bundleid) has name ((bundle ($bundle bundleid)) symbolicname)
+
+P: use nested parentheses to combine commands
+A: echo (bundle 10 | $it symbolicname) is version (bundle 10 | $it version)
+
+# ========== IO Redirection with Tac ==========
+
+P: write text to a file
+A: echo Hello | tac temp.txt
+
+P: append text to a file
+A: echo World | tac -a temp.txt
+
+P: write command output to a file
+A: lb | tac bundles.txt
+
+P: append command output to a file
+A: lb | tac -a bundles.txt
+
+P: read a file that was written
+A: cat temp.txt
+
+P: redirect bundle list to a file
+A: lb | tac mybundles.txt
+
+P: collect output as a list
+A: lb | tac -l
+
+P: show help for tac command
+A: tac -?
+
+# ========== Functions with Arguments ==========
+
+P: define a function with one argument
+A: f = { echo $it }
+
+P: define a function with all arguments
+A: f = { echo $args }
+
+P: define a function with numbered arguments
+A: f = { echo $1 $2 }
+
+P: call a function with arguments
+A: f = { echo $args }
+f Hello World
+
+P: define and use a greeting function
+A: greet = { echo Hello $it }
+greet World
+
+P: define a function to show bundle info
+A: showbundle = { bundle $it | $it symbolicname }
+showbundle 10
+
+# ========== Conditional Execution ==========
+
+P: use if to check if a list is empty
+A: l = []
+if {$l isempty} { echo empty } { echo not empty }
+
+P: use if else on a list
+A: l = []
+$l add foo
+if {$l isempty} { echo empty } { echo not empty }
+
+P: negate a condition with not
+A: if { not {$l isempty}} { echo not empty } { echo empty }
+
+P: check if a bundle is active
+A: if { (bundle 10 | $it state) equals 32 } { echo active } { echo not active }
+
+# ========== Exception Handling ==========
+
+P: throw an exception
+A: throw Foo
+
+P: get the last exception message
+A: $exception message
+
+P: print the last exception class
+A: $exception class
+
+P: try a command and ignore failure
+A: try { throw Foo }
+
+P: try a command and handle the error
+A: try { throw Foo } { echo ouch }
+
+P: try a risky command with error message
+A: try { some-command } { echo "command failed:" $it }
+
+P: clear the last exception
+A: exception = null
+
+# ========== Adding Commands with Scope ==========
+
+P: add commands from an object with a custom scope
+A: addcommand myscope [1 2 3 4]
+
+P: add Math functions as commands
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+
+P: use the sin function after adding Math commands
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:sin 2
+
+P: add InetAddress commands
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+
+P: show the local hostname
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+localhost | $it hostname
+
+# ========== Dynamic Prompt ==========
+
+P: set a simple custom prompt
+A: prompt = "$ "
+
+P: set the prompt to show hostname
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+prompt = { echo ((localhost) hostname) "$ " }
+
+# ========== Built-in Variables ==========
+
+P: access the bundle context
+A: $.context
+
+P: get a framework property from bundle context
+A: $.context getproperty org.osgi.framework.version
+
+P: show the current command scope
+A: echo $SCOPE
+
+P: show the last command return value
+A: echo $_
+
+P: show the last exception
+A: echo $exception
+
+P: show the last exception command
+A: echo $exception-cmd
+
+# ========== Quoting & Special Syntax ==========
+
+P: echo a string with preserved spaces
+A: echo 'Hello                     World'
+
+P: execute multiple commands on one line
+A: echo Hello; echo World
+
+P: pipe output and grep for a match
+A: echo Hello | grep Hello
+
+P: pipe output and grep for a mismatch
+A: echo Hello | grep World
+
+P: execute the first command from history
+A: !1
+
+P: execute the last command starting with echo
+A: !echo
+
+P: execute the last command starting with lb
+A: !lb
+
+# ========== Gogo Procedural (if/while/until/not/try/throw) ==========
+
+P: use gogo if to check a condition
+A: gogo:if { $condition } { echo true } { echo false }
+
+P: use gogo while to loop
+A: gogo:while { $running } { echo "still running"; gogo:sleep 1000 }
+
+P: use gogo while to wait for a bundle to become active
+A: gogo:while { gogo:not { (bundle 10 | $it state) equals 32 } } { gogo:sleep 500 }
+
+P: use gogo until to wait for a condition
+A: gogo:until { $done } { echo "waiting..."; gogo:sleep 1000 }
+
+P: use gogo not to negate
+A: gogo:not { $l isempty }
+
+P: use gogo try to handle errors
+A: gogo:try { risky-command } { echo "Error:" $it }
+
+P: use gogo throw to raise an error
+A: gogo:throw "Something went wrong"
+
+P: combine if and not
+A: gogo:if { gogo:not { $l isempty } } { echo "has items" } { echo "empty" }
+
+# ========== Gogo Grep ==========
+
+P: grep for a pattern in text
+A: gogo:grep test
+
+P: use gogo grep to filter output
+A: echo test | gogo:grep test
+
+P: use gogo grep with regex
+A: echo test | gogo:grep '[tT]est'
+
+P: use gogo grep to search piped output
+A: lb | gogo:grep Active
+
+P: use gogo grep to find a bundle by name
+A: lb | gogo:grep -i http
+
+# ========== Bundle Level Advanced ==========
+
+P: stop a bundle by raising its start level
+A: felix:bundlelevel -s 99 10
+
+P: set a bundle start level above framework level to stop it
+A: felix:bundlelevel -s 100 10
+
+P: set multiple bundles to start level 2
+A: felix:bundlelevel -s 2 10
+felix:bundlelevel -s 2 11
+
+P: show bundle levels for all bundles
+A: felix:bundlelevel
+
+# ========== Felix CD Advanced ==========
+
+P: show the current working directory
+A: felix:cd
+
+P: show current directory info
+A: felix:cd
+
+P: change to a subdirectory
+A: felix:cd subdir
+
+P: change to the parent directory
+A: felix:cd ..
+
+P: change to the tmp directory
+A: felix:cd tmp
+
+# ========== Felix LS Advanced ==========
+
+P: list files in the current directory
+A: felix:ls
+
+P: list files in a specific directory
+A: felix:ls subdir
+
+P: list files in the parent directory
+A: felix:ls ..
+
+# ========== Reflection & Type Inspection ==========
+
+P: get the class name of a variable
+A: ($key class) name
+
+P: get the class of an object using getClass
+A: ($key getClass) getName
+
+P: find the type of a string variable
+A: ($myvar class) name
+
+P: check what class a variable is
+A: ($variable getClass) getName
+
+P: show the full type of a command
+A: type echo
+
+P: show the return type of cd command
+A: type cd
+
+P: show all overloads of a command
+A: gogo:type -a -t cd
+
+# ========== Primitive Variables ==========
+
+P: create a boolean variable
+A: flag = true
+
+P: create a long integer variable
+A: count = 1
+
+P: create a double variable
+A: ratio = 1.2
+
+P: create a string variable with quotes
+A: name = 'mystring'
+
+P: check the type of a boolean
+A: flag = true
+($flag class) name
+
+P: check the type of a number
+A: num = 42
+($num class) name
+
+# ========== List Operations ==========
+
+P: create a list and get an element
+A: list = [1 2 3]
+$list get 0
+
+P: convert a list to string
+A: list = [1 2 3]
+$list toString
+
+P: get an iterator and read the first element
+A: list = [1 2 3]
+($list iterator) next
+
+P: get the size of a list variable
+A: list = [1 2 3]
+$list size
+
+P: check if a list contains a value
+A: list = [1 2 3]
+$list contains 2
+
+P: remove an element from a list
+A: list = [1 2 3]
+$list remove 0
+
+P: clear a list
+A: list = [1 2 3]
+$list clear
+
+# ========== Map Operations ==========
+
+P: create a map with string keys
+A: map = ['1'=Jan '2'=Feb '3'=Mar]
+
+P: check if a map contains a key
+A: $map containsKey '1'
+
+P: get a value from a map by key
+A: ($map) get '1'
+
+P: get all keys from a map
+A: ($map) keyset
+
+P: get all entries from a map
+A: ($map) entryset
+
+P: get the size of a map
+A: ($map) size
+
+P: check if a map contains a value
+A: $map containsValue 'Jan'
+
+# ========== Iterate Map Entries ==========
+
+P: iterate over map entries
+A: each (($map) entryset) { echo $it }
+
+P: iterate over map keys and get values
+A: each (($map) keyset) { ($map) get $it }
+
+P: iterate over map entries and call a macro
+A: each (($map) entryset) { echo "Key-Value:" $it }
+
+# ========== File & Directory Operations ==========
+
+P: store the current directory in a variable
+A: project.root = (cd .)
+
+P: list files in the current directory variable
+A: project.root = (cd .)
+$project.root listfiles
+
+P: show the current working directory variable
+A: echo $_cwd
+
+P: get the name of current directory
+A: (cd .) getName
+
+P: get the absolute path of a directory
+A: (cd .) getAbsolutePath
+
+P: get free disk space
+A: (cd .) getFreeSpace
+
+P: get total disk space
+A: (cd .) getTotalSpace
+
+# ========== Macros with Map Arguments ==========
+
+P: define a macro and pass a map to it
+A: show = { echo "Data:" $args }
+show $map
+
+P: define a macro that processes each argument
+A: process = { each $args { echo "Item:" $it } }
+process a b c
+
+# ========== New & LinkedList ==========
+
+P: create a new LinkedList
+A: list = new java.util.LinkedList
+
+P: create a LinkedList and add elements
+A: list = new java.util.LinkedList
+($list) add "1"
+($list) add "2"
+($list) add "3"
+echo $list
+
+P: create a new TreeMap
+A: map = new java.util.TreeMap
+
+P: create a new LinkedHashMap
+A: map = new java.util.LinkedHashMap
+
+# ========== If with Type Check ==========
+
+P: check if a command exists
+A: if { type mycommand } { echo "command exists" } { echo "command not found" }
+
+P: check if the type command itself exists
+A: if { type type } { echo "type command exist" } { echo "command not exist" }
+
+# ========== Context Commands (BundleContext) ==========
+
+P: get the system bundle via context
+A: context:bundle 0
+
+P: get a bundle by id via context
+A: context:bundle 10
+
+P: list all bundles via context
+A: context:bundles
+
+P: get a framework property via context
+A: context:getproperty org.osgi.framework.version
+
+P: get the OSGi framework vendor via context
+A: context:getproperty org.osgi.framework.vendor
+
+P: get a service reference via context
+A: context:getservicereference org.osgi.service.cm.ConfigurationAdmin
+
+P: get all service references via context
+A: context:getservicereferences org.osgi.service.cm.ConfigurationAdmin null
+
+P: get a service from a reference
+A: ref = (context:getservicereference org.osgi.service.cm.ConfigurationAdmin)
+context:getservice $ref
+
+P: install a bundle via context
+A: context:installbundle 'file:/path/to/bundle.jar'
+
+P: create an LDAP filter via context
+A: context:createfilter "(objectClass=org.osgi.service.cm.ConfigurationAdmin)"
+
+P: get a data file for this bundle
+A: context:getdatafile mydata.txt
+
+P: unget a service via context
+A: context:ungetservice $ref
+
+P: add a bundle listener via context
+A: context:addbundlelistener $listener
+
+P: remove a bundle listener via context
+A: context:removebundlelistener $listener
+
+P: add a service listener via context
+A: context:addservicelistener $listener
+
+P: remove a service listener via context
+A: context:removeservicelistener $listener
+
+P: add a framework listener via context
+A: context:addframeworklistener $listener
+
+P: remove a framework listener via context
+A: context:removeframeworklistener $listener
+
+# ========== OSGi Scope Commands ==========
+
+P: add a command from a class
+A: osgi:addcommand myscope ((bundle 0) loadclass java.lang.Math)
+
+P: remove a command scope
+A: osgi:removecommand myscope java.lang.Math
+
+P: evaluate a gogo expression string
+A: osgi:eval "echo hello"
+
+# ========== System Scope Commands ==========
+
+P: exit the JVM
+A: system:exit 0
+
+P: get a system environment variable
+A: system:getenv JAVA_HOME
+
+P: get all system environment variables
+A: system:getenv
+
+P: get all system properties
+A: system:getproperties
+
+P: get a system property by key
+A: system:getproperty java.home
+
+P: set a system property
+A: system:setproperty my.key my.value
+
+P: clear a system property
+A: system:clearproperty my.key
+
+P: get current time in millis via system scope
+A: system:currenttimemillis
+
+P: get nano time via system scope
+A: system:nanotime
+
+P: perform garbage collection via system scope
+A: system:gc
+
+P: get the line separator via system scope
+A: system:lineseparator
+
+P: show all system properties via system scope
+A: system:properties
+
+P: show a specific property via system scope
+A: system:property java.version
+
+P: get the identity hash code of an object
+A: system:identityhashcode $myobj
+
+P: load a native library
+A: system:load /path/to/library.so
+
+P: map a library name to platform format
+A: system:maplibraryname mylib
+
+P: run finalization
+A: system:runfinalization
+
+P: get the console
+A: system:console
+
+# ========== Felix Which Advanced ==========
+
+P: check which classloader loaded a class
+A: felix:which 1 java.lang.System
+
+P: check where a bundle loads a class from
+A: felix:which 3 org.osgi.framework.BundleActivator
+
+P: check class loading for a service interface
+A: felix:which 3 org.osgi.service.log.LogService
+
+# ========== Type All Commands ==========
+
+P: list all available commands using type
+A: gogo:type -a
+
+P: list all commands in the context scope
+A: gogo:type -s context
+
+P: list all commands in the system scope
+A: gogo:type -s system
+
+P: list all commands in the osgi scope
+A: gogo:type -s osgi
+
+# ========== OBR Deploy Flags ==========
+
+P: deploy only required bundles from OBR
+A: obr:deploy -ro bundlename
+
+P: deploy and start a bundle from OBR
+A: obr:deploy -s bundlename
+
+P: deploy required-only and start from OBR
+A: obr:deploy -ro -s bundlename
+
+# ========== Bundle Update from URL ==========
+
+P: update bundle 10 from a file
+A: felix:update 10 file:/path/to/updated-bundle.jar
+
+P: update bundle 42 from a URL
+A: felix:update 42 http://repo.example.com/bundles/mybundle-2.0.jar
+
+P: update bundle 5 from a local file location
+A: felix:update 5 file:/tmp/mybundle-1.1.jar
+
+P: update all bundles matching a name from a repository
+A: each (lb | grep -i myname) { felix:update $it }
+
+P: update and refresh a bundle atomically
+A: felix:update 10 file:/path/to/new.jar
+felix:refresh 10
+
+# ========== Bundle State Queries ==========
+
+P: check if bundle 10 is active
+A: (bundle 10) state
+
+P: find bundles in starting state
+A: lb | grep Starting
+
+P: find bundles in stopping state
+A: lb | grep Stopping
+
+P: show the numeric state of bundle 5
+A: (bundle 5) state
+
+P: find all fragments
+A: lb | grep Fragment
+
+P: find fragment bundles
+A: lb -s | grep Fragment
+
+P: list only active bundles sorted by symbolic name
+A: lb -s | grep Active
+
+P: find bundles that failed to resolve
+A: lb | grep Installed
+
+P: find all bundles that are not active
+A: lb | grep -v Active
+
+# ========== LDAP Filter Combinations ==========
+
+P: find configurations matching two PIDs
+A: cm:listconfigurations "(|(service.pid=abc)(service.pid=xyz))"
+
+P: find configurations NOT matching a PID
+A: cm:listconfigurations "(!(service.pid=abc))"
+
+P: find configurations with PID starting with com.example AND containing http
+A: cm:listconfigurations "(&(service.pid=com.example*)(service.pid=*http*))"
+
+P: find services implementing two interfaces
+A: services "(&(objectClass=*EventAdmin*)(objectClass=*LogService*))"
+
+P: find services NOT from a specific vendor
+A: services "(!(service.vendor=Apache*))"
+
+P: find services with ranking greater than zero
+A: services "(service.ranking>=1)"
+
+P: find configurations with a specific property value
+A: cm:listconfigurations "(mykey=myvalue)"
+
+P: find factory configs matching a pattern
+A: cm:listconfigurations "(&(service.factoryPid=my.factory*)(service.pid=*prod*))"
+
+P: find all configurations that have a specific key
+A: cm:listconfigurations "(my.custom.key=*)"
+
+# ========== Grep Advanced Patterns ==========
+
+P: filter bundles ignoring case
+A: lb | grep -i HTTP
+
+P: find bundles NOT matching a pattern
+A: lb | grep -v apache
+
+P: count bundles matching a pattern
+A: lb | grep -c Active
+
+P: count how many bundles are installed
+A: lb | grep -c Installed
+
+P: show bundles matching a pattern with context lines
+A: scr:list | grep -A 2 unsatisfied
+
+P: find components that are not satisfied
+A: scr:list | grep -v satisfied
+
+P: grep with case insensitive and invert
+A: lb | grep -iv test
+
+P: find lines matching multiple patterns using pipe
+A: lb | grep Active | grep -i api
+
+P: find bundles that are active but not from apache
+A: lb | grep Active | grep -v apache
+
+P: count active bundles
+A: lb | grep -c Active
+
+P: count resolved bundles
+A: lb | grep -c Resolved
+
+P: count components in active state
+A: scr:list | grep -c active
+
+# ========== String Operations ==========
+
+P: convert a string to uppercase
+A: "hello" toUpperCase
+
+P: convert a string to lowercase
+A: "HELLO" toLowerCase
+
+P: get the length of a string
+A: "hello world" length
+
+P: check if a string starts with a prefix
+A: "hello world" startsWith "hello"
+
+P: check if a string ends with a suffix
+A: "hello world" endsWith "world"
+
+P: check if a string contains a substring
+A: "hello world" contains "llo"
+
+P: replace part of a string
+A: "hello world" replace "world" "gogo"
+
+P: trim whitespace from a string
+A: "  hello  " trim
+
+P: get a substring from a string
+A: "hello world" substring 6
+
+P: get a substring with start and end index
+A: "hello world" substring 0 5
+
+P: split a string by delimiter
+A: "a,b,c,d" split ","
+
+P: check if a string is empty
+A: "" isEmpty
+
+P: compare two strings
+A: "hello" equals "hello"
+
+P: compare two strings ignoring case
+A: "Hello" equalsIgnoreCase "hello"
+
+P: get a character at an index
+A: "hello" charAt 0
+
+P: find the index of a substring
+A: "hello world" indexOf "world"
+
+P: concatenate strings
+A: "hello" concat " world"
+
+# ========== Date & Time Operations ==========
+
+P: show the current date
+A: new java.util.Date
+
+P: show the current date and time
+A: (new java.util.Date) toString
+
+P: get the current time as a long
+A: currenttimemillis
+
+P: create a date from a timestamp
+A: new java.util.Date (currenttimemillis)
+
+P: show the current timezone
+A: (java.util.TimeZone getDefault) getID
+
+P: show the current timezone display name
+A: (java.util.TimeZone getDefault) getDisplayName
+
+P: show the current locale
+A: java.util.Locale getDefault
+
+P: create a specific locale
+A: new java.util.Locale "en" "US"
+
+# ========== Math Operations ==========
+
+P: add math commands to the shell
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+
+P: calculate the square root of 144
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:sqrt 144
+
+P: calculate the absolute value of -42
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:abs -42
+
+P: find the maximum of two numbers
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:max 10 20
+
+P: find the minimum of two numbers
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:min 10 20
+
+P: calculate the power of 2 to 10
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:pow 2 10
+
+P: get the value of PI
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:PI
+
+P: calculate cosine of 0
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:cos 0
+
+P: get a random number
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:random
+
+P: round a decimal number
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:round 3.7
+
+P: calculate the floor of 3.7
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:floor 3.7
+
+P: calculate the ceiling of 3.2
+A: addcommand math ((bundle 0) loadclass java.lang.Math)
+math:ceil 3.2
+
+# ========== Network Utilities ==========
+
+P: get the local host name
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+(inet:getLocalHost) getHostName
+
+P: get the local IP address
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+(inet:getLocalHost) getHostAddress
+
+P: resolve a hostname to IP address
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+(inet:getByName "google.com") getHostAddress
+
+P: get all IP addresses for a hostname
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+inet:getAllByName "google.com"
+
+P: check if an address is reachable
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+(inet:getByName "google.com") isReachable 5000
+
+P: get the loopback address
+A: addcommand inet ((bundle 0) loadclass java.net.InetAddress)
+inet:getLoopbackAddress
+
+# ========== Diagnostic Workflows ==========
+
+P: diagnose all installed (unresolved) bundles
+A: each (lb | grep Installed) { echo "--- Diagnosing:" ($it symbolicname) ; diag $it }
+
+P: find bundles with missing dependencies
+A: each (lb | grep Installed) { diag $it }
+
+P: full health check of the framework
+A: echo "=== Bundles ==="
+lb
+echo "=== Installed (unresolved) ==="
+lb | grep Installed
+echo "=== Components ==="
+scr:list | grep -v active
+
+P: find unsatisfied component references
+A: scr:list | grep -i unsatisfied
+
+P: show why a specific component is not active
+A: scr:info com.example.MyComponent
+
+P: find all disabled components
+A: scr:list | grep -i disabled
+
+P: find all failed components
+A: scr:list | grep -i failed
+
+P: check framework start level and compare to bundle level
+A: echo "Framework level:" (frameworklevel)
+echo "Bundle 10 level:" (bundlelevel 10)
+
+P: identify duplicate symbolic names across bundles
+A: each (lb) { echo ($it symbolicname) ($it bundleid) }
+
+P: check the resolution status of a specific bundle
+A: bundle = bundle 10
+echo "State:" ($bundle state)
+echo "Symbolic Name:" ($bundle symbolicname)
+diag 10
+
+P: troubleshoot a failing configuration
+A: echo "=== Config ==="
+cm:listconfigurations "(service.pid=my.service.pid)"
+echo "=== Component ==="
+scr:info com.example.MyComponent
+
+P: verify a service is registered after installing a bundle
+A: felix:install file:/path/to/bundle.jar
+felix:start $result
+services "(objectClass=*MyService*)"
+
+P: check all services registered by a newly installed bundle
+A: b = (bundle 10)
+echo "Registered:" ($b registeredservices)
+echo "In Use:" ($b servicesinuse)
+
+# ========== Bundle Wiring & Adapt ==========
+
+P: get the bundle wiring for bundle 10
+A: (bundle 10) adapt org.osgi.framework.wiring.BundleWiring
+
+P: get the bundle revision for bundle 10
+A: (bundle 10) adapt org.osgi.framework.wiring.BundleRevision
+
+P: get the bundle start level adapter for bundle 10
+A: (bundle 10) adapt org.osgi.framework.startlevel.BundleStartLevel
+
+P: check if bundle 10 is persistently started
+A: ((bundle 10) adapt org.osgi.framework.startlevel.BundleStartLevel) isPersistentlyStarted
+
+P: get declared capabilities of bundle 5
+A: ((bundle 5) adapt org.osgi.framework.wiring.BundleRevision) getDeclaredCapabilities null
+
+P: get declared requirements of bundle 5
+A: ((bundle 5) adapt org.osgi.framework.wiring.BundleRevision) getDeclaredRequirements null
+
+P: get the provided wires of bundle 10
+A: ((bundle 10) adapt org.osgi.framework.wiring.BundleWiring) getProvidedWires null
+
+P: get the required wires of bundle 10
+A: ((bundle 10) adapt org.osgi.framework.wiring.BundleWiring) getRequiredWires null
+
+P: check if bundle 10 wiring is in use
+A: ((bundle 10) adapt org.osgi.framework.wiring.BundleWiring) isInUse
+
+P: get the current bundle wiring revision
+A: ((bundle 10) adapt org.osgi.framework.wiring.BundleWiring) getRevision
+
+# ========== Configuration Admin Typed Properties ==========
+
+P: create a configuration with an integer property
+A: c = cm:getconfiguration "my.pid"
+d = (new java.util.Hashtable)
+$d put "port" (new java.lang.Integer 8080)
+$c update $d
+
+P: create a configuration with a boolean property
+A: c = cm:getconfiguration "my.pid"
+d = (new java.util.Hashtable)
+$d put "enabled" (new java.lang.Boolean true)
+$c update $d
+
+P: create a configuration with multiple properties
+A: c = cm:getconfiguration "my.pid"
+d = (new java.util.Hashtable)
+$d put "host" "localhost"
+$d put "port" (new java.lang.Integer 8080)
+$d put "enabled" (new java.lang.Boolean true)
+$d put "timeout" (new java.lang.Long 30000)
+$c update $d
+
+P: create a configuration with an array property
+A: c = cm:getconfiguration "my.pid"
+d = (new java.util.Hashtable)
+$d put "urls" [http://a.com http://b.com]
+$c update $d
+
+P: update a single property in an existing configuration
+A: c = cm:getconfiguration "my.pid"
+d = ($c getProperties)
+$d put "newKey" "newValue"
+$c update $d
+
+P: read a specific property from a configuration
+A: c = cm:getconfiguration "my.pid"
+($c getProperties) get "myKey"
+
+P: read all property keys from a configuration
+A: c = cm:getconfiguration "my.pid"
+($c getProperties) keys
+
+P: list all PIDs matching a wildcard
+A: cm:listconfigurations "(service.pid=com.example.*)"
+
+P: list all factory PIDs
+A: cm:listconfigurations "(service.factoryPid=*)"
+
+P: create a factory configuration with properties
+A: f = cm:createfactoryconfiguration "my.factory" "?"
+d = (new java.util.Hashtable)
+$d put "instance.name" "instance1"
+$d put "host" "localhost"
+$f update $d
+
+P: delete all configurations matching a pattern
+A: each (cm:listconfigurations "(service.pid=com.test.*)") { $it delete }
+
+# ========== Service Ranking & Properties ==========
+
+P: find the highest ranked service for an interface
+A: services "(objectClass=org.osgi.service.cm.ConfigurationAdmin)"
+
+P: find services with a specific property
+A: services "(my.custom.property=myvalue)"
+
+P: find services matching a property pattern
+A: services "(my.property=*pattern*)"
+
+P: find services with ranking above 0
+A: services "(service.ranking>=1)"
+
+P: find services by bundle location
+A: services "(service.bundleid=10)"
+
+P: find services registered by a specific bundle
+A: (bundle 10) registeredservices
+
+P: find services used by a specific bundle
+A: (bundle 10) servicesinuse
+
+P: get a service and call a method on it
+A: ref = (context:getservicereference org.osgi.service.cm.ConfigurationAdmin)
+svc = (context:getservice $ref)
+$svc listConfigurations null
+
+P: unget a service after use
+A: ref = (context:getservicereference org.osgi.service.cm.ConfigurationAdmin)
+svc = (context:getservice $ref)
+$svc listConfigurations null
+context:ungetservice $ref
+
+# ========== Framework Properties ==========
+
+P: show the OSGi framework version
+A: context:getproperty org.osgi.framework.version
+
+P: show the framework vendor
+A: context:getproperty org.osgi.framework.vendor
+
+P: show the framework processor architecture
+A: context:getproperty org.osgi.framework.processor
+
+P: show the framework operating system name
+A: context:getproperty org.osgi.framework.os.name
+
+P: show the framework operating system version
+A: context:getproperty org.osgi.framework.os.version
+
+P: show the framework language
+A: context:getproperty org.osgi.framework.language
+
+P: show the framework UUID
+A: context:getproperty org.osgi.framework.uuid
+
+P: show the framework storage directory
+A: context:getproperty org.osgi.framework.storage
+
+P: show the framework execution environment
+A: context:getproperty org.osgi.framework.executionenvironment
+
+P: show the framework bootdelegation setting
+A: context:getproperty org.osgi.framework.bootdelegation
+
+P: show the framework system packages
+A: context:getproperty org.osgi.framework.system.packages
+
+P: show the framework system packages extra
+A: context:getproperty org.osgi.framework.system.packages.extra
+
+P: show the framework bundle parent classloader type
+A: context:getproperty org.osgi.framework.bundle.parent
+
+P: show the framework start level
+A: context:getproperty org.osgi.framework.startlevel.beginning
+
+# ========== Counting & Aggregation ==========
+
+P: count total number of bundles
+A: lb | tac | wc -l
+
+P: count bundles in each state
+A: echo "Active:" (lb | grep -c Active)
+echo "Installed:" (lb | grep -c Installed)
+echo "Resolved:" (lb | grep -c Resolved)
+
+P: count total components
+A: scr:list | tac | wc -l
+
+P: count active components
+A: scr:list | grep -c active
+
+P: count unsatisfied components
+A: scr:list | grep -c unsatisfied
+
+P: count all registered services
+A: services | tac | wc -l
+
+P: count configurations
+A: cm:listconfigurations "(service.pid=*)" | tac | wc -l
+
+P: show a summary of the runtime
+A: echo "Bundles:" (lb | tac | wc -l)
+echo "Components:" (scr:list | tac | wc -l)
+echo "Java:" (property java.version)
+echo "OS:" (property os.name)
+
+# ========== Bundle Manifest Headers ==========
+
+P: show all headers of bundle 10
+A: (bundle 10) headers
+
+P: get the Import-Package header of bundle 10
+A: ((bundle 10) headers) get Import-Package
+
+P: get the Export-Package header of bundle 10
+A: ((bundle 10) headers) get Export-Package
+
+P: get the Bundle-Version header of bundle 10
+A: ((bundle 10) headers) get Bundle-Version
+
+P: get the Bundle-Name header of bundle 10
+A: ((bundle 10) headers) get Bundle-Name
+
+P: get the Bundle-SymbolicName header of bundle 10
+A: ((bundle 10) headers) get Bundle-SymbolicName
+
+P: get the Require-Capability header of bundle 10
+A: ((bundle 10) headers) get Require-Capability
+
+P: get the Provide-Capability header of bundle 10
+A: ((bundle 10) headers) get Provide-Capability
+
+P: get the Bundle-Activator header of bundle 10
+A: ((bundle 10) headers) get Bundle-Activator
+
+P: get the Service-Component header of bundle 10
+A: ((bundle 10) headers) get Service-Component
+
+P: get the Bundle-ClassPath header of bundle 10
+A: ((bundle 10) headers) get Bundle-ClassPath
+
+P: get the Fragment-Host header of bundle 20
+A: ((bundle 20) headers) get Fragment-Host
+
+P: get the Bundle-License header
+A: ((bundle 10) headers) get Bundle-License
+
+P: get the Bundle-DocURL header
+A: ((bundle 10) headers) get Bundle-DocURL
+
+P: get the Bundle-Vendor header
+A: ((bundle 10) headers) get Bundle-Vendor
+
+P: get the Bundle-Description header
+A: ((bundle 10) headers) get Bundle-Description
+
+# ========== Runtime Memory & System Info ==========
+
+P: show JVM memory usage summary
+A: rt = (((bundle 0) loadclass java.lang.Runtime) getRuntime)
+echo "Free:" ($rt freeMemory) "Total:" ($rt totalMemory) "Max:" ($rt maxMemory)
+
+P: calculate used memory
+A: rt = (((bundle 0) loadclass java.lang.Runtime) getRuntime)
+echo "Used:" (($rt totalMemory) - ($rt freeMemory))
+
+P: show number of available processors
+A: (((bundle 0) loadclass java.lang.Runtime) getRuntime) availableProcessors
+
+P: trigger garbage collection and show memory
+A: gc
+rt = (((bundle 0) loadclass java.lang.Runtime) getRuntime)
+echo "After GC - Free:" ($rt freeMemory) "Total:" ($rt totalMemory)
+
+P: show the JVM uptime
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getRuntimeMXBean | $it getUptime
+
+P: show the JVM input arguments
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getRuntimeMXBean | $it getInputArguments
+
+P: show the JVM spec version
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getRuntimeMXBean | $it getSpecVersion
+
+P: show the JVM name and vendor
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getRuntimeMXBean | $it getVmName
+
+P: show the number of loaded classes
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getClassLoadingMXBean | $it getLoadedClassCount
+
+P: show total number of threads
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getThreadMXBean | $it getThreadCount
+
+P: show peak thread count
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getThreadMXBean | $it getPeakThreadCount
+
+P: show daemon thread count
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getThreadMXBean | $it getDaemonThreadCount
+
+# ========== DS Component Details ==========
+
+P: show all components of a specific bundle
+A: scr:list 10
+
+P: show component configuration details
+A: scr:info com.example.MyComponent
+
+P: list components matching a pattern
+A: scr:list | grep -i mypattern
+
+P: find components that provide a specific service
+A: scr:list | grep -i myservice
+
+P: check the activation policy of a component
+A: scr:info com.example.MyComponent
+
+P: enable all disabled components of a bundle
+A: each (scr:list 10 | grep -i disabled) { scr:enable $it }
+
+P: disable all components of a specific bundle
+A: each (scr:list 10) { scr:disable $it }
+
+P: show unsatisfied references of a component
+A: scr:info com.example.MyComponent
+
+P: check if component configuration is satisfied
+A: scr:list | grep my.component | grep -c satisfied
+
+P: find all immediate components
+A: scr:list | grep -i immediate
+
+P: find all delayed components
+A: scr:list | grep -i delayed
+
+P: find all factory components
+A: scr:list | grep -i factory
+
+# ========== SCR Info & Grep Patterns ==========
+
+P: show the references of a component by ID
+A: scr:info 42 | grep -A 2 Reference
+
+P: show the references of a component by name
+A: scr:info com.example.MyComponent | grep -A 2 Reference
+
+P: show the properties of a component
+A: scr:info 15 | grep -A 3 Properties
+
+P: show the service provided by a component
+A: scr:info com.example.MyService | grep -A 1 Service
+
+P: show the implementation class of a component
+A: scr:info 20 | grep -A 1 Class
+
+P: show the activation details of a component
+A: scr:info com.example.Activator | grep -A 2 Activate
+
+P: show the deactivation details of a component
+A: scr:info 12 | grep -A 2 Deactivate
+
+P: show the modified method of a component
+A: scr:info com.example.ConfigHandler | grep -A 1 Modified
+
+P: show the state of a component
+A: scr:info 7 | grep -i state
+
+P: show the configuration policy of a component
+A: scr:info com.example.ManagedService | grep -A 1 -i policy
+
+P: show the configuration PID of a component
+A: scr:info 18 | grep -i pid
+
+P: find unsatisfied references in a component
+A: scr:info com.example.Consumer | grep -A 3 -i unsatisfied
+
+P: show the target filter of a component reference
+A: scr:info 14 | grep -A 3 -i target
+
+P: show the cardinality of a component reference
+A: scr:info com.example.EventDispatcher | grep -A 2 -i cardinality
+
+P: show the scope of a component
+A: scr:info 33 | grep -i scope
+
+P: check if a component has optional references
+A: scr:info com.example.OptionalConsumer | grep -i optional
+
+P: check if a component has mandatory references
+A: scr:info 6 | grep -i mandatory
+
+P: show all bound services of a component
+A: scr:info com.example.ServiceTracker | grep -A 5 -i "bound services"
+
+P: check whether a component is a factory component
+A: scr:info 28 | grep -A 1 -i factory
+
+# ========== SCR List & Grep Patterns ==========
+
+P: find components matching a name
+A: scr:list | grep -i my.component
+
+P: show component name with surrounding context
+A: scr:list | grep -A 3 my.component
+
+P: find all active components
+A: scr:list | grep -i active
+
+P: find all registered components
+A: scr:list | grep -i registered
+
+P: find all satisfied components
+A: scr:list | grep -i satisfied
+
+P: find components that are not active
+A: scr:list | grep -v -i active
+
+P: find factory components in the list
+A: scr:list | grep -i factory
+
+P: count all components
+A: scr:list | tac | wc -l
+
+P: count active components
+A: scr:list | grep -c -i active
+
+P: count unsatisfied components
+A: scr:list | grep -c -i unsatisfied
+
+P: list components matching http
+A: scr:list | grep -i http
+
+P: list components matching servlet
+A: scr:list | grep -i servlet
+
+P: find components in a specific bundle
+A: scr:list 57
+
+P: find components with a specific service interface
+A: scr:list | grep -i EventHandler
+
+P: show all components with their state
+A: scr:list | grep -A 1 "\["
+
+# ========== Advanced Pipeline Patterns ==========
+
+P: sort bundle list by symbolic name
+A: lb -s
+
+P: show unique bundle states
+A: lb | grep -oE '(Active|Installed|Resolved|Fragment)' | sort | uniq
+
+P: show the last modified time of bundle 10
+A: (bundle 10) getLastModified
+
+P: convert bundle last modified to date
+A: new java.util.Date ((bundle 10) getLastModified)
+
+P: show when bundle 10 was last modified
+A: echo "Last modified:" (new java.util.Date ((bundle 10) getLastModified))
+
+P: find the newest installed bundle
+A: each (lb) { echo ($it getLastModified) ($it symbolicname) }
+
+P: list all bundles with their versions
+A: each (lb) { echo ($it symbolicname) ($it version) }
+
+P: list all bundles with state and name
+A: each (lb) { echo ($it state) ($it symbolicname) }
+
+P: find bundles with a specific version
+A: each (lb) { if { ($it version) toString | grep "1.0" } { echo ($it symbolicname) ($it version) } }
+
+P: export a list of all bundle symbolic names
+A: each (lb) { echo ($it symbolicname) } | tac bundles-list.txt
+
+P: export all configurations to a file
+A: cm:listconfigurations "(service.pid=*)" | tac configs.txt
+
+# ========== Service Event Patterns ==========
+
+P: register a mock service via context
+A: d = (new java.util.Hashtable)
+$d put service.description "test service"
+context:registerservice java.lang.Runnable $myRunnable $d
+
+P: add a service listener with filter
+A: context:addservicelistener $listener "(objectClass=org.osgi.service.cm.ConfigurationAdmin)"
+
+P: add a bundle listener
+A: context:addbundlelistener $listener
+
+P: show all available service interfaces
+A: services | grep objectClass
+
+P: find singleton services
+A: services "(service.scope=singleton)"
+
+P: find prototype services
+A: services "(service.scope=prototype)"
+
+P: find bundle scoped services
+A: services "(service.scope=bundle)"
+
+# ========== Multi-Step Upgrade Workflows ==========
+
+P: perform a rolling update of bundles
+A: felix:stop 10
+felix:update 10 file:/path/to/new.jar
+felix:refresh 10
+felix:start 10
+
+P: backup config and update a bundle
+A: cm:listconfigurations "(service.pid=my.service)" | tac config-backup.txt
+felix:stop 10
+felix:update 10
+felix:start 10
+
+P: install a bundle and its dependencies
+A: felix:install file:/path/to/dep1.jar
+felix:start $result
+felix:install file:/path/to/dep2.jar
+felix:start $result
+felix:install file:/path/to/main-bundle.jar
+felix:start $result
+
+P: cleanly remove a bundle and its configs
+A: felix:stop 10
+cm:listconfigurations "(service.pid=my.bundle.pid)" | each { $it delete }
+felix:uninstall 10
+felix:refresh
+
+P: migrate a configuration to a new PID
+A: old = cm:getconfiguration "old.pid"
+new = cm:getconfiguration "new.pid"
+$new update ($old getProperties)
+$old delete
+
+# ========== Java Reflection via Gogo ==========
+
+P: list all methods of a string
+A: "hello" getClass | $it getMethods
+
+P: list all fields of a class
+A: "hello" getClass | $it getFields
+
+P: get the declared methods of a class
+A: "hello" getClass | $it getDeclaredMethods
+
+P: get the interfaces implemented by a class
+A: "hello" getClass | $it getInterfaces
+
+P: get the superclass of a class
+A: "hello" getClass | $it getSuperclass
+
+P: check if a class is an interface
+A: "hello" getClass | $it isInterface
+
+P: get the class name of a variable
+A: "hello" getClass | $it getName
+
+P: get the simple class name
+A: "hello" getClass | $it getSimpleName
+
+P: get the canonical name of a class
+A: "hello" getClass | $it getCanonicalName
+
+P: load a class and inspect its methods
+A: cls = ((bundle 0) loadclass org.osgi.framework.BundleContext)
+$cls getMethods
+
+P: check if a class is assignable from another
+A: cls1 = ((bundle 0) loadclass java.lang.Runnable)
+cls2 = ((bundle 0) loadclass java.lang.Thread)
+$cls1 isAssignableFrom $cls2
+
+# ========== UUID & Random Generation ==========
+
+P: generate a random UUID
+A: java.util.UUID randomUUID
+
+P: generate a UUID and store it
+A: id = (java.util.UUID randomUUID)
+echo $id
+
+P: generate a random number between 0 and 100
+A: r = (new java.util.Random)
+$r nextInt 100
+
+P: generate a random boolean
+A: r = (new java.util.Random)
+$r nextBoolean
+
+# ========== Encoding & Conversion ==========
+
+P: encode a string to base64
+A: java.util.Base64 getEncoder | $it encodeToString ("hello" getBytes)
+
+P: convert a string to integer
+A: java.lang.Integer parseInt "42"
+
+P: convert a string to long
+A: java.lang.Long parseLong "123456"
+
+P: convert an integer to hex string
+A: java.lang.Integer toHexString 255
+
+P: convert an integer to binary string
+A: java.lang.Integer toBinaryString 42
+
+P: convert an integer to octal string
+A: java.lang.Integer toOctalString 42
+
+P: get the max integer value
+A: java.lang.Integer MAX_VALUE
+
+P: get the max long value
+A: java.lang.Long MAX_VALUE
+
+# ========== Thread Information ==========
+
+P: show all thread IDs
+A: ((bundle 0) loadclass java.lang.management.ManagementFactory) getThreadMXBean | $it getAllThreadIds
+
+P: show current thread name
+A: java.lang.Thread currentThread | $it getName
+
+P: show current thread priority
+A: java.lang.Thread currentThread | $it getPriority
+
+P: show current thread group
+A: java.lang.Thread currentThread | $it getThreadGroup
+
+P: check if current thread is a daemon
+A: java.lang.Thread currentThread | $it isDaemon
+
+P: get the active thread count
+A: (java.lang.Thread currentThread | $it getThreadGroup) activeCount
+
+P: show the thread stack traces
+A: java.lang.Thread dumpStack

@@ -21,6 +21,7 @@
 *   **�️ Visual Dependencies:** Explore complex relationships with interactive graphs.
 *   **✨ Ease of Use:** Drag-and-drop installs, smart auto-complete, and valid configuration editing.
 *   **🤖 AI Ready:** Built-in Model Context Protocol (MCP) server for seamless AI agent integration.
+*   **🧠 AI Command Builder:** Generate Gogo shell commands from natural language — instant Smart Match or optional remote LLM integration.
 
 ------------------------------------------------------------------------------------------------------------
 
@@ -145,6 +146,7 @@ For detailed setup instructions, see the [User Guide](GUIDE.md).
 | **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components_ | 3.0.0 | ✅ | 🚀 |
 | **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks_ | 3.0.0 | ✅ | 🚀 |
 | **🌍 Remote Services Admin** <br> _Monitor OSGi Remote Services endpoints (imports and exports) with graph visualization_ | 3.1.0 | ✅ | 🚀 |
+| **🤖 AI Command Builder** <br> _AI-assisted Gogo command generation with Smart Match (BM25) and optional remote LLM (OpenAI, Gemini, Groq, Grok, Ollama)_ | 3.1.0 | ✅ | 🚀 |
 
 --------------------------------------------------------------------------------------------------------------
 
@@ -152,6 +154,7 @@ For detailed setup instructions, see the [User Guide](GUIDE.md).
 
 *   **👻 Headless Mode:** Starting from 2.4.5, need to connect without the connection wizard? Use the `-Dosgifx.config=/path/to/config.json` system property to launch OSGi.fx with a pre-defined connection. See the [Headless Launch Documentation](HEADLESS_LAUNCH.md).
 *   **🤖 AI Assistance:** OSGi.fx 2.4.5 supports the **Model Context Protocol (MCP)**, allowing AI agents to connect to and debug your OSGi runtime directly! See the [MCP Server Documentation](MCP_SERVER.md).
+*   **🧠 AI Command Builder:** Describe what you want in natural language and get the matching Gogo command instantly via Smart Match (BM25). Optionally configure a remote LLM (OpenAI, Gemini, Groq, Grok, Ollama, or any OpenAI-compatible API) for AI-powered command generation with parameter substitution.
 
 --------------------------------------------------------------------------------------------------------------
 
