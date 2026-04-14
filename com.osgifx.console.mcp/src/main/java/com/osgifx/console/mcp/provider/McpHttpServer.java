@@ -272,6 +272,11 @@ public class McpHttpServer implements FxMcpServer {
             res.setStatus(200);
             res.flush(); // Send headers
 
+            // Register connection BEFORE sending the endpoint event to avoid a race condition
+            // where the client POSTs to /messages before the connection is tracked.
+            final ConnectionContext ctx = new ConnectionContext(res);
+            activeSseConnections.put(sessionId, ctx);
+
             // Traditional SSE requires an endpoint event immediately
             if (isTraditionalMode) {
                 // Use relative URI for the endpoint to support proxied/containerized clients properly
@@ -285,9 +290,6 @@ public class McpHttpServer implements FxMcpServer {
             }
 
             // Keep connection open by blocking
-            final ConnectionContext ctx = new ConnectionContext(res);
-            activeSseConnections.put(sessionId, ctx);
-
             try {
                 ctx.lock.lock();
                 try {
