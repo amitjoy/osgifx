@@ -298,10 +298,10 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             out.writeUTF(method.getName());
             if (args != null) {
                 out.writeShort(args.length);
+                FastByteArrayOutputStream argBout = argBuffer.get();
+                DataOutputStream argOut = argBufferOut.get();
                 for (Object arg : args) {
-                    final FastByteArrayOutputStream argBout = argBuffer.get();
                     argBout.reset();
-                    final DataOutputStream argOut = argBufferOut.get();
                     try {
                         codec.encode(arg, argOut);
                     } catch (Exception e) {
@@ -312,8 +312,10 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
                     out.write(argBout.getBuffer(), 0, argLen);
 
                     if (argLen > 1024 * 1024) {
-                        argBuffer.set(new FastByteArrayOutputStream(1024));
-                        argBufferOut.set(new DataOutputStream(argBuffer.get()));
+                        argBout = new FastByteArrayOutputStream(1024);
+                        argOut = new DataOutputStream(argBout);
+                        argBuffer.set(argBout);
+                        argBufferOut.set(argOut);
                     }
                 }
             } else {
