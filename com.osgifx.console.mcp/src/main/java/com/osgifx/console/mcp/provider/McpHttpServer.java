@@ -157,8 +157,9 @@ public class McpHttpServer implements FxMcpServer {
             }
 
             // Traditional SSE Endpoint (Expected by Claude Code, Cursor, etc.)
+            // No Accept header check — /sse is a dedicated SSE endpoint by convention
             if ("/sse".equals(path) || path.startsWith("/sse?")) {
-                if (HTTPMethod.GET == req.getMethod() && acceptsEventStream(req)) {
+                if (HTTPMethod.GET == req.getMethod()) {
                     handleSseConnection(req, res, true); // true = traditional SSE mode
                     return;
                 }
