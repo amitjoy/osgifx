@@ -1,5 +1,6 @@
 -includeresource.all                  =         -src/main/resources
 -donotcopy                            =         .gitignore|.DS_Store
+-fixupmessages.sonatype.publish       =         "Sonatype Publishing"                    
 
 javac.source                          =         25
 javac.target                          =         ${javac.source}
