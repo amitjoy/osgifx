@@ -98,15 +98,19 @@ public final class XLoggerAdmin extends AbstractSnapshotAdmin<XBundleLoggerConte
         }
         final List<XBundleLoggerContextDTO> loggerContexts = new ArrayList<>();
         final LoggerContext                 rootContext    = loggerAdmin.getLoggerContext(null);
+        final LogLevel                      rootLogLevel   = rootContext.getLogLevels().get(ROOT_LOGGER_NAME);
+
+        final Map<String, Map<String, LogLevel>> contextCache = new HashMap<>();
+
         for (final Bundle bundle : context.getBundles()) {
-            final String        bsn           = bundle.getSymbolicName();
-            final LoggerContext loggerContext = loggerAdmin.getLoggerContext(bsn);
+            final String bsn = bundle.getSymbolicName();
 
             final XBundleLoggerContextDTO bundleLoggerContext = new XBundleLoggerContextDTO();
 
             bundleLoggerContext.name         = bsn;
-            bundleLoggerContext.rootLogLevel = rootContext.getLogLevels().get(ROOT_LOGGER_NAME);
-            bundleLoggerContext.logLevels    = loggerContext.getLogLevels();
+            bundleLoggerContext.rootLogLevel = rootLogLevel;
+            bundleLoggerContext.logLevels    = contextCache.computeIfAbsent(bsn,
+                    name -> loggerAdmin.getLoggerContext(name).getLogLevels());
 
             loggerContexts.add(bundleLoggerContext);
         }
