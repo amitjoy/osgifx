@@ -299,7 +299,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
             if (args != null) {
                 out.writeShort(args.length);
                 FastByteArrayOutputStream argBout = argBuffer.get();
-                DataOutputStream argOut = argBufferOut.get();
+                DataOutputStream          argOut  = argBufferOut.get();
                 for (Object arg : args) {
                     argBout.reset();
                     try {
@@ -313,7 +313,7 @@ public class MqttRPC<L, R> implements Closeable, RemoteRPC<L, R> {
 
                     if (argLen > 1024 * 1024) {
                         argBout = new FastByteArrayOutputStream(1024);
-                        argOut = new DataOutputStream(argBout);
+                        argOut  = new DataOutputStream(argBout);
                         argBuffer.set(argBout);
                         argBufferOut.set(argOut);
                     }
