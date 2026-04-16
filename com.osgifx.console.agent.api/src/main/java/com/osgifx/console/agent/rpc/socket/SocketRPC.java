@@ -404,17 +404,17 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
             if (values == null)
                 values = new String[] {};
             out.writeShort(values.length);
+            FastByteArrayOutputStream bout    = buffer.get();
+            DataOutputStream          dataOut = encodingOut.get();
             for (final Object value : values) {
                 if (value instanceof byte[]) {
                     final byte[] data = (byte[]) value;
                     out.writeInt(data.length);
                     out.write(data);
                 } else {
-                    final FastByteArrayOutputStream bout = buffer.get();
                     bout.reset();
                     // Adaptive Compression: Serialize first, then decide
                     // We use a cached DataOutputStream wrapper around the buffer
-                    final DataOutputStream dataOut = encodingOut.get();
                     codec.encode(value, dataOut);
 
                     final int    length    = bout.size();
@@ -450,8 +450,10 @@ public class SocketRPC<L, R> extends Thread implements Closeable, RemoteRPC<L, R
                     }
 
                     if (length > 1024 * 1024) {
-                        buffer.set(new FastByteArrayOutputStream(4096));
-                        encodingOut.set(new DataOutputStream(buffer.get()));
+                        bout    = new FastByteArrayOutputStream(4096);
+                        dataOut = new DataOutputStream(bout);
+                        buffer.set(bout);
+                        encodingOut.set(dataOut);
                     }
                 }
             }
