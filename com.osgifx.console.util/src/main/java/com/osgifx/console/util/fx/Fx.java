@@ -101,7 +101,7 @@ public final class Fx {
                     }
                 }
             }
-            // set the new max-widht with some extra space
+            // set the new max-width with some extra space
             column.setPrefWidth(max + 10.0d);
         });
     }
