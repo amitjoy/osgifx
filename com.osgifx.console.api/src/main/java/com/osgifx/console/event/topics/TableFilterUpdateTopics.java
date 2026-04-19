@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
+/**
+ * Event topics for updating table filters in the OSGi.fx Console UI.
+ *
+ * @since 11.0
+ */
 public final class TableFilterUpdateTopics {
 
     private TableFilterUpdateTopics() {
