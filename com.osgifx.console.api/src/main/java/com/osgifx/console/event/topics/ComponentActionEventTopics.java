@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
+/**
+ * Event topics for component actions (activation, deactivation) in the OSGi.fx Console.
+ *
+ * @since 11.0
+ */
 public final class ComponentActionEventTopics {
 
     private ComponentActionEventTopics() {
