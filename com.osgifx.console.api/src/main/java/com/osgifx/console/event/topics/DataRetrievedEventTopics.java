@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
+/**
+ * Event topics indicating data retrieval updates from the agent in the OSGi.fx Console.
+ *
+ * @since 11.0
+ */
 public final class DataRetrievedEventTopics {
 
     private DataRetrievedEventTopics() {
