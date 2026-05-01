@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
+/**
+ * Event topics for logger context actions (update, reset) in the OSGi.fx Console.
+ *
+ * @since 11.0
+ */
 public final class LoggerContextActionEventTopics {
 
     private LoggerContextActionEventTopics() {
