@@ -17,6 +17,11 @@ package com.osgifx.console.mcp.dto;
 
 import org.osgi.dto.DTO;
 
+/**
+ * Data Transfer Object representing an MCP log entry with its type, message, and timestamp.
+ *
+ * @since 11.0
+ */
 public class McpLogEntryDTO extends DTO {
 
     public long            timestamp;
