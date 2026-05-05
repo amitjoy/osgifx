@@ -19,6 +19,11 @@ import java.util.Map;
 
 import org.osgi.dto.DTO;
 
+/**
+ * Data Transfer Object for MCP tools, containing metadata and schema definition.
+ *
+ * @since 11.0
+ */
 public class McpToolDTO extends DTO {
 
     public String              name;
