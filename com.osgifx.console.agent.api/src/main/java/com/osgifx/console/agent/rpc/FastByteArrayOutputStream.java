@@ -17,6 +17,11 @@ package com.osgifx.console.agent.rpc;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * A high-performance non-synchronized byte array output stream.
+ *
+ * @since 11.0
+ */
 public class FastByteArrayOutputStream extends ByteArrayOutputStream {
 
     public FastByteArrayOutputStream(int size) {
