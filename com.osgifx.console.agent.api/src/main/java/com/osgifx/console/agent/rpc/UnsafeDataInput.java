@@ -20,6 +20,11 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * High-performance remote RPC data input deserializer using Unsafe memory access.
+ *
+ * @since 11.0
+ */
 public class UnsafeDataInput implements Closeable {
 
     private static final long    ARRAY_BASE_OFFSET = UnsafeMemory.ARRAY_BYTE_BASE_OFFSET;
