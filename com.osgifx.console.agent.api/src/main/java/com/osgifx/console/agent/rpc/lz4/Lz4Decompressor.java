@@ -21,6 +21,11 @@ import static java.util.Objects.requireNonNull;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
+/**
+ * Decompresses input data using low-level LZ4 decompression routines.
+ *
+ * @since 11.0
+ */
 public class Lz4Decompressor
 
 {
