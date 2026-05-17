@@ -22,6 +22,11 @@ import java.util.Arrays;
 
 import com.osgifx.console.agent.rpc.UnsafeMemory;
 
+/**
+ * Low-level raw LZ4 block compressor utilizing Unsafe for maximum performance.
+ *
+ * @since 11.0
+ */
 public final class Lz4RawCompressor {
     private static final int MAX_INPUT_SIZE = 0x7E000000; /* 2 113 929 216 bytes */
 
