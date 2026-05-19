@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.lz4;
 
+/**
+ * Thrown when the compressed LZ4 input stream is malformed or corrupted.
+ *
+ * @since 11.0
+ */
 public class MalformedInputException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private final long        offset;
