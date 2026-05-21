@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.ai;
 
+/**
+ * Represents the various states of the AI code generator lifecycle.
+ *
+ * @since 11.0
+ */
 public enum GeneratorState {
     NOT_CONFIGURED,
     READY,
