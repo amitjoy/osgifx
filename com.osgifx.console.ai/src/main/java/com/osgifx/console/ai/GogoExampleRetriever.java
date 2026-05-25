@@ -20,6 +20,11 @@ import java.util.List;
 import org.osgi.annotation.versioning.ProviderType;
 
 @ProviderType
+/**
+ * Service to retrieve relevant usage examples of Gogo commands to prime AI generation.
+ *
+ * @since 11.0
+ */
 public interface GogoExampleRetriever {
 
     List<GogoExample> retrieve(String prompt, int maxResults);
