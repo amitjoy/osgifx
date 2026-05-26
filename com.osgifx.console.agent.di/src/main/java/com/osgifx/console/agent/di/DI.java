@@ -33,6 +33,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
+/**
+ * Lightweight dependency injection container designed for the OSGi.fx Console agent.
+ *
+ * @since 11.0
+ */
 public final class DI {
 
     public static class DiException extends RuntimeException {
