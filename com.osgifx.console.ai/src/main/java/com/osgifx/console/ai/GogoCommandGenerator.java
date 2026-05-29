@@ -20,6 +20,11 @@ import java.util.concurrent.CompletableFuture;
 import org.osgi.annotation.versioning.ProviderType;
 
 @ProviderType
+/**
+ * Generator service to produce shell command scripts for OSGi Gogo Shell.
+ *
+ * @since 11.0
+ */
 public interface GogoCommandGenerator {
 
     CompletableFuture<String> generate(String prompt);

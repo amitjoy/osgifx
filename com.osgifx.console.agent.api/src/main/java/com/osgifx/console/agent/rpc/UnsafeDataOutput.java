@@ -20,6 +20,11 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * High-performance remote RPC data output serializer using Unsafe memory access.
+ *
+ * @since 11.0
+ */
 public class UnsafeDataOutput implements Closeable {
 
     private static final long    ARRAY_BASE_OFFSET = UnsafeMemory.ARRAY_BYTE_BASE_OFFSET;

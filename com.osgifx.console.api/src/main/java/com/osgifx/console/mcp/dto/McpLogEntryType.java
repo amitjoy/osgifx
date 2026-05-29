@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.mcp.dto;
 
+/**
+ * Specifies the type of an MCP (Model Context Protocol) log entry.
+ *
+ * @since 11.0
+ */
 public enum McpLogEntryType {
     REQUEST,
     RESPONSE

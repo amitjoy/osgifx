@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
+/**
+ * Event topics for user role actions (creation, deletion, modification) in the OSGi.fx Console.
+ *
+ * @since 11.0
+ */
 public final class RoleActionEventTopics {
 
     private RoleActionEventTopics() {

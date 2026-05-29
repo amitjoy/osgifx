@@ -21,6 +21,11 @@ import static com.osgifx.console.agent.rpc.lz4.Lz4Constants.SIZE_OF_SHORT;
 
 import com.osgifx.console.agent.rpc.UnsafeMemory;
 
+/**
+ * Low-level raw LZ4 block decompressor utilizing Unsafe for maximum performance.
+ *
+ * @since 11.0
+ */
 public final class Lz4RawDecompressor {
     private static final int[] DEC_32_TABLE = { 4, 1, 2, 1, 4, 4, 4, 4 };
     private static final int[] DEC_64_TABLE = { 0, 0, 0, -1, 0, 1, 2, 3 };

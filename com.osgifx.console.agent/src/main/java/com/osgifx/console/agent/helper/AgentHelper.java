@@ -35,6 +35,11 @@ import com.osgifx.console.agent.provider.PackageWirings;
 import aQute.lib.converter.Converter;
 import aQute.lib.converter.TypeReference;
 
+/**
+ * Helper methods and utilities for the OSGi.fx Console agent runtime.
+ *
+ * @since 11.0
+ */
 public final class AgentHelper {
 
     private AgentHelper() {
