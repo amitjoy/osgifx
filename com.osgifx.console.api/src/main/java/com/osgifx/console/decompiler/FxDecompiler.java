@@ -18,6 +18,11 @@ package com.osgifx.console.decompiler;
 import org.osgi.annotation.versioning.ProviderType;
 
 @ProviderType
+/**
+ * Service interface to decompile Java bytecode classes in the OSGi.fx Console.
+ *
+ * @since 11.0
+ */
 public interface FxDecompiler {
     /**
      * Decompiles the raw bytecode of a Java class into Java source code.

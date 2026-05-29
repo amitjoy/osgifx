@@ -22,6 +22,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 
+/**
+ * Provides low-level memory operations using Unsafe for fast RPC serialization.
+ *
+ * @since 11.0
+ */
 public final class UnsafeMemory {
 
     @FunctionalInterface

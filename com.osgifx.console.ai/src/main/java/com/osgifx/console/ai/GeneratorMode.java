@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.ai;
 
+/**
+ * Mode configurations for the AI-assisted code generator.
+ *
+ * @since 11.0
+ */
 public enum GeneratorMode {
     SMART_MATCH,
     AI_PROVIDER

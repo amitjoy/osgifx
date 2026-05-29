@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.event.topics;
 
+/**
+ * Event topics for receiving events from the OSGi event admin in the OSGi.fx Console.
+ *
+ * @since 11.0
+ */
 public final class EventReceiveEventTopics {
 
     private EventReceiveEventTopics() {

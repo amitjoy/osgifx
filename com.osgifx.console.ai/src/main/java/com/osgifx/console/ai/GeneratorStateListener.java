@@ -16,6 +16,11 @@
 package com.osgifx.console.ai;
 
 @FunctionalInterface
+/**
+ * Listener interface for receiving notifications about AI code generator state changes.
+ *
+ * @since 11.0
+ */
 public interface GeneratorStateListener {
 
     void onStateChanged(GeneratorState newState);

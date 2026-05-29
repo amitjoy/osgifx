@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc;
 
+/**
+ * A unique identifier key for remote RPC methods.
+ *
+ * @since 11.0
+ */
 public final class MethodKey {
     private String name;
     private int    count;

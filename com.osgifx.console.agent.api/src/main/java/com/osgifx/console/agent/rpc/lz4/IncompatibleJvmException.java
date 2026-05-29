@@ -15,6 +15,11 @@
  ******************************************************************************/
 package com.osgifx.console.agent.rpc.lz4;
 
+/**
+ * Thrown when the current JVM environment is incompatible with the low-level Unsafe memory needs.
+ *
+ * @since 11.0
+ */
 public class IncompatibleJvmException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
