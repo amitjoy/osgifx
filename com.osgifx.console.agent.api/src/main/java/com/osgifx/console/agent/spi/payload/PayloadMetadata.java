@@ -20,6 +20,11 @@ package com.osgifx.console.agent.spi.payload;
  *
  * @since 11.0
  */
+/**
+ * Metadata associated with a large payload transaction.
+ *
+ * @since 11.0
+ */
 public final class PayloadMetadata {
 
     /**
