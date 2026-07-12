@@ -1,2 +1,8 @@
 tasks.named('wrapper') {
 }
+
+subprojects {
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+}
