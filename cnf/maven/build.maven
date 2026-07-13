@@ -96,5 +96,6 @@ org.mockito:mockito-core:5.14.2
 org.mockito:mockito-junit-jupiter:5.14.2
 
 # Mockito transitive deps
-net.bytebuddy:byte-buddy:1.14.18
+net.bytebuddy:byte-buddy:1.15.10
+net.bytebuddy:byte-buddy-agent:1.15.10
 org.objenesis:objenesis:3.3

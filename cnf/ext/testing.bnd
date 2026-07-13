@@ -13,6 +13,7 @@
     org.mockito.mockito-core,\
     org.mockito.junit-jupiter,\
     net.bytebuddy.byte-buddy,\
+    net.bytebuddy.byte-buddy-agent,\
     org.objenesis,\
     org.opentest4j,\
     org.apiguardian.api
