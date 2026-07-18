@@ -2,7 +2,8 @@ tasks.named('wrapper') {
 }
 
 subprojects {
-    tasks.withType(Test).configureEach {
+    tasks.withType(Test) {
         useJUnitPlatform()
+        systemProperty "net.bytebuddy.experimental", "true"
     }
 }
