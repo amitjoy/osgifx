@@ -15,17 +15,17 @@
  ******************************************************************************/
 package com.osgifx.console.mcp.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -36,7 +36,7 @@ public class McpJsonRpcServerTest {
     private McpJsonRpcServer server;
     private Gson             gson;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         gson   = new Gson();
         server = new McpJsonRpcServer(gson);
@@ -78,8 +78,8 @@ public class McpJsonRpcServerTest {
         final JsonObject capabilities = result.getAsJsonObject("capabilities");
 
         assertTrue(capabilities.has("tools"));
-        assertFalse("resources should not be declared", capabilities.has("resources"));
-        assertFalse("prompts should not be declared", capabilities.has("prompts"));
+        assertFalse(capabilities.has("resources"), "resources should not be declared");
+        assertFalse(capabilities.has("prompts"), "prompts should not be declared");
     }
 
     @Test
@@ -168,7 +168,7 @@ public class McpJsonRpcServerTest {
         final JsonObject result1   = JsonParser.parseString(response1).getAsJsonObject().getAsJsonObject("result");
 
         assertEquals(50, result1.getAsJsonArray("tools").size());
-        assertTrue("Should have nextCursor", result1.has("nextCursor"));
+        assertTrue(result1.has("nextCursor"), "Should have nextCursor");
         assertEquals("50", result1.get("nextCursor").getAsString());
 
         // Second page
@@ -178,7 +178,7 @@ public class McpJsonRpcServerTest {
         final JsonObject result2   = JsonParser.parseString(response2).getAsJsonObject().getAsJsonObject("result");
 
         assertEquals(10, result2.getAsJsonArray("tools").size());
-        assertFalse("Should not have nextCursor on last page", result2.has("nextCursor"));
+        assertFalse(result2.has("nextCursor"), "Should not have nextCursor on last page");
     }
 
     @Test
@@ -189,7 +189,7 @@ public class McpJsonRpcServerTest {
 
         final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
 
-        assertNotNull("Should return error for invalid cursor", json.get("error"));
+        assertNotNull(json.get("error"), "Should return error for invalid cursor");
     }
 
     // ---- Tool Call ----
@@ -294,7 +294,7 @@ public class McpJsonRpcServerTest {
         final String response = server.handleMessage(batch);
 
         final var array = JsonParser.parseString(response).getAsJsonArray();
-        assertEquals("Only the ping should have a response", 1, array.size());
+        assertEquals(1, array.size(), "Only the ping should have a response");
     }
 
     @Test
@@ -304,7 +304,7 @@ public class McpJsonRpcServerTest {
 
         final String response = server.handleMessage(batch);
 
-        assertNull("All notifications should return null", response);
+        assertNull(response, "All notifications should return null");
     }
 
     // ---- Tool Removal ----
@@ -321,7 +321,7 @@ public class McpJsonRpcServerTest {
 
         final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
 
-        assertNotNull("Removed tool should return error", json.get("error"));
+        assertNotNull(json.get("error"), "Removed tool should return error");
     }
 
     // ---- Logging ----
@@ -335,5 +335,49 @@ public class McpJsonRpcServerTest {
         assertEquals(2, logs.size());
         assertEquals(McpLogEntry.Type.REQUEST, logs.get(0).getType());
         assertEquals(McpLogEntry.Type.RESPONSE, logs.get(1).getType());
+    }
+    @Test
+    public void logCircularBufferLimit() {
+        for (int i = 0; i < 150; i++) {
+            server.handleMessage("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/test" + i + "\"}");
+        }
+        final var logs = server.getLogs();
+        assertEquals(100, logs.size());
+    }
+
+    @Test
+    public void toolCallWithNullArguments() {
+        server.registerTool("testNullArgs", "A test tool",
+                Map.of("type", "object", "properties", Map.of(), "required", List.of()), args -> args == null ? "success" : "failed");
+        
+        final String request  = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\","
+                + "\"params\":{\"name\":\"testNullArgs\",\"arguments\":null}}";
+        final String response = server.handleMessage(request);
+
+        final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+        
+        assertNotNull(json.get("result"), "Response should be present");
+    }
+
+    @Test
+    public void registerDuplicateToolOverrides() {
+        server.registerTool("duplicateTool", "original", Map.of(), _ -> "original");
+        server.registerTool("duplicateTool", "replaced", Map.of(), _ -> "replaced");
+
+        final String request  = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\","
+                + "\"params\":{\"name\":\"duplicateTool\",\"arguments\":{}}}";
+        final String response = server.handleMessage(request);
+        
+        final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+        final JsonObject result = json.getAsJsonObject("result");
+        final String contentText = result.getAsJsonArray("content").get(0).getAsJsonObject().get("text").getAsString();
+        
+        assertEquals("replaced", contentText);
+    }
+
+    @Test
+    public void batchEmptyArrayReturnsNull() {
+        final String response = server.handleMessage("[]");
+        assertNull(response, "Empty batch should return null");
     }
 }
