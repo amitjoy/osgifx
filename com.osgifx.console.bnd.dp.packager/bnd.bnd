@@ -12,3 +12,8 @@ Import-Package      : \
                       javax.annotation;'resolution:'=optional,\
                       org.checkerframework.checker.nullness.qual;'resolution:'=optional,\
                       *
+-testpath           : \
+                      biz.aQute.bnd.util,\
+                      biz.aQute.bndlib,\
+                      slf4j.api,\
+                      slf4j.simple
