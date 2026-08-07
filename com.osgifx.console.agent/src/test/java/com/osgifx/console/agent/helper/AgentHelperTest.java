@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.osgifx.console.agent.dto.ConfigValue;
 import com.osgifx.console.agent.dto.XResultDTO;
 
 public class AgentHelperTest {
@@ -183,6 +184,48 @@ public class AgentHelperTest {
 
         Map<String, String> props = AgentHelper.createProperties(ref);
         assertEquals("null", props.get("test.null.val"));
+    }
+
+    @Test
+    public void convertStringArrayType() throws Exception {
+        ConfigValue entry = ConfigValue.create("key", new String[] { "a", "b" }, com.osgifx.console.agent.dto.XAttributeDefType.STRING_ARRAY);
+        Object result = AgentHelper.convert(entry);
+        org.junit.jupiter.api.Assertions.assertTrue(result instanceof String[]);
+        String[] arr = (String[]) result;
+        org.junit.jupiter.api.Assertions.assertEquals("a", arr[0]);
+        org.junit.jupiter.api.Assertions.assertEquals("b", arr[1]);
+    }
+
+    @Test
+    public void convertIntegerArrayType() throws Exception {
+        ConfigValue entry = ConfigValue.create("key", new int[] { 1, 2 }, com.osgifx.console.agent.dto.XAttributeDefType.INTEGER_ARRAY);
+        Object result = AgentHelper.convert(entry);
+        org.junit.jupiter.api.Assertions.assertTrue(result instanceof int[]);
+        int[] arr = (int[]) result;
+        org.junit.jupiter.api.Assertions.assertEquals(1, arr[0]);
+        org.junit.jupiter.api.Assertions.assertEquals(2, arr[1]);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void convertBooleanListType() throws Exception {
+        ConfigValue entry = ConfigValue.create("key", java.util.Arrays.asList(true, false), com.osgifx.console.agent.dto.XAttributeDefType.BOOLEAN_LIST);
+        Object result = AgentHelper.convert(entry);
+        org.junit.jupiter.api.Assertions.assertTrue(result instanceof java.util.List);
+        java.util.List<Boolean> list = (java.util.List<Boolean>) result;
+        org.junit.jupiter.api.Assertions.assertTrue(list.get(0));
+        org.junit.jupiter.api.Assertions.assertFalse(list.get(1));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void convertLongListType() throws Exception {
+        ConfigValue entry = ConfigValue.create("key", java.util.Arrays.asList(1L, 2L), com.osgifx.console.agent.dto.XAttributeDefType.LONG_LIST);
+        Object result = AgentHelper.convert(entry);
+        org.junit.jupiter.api.Assertions.assertTrue(result instanceof java.util.List);
+        java.util.List<Long> list = (java.util.List<Long>) result;
+        org.junit.jupiter.api.Assertions.assertEquals(1L, list.get(0));
+        org.junit.jupiter.api.Assertions.assertEquals(2L, list.get(1));
     }
 
 }
