@@ -100,6 +100,7 @@ public class RedirectInputTest {
     @Test
     public void getOrgReturnsOriginalStream() {
         InputStream mockStream = new ByteArrayInputStream(new byte[0]);
+        @SuppressWarnings("resource")
         RedirectInput withOrg = new RedirectInput(mockStream);
         
         assertSame(mockStream, withOrg.getOrg());

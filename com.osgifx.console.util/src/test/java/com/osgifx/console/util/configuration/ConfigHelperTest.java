@@ -71,7 +71,6 @@ public class ConfigHelperTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void readLoadsPropertiesFromConfiguration() throws Exception {
         Dictionary<String, Object> dict = new Hashtable<>();
         dict.put("port", 9090);

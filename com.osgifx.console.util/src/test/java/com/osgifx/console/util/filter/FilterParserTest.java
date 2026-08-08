@@ -176,9 +176,6 @@ public class FilterParserTest {
 
     @Test
     public void rangeExpressionRoundTrip() {
-        Expression expr = parser.parse("(&(version>=1)(version<=2))");
-        String stringified = expr.toString();
-        
         FilterParser parser2 = new FilterParser();
         // Since RangeExpression toString returns e.g. "version=[1,2]", we should test standard roundtrip via range query instead, 
         // or just construct a standard expression for roundtrip if it's not supported to parse range directly.
