@@ -1,5 +1,7 @@
-Bundle-SymbolicName : ${p}
+-include             : ${build}/ext/testing.bnd 
+Bundle-SymbolicName  : ${p}
 Export-Package       : com.osgifx.console.ai
 -buildpath           : ${bundles.required}
 -privatepackage      : com.osgifx.console.ai.provider
 -includeresource     : resources=src/main/resources
+-testpath            : ${testing.bundles}

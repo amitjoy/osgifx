@@ -1,3 +1,4 @@
+-include             : ${build}/ext/testing.bnd 
 javac.source         : 1.8
 javac.target         : ${javac.source}
 javac.compliance     : ${javac.source}
@@ -24,5 +25,4 @@ Require-Capability   : compile
 -buildpath.base.api  :
 -buildpath.agent.api :
 -testpath            : \
-                       osgi.enroute.junit.wrapper,\
-                       osgi.enroute.hamcrest.wrapper
+                       ${testing.bundles}

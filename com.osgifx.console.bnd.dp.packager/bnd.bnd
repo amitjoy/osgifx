@@ -1,3 +1,4 @@
+-include            : ${build}/ext/testing.bnd 
 -buildpath          : \
                       biz.aQute.bndlib;packages=*,\
                       com.google.guava,\
@@ -16,4 +17,5 @@ Import-Package      : \
                       biz.aQute.bnd.util,\
                       biz.aQute.bndlib,\
                       slf4j.api,\
-                      slf4j.simple
+                      slf4j.simple,\
+                      ${testing.bundles}

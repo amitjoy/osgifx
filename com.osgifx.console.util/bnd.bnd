@@ -1,3 +1,4 @@
+-include            : ${build}/ext/testing.bnd 
 -buildpath          : biz.aQute.bndlib;packages=*,\
                       biz.aQute.bnd.util;packages=*,\
                       com.osgifx.console.assets.common,\
@@ -9,3 +10,4 @@
 -includeresource    : \
 					  css/ = @${repo;com.osgifx.console.assets.common}!/default.css
 -conditionalpackage : aQute.*
+-testpath           : ${testing.bundles}

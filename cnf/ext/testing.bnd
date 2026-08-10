@@ -1,6 +1,6 @@
 ## JUnit 5 + Mockito 5 — auto-applied to all workspace projects
 -tester: biz.aQute.tester.junit-platform
--testpath.junit5 : \
+testing.bundles : \
     junit-jupiter-api,\
     junit-jupiter-engine,\
     junit-jupiter-params,\
