@@ -1,3 +1,4 @@
+-include            : ${build}/ext/testing.bnd 
 -buildpath          : \
                       ${bundles.required},\
                       com.google.gson,\
@@ -6,6 +7,4 @@
 -privatepackage     : com.osgifx.console.mcp.*
 -conditionalpackage : io.fusionauth*
 -fixupmessages      : 'split'
--testpath           : \
-                      osgi.enroute.junit.wrapper,\
-                      osgi.enroute.hamcrest.wrapper
+-testpath           : ${testing.bundles}

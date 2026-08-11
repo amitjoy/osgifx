@@ -1,0 +1,19 @@
+## JUnit 5 + Mockito 5 — auto-applied to all workspace projects
+-tester: biz.aQute.tester.junit-platform
+testing.bundles : \
+    junit-jupiter-api,\
+    junit-jupiter-engine,\
+    junit-jupiter-params,\
+    junit-platform-launcher,\
+    junit-platform-engine,\
+    junit-platform-commons,\
+    junit-vintage-engine,\
+    osgi.enroute.junit.wrapper,\
+    osgi.enroute.hamcrest.wrapper,\
+    org.mockito.mockito-core,\
+    org.mockito.junit-jupiter,\
+    net.bytebuddy.byte-buddy,\
+    net.bytebuddy.byte-buddy-agent,\
+    org.objenesis,\
+    org.opentest4j,\
+    org.apiguardian.api

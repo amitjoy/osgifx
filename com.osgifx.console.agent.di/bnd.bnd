@@ -1,4 +1,6 @@
+-include              : ${build}/ext/testing.bnd 
 javac.source          : 1.8
 javac.target          : ${javac.source}
 javac.compliance      : ${javac.source}
 -noimportjava         : true
+-testpath             : ${testing.bundles}

@@ -74,3 +74,31 @@ io.fusionauth:java-http:1.4.0
 
 # Decompiler
 org.vineflower:vineflower:1.11.2
+
+# JUnit 5
+org.junit.jupiter:junit-jupiter-api:5.9.1
+org.junit.jupiter:junit-jupiter-engine:5.9.1
+org.junit.jupiter:junit-jupiter-params:5.9.1
+org.junit.platform:junit-platform-commons:1.9.1
+org.junit.platform:junit-platform-engine:1.9.1
+org.junit.platform:junit-platform-launcher:1.9.1
+org.junit.platform:junit-platform-runner:1.9.1
+org.junit.platform:junit-platform-suite-api:1.9.1
+org.junit.platform:junit-platform-suite-commons:1.9.1
+org.junit.platform:junit-platform-suite-engine:1.9.1
+org.junit.platform:junit-platform-testkit:1.9.1
+org.junit.vintage:junit-vintage-engine:5.9.1
+org.opentest4j:opentest4j:1.2.0
+org.apiguardian:apiguardian-api:1.1.2
+
+# Mockito
+org.mockito:mockito-core:5.14.2
+org.mockito:mockito-junit-jupiter:5.14.2
+
+# Mockito transitive deps
+net.bytebuddy:byte-buddy:1.15.10
+net.bytebuddy:byte-buddy-agent:1.15.10
+org.objenesis:objenesis:3.3
+# SLF4J
+org.slf4j:slf4j-api:1.7.36
+org.slf4j:slf4j-simple:1.7.36

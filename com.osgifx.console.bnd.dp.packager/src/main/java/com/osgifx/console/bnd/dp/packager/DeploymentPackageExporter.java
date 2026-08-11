@@ -283,7 +283,9 @@ public class DeploymentPackageExporter implements Exporter {
             Files.walkFileTree(sourceFolder, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-                    final var entry = sourceFolder.relativize(file).toString();
+                    // Normalize to forward slashes so the manifest is always reachable
+                    // as META-INF/MANIFEST.MF regardless of the host OS (Windows uses '\')
+                    final var entry = sourceFolder.relativize(file).toString().replace('\\', '/');
                     jos.putNextEntry(new JarEntry(entry));
                     Files.copy(file, jos);
                     jos.closeEntry();

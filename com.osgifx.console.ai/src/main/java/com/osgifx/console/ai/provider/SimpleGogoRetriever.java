@@ -88,8 +88,14 @@ public final class SimpleGogoRetriever implements GogoExampleRetriever {
     }
 
     private void loadExamples() {
-        try (final var is = getClass().getClassLoader().getResourceAsStream("resources/gogo-examples.txt");
-                final var reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+        var is = getClass().getClassLoader().getResourceAsStream("resources/gogo-examples.txt");
+        if (is == null) {
+            is = getClass().getClassLoader().getResourceAsStream("gogo-examples.txt");
+        }
+        if (is == null) {
+            throw new RuntimeException("Could not find gogo-examples.txt in classpath");
+        }
+        try (final var reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
 
             String    line;
             String    currentPrompt = null;
