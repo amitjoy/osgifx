@@ -1,4 +1,4 @@
-## JUnit 5 + Mockito 5 — auto-applied to all workspace projects
+## JUnit 5 + Mockito 4 (Java 8 compatible) — auto-applied to all workspace projects
 -tester: biz.aQute.tester.junit-platform
 testing.bundles : \
     junit-jupiter-api,\
