@@ -55,7 +55,7 @@
 
 ### 🚀 Getting Started
 
-The latest released version is **3.0.0**.
+The latest released version is **3.1.0**.
 
 #### 📥 Download & Install
 Visit the [Project Website](http://osgifx.com) to download and install the latest version for your platform.
