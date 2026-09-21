@@ -59,8 +59,11 @@ jobs:
       -  name: 📦 Set up Node.js
          uses: actions/setup-node@v4
          with:
-            node-version: '20'
+            node-version: '22'
             registry-url: 'https://registry.npmjs.org'
+      
+      -  name: 🔄 Update npm for Trusted Publishing
+         run: npm install -g npm@latest
       
       -  name: ⚙️ Configure Git
          run: |
@@ -122,8 +125,6 @@ jobs:
       -  name: 📢 Publish to npm
          if: ${{ inputs.dry_run != true }}
          run: npx jdeploy publish
-         env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       -  name: 📝 Generate release summary
          if: success()
