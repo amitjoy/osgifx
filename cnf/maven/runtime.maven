@@ -83,5 +83,5 @@ org.apache.sling:org.apache.sling.commons.logservice:1.1.0
 org.slf4j:slf4j-api:1.7.36
 
 # OSGi Messaging Adapter
-in.bytehue:in.bytehue.messaging.mqtt5.api:1.1.0
-in.bytehue:in.bytehue.messaging.mqtt5.provider:1.1.0
+in.bytehue:in.bytehue.messaging.mqtt5.api:1.3.0
+in.bytehue:in.bytehue.messaging.mqtt5.provider:1.3.0
