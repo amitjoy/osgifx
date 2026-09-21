@@ -20,7 +20,7 @@ java -Dosgifx.config=/path/to/config.json -jar osgifx.jar
 ```
 
 <div style="text-align: left; margin: 1.5rem 0;">
-  <a href="https://central.sonatype.com/artifact/com.osgifx/osgifx/3.0.0" class="btn btn-secondary">Download Headless JAR</a>
+  <a href="https://central.sonatype.com/artifact/com.osgifx/osgifx/3.1.0" class="btn btn-secondary">Download Headless JAR</a>
 </div>
 
 ### Using Launch Script

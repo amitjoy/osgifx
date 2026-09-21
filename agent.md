@@ -133,6 +133,7 @@ To prevent the agent from thrashing the CPU during high-frequency OSGi events (e
 | **User Admin** | `UserAdminListener` | Roles, Groups, and Credential changes |
 | **Loggers** | `BundleListener` | Bundle attachment (logger context availability) |
 | **Health Checks** | `ServiceTracker` | HealthCheck service registration changes |
+| **Remote Services** | `RemoteServiceAdminListener` | RSA endpoint registration/modification/removal |
 | **Threads/Props** | **Live (On-demand)** | Real-time JVM state (Too volatile to cache) |
 
 #### 🛠️ Concrete Example: `XBundleAdmin`
@@ -191,6 +192,7 @@ All the following data points are available as binary snapshots via the `AgentSn
 | `runtime()` | `RuntimeDTO` | Framework and System information |
 | `heapUsage()` | `XHeapUsageDTO` | Real-time memory/heap statistics |
 | `runtimeCapabilities()` | `XRuntimeCapabilityDTO` | Detected framework capabilities |
+| `remoteServices()` | `XRemoteServiceDTO` | OSGi Remote Services Admin endpoints (imports and exports) |
 
 #### 🔍 Live vs. Cached Snapshots
 
@@ -208,6 +210,7 @@ The agent intelligently distinguishes between data that benefits from reactive c
 | **HTTP Components** | **Cached** | R7/R8 Whiteboard runtime tracked via `changecount`. |
 | **JAX-RS Components** | **Cached** | JAX-RS runtime tracked via `changecount`. |
 | **CDI Containers** | **Cached** | CDI runtime tracked via `changecount`. |
+| **Remote Services** | **Cached** | Tracked via `RemoteServiceAdminListener` endpoint events. |
 | **Logger Contexts** | **Cached** | Bundle-based logger contexts change with bundle lifecycle. |
 | **Classloader Leaks** | **Cached** | Phantom reference tracking updates on GC events. |
 | **Threads** | **Live** | Constantly changing. Caching would provide stale data. |
@@ -471,6 +474,7 @@ The following specifications are dynamically detected via `PackageWirings`. If i
 *   **Felix Health Checks** (`org.apache.felix.hc.api`)
 *   **Gogo Shell** (`org.apache.felix.gogo.runtime`)
 *   **DMT Admin** (`org.osgi.service.dmt`)
+*   **Remote Service Admin** (`org.osgi.service.remoteserviceadmin`)
 
 *(Note: OSGi.fx queries `Agent.getRuntimeCapabilities()` to dynamically toggle UI elements based on the exact wirings active on the remote agent).*
 

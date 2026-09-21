@@ -17,6 +17,7 @@ title: Home
 *   **🕸️ Visual Dependencies:** Explore complex relationships with interactive graphs.
 *   **✨ Ease of Use:** Drag-and-drop installs, smart auto-complete, and valid configuration editing.
 *   **🤖 AI Ready:** Built-in **Model Context Protocol (MCP)** server for seamless AI agent integration.
+*   **🧠 AI Command Builder:** Generate Gogo shell commands from natural language — instant Smart Match or optional remote LLM integration.
 
 ---
 
@@ -53,7 +54,7 @@ title: Home
 
 ### 🚀 Getting Started
 
-The latest released version is **3.0.0**.
+The latest released version is **3.1.0**.
 
 #### 📥 Download & Install
 Download and install the latest version for your platform
@@ -84,7 +85,7 @@ To secure sockets, set:
 **2. MQTT Connection**
 Install `in.bytehue.messaging.mqtt5.provider.jar`.
 <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; margin-bottom: 1.5rem; align-items: center;">
-  <a href="https://central.sonatype.com/artifact/in.bytehue/in.bytehue.messaging.mqtt5.provider/1.1.0" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">Download MQTT JAR</a>
+  <a href="https://central.sonatype.com/artifact/in.bytehue/in.bytehue.messaging.mqtt5.provider/1.3.0" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">Download MQTT JAR</a>
   <a href="https://github.com/amitjoy/osgi-messaging" class="btn btn-secondary" target="_blank" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">OSGi Messaging Project</a>
 </div>
 
@@ -150,6 +151,8 @@ You can use OAuth tokens instead of passwords. Configure the token in OSGi.fx ap
 | **🌊 Activation Cascade Analysis** <br> _Predictive analysis of service activations and hijacking when starting bundles or enabling components. [Read More](/resilience#-activation-cascade-analysis--predict-service-hijacking-before-it-happens)_ | 3.0.0 | ✅ | 🚀 |
 | **🐒 Chaos Monkey** <br> _Resilience and fault-injection testing for bundles and components. [Read More](/resilience#-chaos-monkey--fault-injection-testing)_ | 3.0.0 | ✅ | 🚀 |
 | **🕵️ Conditions Monitor** <br> _Inspect system conditions and inject/revoke mocks. [Read More](/resilience#️-conditions-monitor--inject--revoke-mocked-osgi-conditions-live)_ | 3.0.0 | ✅ | 🚀 |
+| **🌍 Remote Services Admin** <br> _Monitor OSGi Remote Services endpoints (imports and exports) with graph visualization_ | 3.1.0 | ✅ | 🚀 |
+| **🤖 AI Command Builder** <br> _AI-assisted Gogo command generation with Smart Match (BM25) and optional remote LLM (OpenAI, Gemini, Groq, Grok, Ollama)_ | 3.1.0 | ✅ | 🚀 |
 
 ---
 
@@ -167,6 +170,12 @@ OSGi.fx offers a rich set of features designed to make remote OSGi management se
 
 #### 📢 Event Administration
 *   **Sending and Receiving Events**: You can both listen to and emit OSGi events through the EventAdmin interface. Use the intuitive **Event Filter Dialog** to easily construct LDAP filters for subscribing to specific topics. The dialog features an autocomplete dropdown that displays options recognized by OSGi in event filters, drastically simplifying the manual creation of complex filtering rules.
+
+#### 🌐 Remote Services Admin (RSA)
+*   **Endpoint Monitoring & Topology**: Monitor OSGi Remote Services endpoints (both imported proxies and exported services). Inspect endpoint properties, interfaces, and discovery metadata for standard distribution providers (e.g. Apache Aries, Eclipse ECF). The interactive RSA graph view visualizes remote topologies with customizable label abbreviation rules.
+
+#### 🧠 AI Command Builder
+*   **Natural Language to Gogo**: Describe any OSGi command in natural language and receive the matching Gogo shell command instantly. Features offline **Smart Match (BM25)** for zero-latency local retrieval, with optional configuration for remote LLMs (OpenAI, Gemini, Groq, Grok, Ollama, or any OpenAI-compatible endpoint) for intelligent command synthesis with automatic parameter extraction.
 
 #### 🛡️ Resilience & Observability
 
@@ -201,6 +210,7 @@ OSGi.fx is deeply extensible. You can build your own plugins using OSGi and Java
 
 *   **👻 Headless Mode:** Starting from 2.4.5, need to connect without the connection wizard? Use the `-Dosgifx.config=/path/to/config.json` system property to launch OSGi.fx with a pre-defined connection. See the [Headless Launch Documentation](/headless-launch).
 *   **🤖 AI Assistance:** OSGi.fx 2.4.5 supports the **Model Context Protocol (MCP)**, allowing AI agents to connect to and debug your OSGi runtime directly! See the [MCP Server Documentation](/mcp-server).
+*   **🧠 AI Command Builder:** Describe what you want in natural language and get the matching Gogo command instantly via Smart Match (BM25). Optionally configure a remote LLM (OpenAI, Gemini, Groq, Grok, Ollama, or any OpenAI-compatible API) for AI-powered command generation with parameter substitution.
 
 ---
 

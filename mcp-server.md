@@ -38,9 +38,10 @@ The MCP server is built into the **OSGi.fx** application.
 
 ### 3. Client Configuration (SSE)
 
-Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Events (SSE).
+Configure your MCP client (e.g., Claude Desktop, Cursor, Windsurf) to connect to the OSGi.fx MCP server.
 
-**Example Configuration:**
+**Recommended Configuration (Streamable HTTP):**
+Streamable HTTP is the current MCP standard transport (2025-03-26+). It uses a single endpoint for both streaming and messages. Most modern clients support this.
 
 ```json
 {
@@ -54,6 +55,40 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 }
 ```
 
+**Fallback Configuration (Traditional SSE):**
+Traditional SSE uses separate endpoints for the stream (`/sse`) and messages (`/messages`). Use this if your client does not yet support Streamable HTTP.
+
+```json
+{
+  "mcpServers": {
+    "osgifx": {
+      "serverUrl": "http://localhost:8080/sse",
+      "type": "sse",
+      "disabled": false
+    }
+  }
+}
+```
+
+### 4. Protocol Compatibility
+
+The OSGi.fx MCP Server actively negotiates the Model Context Protocol version during initialization.
+
+*   **Latest Supported Version:** `2025-11-25` (Full support for the latest MCP specification).
+*   **Widely Supported Version:** `2025-03-26` (Ensures compatibility with most modern AI clients).
+*   **Backward Compatibility:** `2024-11-05` is fully supported for older clients.
+
+Clients requesting unsupported versions will be offered `2025-11-25` as the fallback negotiated version.
+
+### 5. Security
+
+The MCP server implements the following security measures per the MCP specification:
+
+*   **Origin Validation:** All incoming HTTP requests are validated against a localhost allowlist (`localhost`, `127.0.0.1`, `[::1]`) to prevent DNS rebinding attacks. Requests from untrusted origins are rejected with HTTP 403.
+*   **CORS:** Cross-Origin Resource Sharing headers are set with the validated origin (not a wildcard), and `Access-Control-Expose-Headers` is configured so clients can read `MCP-Protocol-Version` and session ID headers.
+*   **Protocol Version Enforcement:** Requests with an unsupported `MCP-Protocol-Version` header (outside of initialization) are rejected with HTTP 400.
+*   **Session Management:** Session IDs are generated as cryptographically random UUIDs and reflected in `Mcp-Session-Id` headers.
+
 ## Available Tools
 
 | Tool Name | Description |
@@ -62,6 +97,7 @@ Configure your MCP client (e.g., Claude Desktop) to connect via Server-Sent Even
 | **`list_services`** | Lists all registered services and their properties. |
 | **`list_components`** | Lists Declarative Services (DS) components and their satisfaction state. |
 | **`list_configurations`** | Lists OSGi Configuration Admin configurations (PIDs). |
+| **`list_remote_services`** | Lists OSGi Remote Services Admin endpoints (exports and imports). Filter by direction. |
 | **`list_http_components`** | Lists registered Servlets, Filters, and Resources (HttpService). |
 | **`list_threads`** | Lists JVM threads with states (use for deadlock detection). |
 | **`get_system_properties`** | Retrieves Java System Properties (e.g., `java.version`) and Framework properties. |
@@ -119,7 +155,13 @@ When configuring your LLM (e.g., Claude), use these principles to ensure safe an
 
 *   **Restricted Commands:** State-changing Gogo commands (e.g., `stop`, `uninstall`, `update`) are **blocked** in `run_gogo_command` to encourage using the dedicated tools (`stop_bundle`).
 *   **Heap Dumps:** The `capture_heap_dump` tool returns large binary blobs; ensure your client can handle them.
-*   **No Authentication:** By default, the MCP server does not require authentication as it only listens on `localhost`. Ensure your host is appropriately secured if exposing it further.
+
+## Spec Compliance Notes
+
+*   **JSON-RPC Batching:** The server supports JSON-RPC batch requests (arrays of requests/notifications) as required by the `2025-03-26` specification.
+*   **Tool Pagination:** The `tools/list` response supports cursor-based pagination (page size of 50). Clients can pass a `cursor` parameter and receive a `nextCursor` in the response.
+*   **SSE Event IDs:** All Server-Sent Events include unique `id:` fields to support client reconnection and stream resumability.
+*   **Capability Declaration:** The server only declares `tools` in its capabilities. It does not advertise `resources` or `prompts` since those are not implemented.
 
 ---
 
